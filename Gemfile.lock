@@ -132,6 +132,7 @@ GEM
       rack (>= 1.0, < 3)
     rack_csrf (2.6.0)
       rack (>= 1.1.0)
+    rake (12.0.0)
     rb-fsevent (0.10.2)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -168,7 +169,6 @@ PLATFORMS
 DEPENDENCIES
   awesome_print (~> 1.7)
   bcrypt
-  bundler
   crossbeams-dataminer!
   crossbeams-dataminer_interface!
   crossbeams-label_designer!
@@ -184,6 +184,7 @@ DEPENDENCIES
   pry-doc
   rack-console
   rack_csrf
+  rake
   rerun
   roda (~> 2.25)
   roda-data_grid!

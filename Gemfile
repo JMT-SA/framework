@@ -28,4 +28,4 @@ gem 'pry-clipboard'
 gem 'pry-byebug'
 gem 'rerun' # actually just for dev...
 gem 'rack-console'
-gem 'bundler'
+gem 'rake'

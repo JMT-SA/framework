@@ -1,5 +1,10 @@
 # TODO
 
+* New DB
+* Create all tables via migrations...
+* Setup master user & menu in seeding scripts.
+
+
 # Javascript
 
 Look at using webpack - good thoughts for Rails 4 from here: https://revs.runtime-revolution.com/want-to-use-es6-with-rails-right-now-webpack-to-the-rescue-ebefb2004e9e#.ouv5jkmo5

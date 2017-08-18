@@ -1,0 +1,9 @@
+---
+:dataminer_definition: users
+:actions:
+  - :url: /masterfiles/users/users/$:id$/edit
+    :text: edit
+  - :url: /masterfiles/users/users/$:id$
+    :text: delete
+    :is_delete: true
+

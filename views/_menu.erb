@@ -1,0 +1,52 @@
+   <% if current_user %>
+      <nav class="db dtc-ns v-mid w-100 tl tr-ns mt2 mt0-ns">
+        <a href="/logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
+        <span class="ml2 mr2"><%= current_user.user_name %> (<%#= current_user.department_name %>)</span>
+      </nav>
+    <% end %>
+
+    <nav role="navigation" id="nav">
+      <input class="trigger" type="checkbox" id="mainNavButton">
+      <label for="mainNavButton" onclick>Menu</label>
+      <ul class="pure-menu-list">
+        <li><a href="/">Home</a></li>
+        <li><a href="/test">Test VIEW</a></li>
+        <li><a href="/grid">Grid</a></li>
+        <li><a href="/list/functions_progs_progfuncs">Nest Grid</a></li>
+        <li><a href="/list/menu_definitions">Menu def</a></li>
+        <li><a href="/search/menu_definitions">Menu search</a></li>
+        <li><a href="/lay">Layout</a></li>
+        <li>
+          <a href="#" id="menuLink1">Commodities</a>
+          <ul>
+            <li><a href="/list/commodities">List</a></li>
+            <li><a href="/masterfiles/fruit_and_packing/commodities/new">New</a></li>
+            <li><a href="/search/commodities">Search</a></li>
+          </ul>
+        </li>
+        <li><a href="/search/users">Users</a></li>
+        <li><a href="/list/active_users">Active</a></li>
+        <!--
+        <li>
+          <a href="#" id="menuLink1">Payment Terms</a>
+          <ul>
+            <li><a href="/list/payment_terms">List</a></li>
+            <li><a href="/finance/payment_terms/payment_terms/new">New</a></li>
+            <li><a href="/search/payment_terms">Search</a></li>
+          </ul>
+        </li> -->
+        <li>
+          <a href="#" id="menuLink2">Label</a>
+          <ul>
+            <li><a href="/label_designer/new">New</a></li>
+            <li><a href="/label_designer/blue">Existing 1</a></li>
+            <li><a href="/label_designer/green">Existing 2</a></li>
+          </ul>
+        </li>
+        <li><a href="/dataminer/">Dataminer</a></li>
+        <% if can_do_dataminer_admin? %>
+          <li><a href="/dataminer/admin/">DM Admin</a></li>
+        <% end %>
+        <li><a href="/list/voyages">Voyages</a></li>
+      </ul>
+    </nav>

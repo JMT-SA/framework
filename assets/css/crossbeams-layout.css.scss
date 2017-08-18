@@ -1,0 +1,256 @@
+#content {
+  padding: 0 1em;
+}
+.grid-head {
+  background-color: #375c7f;
+  padding: 0.2em;
+}
+.grid-caption {
+  font-size: 1.2em;
+  font-weight: bold;
+  padding-left: 2em;
+  color: aliceblue;
+  vertical-align: sub;
+}
+.un-formed-input {
+  padding: 0.5em 0.6em;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 3px #ddd;
+  border-radius: 4px;
+  vertical-align: middle;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.content-target {
+  min-height: 150px;
+}
+.content-loading{
+  background: transparent url(/images/loading_bars.gif) 0 0 no-repeat;
+}
+section.crossbeams_layout {
+  border-bottom: gray thin solid;
+}
+.grid-number-column {
+  text-align: right;
+}
+.grid-boolean-column {
+  text-align: center;
+}
+.grid-row-red {
+  color: red;
+  background-color: yellow;
+  text-align: right;
+}
+.ac_icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  display: inline-block;
+  padding-right: 4px;
+}
+.ac_icon_uncheck {
+  @extend .ac_icon;
+  background-image: url(/images/checkbox.png);
+  background-position: -50px -4px;
+}
+.ac_icon_check {
+  @extend .ac_icon;
+  background-image: url(/images/checkbox.png);
+  background-position: -25px -4px;
+}
+/* Nested grids */
+    .full-width-panel {
+        position: relative;
+        background: beige; /* #fafafa; */
+        height: 100%;
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        border-left: 2px solid grey;
+        border-bottom: 2px solid lightgray;
+        border-right: 2px solid lightgray;
+    }
+    .call-record-cell {
+        text-align: right;
+    }
+    .full-width-detail {
+        padding-top: 4px;
+    }
+    .full-width-details {
+        float: left;
+        padding: 5px;
+        margin: 5px;
+        width: 150px;
+    }
+    .full-width-grid {
+         margin-left: 100px; 
+        padding-top: 35px;
+        box-sizing: border-box;
+        display: block;
+        height: 100%;
+    }
+    .full-width-grid-toolbar {
+        top: 8px;
+        left: 30px;
+        /* margin-left: 150px; */
+        display: block;
+        position: absolute;
+    }
+    .full-width-phone-icon {
+        padding-right: 10px;
+    }
+    .full-width-search {
+        border: 1px solid #eee;
+        margin-left: 10px;
+    }
+/* ------------ */
+
+option[value=""] {
+  color: #999;
+  font-style: italic;
+}
+
+/* Main grid layout */
+.site {
+  display: flex;
+  min-height: 98vh;
+  flex-direction: column;
+}
+.container {
+  flex: 1;
+  margin: 0 1em;
+}
+
+header,
+.footness {
+  flex: none; /* 2 */
+}
+.footness {
+  background-color: #0F9962;
+}
+.footness p {
+  padding: 0 0.5em;
+  color: white;
+}
+
+/* Main content form layout */
+
+.crossbeams-field { padding: 0.5em; }
+.crossbeams-row {
+    width: 100%;
+    max-width: 1200px; /* This is ok for forms, but grids should be able to break out to the full width.... */
+    /* margin: 0 auto;*/
+}
+.crossbeams-row {
+  display: flex;
+}
+
+.crossbeams-col {
+  flex: 1;
+}
+
+input, textarea, select {
+  font-size: 1em;
+  padding: 2px 5px 4px;
+/*  border: 0 none; */
+  border-radius: 2px;
+}
+/* flexbox styles */
+/* fieldset div { */
+.crossbeams-field {
+  display: flex;
+  /*align-items: center; */
+}
+
+.crossbeams-form label {
+  order: 1;
+  width: 10em;
+  text-align: right;
+  padding-right: 0.5em;
+/*  white-space: nowrap; */
+  user-select: none;
+  cursor: pointer;
+}
+
+.crossbeams-form input, .crossbeams-form textarea, .crossbeams-form select {
+  order: 2;
+  flex: 1 1 auto;
+}
+
+.crossbeams-form input[type="checkbox"], .crossbeams-form input[type="radio"] {
+  order: 1;
+  flex: none;
+  width: auto;
+  margin-left: 10em;
+}
+
+.crossbeams-form input[type="checkbox"] ~ label, .crossbeams-form input[type="radio"] ~ label {
+  width: auto;
+  text-align: left;
+  padding-left: 0.4em;
+}
+
+.crossbeams-form-error {
+  color: brown;
+}
+
+.crossbeams-div-error {
+  background-color: #fee;
+}
+
+/* label state styles - relies on label placed after input in form...*/
+.crossbeams-form input:focus ~ label, .crossbeams-form textarea:focus ~ label, .crossbeams-form select:focus ~ label {
+  color: darkcyan;
+}
+
+.crossbeams-form input:checked ~ label {
+  font-weight: bold;
+}
+/* DRAG-AND-DROP FOR SortableList layout object */
+.crossbeams-draggable {
+  padding: 0.2em;
+  margin: 0.2em 0;
+}
+.crossbeams-drag-handle {
+  cursor: move;
+  margin-right: 0.5em;
+  background: transparent url('/images/handle.png') repeat left top;
+}
+.crossbeams-sortable-drag {
+  background-color: #ccc;
+}
+.crossbeams-sortable-ghost {
+  background-color: #666;
+  border: thin solid purple;
+}
+/* END: DRAG-AND-DROP FOR SortableList layout object */
+
+/* RESPONSIVE */
+@media (max-width: 48em) {
+  .crossbeams-row {
+    flex-direction: column;
+  }
+}
+@media (max-width: 600px) {
+  input,
+  select{width: 100%;}
+  input[type="radio"],
+  input[type="checkbox"],
+  input[type="submit"]{
+  width: auto;
+  }
+  form .crossbeams-field{
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 6px 0;
+  }
+  form .crossbeams-field label{
+  padding: 0 0 5px 0;
+  margin: 10px 0 0 0;
+  text-align: left;
+  }
+}
+

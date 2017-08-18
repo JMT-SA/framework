@@ -1,0 +1,58 @@
+---
+:dataminer_definition: functions_progs_progfuncs
+:nesting:
+  :keys:
+    1: :functional_area_id
+    2: :program_id
+    3: :id
+  :expand_columns:
+    1: :functional_area_name
+    2: :program_name
+  :columns:
+    1:
+      - :functional_area_name
+      - :functional_area_id
+      - :f_active
+      - :f_created_at
+      - :f_updated_at
+    2:
+      - :program_name
+      - :program_id
+      - :p_active
+      - :p_created_at
+      - :p_updated_at
+    3:
+      - :id
+      - :group_name
+      - :program_function_name
+      - :url
+      - :program_function_sequence
+      - :restricted_user_access
+      - :pf_active
+      - :pf_created_at
+      - :pf_updated_at
+  :actions:
+    1:
+      - :url: /security/functional_areas/functional_areas/$:functional_area_id$/edit
+        :text: edit
+        :icon: fa-edit
+      - :url: /security/functional_areas/functional_areas/$:functional_area_id$
+        :text: delete
+        :is_delete: true
+        :icon: fa-remove
+    2:
+      - :url: /security/functional_areas/programs/$:program_id$/edit
+        :text: edit
+        :icon: fa-edit
+      - :url: /security/functional_areas/programs/$:program_id$
+        :text: delete
+        :is_delete: true
+        :icon: fa-remove
+    3:
+      - :url: /security/functional_areas/program_functions/$:id$/edit
+        :text: edit
+        :icon: fa-edit
+      - :url: /security/functional_areas/program_functions/$:id$
+        :text: delete
+        :is_delete: true
+        :icon: fa-remove

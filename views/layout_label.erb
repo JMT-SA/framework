@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Roda Frame</title>
+
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"-->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <%#= stylesheet 'pure', 'grids-responsive', 'crossbeams-layout', 'font-awesome.min' %>
+    <!--link rel="stylesheet" href="/css/pure.css"-->
+    <!--link rel="stylesheet" href="/css/grids-responsive.css"-->
+    <link rel="stylesheet" href="/css/jackbox.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/tachyons.min.css">
+    <link rel="stylesheet" href="/css/sweetalert2.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/jquery-ui.css">
+    <%= assets(:css) %>
+    <%= content_for :late_style %>
+
+  </head>
+  <body class="site">
+  <header>
+    <%= partial 'page_banner' %>
+      <!-- FOR NAVIGATION IDEA: file:///home/james/SilberbauerComputing/JMT/framework_upgrade/pure_css/Frame4-dyn-menu.html -->
+              <!--ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About Us</a>
+                    <ul>
+                      <li><a href="#">Sub Nav Item</a></li>
+                      <li><a href="#">Sub Nav Item</a>
+                        <ul>
+                          <li><a href="#">Sub Sub Nav Item</a></li>
+                          <li><a href="#">Sub Sub Nav Item</a></li>
+                          <li><a href="#">Sub Sub Nav Item</a></li>
+                          <li><a href="#">Sub Sub Nav Item</a></li>
+                        </ul>
+                      </li>
+                      <li><a href="#">Sub Nav Item</a></li>
+                      <li><a href="#">Sub Nav Item</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Products</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Specials</a></li>
+                <li><a href="#">Contact Us</a></li>
+              </ul>
+              </ul-->
+            <!--/nav-->
+
+    <!--nav class="navbar navbar-default navbar-inverse">
+      <div class="pure-menu pure-menu-horizontal"-->
+        <%= partial 'menu' %>
+    <hr>
+</header>
+    <div class="container">
+      <%= yield %>
+    </div>
+
+    <footer class="footness">
+      <p>RODA FRAME testing out new framework code.
+    </footer>
+
+    <script src="/js/ag-grid-enterprise.js" type="text/javascript"></script>
+    <script src="/js/ag-enterprise-activation.js" type="text/javascript"></script>
+    <script src="/js/jackbox.min.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-local-storage.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-utils.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-layout.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-data-miner-params.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-grid-loader.js" type="text/javascript"></script>
+    <script src="/js/choices.min.js" type="text/javascript"></script>
+    <script src="/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+    <script src="/js/jquery-ui-1.12.1.min.js" type="text/javascript"></script>
+    <script src="/js/konva.min.js" type="text/javascript"></script>
+    <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
+    <%#= javascript 'ag-grid-enterprise', 'ag-enterprise-activation', 'crossbeams-local-storage', 'crossbeams-utils', 'crossbeams-layout', 'crossbeams-data-miner-params', 'crossbeams-grid-loader' %>
+
+    <script>
+      Jackbox.init();
+      <% if flash[:notice] %>
+        Jackbox.success('<%= flash[:notice].tr("'", "`") %>');
+      <% end %>
+
+      // const choices = new Choices('.searchable-select', {removeItemButton: true, fuseOptions: {threshold: 0.0, distance: 0}});
+    </script>
+    <%= content_for :late_javascript %>
+  </body>
+</html>

@@ -1,0 +1,324 @@
+---
+:caption: Menu definitions
+:sql: "SELECT \r\nf.id AS functional_area_id, p.id AS program_id, pf.id, f.functional_area_name,
+  f.active AS f_active, f.created_at AS f_created_at, f.updated_at AS f_updated_at,\r\np.program_name,
+  p.active AS p_active, p.created_at AS p_created_at, p.updated_at AS p_updated_at,
+  -- p.functional_area_id\r\npf.group_name, pf.program_function_name, pf.url, pf.program_function_sequence,
+  \r\n       pf.restricted_user_access, pf.active AS pf_active, pf.created_at AS pf_created_at,
+  pf.updated_at AS pf_updated_at\r\n  FROM functional_areas f\r\n LEFT OUTER JOIN
+  programs p ON p.functional_area_id = f.id\r\n LEFT OUTER JOIN program_functions
+  pf ON pf.program_id = p.id\r\nORDER BY f.functional_area_name, p.program_name, pf.group_name,
+  pf.program_function_sequence, pf.program_function_name"
+:limit: 
+:offset: 
+:columns:
+  functional_area_id:
+    :name: functional_area_id
+    :sequence_no: 1
+    :caption: F. Id
+    :namespaced_name: f.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_id:
+    :name: program_id
+    :sequence_no: 2
+    :caption: P. Id
+    :namespaced_name: p.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 3
+    :caption: PF. Id
+    :namespaced_name: pf.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  functional_area_name:
+    :name: functional_area_name
+    :sequence_no: 10
+    :caption: Functional area name
+    :namespaced_name: f.functional_area_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 1
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  f_active:
+    :name: f_active
+    :sequence_no: 11
+    :caption: Active
+    :namespaced_name: f.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  f_created_at:
+    :name: f_created_at
+    :sequence_no: 12
+    :caption: Created at
+    :namespaced_name: f.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  f_updated_at:
+    :name: f_updated_at
+    :sequence_no: 13
+    :caption: Updated at
+    :namespaced_name: f.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_name:
+    :name: program_name
+    :sequence_no: 14
+    :caption: Program name
+    :namespaced_name: p.program_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 2
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  p_active:
+    :name: p_active
+    :sequence_no: 15
+    :caption: Active
+    :namespaced_name: p.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  p_created_at:
+    :name: p_created_at
+    :sequence_no: 16
+    :caption: Created at
+    :namespaced_name: p.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  p_updated_at:
+    :name: p_updated_at
+    :sequence_no: 17
+    :caption: Updated at
+    :namespaced_name: p.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  group_name:
+    :name: group_name
+    :sequence_no: 4
+    :caption: Group name
+    :namespaced_name: pf.group_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_function_name:
+    :name: program_function_name
+    :sequence_no: 5
+    :caption: Program function name
+    :namespaced_name: pf.program_function_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  url:
+    :name: url
+    :sequence_no: 6
+    :caption: Url
+    :namespaced_name: pf.url
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_function_sequence:
+    :name: program_function_sequence
+    :sequence_no: 7
+    :caption: Program function sequence
+    :namespaced_name: pf.program_function_sequence
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  restricted_user_access:
+    :name: restricted_user_access
+    :sequence_no: 8
+    :caption: Restricted user access
+    :namespaced_name: pf.restricted_user_access
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pf_active:
+    :name: pf_active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: pf.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pf_created_at:
+    :name: pf_created_at
+    :sequence_no: 18
+    :caption: Created at
+    :namespaced_name: pf.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pf_updated_at:
+    :name: pf_updated_at
+    :sequence_no: 19
+    :caption: Updated at
+    :namespaced_name: pf.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: f.functional_area_name
+  :caption: Functional Area
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT functional_area_name FROM functional_areas ORDER BY functional_area_name
+- :column: p.program_name
+  :caption: Program
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT program_name FROM programs ORDER BY program_name
+- :column: pf.id
+  :caption: Program function
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT program_function_name, id FROM program_functions ORDER BY program_function_name

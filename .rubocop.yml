@@ -1,0 +1,28 @@
+AllCops:
+  Exclude:
+    - test/**/*
+    - tmp/**/*
+
+Documentation:
+  Enabled: false
+
+LineLength:
+  Enabled: false
+
+FrozenStringLiteralComment:
+  Enabled: false
+
+MethodLength:
+  Enabled: false
+
+Style/ExtraSpacing:
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'spec/**/*.rb'
+
+Layout/SpaceAroundOperators:
+  AllowForAlignment: true

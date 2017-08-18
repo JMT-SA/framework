@@ -1,0 +1,209 @@
+---
+:caption: A List of Users
+:old_sql: "SELECT users.id, users.user_name, people.title, people.first_name, people.last_name,
+  parties.party_name, users.created_at,\r\n  users.updated_at,  users.email_address,
+  departments.department_name FROM\r\n  users JOIN people ON people.id = users.person_id
+  JOIN parties ON parties.id\r\n  = people.party_id JOIN departments ON departments.id
+  = users.department_id ORDER\r\n  BY departments.department_name, people.last_name,
+  people.first_name"
+:sql: "SELECT users.id, users.user_name, users.login_name,\r\nusers.created_at,
+  users.updated_at, \r\nusers.email\r\nFROM users"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: users.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  user_name:
+    :name: user_name
+    :sequence_no: 2
+    :caption: User name
+    :namespaced_name: users.user_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  # title:
+  #   :name: title
+  #   :sequence_no: 3
+  #   :caption: Title
+  #   :namespaced_name: people.title
+  #   :data_type: :string
+  #   :width: 
+  #   :format: 
+  #   :hide: false
+  #   :groupable: true
+  #   :group_by_seq: 
+  #   :group_sum: false
+  #   :group_avg: false
+  #   :group_min: false
+  #   :group_max: false
+  # first_name:
+  #   :name: first_name
+  #   :sequence_no: 4
+  #   :caption: First name
+  #   :namespaced_name: people.first_name
+  #   :data_type: :string
+  #   :width: 
+  #   :format: 
+  #   :hide: false
+  #   :groupable: true
+  #   :group_by_seq: 
+  #   :group_sum: false
+  #   :group_avg: false
+  #   :group_min: false
+  #   :group_max: false
+  # last_name:
+  #   :name: last_name
+  #   :sequence_no: 5
+  #   :caption: Last name
+  #   :namespaced_name: people.last_name
+  #   :data_type: :string
+  #   :width: 
+  #   :format: 
+  #   :hide: false
+  #   :groupable: true
+  #   :group_by_seq: 
+  #   :group_sum: false
+  #   :group_avg: false
+  #   :group_min: false
+  #   :group_max: false
+  # party_name:
+  #   :name: party_name
+  #   :sequence_no: 6
+  #   :caption: Party name
+  #   :namespaced_name: parties.party_name
+  #   :data_type: :string
+  #   :width: 
+  #   :format: 
+  #   :hide: false
+  #   :groupable: true
+  #   :group_by_seq: 
+  #   :group_sum: false
+  #   :group_avg: false
+  #   :group_min: false
+  #   :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: users.created_at
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: users.updated_at
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  email:
+    :name: email
+    :sequence_no: 9
+    :caption: Email address
+    :namespaced_name: users.email_address
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  # department_name:
+  #   :name: department_name
+  #   :sequence_no: 10
+  #   :caption: Department name
+  #   :namespaced_name: departments.department_name
+  #   :data_type: :string
+  #   :width: 
+  #   :format: 
+  #   :hide: false
+  #   :groupable: true
+  #   :group_by_seq: 
+  #   :group_sum: false
+  #   :group_avg: false
+  #   :group_min: false
+  #   :group_max: false
+:query_parameter_definitions:
+- :column: users.department_id
+  :caption: Department
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: 44
+  :ui_priority: 1
+  # :list_def: SELECT department_name, id FROM departments ORDER BY department_name
+  :list_def: 
+  - - IT
+    - 1
+  - - Finance
+    - 2
+- :column: users.user_name
+  :caption: Login name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 
+- :column: users.id
+  :caption: ID
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 
+- :column: users.active
+  :caption: Active
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 
+- :column: users.created_at
+  :caption: Created
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

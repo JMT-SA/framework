@@ -1,0 +1,66 @@
+---
+:dataminer_definition: menu_definitions
+:actions:
+  - :submenu:
+      :text: Functional Area
+      :items:
+      - :url: /security/functional_areas/functional_areas/$:functional_area_id$/edit
+        :text: edit functional area
+        :icon: fa-edit
+        :title: Properties
+        :popup: true
+      - :url: /security/functional_areas/functional_areas/$:functional_area_id$
+        :text: delete functional area
+        :icon: fa-remove
+        :is_delete: true
+        :hide_if_present: :program_id
+  - :separator: true
+  - :submenu:
+      :text: Program
+      :items:
+      - :url: /security/functional_areas/programs/$:functional_area_id$/new
+        :text: new program
+        :icon: fa-plus
+      - :url: /security/functional_areas/programs/$:program_id$/edit
+        :text: edit program
+        :icon: fa-edit
+        :hide_if_null: :program_id
+      - :url: /security/functional_areas/programs/$:program_id$
+        :text: delete program
+        :icon: fa-remove
+        :is_delete: true
+        :hide_if_null: :program_id
+        :hide_if_present: :id
+      - :url: /security/functional_areas/programs/$:program_id$/reorder
+        :text: re-order program functions
+        :icon: fa-sort
+        :title: Re-order
+        :hide_if_null: :id
+        :popup: true
+  - :separator: true
+  - :submenu:
+      :text: Program Function
+      :items:
+      - :url: /security/functional_areas/program_functions/$:program_id$/new
+        :text: new program function
+        :icon: fa-plus
+        :hide_if_null: :program_id
+      - :url: /security/functional_areas/program_functions/$:id$/edit
+        :text: edit program function
+        :icon: fa-edit
+        :hide_if_null: :id
+      - :url: /security/functional_areas/program_functions/$:id$
+        :text: delete program function
+        :icon: fa-remove
+        :is_delete: true
+        :hide_if_null: :id
+      - :url: /security/functional_areas/program_functions/$:id$/link_users
+        :text: restrict program function to specific users
+        :icon: fa-lock
+        :hide_if_null: :id
+:page_controls:
+  - :control_type: :link
+    :url: /security/functional_areas/functional_areas/new
+    :text: New functional area
+    :style: :button
+    :behaviour: :popup

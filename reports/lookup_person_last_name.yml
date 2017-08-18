@@ -1,0 +1,325 @@
+---
+:caption: Lookup person
+:sql: select id, first_name, last_name, party_id, title, date_of_birth, maiden_name,
+  industry_number, initials, is_deleted, is_logged_on, logged_onto_module, logged_onoff_time,
+  reader_id, created_at, updated_at, affected_by_env, affected_by_function, affected_by_program,
+  created_by, updated_by from people
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  first_name:
+    :name: first_name
+    :sequence_no: 2
+    :caption: First name
+    :namespaced_name: first_name
+    :data_type: :string
+    :width: 50
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  last_name:
+    :name: last_name
+    :sequence_no: 3
+    :caption: Last name
+    :namespaced_name: last_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_id:
+    :name: party_id
+    :sequence_no: 4
+    :caption: Party
+    :namespaced_name: party_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  title:
+    :name: title
+    :sequence_no: 5
+    :caption: Title
+    :namespaced_name: title
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  date_of_birth:
+    :name: date_of_birth
+    :sequence_no: 6
+    :caption: Date of birth
+    :namespaced_name: date_of_birth
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  maiden_name:
+    :name: maiden_name
+    :sequence_no: 7
+    :caption: Maiden name
+    :namespaced_name: maiden_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  industry_number:
+    :name: industry_number
+    :sequence_no: 8
+    :caption: Industry number
+    :namespaced_name: industry_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  initials:
+    :name: initials
+    :sequence_no: 9
+    :caption: Initials
+    :namespaced_name: initials
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_deleted:
+    :name: is_deleted
+    :sequence_no: 10
+    :caption: Is deleted
+    :namespaced_name: is_deleted
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_logged_on:
+    :name: is_logged_on
+    :sequence_no: 11
+    :caption: Is logged on
+    :namespaced_name: is_logged_on
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  logged_onto_module:
+    :name: logged_onto_module
+    :sequence_no: 12
+    :caption: Logged onto module
+    :namespaced_name: logged_onto_module
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  logged_onoff_time:
+    :name: logged_onoff_time
+    :sequence_no: 13
+    :caption: Logged onoff time
+    :namespaced_name: logged_onoff_time
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  reader_id:
+    :name: reader_id
+    :sequence_no: 14
+    :caption: Reader
+    :namespaced_name: reader_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 15
+    :caption: Created at
+    :namespaced_name: created_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 16
+    :caption: Updated at
+    :namespaced_name: updated_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  affected_by_env:
+    :name: affected_by_env
+    :sequence_no: 17
+    :caption: Affected by env
+    :namespaced_name: affected_by_env
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  affected_by_function:
+    :name: affected_by_function
+    :sequence_no: 18
+    :caption: Affected by function
+    :namespaced_name: affected_by_function
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  affected_by_program:
+    :name: affected_by_program
+    :sequence_no: 19
+    :caption: Affected by program
+    :namespaced_name: affected_by_program
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 20
+    :caption: Created by
+    :namespaced_name: created_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_by:
+    :name: updated_by
+    :sequence_no: 21
+    :caption: Updated by
+    :namespaced_name: updated_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

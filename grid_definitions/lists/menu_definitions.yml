@@ -9,6 +9,9 @@
         :icon: fa-edit
         :title: Properties
         :popup: true
+        :auth:
+          :program: menu
+          :permission: edit
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$
         :text: delete functional area
         :icon: fa-remove

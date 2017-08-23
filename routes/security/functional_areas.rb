@@ -28,11 +28,15 @@ class Framework < Roda
       end
       r.on :id do |id|
         r.on 'edit' do
-          # if authorised?('menu', 'edit')
-            show_partial { Security::FunctionalAreas::FunctionalAreas::Edit.call(id) }
-          # else
-            # handle_json_error('You do not have permission')
-          # end
+          begin
+            if authorised?('menu', 'edit')
+              show_partial { Security::FunctionalAreas::FunctionalAreas::Edit.call(id) }
+            else
+              dialog_permission_error
+            end
+          rescue => e
+            dialog_error(e)
+          end
         end
         # define a routes result object:
         # - success?

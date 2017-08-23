@@ -10,10 +10,12 @@ const crossbeamsUtils = {
   dialogLoadSuccessHandler: function dialogLoadSuccessHandler(data, textStatus, jqXHR) {
     $('#dialog-modal').html(data);
   },
-  // // On failure of AJAX call, show an alert.
-  // function errorHandler(jqXHR, textStatus, errorThrown) {
-  //   alert("Something went wrong: " + textStatus + ": " + errorThrown);
-  // }
+  // On failure of AJAX call, display a message in the dialog.
+  dialogLoadErrorHandler: function dialogLoadSuccessHandler(data, textStatus, jqXHR) {
+    Jackbox.error('The action was unsuccessful...');
+    const htmlText = data.responseText ? data.responseText : '';
+    $('#dialog-modal').html(htmlText);
+  },
 
   // Popup a JQ UI dialog.
   jmtPopupDialog: function jmtPopupDialog(new_width, new_height, title, text, href) {
@@ -37,8 +39,8 @@ const crossbeamsUtils = {
       type: 'get',
       url: href,
       //          dataType: "script",
-      success: crossbeamsUtils.dialogLoadSuccessHandler//,
-      //error: errorHandler
+      success: crossbeamsUtils.dialogLoadSuccessHandler,
+      error: crossbeamsUtils.dialogLoadErrorHandler
     });
   },
 

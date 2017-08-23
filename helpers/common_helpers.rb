@@ -38,6 +38,10 @@ module CommonHelpers
     prog_repo.authorise?(current_user, Array(programs), sought_permission)
   end
 
+  def auth_blocked?(programs, sought_permission)
+    !authorised?(programs, sought_permission)
+  end
+
   def can_do_dataminer_admin?
     # TODO: what decides that user can do admin? security role on dm program?
     # program + user -> program_users -> security_group -> security_permissions
@@ -73,6 +77,16 @@ module CommonHelpers
   def handle_json_error(err)
     response.status = 500
     { exception: err.class.name, flash: { error: "An error occurred: #{err.message}" } }.to_json
+  end
+
+  def dialog_permission_error
+    response.status = 404
+    "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>"
+  end
+
+  def dialog_error(e, state = nil)
+    response.status = 500
+    "<div class='crossbeams-error-note'><strong>#{state || 'ERROR'}</strong><br>#{e}</div>"
   end
 
   def menu_items

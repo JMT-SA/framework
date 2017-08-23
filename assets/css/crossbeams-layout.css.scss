@@ -202,6 +202,20 @@ input, textarea, select {
   background-color: #fee;
 }
 
+.crossbeams-warning-note {
+  padding: 0.2em;
+  border: thin solid brown;
+  color: brown;
+  background-color: #FFC107;
+}
+
+.crossbeams-error-note {
+  padding: 0.2em;
+  border: thin solid brown;
+  color: brown;
+  background-color: #fee;
+}
+
 /* label state styles - relies on label placed after input in form...*/
 .crossbeams-form input:focus ~ label, .crossbeams-form textarea:focus ~ label, .crossbeams-form select:focus ~ label {
   color: darkcyan;

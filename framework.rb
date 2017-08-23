@@ -15,7 +15,7 @@ require 'yaml'
 require 'base64'
 require 'dry-struct'
 require 'dry-validation'
-#require 'pry' # TODO: Put this in based on dev env.
+# require 'pry' # TODO: Put this in based on dev env.
 
 module Types
   include Dry::Types.module
@@ -134,7 +134,7 @@ class Framework < Roda
 
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
-          render_data_grid_rows(id)
+          render_data_grid_rows(id, lambda { |program, permission| auth_blocked?(program, permission) })
         end
 
         r.on 'nested_grid' do
@@ -158,7 +158,7 @@ class Framework < Roda
 
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
-          render_search_grid_rows(id, params)
+          render_search_grid_rows(id, params, lambda { |program, permission| auth_blocked?(program, permission) })
         end
 
         r.on 'xls' do

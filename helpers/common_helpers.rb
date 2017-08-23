@@ -25,11 +25,14 @@ module CommonHelpers
 
   def current_user
     return nil unless session[:user_id]
-    @current_user ||= UserRepo.new.find(session[:user_id]) # (DB.db).users.by_pk(session[:user_id]).one
+    @current_user ||= begin
+                        user_hash = UserRepo.new.find_hash(session[:user_id]) # Should be find_or_nil...
+                        user_hash.nil? ? nil : User.new(user_hash)
+                      end
   end
 
   def authorised?(programs, sought_permission)
-    return true # JUST FOR TESTING....
+    # return true # JUST FOR TESTING....
     return false unless current_user
     prog_repo = ProgramRepo.new #(DB.db)
     prog_repo.authorise?(current_user, Array(programs), sought_permission)
@@ -70,5 +73,28 @@ module CommonHelpers
   def handle_json_error(err)
     response.status = 500
     { exception: err.class.name, flash: { error: "An error occurred: #{err.message}" } }.to_json
+  end
+
+  def menu_items
+    return nil if current_user.nil?
+    repo = ProgramFunctionRepo.new
+    rows = repo.menu_for_user(current_user)
+    # will need to keep track of which func/prog is active...
+    res = { }
+    funcs = Set.new
+    progs = {}
+    progfuncs = {}
+    rows.each do |row|
+      funcs << { name: row[:functional_area_name], id: row[:functional_area_id] }
+      progs[row[:functional_area_id]] ||= Set.new
+      progs[row[:functional_area_id]] << { name: row[:program_name], id: row[:program_id] }
+      progfuncs[row[:program_id]] ||= []
+      progfuncs[row[:program_id]] << { name: row[:program_function_name], group_name: row[:group_name], url: row[:url], id: row[:id] }
+    end
+    res[:functional_areas] = funcs.to_a
+    res[:programs] = {}
+    progs.map { |k,v| res[:programs][k] = v.to_a }
+    res[:program_functions] = progfuncs
+    res.to_json
   end
 end

@@ -24,6 +24,7 @@ h1, p {
     color:white;
 }
 */
+/*
 #nav {
   position:relative;
   
@@ -79,7 +80,7 @@ h1, p {
       display:block !important;
       @media (min-width:$flex_nav_breakpoint){
         /* older flexbox */
-        display: -webkit-box;
+/*        display: -webkit-box;
         display: -moz-box;
         display: box;
         -webkit-box-orient: horizontal;
@@ -87,7 +88,7 @@ h1, p {
         box-orient: horizontal;
       
         /* newer flexbox */
-        display: flex;
+/*        display: flex;
         flex-direction: row;
       }
     }
@@ -118,7 +119,7 @@ h1, p {
     ul {
       /* older flexbox */
       //display:block;
-      display: -ms-flexbox;
+/*      display: -ms-flexbox;
       flex-direction: -ms-row;
       display: -webkit-box;
       display: -moz-box;
@@ -129,7 +130,7 @@ h1, p {
       box-orient: horizontal;
       
       /* newer flexbox */
-      display: flex;
+/*      display: flex;
       flex-direction: row;
       
       li {
@@ -137,13 +138,13 @@ h1, p {
         text-align: center;
         
         /* older flexbox */
-        -ms-flex: 1;
+/*        -ms-flex: 1;
         -webkit-box-flex: 1;
         -moz-box-flex: 1;
         box-flex: 1;
         
         /* newer flexbox */
-        flex: 1;
+/*        flex: 1;
 
         // 2nd level
         ul {
@@ -181,3 +182,4 @@ h1, p {
   } // breakpoint
 
 } // nav
+*/

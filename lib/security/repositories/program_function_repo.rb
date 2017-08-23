@@ -7,20 +7,20 @@ class ProgramFunctionRepo < RepoBase
   def menu_for_user(user)
     query = <<-EOQ
     SELECT f.id AS functional_area_id, p.id AS program_id, pf.id,
-    f.functional_area_name, p.program_name, pf.group_name, pf.program_function_name,
-    pf.url, pf.program_function_sequence
+    f.functional_area_name, p.program_sequence, p.program_name, pf.group_name,
+    pf.program_function_name, pf.url, pf.program_function_sequence
     FROM program_functions pf
     JOIN programs p ON p.id = pf.program_id
-    JOIN program_users pu ON pu.program_id = pf.program_id
+    JOIN programs_users pu ON pu.program_id = pf.program_id
     JOIN functional_areas f ON f.id = p.functional_area_id
     WHERE pu.user_id = #{user.id}
-      AND (NOT pf.restricted_user_access OR EXISTS(SELECT id FROM program_function_users
+      AND (NOT pf.restricted_user_access OR EXISTS(SELECT user_id FROM program_functions_users
       WHERE program_function_id = pf.id
         AND user_id = #{user.id}))
         AND f.active
         AND p.active
         AND pf.active
-    ORDER BY f.functional_area_name, p.program_name, pf.group_name, pf.program_function_sequence
+    ORDER BY f.functional_area_name, p.program_sequence, p.program_name, pf.group_name, pf.program_function_sequence
     EOQ
     DB[query].all
   end

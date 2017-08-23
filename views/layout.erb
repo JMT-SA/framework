@@ -25,42 +25,33 @@
     <link rel="stylesheet" href="/css/sweetalert2.min.css">
     <link rel="stylesheet" href="/css/jquery.contextMenu.css">
     <link rel="stylesheet" href="/css/popupwindow.css">
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="/css/skin.css">
     <%= assets(:css) %>
 
   </head>
   <body class="site">
   <header>
-    <%= partial 'page_banner' %>
-      <!-- FOR NAVIGATION IDEA: file:///home/james/SilberbauerComputing/JMT/framework_upgrade/pure_css/Frame4-dyn-menu.html -->
-              <!--ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About Us</a>
-                    <ul>
-                      <li><a href="#">Sub Nav Item</a></li>
-                      <li><a href="#">Sub Nav Item</a>
-                        <ul>
-                          <li><a href="#">Sub Sub Nav Item</a></li>
-                          <li><a href="#">Sub Sub Nav Item</a></li>
-                          <li><a href="#">Sub Sub Nav Item</a></li>
-                          <li><a href="#">Sub Sub Nav Item</a></li>
-                        </ul>
-                      </li>
-                      <li><a href="#">Sub Nav Item</a></li>
-                      <li><a href="#">Sub Nav Item</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Products</a></li>
-                <li><a href="#">Blog</a></li>
-                <li><a href="#">Specials</a></li>
-                <li><a href="#">Contact Us</a></li>
-              </ul>
-              </ul-->
-            <!--/nav-->
-
-    <!--nav class="navbar navbar-default navbar-inverse">
-      <div class="pure-menu pure-menu-horizontal"-->
-        <%= partial 'menu' %>
-    <hr>
+    <div class="system-name">
+      <a href="/" class="dib f5 f4-ns fw6 mt0 mb2 link dark-green" title="Home">
+        KR new Framework
+        <div class="dib">
+          <small class="nowrap f6 mt2 mt3-ns pr2 black-70 fw2">v0.1.0</small>
+        </div>
+      </a>
+</div>
+      <div id="notification-area">
+        <input type="search" placeholder="Search menu" />
+        [current resource]
+        <% if current_user %>
+          <!--nav class="db dtc-ns v-mid w-100 tl tr-ns mt2 mt0-ns"-->
+            <span class="ml2 mr2"><%= current_user.user_name %> (<%#= current_user.department_name %>)</span>
+            <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
+          <!--/nav-->
+        <% end %>
+      </div>
+    <%#= partial 'page_banner' %>
+    <%= partial 'menu' %>
 </header>
     <div class="container">
       <%= yield %>
@@ -85,7 +76,7 @@
     <script src="/js/crossbeams-layout.js" type="text/javascript"></script>
     <script src="/js/crossbeams-grid-loader.js" type="text/javascript"></script>
     <script src="/js/crossbeams-data-miner-params.js" type="text/javascript"></script>
-    <script src="/js/choices.min.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-menu-builder.js" type="text/javascript"></script>
     <%#= javascript 'ag-grid-enterprise', 'ag-enterprise-activation', 'crossbeams-local-storage', 'crossbeams-utils', 'crossbeams-layout', 'crossbeams-data-miner-params', 'crossbeams-grid-loader' %>
     <script src="/js/popupwindow.js" type="text/javascript"></script>
     <script>
@@ -102,6 +93,9 @@
         }
       });
 
+      // Build the menu.
+      crossbeamsMenuBuilder.buildMenu(<%= menu_items %>);
+
       Jackbox.init();
       <% if flash[:notice] %>
         Jackbox.success('<%= flash[:notice].tr("'", "`") %>');
@@ -110,8 +104,8 @@
         Jackbox.error('<%= flash[:error].tr("'", "`") %>', { time: 20 });
       <% end %>
 
-      // const choices = new Choices('.searchable-select', {removeItemButton: true, fuseOptions: {threshold: 0.0, distance: 0}});
     </script>
+    <script src="/js/menu.js" type="text/javascript"></script>
     <%= content_for :late_javascript %>
   </body>
 </html>

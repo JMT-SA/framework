@@ -433,5 +433,22 @@ th {
 /* END OF normalize */
 
 .page-header { color: green }
-@import "crossbeams-layout.css.scss", "crossbeams-menu.css.scss"
+
+header {
+  padding: 0.1em;
+}
+.Content {
+  margin-top: 140px;
+}
+.system-name {
+  display: inline-block;
+}
+#notification-area {
+  display: inline-block;
+  position: absolute;
+  right: 0px;
+  padding: 0 1em;
+}
+/* #import "crossbeams-layout.css.scss", "crossbeams-menu.css.scss" */
+@import "crossbeams-layout.css.scss"
 

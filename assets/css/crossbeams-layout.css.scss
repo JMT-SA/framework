@@ -243,6 +243,49 @@ input, textarea, select {
 }
 /* END: DRAG-AND-DROP FOR SortableList layout object */
 
+/* START: SEARCH MENU RESULTS */
+#menuSearchResults {
+  background-color: white;
+  display: none;
+  list-style-type: none;
+  margin: 0 0 0 10px;
+  padding: 0;
+  position: absolute;
+  /* width: 150px; */
+  z-index: 999;
+  font-family: Arial, Helvetica, Sans;
+  font-size: 16px;
+  line-height: 40px;
+}
+
+#menuSearchResults > li {
+  border-color: gray;
+  border-image: none;
+  border-style: solid solid none;
+  border-width: 1px 1px 0;
+  padding: 1px 5px;
+  height: 40px;
+  font-size: 18px;
+}
+
+#menuSearchResults > li:last-child {
+  border-bottom: 1px solid gray;
+}
+
+#menuSearchResults > li > a {
+  text-decoration: none;
+  color: inherit;
+}
+/* #menuSearchResults > li:hover > a:first-child { */
+#menuSearchResults > li:hover {
+  background-color: rgba(0,0,0,0.1);
+}
+
+// #menuSearch:focus + #menuSearchResults {
+//   display: block;
+// }
+/* END: SEARCH MENU RESULTS */
+
 /* RESPONSIVE */
 @media (max-width: 48em) {
   .crossbeams-row {

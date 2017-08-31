@@ -327,10 +327,12 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
           repo = SecurityPermissionRepo.new
           repo.delete(id)
-          flash[:notice] = 'Deleted'
-          redirect_to_last_grid(r)
+          # flash[:notice] = 'Deleted'
+          # redirect_to_last_grid(r)
+          delete_grid_row(id, notice: 'Deleted')
         end
       end
     end
@@ -339,29 +341,26 @@ class Framework < Roda
         begin
           if authorised?('menu', 'new')
             # show_partial { Security::FunctionalAreas::SecurityPermissions::New.call }
-            show_page { Security::FunctionalAreas::SecurityPermissions::New.call }
+            show_partial { Security::FunctionalAreas::SecurityPermissions::New.call }
           else
-            # dialog_permission_error
-            show_unauthorised
+            dialog_permission_error
+            # show_unauthorised
           end
         rescue => e
-          # dialog_error(e)
-          handle_error(e)
+          dialog_error(e)
         end
-        # 'PERM: new'
       end
       r.post do        # CREATE
-        # 'PERM: create new'
         res = SecurityPermissionSchema.call(params[:security_permission])
         errors = res.messages
         if errors.empty?
           repo = SecurityPermissionRepo.new
           repo.create(res)
           flash[:notice] = 'Created'
-          redirect_to_last_grid(r)
+          redirect_via_json_to_last_grid
         else
-          flash.now[:error] = 'Unable to create functional area'
-          show_page { Security::FunctionalAreas::SecurityPermissions::New.call(params[:security_permission], errors) }
+          content = show_partial { Security::FunctionalAreas::SecurityPermissions::New.call(params[:security_permission], errors) }
+          update_dialog_content(content: content, error: 'Validation error')
         end
       end
     end

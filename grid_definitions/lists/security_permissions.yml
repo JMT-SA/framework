@@ -9,6 +9,7 @@
   - :url: /security/functional_areas/security_permissions/$:id$
     :text: delete
     :is_delete: true
+    :popup: true
     :icon: fa-remove
     :hide_if_true: in_use
 :page_controls:

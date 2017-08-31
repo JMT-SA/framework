@@ -23,7 +23,7 @@
       :items:
       - :url: /security/functional_areas/programs/$:functional_area_id$/new
         :text: new program
-        :icon: fa-plus
+        :icon: fa-plus-circle
       - :url: /security/functional_areas/programs/$:program_id$/edit
         :text: edit program
         :icon: fa-edit
@@ -46,7 +46,7 @@
       :items:
       - :url: /security/functional_areas/program_functions/$:program_id$/new
         :text: new program function
-        :icon: fa-plus
+        :icon: fa-plus-circle
         :hide_if_null: :program_id
       - :url: /security/functional_areas/program_functions/$:id$/edit
         :text: edit program function

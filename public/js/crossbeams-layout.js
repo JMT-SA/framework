@@ -100,11 +100,16 @@
     }
 
     document.body.addEventListener('click', (event) => {
-      if (event.target.dataset.disableWith) {
+      if (event.target.dataset && event.target.dataset.disableWith) {
         preventMultipleSubmits(event.target);
       }
-      if (event.target.dataset.brieflyDisableWith) {
+      if (event.target.dataset && event.target.dataset.brieflyDisableWith) {
         preventMultipleSubmitsBriefly(event.target);
+      }
+      if (event.target.dataset && event.target.dataset.popupDialog) {
+        crossbeamsUtils.jmtPopupDialog(100, 100, event.target.text, '', event.target.href);
+        event.stopPropagation();
+        event.preventDefault();
       }
       if (event.target.classList.contains('close-dialog')) {
          crossbeamsUtils.closeJmtDialog();
@@ -115,7 +120,7 @@
      * Turn a form into a remote (AJAX) form on submit.
      */
     document.body.addEventListener('submit', function(event) {
-      if (event.target.dataset.remote === 'true') {
+      if (event.target.dataset && event.target.dataset.remote === 'true') {
         fetch(event.target.action, {
           method: 'POST', // GET?
           credentials: 'same-origin',

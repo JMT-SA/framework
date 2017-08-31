@@ -3,7 +3,7 @@
 :actions:
   - :url: /security/functional_areas/security_groups/$:id$
     :text: view
-    :icon: fa-view
+    :icon: fa-eye
     :title: View
     :popup: true
   - :url: /security/functional_areas/security_groups/$:id$/edit
@@ -15,9 +15,16 @@
     :text: delete
     :is_delete: true
     :icon: fa-remove
+    :hide_if_true: in_use
   - :url: /security/functional_areas/security_groups/new
     :text: new
-    :icon: fa-new
+    :icon: fa-plus-circle
   - :url: /security/functional_areas/security_groups/$:id$/permissions
     :text: permissions
-    :icon: fa-perm
+    :icon: fa-list
+:page_controls:
+  - :control_type: :link
+    :url: /security/functional_areas/security_groups/new
+    :text: New security group
+    :style: :button
+    :behaviour: :popup

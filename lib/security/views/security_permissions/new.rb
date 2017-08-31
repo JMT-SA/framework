@@ -16,6 +16,7 @@ module Security
             page.form_errors form_errors
             page.form do |form|
               form.action '/security/functional_areas/security_permissions'
+              form.remote!
               form.add_field :security_permission
             end
           end

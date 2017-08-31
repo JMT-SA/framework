@@ -1,10 +1,11 @@
 ---
 :caption: Security Groups
-:sql: "SELECT id, security_group_name,\r\n(SELECT string_agg(security_permission,
+:sql: "  SELECT id, security_group_name,\r\n(SELECT string_agg(security_permission,
   '; ') \r\nFROM (SELECT sp.security_permission\r\n      FROM security_groups_security_permissions
   sgsp\r\n      JOIN security_permissions sp ON sp.id = sgsp.security_permission_id\r\n
   \     WHERE sgsp.security_group_id = security_groups.id) sub) AS permissions,\r\ncreated_at,
-  updated_at\r\n  FROM security_groups"
+  updated_at, EXISTS(SELECT \"id\"\r\nFROM programs_users\r\nWHERE \"security_group_id\"
+  = \"security_groups\".\"id\") AS in_use\r\n  FROM security_groups\r\n  "
 :limit: 
 :offset: 
 :columns:
@@ -74,6 +75,21 @@
     :caption: Updated at
     :namespaced_name: updated_at
     :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  in_use:
+    :name: in_use
+    :sequence_no: 6
+    :caption: In use
+    :namespaced_name: 
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false

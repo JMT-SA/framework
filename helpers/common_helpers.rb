@@ -67,6 +67,12 @@ module CommonHelpers
     res.to_json
   end
 
+  def delete_grid_row(id, notice: nil)
+    res = { removeGridRowInPlace: { id: id.to_i } }
+    res[:flash] = { notice: notice } if notice
+    res.to_json
+  end
+
   def update_dialog_content(content:, notice: nil, error: nil)
     res = { replaceDialog: { content: content } }
     res[:flash] = { notice: notice } if notice

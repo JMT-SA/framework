@@ -7,6 +7,9 @@
         color: black;
         border-color: black; /* chevron colour */
     }
+    .Menu li.-hasSubmenu > ul {
+      z-index: 1;
+    }
 
     /* Background */
     .Menu,
@@ -48,17 +51,21 @@
     ;
 }
 .functional-area-menu {
-    position: fixed;
+    position: absolute; /* fixed; */
     display: block;
+    /*
     z-index: 90;
+    */
     top: 40px;
     left: 0px;
     right: 0px;
 }
 .Header {
-    position: fixed;
+    position: absolute; /* fixed; */
     display: block;
+    /*
     z-index: 100;
+    */
     top: 80px;
     left: 0px;
     right: 0px;

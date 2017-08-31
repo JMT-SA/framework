@@ -3,17 +3,18 @@ module Security
     module ProgramFunctions
       class New
         def self.call(id, form_values = nil, form_errors = nil)
-
           this_repo = ProgramFunctionRepo.new
-          rules = { fields: {
-            program_id: { renderer: :hidden },
-            program_function_name: { },
-            group_name: { datalist: this_repo.groups_for(id) },
-            url: { },
-            program_function_sequence: { renderer: :number },
-            restricted_user_access: { renderer: :checkbox },
-            active: { renderer: :checkbox },
-          }, name: 'program_function'.freeze }
+          rules     = {
+            fields: {
+              program_id: { renderer: :hidden },
+              program_function_name: {},
+              group_name: { datalist: this_repo.groups_for(id) },
+              url: {},
+              program_function_sequence: { renderer: :number },
+              restricted_user_access: { renderer: :checkbox },
+              active: { renderer: :checkbox }
+            }, name: 'program_function'.freeze
+          }
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object(OpenStruct.new(program_id: id,

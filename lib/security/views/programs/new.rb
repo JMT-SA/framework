@@ -3,12 +3,14 @@ module Security
     module Programs
       class New
         def self.call(id, form_values = nil, form_errors = nil)
-
-          rules = { fields: {
-            functional_area_id: { renderer: :hidden },
-            program_name: { },
-            active: { renderer: :checkbox },
-          }, name: 'program'.freeze }
+          rules = {
+            fields: {
+              functional_area_id: { renderer: :hidden },
+              program_name: {},
+              active: { renderer: :checkbox }
+            },
+            name: 'program'.freeze
+          }
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object(OpenStruct.new(functional_area_id: id,

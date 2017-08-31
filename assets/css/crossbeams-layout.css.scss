@@ -12,6 +12,11 @@
   color: aliceblue;
   vertical-align: sub;
 }
+.crossbeams-rowcount {
+  color: white;
+  margin-left: 3em;
+  vertical-align: sub;
+}
 .un-formed-input {
   padding: 0.5em 0.6em;
   display: inline-block;
@@ -311,4 +316,8 @@ input, textarea, select {
   text-align: left;
   }
 }
-
+@media (max-width: 800px) {
+  .crossbeams-to-fullscreen {
+    display:none;
+  }
+}

@@ -1,7 +1,7 @@
 class ProgramFunctionRepo < RepoBase
   def initialize
-    set_main_table :program_functions
-    set_wrapper ProgramFunction
+    main_table :program_functions
+    table_wrapper ProgramFunction
   end
 
   def menu_for_user(user)

@@ -3,13 +3,14 @@ module Security
     module Programs
       class Edit
         def self.call(id, form_values = nil, form_errors = nil)
-
           this_repo = ProgramRepo.new
-          obj     = this_repo.find(id)
-          rules = { fields: {
-            program_name: { },
-            active: { renderer: :checkbox },
-          } }
+          obj       = this_repo.find(id)
+          rules     = {
+            fields: {
+              program_name: {},
+              active: { renderer: :checkbox }
+            }
+          }
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object obj

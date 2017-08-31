@@ -80,7 +80,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.body.addEventListener("click", hideAllInactiveMenus);
       document.body.addEventListener('click', (event) => {
-        if (event.target.parentNode.classList.contains('-hasSubmenu')) {
+        if (event.target.parentNode && event.target.parentNode.classList.contains('-hasSubmenu')) {
           showMenu(event.target.parentNode);
           event.stopPropagation();
           event.preventDefault();

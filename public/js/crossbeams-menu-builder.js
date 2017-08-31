@@ -83,10 +83,16 @@ const crossbeamsMenuBuilder = (function() {
     const searchBox = document.querySelector("#menuSearch");
     const resultsList = document.querySelector("#menuSearchResults");
 
+    searchBox.addEventListener('keyup', () => {
+      if (event.keyCode === 27) { // ESC
+        resultsList.innerHTML = '';
+        resultsList.style.display = "none";
+      }
+    });
+
     searchBox.addEventListener('change', () => {
       const results = crossbeamsMenuBuilder.searchMenu(searchBox.value);
       let listItems = '';
-      resultsList.innerHTML = '';
       results.forEach((menu) => {
         listItems += `<li><a href="${menu.url}">${menu.name}</a></li>`
       });

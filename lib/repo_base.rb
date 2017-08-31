@@ -6,11 +6,11 @@ class RepoBase
     @wrapper = nil
   end
 
-  def set_main_table(value)
+  def main_table(value)
     @main_table_name = value
   end
 
-  def set_wrapper(value)
+  def table_wrapper(value)
     @wrapper = value
   end
 
@@ -23,9 +23,19 @@ class RepoBase
     DB[main_table_name].all
   end
 
+  def find!(id)
+    raise Crossbeams::FrameworkError, "#{self.class.name}: Cannot call 'find!' on a repo that was not initialized with a wrapper. Use a wrapper or 'find_hash'." if wrapper.nil?
+    hash = find_hash(id)
+    raise Crossbeams::FrameworkError, "#{self.class.name}: id #{id} not found." if hash.nil?
+    wrapper.new(hash)
+  end
+
   def find(id)
     raise Crossbeams::FrameworkError, "#{self.class.name}: Cannot call 'find' on a repo that was not initialized with a wrapper. Use a wrapper or 'find_hash'." if wrapper.nil?
-    wrapper.new(DB[main_table_name].where(id: id).first)
+    hash = find_hash(id)
+    return nil if hash.nil?
+    # wrapper.new(DB[main_table_name].where(id: id).first)
+    wrapper.new(hash)
   end
 
   def find_hash(id)

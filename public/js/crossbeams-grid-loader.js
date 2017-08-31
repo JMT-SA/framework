@@ -58,6 +58,32 @@ const crossbeamsGridStore = {
  */
 const crossbeamsGridEvents = {
   /**
+   * Expand a grid to full screen.
+   * @param {string} gridId - the DOM id of the grid.
+   * @returns {void}
+   */
+  toFullScreen: function toFullScreen(gridId) {
+    const grid = document.getElementById(gridId);
+    (grid.requestFullscreen || grid.webkitRequestFullscreen || grid.mozRequestFullScreen || grid.msRequestFullscreen || function(){}).call(grid);
+  },
+
+  /**
+   * Display the number of rows in the grid. Adjust on filter.
+   * @param {string} gridId - the DOM id of the grid.
+   * @param {integer} filterLength - the number of filtered rows.
+   * @param {integer} rows - the total number of rows.
+   * @returns {void}
+   */
+  displayRowCounts: function displayRowCounts(gridId, filterLength, rows) {
+    const display = document.getElementById(`${gridId}_rowcount`);
+    if (filterLength === rows) {
+      display.textContent = `(${rows} rows)`;
+    } else {
+      display.textContent = `(${filterLength} of ${rows} rows)`;
+    }
+  },
+
+  /**
    * Export a grid to a csv file.
    * @param {string} gridId - the DOM id of the grid.
    * @param {string} fileName - the name to be given to the exported file.
@@ -154,37 +180,12 @@ const crossbeamsGridEvents = {
     gridOptions.api.setQuickFilter(event.target.value);
   },
 
-  // setFilterChangeEvent: function (gridId) {
-  //   var gridOptions;
-  //
-  //   gridOptions = crossbeamsGridStore.getGrid(gridId);
-  //   gridOptions.api.afterFilterChanged();
-  //   //.api.rowModel.rootNode.childrenAfterFilter.length
-  //
-  // }
-
-  /**
-   * Show the results of a filter change (no rows of total displayed).
-   * FIXME: Not yet working.
-   * @param {string} gridId - the DOM id of the grid.
-   * @returns {void}
-   */
-  showFilterChange: function showFilterChange(gridId) {
-    let filterLength = 0;
-    const gridOptions = crossbeamsGridStore.getGrid(gridId);
-    if (gridOptions.api.rowModel.rootNode.childrenAfterFilter) {
-      filterLength = gridOptions.api.rowModel.rootNode.childrenAfterFilter.length;
-    }
-    // console.log('onAfterFilterChanged', filterLength, gridId);
-  },
-
   /**
    * Show a prompt asking the user to confirm an action from a link in a grid.
    * @param {element} target - the link.
    * @returns {void}
    */
   promptClick: function promptClick(target) {
-    // const target = event.target;
     const prompt = target.dataset.prompt;
     const url = target.dataset.url;
     const method = target.dataset.method;
@@ -230,6 +231,9 @@ const crossbeamsGridFormatters = {
       // No show of item
       return null;
     } else if (item.hide_if_present && params.data[item.hide_if_present] !== null) {
+      // No show of item
+      return null;
+    } else if (item.hide_if_true && params.data[item.hide_if_true] === true) {
       // No show of item
       return null;
     } else if (item.is_submenu) {
@@ -358,7 +362,7 @@ const crossbeamsGridFormatters = {
     prompt = prompt || 'Are you sure?';
     method = (method || 'post').toLowerCase();
     return `<a href='#' data-prompt="${prompt}" data-method="${method}" data-url="${url}"
-    onclick="crossbeamsGridEvents.promptClick();">${linkText}</a>`;
+    onclick="crossbeamsGridEvents.promptClick(this);">${linkText}</a>`;
   },
 };
 
@@ -706,6 +710,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     httpRequest.onreadystatechange = () => {
       let httpResult = null;
       let newColDefs = null;
+      let rows = 0;
       if (httpRequest.readyState === 4 && httpRequest.status === 200) {
         httpResult = JSON.parse(httpRequest.responseText);
         // var midLevelColumnDefs, detailColumnDefs;
@@ -718,6 +723,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         }
         gridOptions.api.setColumnDefs(newColDefs); // TODO.............. ????
         gridOptions.api.setRowData(httpResult.rowDefs);
+        gridOptions.api.forEachLeafNode((n) => { rows += 1; });
+        crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
       }
     };
     httpRequest.send();
@@ -740,7 +747,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           enableColResize: true,
           enableSorting: true,
           enableFilter: true,
-          suppressScrollLag: true,
+          suppressScrollLag: true, // TODO: remove with version 13...
           enableRangeSelection: true,
           enableStatusBar: true,
           suppressAggFuncInHeader: true,
@@ -784,12 +791,14 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           enableRangeSelection: true,
           enableStatusBar: true,
           suppressAggFuncInHeader: true,
-          // onAfterFilterChanged: function () {
-          // console.log('onAfterFilterChanged',
-          // this.api.rowModel.rootNode.childrenAfterFilter.length, gridId);}
-          // onAfterFilterChanged: crossbeamsGridEvents.showFilterChange(gridId) // TODO: fix...
+          onFilterChanged: function () {
+            let filterLength = 0;
+            let rows = 0;
+            this.api.forEachLeafNode((n) => { rows += 1; });
+            this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
+            crossbeamsGridEvents.displayRowCounts(gridId, filterLength, rows);
+          },
           // suppressCopyRowsToClipboard: true
-          // quickFilterText: 'fred'
         };
       }
 
@@ -803,7 +812,6 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
 
       new agGrid.Grid(grid, gridOptions);
       crossbeamsGridStore.addGrid(gridId, gridOptions);
-      // gridOptions.onAfterFilterChanged = crossbeamsGridEvents.showFilterChange(gridId);
       loadGrid(grid, gridOptions);
     });
   });

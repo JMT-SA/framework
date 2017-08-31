@@ -1,6 +1,6 @@
 class User < Dry::Struct
   attribute :id, Types::Int
-  attribute :login_name, Types::String  
+  attribute :login_name, Types::String
   attribute :user_name, Types::String
   attribute :password_hash, Types::String.optional
   attribute :email, Types::String.optional

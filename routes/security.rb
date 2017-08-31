@@ -7,4 +7,3 @@ class Framework < Roda
     r.multi_route('security')
   end
 end
-

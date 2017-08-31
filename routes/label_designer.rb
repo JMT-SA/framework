@@ -11,7 +11,7 @@ class Framework < Roda
 
   def label_designer_page(file_name = nil)
     page = Crossbeams::LabelDesigner::Page.new(file_name)
-    #page.json_load_path = '/load_label_via_json' # Override config just before use.
+    # page.json_load_path = '/load_label_via_json' # Override config just before use.
     html = page.render
     css  = page.css
     js   = page.javascript
@@ -26,5 +26,4 @@ class Framework < Roda
     <% end %>
     EOC
   end
-
 end

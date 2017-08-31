@@ -120,9 +120,8 @@
           method: 'POST', // GET?
           credentials: 'same-origin',
           body: new FormData(event.target),
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
+        }).then((response) => response.json())
+          .then(function(data) {
           let closeDialog = true;
           if (data.redirect) {
             window.location = data.redirect;

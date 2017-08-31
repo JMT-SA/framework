@@ -1,6 +1,7 @@
 *.gem
 /.config
 /coverage/
+/hold/
 /InstalledFiles
 /pkg/
 /spec/reports/

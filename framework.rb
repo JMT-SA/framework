@@ -27,13 +27,17 @@ Dir['./lib/applets/*.rb'].each { |f| require f }
 
 class Framework < Roda
   include CommonHelpers
+  include MenuHelpers
 
-  use Rack::Session::Cookie, secret: "some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH", key: "_myapp_session"
-  use Rack::MethodOverride # USe with all_verbs plugin to allow "r.delete" etc.
-  use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb'#, session: request.session
-  use Crossbeams::DataminerInterface::App, url_prefix: 'dataminer/',
-    dm_reports_location: File.join(File.dirname(__FILE__), 'reports'),
-    dm_js_location: 'js', dm_css_location: 'css', db_connection: DB
+  use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
+  use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
+  use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb' # , session: request.session
+  use Crossbeams::DataminerInterface::App,
+      url_prefix: 'dataminer/',
+      dm_reports_location: File.join(File.dirname(__FILE__), 'reports'),
+      dm_js_location: 'js',
+      dm_css_location: 'css',
+      db_connection: DB
 
   plugin :data_grid, path: File.dirname(__FILE__),
                      list_url: '/list/%s/grid',
@@ -45,35 +49,35 @@ class Framework < Roda
   plugin :all_verbs
   plugin :render
   plugin :partials
-  plugin :assets, css: 'style.scss'#, js: 'behave.js'
+  plugin :assets, css: 'style.scss' # , js: 'behave.js'
   plugin :public # serve assets from public folder.
   plugin :view_options
   plugin :multi_route
-  plugin :content_for, :append=>true
+  plugin :content_for, append: true
   # plugin :indifferent_params # - allows access to params by string or symbol.
   plugin :symbolized_params    # - automatically converts all keys of params to symbols.
   plugin :flash
   plugin :csrf, raise: true  # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
   plugin :rodauth do
-      db DB # .connection
-      enable :login, :logout#, :change_password
-      logout_route 'a_dummy_route' # Override 'logout' route so that we have control over it.
-      # logout_notice_flash 'Logged out'
-      session_key :user_id
-      login_param 'login_name' # 'user_name'
-      login_label 'Login name'
-      login_column :login_name # :user_name
-      accounts_table :users
-      account_password_hash_column :password_hash # :hashed_password (This is old base64 version)
-      # require_bcrypt? false
-      # password_match? do |password| # Use legacy password hashing. Maybe change this to modern bcrypt using extra new pwd field?
-      #   account[:hashed_password] == Base64.encode64(password)
-      # end
-      # title_instance_variable :@title
-      # if DEMO_MODE
-      #   before_change_password{r.halt(404)}
-      # end
-    end
+    db DB # .connection
+    enable :login, :logout # , :change_password
+    logout_route 'a_dummy_route' # Override 'logout' route so that we have control over it.
+    # logout_notice_flash 'Logged out'
+    session_key :user_id
+    login_param 'login_name' # 'user_name'
+    login_label 'Login name'
+    login_column :login_name # :user_name
+    accounts_table :users
+    account_password_hash_column :password_hash # :hashed_password (This is old base64 version)
+    # require_bcrypt? false
+    # password_match? do |password| # Use legacy password hashing. Maybe change this to modern bcrypt using extra new pwd field?
+    #   account[:hashed_password] == Base64.encode64(password)
+    # end
+    # title_instance_variable :@title
+    # if DEMO_MODE
+    #   before_change_password{r.halt(404)}
+    # end
+  end
   # plugin :error_handler do |e|
   #   # TODO: how to handle AJAX/JSON etc...
   #   view(inline: "An error occurred - #{e.message}") # TODO: refine this to handle certain classes of errors in certain ways.
@@ -124,6 +128,11 @@ class Framework < Roda
       view(inline: s)
     end
 
+    r.is 'not_found' do
+      response.status = 404
+      view(inline: '<div class="crossbeams-error-note"><strong>Error</strong><br>The requested resource was not found.</div>')
+    end
+
     # Generic grid lists.
     r.on 'list' do
       r.on :id do |id|
@@ -134,7 +143,7 @@ class Framework < Roda
 
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
-          render_data_grid_rows(id, lambda { |program, permission| auth_blocked?(program, permission) })
+          render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })
         end
 
         r.on 'nested_grid' do
@@ -158,16 +167,15 @@ class Framework < Roda
 
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
-          render_search_grid_rows(id, params, lambda { |program, permission| auth_blocked?(program, permission) })
+          render_search_grid_rows(id, params, ->(program, permission) { auth_blocked?(program, permission) })
         end
 
         r.on 'xls' do
           begin
             caption, xls = render_excel_rows(id, params)
-            response.headers['content_type'] = "application/vnd.ms-excel"
-            response.headers['Content-Disposition'] = "attachment; filename=\"#{caption.strip.gsub(/[\/:*?"\\<>\|\r\n]/i, '-') + '.xls'}\""
+            response.headers['content_type'] = 'application/vnd.ms-excel'
+            response.headers['Content-Disposition'] = "attachment; filename=\"#{caption.strip.gsub(%r{[/:*?"\\<>\|\r\n]}i, '-') + '.xls'}\""
             response.write(xls) # NOTE: could this use streaming to start downloading quicker?
-
           rescue Sequel::DatabaseError => e
             view(inline: <<-EOS)
             <p style='color:red;'>There is a problem with the SQL definition of this report:</p>

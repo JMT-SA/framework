@@ -3,13 +3,14 @@ module Security
     module FunctionalAreas
       class Edit
         def self.call(id, form_values = nil, form_errors = nil)
-
           this_repo = FunctionalAreaRepo.new
-          obj     = this_repo.find(id)
-          rules = { fields: {
-            functional_area_name: { },
-            active: { renderer: :checkbox },
-          } }
+          obj       = this_repo.find(id)
+          rules     = {
+            fields: {
+              functional_area_name: {},
+              active: { renderer: :checkbox }
+            }
+          }
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object obj
@@ -29,4 +30,3 @@ module Security
     end
   end
 end
-

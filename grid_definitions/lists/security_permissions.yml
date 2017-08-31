@@ -1,0 +1,19 @@
+---
+:dataminer_definition: security_permissions
+:actions:
+  - :url: /security/functional_areas/security_permissions/$:id$/edit
+    :text: edit
+    :icon: fa-edit
+    :title: Edit
+    :popup: true
+  - :url: /security/functional_areas/security_permissions/$:id$
+    :text: delete
+    :is_delete: true
+    :icon: fa-remove
+    :hide_if_true: in_use
+:page_controls:
+  - :control_type: :link
+    :url: /security/functional_areas/security_permissions/new
+    :text: New security permission
+    :style: :button
+    :behaviour: :popup

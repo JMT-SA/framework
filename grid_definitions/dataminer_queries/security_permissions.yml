@@ -1,0 +1,92 @@
+---
+:caption: Security Permissions
+:sql: "  SELECT id, security_permission, created_at, updated_at,\r\nEXISTS(SELECT
+  id FROM security_groups_security_permissions WHERE security_permission_id = security_permissions.id)
+  AS in_use\r\n  FROM security_permissions ORDER BY security_permission\r\n\r\n  "
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  security_permission:
+    :name: security_permission
+    :sequence_no: 2
+    :caption: Security permission
+    :namespaced_name: security_permission
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 3
+    :caption: Created at
+    :namespaced_name: created_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 4
+    :caption: Updated at
+    :namespaced_name: updated_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  in_use:
+    :name: in_use
+    :sequence_no: 5
+    :caption: In use
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: security_permission
+  :caption: Security Permission
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

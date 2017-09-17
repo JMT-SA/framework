@@ -115,11 +115,11 @@ const crossbeamsDataMinerParams = {
    * @returns {void}
    */
   operatorParmChange: function operatorParmChange(event) {
-    const val1 = document.getElementById('qp_value');
+    const val1 = document.getElementById('qp_value_wrapper');
     const val2 = document.getElementById('qp_value_to');
     switch (event.target.value) {
       case 'between':
-        val1.style.display = '';
+        val1.style.display = 'inline-block';
         val2.style.display = '';
         break;
       case 'is_null':
@@ -131,7 +131,7 @@ const crossbeamsDataMinerParams = {
         val2.style.display = 'none';
         break;
       default:
-        val1.style.display = '';
+        val1.style.display = 'inline-block';
         val2.style.display = 'none';
     }
   },
@@ -323,6 +323,7 @@ const crossbeamsDataMinerParams = {
       let valInput = null;
       let inputType = null;
       const qpForm = document.getElementById('qp_form');
+      let sel = null;
       if (val === '') {
         qpForm.innerHTML = '';
       } else {
@@ -364,10 +365,14 @@ const crossbeamsDataMinerParams = {
         qpForm.innerHTML = `<form id="dForm" action="">
           <input type="hidden" id="qp_column" value="${qp.column}" />
           ${crossbeamsUtils.makeSelect('qp_operator', qp.operator)}
-          ${valInput}
+          <div id="qp_value_wrapper" style="display:inline-block">${valInput}</div>
           <button type="button" class="pure-button pure-button"
           onclick="crossbeamsDataMinerParams.addQpFormParam()">
           <i class="fa fa-plus"></i></button></form>`;
+        if (qp.control_type === 'list') {
+          sel = document.getElementById('qp_value');
+          if (sel !== null) { new Selectr(sel); }
+        }
       }
       // event.stopPropagation();
       // event.preventDefault();

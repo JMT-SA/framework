@@ -98,6 +98,9 @@
         crossbeamsLocalStorage.removeItem('selectedFuncMenu');
       });
     }
+    // Initialise any selects to be searchable or multi-selects.
+    crossbeamsUtils.makeMultiSelects();
+    crossbeamsUtils.makeSearchableSelects();
 
     document.body.addEventListener('click', (event) => {
       if (event.target.dataset && event.target.dataset.disableWith) {
@@ -112,7 +115,9 @@
         event.preventDefault();
       }
       if (event.target.classList.contains('close-dialog')) {
-         crossbeamsUtils.closeJmtDialog();
+        crossbeamsUtils.closeJmtDialog();
+        event.stopPropagation();
+        event.preventDefault();
       }
     });
 

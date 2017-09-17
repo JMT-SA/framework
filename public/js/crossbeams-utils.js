@@ -9,6 +9,8 @@ const crossbeamsUtils = {
   // On success of AJAX call, load results into dialog.
   dialogLoadSuccessHandler: function dialogLoadSuccessHandler(data, textStatus, jqXHR) {
     $('#dialog-modal').html(data);
+    crossbeamsUtils.makeMultiSelects();
+    crossbeamsUtils.makeSearchableSelects();
   },
   // On failure of AJAX call, display a message in the dialog.
   dialogLoadErrorHandler: function dialogLoadSuccessHandler(data, textStatus, jqXHR) {
@@ -46,6 +48,26 @@ const crossbeamsUtils = {
 
   closeJmtDialog: function closeJmtDialog() {
     $("#dialog-modal").PopupWindow("close").html('');
+  },
+  /**
+   * Applies the multi skin to multiselect dropdowns.
+   * @returns {void}
+   */
+  makeMultiSelects: function makeMultiSelects() {
+    const sels = document.querySelectorAll('[data-multi]');
+    sels.forEach((sel) => {
+      multi(sel); // multi select with two panes...
+    });
+  },
+  /**
+   * Changes select tags into Selectr elements.
+   * @returns {void}
+   */
+  makeSearchableSelects: function makeSearchableSelects() {
+    const sels = document.querySelectorAll('.searchable-select');
+    sels.forEach((sel) => {
+      new Selectr(sel); // select that can be searched.
+    });
   },
   /**
    * Toggle the visibility of en element in the DOM:
@@ -125,11 +147,12 @@ const crossbeamsUtils = {
    * For a 2-dimensional array the option text is the 1st element and the value is the second.
    * @param {string} name - the name of the select tag.
    * @param {array} arr - the array of option values.
+   * @param {string} [attrs] - optional - a string to include class/style etc in the tag.
    * @returns {string} - the select tag code.
    */
-  makeSelect: function makeSelect(name, arr) {
+  makeSelect: function makeSelect(name, arr, attrs) {
     // var sel = '<select id="' + name + '" name="' + name + '">';
-    let sel = `<select id="${name}" name="${name}">`;
+    let sel = `<select id="${name}" name="${name}" ${attrs || ''}>`;
     arr.forEach((item) => {
       if (item.constructor === Array) {
         // sel += '<option value="' + (item[1] || item[0]) + '">' + item[0] + '</option>';

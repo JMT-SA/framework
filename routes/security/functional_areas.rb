@@ -18,10 +18,14 @@ class Framework < Roda
       #   render(inline: '<h2>functional_areas</h2>')
       # end
       r.on 'new' do
-        if authorised?('menu', 'new')
-          show_page { Security::FunctionalAreas::FunctionalAreas::New.call }
-        else
-          show_unauthorised
+        begin
+          if authorised?('menu', 'new')
+            show_partial { Security::FunctionalAreas::FunctionalAreas::New.call }
+          else
+            dialog_permission_error
+          end
+        rescue => e
+          dialog_error(e)
         end
       end
       r.on 'create' do
@@ -244,39 +248,93 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        <<-EOS
-        <form action='/security/functional_areas/security_groups/#{id}' method='POST' data-remote='true'>
-          SEC: edit, #{id} - #{security_group.security_group_name}
-          #{csrf_tag}
-          <input type='hidden' name='_method', value='put'>
-          <input type='submit'>
-        </form>
-        EOS
+        begin
+          if authorised?('menu', 'edit')
+            show_partial { Security::FunctionalAreas::SecurityGroups::Edit.call(id) }
+          else
+            dialog_permission_error
+          end
+        rescue => e
+          dialog_error(e)
+        end
       end
       r.on 'permissions' do
         r.post do
-          "SEC: save permissions, #{id}"
+          response['Content-Type'] = 'application/json'
+          if params[:domain_security_group][:security_permissions]
+            repo.assign_security_permissions(id, params[:domain_security_group][:security_permissions].map { |sp| sp.to_i })
+            security_group = repo.find_with_permissions(id)
+            update_grid_row(id, changes: { permissions: security_group.permission_list },
+                                notice:  'Updated permissions')
+          else
+            errors = { security_permissions: ['You did not choose a permission'] }
+            content = show_partial { Security::FunctionalAreas::SecurityGroups::Permissions.call(id, params[:domain_security_group], errors) }
+            update_dialog_content(content: content, error: 'Validation error')
+          end
         end
-        "SEC: edit permissions, #{id}"
+
+        show_partial { Security::FunctionalAreas::SecurityGroups::Permissions.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          "SEC: show, #{id}"
+          if authorised?('menu', 'read')
+            show_partial { Security::FunctionalAreas::SecurityGroups::Show.call(id) }
+          else
+            dialog_permission_error
+          end
         end
-        r.put do       # UPDATE
-          { replaceDialog: { content: "SEC: update edit, #{id}" } }.to_json
+        r.patch do     # UPDATE
+          begin
+            response['Content-Type'] = 'application/json'
+            res = SecurityGroupSchema.call(params[:security_group])
+            errors = res.messages
+            if errors.empty?
+              repo = SecurityGroupRepo.new
+              repo.update(id, res)
+              # flash[:notice] = 'Updated'
+              # redirect_via_json_to_last_grid
+              update_grid_row(id, changes: { security_group_name: res[:security_group_name] },
+                                  notice:  "Updated #{res[:security_group_name]}")
+            else
+              content = show_partial { Security::FunctionalAreas::SecurityGroups::Edit.call(id, params[:security_group], errors) }
+              update_dialog_content(content: content, error: 'Validation error')
+            end
+          rescue => e
+            handle_json_error(e)
+          end
         end
         r.delete do    # DELETE
-          "SEC: delete, #{id}"
+          response['Content-Type'] = 'application/json'
+          repo = SecurityGroupRepo.new
+          repo.delete_with_permissions(id)
+          delete_grid_row(id, notice: 'Deleted')
         end
       end
     end
     r.on 'security_groups' do
       r.on 'new' do    # NEW
-        'SEC: new'
+        begin
+          if authorised?('menu', 'new')
+            show_partial { Security::FunctionalAreas::SecurityGroups::New.call }
+          else
+            dialog_permission_error
+          end
+        rescue => e
+          dialog_error(e)
+        end
       end
       r.post do        # CREATE
-        'SEC: create new'
+        res = SecurityGroupSchema.call(params[:security_group])
+        errors = res.messages
+        if errors.empty?
+          repo = SecurityGroupRepo.new
+          repo.create(res)
+          flash[:notice] = 'Created'
+          redirect_via_json_to_last_grid
+        else
+          content = show_partial { Security::FunctionalAreas::SecurityGroups::New.call(params[:security_group], errors) }
+          update_dialog_content(content: content, error: 'Validation error')
+        end
       end
     end
 
@@ -304,7 +362,11 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          "PERM: show, #{id}"
+          if authorised?('menu', 'read')
+            show_partial { Security::FunctionalAreas::SecurityPermissions::Show.call(id) }
+          else
+            dialog_permission_error
+          end
         end
         r.patch do     # UPDATE
           begin
@@ -340,7 +402,7 @@ class Framework < Roda
       r.on 'new' do    # NEW
         begin
           if authorised?('menu', 'new')
-            # show_partial { Security::FunctionalAreas::SecurityPermissions::New.call }
+            # show_page { Security::FunctionalAreas::SecurityPermissions::New.call }
             show_partial { Security::FunctionalAreas::SecurityPermissions::New.call }
           else
             dialog_permission_error

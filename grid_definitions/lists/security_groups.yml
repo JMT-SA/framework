@@ -14,14 +14,14 @@
   - :url: /security/functional_areas/security_groups/$:id$
     :text: delete
     :is_delete: true
+    :popup: true
     :icon: fa-remove
     :hide_if_true: in_use
-  - :url: /security/functional_areas/security_groups/new
-    :text: new
-    :icon: fa-plus-circle
   - :url: /security/functional_areas/security_groups/$:id$/permissions
     :text: permissions
     :icon: fa-list
+    :title: Assign Permissions
+    :popup: true
 :page_controls:
   - :control_type: :link
     :url: /security/functional_areas/security_groups/new

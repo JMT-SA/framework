@@ -3,27 +3,11 @@ module Security
     module ProgramFunctions
       class New
         def self.call(id, form_values = nil, form_errors = nil)
-          this_repo = ProgramFunctionRepo.new
-          rules     = {
-            fields: {
-              program_id: { renderer: :hidden },
-              program_function_name: {},
-              group_name: { datalist: this_repo.groups_for(id) },
-              url: {},
-              program_function_sequence: { renderer: :number },
-              restricted_user_access: { renderer: :checkbox },
-              active: { renderer: :checkbox }
-            }, name: 'program_function'.freeze
-          }
+          ui_rule = UiRules::Compiler.new(:program_functions, :new, id: id)
+          rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
-            page.form_object(OpenStruct.new(program_id: id,
-                                            program_function_name: nil,
-                                            group_name: nil,
-                                            url: nil,
-                                            program_function_sequence: nil,
-                                            restricted_user_access: false,
-                                            active: true))
+            page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|

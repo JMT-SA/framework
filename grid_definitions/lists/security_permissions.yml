@@ -1,6 +1,11 @@
 ---
 :dataminer_definition: security_permissions
 :actions:
+  - :url: /security/functional_areas/security_permissions/$:id$
+    :text: view
+    :icon: fa-eye
+    :title: View
+    :popup: true
   - :url: /security/functional_areas/security_permissions/$:id$/edit
     :text: edit
     :icon: fa-edit

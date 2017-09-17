@@ -3,17 +3,11 @@ module Security
     module Programs
       class Edit
         def self.call(id, form_values = nil, form_errors = nil)
-          this_repo = ProgramRepo.new
-          obj       = this_repo.find(id)
-          rules     = {
-            fields: {
-              program_name: {},
-              active: { renderer: :checkbox }
-            }
-          }
+          ui_rule = UiRules::Compiler.new(:programs, :edit, id: id)
+          rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
-            page.form_object obj
+            page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|

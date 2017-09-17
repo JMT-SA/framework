@@ -22,6 +22,7 @@ module Types
 end
 
 require './lib/repo_base'
+require './lib/ui_rules'
 Dir['./helpers/**/*.rb'].each { |f| require f }
 Dir['./lib/applets/*.rb'].each { |f| require f }
 

@@ -181,7 +181,8 @@ input, textarea, select {
   cursor: pointer;
 }
 
-.crossbeams-form input, .crossbeams-form textarea, .crossbeams-form select {
+/* .crossbeams-form input, .crossbeams-form textarea, .crossbeams-form select { */
+.crossbeams-form .cbl-input, .crossbeams-form .multi-wrapper {
   order: 2;
   flex: 1 1 auto;
 }
@@ -222,7 +223,8 @@ input, textarea, select {
 }
 
 /* label state styles - relies on label placed after input in form...*/
-.crossbeams-form input:focus ~ label, .crossbeams-form textarea:focus ~ label, .crossbeams-form select:focus ~ label {
+/* .crossbeams-form input:focus ~ label, .crossbeams-form textarea:focus ~ label, .crossbeams-form select:focus ~ label { */
+.crossbeams-form .cbl-input:focus ~ label, .crossbeams-form .searchable-multi:focus ~ label {
   color: darkcyan;
 }
 
@@ -298,6 +300,8 @@ input, textarea, select {
   }
 }
 @media (max-width: 600px) {
+  .cbl-input,
+  .multi-wrapper,
   input,
   select{width: 100%;}
   input[type="radio"],

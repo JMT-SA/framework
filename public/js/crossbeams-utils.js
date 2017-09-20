@@ -31,8 +31,8 @@ const crossbeamsUtils = {
           title       : title,
           modal       : true,
           statusBar   : false,
-          height      : 300,
-          width       : 400,
+          height      : 450,
+          width       : 650,
           buttons     : {minimize: false },
           // top         : 100,
           // left        : 300
@@ -66,7 +66,13 @@ const crossbeamsUtils = {
   makeSearchableSelects: function makeSearchableSelects() {
     const sels = document.querySelectorAll('.searchable-select');
     sels.forEach((sel) => {
-      new Selectr(sel); // select that can be searched.
+      new Selectr(sel, {
+        customClass: 'cbl-input',
+        defaultSelected: true, // should configure via data...
+        // multiple: true,     // should configure via data...
+        allowDeselect: false,
+        clearable: true,       // should configure via data...
+      }); // select that can be searched.
     });
   },
   /**

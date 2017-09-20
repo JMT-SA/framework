@@ -39,9 +39,9 @@ namespace :db do
   task :new_migration do
     nm = ENV['NAME']
     raise "\nSupply a filename (to create \"#{Time.now.strftime('%Y%m%d%H%M_create_a_table.rb')}\"):\n\n  rake #{Rake.application.top_level_tasks.last} NAME=create_a_table\n\n" if nm.nil?
-    # puts 'GOT: #{nm}'
-    # touch File.join('db/migrations', Time.now.strftime('%Y%m%d%H%M_#{nm}.rb'))
-    File.open(File.join('db/migrations', Time.now.strftime("%Y%m%d%H%M_#{nm}.rb")), 'w') do |file|
+
+    fn = Time.now.strftime("%Y%m%d%H%M_#{nm}.rb")
+    File.open(File.join('db/migrations', fn), 'w') do |file|
       file.puts <<~EOS
         # require 'sequel_postgresql_triggers' # Uncomment this line for created_at and updated_at triggers.
         Sequel.migration do
@@ -85,6 +85,7 @@ namespace :db do
         end
       EOS
     end
+    puts "Created migration #{fn}"
   end
 
   desc 'Migration to create a new table - use NAME env var for table name.'
@@ -92,7 +93,8 @@ namespace :db do
     nm = ENV['NAME']
     raise "\nYou must supply a table name - e.g. rake #{Rake.application.top_level_tasks.last} NAME=users\n\n" if nm.nil?
 
-    File.open(File.join('db/migrations', Time.now.strftime("%Y%m%d%H%M_create_#{nm}.rb")), 'w') do |file|
+    fn = Time.now.strftime("%Y%m%d%H%M_create_#{nm}.rb")
+    File.open(File.join('db/migrations', fn), 'w') do |file|
       file.puts <<~EOS
         require 'sequel_postgresql_triggers'
         Sequel.migration do
@@ -100,7 +102,7 @@ namespace :db do
             extension :pg_triggers
             create_table(:#{nm}, ignore_index_errors: true) do
               primary_key :id
-              # String :code, size: 255, null:false
+              # String :code, size: 255, null: false
               # TrueClass :active, default: true
               DateTime :created_at, null: false
               DateTime :updated_at, null: false
@@ -129,6 +131,7 @@ namespace :db do
         end
       EOS
     end
+    puts "Created migration #{fn}"
   end
 end
 

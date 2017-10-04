@@ -293,6 +293,38 @@ input, textarea, select {
 // }
 /* END: SEARCH MENU RESULTS */
 
+.thinbordertable {
+  border-collapse: collapse;
+}
+.thinbordertable th {
+  font-size: smaller;
+  font-weight: bold;
+  padding: 0 5px;
+  vertical-align: bottom;
+}
+.thinbordertable td {
+  vertical-align: top;
+  padding:        4px;
+  border: thin solid gray;
+}
+.thinbordertable td.noborder {
+  vertical-align: top;
+  padding:        4px;
+  border: none;
+}
+
+/* START: Table row alternate background and hover background */
+tr.hover-row:hover {
+  background-color: #90EE90;
+  color: #000000;
+}
+tr.rowodd {
+}
+tr.roweven {
+  background-color: whiteSmoke;
+}
+/* END  : Table row alternate background and hover background */
+
 /* RESPONSIVE */
 @media (max-width: 48em) {
   .crossbeams-row {

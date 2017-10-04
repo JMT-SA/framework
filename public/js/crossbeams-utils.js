@@ -49,6 +49,22 @@ const crossbeamsUtils = {
   closeJmtDialog: function closeJmtDialog() {
     $("#dialog-modal").PopupWindow("close").html('');
   },
+
+  showHtmlInDialog: function showHtmlInDialog(title, text) {
+    $("#dialog-modal").html(text);
+    if ($("#dialog-modal").PopupWindow("getState")) $("#dialog-modal").PopupWindow("destroy");
+    $('#dialog-modal').PopupWindow({
+          title       : title,
+          modal       : true,
+          statusBar   : false,
+          height      : 450,
+          width       : 650,
+          buttons     : {minimize: false },
+          // top         : 100,
+          // left        : 300
+    });
+  },
+
   /**
    * Applies the multi skin to multiselect dropdowns.
    * @returns {void}

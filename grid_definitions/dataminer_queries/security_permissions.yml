@@ -14,7 +14,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: true
     :group_by_seq: 
     :group_sum: false

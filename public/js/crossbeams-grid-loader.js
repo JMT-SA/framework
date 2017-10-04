@@ -84,6 +84,37 @@ const crossbeamsGridEvents = {
   },
 
   /**
+   * Add option tags to a select element - one for each column name in the grid.
+   * @param {string} gridId - the DOM id of the grid.
+   * @param {array} colDefs - the column definitions for the grid.
+   * @returns {void}
+   */
+  makeColumnScrollList: function makeColumnScrollList(gridId, colDefs) {
+    const select = document.getElementById(`${gridId}-scrollcol`);
+    let option;
+    colDefs.sort((a, b) => a.headerName.localeCompare(b.headerName) ).forEach((col) => {
+      if (col.field !== undefined && !col.hide) {
+        option = document.createElement("option");
+        option.text = col.headerName;
+        option.value = col.field;
+        select.appendChild(option);
+      }
+    });
+    // new Selectr(select);
+  },
+
+  /**
+   * Scroll the grid horizontally to ensure the chosen column is visible.
+   * @param {event} event - a change event.
+   * @returns {void}
+   */
+  scrollToColumn: function scrollToColumn(event) {
+    const gridOptions = crossbeamsGridStore.getGrid(event.target.dataset.gridId);
+    gridOptions.api.ensureColumnVisible(event.target.value);
+    event.target.selectedIndex = 0;
+  },
+
+  /**
    * Export a grid to a csv file.
    * @param {string} gridId - the DOM id of the grid.
    * @param {string} fileName - the name to be given to the exported file.
@@ -178,6 +209,40 @@ const crossbeamsGridEvents = {
       event.target.value = '';
     }
     gridOptions.api.setQuickFilter(event.target.value);
+  },
+
+  viewSelectedRow: function viewSelectedRow(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    let rowNode = gridOptions.api.getSelectedNodes()[0];
+    let cnt = 0;
+    if (rowNode === undefined) {
+      rowNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
+    }
+
+    // TODO: smarten table, use grid value getters/formatters etc for boolean, right-justify etc.
+    //       - row highlight.
+    //       - sort keys. (and un-sort)
+    //       - next/prev navigation of table
+    //       - button in UI
+    //       - skip hidden columns
+    //       - skip grouped rows in going for first selected
+    //       - skip if data does not have a columndef (e.g. dataminer reports grid)
+    const content = `<div style="position:absolute;overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
+      <table class="thinbordertable">
+      <thead>
+      <tr><th>Column</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+      ${Object.keys(rowNode.data).map((k) => `
+        <tr class="hover-row ${(() => {cnt += 1; return cnt % 2 === 0 ? 'roweven' : 'rowodd';})()}"><td>
+          ${gridOptions.api.getColumnDef(k).headerName}
+          </td><td>
+          ${rowNode.data[k]}
+        </td></tr>`).join('')}
+      </tbody>
+      </table>
+      </div>`
+    crossbeamsUtils.showHtmlInDialog('Selected Row', content);
   },
 
   /**
@@ -725,10 +790,13 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         gridOptions.api.setRowData(httpResult.rowDefs);
         gridOptions.api.forEachLeafNode((n) => { rows += 1; });
         crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
+        // TODO: if the grid has no horizontal scrollbar, hide the scroll to column dropdown.
+        crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId, newColDefs);
       }
     };
     httpRequest.send();
   };
+
 
   document.addEventListener('DOMContentLoaded', () => {
     let gridOptions = null;
@@ -788,6 +856,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           enableSorting: true,
           enableFilter: true,
           suppressScrollLag: true,
+          rowSelection: 'single',
           enableRangeSelection: true,
           enableStatusBar: true,
           suppressAggFuncInHeader: true,

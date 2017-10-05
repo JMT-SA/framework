@@ -227,7 +227,8 @@ const crossbeamsGridEvents = {
     //       - skip hidden columns
     //       - skip grouped rows in going for first selected
     //       - skip if data does not have a columndef (e.g. dataminer reports grid)
-    const content = `<div style="position:absolute;overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
+    // const content = `<div style="position:absolute;overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
+    const content = `<div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
       <table class="thinbordertable">
       <thead>
       <tr><th>Column</th><th>Value</th></tr>
@@ -958,7 +959,8 @@ $(() => {
             if (item.method === undefined) {
               if (item.popup) {
                 crossbeamsLocalStorage.setItem('popupOnGrid', item.domGridId);
-                crossbeamsUtils.jmtPopupDialog(100, 100, item.title_field, '', item.url);
+                // crossbeamsUtils.jmtPopupDialog(100, 100, item.title_field, '', item.url);
+                crossbeamsUtils.popupDialog(item.title_field, item.url);
               } else {
                 window.location = item.url;
               }

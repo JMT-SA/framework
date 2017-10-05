@@ -6,63 +6,52 @@
  */
 const crossbeamsUtils = {
 
-  // On success of AJAX call, load results into dialog.
-  dialogLoadSuccessHandler: function dialogLoadSuccessHandler(data, textStatus, jqXHR) {
-    $('#dialog-modal').html(data);
-    crossbeamsUtils.makeMultiSelects();
-    crossbeamsUtils.makeSearchableSelects();
-  },
-  // On failure of AJAX call, display a message in the dialog.
-  dialogLoadErrorHandler: function dialogLoadSuccessHandler(data, textStatus, jqXHR) {
-    Jackbox.error('The action was unsuccessful...');
-    const htmlText = data.responseText ? data.responseText : '';
-    $('#dialog-modal').html(htmlText);
-  },
-
-  // Popup a JQ UI dialog.
-  jmtPopupDialog: function jmtPopupDialog(new_width, new_height, title, text, href) {
-    // if (new_width) {$('#dialog-modal').dialog('option', 'width', new_width);}
-    // if (new_height) {$('#dialog-modal').dialog('option', 'height', new_height);}
-    // $('#dialog-modal').html('');
-    // $('#dialog-modal').dialog('option', 'title', title || text);
-    // $('#dialog-modal').dialog('open');
-    if ($("#dialog-modal").PopupWindow("getState")) $("#dialog-modal").PopupWindow("destroy");
-    $('#dialog-modal').PopupWindow({
-          title       : title,
-          modal       : true,
-          statusBar   : false,
-          height      : 450,
-          width       : 650,
-          buttons     : {minimize: false },
-          // top         : 100,
-          // left        : 300
+  // Popup a modal dialog.
+  /**
+   * Show a popup dialog window and make an AJAX call to populate the dialog.
+   * @param {string} title - the title to show in the dialog.
+   * @param {string} href - the url to call to load the dialog main content.
+   * @returns {void}
+   */
+  popupDialog: function popupDialog(title, href) {
+    document.getElementById('dialogTitle').innerHTML = title;
+    document.getElementById('dialog-content').innerHTML = '';
+    fetch(href, {
+      method: 'GET',
+      credentials: 'same-origin',
+    }).then(function(response) {
+      return response.text();
+      })
+      .then(function(data) {
+      document.getElementById('dialog-content').innerHTML = data;
+      crossbeamsUtils.makeMultiSelects();
+      crossbeamsUtils.makeSearchableSelects();
+    }).catch(function(data) {
+      Jackbox.error('The action was unsuccessful...');
+      const htmlText = data.responseText ? data.responseText : '';
+      document.getElementById('dialog-content').innerHTML = htmlText;
     });
-    $.ajax({
-      type: 'get',
-      url: href,
-      //          dataType: "script",
-      success: crossbeamsUtils.dialogLoadSuccessHandler,
-      error: crossbeamsUtils.dialogLoadErrorHandler
-    });
+    crossbeamsDialog.show();
   },
 
-  closeJmtDialog: function closeJmtDialog() {
-    $("#dialog-modal").PopupWindow("close").html('');
+  /**
+   * Close the popup dialog window.
+   * @returns {void}
+   */
+  closePopupDialog: function closePopupDialog() {
+    crossbeamsDialog.hide();
   },
 
+  /**
+   * Show a popup dialog window with the provided title and text.
+   * @param {string} title - the title to show in the dialog.
+   * @param {string} text - the text to serve as the main body of the dialog.
+   * @returns {void}
+   */
   showHtmlInDialog: function showHtmlInDialog(title, text) {
-    $("#dialog-modal").html(text);
-    if ($("#dialog-modal").PopupWindow("getState")) $("#dialog-modal").PopupWindow("destroy");
-    $('#dialog-modal').PopupWindow({
-          title       : title,
-          modal       : true,
-          statusBar   : false,
-          height      : 450,
-          width       : 650,
-          buttons     : {minimize: false },
-          // top         : 100,
-          // left        : 300
-    });
+    document.getElementById('dialogTitle').innerHTML = title;
+    document.getElementById('dialog-content').innerHTML = text;
+    crossbeamsDialog.show();
   },
 
   /**

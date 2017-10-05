@@ -110,12 +110,13 @@
         preventMultipleSubmitsBriefly(event.target);
       }
       if (event.target.dataset && event.target.dataset.popupDialog) {
-        crossbeamsUtils.jmtPopupDialog(100, 100, event.target.text, '', event.target.href);
+        // crossbeamsUtils.jmtPopupDialog(100, 100, event.target.text, '', event.target.href);
+        crossbeamsUtils.popupDialog(event.target.text, event.target.href);
         event.stopPropagation();
         event.preventDefault();
       }
       if (event.target.classList.contains('close-dialog')) {
-        crossbeamsUtils.closeJmtDialog();
+        crossbeamsUtils.closePopupDialog();
         event.stopPropagation();
         event.preventDefault();
       }
@@ -145,7 +146,7 @@
             };
           } else if (data.replaceDialog) {
             closeDialog = false;
-            $('#dialog-modal').html(data.replaceDialog.content);
+            document.getElementById('dialog-content').innerHTML = data.replaceDialog.content;
           } else {
             console.log('Not sure what to do with this:', data);
           }
@@ -163,7 +164,7 @@
             }
           }
           if (closeDialog && !data.exception) {
-            crossbeamsUtils.closeJmtDialog();
+            crossbeamsUtils.closePopupDialog();
           }
         }).catch(function(data) {
             Jackbox.error(`An error occurred ${data}`, { time: 20 });

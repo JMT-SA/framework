@@ -21,6 +21,32 @@ end
 task default: :test
 
 namespace :db do
+  desc "Prints current schema version"
+  task :version  => :dotenv do
+    require 'sequel'
+    Sequel.extension :migration
+    db = Sequel.connect(ENV.fetch('FM_DATABASE_URL'))
+    version = if db.tables.include?(:schema_migrations)
+      db[:schema_migrations].reverse(:filename).first[:filename]
+    end || 0
+
+    puts "Schema Version: #{version}"
+  end
+
+  desc "Prints previous 10 schema versions"
+  task :recent_migrations  => :dotenv do
+    require 'sequel'
+    Sequel.extension :migration
+    db = Sequel.connect(ENV.fetch('FM_DATABASE_URL'))
+    if db.tables.include?(:schema_migrations)
+      migrations = db[:schema_migrations].reverse(:filename).first(10).map { |r| r[:filename] }
+    else
+      migrations = ['No migrations have been run']
+    end
+
+    puts "Recent migrations:\n#{migrations.join("\n")}"
+  end
+
   desc 'Run migrations'
   task :migrate, [:version] => :dotenv do |_, args|
     require 'sequel'

@@ -27,6 +27,7 @@ PATH
   remote: /home/james/ra/crossbeams/crossbeams-layout
   specs:
     crossbeams-layout (0.1.0)
+      rouge
 
 PATH
   remote: /home/james/ra/crossbeams/crossbeams-rack_middleware

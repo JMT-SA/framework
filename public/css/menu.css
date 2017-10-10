@@ -71,6 +71,7 @@ element
         position: relative;
         white-space: nowrap;
         word-break: keep-all;
+        z-index: 2;
     }
     .Menu.-horizontal > li {
         display: inline-block;

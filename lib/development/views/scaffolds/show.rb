@@ -8,7 +8,15 @@ module Development
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
-              section.add_text "<p>Preview of files to be generated.</p>"
+              section.add_text "<p>Preview of files to be generated.<br><em>Note the permissions required for program <strong>#{results[:opts].program}</strong></em></p>"
+            end
+            if results[:applet]
+              page.section do |section|
+                section.caption = 'Applet'
+                section.hide_caption = false
+                section.add_text(results[:paths][:applet])
+                section.add_text(results[:applet], preformatted: true, syntax: :ruby)
+              end
             end
             page.section do |section|
               section.caption = 'Repo'

@@ -14,7 +14,7 @@ class ProgramRepo < RepoBase
     JOIN programs ON programs.id = programs_users.program_id
     WHERE programs_users.user_id = #{user.id}
     AND security_permissions.security_permission = '#{sought_permission}'
-    AND programs.program_name IN ( '#{programs.map(&:to_s).join("','")}')
+    AND LOWER(programs.program_name) IN ( '#{programs.map(&:to_s).map(&:downcase).join("','")}')
     EOQ
     !DB[query].first.nil?
   end

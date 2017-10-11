@@ -63,8 +63,10 @@ module UiRules
       fields[:other][:disabled] = true if form_object.applet && form_object.applet != 'other'
     end
 
-    def applets_list # read this from disk...
-      %w{other masterfiles security}
+    def applets_list
+      dir = File.expand_path('../../../applets', __FILE__)
+      Dir.chdir(dir)
+      Dir.glob('*_applet.rb').map {|d| d.sub(/_applet.rb$/, '') }.unshift('other')
     end
   end
 end

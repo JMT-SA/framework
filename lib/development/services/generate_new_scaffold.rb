@@ -6,7 +6,7 @@ class GenerateNewScaffold < BaseService
   # TODO: dry-validation: type to pre-strip strings...
   def initialize(params)
     @opts             = OpenStruct.new(params)
-    @opts.applet    ||= 'masterfiles'
+    @opts.new_applet  = @opts.applet == 'other'
     @opts.applet      = params[:other] if @opts.applet == 'other'
     @opts.program   ||= 'progname'
     @opts.singlename  = simple_single(@opts.table)
@@ -15,24 +15,24 @@ class GenerateNewScaffold < BaseService
     @opts.list_name   = params[:list_name]   || @opts.table
     @opts.search_name = params[:search_name] || @opts.table
     @opts.label_field = params[:label_field]
+    @opts.table_meta  = TableMeta.new(@opts.table)
+    @opts.label_field = @opts.table_meta.likely_label_field if @opts.label_field.empty?
   end
 
   def call
-    # get data about table
-    table_opts
-    sources              = { paths: {} }
+    sources = { opts: opts, paths: {} }
     sources[:paths][:dm_query] = "grid_definitions/dataminer_queries/#{opts.table}.yml"
     sources[:paths][:list] = "grid_definitions/lists/#{opts.table}.yml"
     sources[:paths][:search] = "grid_definitions/searches/#{opts.table}.yml"
-    sources[:paths][:repo] = "lib/#{opts.applet}/repositories/#{opts.singlename}.rb"
+    sources[:paths][:repo] = "lib/#{opts.applet}/repositories/#{opts.singlename}_repo.rb"
     sources[:paths][:entity] = "lib/#{opts.applet}/entities/#{opts.singlename}.rb"
     sources[:paths][:validation] = "lib/#{opts.applet}/validations/#{opts.singlename}_schema.rb"
     sources[:paths][:route] = "routes/#{opts.applet}/#{opts.program}.rb"
     sources[:paths][:uirule] = "lib/#{opts.applet}/ui_rules/#{opts.singlename}.rb"
     sources[:paths][:view] = {
-                               new: "lib/#{opts.applet}/views/#{opts.table}/new.rb",
-                               edit: "lib/#{opts.applet}/views/#{opts.table}/edit.rb",
-                               show: "lib/#{opts.applet}/views/#{opts.table}/show.rb"
+                               new: "lib/#{opts.applet}/views/#{opts.singlename}/new.rb",
+                               edit: "lib/#{opts.applet}/views/#{opts.singlename}/edit.rb",
+                               show: "lib/#{opts.applet}/views/#{opts.singlename}/show.rb"
                              }
     report               = QueryMaker.call(opts)
     sources[:query]      = wrapped_sql_from_report(report)
@@ -46,6 +46,11 @@ class GenerateNewScaffold < BaseService
     sources[:view]       = ViewMaker.call(opts)
     sources[:route]      = RouteMaker.call(opts)
 
+    if opts.new_applet
+      sources[:paths][:applet] = "lib/applets/#{opts.applet}_applet.rb"
+      sources[:applet]         = AppletMaker.call(opts)
+    end
+
     sources
 
     # 1) use repo to get schema of table.
@@ -56,17 +61,77 @@ class GenerateNewScaffold < BaseService
 
   private
 
-  def table_opts
-    repo              = DevelopmentRepo.new
-    opts.columns      = repo.table_columns(opts.table)
-    opts.column_names = repo.table_col_names(opts.table)
-    opts.foreigns     = repo.foreign_keys(opts.table)
-  end
-
   def wrapped_sql_from_report(report)
     width = 120
     ar = report.runnable_sql.gsub(/from /i, "\nFROM ").gsub(/where /i, "\nWHERE ").gsub(/(left outer join |left join |inner join |join )/i, "\n\\1").split("\n")
     ar.map { |a| a.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n") }.join("\n")
+  end
+
+  class TableMeta
+    attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup
+    def initialize(table)
+      repo          = DevelopmentRepo.new
+      @columns      = repo.table_columns(table)
+      @column_names = repo.table_col_names(table)
+      @foreigns     = repo.foreign_keys(table)
+      @col_lookup   = Hash[@columns]
+      @fk_lookup    = {}
+      @foreigns.each { |hs| hs[:columns].each { |c| @fk_lookup[c] = { key: hs[:key], table: hs[:table] } } }
+    end
+
+    def likely_label_field
+      col_name = nil
+      columns.each do |this_name, attrs|
+        next if this_name == :id
+        next if this_name.to_s.end_with?('_id')
+        next unless attrs[:type] == :string
+        col_name = this_name
+        break
+      end
+      col_name || 'id'
+    end
+
+    def columns_without(ignore_cols)
+      @column_names.reject { |c| ignore_cols.include?(c) }
+    end
+
+    def column_dry_type(column)
+      case @col_lookup[column][:type]
+      when :integer
+        'Types::Int'
+      when :string
+        'Types::String'
+      when :boolean
+        'Types::Bool'
+      when :datetime
+        'Types::DateTime'
+      else
+        "Types::??? (#{@col_lookup[column][:type]}"
+      end
+    end
+
+    def column_dry_validation_type(column)
+      case @col_lookup[column][:type]
+      when :integer
+        ':int?'
+      when :string
+        ':str?'
+      when :boolean
+        ':bool?'
+      when :datetime
+        ':date_time?'
+      when :date
+        ':date?'
+      when :time
+        ':time?'
+        # float? equivalent to type?(Float)
+        # decimal? equivalent to type?(BigDecimal)
+        # array? equivalent to type?(Array)
+        # hash? equivalent to type?(Hash)
+      else
+        "Types::??? (#{@col_lookup[column][:type]}"
+      end
+    end
   end
 
   class RepoMaker < BaseService
@@ -77,6 +142,8 @@ class GenerateNewScaffold < BaseService
 
     def call
       <<~EOS
+      # frozen_string_literal: true
+
       class #{opts.klassname}Repo < RepoBase
         def initialize
           main_table :#{opts.table}
@@ -107,6 +174,8 @@ class GenerateNewScaffold < BaseService
     def call
       attr = columnise
       <<~EOS
+      # frozen_string_literal: true
+
       class #{opts.klassname} < Dry::Struct
         #{attr.join("\n  ")}
       end
@@ -117,24 +186,10 @@ class GenerateNewScaffold < BaseService
 
     def columnise
       attr = []
-      opts.columns.each do |col, detail|
-        next if [:created_at, :updated_at].include?(col)
-        attr << "attribute :#{col}, #{type_for(detail[:type])}"
+      opts.table_meta.columns_without(%i{created_at updated_at}).each do |col|
+        attr << "attribute :#{col}, #{opts.table_meta.column_dry_type(col)}"
       end
       attr
-    end
-
-    def type_for(r_type)
-      case r_type
-      when :integer
-        'Types::Int'
-      when :string
-        'Types::String'
-      when :boolean
-        'Types::Bool'
-      else
-        "Types::??? (#{r_type}"
-      end
     end
   end
 
@@ -147,6 +202,8 @@ class GenerateNewScaffold < BaseService
     def call
       attr = columnise
       <<~EOS
+      # frozen_string_literal: true
+
       #{opts.klassname}Schema = Dry::Validation.Form do
         #{attr.join("\n  ")}
       end
@@ -157,27 +214,18 @@ class GenerateNewScaffold < BaseService
 
     def columnise
       attr = []
-      opts.columns.each do |col, detail|
-        next if [:created_at, :updated_at].include?(col)
+      opts.table_meta.columns_without(%i{created_at updated_at}).each do |col|
+        detail = opts.table_meta.col_lookup[col]
         fill_opt = detail[:allow_null] ? 'maybe' : 'filled'
         max = detail[:max_length] && detail[:max_length] < 200 ? "max_size?: #{detail[:max_length]}" : nil
-        rules = [type_for(detail[:type]), max].compact.join(', ')
-        attr << "required(:#{col}).#{fill_opt}(#{rules})"
+        rules = [opts.table_meta.column_dry_validation_type(col), max].compact.join(', ')
+        if col == :id
+          attr << "optional(:#{col}).#{fill_opt}(#{rules})"
+        else
+          attr << "required(:#{col}).#{fill_opt}(#{rules})"
+        end
       end
       attr
-    end
-
-    def type_for(r_type) # FIXME: types...
-      case r_type
-      when :integer
-        ':int?'
-      when :string
-        ':str?'
-      when :boolean
-        ':bool?'
-      else
-        "??? (#{r_type}"
-      end
     end
   end
 
@@ -208,7 +256,7 @@ class GenerateNewScaffold < BaseService
       list[:page_controls] = []
       list[:page_controls] << { control_type: :link,
                                 url: "/#{opts.applet}/#{opts.program}/#{opts.table}/new",
-                                text: "New #{opts.klassname}",
+                                text: "New #{opts.singlename.split('_').map { |n| n.capitalize}.join(' ')}",
                                 style: :button,
                                 behaviour: :popup }
       list.to_yaml
@@ -242,7 +290,7 @@ class GenerateNewScaffold < BaseService
       search[:page_controls] = []
       search[:page_controls] << { control_type: :link,
                                   url: "/#{opts.applet}/#{opts.program}/#{opts.table}/new",
-                                  text: "New #{opts.klassname}",
+                                  text: "New #{opts.singlename.split('_').map { |n| n.capitalize}.join(' ')}",
                                   style: :button,
                                   behaviour: :popup }
       search.to_yaml
@@ -304,8 +352,8 @@ class GenerateNewScaffold < BaseService
                   if errors.empty?
                     repo = #{opts.klassname}Repo.new
                     repo.update(id, res)
-                    update_grid_row(id, changes: { code: res[:code], description: res[:description] }, #TODONOW
-                                        notice:  "Updated \#{res[:code]}") #TODONOW
+                    update_grid_row(id, changes: { #{grid_refresh_fields} },
+                                        notice:  "Updated \#{res[:#{opts.label_field}]}")
                   else
                     content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, params[:#{opts.singlename}], errors) }
                     update_dialog_content(content: content, error: 'Validation error')
@@ -352,6 +400,13 @@ class GenerateNewScaffold < BaseService
       end
       EOS
     end
+
+    def grid_refresh_fields
+      opts.table_meta.columns_without(%i{id created_at updated_at}).map do |col|
+        "#{col}: res[:#{col}]"
+      end.join(', ')
+    end
+
   end
 
   class UiRuleMaker < BaseService
@@ -362,6 +417,8 @@ class GenerateNewScaffold < BaseService
 
     def call
       <<~EOS
+      # frozen_string_literal: true
+
       module UiRules
         class #{opts.klassname} < Base
           def generate_rules
@@ -402,19 +459,67 @@ class GenerateNewScaffold < BaseService
     private
 
     def fields_to_use
-      opts.column_names.reject { |col| %i{id created_at updated_at}.include?(col) }
+      opts.table_meta.columns_without(%i{id created_at updated_at})
     end
 
     def show_fields
-      fields_to_use.map { |f| "fields[:#{f}] = { renderer: :label }" }
+      flds = []
+      fields_to_use.each do |f|
+        fk = opts.table_meta.fk_lookup[f]
+        if fk
+          tm = TableMeta.new(fk[:table])
+          singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
+          klassname   = UtilityFunctions.camelize(singlename)
+          fk_repo = "#{klassname}Repo"
+          code = tm.likely_label_field
+          flds << "#{f}_label = #{fk_repo}.new.find(@form_object.#{f})&.#{code}"
+        end
+      end
+
+      flds + fields_to_use.map do |f|
+        fk = opts.table_meta.fk_lookup[f]
+        if fk.nil?
+          "fields[:#{f}] = { renderer: :label }"
+        else
+          "fields[:#{f}] = { renderer: :label, with_value: #{f}_label }"
+        end
+      end # can be more intelligent for foreign keys...
     end
 
-    def common_fields
-      fields_to_use.map { |f| "#{f}: {}" }
+    def common_fields # bool == checkbox, fk == select etc
+      fields_to_use.map do |field|
+        this_col = opts.table_meta.col_lookup[field]
+        if this_col.nil?
+          "#{field}: {}"
+        elsif this_col[:type] == :boolean #int: number, _id: select.
+          "#{field}: { renderer: :checkbox }"
+        elsif field.to_s.end_with?('_id')
+          make_select(field, this_col)
+        else
+          "#{field}: {}"
+        end
+      end
     end
 
-    def struct_fields
-      fields_to_use.map { |f| "#{f}: nil" }
+    def make_select(field, col)
+      fk = opts.table_meta.fk_lookup[field]
+      return "#{field}: {}" if fk.nil?
+      singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
+      klassname   = UtilityFunctions.camelize(singlename)
+      fk_repo = "#{klassname}Repo"
+      # get fk data & make select - or (if no fk....)
+      "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select }"
+    end
+
+    def struct_fields # use default values (or should the use of struct be changed to something that knows the db?)
+      fields_to_use.map do |field|
+        this_col = opts.table_meta.col_lookup[field]
+        if this_col && this_col[:default]
+          "#{field}: #{this_col[:default]}" # might need to be in quotes...
+        else
+          "#{field}: nil"
+        end
+      end
     end
   end
 
@@ -435,7 +540,7 @@ class GenerateNewScaffold < BaseService
     private
 
     def fields_to_use
-      opts.column_names.reject { |col| %i{id created_at updated_at}.include?(col) }
+      opts.table_meta.columns_without(%i{id created_at updated_at})
     end
 
     def form_fields
@@ -446,12 +551,14 @@ class GenerateNewScaffold < BaseService
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
       <<~EOS
+      # frozen_string_literal: true
+
       module #{applet_klass}
         module #{program_klass}
           module #{opts.klassname}
             class New
               def self.call(form_values = nil, form_errors = nil)
-                ui_rule = UiRules::Compiler.new(:#{opts.table}, :new)
+                ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new)
                 rules   = ui_rule.compile
 
                 layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -478,12 +585,14 @@ class GenerateNewScaffold < BaseService
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
       <<~EOS
+      # frozen_string_literal: true
+
       module #{applet_klass}
         module #{program_klass}
           module #{opts.klassname}
             class Edit
               def self.call(id, form_values = nil, form_errors = nil)
-                ui_rule = UiRules::Compiler.new(:#{opts.table}, :edit, id: id)
+                ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id)
                 rules   = ui_rule.compile
 
                 layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -491,7 +600,7 @@ class GenerateNewScaffold < BaseService
                   page.form_values form_values
                   page.form_errors form_errors
                   page.form do |form|
-                    form.action '/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}'
+                    form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}"
                     form.remote!
                     form.method :update
                     #{form_fields}
@@ -511,19 +620,20 @@ class GenerateNewScaffold < BaseService
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
       <<~EOS
+      # frozen_string_literal: true
+
       module #{applet_klass}
         module #{program_klass}
           module #{opts.klassname}
             class Show
               def self.call(id)
-                ui_rule = UiRules::Compiler.new(:#{opts.table}, :show, id: id)
+                ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :show, id: id)
                 rules   = ui_rule.compile
 
                 layout = Crossbeams::Layout::Page.build(rules) do |page|
                   page.form_object ui_rule.form_object
                   page.form do |form|
                     form.view_only!
-                    form.method :update
                     #{form_fields}
                   end
                 end
@@ -551,48 +661,47 @@ class GenerateNewScaffold < BaseService
       FROM #{opts.table}
       #{make_joins}
       EOS
-      rpt = Crossbeams::Dataminer::Report.new(opts.table.split('_').map { |w| w.capitalize }.join(' '))
-      rpt.sql = base_sql
-      rpt
+      report = Crossbeams::Dataminer::Report.new(opts.table.split('_').map { |w| w.capitalize }.join(' '))
+      report.sql = base_sql
+      report
     end
 
     private
 
     def columns
-      tab_cols = opts.column_names.map { |col| "#{opts.table}.#{col}" }
+      tab_cols = opts.table_meta.column_names.map { |col| "#{opts.table}.#{col}" }
       fk_cols  = []
-      opts.foreigns.map do |fk|
-        fk_col = get_representative_col_from_table(fk[:table])
-        if opts.column_names.include?(fk_col.to_sym)
-          fk_cols << "#{fk[:table]}.#{fk_col} AS #{fk[:table]}_#{fk_col}"
+      opts.table_meta.foreigns.each do |fk|
+        if fk[:table] == :party_roles # Special treatment for party_lore lookups to get party name
+          fk[:columns].each do |fk_col|
+            fk_cols << "fn_party_role_name(#{opts.table}.#{fk_col}) AS #{fk_col.sub(/_id$/, '')}"
+          end
         else
-          fk_cols << "#{fk[:table]}.#{fk_col}"
+          fk_col = get_representative_col_from_table(fk[:table])
+          if opts.table_meta.column_names.include?(fk_col.to_sym)
+            fk_cols << "#{fk[:table]}.#{fk_col} AS #{fk[:table]}_#{fk_col}"
+          else
+            fk_cols << "#{fk[:table]}.#{fk_col}"
+          end
         end
       end
       (tab_cols + fk_cols).join(', ')
     end
 
     def get_representative_col_from_table(table)
-      cols = @repo.table_columns(table)
-      col_name = nil
-      cols.each do |this_name, attrs|
-        next if this_name == :id
-        next if this_name.to_s.end_with?('_id')
-        next unless attrs[:type] == :string
-        col_name = this_name
-        break
-      end
-      col_name || 'id'
+      tab = TableMeta.new(table)
+      tab.likely_label_field
     end
 
     def make_joins
       used_tables = Hash.new(0)
-      opts.foreigns.map do |fk|
+      opts.table_meta.foreigns.map do |fk|
         tab_alias = fk[:table]
+        next if tab_alias == :party_roles # No join - usualy no need to join if using fn_party_role_name() function for party name
         cnt       = used_tables[fk[:table]] += 1
         tab_alias = "#{tab_alias}#{cnt}" if cnt > 1
         on_str    = make_on_clause(tab_alias, fk[:key], fk[:columns])
-        out_join = nullable_column?(fk[:columns].first) ? 'LEFT OUTER ' : ''
+        out_join = nullable_column?(fk[:columns].first) ? 'LEFT ' : ''
         "#{out_join}JOIN #{fk[:table]} #{cnt > 1 ? tab_alias : ''} #{on_str}"
       end.join("\n")
     end
@@ -606,28 +715,46 @@ class GenerateNewScaffold < BaseService
     end
 
     def nullable_column?(column)
-      this_col = opts.columns.find { |col, _| col == column }.last
-      this_col.nil? ? false : this_col[:allow_null]
+      opts.table_meta.col_lookup[column][:allow_null]
     end
   end
 
   class DmQueryMaker < BaseService
     attr_reader :opts, :report
     def initialize(report, opts)
-      @report = report
+      @report = Crossbeams::Dataminer::Report.new(report.caption)
+      @report.sql = report.runnable_sql
       @opts   = opts
     end
 
     def call
       new_report = Crossbeams::DataminerInterface::DmCreator.new(DB, report).modify_column_datatypes
       hide_cols = %w{id created_at updated_at}
-      # Hide all id, _id, created/updated...
       new_report.ordered_columns.each do |col|
         new_report.column(col.name).hide = true if hide_cols.include?(col.name) || col.name.end_with?('_id')
       end
       new_report.to_hash.to_yaml
-      #             yp = Crossbeams::Dataminer::YamlPersistor.new('dummy_file_name')
-      # { caption: 'A caption', sql: 'a query' }.to_yaml
+    end
+  end
+  # service?
+
+  class AppletMaker < BaseService
+    attr_reader :opts
+    def initialize(opts)
+      @opts   = opts
+    end
+
+    def call
+      <<~EOS
+      # frozen_string_literal: true
+
+      Dir['./lib/#{opts.applet}/entities/*.rb'].each { |f| require f }
+      Dir['./lib/#{opts.applet}/repositories/*.rb'].each { |f| require f }
+      # Dir['./lib/#{opts.applet}/services/*.rb'].each { |f| require f }
+      Dir['./lib/#{opts.applet}/ui_rules/*.rb'].each { |f| require f }
+      Dir['./lib/#{opts.applet}/validations/*.rb'].each { |f| require f }
+      Dir['./lib/#{opts.applet}/views/**/*.rb'].each { |f| require f }
+      EOS
     end
   end
 end

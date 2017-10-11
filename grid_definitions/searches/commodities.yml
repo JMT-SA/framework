@@ -1,0 +1,24 @@
+---
+:dataminer_definition: commodities
+:actions:
+- :url: "/masterfiles/fruit/commodities/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/masterfiles/fruit/commodities/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/fruit/commodities/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/fruit/commodities/new"
+  :text: New Commodity
+  :style: :button
+  :behaviour: :popup

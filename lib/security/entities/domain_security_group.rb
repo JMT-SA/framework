@@ -8,6 +8,6 @@ class DomainSecurityGroup < SimpleDelegator
   end
 
   def permission_list
-    security_permissions.map { |sp| sp.security_permission }.join('; ')
+    security_permissions.map(&:security_permission).join('; ')
   end
 end

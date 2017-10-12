@@ -72,11 +72,11 @@ class RepoBase
 
     dataset = DB[main_table_name]
     if select_options[:order_by]
-      if select_options[:desc]
-        dataset = dataset.order_by(Sequel.desc(select_options[:order_by]))
-      else
-        dataset = dataset.order_by(select_options[:order_by])
-      end
+      dataset = if select_options[:desc]
+                  dataset.order_by(Sequel.desc(select_options[:order_by]))
+                else
+                  dataset.order_by(select_options[:order_by])
+                end
     end
     if label == value
       dataset.map { |rec| rec[value] }

@@ -30,3 +30,6 @@ Layout/SpaceAroundOperators:
 
 Naming/HeredocDelimiterNaming:
   Enabled: false
+
+Performance/UnfreezeString:
+  Enabled: false

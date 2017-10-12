@@ -2,7 +2,7 @@ module Security
   module FunctionalAreas
     module ProgramFunctions
       class Edit
-        def self.call(id, form_values = nil, form_errors = nil)
+        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:program_functions, :edit, id: id)
           rules   = ui_rule.compile
 

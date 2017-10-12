@@ -13,7 +13,7 @@ class Framework < Roda
           #   show_unauthorised
           # end
           # Should lead to step 1, 2 etc.
-        rescue => e
+        rescue StandardError => e
           handle_error(e)
         end
       end

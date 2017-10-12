@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/BlockLength
+
 Dir['./lib/security/functional_areas/**/*.rb'].each { |f| require f }
 Dir['./lib/security/programs/**/*.rb'].each { |f| require f }
 Dir['./lib/security/program_functions/**/*.rb'].each { |f| require f }
@@ -24,7 +27,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end
@@ -49,7 +52,7 @@ class Framework < Roda
             else
               dialog_permission_error
             end
-          rescue => e
+          rescue StandardError => e
             dialog_error(e)
           end
         end
@@ -79,7 +82,7 @@ class Framework < Roda
                 content = show_partial { Security::FunctionalAreas::FunctionalAreas::Edit.call(id, params[:functional_area], errors) }
                 update_dialog_content(content: content, error: 'Validation error')
               end
-            rescue => e
+            rescue StandardError => e
               handle_json_error(e)
             end
           end
@@ -254,7 +257,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end
@@ -262,7 +265,7 @@ class Framework < Roda
         r.post do
           response['Content-Type'] = 'application/json'
           if params[:domain_security_group][:security_permissions]
-            repo.assign_security_permissions(id, params[:domain_security_group][:security_permissions].map { |sp| sp.to_i })
+            repo.assign_security_permissions(id, params[:domain_security_group][:security_permissions].map(&:to_i))
             security_group = repo.find_with_permissions(id)
             update_grid_row(id, changes: { permissions: security_group.permission_list },
                                 notice:  'Updated permissions')
@@ -299,7 +302,7 @@ class Framework < Roda
               content = show_partial { Security::FunctionalAreas::SecurityGroups::Edit.call(id, params[:security_group], errors) }
               update_dialog_content(content: content, error: 'Validation error')
             end
-          rescue => e
+          rescue StandardError => e
             handle_json_error(e)
           end
         end
@@ -319,7 +322,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end
@@ -356,7 +359,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end
@@ -384,7 +387,7 @@ class Framework < Roda
               content = show_partial { Security::FunctionalAreas::SecurityPermissions::Edit.call(id, params[:security_permission], errors) }
               update_dialog_content(content: content, error: 'Validation error')
             end
-          rescue => e
+          rescue StandardError => e
             handle_json_error(e)
           end
         end
@@ -408,7 +411,7 @@ class Framework < Roda
             dialog_permission_error
             # show_unauthorised
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SecurityGroupRepo < RepoBase
   def initialize
     main_table :security_groups
@@ -13,7 +15,7 @@ class SecurityGroupRepo < RepoBase
   end
 
   def assign_security_permissions(id, perm_ids)
-    return { error: 'Choose at least one permission' } if perm_ids.length == 0
+    return { error: 'Choose at least one permission' } if perm_ids.empty?
     del = "DELETE FROM security_groups_security_permissions WHERE security_group_id = #{id}"
     ins = String.new
     perm_ids.each do |p_id|

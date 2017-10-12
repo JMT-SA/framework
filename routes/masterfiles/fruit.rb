@@ -23,7 +23,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end
@@ -49,7 +49,7 @@ class Framework < Roda
               content = show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id, params[:commodity_group], errors) }
               update_dialog_content(content: content, error: 'Validation error')
             end
-          rescue => e
+          rescue StandardError => e
             handle_json_error(e)
           end
         end
@@ -69,7 +69,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end
@@ -106,7 +106,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end
@@ -132,7 +132,7 @@ class Framework < Roda
               content = show_partial { Masterfiles::Fruit::Commodity::Edit.call(id, params[:commodity], errors) }
               update_dialog_content(content: content, error: 'Validation error')
             end
-          rescue => e
+          rescue StandardError => e
             handle_json_error(e)
           end
         end
@@ -152,7 +152,7 @@ class Framework < Roda
           else
             dialog_permission_error
           end
-        rescue => e
+        rescue StandardError => e
           dialog_error(e)
         end
       end

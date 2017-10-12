@@ -20,4 +20,3 @@ module Security
     end
   end
 end
-

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/BlockLength
+
 # TODO: Get rubocop in from the start....
 
 require 'roda'

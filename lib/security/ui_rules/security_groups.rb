@@ -13,8 +13,8 @@ module UiRules
     end
 
     def set_permission_fields
-      perm_repo  = SecurityPermissionRepo.new
-      fields[:security_permissions] = { renderer: :multi, options: perm_repo.for_select, selected: @form_object.security_permissions.map { |sp| sp.id } }
+      perm_repo = SecurityPermissionRepo.new
+      fields[:security_permissions] = { renderer: :multi, options: perm_repo.for_select, selected: @form_object.security_permissions.map(&:id) }
       fields[:security_group_name]  = { renderer: :label }
     end
 

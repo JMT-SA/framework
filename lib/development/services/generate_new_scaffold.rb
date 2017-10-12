@@ -340,7 +340,7 @@ class GenerateNewScaffold < BaseService
                   else
                     dialog_permission_error
                   end
-                rescue => e
+                rescue StandardError => e
                   dialog_error(e)
                 end
               end
@@ -366,7 +366,7 @@ class GenerateNewScaffold < BaseService
                       content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, params[:#{opts.singlename}], errors) }
                       update_dialog_content(content: content, error: 'Validation error')
                     end
-                  rescue => e
+                  rescue StandardError => e
                     handle_json_error(e)
                   end
                 end
@@ -386,7 +386,7 @@ class GenerateNewScaffold < BaseService
                   else
                     dialog_permission_error
                   end
-                rescue => e
+                rescue StandardError => e
                   dialog_error(e)
                 end
               end

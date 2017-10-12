@@ -12,7 +12,7 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:security_permission]  = { renderer: :label }
+      fields[:security_permission] = { renderer: :label }
     end
 
     def common_fields

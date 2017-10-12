@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/BlockLength
+
 module Development
   module Generators
     module Scaffolds
@@ -8,7 +13,12 @@ module Development
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
-              section.add_text "<p>Preview of files to be generated.<br><em>Note the permissions required for program <strong>#{results[:opts].program}</strong></em></p>"
+              section.add_text <<~EOS
+                <p>
+                  Preview of files to be generated.<br>
+                  <em>Note the permissions required for program <strong>#{results[:opts].program}</strong></em>
+                </p>
+              EOS
             end
             if results[:applet]
               page.section do |section|
@@ -62,10 +72,10 @@ module Development
               section.caption = 'Query to use in Dataminer'
               section.hide_caption = false
               section.add_text(<<~EOS)
-              <p>
-                The query might nead tweaking - especially if there are joins.
-                Adjust it and edit the Dataminer Query.
-              </p>
+                <p>
+                  The query might nead tweaking - especially if there are joins.
+                  Adjust it and edit the Dataminer Query.
+                </p>
               EOS
               section.add_text(results[:query], syntax: :sql)
             end

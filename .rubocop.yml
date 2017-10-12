@@ -27,3 +27,6 @@ Metrics/BlockLength:
 
 Layout/SpaceAroundOperators:
   AllowForAlignment: true
+
+Naming/HeredocDelimiterNaming:
+  Enabled: false

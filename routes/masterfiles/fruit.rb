@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/BlockLength
+
 class Framework < Roda
   route 'fruit', 'masterfiles' do |r|
-
     # COMMODITY GROUPS
     # --------------------------------------------------------------------------
     r.on 'commodity_groups', Integer do |id|
-      repo                = CommodityGroupRepo.new
+      repo = CommodityGroupRepo.new
       commodity_group = repo.find(id)
 
       # Check for notfound:
@@ -89,7 +91,7 @@ class Framework < Roda
     # COMMODITIES
     # --------------------------------------------------------------------------
     r.on 'commodities', Integer do |id|
-      repo                = CommodityRepo.new
+      repo = CommodityRepo.new
       commodity = repo.find(id)
 
       # Check for notfound:

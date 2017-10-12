@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/CyclomaticComplexity
+
 class GenerateNewScaffold < BaseService
   include UtilityFunctions
   attr_accessor :opts
@@ -30,10 +35,10 @@ class GenerateNewScaffold < BaseService
     sources[:paths][:route] = "routes/#{opts.applet}/#{opts.program}.rb"
     sources[:paths][:uirule] = "lib/#{opts.applet}/ui_rules/#{opts.singlename}.rb"
     sources[:paths][:view] = {
-                               new: "lib/#{opts.applet}/views/#{opts.singlename}/new.rb",
-                               edit: "lib/#{opts.applet}/views/#{opts.singlename}/edit.rb",
-                               show: "lib/#{opts.applet}/views/#{opts.singlename}/show.rb"
-                             }
+      new: "lib/#{opts.applet}/views/#{opts.singlename}/new.rb",
+      edit: "lib/#{opts.applet}/views/#{opts.singlename}/edit.rb",
+      show: "lib/#{opts.applet}/views/#{opts.singlename}/show.rb"
+    }
     report               = QueryMaker.call(opts)
     sources[:query]      = wrapped_sql_from_report(report)
     sources[:dm_query]   = DmQueryMaker.call(report, opts)
@@ -142,26 +147,27 @@ class GenerateNewScaffold < BaseService
 
     def call
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      class #{opts.klassname}Repo < RepoBase
-        def initialize
-          main_table :#{opts.table}
-          table_wrapper #{opts.klassname}#{for_select}
+        class #{opts.klassname}Repo < RepoBase
+          def initialize
+            main_table :#{opts.table}
+            table_wrapper #{opts.klassname}#{for_select}
+          end
         end
-      end
       EOS
     end
 
     private
+
     def for_select
       return nil if opts.label_field.empty?
-      <<-EOS
-
-    for_select_options label: :#{opts.label_field},
-                       value: :id,
-                       order_by: :#{opts.label_field}
-      EOS
+      code = [
+        "    for_select_options label: :#{opts.label_field},",
+        '                   value: :id,',
+        "                   order_by: :#{opts.label_field}"
+      ]
+      "\n#{code.join(UtilityFunctions.newline_and_spaces(4))}"
     end
   end
 
@@ -174,11 +180,11 @@ class GenerateNewScaffold < BaseService
     def call
       attr = columnise
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      class #{opts.klassname} < Dry::Struct
-        #{attr.join("\n  ")}
-      end
+        class #{opts.klassname} < Dry::Struct
+          #{attr.join("\n  ")}
+        end
       EOS
     end
 
@@ -186,7 +192,7 @@ class GenerateNewScaffold < BaseService
 
     def columnise
       attr = []
-      opts.table_meta.columns_without(%i{created_at updated_at}).each do |col|
+      opts.table_meta.columns_without(%i[created_at updated_at]).each do |col|
         attr << "attribute :#{col}, #{opts.table_meta.column_dry_type(col)}"
       end
       attr
@@ -202,11 +208,11 @@ class GenerateNewScaffold < BaseService
     def call
       attr = columnise
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      #{opts.klassname}Schema = Dry::Validation.Form do
-        #{attr.join("\n  ")}
-      end
+        #{opts.klassname}Schema = Dry::Validation.Form do
+          #{attr.join("\n  ")}
+        end
       EOS
     end
 
@@ -214,16 +220,16 @@ class GenerateNewScaffold < BaseService
 
     def columnise
       attr = []
-      opts.table_meta.columns_without(%i{created_at updated_at}).each do |col|
+      opts.table_meta.columns_without(%i[created_at updated_at]).each do |col|
         detail = opts.table_meta.col_lookup[col]
         fill_opt = detail[:allow_null] ? 'maybe' : 'filled'
         max = detail[:max_length] && detail[:max_length] < 200 ? "max_size?: #{detail[:max_length]}" : nil
         rules = [opts.table_meta.column_dry_validation_type(col), max].compact.join(', ')
-        if col == :id
-          attr << "optional(:#{col}).#{fill_opt}(#{rules})"
-        else
-          attr << "required(:#{col}).#{fill_opt}(#{rules})"
-        end
+        attr << if col == :id
+                  "optional(:#{col}).#{fill_opt}(#{rules})"
+                else
+                  "required(:#{col}).#{fill_opt}(#{rules})"
+                end
       end
       attr
     end
@@ -256,7 +262,7 @@ class GenerateNewScaffold < BaseService
       list[:page_controls] = []
       list[:page_controls] << { control_type: :link,
                                 url: "/#{opts.applet}/#{opts.program}/#{opts.table}/new",
-                                text: "New #{opts.singlename.split('_').map { |n| n.capitalize}.join(' ')}",
+                                text: "New #{opts.singlename.split('_').map(&:capitalize).join(' ')}",
                                 style: :button,
                                 behaviour: :popup }
       list.to_yaml
@@ -290,7 +296,7 @@ class GenerateNewScaffold < BaseService
       search[:page_controls] = []
       search[:page_controls] << { control_type: :link,
                                   url: "/#{opts.applet}/#{opts.program}/#{opts.table}/new",
-                                  text: "New #{opts.singlename.split('_').map { |n| n.capitalize}.join(' ')}",
+                                  text: "New #{opts.singlename.split('_').map(&:capitalize).join(' ')}",
                                   style: :button,
                                   behaviour: :popup }
       search.to_yaml
@@ -309,104 +315,105 @@ class GenerateNewScaffold < BaseService
       program_klass = UtilityFunctions.camelize(opts.program)
 
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      class #{roda_klass} < Roda
-        route '#{opts.program}', '#{opts.applet}' do |r|
+        # rubocop:disable Metrics/ClassLength
+        # rubocop:disable Metrics/BlockLength
 
-          # #{opts.table.upcase.gsub('_', ' ')}
-          # --------------------------------------------------------------------------
-          r.on '#{opts.table}', Integer do |id|
-            repo                = #{opts.klassname}Repo.new
-            #{opts.singlename} = repo.find(id)
+        class #{roda_klass} < Roda
+          route '#{opts.program}', '#{opts.applet}' do |r|
+            # #{opts.table.upcase.tr('_', ' ')}
+            # --------------------------------------------------------------------------
+            r.on '#{opts.table}', Integer do |id|
+              repo = #{opts.klassname}Repo.new
+              #{opts.singlename} = repo.find(id)
 
-            # Check for notfound:
-            r.on #{opts.singlename}.nil? do
-              handle_not_found(r)
-            end
-
-            r.on 'edit' do   # EDIT
-              begin
-                if authorised?('#{opts.program}', 'edit')
-                  show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id) }
-                else
-                  dialog_permission_error
-                end
-              rescue => e
-                dialog_error(e)
+              # Check for notfound:
+              r.on #{opts.singlename}.nil? do
+                handle_not_found(r)
               end
-            end
-            r.is do
-              r.get do       # SHOW
-                if authorised?('#{opts.program}', 'read')
-                  show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Show.call(id) }
-                else
-                  dialog_permission_error
-                end
-              end
-              r.patch do     # UPDATE
+
+              r.on 'edit' do   # EDIT
                 begin
-                  response['Content-Type'] = 'application/json'
-                  res = #{opts.klassname}Schema.call(params[:#{opts.singlename}])
-                  errors = res.messages
-                  if errors.empty?
-                    repo = #{opts.klassname}Repo.new
-                    repo.update(id, res)
-                    update_grid_row(id, changes: { #{grid_refresh_fields} },
-                                        notice:  "Updated \#{res[:#{opts.label_field}]}")
+                  if authorised?('#{opts.program}', 'edit')
+                    show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id) }
                   else
-                    content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, params[:#{opts.singlename}], errors) }
-                    update_dialog_content(content: content, error: 'Validation error')
+                    dialog_permission_error
                   end
                 rescue => e
-                  handle_json_error(e)
+                  dialog_error(e)
                 end
               end
-              r.delete do    # DELETE
-                response['Content-Type'] = 'application/json'
-                repo = #{opts.klassname}Repo.new
-                repo.delete(id)
-                delete_grid_row(id, notice: 'Deleted')
+              r.is do
+                r.get do       # SHOW
+                  if authorised?('#{opts.program}', 'read')
+                    show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Show.call(id) }
+                  else
+                    dialog_permission_error
+                  end
+                end
+                r.patch do     # UPDATE
+                  begin
+                    response['Content-Type'] = 'application/json'
+                    res = #{opts.klassname}Schema.call(params[:#{opts.singlename}])
+                    errors = res.messages
+                    if errors.empty?
+                      repo = #{opts.klassname}Repo.new
+                      repo.update(id, res)
+                      update_grid_row(id, changes: { #{grid_refresh_fields} },
+                                          notice:  "Updated \#{res[:#{opts.label_field}]}")
+                    else
+                      content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, params[:#{opts.singlename}], errors) }
+                      update_dialog_content(content: content, error: 'Validation error')
+                    end
+                  rescue => e
+                    handle_json_error(e)
+                  end
+                end
+                r.delete do    # DELETE
+                  response['Content-Type'] = 'application/json'
+                  repo = #{opts.klassname}Repo.new
+                  repo.delete(id)
+                  delete_grid_row(id, notice: 'Deleted')
+                end
               end
             end
-          end
-          r.on '#{opts.table}' do
-            r.on 'new' do    # NEW
-              begin
-                if authorised?('#{opts.program}', 'new')
-                  show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call }
+            r.on '#{opts.table}' do
+              r.on 'new' do    # NEW
+                begin
+                  if authorised?('#{opts.program}', 'new')
+                    show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call }
+                  else
+                    dialog_permission_error
+                  end
+                rescue => e
+                  dialog_error(e)
+                end
+              end
+              r.post do        # CREATE
+                res = #{opts.klassname}Schema.call(params[:#{opts.singlename}])
+                errors = res.messages
+                if errors.empty?
+                  repo = #{opts.klassname}Repo.new
+                  repo.create(res)
+                  flash[:notice] = 'Created'
+                  redirect_via_json_to_last_grid
                 else
-                  dialog_permission_error
+                  content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(params[:#{opts.singlename}], errors) }
+                  update_dialog_content(content: content, error: 'Validation error')
                 end
-              rescue => e
-                dialog_error(e)
-              end
-            end
-            r.post do        # CREATE
-              res = #{opts.klassname}Schema.call(params[:#{opts.singlename}])
-              errors = res.messages
-              if errors.empty?
-                repo = #{opts.klassname}Repo.new
-                repo.create(res)
-                flash[:notice] = 'Created'
-                redirect_via_json_to_last_grid
-              else
-                content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(params[:#{opts.singlename}], errors) }
-                update_dialog_content(content: content, error: 'Validation error')
               end
             end
           end
         end
-      end
       EOS
     end
 
     def grid_refresh_fields
-      opts.table_meta.columns_without(%i{id created_at updated_at}).map do |col|
+      opts.table_meta.columns_without(%i[id created_at updated_at]).map do |col|
         "#{col}: res[:#{col}]"
       end.join(', ')
     end
-
   end
 
   class UiRuleMaker < BaseService
@@ -417,63 +424,62 @@ class GenerateNewScaffold < BaseService
 
     def call
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      module UiRules
-        class #{opts.klassname} < Base
-          def generate_rules
-            @this_repo = #{opts.klassname}Repo.new
-            make_form_object
+        module UiRules
+          class #{opts.klassname} < Base
+            def generate_rules
+              @this_repo = #{opts.klassname}Repo.new
+              make_form_object
 
-            set_common_fields common_fields
+              set_common_fields common_fields
 
-            set_show_fields if @mode == :show
+              set_show_fields if @mode == :show
 
-            form_name '#{opts.singlename}'.freeze
-          end
+              form_name '#{opts.singlename}'
+            end
 
-          def set_show_fields
-            #{show_fields.join(UtilityFunctions.newline_and_spaces(6))}
-          end
+            def set_show_fields
+              #{show_fields.join(UtilityFunctions.newline_and_spaces(6))}
+            end
 
-          def common_fields
-            {
-              #{common_fields.join(UtilityFunctions.comma_newline_and_spaces(8))}
-            }
-          end
+            def common_fields
+              {
+                #{common_fields.join(UtilityFunctions.comma_newline_and_spaces(8))}
+              }
+            end
 
-          def make_form_object
-            make_new_form_object && return if @mode == :new
+            def make_form_object
+              make_new_form_object && return if @mode == :new
 
-            @form_object = @this_repo.find(@options[:id])
-          end
+              @form_object = @this_repo.find(@options[:id])
+            end
 
-          def make_new_form_object
-            @form_object = OpenStruct.new(#{struct_fields.join(UtilityFunctions.comma_newline_and_spaces(36))})
+            def make_new_form_object
+              @form_object = OpenStruct.new(#{struct_fields.join(UtilityFunctions.comma_newline_and_spaces(36))})
+            end
           end
         end
-      end
       EOS
     end
 
     private
 
     def fields_to_use
-      opts.table_meta.columns_without(%i{id created_at updated_at})
+      opts.table_meta.columns_without(%i[id created_at updated_at])
     end
 
     def show_fields
       flds = []
       fields_to_use.each do |f|
         fk = opts.table_meta.fk_lookup[f]
-        if fk
-          tm = TableMeta.new(fk[:table])
-          singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
-          klassname   = UtilityFunctions.camelize(singlename)
-          fk_repo = "#{klassname}Repo"
-          code = tm.likely_label_field
-          flds << "#{f}_label = #{fk_repo}.new.find(@form_object.#{f})&.#{code}"
-        end
+        next unless fk
+        tm = TableMeta.new(fk[:table])
+        singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
+        klassname   = UtilityFunctions.camelize(singlename)
+        fk_repo = "#{klassname}Repo"
+        code = tm.likely_label_field
+        flds << "#{f}_label = #{fk_repo}.new.find(@form_object.#{f})&.#{code}"
       end
 
       flds + fields_to_use.map do |f|
@@ -491,17 +497,17 @@ class GenerateNewScaffold < BaseService
         this_col = opts.table_meta.col_lookup[field]
         if this_col.nil?
           "#{field}: {}"
-        elsif this_col[:type] == :boolean #int: number, _id: select.
+        elsif this_col[:type] == :boolean # int: number, _id: select.
           "#{field}: { renderer: :checkbox }"
         elsif field.to_s.end_with?('_id')
-          make_select(field, this_col)
+          make_select(field)
         else
           "#{field}: {}"
         end
       end
     end
 
-    def make_select(field, col)
+    def make_select(field)
       fk = opts.table_meta.fk_lookup[field]
       return "#{field}: {}" if fk.nil?
       singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
@@ -540,7 +546,7 @@ class GenerateNewScaffold < BaseService
     private
 
     def fields_to_use
-      opts.table_meta.columns_without(%i{id created_at updated_at})
+      opts.table_meta.columns_without(%i[id created_at updated_at])
     end
 
     def form_fields
@@ -551,33 +557,33 @@ class GenerateNewScaffold < BaseService
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      module #{applet_klass}
-        module #{program_klass}
-          module #{opts.klassname}
-            class New
-              def self.call(form_values = nil, form_errors = nil)
-                ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new)
-                rules   = ui_rule.compile
+        module #{applet_klass}
+          module #{program_klass}
+            module #{opts.klassname}
+              class New
+                def self.call(form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+                  ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new)
+                  rules   = ui_rule.compile
 
-                layout = Crossbeams::Layout::Page.build(rules) do |page|
-                  page.form_object ui_rule.form_object
-                  page.form_values form_values
-                  page.form_errors form_errors
-                  page.form do |form|
-                    form.action '/#{opts.applet}/#{opts.program}/#{opts.table}'
-                    form.remote!
-                    #{form_fields}
+                  layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    page.form_object ui_rule.form_object
+                    page.form_values form_values
+                    page.form_errors form_errors
+                    page.form do |form|
+                      form.action '/#{opts.applet}/#{opts.program}/#{opts.table}'
+                      form.remote!
+                      #{form_fields}
+                    end
                   end
-                end
 
-                layout
+                  layout
+                end
               end
             end
           end
         end
-      end
       EOS
     end
 
@@ -585,34 +591,34 @@ class GenerateNewScaffold < BaseService
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      module #{applet_klass}
-        module #{program_klass}
-          module #{opts.klassname}
-            class Edit
-              def self.call(id, form_values = nil, form_errors = nil)
-                ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id)
-                rules   = ui_rule.compile
+        module #{applet_klass}
+          module #{program_klass}
+            module #{opts.klassname}
+              class Edit
+                def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+                  ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id)
+                  rules   = ui_rule.compile
 
-                layout = Crossbeams::Layout::Page.build(rules) do |page|
-                  page.form_object ui_rule.form_object
-                  page.form_values form_values
-                  page.form_errors form_errors
-                  page.form do |form|
-                    form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}"
-                    form.remote!
-                    form.method :update
-                    #{form_fields}
+                  layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    page.form_object ui_rule.form_object
+                    page.form_values form_values
+                    page.form_errors form_errors
+                    page.form do |form|
+                      form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}"
+                      form.remote!
+                      form.method :update
+                      #{form_fields}
+                    end
                   end
-                end
 
-                layout
+                  layout
+                end
               end
             end
           end
         end
-      end
       EOS
     end
 
@@ -620,30 +626,30 @@ class GenerateNewScaffold < BaseService
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      module #{applet_klass}
-        module #{program_klass}
-          module #{opts.klassname}
-            class Show
-              def self.call(id)
-                ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :show, id: id)
-                rules   = ui_rule.compile
+        module #{applet_klass}
+          module #{program_klass}
+            module #{opts.klassname}
+              class Show
+                def self.call(id)
+                  ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :show, id: id)
+                  rules   = ui_rule.compile
 
-                layout = Crossbeams::Layout::Page.build(rules) do |page|
-                  page.form_object ui_rule.form_object
-                  page.form do |form|
-                    form.view_only!
-                    #{form_fields}
+                  layout = Crossbeams::Layout::Page.build(rules) do |page|
+                    page.form_object ui_rule.form_object
+                    page.form do |form|
+                      form.view_only!
+                      #{form_fields}
+                    end
                   end
-                end
 
-                layout
+                  layout
+                end
               end
             end
           end
         end
-      end
       EOS
     end
   end
@@ -657,11 +663,11 @@ class GenerateNewScaffold < BaseService
 
     def call
       base_sql = <<~EOS
-      SELECT #{columns}
-      FROM #{opts.table}
-      #{make_joins}
+        SELECT #{columns}
+        FROM #{opts.table}
+        #{make_joins}
       EOS
-      report = Crossbeams::Dataminer::Report.new(opts.table.split('_').map { |w| w.capitalize }.join(' '))
+      report = Crossbeams::Dataminer::Report.new(opts.table.split('_').map(&:capitalize).join(' '))
       report.sql = base_sql
       report
     end
@@ -678,11 +684,11 @@ class GenerateNewScaffold < BaseService
           end
         else
           fk_col = get_representative_col_from_table(fk[:table])
-          if opts.table_meta.column_names.include?(fk_col.to_sym)
-            fk_cols << "#{fk[:table]}.#{fk_col} AS #{fk[:table]}_#{fk_col}"
-          else
-            fk_cols << "#{fk[:table]}.#{fk_col}"
-          end
+          fk_cols << if opts.table_meta.column_names.include?(fk_col.to_sym)
+                       "#{fk[:table]}.#{fk_col} AS #{fk[:table]}_#{fk_col}"
+                     else
+                       "#{fk[:table]}.#{fk_col}"
+                     end
         end
       end
       (tab_cols + fk_cols).join(', ')
@@ -722,14 +728,14 @@ class GenerateNewScaffold < BaseService
   class DmQueryMaker < BaseService
     attr_reader :opts, :report
     def initialize(report, opts)
-      @report = Crossbeams::Dataminer::Report.new(report.caption)
+      @report     = Crossbeams::Dataminer::Report.new(report.caption)
       @report.sql = report.runnable_sql
-      @opts   = opts
+      @opts       = opts
     end
 
     def call
       new_report = Crossbeams::DataminerInterface::DmCreator.new(DB, report).modify_column_datatypes
-      hide_cols = %w{id created_at updated_at}
+      hide_cols = %w[id created_at updated_at]
       new_report.ordered_columns.each do |col|
         new_report.column(col.name).hide = true if hide_cols.include?(col.name) || col.name.end_with?('_id')
       end
@@ -741,19 +747,19 @@ class GenerateNewScaffold < BaseService
   class AppletMaker < BaseService
     attr_reader :opts
     def initialize(opts)
-      @opts   = opts
+      @opts = opts
     end
 
     def call
       <<~EOS
-      # frozen_string_literal: true
+        # frozen_string_literal: true
 
-      Dir['./lib/#{opts.applet}/entities/*.rb'].each { |f| require f }
-      Dir['./lib/#{opts.applet}/repositories/*.rb'].each { |f| require f }
-      # Dir['./lib/#{opts.applet}/services/*.rb'].each { |f| require f }
-      Dir['./lib/#{opts.applet}/ui_rules/*.rb'].each { |f| require f }
-      Dir['./lib/#{opts.applet}/validations/*.rb'].each { |f| require f }
-      Dir['./lib/#{opts.applet}/views/**/*.rb'].each { |f| require f }
+        Dir['./lib/#{opts.applet}/entities/*.rb'].each { |f| require f }
+        Dir['./lib/#{opts.applet}/repositories/*.rb'].each { |f| require f }
+        # Dir['./lib/#{opts.applet}/services/*.rb'].each { |f| require f }
+        Dir['./lib/#{opts.applet}/ui_rules/*.rb'].each { |f| require f }
+        Dir['./lib/#{opts.applet}/validations/*.rb'].each { |f| require f }
+        Dir['./lib/#{opts.applet}/views/**/*.rb'].each { |f| require f }
       EOS
     end
   end

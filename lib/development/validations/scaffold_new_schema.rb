@@ -14,7 +14,7 @@ ScaffoldNewSchema = Dry::Validation.Form do
   required(:label_field).maybe(:str?)
 
   # validate(applet_is_other: [:applet, :other]) do |applet, other|
-  validate(filled?: [:applet, :other]) do |applet, other|
+  validate(filled?: %i[applet other]) do |applet, other|
     applet != 'other' || (!other.nil? && !other.empty?)
   end
 
@@ -22,4 +22,3 @@ ScaffoldNewSchema = Dry::Validation.Form do
   #   applet.eql?('other').then(other.filled?)
   # end
 end
-

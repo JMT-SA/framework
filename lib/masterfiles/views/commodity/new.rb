@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module Commodity
       class New
-        def self.call(form_values = nil, form_errors = nil)
+        def self.call(form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:commodity, :new)
           rules   = ui_rule.compile
 

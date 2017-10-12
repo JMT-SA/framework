@@ -10,7 +10,7 @@ module UiRules
 
       set_show_fields if @mode == :show
 
-      form_name 'commodity_group'.freeze
+      form_name 'commodity_group'
     end
 
     def set_show_fields

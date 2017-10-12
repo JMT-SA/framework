@@ -7,6 +7,5 @@ class CommodityRepo < RepoBase
     for_select_options label: :code,
                        value: :id,
                        order_by: :code
-
   end
 end

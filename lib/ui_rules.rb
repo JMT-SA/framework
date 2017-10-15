@@ -50,5 +50,25 @@ module UiRules
     def form_name(name)
       @rules[:name] = name
     end
+
+    def behaviours
+      behaviour = Behaviour.new
+      yield behaviour
+      @rules[:behaviours] = behaviour.rules
+    end
+  end
+
+  class Behaviour
+    attr_reader :rules
+    def initialize
+      @rules = []
+    end
+
+    def enable(field_to_enable, conditions = {})
+      observer = conditions[:when] || raise(ArgumentError, 'Enable behaviour requires `when`.')
+      change_values = conditions[:changes_to]
+      @rules << { observer => { change_affects: field_to_enable } }
+      @rules << { field_to_enable => { enable_on_change: change_values } }
+    end
   end
 end

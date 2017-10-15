@@ -64,22 +64,42 @@ const crossbeamsUtils = {
       multi(sel); // multi select with two panes...
     });
   },
+
   /**
    * Changes select tags into Selectr elements.
    * @returns {void}
    */
   makeSearchableSelects: function makeSearchableSelects() {
     const sels = document.querySelectorAll('.searchable-select');
+    let holdSel;
     sels.forEach((sel) => {
-      new Selectr(sel, {
+      holdSel = new Selectr(sel, {
         customClass: 'cbl-input',
         defaultSelected: true, // should configure via data...
         // multiple: true,     // should configure via data...
         allowDeselect: false,
         clearable: true,       // should configure via data...
       }); // select that can be searched.
+
+      // TODO: Split this up into modular pieces based on rules in data- attributes...
+      if (sel.dataset && sel.dataset.changeValues) {
+        holdSel.on('selectr.change', function(option) {
+          sel.dataset.changeValues.split(',').forEach((el) => {
+            let target = document.getElementById(el);
+            if (target && (target.dataset && target.dataset.enableOnValues)) {
+              let vals = target.dataset.enableOnValues;
+              if(_.includes(vals, option.value)) {
+                target.disabled = false;
+              } else {
+                target.disabled = true;
+              }
+            }
+          });
+        });
+      }
     });
   },
+
   /**
    * Toggle the visibility of en element in the DOM:
    * @param {string} id - the id of the DOM element.

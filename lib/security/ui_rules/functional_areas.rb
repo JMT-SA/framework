@@ -4,7 +4,7 @@ module UiRules
       @this_repo = FunctionalAreaRepo.new
       make_form_object
 
-      set_common_fields common_fields
+      common_values_for_fields common_fields
 
       form_name 'functional_area'.freeze
     end

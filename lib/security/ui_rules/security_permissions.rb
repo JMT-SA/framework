@@ -4,7 +4,7 @@ module UiRules
       @this_repo = SecurityPermissionRepo.new
       make_form_object
 
-      set_common_fields common_fields
+      common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
 

@@ -3,7 +3,9 @@ module UtilityFunctions
 
   # Camelize a string (another_string => AnotherString)
   def camelize(s)
-    s.sub(/^[a-z\d]*/) { $&.capitalize }.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
+    s.sub(/^[a-z\d]*/) { $&.capitalize }.gsub(%r{(?:_|(\/))([a-z\d]*)}) do
+      "#{Regexp.last_match[1]}#{Regexp.last_match[2].capitalize}"
+    end.gsub('/', '::')
   end
 
   # Take a plural string and make a singular version.

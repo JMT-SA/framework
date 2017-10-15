@@ -432,7 +432,7 @@ class GenerateNewScaffold < BaseService
               @this_repo = #{opts.klassname}Repo.new
               make_form_object
 
-              set_common_fields common_fields
+              common_values_for_fields common_fields
 
               set_show_fields if @mode == :show
 

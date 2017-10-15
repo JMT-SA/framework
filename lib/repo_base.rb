@@ -67,21 +67,32 @@ class RepoBase
   # Uses for_select_options to configure.
   # @return Array - list of label/value pairs or just of values.
   def for_select
-    label = select_options[:label] || select_options[:value]
-    value = select_options[:value]
-
     dataset = DB[main_table_name]
-    if select_options[:order_by]
-      dataset = if select_options[:desc]
-                  dataset.order_by(Sequel.desc(select_options[:order_by]))
-                else
-                  dataset.order_by(select_options[:order_by])
-                end
-    end
-    if label == value
-      dataset.map { |rec| rec[value] }
+    dataset = make_order(dataset) if select_options[:order_by]
+    select_label_name == select_value_name ? select_single(dataset) : select_two(dataset)
+  end
+
+  def select_single(dataset)
+    dataset.map { |rec| rec[select_value_name] }
+  end
+
+  def select_two(dataset)
+    dataset.map { |rec| [rec[select_label_name], rec[select_value_name]] }
+  end
+
+  def select_label_name
+    @sel_label_name ||= select_options[:label] || select_options[:value]
+  end
+
+  def select_value_name
+    @sel_value_name ||= select_options[:value]
+  end
+
+  def make_order(dataset)
+    if select_options[:desc]
+      dataset.order_by(Sequel.desc(select_options[:order_by]))
     else
-      dataset.map { |rec| [rec[label], rec[value]] }
+      dataset.order_by(select_options[:order_by])
     end
   end
 end

@@ -39,7 +39,7 @@ module UiRules
 
     private
 
-    def set_common_fields(value)
+    def common_values_for_fields(value)
       @rules[:fields] = value
     end
 

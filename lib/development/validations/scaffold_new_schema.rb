@@ -9,7 +9,7 @@ ScaffoldNewSchema = Dry::Validation.Form do
 
   required(:table).filled(:str?)
   required(:applet).filled(:str?)
-  required(:other).maybe(:str?)
+  optional(:other).maybe(:str?)
   required(:program).filled(:str?) # downcase...
   required(:label_field).maybe(:str?)
 

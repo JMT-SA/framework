@@ -431,6 +431,7 @@ class GenerateNewScaffold < BaseService
             def generate_rules
               @this_repo = #{opts.klassname}Repo.new
               make_form_object
+              apply_form_object
 
               common_values_for_fields common_fields
 
@@ -564,7 +565,7 @@ class GenerateNewScaffold < BaseService
             module #{opts.klassname}
               class New
                 def self.call(form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
-                  ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new)
+                  ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new, form_values: form_values)
                   rules   = ui_rule.compile
 
                   layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -598,7 +599,7 @@ class GenerateNewScaffold < BaseService
             module #{opts.klassname}
               class Edit
                 def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
-                  ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id)
+                  ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id, form_values: form_values)
                   rules   = ui_rule.compile
 
                   layout = Crossbeams::Layout::Page.build(rules) do |page|

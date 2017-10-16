@@ -56,6 +56,14 @@ module UiRules
       yield behaviour
       @rules[:behaviours] = behaviour.rules
     end
+
+    def apply_form_values
+      return unless @options && @options[:form_values]
+
+      @options[:form_values].each do |k, v|
+        @form_object.public_send("#{k}=", v)
+      end
+    end
   end
 
   class Behaviour

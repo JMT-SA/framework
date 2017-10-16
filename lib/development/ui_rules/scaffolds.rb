@@ -3,6 +3,7 @@ module UiRules
     def generate_rules
       @this_repo = DevelopmentRepo.new
       make_form_object
+      apply_form_values
 
       common_values_for_fields common_fields
 
@@ -46,7 +47,7 @@ module UiRules
     end
 
     def disable_other
-      fields[:other][:disabled] = true if [nil, 'other'].include?(form_object.applet)
+      fields[:other][:disabled] = true unless form_object.applet == 'other'
     end
 
     def applets_list

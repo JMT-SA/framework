@@ -427,7 +427,7 @@ class GenerateNewScaffold < BaseService
             def generate_rules
               @this_repo = #{opts.klassname}Repo.new
               make_form_object
-              apply_form_object
+              apply_form_values
 
               common_values_for_fields common_fields
 

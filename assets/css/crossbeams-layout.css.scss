@@ -232,6 +232,9 @@ header,
 .crossbeams-form input:checked ~ label {
   font-weight: bold;
 }
+input[readonly] {
+  background-color: #ddd;
+}
 /* DRAG-AND-DROP FOR SortableList layout object */
 .crossbeams-draggable {
   padding: 0.2em;

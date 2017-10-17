@@ -17,25 +17,22 @@ class Framework < Roda
           handle_error(e)
         end
       end
+
+      r.on 'save_snippet' do
+        response['Content-Type'] = 'application/json'
+        FileUtils.mkpath(File.dirname(params[:snippet][:path]))
+        File.open(File.join(ENV['ROOT'], params[:snippet][:path]), 'w') do |file|
+          file.puts Base64.decode64(params[:snippet][:value])
+        end
+        { flash: { notice: "Saved file `#{params[:snippet][:path]}`" } }.to_json
+      end
+
       r.post do        # CREATE
         res = ScaffoldNewSchema.call(params[:scaffold] || {})
         errors = res.messages
         if errors.empty?
           result = GenerateNewScaffold.call(params[:scaffold])
-          # puts result[:repo]
-          # puts result[:entity]
           show_page { Development::Generators::Scaffolds::Show.call(result) }
-          # if ok
-          # redirect
-          # else
-          # re-show page
-          # end
-          #
-          # call service
-          # repo = CommodityGroupRepo.new
-          # repo.create(res)
-          # flash[:notice] = 'Created'
-          # redirect_to_last_grid(r)
         else
           puts errors.inspect
           show_page { Development::Generators::Scaffolds::New.call(params[:scaffold], errors) }

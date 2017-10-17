@@ -30,6 +30,8 @@ require './lib/ui_rules'
 Dir['./helpers/**/*.rb'].each { |f| require f }
 Dir['./lib/applets/*.rb'].each { |f| require f }
 
+ENV['ROOT'] = File.dirname(__FILE__)
+
 class Framework < Roda
   include CommonHelpers
   include MenuHelpers

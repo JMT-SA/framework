@@ -50,6 +50,7 @@ class GenerateNewScaffold < BaseService
     sources[:uirule]     = UiRuleMaker.call(opts)
     sources[:view]       = ViewMaker.call(opts)
     sources[:route]      = RouteMaker.call(opts)
+    sources[:menu]       = MenuMaker.call(opts)
 
     if opts.new_applet
       sources[:paths][:applet] = "lib/applets/#{opts.applet}_applet.rb"
@@ -57,11 +58,6 @@ class GenerateNewScaffold < BaseService
     end
 
     sources
-
-    # 1) use repo to get schema of table.
-    # create files & dirs...
-    # classes for creating each of entity, repo, ui_rule, valid, view, route
-    # :: where should these classes live? >>> within service class at first...
   end
 
   private
@@ -761,6 +757,47 @@ class GenerateNewScaffold < BaseService
         Dir['./lib/#{opts.applet}/ui_rules/*.rb'].each { |f| require f }
         Dir['./lib/#{opts.applet}/validations/*.rb'].each { |f| require f }
         Dir['./lib/#{opts.applet}/views/**/*.rb'].each { |f| require f }
+      EOS
+    end
+  end
+
+  class MenuMaker < BaseService
+    attr_reader :opts
+    def initialize(opts)
+      @opts = opts
+    end
+
+    def call
+      <<~EOS
+        INSERT INTO functional_areas (functional_area_name) VALUES ('#{opts.applet}');
+
+        INSERT INTO programs (program_name, program_sequence, functional_area_id)
+        VALUES ('#{opts.program}', 1, (SELECT id FROM functional_areas WHERE functional_area_name = '#{opts.applet}'));
+
+        -- NEW menu item
+        /*
+        INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+        VALUES ((SELECT id FROM programs WHERE program_name = '#{opts.program}'
+                 AND functional_area_id = (SELECT id FROM functional_areas
+                                           WHERE functional_area_name = '#{opts.applet}')),
+                 'New #{opts.klassname}', '/#{opts.applet}/#{opts.program}/#{opts.table}/new', 1);
+        */
+
+        -- LIST menu item
+        INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+        VALUES ((SELECT id FROM programs WHERE program_name = '#{opts.program}'
+                 AND functional_area_id = (SELECT id FROM functional_areas
+                                           WHERE functional_area_name = '#{opts.applet}')),
+                 '#{opts.table.capitalize}', '/list/#{opts.list_name}', 2);
+
+        -- SEARCH menu item
+        /*
+        INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+        VALUES ((SELECT id FROM programs WHERE program_name = '#{opts.program}'
+                 AND functional_area_id = (SELECT id FROM functional_areas
+                                           WHERE functional_area_name = '#{opts.applet}')),
+                 'Search #{opts.table.capitalize}', '/search/#{opts.list_name}', 2);
+        */
       EOS
     end
   end

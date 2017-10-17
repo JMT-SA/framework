@@ -97,6 +97,11 @@ module Development
               section.add_text(results[:paths][:search])
               section.add_text(results[:search], syntax: :yaml)
             end
+            page.section do |section|
+              section.caption = 'Optional SQL for inserting menu items'
+              section.hide_caption = false
+              section.add_text(results[:menu], syntax: :sql)
+            end
           end
 
           layout

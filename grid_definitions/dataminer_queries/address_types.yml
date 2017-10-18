@@ -1,0 +1,83 @@
+---
+:caption: Address Types
+:sql: SELECT "address_types"."id", "address_types"."address_type", "address_types"."active",
+        "address_types"."created_at", "address_types"."updated_at" FROM "address_types"
+:limit:
+:offset:
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: address_types.id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  address_type:
+    :name: address_type
+    :sequence_no: 2
+    :caption: Address type
+    :namespaced_name: address_types.address_type
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 3
+    :caption: Active
+    :namespaced_name: address_types.active
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: address_types.created_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 5
+    :caption: Updated at
+    :namespaced_name: address_types.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

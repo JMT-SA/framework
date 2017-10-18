@@ -12,7 +12,7 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'menu' AND functional_area
 INSERT INTO functional_areas (functional_area_name)
 VALUES ('dataminer');
 
-INSERT INTO programs (program_name, program_sequence, , functional_area_id)
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('reports', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'dataminer'));
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)

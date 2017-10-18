@@ -73,7 +73,7 @@ module Development
               section.hide_caption = false
               section.add_text(<<~EOS)
                 <p>
-                  The query might nead tweaking - especially if there are joins.
+                  The query might need tweaking - especially if there are joins.
                   Adjust it and edit the Dataminer Query.
                 </p>
               EOS

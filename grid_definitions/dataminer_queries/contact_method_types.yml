@@ -1,0 +1,68 @@
+---
+:caption: Contact Method Types
+:sql: SELECT "contact_method_types"."id", "contact_method_types"."contact_method_code",
+        "contact_method_types"."created_at", "contact_method_types"."updated_at" FROM "contact_method_types"
+:limit:
+:offset:
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: contact_method_types.id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contact_method_code:
+    :name: contact_method_code
+    :sequence_no: 2
+    :caption: Contact method code
+    :namespaced_name: contact_method_types.contact_method_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 3
+    :caption: Created at
+    :namespaced_name: contact_method_types.created_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 4
+    :caption: Updated at
+    :namespaced_name: contact_method_types.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

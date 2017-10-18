@@ -1,0 +1,83 @@
+---
+:caption: Roles
+:sql: SELECT "roles"."id", "roles"."name", "roles"."active", "roles"."created_at",
+  "roles"."updated_at" FROM "roles"
+:limit:
+:offset:
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: roles.id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  name:
+    :name: name
+    :sequence_no: 2
+    :caption: Name
+    :namespaced_name: roles.name
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 3
+    :caption: Active
+    :namespaced_name: roles.active
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: roles.created_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 5
+    :caption: Updated at
+    :namespaced_name: roles.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

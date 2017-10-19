@@ -517,12 +517,16 @@ class GenerateNewScaffold < BaseService
     def struct_fields # use default values (or should the use of struct be changed to something that knows the db?)
       fields_to_use.map do |field|
         this_col = opts.table_meta.col_lookup[field]
-        if this_col && this_col[:default]
-          "#{field}: #{this_col[:default]}" # might need to be in quotes...
+        if this_col && this_col[:ruby_default]
+          "#{field}: #{default_to_string(this_col[:ruby_default])}"
         else
           "#{field}: nil"
         end
       end
+    end
+
+    def default_to_string(default)
+      default.is_a?(String) ? "'#{default}'" : default
     end
   end
 

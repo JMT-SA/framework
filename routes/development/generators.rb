@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
+
 class Framework < Roda
   route 'generators', 'development' do |r|
     # SCAFFOLDS

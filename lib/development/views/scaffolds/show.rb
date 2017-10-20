@@ -2,6 +2,7 @@
 
 # rubocop:disable Metrics/AbcSize
 # rubocop:disable Metrics/BlockLength
+# rubocop:disable Metrics/ClassLength
 
 module Development
   module Generators
@@ -107,13 +108,18 @@ module Development
           layout
         end
 
-        private
+        private_class_method
 
         def self.save_snippet_form(section, path, code)
-          if !File.exists?(File.join(ENV['ROOT'], path))
+          if !File.exist?(File.join(ENV['ROOT'], path))
             section.form do |form|
-              form.form_config = { name: 'snippet', fields: { path: { readonly: true },
-                                                            value: { renderer: :hidden } } }
+              form.form_config = {
+                name: 'snippet',
+                fields: {
+                  path: { readonly: true },
+                  value: { renderer: :hidden }
+                }
+              }
               form.form_object OpenStruct.new(path: path, value: Base64.encode64(code))
               form.action '/development/generators/scaffolds/save_snippet'
               form.method :update

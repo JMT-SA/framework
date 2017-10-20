@@ -69,14 +69,15 @@ class GenerateNewScaffold < BaseService
   end
 
   class TableMeta
-    attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup
+    attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup, :indexed_columns
     def initialize(table)
-      repo          = DevelopmentRepo.new
-      @columns      = repo.table_columns(table)
-      @column_names = repo.table_col_names(table)
-      @foreigns     = repo.foreign_keys(table)
-      @col_lookup   = Hash[@columns]
-      @fk_lookup    = {}
+      repo             = DevelopmentRepo.new
+      @columns         = repo.table_columns(table)
+      @column_names    = repo.table_col_names(table)
+      @indexed_columns = repo.indexed_columns(table)
+      @foreigns        = repo.foreign_keys(table)
+      @col_lookup      = Hash[@columns]
+      @fk_lookup       = {}
       @foreigns.each { |hs| hs[:columns].each { |c| @fk_lookup[c] = { key: hs[:key], table: hs[:table] } } }
     end
 
@@ -679,7 +680,7 @@ class GenerateNewScaffold < BaseService
       tab_cols = opts.table_meta.column_names.map { |col| "#{opts.table}.#{col}" }
       fk_cols  = []
       opts.table_meta.foreigns.each do |fk|
-        if fk[:table] == :party_roles # Special treatment for party_lore lookups to get party name
+        if fk[:table] == :party_roles # Special treatment for party_role lookups to get party name
           fk[:columns].each do |fk_col|
             fk_cols << "fn_party_role_name(#{opts.table}.#{fk_col}) AS #{fk_col.sub(/_id$/, '')}"
           end
@@ -739,11 +740,52 @@ class GenerateNewScaffold < BaseService
       hide_cols = %w[id created_at updated_at]
       new_report.ordered_columns.each do |col|
         new_report.column(col.name).hide = true if hide_cols.include?(col.name) || col.name.end_with?('_id')
+        if col.name.end_with?('_id') || opts.table_meta.indexed_columns.include?(col.name.to_sym)
+          param = make_param_for(col)
+          new_report.add_parameter_definition(param)
+        end
       end
       new_report.to_hash.to_yaml
     end
+
+    private
+
+    def make_param_for(col)
+      control_type = if col.name.end_with?('_id')
+                       :list
+                     elsif %i[date datetime].include?(col.data_type)
+                       :daterange
+                     else
+                       :text
+                     end
+      opts = {
+        control_type: control_type,
+        data_type: col.data_type,
+        caption: col.caption
+      }
+      opts[:list_def] = make_list_def_for(col) if control_type == :list
+      Crossbeams::Dataminer::QueryParameterDefinition.new(col.namespaced_name, opts)
+    end
+
+    def make_list_def_for(col)
+      fk = opts.table_meta.fk_lookup[col.name.to_sym]
+      table = fk[:table]
+      key = fk[:key].first
+      if table == :party_roles
+        "SELECT fn_party_role_name(#{key}), #{key} FROM party_roles WHERE role_id = (SELECT id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')"
+      else
+        likely = get_representative_col_from_table(table)
+        "SELECT #{likely}, #{key} FROM #{table} ORDER BY #{likely}"
+      end
+    end
+
+    def get_representative_col_from_table(table)
+      tab = TableMeta.new(table)
+      tab.likely_label_field
+    end
   end
-  # service?
+
+  # generate a blank service?
 
   class AppletMaker < BaseService
     attr_reader :opts

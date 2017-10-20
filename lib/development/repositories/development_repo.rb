@@ -19,4 +19,10 @@ class DevelopmentRepo < RepoBase
   def foreign_keys(table)
     DB.foreign_key_list(table)
   end
+
+  def indexed_columns(table)
+    DB.indexes(table).map do |_, index|
+      index[:columns].length == 1 ? index[:columns].first : nil
+    end.compact
+  end
 end

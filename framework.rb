@@ -42,6 +42,7 @@ class Framework < Roda
   use Crossbeams::DataminerInterface::App,
       url_prefix: 'dataminer/',
       dm_reports_location: File.join(File.dirname(__FILE__), 'reports'),
+      dm_grid_queries_location: File.join(File.dirname(__FILE__), 'grid_definitions', 'dataminer_queries'),
       dm_js_location: 'js',
       dm_css_location: 'css',
       db_connection: DB

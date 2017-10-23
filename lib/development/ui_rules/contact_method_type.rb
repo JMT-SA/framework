@@ -20,7 +20,7 @@ module UiRules
 
     def common_fields
       {
-          contact_method_code: {}
+        contact_method_code: {}
       }
     end
 

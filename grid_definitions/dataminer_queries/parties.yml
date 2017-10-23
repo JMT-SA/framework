@@ -1,0 +1,170 @@
+---
+:caption: Parties
+:sql: SELECT "parties".id,
+      fn_party_role_name("party_roles"."id") AS party, string_agg("roles"."name", '; ') AS roles,
+      CASE WHEN "parties"."party_type" = 'O' THEN 'Organization' ELSE 'Person' END AS party_type, "parties"."active",
+      COALESCE("organizations"."vat_number", "people"."vat_number") AS vat_number,
+      "parties"."created_at", "parties"."updated_at",
+      "party_roles"."organization_id", "party_roles"."person_id"
+      FROM "party_roles"
+      LEFT JOIN "organizations" ON "organizations"."id" = "party_roles"."organization_id"
+      JOIN "parties" ON "parties"."id" = "party_roles"."party_id"
+      LEFT JOIN "people" ON "people"."id" = "party_roles"."person_id"
+      JOIN "roles" ON "roles"."id" = "party_roles"."role_id"
+      GROUP BY "parties".id, fn_party_role_name("party_roles"."id"), "parties"."party_type", "parties"."active",
+      "party_roles"."organization_id", "party_roles"."person_id", COALESCE("organizations"."vat_number", "people"."vat_number"),
+       "parties"."created_at", "parties"."updated_at"
+:limit:
+:offset:
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party:
+    :name: party
+    :sequence_no: 2
+    :caption: Party
+    :namespaced_name: party
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_type:
+    :name: party_type
+    :sequence_no: 3
+    :caption: Party type
+    :namespaced_name: party_type
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 4
+    :caption: Active
+    :namespaced_name: active
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  organization_id:
+    :name: organization_id
+    :sequence_no: 5
+    :caption: Organization
+    :namespaced_name: organization_id
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  person_id:
+    :name: person_id
+    :sequence_no: 6
+    :caption: Person
+    :namespaced_name: person_id
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  roles:
+    :name: roles
+    :sequence_no: 7
+    :caption: Roles
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vat_number:
+    :name: vat_number
+    :sequence_no: 8
+    :caption: Vat number
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: created_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

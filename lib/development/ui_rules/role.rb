@@ -21,8 +21,8 @@ module UiRules
 
     def common_fields
       {
-          name: { force_uppercase: true },
-          active: { renderer: :checkbox }
+        name: { force_uppercase: true },
+        active: { renderer: :checkbox }
       }
     end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RoleSchema = Dry::Validation.Form do
+PartySchema = Dry::Validation.Form do
   optional(:id).filled(:int?)
-  required(:name).maybe(:str?)
+  required(:party_type).filled(:str?, max_size?: 1)
   required(:active).maybe(:bool?)
 end

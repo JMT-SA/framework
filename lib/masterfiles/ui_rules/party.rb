@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module UiRules
-  class AddressType < Base
+  class Party < Base
     def generate_rules
-      @this_repo = AddressTypeRepo.new
+      @this_repo = PartyRepo.new
       make_form_object
       apply_form_values
 
@@ -11,17 +11,17 @@ module UiRules
 
       set_show_fields if @mode == :show
 
-      form_name 'address_type'
+      form_name 'party'
     end
 
     def set_show_fields
-      fields[:address_type] = { renderer: :label }
+      fields[:party_type] = { renderer: :label }
       fields[:active] = { renderer: :label }
     end
 
     def common_fields
       {
-        address_type: {},
+        party_type: {},
         active: { renderer: :checkbox }
       }
     end
@@ -33,7 +33,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(address_type: nil,
+      @form_object = OpenStruct.new(party_type: 'O',
                                     active: true)
     end
   end

@@ -4,7 +4,7 @@ module Development
   module Masterfiles
     module Role
       class New
-        def self.call(form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:role, :new, form_values: form_values)
           rules   = ui_rule.compile
 

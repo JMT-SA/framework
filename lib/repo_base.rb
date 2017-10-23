@@ -47,6 +47,10 @@ class RepoBase
     DB[main_table_name].where(id: id).first
   end
 
+  def exists?(args)
+    DB.select(1).where(DB[main_table_name].where(args).exists).one?
+  end
+
   def create(attrs)
     DB[main_table_name].insert(attrs.to_h)
   end

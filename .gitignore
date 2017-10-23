@@ -12,6 +12,7 @@
 *.backup
 *.old
 /.sass-cache/
+lib/applets/.sass-cache/
 public/js/ag-enterprise-activation.js
 public/js/ag-grid-*.*
 public/js/jackbox*.*

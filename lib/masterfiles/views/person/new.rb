@@ -15,12 +15,13 @@ module Masterfiles
             page.form do |form|
               form.action '/masterfiles/parties/people'
               form.remote!
-              form.add_field :party_id
-              form.add_field :surname
-              form.add_field :first_name
+              # form.add_field :party_id
               form.add_field :title
+              form.add_field :first_name
+              form.add_field :surname
               form.add_field :vat_number
-              form.add_field :active
+              form.add_field :role_id
+              # form.add_field :active
             end
           end
 

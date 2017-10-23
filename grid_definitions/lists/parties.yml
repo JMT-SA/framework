@@ -1,11 +1,18 @@
 ---
 :dataminer_definition: parties
 :actions:
-- :url: "/masterfiles/parties/parties/$:id$"
+- :url: "/masterfiles/parties/organizations/$:organization_id$"
   :text: view
   :icon: fa-eye
   :title: View
   :popup: true
+  :hide_if_null: organization_id
+- :url: "/masterfiles/parties/people/$:person_id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+  :hide_if_null: person_id
 - :url: "/masterfiles/parties/organizations/$:organization_id$/edit"
   :text: edit
   :icon: fa-edit
@@ -18,11 +25,18 @@
   :title: Edit
   :popup: true
   :hide_if_null: person_id
-- :url: "/masterfiles/parties/parties/$:id$"
+- :url: "/masterfiles/parties/organizations/$:organization_id$"
   :text: delete
   :icon: fa-remove
   :is_delete: true
   :popup: true
+  :hide_if_null: organization_id
+- :url: "/masterfiles/parties/people/$:person_id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+  :hide_if_null: person_id
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/parties/organizations/new"

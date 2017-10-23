@@ -331,7 +331,7 @@ class Framework < Roda
         errors = res.messages
         if errors.empty?
           repo = PersonRepo.new
-          repo.create(res)
+          repo.create_person(res)
           flash[:notice] = 'Created'
           redirect_via_json_to_last_grid
         else

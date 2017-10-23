@@ -16,14 +16,15 @@ module Masterfiles
               form.action "/masterfiles/parties/organizations/#{id}"
               form.remote!
               form.method :update
-              form.add_field :party_id
+              # form.add_field :party_id
               form.add_field :parent_id
               form.add_field :short_description
               form.add_field :medium_description
               form.add_field :long_description
               form.add_field :vat_number
-              form.add_field :variants
-              form.add_field :active
+              # form.add_field :variants
+              # form.add_field :active
+              form.add_field :role_ids
             end
           end
 

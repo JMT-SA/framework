@@ -16,22 +16,24 @@ module UiRules
 
     def set_show_fields
       party_id_label = PartyRepo.new.find(@form_object.party_id)&.party_type
-      fields[:party_id] = { renderer: :label, with_value: party_id_label }
+      # fields[:party_id] = { renderer: :label, with_value: party_id_label }
       fields[:surname] = { renderer: :label }
       fields[:first_name] = { renderer: :label }
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      fields[:active] = { renderer: :label }
+      fields[:role_id] = { renderer: :label }
+      # fields[:active] = { renderer: :label }
     end
 
     def common_fields
       {
-        party_id: { renderer: :select, options: PartyRepo.new.for_select },
+        # party_id: { renderer: :select, options: PartyRepo.new.for_select },
         surname: {},
         first_name: {},
         title: {},
         vat_number: {},
-        active: { renderer: :checkbox }
+        # active: { renderer: :checkbox },
+        role_id: { renderer: :select, options: RoleRepo.new.for_select }
       }
     end
 
@@ -42,12 +44,12 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(party_id: nil,
-                                    surname: nil,
+      @form_object = OpenStruct.new(surname: nil,
                                     first_name: nil,
                                     title: nil,
                                     vat_number: nil,
-                                    active: true)
+                                    role_id: nil)
+                                    # active: true)
     end
   end
 end

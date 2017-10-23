@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class AddressType < Dry::Struct
+class Party < Dry::Struct
   attribute :id, Types::Int
-  attribute :address_type, Types::String
+  attribute :party_type, Types::String
   attribute :active, Types::Bool
 end

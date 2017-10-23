@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Development
-  module Masterfiles
-    module ContactMethodType
-      class New
-        def self.call(form_values = nil, form_errors = nil)
-          ui_rule = UiRules::Compiler.new(:contact_method_type, :new, form_values: form_values)
+module Masterfiles
+  module Parties
+    module Party
+      class Edit
+        def self.call(id, form_values = nil, form_errors = nil)
+          ui_rule = UiRules::Compiler.new(:party, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,9 +13,11 @@ module Development
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action '/development/masterfiles/contact_method_types'
+              form.action "/masterfiles/parties/parties/#{id}"
               form.remote!
-              form.add_field :contact_method_code
+              form.method :update
+              form.add_field :party_type
+              form.add_field :active
             end
           end
 

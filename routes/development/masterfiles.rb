@@ -19,7 +19,7 @@ class Framework < Roda
       r.on 'edit' do   # EDIT
         begin
           if authorised?('masterfiles', 'edit')
-            show_partial { Development::Masterfiles::Role::Edit.call(id) }
+            show_partial { Masterfiles::Parties::Role::Edit.call(id) }
           else
             dialog_permission_error
           end
@@ -30,7 +30,7 @@ class Framework < Roda
       r.is do
         r.get do       # SHOW
           if authorised?('masterfiles', 'read')
-            show_partial { Development::Masterfiles::Role::Show.call(id) }
+            show_partial { Masterfiles::Parties::Role::Show.call(id) }
           else
             dialog_permission_error
           end
@@ -46,7 +46,7 @@ class Framework < Roda
               update_grid_row(id, changes: { name: res[:name], active: res[:active] },
                               notice:  "Updated #{res[:name]}")
             else
-              content = show_partial { Development::Masterfiles::Role::Edit.call(id, params[:role], errors) }
+              content = show_partial { Masterfiles::Parties::Role::Edit.call(id, params[:role], errors) }
               update_dialog_content(content: content, error: 'Validation error')
             end
           rescue StandardError => e
@@ -65,7 +65,7 @@ class Framework < Roda
       r.on 'new' do    # NEW
         # begin
           if authorised?('masterfiles', 'new')
-            show_partial { Development::Masterfiles::Role::New.call }
+            show_partial { Masterfiles::Parties::Role::New.call }
           else
             dialog_permission_error
           end
@@ -82,7 +82,7 @@ class Framework < Roda
           flash[:notice] = 'Created'
           redirect_via_json_to_last_grid
         else
-          content = show_partial { Development::Masterfiles::Role::New.call(params[:role], errors) }
+          content = show_partial { Masterfiles::Parties::Role::New.call(params[:role], errors) }
           update_dialog_content(content: content, error: 'Validation error')
         end
       end

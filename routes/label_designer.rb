@@ -16,7 +16,7 @@ class Framework < Roda
     css  = page.css
     js   = page.javascript
 
-    <<-EOC
+    <<-ERB
     #{html}
     <% content_for :late_style do %>
       #{css}
@@ -24,6 +24,6 @@ class Framework < Roda
     <% content_for :late_javascript do %>
       #{js}
     <% end %>
-    EOC
+    ERB
   end
 end

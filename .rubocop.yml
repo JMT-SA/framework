@@ -16,7 +16,7 @@ FrozenStringLiteralComment:
 MethodLength:
   Enabled: false
 
-Style/ExtraSpacing:
+Layout/ExtraSpacing:
   Enabled: false
 
 Metrics/BlockLength:
@@ -27,9 +27,6 @@ Metrics/BlockLength:
 
 Layout/SpaceAroundOperators:
   AllowForAlignment: true
-
-Naming/HeredocDelimiterNaming:
-  Enabled: false
 
 Performance/UnfreezeString:
   Enabled: false

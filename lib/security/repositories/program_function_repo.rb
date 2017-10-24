@@ -5,7 +5,7 @@ class ProgramFunctionRepo < RepoBase
   end
 
   def menu_for_user(user)
-    query = <<-EOQ
+    query = <<-SQL
     SELECT f.id AS functional_area_id, p.id AS program_id, pf.id,
     f.functional_area_name, p.program_sequence, p.program_name, pf.group_name,
     pf.program_function_name, pf.url, pf.program_function_sequence
@@ -21,17 +21,17 @@ class ProgramFunctionRepo < RepoBase
         AND p.active
         AND pf.active
     ORDER BY f.functional_area_name, p.program_sequence, p.program_name, pf.group_name, pf.program_function_sequence
-    EOQ
+    SQL
     DB[query].all
   end
 
   def groups_for(program_id)
-    query = <<-EOQ
+    query = <<-SQL
     SELECT DISTINCT group_name
     FROM program_functions
     WHERE program_id = #{program_id}
     ORDER BY group_name
-    EOQ
+    SQL
     DB[query].map { |r| r[:group_name] }
   end
 end

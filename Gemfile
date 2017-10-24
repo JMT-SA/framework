@@ -29,5 +29,5 @@ gem 'pry-doc'
 gem 'rack-console'
 gem 'rake'
 gem 'rerun' # actually just for dev...
-gem 'rubocop'
+gem 'rubocop', '~> 0.51'
 gem 'yard'

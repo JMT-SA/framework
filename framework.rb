@@ -102,14 +102,14 @@ class Framework < Roda
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do
-      s = <<-EOS
+      s = <<-HTML
       <h2>Kromco packhouse</h2>
       <p>There are currently 99 bins and 99 pallets on site.</p>
       <p>Since 1 December 2016: <ul>
       <li>99 deliveries have been received</li>
       <li>99 cartons have been packed</li>
       </p>
-      EOS
+      HTML
       view(inline: s)
     end
 
@@ -185,7 +185,7 @@ class Framework < Roda
             response.headers['Content-Disposition'] = "attachment; filename=\"#{caption.strip.gsub(%r{[/:*?"\\<>\|\r\n]}i, '-') + '.xls'}\""
             response.write(xls) # NOTE: could this use streaming to start downloading quicker?
           rescue Sequel::DatabaseError => e
-            view(inline: <<-EOS)
+            view(inline: <<-HTML)
             <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
             <p>Report: <em>#{caption}</em></p>The error message is:
             <pre>#{e.message}</pre>
@@ -193,7 +193,7 @@ class Framework < Roda
               <i class="fa fa-info"></i> Toggle SQL
             </button>
             <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@rpt.runnable_sql) %></pre>
-            EOS
+            HTML
           end
         end
       end

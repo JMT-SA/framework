@@ -143,7 +143,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         class #{opts.klassname}Repo < RepoBase
@@ -152,7 +152,7 @@ class GenerateNewScaffold < BaseService
             table_wrapper #{opts.klassname}#{for_select}
           end
         end
-      EOS
+      RUBY
     end
 
     private
@@ -176,13 +176,13 @@ class GenerateNewScaffold < BaseService
 
     def call
       attr = columnise
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         class #{opts.klassname} < Dry::Struct
           #{attr.join("\n  ")}
         end
-      EOS
+      RUBY
     end
 
     private
@@ -204,13 +204,13 @@ class GenerateNewScaffold < BaseService
 
     def call
       attr = columnise
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         #{opts.klassname}Schema = Dry::Validation.Form do
           #{attr.join("\n  ")}
         end
-      EOS
+      RUBY
     end
 
     private
@@ -311,7 +311,7 @@ class GenerateNewScaffold < BaseService
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
 
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         # rubocop:disable Metrics/ClassLength
@@ -403,7 +403,7 @@ class GenerateNewScaffold < BaseService
             end
           end
         end
-      EOS
+      RUBY
     end
 
     def grid_refresh_fields
@@ -420,7 +420,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         module UiRules
@@ -458,7 +458,7 @@ class GenerateNewScaffold < BaseService
             end
           end
         end
-      EOS
+      RUBY
     end
 
     private
@@ -487,10 +487,11 @@ class GenerateNewScaffold < BaseService
         else
           "fields[:#{f}] = { renderer: :label, with_value: #{f}_label }"
         end
-      end # can be more intelligent for foreign keys...
+      end
     end
 
-    def common_fields # bool == checkbox, fk == select etc
+    # bool == checkbox, fk == select etc
+    def common_fields
       fields_to_use.map do |field|
         this_col = opts.table_meta.col_lookup[field]
         if this_col.nil?
@@ -515,7 +516,8 @@ class GenerateNewScaffold < BaseService
       "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select }"
     end
 
-    def struct_fields # use default values (or should the use of struct be changed to something that knows the db?)
+    # use default values (or should the use of struct be changed to something that knows the db?)
+    def struct_fields
       fields_to_use.map do |field|
         this_col = opts.table_meta.col_lookup[field]
         if this_col && this_col[:ruby_default]
@@ -558,7 +560,7 @@ class GenerateNewScaffold < BaseService
     def new_view
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         module #{applet_klass}
@@ -586,13 +588,13 @@ class GenerateNewScaffold < BaseService
             end
           end
         end
-      EOS
+      RUBY
     end
 
     def edit_view
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         module #{applet_klass}
@@ -621,13 +623,13 @@ class GenerateNewScaffold < BaseService
             end
           end
         end
-      EOS
+      RUBY
     end
 
     def show_view
       applet_klass  = UtilityFunctions.camelize(opts.applet)
       program_klass = UtilityFunctions.camelize(opts.program)
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         module #{applet_klass}
@@ -652,7 +654,7 @@ class GenerateNewScaffold < BaseService
             end
           end
         end
-      EOS
+      RUBY
     end
   end
 
@@ -664,11 +666,11 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      base_sql = <<~EOS
+      base_sql = <<~SQL
         SELECT #{columns}
         FROM #{opts.table}
         #{make_joins}
-      EOS
+      SQL
       report = Crossbeams::Dataminer::Report.new(opts.table.split('_').map(&:capitalize).join(' '))
       report.sql = base_sql
       report
@@ -794,7 +796,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      <<~EOS
+      <<~RUBY
         # frozen_string_literal: true
 
         Dir['./lib/#{opts.applet}/entities/*.rb'].each { |f| require f }
@@ -803,7 +805,7 @@ class GenerateNewScaffold < BaseService
         Dir['./lib/#{opts.applet}/ui_rules/*.rb'].each { |f| require f }
         Dir['./lib/#{opts.applet}/validations/*.rb'].each { |f| require f }
         Dir['./lib/#{opts.applet}/views/**/*.rb'].each { |f| require f }
-      EOS
+      RUBY
     end
   end
 
@@ -814,7 +816,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      <<~EOS
+      <<~SQL
         INSERT INTO functional_areas (functional_area_name) VALUES ('#{opts.applet}');
 
         INSERT INTO programs (program_name, program_sequence, functional_area_id)
@@ -844,7 +846,7 @@ class GenerateNewScaffold < BaseService
                                            WHERE functional_area_name = '#{opts.applet}')),
                  'Search #{opts.table.capitalize}', '/search/#{opts.list_name}', 2);
         */
-      EOS
+      SQL
     end
   end
 end

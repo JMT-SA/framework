@@ -68,7 +68,7 @@ namespace :db do
 
     fn = Time.now.strftime("%Y%m%d%H%M_#{nm}.rb")
     File.open(File.join('db/migrations', fn), 'w') do |file|
-      file.puts <<~EOS
+      file.puts <<~RUBY
         # require 'sequel_postgresql_triggers' # Uncomment this line for created_at and updated_at triggers.
         Sequel.migration do
           change do
@@ -109,7 +109,7 @@ namespace :db do
           #   drop_function(:table_name_set_updated_at)
           # end
         end
-      EOS
+      RUBY
     end
     puts "Created migration #{fn}"
   end
@@ -121,7 +121,7 @@ namespace :db do
 
     fn = Time.now.strftime("%Y%m%d%H%M_create_#{nm}.rb")
     File.open(File.join('db/migrations', fn), 'w') do |file|
-      file.puts <<~EOS
+      file.puts <<~RUBY
         require 'sequel_postgresql_triggers'
         Sequel.migration do
           up do
@@ -155,7 +155,7 @@ namespace :db do
             drop_table(:#{nm})
           end
         end
-      EOS
+      RUBY
     end
     puts "Created migration #{fn}"
   end

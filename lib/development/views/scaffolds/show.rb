@@ -14,12 +14,12 @@ module Development
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
-              section.add_text <<~EOS
+              section.add_text <<~HTML
                 <p>
                   Preview of files to be generated.<br>
                   <em>Note the permissions required for program <strong>#{results[:opts].program}</strong></em>
                 </p>
-              EOS
+              HTML
             end
             if results[:applet]
               page.section do |section|
@@ -72,12 +72,12 @@ module Development
             page.section do |section|
               section.caption = 'Query to use in Dataminer'
               section.hide_caption = false
-              section.add_text(<<~EOS)
+              section.add_text(<<~HTML)
                 <p>
                   The query might need tweaking - especially if there are joins.
                   Adjust it and edit the Dataminer Query.
                 </p>
-              EOS
+              HTML
               section.add_text(results[:query], syntax: :sql)
             end
             page.section do |section|

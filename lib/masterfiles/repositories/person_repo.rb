@@ -23,13 +23,13 @@ class PersonRepo < RepoBase
   end
 
   def find_hash(id)
-    query = <<-EOQ
+    query = <<-SQL
     SELECT p.*,
     (SELECT array_agg(sub.id) 
      FROM (SELECT id FROM party_roles WHERE party_roles.party_id = p.party_id) sub) AS role_ids
     FROM people p
     WHERE id = #{id}
-    EOQ
+    SQL
     DB[query].first
   end
 

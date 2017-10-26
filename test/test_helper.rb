@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-# require 'crossbeams/layout' ### >>>> creates rouge err messages!!!
+require 'crossbeams/layout'
 require 'yaml'
 require 'dry-struct'
 require 'dry-validation'

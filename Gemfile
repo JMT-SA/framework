@@ -26,6 +26,7 @@ gem 'pry'
 gem 'pry-byebug'
 gem 'pry-clipboard'
 gem 'pry-doc'
+gem 'minitest'
 gem 'rack-console'
 gem 'rake'
 gem 'rerun' # actually just for dev...

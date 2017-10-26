@@ -1,5 +1,4 @@
 require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
-# require File.join(File.expand_path('../../../../applets', __FILE__), 'masterfiles_applet')
 
 class TestPartyApplication < Minitest::Test
 

@@ -23,11 +23,11 @@ gem 'crossbeams-layout',              path: File.expand_path('../../crossbeams-l
 gem 'crossbeams-rack_middleware',     path: File.expand_path('../../crossbeams-rack_middleware', __FILE__)
 gem 'roda-data_grid',                 path: File.expand_path('../../roda-data_grid', __FILE__)
 
+gem 'minitest'
 gem 'pry'
 gem 'pry-byebug'
 gem 'pry-clipboard'
 gem 'pry-doc'
-gem 'minitest'
 gem 'rack-console'
 gem 'rake'
 gem 'rerun' # actually just for dev...

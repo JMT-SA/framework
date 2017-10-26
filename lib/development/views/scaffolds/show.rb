@@ -108,8 +108,6 @@ module Development
           layout
         end
 
-        private_class_method
-
         def self.save_snippet_form(section, path, code)
           if !File.exist?(File.join(ENV['ROOT'], path))
             section.form do |form|
@@ -132,6 +130,8 @@ module Development
             section.add_text(path)
           end
         end
+
+        private_class_method :save_snippet_form
       end
     end
   end

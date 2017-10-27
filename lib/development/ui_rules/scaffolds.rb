@@ -18,8 +18,8 @@ module UiRules
       {
         table: { renderer: :select, options: @this_repo.table_list, prompt: true },
         applet: { renderer: :select, options: applets_list },
-        other: {},
-        program: {},
+        other: { force_lowercase: true },
+        program: { force_lowercase: true },
         label_field: {}
       }
     end

@@ -3,7 +3,7 @@ require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helpe
 class TestPartyApplication < Minitest::Test
 
   def test_nothing
-    x = PartyApplication.create_organization_party
+    x = PartyApplication.new.create_organization_party
     p x
     assert true
   end

@@ -1,7 +1,7 @@
 class PartyApplication
 
   # I want to use the party ID instead of the person and organization ids so that they are sequential
-  def self.create_organization_party
+  def create_organization_party
     return 'tested method'
   end
 

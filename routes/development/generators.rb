@@ -8,16 +8,16 @@ class Framework < Roda
     # --------------------------------------------------------------------------
     r.on 'scaffolds' do
       r.on 'new' do    # NEW
-        begin
+        # begin
           # if authorised?('menu', 'new')
           show_page { Development::Generators::Scaffolds::New.call }
           # else
           #   show_unauthorised
           # end
           # Should lead to step 1, 2 etc.
-        rescue StandardError => e
-          handle_error(e)
-        end
+        # rescue StandardError => e
+        #   handle_error(e)
+        # end
       end
 
       r.on 'save_snippet' do
@@ -33,7 +33,7 @@ class Framework < Roda
         res = ScaffoldNewSchema.call(params[:scaffold] || {})
         errors = res.messages
         if errors.empty?
-          result = GenerateNewScaffold.call(params[:scaffold])
+          result = GenerateNewScaffold.call(res.to_h)
           show_page { Development::Generators::Scaffolds::Show.call(result) }
         else
           puts errors.inspect

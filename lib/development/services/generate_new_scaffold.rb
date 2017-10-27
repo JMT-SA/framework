@@ -21,7 +21,7 @@ class GenerateNewScaffold < BaseService
     @opts.search_name = params[:search_name] || @opts.table
     @opts.label_field = params[:label_field]
     @opts.table_meta  = TableMeta.new(@opts.table)
-    @opts.label_field = @opts.table_meta.likely_label_field if @opts.label_field.empty?
+    @opts.label_field = @opts.table_meta.likely_label_field if @opts.label_field.nil?
   end
 
   def call
@@ -799,12 +799,13 @@ class GenerateNewScaffold < BaseService
       <<~RUBY
         # frozen_string_literal: true
 
-        Dir['./lib/#{opts.applet}/entities/*.rb'].each { |f| require f }
-        Dir['./lib/#{opts.applet}/repositories/*.rb'].each { |f| require f }
-        # Dir['./lib/#{opts.applet}/services/*.rb'].each { |f| require f }
-        Dir['./lib/#{opts.applet}/ui_rules/*.rb'].each { |f| require f }
-        Dir['./lib/#{opts.applet}/validations/*.rb'].each { |f| require f }
-        Dir['./lib/#{opts.applet}/views/**/*.rb'].each { |f| require f }
+        root_dir = File.expand_path('../..', __FILE__)
+        Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].each { |f| require f }
+        Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }
+        # Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
+        Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }
+        Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].each { |f| require f }
+        Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].each { |f| require f }
       RUBY
     end
   end

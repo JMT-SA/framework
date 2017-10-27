@@ -184,7 +184,7 @@ class GenerateNewScaffold < BaseService
             return validation_failed_response(res) unless res.messages.empty?
             # res = validate_#{opts.singlename}... etc.
             @id = #{opts.singlename}_repo.create(res.to_h)
-            success_response("Created #{opts.singlename.gsub('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
+            success_response("Created #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename})
           end
 
@@ -194,7 +194,7 @@ class GenerateNewScaffold < BaseService
             return validation_failed_response(res) unless res.messages.empty?
             # res = validate_#{opts.singlename}... etc.
             #{opts.singlename}_repo.update(id, res.to_h)
-            success_response("Updated #{opts.singlename.gsub('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
+            success_response("Updated #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename}(false))
           end
 
@@ -202,7 +202,7 @@ class GenerateNewScaffold < BaseService
             @id = id
             name = #{opts.singlename}.#{opts.label_field}
             #{opts.singlename}_repo.delete(id)
-            success_response("Deleted #{opts.singlename.gsub('_', ' ')} \#{name}")
+            success_response("Deleted #{opts.singlename.tr('_', ' ')} \#{name}")
           end
         end
       RUBY
@@ -380,10 +380,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      roda_klass    = 'Framework'
-      applet_klass  = UtilityFunctions.camelize(opts.applet)
-      program_klass = UtilityFunctions.camelize(opts.program)
-
+      roda_klass = 'Framework'
       <<~RUBY
         # frozen_string_literal: true
 
@@ -395,82 +392,63 @@ class GenerateNewScaffold < BaseService
             # #{opts.table.upcase.tr('_', ' ')}
             # --------------------------------------------------------------------------
             r.on '#{opts.table}', Integer do |id|
-              repo = #{opts.klassname}Repo.new
-              #{opts.singlename} = repo.find(id)
+              interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
 
               # Check for notfound:
-              r.on #{opts.singlename}.nil? do
+              r.on !interactor.exists?(:#{opts.table}, id) do
                 handle_not_found(r)
               end
 
               r.on 'edit' do   # EDIT
-                begin
-                  if authorised?('#{opts.program}', 'edit')
-                    show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id) }
-                  else
-                    dialog_permission_error
-                  end
-                rescue StandardError => e
-                  dialog_error(e)
+                if authorised?('#{opts.program}', 'edit')
+                  show_partial { interactor.edit_#{opts.singlename}_layout(id) }
+                else
+                  dialog_permission_error
                 end
               end
               r.is do
                 r.get do       # SHOW
                   if authorised?('#{opts.program}', 'read')
-                    show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Show.call(id) }
+                    show_partial { interactor.show_#{opts.singlename}_layout(id) }
                   else
                     dialog_permission_error
                   end
                 end
                 r.patch do     # UPDATE
-                  begin
-                    response['Content-Type'] = 'application/json'
-                    res = #{opts.klassname}Schema.call(params[:#{opts.singlename}])
-                    errors = res.messages
-                    if errors.empty?
-                      repo = #{opts.klassname}Repo.new
-                      repo.update(id, res)
-                      update_grid_row(id, changes: { #{grid_refresh_fields} },
-                                          notice:  "Updated \#{res[:#{opts.label_field}]}")
-                    else
-                      content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, params[:#{opts.singlename}], errors) }
-                      update_dialog_content(content: content, error: 'Validation error')
-                    end
-                  rescue StandardError => e
-                    handle_json_error(e)
+                  response['Content-Type'] = 'application/json'
+                  res = interactor.update_#{opts.singlename}(id, params[:#{opts.singlename}])
+                  if res.success
+                    update_grid_row(id, changes: { #{grid_refresh_fields} },
+                                        notice:  res.message)
+                  else
+                    content = show_partial { interactor.edit_#{opts.singlename}_layout(id, params[:#{opts.singlename}], res.errors) }
+                    update_dialog_content(content: content, error: res.message)
                   end
                 end
                 r.delete do    # DELETE
                   response['Content-Type'] = 'application/json'
-                  repo = #{opts.klassname}Repo.new
-                  repo.delete(id)
-                  delete_grid_row(id, notice: 'Deleted')
+                  res = interactor.delete_#{opts.singlename}(id)
+                  delete_grid_row(id, notice: res.message)
                 end
               end
             end
             r.on '#{opts.table}' do
+              interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
               r.on 'new' do    # NEW
-                begin
-                  if authorised?('#{opts.program}', 'new')
-                    show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call }
-                  else
-                    dialog_permission_error
-                  end
-                rescue StandardError => e
-                  dialog_error(e)
+                if authorised?('#{opts.program}', 'new')
+                  show_partial { interactor.new_#{opts.singlename}_layout }
+                else
+                  dialog_permission_error
                 end
               end
               r.post do        # CREATE
-                res = #{opts.klassname}Schema.call(params[:#{opts.singlename}])
-                errors = res.messages
-                if errors.empty?
-                  repo = #{opts.klassname}Repo.new
-                  repo.create(res)
-                  flash[:notice] = 'Created'
+                res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
+                if res.success
+                  flash[:notice] = res.message
                   redirect_via_json_to_last_grid
                 else
-                  content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(params[:#{opts.singlename}], errors) }
-                  update_dialog_content(content: content, error: 'Validation error')
+                  content = show_partial { interactor.new_#{opts.singlename}_layout(params[:#{opts.singlename}], res.errors) }
+                  update_dialog_content(content: content, error: res.message)
                 end
               end
             end
@@ -481,7 +459,7 @@ class GenerateNewScaffold < BaseService
 
     def grid_refresh_fields
       opts.table_meta.columns_without(%i[id created_at updated_at]).map do |col|
-        "#{col}: res[:#{col}]"
+        "#{col}: res.instance[:#{col}]"
       end.join(', ')
     end
   end

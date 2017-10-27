@@ -242,101 +242,78 @@ class Framework < Roda
     # SECURITY GROUPS
     # --------------------------------------------------------------------------
     r.on 'security_groups', Integer do |id|
-      repo           = SecurityGroupRepo.new
-      security_group = repo.find(id)
+      interactor = SecurityGroupInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on security_group.nil? do
+      r.on !interactor.exists?(:security_groups, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('menu', 'edit')
-            show_partial { Security::FunctionalAreas::SecurityGroups::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'edit')
+          show_partial { interactor.edit_security_group_layout(id) }
+        else
+          dialog_permission_error
         end
       end
       r.on 'permissions' do
         r.post do
           response['Content-Type'] = 'application/json'
-          if params[:domain_security_group][:security_permissions]
-            repo.assign_security_permissions(id, params[:domain_security_group][:security_permissions].map(&:to_i))
-            security_group = repo.find_with_permissions(id)
-            update_grid_row(id, changes: { permissions: security_group.permission_list },
-                                notice:  'Updated permissions')
+          res = interactor.assign_security_permissions(id, params[:security_group])
+          if res.success
+            update_grid_row(id, changes: { permissions: res.instance.permission_list },
+                                notice:  res.message)
           else
-            errors = { security_permissions: ['You did not choose a permission'] }
-            content = show_partial { Security::FunctionalAreas::SecurityGroups::Permissions.call(id, params[:domain_security_group], errors) }
-            update_dialog_content(content: content, error: 'Validation error')
+            content = show_partial { interactor.security_group_permissions_layout(id, params[:security_group], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
 
-        show_partial { Security::FunctionalAreas::SecurityGroups::Permissions.call(id) }
+        show_partial { interactor.security_group_permissions_layout(id) }
       end
       r.is do
         r.get do       # SHOW
           if authorised?('menu', 'read')
-            show_partial { Security::FunctionalAreas::SecurityGroups::Show.call(id) }
+            show_partial { interactor.show_security_group_layout(id) }
           else
             dialog_permission_error
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = SecurityGroupSchema.call(params[:security_group])
-            errors = res.messages
-            if errors.empty?
-              repo = SecurityGroupRepo.new
-              repo.update(id, res)
-              # flash[:notice] = 'Updated'
-              # redirect_via_json_to_last_grid
-              update_grid_row(id, changes: { security_group_name: res[:security_group_name] },
-                                  notice:  "Updated #{res[:security_group_name]}")
-            else
-              content = show_partial { Security::FunctionalAreas::SecurityGroups::Edit.call(id, params[:security_group], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_security_group(id, params[:security_group])
+          if res.success
+            update_grid_row(id, changes: { security_group_name: res.instance[:security_group_name] },
+                                notice:  res.message)
+          else
+            content = show_partial { interactor.edit_security_group_layout(id, params[:security_group], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = SecurityGroupRepo.new
-          repo.delete_with_permissions(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_security_group(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'security_groups' do
+      interactor = SecurityGroupInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('menu', 'new')
-            show_partial { Security::FunctionalAreas::SecurityGroups::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'new')
+          show_partial { interactor.new_security_group_layout }
+        else
+          dialog_permission_error
         end
       end
       r.post do        # CREATE
-        res = SecurityGroupSchema.call(params[:security_group])
-        errors = res.messages
-        if errors.empty?
-          repo = SecurityGroupRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
+        res = interactor.create_security_group(params[:security_group])
+        if res.success
+          flash[:notice] = res.message
           redirect_via_json_to_last_grid
         else
-          content = show_partial { Security::FunctionalAreas::SecurityGroups::New.call(params[:security_group], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          content = show_partial { interactor.new_security_group_layout(params[:security_group], res.errors) }
+          update_dialog_content(content: content, error: res.message)
         end
       end
     end

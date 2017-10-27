@@ -25,6 +25,7 @@ module Types
 end
 
 require './lib/repo_base'
+require './lib/base_interactor'
 require './lib/base_service'
 require './lib/ui_rules'
 Dir['./helpers/**/*.rb'].each { |f| require f }

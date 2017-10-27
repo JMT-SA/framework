@@ -30,6 +30,7 @@ class GenerateNewScaffold < BaseService
     sources[:paths][:list] = "grid_definitions/lists/#{opts.table}.yml"
     sources[:paths][:search] = "grid_definitions/searches/#{opts.table}.yml"
     sources[:paths][:repo] = "lib/#{opts.applet}/repositories/#{opts.singlename}_repo.rb"
+    sources[:paths][:inter] = "lib/#{opts.applet}/interactors/#{opts.singlename}_interactor.rb"
     sources[:paths][:entity] = "lib/#{opts.applet}/entities/#{opts.singlename}.rb"
     sources[:paths][:validation] = "lib/#{opts.applet}/validations/#{opts.singlename}_schema.rb"
     sources[:paths][:route] = "routes/#{opts.applet}/#{opts.program}.rb"
@@ -46,6 +47,7 @@ class GenerateNewScaffold < BaseService
     sources[:search]     = SearchMaker.call(opts)
     sources[:repo]       = RepoMaker.call(opts)
     sources[:entity]     = EntityMaker.call(opts)
+    sources[:inter]      = InteractorMaker.call(opts)
     sources[:validation] = ValidationMaker.call(opts)
     sources[:uirule]     = UiRuleMaker.call(opts)
     sources[:view]       = ViewMaker.call(opts)
@@ -133,6 +135,77 @@ class GenerateNewScaffold < BaseService
       else
         "Types::??? (#{@col_lookup[column][:type]}"
       end
+    end
+  end
+
+  class InteractorMaker < BaseService
+    attr_reader :opts
+    def initialize(opts)
+      @opts = opts
+    end
+
+    def call
+      applet_klass  = UtilityFunctions.camelize(opts.applet)
+      program_klass = UtilityFunctions.camelize(opts.program)
+      <<~RUBY
+        # frozen_string_literal: true
+
+        class #{opts.klassname}Interactor < BaseInteractor
+          def new_#{opts.singlename}_layout(form_values = nil, form_errors = nil)
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values, form_errors)
+          end
+
+          def edit_#{opts.singlename}_layout(id, form_values = nil, form_errors = nil)
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, form_values, form_errors)
+          end
+
+          def show_#{opts.singlename}_layout(id)
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::Show.call(id)
+          end
+
+          def #{opts.singlename}_repo
+            @#{opts.singlename}_repo ||= #{opts.klassname}Repo.new
+          end
+
+          def #{opts.singlename}(cached = true)
+            if cached
+              @#{opts.singlename} ||= #{opts.singlename}_repo.find(@id)
+            else
+              @#{opts.singlename} = #{opts.singlename}_repo.find(@id)
+            end
+          end
+
+          def validate_#{opts.singlename}_params(params)
+            #{opts.klassname}Schema.call(params)
+          end
+
+          def create_#{opts.singlename}(params)
+            res = validate_#{opts.singlename}_params(params)
+            return validation_failed_response(res) unless res.messages.empty?
+            # res = validate_#{opts.singlename}... etc.
+            @id = #{opts.singlename}_repo.create(res.to_h)
+            success_response("Created #{opts.singlename.gsub('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
+                             #{opts.singlename})
+          end
+
+          def update_#{opts.singlename}(id, params)
+            @id = id
+            res = validate_#{opts.singlename}_params(params)
+            return validation_failed_response(res) unless res.messages.empty?
+            # res = validate_#{opts.singlename}... etc.
+            #{opts.singlename}_repo.update(id, res.to_h)
+            success_response("Updated #{opts.singlename.gsub('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
+                             #{opts.singlename}(false))
+          end
+
+          def delete_#{opts.singlename}(id)
+            @id = id
+            name = #{opts.singlename}.#{opts.label_field}
+            #{opts.singlename}_repo.delete(id)
+            success_response("Deleted #{opts.singlename.gsub('_', ' ')} \#{name}")
+          end
+        end
+      RUBY
     end
   end
 
@@ -801,6 +874,7 @@ class GenerateNewScaffold < BaseService
 
         root_dir = File.expand_path('../..', __FILE__)
         Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].each { |f| require f }
+        Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }
         # Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }

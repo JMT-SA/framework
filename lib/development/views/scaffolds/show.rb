@@ -42,6 +42,12 @@ module Development
               section.add_text(results[:entity], syntax: :ruby)
             end
             page.section do |section|
+              section.caption = 'Interactor'
+              section.hide_caption = false
+              save_snippet_form(section, results[:paths][:inter], results[:inter])
+              section.add_text(results[:inter], syntax: :ruby)
+            end
+            page.section do |section|
               section.caption = 'Routes'
               section.hide_caption = false
               save_snippet_form(section, results[:paths][:route], results[:route])

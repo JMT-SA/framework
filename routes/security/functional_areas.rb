@@ -251,7 +251,7 @@ class Framework < Roda
 
       r.on 'edit' do   # EDIT
         if authorised?('menu', 'edit')
-          show_partial { interactor.edit_security_group_layout(id) }
+          show_partial { Security::FunctionalAreas::SecurityGroups::Edit.call(id) }
         else
           dialog_permission_error
         end
@@ -264,17 +264,17 @@ class Framework < Roda
             update_grid_row(id, changes: { permissions: res.instance.permission_list },
                                 notice:  res.message)
           else
-            content = show_partial { interactor.security_group_permissions_layout(id, params[:security_group], res.errors) }
+            content = show_partial { Security::FunctionalAreas::SecurityGroups::Permissions.call(id, params[:security_group], res.errors) }
             update_dialog_content(content: content, error: res.message)
           end
         end
 
-        show_partial { interactor.security_group_permissions_layout(id) }
+        show_partial { Security::FunctionalAreas::SecurityGroups::Permissions.call(id) }
       end
       r.is do
         r.get do       # SHOW
           if authorised?('menu', 'read')
-            show_partial { interactor.show_security_group_layout(id) }
+            show_partial { Security::FunctionalAreas::SecurityGroups::Show.call(id) }
           else
             dialog_permission_error
           end
@@ -286,7 +286,7 @@ class Framework < Roda
             update_grid_row(id, changes: { security_group_name: res.instance[:security_group_name] },
                                 notice:  res.message)
           else
-            content = show_partial { interactor.edit_security_group_layout(id, params[:security_group], res.errors) }
+            content = show_partial { Security::FunctionalAreas::SecurityGroups::Edit.call(id, params[:security_group], res.errors) }
             update_dialog_content(content: content, error: res.message)
           end
         end
@@ -301,7 +301,7 @@ class Framework < Roda
       interactor = SecurityGroupInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('menu', 'new')
-          show_partial { interactor.new_security_group_layout }
+          show_partial { Security::FunctionalAreas::SecurityGroups::New.call }
         else
           dialog_permission_error
         end
@@ -312,7 +312,7 @@ class Framework < Roda
           flash[:notice] = res.message
           redirect_via_json_to_last_grid
         else
-          content = show_partial { interactor.new_security_group_layout(params[:security_group], res.errors) }
+          content = show_partial { Security::FunctionalAreas::SecurityGroups::New.call(params[:security_group], res.errors) }
           update_dialog_content(content: content, error: res.message)
         end
       end

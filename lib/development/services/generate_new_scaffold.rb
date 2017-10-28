@@ -145,24 +145,10 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      applet_klass  = UtilityFunctions.camelize(opts.applet)
-      program_klass = UtilityFunctions.camelize(opts.program)
       <<~RUBY
         # frozen_string_literal: true
 
         class #{opts.klassname}Interactor < BaseInteractor
-          def new_#{opts.singlename}_layout(form_values = nil, form_errors = nil)
-            #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values, form_errors)
-          end
-
-          def edit_#{opts.singlename}_layout(id, form_values = nil, form_errors = nil)
-            #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, form_values, form_errors)
-          end
-
-          def show_#{opts.singlename}_layout(id)
-            #{applet_klass}::#{program_klass}::#{opts.klassname}::Show.call(id)
-          end
-
           def #{opts.singlename}_repo
             @#{opts.singlename}_repo ||= #{opts.klassname}Repo.new
           end
@@ -380,7 +366,9 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      roda_klass = 'Framework'
+      roda_klass    = 'Framework'
+      applet_klass  = UtilityFunctions.camelize(opts.applet)
+      program_klass = UtilityFunctions.camelize(opts.program)
       <<~RUBY
         # frozen_string_literal: true
 
@@ -401,7 +389,7 @@ class GenerateNewScaffold < BaseService
 
               r.on 'edit' do   # EDIT
                 if authorised?('#{opts.program}', 'edit')
-                  show_partial { interactor.edit_#{opts.singlename}_layout(id) }
+                  show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id) }
                 else
                   dialog_permission_error
                 end
@@ -409,7 +397,7 @@ class GenerateNewScaffold < BaseService
               r.is do
                 r.get do       # SHOW
                   if authorised?('#{opts.program}', 'read')
-                    show_partial { interactor.show_#{opts.singlename}_layout(id) }
+                    show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Show.call(id) }
                   else
                     dialog_permission_error
                   end
@@ -421,7 +409,7 @@ class GenerateNewScaffold < BaseService
                     update_grid_row(id, changes: { #{grid_refresh_fields} },
                                         notice:  res.message)
                   else
-                    content = show_partial { interactor.edit_#{opts.singlename}_layout(id, params[:#{opts.singlename}], res.errors) }
+                    content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.call(id, params[:#{opts.singlename}], res.errors) }
                     update_dialog_content(content: content, error: res.message)
                   end
                 end
@@ -436,7 +424,7 @@ class GenerateNewScaffold < BaseService
               interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
               r.on 'new' do    # NEW
                 if authorised?('#{opts.program}', 'new')
-                  show_partial { interactor.new_#{opts.singlename}_layout }
+                  show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call }
                 else
                   dialog_permission_error
                 end
@@ -447,7 +435,7 @@ class GenerateNewScaffold < BaseService
                   flash[:notice] = res.message
                   redirect_via_json_to_last_grid
                 else
-                  content = show_partial { interactor.new_#{opts.singlename}_layout(params[:#{opts.singlename}], res.errors) }
+                  content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(params[:#{opts.singlename}], res.errors) }
                   update_dialog_content(content: content, error: res.message)
                 end
               end

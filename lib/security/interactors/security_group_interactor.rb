@@ -1,22 +1,6 @@
 # frozen_string_literal: true
 
 class SecurityGroupInteractor < BaseInteractor
-  def new_security_group_layout(form_values = nil, form_errors = nil)
-    Security::FunctionalAreas::SecurityGroups::New.call(form_values, form_errors)
-  end
-
-  def edit_security_group_layout(id, form_values = nil, form_errors = nil)
-    Security::FunctionalAreas::SecurityGroups::Edit.call(id, form_values, form_errors)
-  end
-
-  def show_security_group_layout(id)
-    Security::FunctionalAreas::SecurityGroups::Show.call(id)
-  end
-
-  def security_group_permissions_layout(id, form_values = nil, form_errors = nil)
-    Security::FunctionalAreas::SecurityGroups::Permissions.call(id, form_values, form_errors)
-  end
-
   def security_group_repo
     @security_group_repo ||= SecurityGroupRepo.new
   end

@@ -18,6 +18,9 @@ const crossbeamsUtils = {
     document.getElementById('dialog-content').innerHTML = '';
     fetch(href, {
       method: 'GET',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch'
+      }),
       credentials: 'same-origin',
     }).then(function(response) {
       return response.text();

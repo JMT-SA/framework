@@ -2,7 +2,7 @@ module Security
   module FunctionalAreas
     module SecurityGroups
       class New
-        def self.call(form_values = nil, form_errors = nil)
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:security_groups, :new)
           rules   = ui_rule.compile
 
@@ -12,7 +12,7 @@ module Security
             page.form_errors form_errors
             page.form do |form|
               form.action '/security/functional_areas/security_groups'
-              form.remote!
+              form.remote! if remote
               form.add_field :security_group_name
             end
           end

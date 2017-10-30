@@ -424,19 +424,34 @@ class GenerateNewScaffold < BaseService
               interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
               r.on 'new' do    # NEW
                 if authorised?('#{opts.program}', 'new')
-                  show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call }
+                  show_partial_or_page(is_fetch?(r)) { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(remote: is_fetch?(r)) }
                 else
-                  dialog_permission_error
+                  is_fetch?(r) ? dialog_permission_error : show_unauthorised
                 end
               end
               r.post do        # CREATE
                 res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
                 if res.success
                   flash[:notice] = res.message
-                  redirect_via_json_to_last_grid
-                else
-                  content = show_partial { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(params[:#{opts.singlename}], res.errors) }
+                  if is_fetch?(r)
+                    redirect_via_json_to_last_grid
+                  else
+                    redirect_to_last_grid(r)
+                  end
+                elsif is_fetch?(r)
+                  content = show_partial do
+                    #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
+                                                                                   form_errors: #res.errors,
+                                                                                   remote: true)
+                  end
                   update_dialog_content(content: content, error: res.message)
+                else
+                  flash[:error] = res.message
+                  show_page do
+                    #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:security_group],
+                                                                                   form_errors: res.errors,
+                                                                                   remote: false)
+                  end
                 end
               end
             end
@@ -606,7 +621,7 @@ class GenerateNewScaffold < BaseService
           module #{program_klass}
             module #{opts.klassname}
               class New
-                def self.call(form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+                def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
                   ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new, form_values: form_values)
                   rules   = ui_rule.compile
 
@@ -616,7 +631,7 @@ class GenerateNewScaffold < BaseService
                     page.form_errors form_errors
                     page.form do |form|
                       form.action '/#{opts.applet}/#{opts.program}/#{opts.table}'
-                      form.remote!
+                      form.remote! if remote
                       #{form_fields}
                     end
                   end

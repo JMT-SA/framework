@@ -130,6 +130,9 @@
         fetch(event.target.action, {
           method: 'POST', // GET?
           credentials: 'same-origin',
+          headers: new Headers({
+            'X-Custom-Request-Type': 'Fetch'
+          }),
           body: new FormData(event.target),
         }).then((response) => response.json())
           .then(function(data) {

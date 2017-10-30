@@ -301,19 +301,34 @@ class Framework < Roda
       interactor = SecurityGroupInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('menu', 'new')
-          show_partial { Security::FunctionalAreas::SecurityGroups::New.call }
+          show_partial_or_page(is_fetch?(r)) { Security::FunctionalAreas::SecurityGroups::New.call(remote: is_fetch?(r)) }
         else
-          dialog_permission_error
+          is_fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
         res = interactor.create_security_group(params[:security_group])
         if res.success
           flash[:notice] = res.message
-          redirect_via_json_to_last_grid
-        else
-          content = show_partial { Security::FunctionalAreas::SecurityGroups::New.call(params[:security_group], res.errors) }
+          if is_fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif is_fetch?(r)
+          content = show_partial do
+            Security::FunctionalAreas::SecurityGroups::New.call(form_values: params[:security_group],
+                                                                form_errors: res.errors,
+                                                                remote: true)
+          end
           update_dialog_content(content: content, error: res.message)
+        else
+          flash[:error] = res.message
+          show_page do
+            Security::FunctionalAreas::SecurityGroups::New.call(form_values: params[:security_group],
+                                                                form_errors: res.errors,
+                                                                remote: false)
+          end
         end
       end
     end

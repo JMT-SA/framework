@@ -16,6 +16,7 @@ module Security
               form.method :update
               form.add_field :security_group_name
             end
+            page.add_grid('sec_perms', '/list/security_groups', caption: 'Perms')
           end
 
           layout

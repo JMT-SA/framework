@@ -798,8 +798,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     httpRequest.send();
   };
 
-
-  document.addEventListener('DOMContentLoaded', () => {
+  const listenForGrid = function listenForGrid() {
     let gridOptions = null;
     let gridId = null;
     let forPrint = false;
@@ -884,7 +883,15 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       crossbeamsGridStore.addGrid(gridId, gridOptions);
       loadGrid(grid, gridOptions);
     });
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    listenForGrid();
   });
+
+  return {
+    listenForGrid: listenForGrid
+  };
 }).call();
 
 $(() => {
@@ -977,6 +984,9 @@ $(() => {
                 fetch(item.url, {
                   method: 'POST',
                   credentials: 'same-origin',
+                  headers: new Headers({
+                    'X-Custom-Request-Type': 'Fetch'
+                  }),
                   body: form,
                 }).then((response) => response.json())
                   .then(function(data) {

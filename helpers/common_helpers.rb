@@ -13,6 +13,16 @@ module CommonHelpers
     @layout.render
   end
 
+  def show_partial_or_page(partial, &block)
+    @layout = block.yield
+    @layout.add_csrf_tag(csrf_tag)
+    if partial
+      @layout.render
+    else
+      view('crossbeams_layout_page')
+    end
+  end
+
   def make_options(ar)
     ar.map do |a|
       if a.is_a?(Array)
@@ -21,6 +31,11 @@ module CommonHelpers
         "<option value=\"#{a}\">#{a}</option>"
       end
     end.join("\n")
+  end
+
+  # Is this a fetch request?
+  def is_fetch?(r)
+    r.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE')
   end
 
   def current_user

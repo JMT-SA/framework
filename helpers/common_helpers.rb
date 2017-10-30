@@ -34,7 +34,7 @@ module CommonHelpers
   end
 
   # Is this a fetch request?
-  def is_fetch?(r)
+  def fetch?(r)
     r.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE')
   end
 

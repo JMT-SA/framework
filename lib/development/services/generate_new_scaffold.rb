@@ -424,21 +424,21 @@ class GenerateNewScaffold < BaseService
               interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
               r.on 'new' do    # NEW
                 if authorised?('#{opts.program}', 'new')
-                  show_partial_or_page(is_fetch?(r)) { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(remote: is_fetch?(r)) }
+                  show_partial_or_page(fetch?(r)) { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(remote: fetch?(r)) }
                 else
-                  is_fetch?(r) ? dialog_permission_error : show_unauthorised
+                  fetch?(r) ? dialog_permission_error : show_unauthorised
                 end
               end
               r.post do        # CREATE
                 res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
                 if res.success
                   flash[:notice] = res.message
-                  if is_fetch?(r)
+                  if fetch?(r)
                     redirect_via_json_to_last_grid
                   else
                     redirect_to_last_grid(r)
                   end
-                elsif is_fetch?(r)
+                elsif fetch?(r)
                   content = show_partial do
                     #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
                                                                                    form_errors: #res.errors,

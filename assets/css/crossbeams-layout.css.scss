@@ -165,6 +165,13 @@ header,
 /*  border: 0 none; */
   border-radius: 2px;
 }
+.cbl-to-upper {
+  text-transform: uppercase;
+}
+.cbl-to-lower {
+  text-transform: lowercase;
+}
+
 /* flexbox styles */
 /* fieldset div { */
 .crossbeams-field {

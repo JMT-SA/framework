@@ -68,6 +68,49 @@ const crossbeamsGridEvents = {
   },
 
   /**
+   * Save row ids from a multiselect grid.
+   * @param {string} gridId - the DOM id of the grid.
+   * @param {string} url - the URL to receive the fetch request.
+   * @returns {void}
+   */
+  saveSelectedRows: function saveSelectedRows(gridId, url) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    const ids = _.map(gridOptions.api.getSelectedRows(), (m) => m.id );
+    crossbeamsUtils.alert({prompt: ids.join(','), title: url});
+    let msg;
+    // if(!can_be_cleared && ids.length === 0) {
+    //   alert("You have not selected any items to submit!");
+    // }
+    // else {
+      if(ids.length === 0) {
+        msg = 'Are you sure you want to submit an empty selection?'
+      }
+      else {
+        msg = 'Are you sure you want to submit this selection?(' + ids.length.toString() + ' items)'
+      }
+
+      crossbeamsUtils.confirm({
+        prompt: msg,
+        okFunc: () => {
+          const form = document.createElement('form');
+          let element1 = document.createElement("input");
+          let csrf = document.createElement("input");
+          form.method = 'POST';
+          form.action = url;
+          element1.value = ids.join(',')
+          element1.name = 'selection[list]';
+          csrf.value = document.querySelector('meta[name="_csrf"]').content;
+          csrf.name = '_csrf';
+          form.appendChild(element1);
+          form.appendChild(csrf);
+          document.body.appendChild(form);
+          form.submit();
+        },
+      });
+    // }
+  },
+
+  /**
    * Display the number of rows in the grid. Adjust on filter.
    * @param {string} gridId - the DOM id of the grid.
    * @param {integer} filterLength - the number of filtered rows.
@@ -790,6 +833,13 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         gridOptions.api.setColumnDefs(newColDefs); // TODO.............. ????
         gridOptions.api.setRowData(httpResult.rowDefs);
         gridOptions.api.forEachLeafNode((n) => { rows += 1; });
+        if (httpResult.multiselect_ids) {
+          gridOptions.api.forEachNode( function (node) {
+            if (node.data && _.includes(httpResult.multiselect_ids, node.data.id)) {
+              node.setSelected(true);
+            }
+          });
+        }
         crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
         // TODO: if the grid has no horizontal scrollbar, hide the scroll to column dropdown.
         crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId, newColDefs);
@@ -802,10 +852,12 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     let gridOptions = null;
     let gridId = null;
     let forPrint = false;
+    let multisel = false;
     const grids = document.querySelectorAll('[data-grid]');
     grids.forEach((grid) => {
       gridId = grid.getAttribute('id');
       forPrint = grid.dataset.gridPrint;
+      multisel = grid.dataset.gridMulti;
       // lookup of grid ids? populate here and clear when grid unloaded...
       if (grid.dataset.nestedGrid) {
         gridOptions = {
@@ -874,6 +926,14 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       if (forPrint) {
         gridOptions.forPrint = true;
         gridOptions.enableStatusBar = false;
+      }
+
+      if (multisel) {
+        gridOptions.rowSelection = 'multiple';
+        gridOptions.rowDeselection = true;
+        gridOptions.suppressRowClickSelection = true;
+        gridOptions.groupSelectsChildren = true;
+        gridOptions.groupSelectsFiltered = true;
       }
 
       // Index rows by the id column...

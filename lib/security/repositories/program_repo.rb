@@ -36,4 +36,18 @@ class ProgramRepo < RepoBase
     end
     DB[upd.join].update
   end
+
+  def link_user(user_id, program_ids)
+    existing_ids      = DB[:programs_users].where(user_id: user_id).select_map(:program_id)
+    old_ids           = existing_ids - program_ids
+    new_ids           = program_ids - existing_ids
+    security_group_id = SecurityGroupRepo.new.default_security_group_id
+
+    DB.transaction do
+      DB[:programs_users].where(user_id: user_id).where(program_id: old_ids).delete
+      new_ids.each do |prog_id|
+        DB[:programs_users].insert(user_id: user_id, program_id: prog_id, security_group_id: security_group_id)
+      end
+    end
+  end
 end

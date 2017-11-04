@@ -23,6 +23,16 @@ module CommonHelpers
     end
   end
 
+  # Selection from a multiselect grid.
+  # Returns an array of values.
+  def multiselect_grid_choices(params, treat_as_integers: true)
+    if treat_as_integers
+      params[:selection][:list].split(',').map { |i| i.to_i }
+    else
+      params[:selection][:list].split(',')
+    end
+  end
+
   def make_options(ar)
     ar.map do |a|
       if a.is_a?(Array)

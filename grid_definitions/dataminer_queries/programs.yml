@@ -1,0 +1,70 @@
+---
+:caption: Programs
+:sql: "SELECT programs.id, functional_areas.functional_area_name, programs.program_name,
+  programs.program_sequence\r\nFROM programs\r\nJOIN functional_areas ON functional_areas.id
+  = programs.functional_area_id\r\nWHERE programs.active\r\nORDER BY functional_areas.functional_area_name,
+  programs.program_sequence, programs.program_name\r\n"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: programs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  functional_area_name:
+    :name: functional_area_name
+    :sequence_no: 2
+    :caption: Functional area name
+    :namespaced_name: functional_areas.functional_area_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: '1'
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_name:
+    :name: program_name
+    :sequence_no: 3
+    :caption: Program name
+    :namespaced_name: programs.program_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_sequence:
+    :name: program_sequence
+    :sequence_no: 4
+    :caption: Program sequence
+    :namespaced_name: programs.program_sequence
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

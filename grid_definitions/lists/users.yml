@@ -1,0 +1,27 @@
+---
+:dataminer_definition: users
+:actions:
+- :url: "/development/masterfiles/users/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/development/masterfiles/users/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/development/masterfiles/users/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+- :url: "/list/programs/multi?key=program_users&id=$:id$"
+  :text: select programs
+  :icon: fa-list
+:page_controls:
+- :control_type: :link
+  :url: "/development/masterfiles/users/new"
+  :text: New User
+  :style: :button
+  :behaviour: :popup

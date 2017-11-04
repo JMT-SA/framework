@@ -51,6 +51,7 @@ class Framework < Roda
   plugin :data_grid, path: File.dirname(__FILE__),
                      list_url: '/list/%s/grid',
                      list_nested_url: '/list/%s/nested_grid',
+                     list_multi_url: '/list/%s/grid_multi',
                      search_url: '/search/%s/grid',
                      filter_url: '/search/%s',
                      run_search_url: '/search/%s/run',
@@ -150,9 +151,18 @@ class Framework < Roda
           show_page { render_data_grid_page(id) }
         end
 
+        r.on 'multi' do
+          show_page { render_data_grid_page_multiselect(id, params) }
+        end
+
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
           render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })
+        end
+
+        r.on 'grid_multi', String do |key|
+          response['Content-Type'] = 'application/json'
+          render_data_grid_multiselect_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, key, params)
         end
 
         r.on 'nested_grid' do
@@ -160,6 +170,20 @@ class Framework < Roda
           render_data_grid_nested_rows(id)
         end
       end
+    end
+
+# - :url: "/list/users/multi?key=program_users&id=$:id$/"
+
+    # In-page grids (no last grid_url)
+    # 1) list with multi-select - might need last_grid
+    # 2) list_section - never use last_grid
+    r.on 'list_section' do
+      # list_section/users/?user_id=123&multi_select=fredo
+      # open users yml & look for fredo multiselect to get rules
+      #
+      # list_section/users/?user_id=123
+      # open users yml & apply user_id param
+      #
     end
 
     # Generic code for grid searches.

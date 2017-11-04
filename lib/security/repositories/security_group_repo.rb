@@ -32,4 +32,15 @@ class SecurityGroupRepo < RepoBase
       DB[:security_groups].where(id: id).delete
     end
   end
+
+  def default_security_group_id
+    query = <<~SQL
+      SELECT security_group_id
+      FROM security_groups_security_permissions
+      JOIN security_permissions ON security_permissions.id = security_groups_security_permissions.security_permission_id
+      WHERE security_permissions.security_permission = 'read'
+      LIMIT 1
+    SQL
+    DB[query].get(:security_group_id)
+  end
 end

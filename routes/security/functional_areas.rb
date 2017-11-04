@@ -115,6 +115,15 @@ class Framework < Roda
           show_page { Security::FunctionalAreas::Programs::New.call(params[:program][:functional_area_id], params[:program], errors) }
         end
       end
+
+      r.on 'link_users', Integer do |id|
+        r.post do
+          repo = ProgramRepo.new
+          repo.link_user(id, multiselect_grid_choices(params))
+          r.redirect '/list/users'
+        end
+      end
+
       r.on :id do |id|
         r.on 'new' do
           show_page { Security::FunctionalAreas::Programs::New.call(id) }

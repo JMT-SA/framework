@@ -126,6 +126,20 @@ const crossbeamsUtils = {
   },
 
   /**
+   * alert() Shows a SweetAlert2 info alert dialog.
+   * @param {string} prompt - the prompt text.
+   * @param {string} [title] - optional title for the dialog.
+   * @returns {void}
+   */
+  alert: function alert({ prompt, title }) {
+    swal({
+      title: title === undefined ? '' : title,
+      text: prompt,
+      type: 'info',
+    });
+  },
+
+  /**
    * confirm() Shows a SweetAlert2 warning dialog asking the user to confirm or cancel.
    * @param {string} prompt - the prompt text.
    * @param {string} [title] - optional title for the dialog.

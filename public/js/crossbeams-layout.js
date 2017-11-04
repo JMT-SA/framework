@@ -198,6 +198,10 @@
     });
   });
 }());
+
+function testEvt(gridId) {
+  console.log('got grid', gridId, self);
+};
 // CODE FROM HERE...
 // This is an alternative way of loading sections...
 // (js can be in head of page)

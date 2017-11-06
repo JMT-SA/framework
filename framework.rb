@@ -28,6 +28,7 @@ require './lib/repo_base'
 require './lib/base_interactor'
 require './lib/base_service'
 require './lib/ui_rules'
+require './lib/library_versions'
 Dir['./helpers/**/*.rb'].each { |f| require f }
 Dir['./lib/applets/*.rb'].each { |f| require f }
 
@@ -128,14 +129,13 @@ class Framework < Roda
     end
 
     r.is 'versions' do
-      s = String.new('<h2>Gem Versions</h2><ul><li>')
-      s << [Crossbeams::Layout,
-            Crossbeams::Dataminer,
-            Crossbeams::LabelDesigner,
-            Crossbeams::RackMiddleware,
-            Roda::DataGrid].map { |k| "#{k}: #{k.const_get('VERSION')}" }.join('</li><li>')
-      s << '</li></ul>'
-      view(inline: s)
+      view(inline: LibraryVersions.new(:layout,
+                                       :dataminer,
+                                       :label_designer,
+                                       :rackmid,
+                                       :datagrid,
+                                       :ag_grid,
+                                       :selectr).to_html)
     end
 
     r.is 'not_found' do
@@ -172,7 +172,7 @@ class Framework < Roda
       end
     end
 
-# - :url: "/list/users/multi?key=program_users&id=$:id$/"
+    # - :url: "/list/users/multi?key=program_users&id=$:id$/"
 
     # In-page grids (no last grid_url)
     # 1) list with multi-select - might need last_grid

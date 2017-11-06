@@ -27,7 +27,7 @@ module CommonHelpers
   # Returns an array of values.
   def multiselect_grid_choices(params, treat_as_integers: true)
     if treat_as_integers
-      params[:selection][:list].split(',').map { |i| i.to_i }
+      params[:selection][:list].split(',').map(&:to_i)
     else
       params[:selection][:list].split(',')
     end

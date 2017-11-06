@@ -36,3 +36,7 @@ public/fonts
 /.bundle/
 /vendor/bundle
 /lib/bundler/man/
+
+## Rubymine
+.idea/
+.rake_tasks~

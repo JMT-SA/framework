@@ -1,0 +1,124 @@
+---
+:caption: Contact Methods
+:sql: SELECT "contact_methods"."id", "contact_methods"."contact_method_type_id", "contact_methods"."contact_method_code",
+  "contact_methods"."active", "contact_methods"."created_at", "contact_methods"."updated_at",
+  "contact_method_types"."contact_method_code" AS contact_method_types_contact_method_code
+  FROM "contact_methods" JOIN "contact_method_types" ON "contact_method_types"."id"
+  = "contact_methods"."contact_method_type_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: contact_methods.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contact_method_type_id:
+    :name: contact_method_type_id
+    :sequence_no: 2
+    :caption: Contact method type
+    :namespaced_name: contact_methods.contact_method_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contact_method_code:
+    :name: contact_method_code
+    :sequence_no: 3
+    :caption: Contact method code
+    :namespaced_name: contact_methods.contact_method_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 4
+    :caption: Active
+    :namespaced_name: contact_methods.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: contact_methods.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: contact_methods.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contact_method_types_contact_method_code:
+    :name: contact_method_types_contact_method_code
+    :sequence_no: 7
+    :caption: Contact method types contact method code
+    :namespaced_name: contact_method_types.contact_method_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: contact_methods.contact_method_type_id
+  :caption: Contact method type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT contact_method_code, id FROM contact_method_types ORDER BY contact_method_code

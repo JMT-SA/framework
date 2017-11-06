@@ -9,7 +9,7 @@ class BaseInteractor
   end
 
   def exists?(entity, id)
-    repo = SecurityGroupRepo.new
+    repo = RepoBase.new
     repo.row_exists?(entity, id: id)
   end
 

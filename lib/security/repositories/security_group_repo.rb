@@ -21,8 +21,10 @@ class SecurityGroupRepo < RepoBase
     perm_ids.each do |p_id|
       ins << "INSERT INTO security_groups_security_permissions (security_group_id, security_permission_id) VALUES(#{id}, #{p_id});"
     end
-    DB.execute(del)
-    DB.execute(ins)
+    DB.transaction do
+      DB.execute(del)
+      DB.execute(ins)
+    end
     { success: true }
   end
 

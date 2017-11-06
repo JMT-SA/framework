@@ -9,7 +9,7 @@ class OrganizationRepo < RepoBase
                        order_by: :short_description
   end
 
-  def create_organization(attrs)
+  def create(attrs)
     params = attrs.to_h
     role_id = params.delete(:role_id)
     params[:medium_description] = params[:short_description] unless params[:medium_description]
@@ -20,32 +20,37 @@ class OrganizationRepo < RepoBase
       DB[:party_roles].insert(organization_id: org_id,
                               party_id: party_id,
                               role_id: role_id)
+      org_id
     end
   end
 
-  def find_with_permissions(id)
-    security_group = find(id)
-    domain_obj = DomainSecurityGroup.new(security_group)
-    ids = select_values("SELECT security_permission_id FROM security_groups_security_permissions WHERE security_group_id = #{id}")
-    domain_obj.security_permissions = DB[:security_permissions].where(id: ids).map { |sp| SecurityPermission.new(sp) }
+  def find_with_roles(id)
+    organization = find(id)
+    domain_obj = DomainParty.new(organization)
+    ids = select_values("SELECT role_id FROM party_roles WHERE organization_id = #{id}")
+    domain_obj.roles = DB[:roles].where(id: ids).map { |r| Role.new(r) } # :name && :active
     domain_obj
   end
 
-  def assign_security_permissions(id, perm_ids)
-    return { error: 'Choose at least one permission' } if perm_ids.empty?
-    del = "DELETE FROM security_groups_security_permissions WHERE security_group_id = #{id}"
+  def assign_roles(id, role_ids)
+    return { error: 'Choose at least one role' } if role_ids.empty?
+    organization = find(id)
+    del = "DELETE FROM party_roles WHERE organization_id = #{id};"
     ins = String.new
-    perm_ids.each do |p_id|
-      ins << "INSERT INTO security_groups_security_permissions (security_group_id, security_permission_id) VALUES(#{id}, #{p_id});"
+    role_ids.each do |r_id|
+      ins << "INSERT INTO party_roles (party_id, role_id, organization_id) VALUES(#{organization.party_id}, #{r_id}, #{id});"
     end
-    DB.execute(del)
-    DB.execute(ins)
+    DB.transaction do
+      DB.execute(del)
+      DB.execute(ins)
+    end
     { success: true }
   end
 
-  def delete_with_permissions(id)
+  def delete_with_all(id)
+    organization = find(id)
     DB.transaction do
-      DB[:security_groups_security_permissions].where(security_group_id: id).delete
+      DB[:party_roles].where(organization_id: id).delete
       DB[:security_groups].where(id: id).delete
     end
   end

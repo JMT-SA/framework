@@ -37,6 +37,43 @@
   :is_delete: true
   :popup: true
   :hide_if_null: person_id
+- :separator: true
+- :url: "/masterfiles/parties/organizations/$:organization_id$/roles"
+  :text: roles
+  :icon: fa-list
+  :title: Roles
+  :popup: true
+  :hide_if_null: organization_id
+- :url: "/masterfiles/parties/organizations/$:organization_id$/addresses"
+  :text: addresses
+  :icon: fa-list
+  :title: Addresses
+  :popup: true
+  :hide_if_null: organization_id
+- :url: "/masterfiles/parties/organizations/$:organization_id$/contact_methods"
+  :text: contact methods
+  :icon: fa-list
+  :title: Contact Methods
+  :popup: true
+  :hide_if_null: organization_id
+- :url: "/masterfiles/parties/people/$:person_id$/roles"
+  :text: roles
+  :icon: fa-list
+  :title: Roles
+  :popup: true
+  :hide_if_null: person_id
+- :url: "/masterfiles/parties/people/$:person_id$/addresses"
+  :text: addresses
+  :icon: fa-list
+  :title: Addresses
+  :popup: true
+  :hide_if_null: person_id
+- :url: "/masterfiles/parties/people/$:person_id$/contact_methods"
+  :text: contact methods
+  :icon: fa-list
+  :title: Contact Methods
+  :popup: true
+  :hide_if_null: person_id
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/parties/organizations/new"
@@ -46,5 +83,15 @@
 - :control_type: :link
   :url: "/masterfiles/parties/people/new"
   :text: New Person
+  :style: :button
+  :behaviour: :popup
+- :control_type: :link
+  :url: "/masterfiles/parties/addresses/new"
+  :text: New Address
+  :style: :button
+  :behaviour: :popup
+- :control_type: :link
+  :url: "/masterfiles/parties/contact_methods/new"
+  :text: New Contact
   :style: :button
   :behaviour: :popup

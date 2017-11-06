@@ -10,6 +10,7 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
+      set_role_fields if @mode == :roles
 
       form_name 'person'
     end
@@ -23,6 +24,12 @@ module UiRules
       fields[:vat_number] = { renderer: :label }
       fields[:role_id] = { renderer: :label }
       # fields[:active] = { renderer: :label }
+    end
+
+    def set_role_fields
+    roles_repo = RoleRepo.new
+      fields[:roles] = { renderer: :multi, options: roles_repo.for_select, selected: @form_object.roles.map(&:id) }
+      fields[:name]  = { renderer: :label }
     end
 
     def common_fields
@@ -39,6 +46,7 @@ module UiRules
 
     def make_form_object
       make_new_form_object && return if @mode == :new
+      make_roles_form_object && return if @mode == :roles
 
       @form_object = @this_repo.find(@options[:id])
     end
@@ -50,6 +58,10 @@ module UiRules
                                     vat_number: nil,
                                     role_id: nil)
                                     # active: true)
+    end
+
+    def make_roles_form_object
+      @form_object = @this_repo.find_with_roles(@options[:id])
     end
   end
 end

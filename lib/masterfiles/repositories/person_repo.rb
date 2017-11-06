@@ -9,36 +9,47 @@ class PersonRepo < RepoBase
                        order_by: :surname
   end
 
-  def create_person(attrs)
+  def create(attrs)
     params = attrs.to_h
     role_id = params.delete(:role_id)
-    p role_id
     DB.transaction do # BEGIN
       party_id = DB[:parties].insert(party_type: 'P')
       person_id = DB[:people].insert(params.merge(party_id: party_id))
       DB[:party_roles].insert(person_id: person_id,
                               party_id: party_id,
                               role_id: role_id)
+      person_id
     end
   end
 
-  def find_hash(id)
-    query = <<-SQL
-    SELECT p.*,
-    (SELECT array_agg(sub.id) 
-     FROM (SELECT id FROM party_roles WHERE party_roles.party_id = p.party_id) sub) AS role_ids
-    FROM people p
-    WHERE id = #{id}
-    SQL
-    DB[query].first
+  def find_with_roles(id)
+    person = find(id)
+    domain_obj = DomainParty.new(person)
+    ids = select_values("SELECT role_id FROM party_roles WHERE person_id = #{id}")
+    domain_obj.roles = DB[:roles].where(id: ids).map { |r| Role.new(r) } # :name && :active
+    domain_obj
   end
 
-  def role_ids
-  #   ?
-  # repo = PartyRoleRepo.new
-  #   repo.find(self.party_id)
-  #   DB["SELECT roles.name FROM people JOIN party_roles ON party_roles.party_id = people.party_id JOIN roles ON roles.id = party_roles.role_id"]
-    # Array => role_ids
+  def assign_roles(id, role_ids)
+    return { error: 'Choose at least one role' } if role_ids.empty?
+    person = find(id)
+    del = "DELETE FROM party_roles WHERE person_id = #{id};"
+    ins = String.new
+    role_ids.each do |r_id|
+      ins << "INSERT INTO party_roles (party_id, role_id, person_id) VALUES(#{person.party_id}, #{r_id}, #{id});"
+    end
+    DB.transaction do
+      DB.execute(del)
+      DB.execute(ins)
+    end
+    { success: true }
+  end
 
+  def delete_with_all(id)
+    person = find(id)
+    DB.transaction do
+      DB[:party_roles].where(person_id: id).delete
+      DB[:security_groups].where(id: id).delete
+    end
   end
 end

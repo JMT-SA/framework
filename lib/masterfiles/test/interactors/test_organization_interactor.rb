@@ -1,9 +1,9 @@
 require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
 
-class TestPartyApplication < Minitest::Test
+class TestOrganizationInteractor < Minitest::Test
 
   def test_nothing
-    x = PartyApplication.new.create_organization_party
+    x = OrganizationInteractor.new.create_organization_party
     p x
     assert true
   end
@@ -28,7 +28,7 @@ class TestPartyApplication < Minitest::Test
   # it "returns all roles"
 
   # it "creates an address type"
-  # it "returns all addresse types"
+  # it "returns all address types"
 
   # it "creates a contact method"
   # it "returns all contact methods"

@@ -5,340 +5,409 @@
 
 class Framework < Roda
   route 'parties', 'masterfiles' do |r|
-    # ORGANIZATIONS
-    # --------------------------------------------------------------------------
     r.on 'organizations', Integer do |id|
-      repo = OrganizationRepo.new
-      organization = repo.find(id)
+      interactor = OrganizationInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on organization.nil? do
+      r.on !interactor.exists?(:organizations, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('masterfiles', 'edit')
-            show_partial { Masterfiles::Parties::Organization::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'edit')
+          show_partial { Masterfiles::Parties::Organization::Edit.call(id) }
+        else
+          dialog_permission_error
         end
+      end
+      r.on 'roles' do
+        r.post do
+          response['Content-Type'] = 'application/json'
+          res = interactor.assign_roles(id, params[:organization])
+          if res.success
+            update_grid_row(id, changes: { roles: res.instance.role_list },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Organization::Roles.call(id, params[:organization], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+
+        show_partial { Masterfiles::Parties::Organization::Roles.call(id) }
+      end
+      r.on 'addresses' do
+        r.post do
+          response['Content-Type'] = 'application/json'
+          res = interactor.assign_addresses(id, params[:organization])
+          if res.success
+            update_grid_row(id, changes: { addresses: res.instance.address_list },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Organization::Addresses.call(id, params[:organization], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+
+        show_partial { Masterfiles::Parties::Organization::Addresses.call(id) }
+      end
+      r.on 'contact_methods' do
+        r.post do
+          response['Content-Type'] = 'application/json'
+          res = interactor.assign_contact_methods(id, params[:organization])
+          if res.success
+            update_grid_row(id, changes: { contact_methods: res.instance.contact_method_list },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Organization::ContactMethods.call(id, params[:organization], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+
+        show_partial { Masterfiles::Parties::Organization::ContactMethods.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('masterfiles', 'read')
+          if authorised?('menu', 'read')
             show_partial { Masterfiles::Parties::Organization::Show.call(id) }
           else
             dialog_permission_error
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = OrganizationSchema.call(params[:organization])
-            errors = res.messages
-            if errors.empty?
-              repo = OrganizationRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { party_id: res[:party_id], parent_id: res[:parent_id], short_description: res[:short_description], medium_description: res[:medium_description], long_description: res[:long_description], vat_number: res[:vat_number], variants: res[:variants], active: res[:active] },
-                              notice:  "Updated #{res[:short_description]}")
-            else
-              content = show_partial { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_organization(id, params[:organization])
+          if res.success
+            update_grid_row(id, changes: { short_description: res.instance[:short_description] },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = OrganizationRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_organization(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'organizations' do
+      interactor = OrganizationInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('masterfiles', 'new')
-            show_partial { Masterfiles::Parties::Organization::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'new')
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
-        res = OrganizationSchema.call(params[:organization])
-        errors = res.messages
-        # errors[:short_description] = []
-        if OrganizationRepo.new.exists?(short_description: res[:short_description])
-          errors[:short_description] ||= []
-          errors[:short_description] << 'Dup'
-        end
-        if errors.empty?
-
-          repo = OrganizationRepo.new
-          repo.create_organization(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_organization(params[:organization])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
+                                                                form_errors: res.errors,
+                                                                remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Masterfiles::Parties::Organization::New.call(params[:organization], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
+                                                                form_errors: res.errors,
+                                                                remote: false)
+          end
         end
       end
     end
-    # PARTIES
-    # --------------------------------------------------------------------------
-    r.on 'parties', Integer do |id|
-      repo = PartyRepo.new
-      party = repo.find(id)
 
-      # Check for notfound:
-      r.on party.nil? do
-        handle_not_found(r)
-      end
-
-      r.on 'edit' do   # EDIT
-        begin
-          if authorised?('masterfiles', 'edit')
-            show_partial { Masterfiles::Parties::Party::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
-        end
-      end
-      r.is do
-        r.get do       # SHOW
-          if authorised?('masterfiles', 'read')
-            show_partial { Masterfiles::Parties::Party::Show.call(id) }
-          else
-            dialog_permission_error
-          end
-        end
-        r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = PartySchema.call(params[:party])
-            errors = res.messages
-            if errors.empty?
-              repo = PartyRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { party_type: res[:party_type], active: res[:active] },
-                              notice:  "Updated #{res[:party_type]}")
-            else
-              content = show_partial { Masterfiles::Parties::Party::Edit.call(id, params[:party], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
-          end
-        end
-        r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
-          repo = PartyRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
-        end
-      end
-    end
-    r.on 'parties' do
-      r.on 'new' do    # NEW
-        begin
-          if authorised?('masterfiles', 'new')
-            show_partial { Masterfiles::Parties::Party::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
-        end
-      end
-      r.post do        # CREATE
-        res = PartySchema.call(params[:party])
-        errors = res.messages
-        if errors.empty?
-          repo = PartyRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
-        else
-          content = show_partial { Masterfiles::Parties::Party::New.call(params[:party], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
-        end
-      end
-    end
-    # PARTY ROLES
-    # --------------------------------------------------------------------------
-    r.on 'party_roles', Integer do |id|
-      repo = PartyRoleRepo.new
-      party_role = repo.find(id)
-
-      # Check for notfound:
-      r.on party_role.nil? do
-        handle_not_found(r)
-      end
-
-      r.on 'edit' do   # EDIT
-        begin
-          if authorised?('masterfiles', 'edit')
-            show_partial { Masterfiles::Parties::PartyRole::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
-        end
-      end
-      r.is do
-        r.get do       # SHOW
-          if authorised?('masterfiles', 'read')
-            show_partial { Masterfiles::Parties::PartyRole::Show.call(id) }
-          else
-            dialog_permission_error
-          end
-        end
-        r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = PartyRoleSchema.call(params[:party_role])
-            errors = res.messages
-            if errors.empty?
-              repo = PartyRoleRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { party_id: res[:party_id], role_id: res[:role_id], organization_id: res[:organization_id], person_id: res[:person_id], active: res[:active] },
-                              notice:  "Updated #{res[:id]}")
-            else
-              content = show_partial { Masterfiles::Parties::PartyRole::Edit.call(id, params[:party_role], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
-          end
-        end
-        r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
-          repo = PartyRoleRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
-        end
-      end
-    end
-    r.on 'party_roles' do
-      r.on 'new' do    # NEW
-        begin
-          if authorised?('masterfiles', 'new')
-            show_partial { Masterfiles::Parties::PartyRole::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
-        end
-      end
-      r.post do        # CREATE
-        res = PartyRoleSchema.call(params[:party_role])
-        errors = res.messages
-        if errors.empty?
-          repo = PartyRoleRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
-        else
-          content = show_partial { Masterfiles::Parties::PartyRole::New.call(params[:party_role], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
-        end
-      end
-    end
-    # PEOPLE
-    # --------------------------------------------------------------------------
     r.on 'people', Integer do |id|
-      repo = PersonRepo.new
-      person = repo.find(id)
+      interactor = PersonInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on person.nil? do
+      r.on !interactor.exists?(:people, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('masterfiles', 'edit')
-            show_partial { Masterfiles::Parties::Person::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'edit')
+          show_partial { Masterfiles::Parties::Person::Edit.call(id) }
+        else
+          dialog_permission_error
         end
+      end
+      r.on 'roles' do
+        r.post do
+          response['Content-Type'] = 'application/json'
+          res = interactor.assign_roles(id, params[:person])
+          if res.success
+            update_grid_row(id, changes: { roles: res.instance.role_list },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Person::Roles.call(id, params[:person], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+
+        show_partial { Masterfiles::Parties::Person::Roles.call(id) }
+      end
+      r.on 'addresses' do
+        r.post do
+          response['Content-Type'] = 'application/json'
+          res = interactor.assign_addresses(id, params[:person])
+          if res.success
+            update_grid_row(id, changes: { addresses: res.instance.address_list },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Person::Addresses.call(id, params[:person], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+
+        show_partial { Masterfiles::Parties::Person::Addresses.call(id) }
+      end
+      r.on 'contact_methods' do
+        r.post do
+          response['Content-Type'] = 'application/json'
+          res = interactor.assign_contact_methods(id, params[:person])
+          if res.success
+            update_grid_row(id, changes: { contact_methods: res.instance.contact_method_list },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Person::ContactMethods.call(id, params[:person], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+
+        show_partial { Masterfiles::Parties::Person::ContactMethods.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('masterfiles', 'read')
+          if authorised?('menu', 'read')
             show_partial { Masterfiles::Parties::Person::Show.call(id) }
           else
             dialog_permission_error
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = PersonSchema.call(params[:person])
-            errors = res.messages
-            if errors.empty?
-              repo = PersonRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { party_id: res[:party_id], surname: res[:surname], first_name: res[:first_name], title: res[:title], vat_number: res[:vat_number], active: res[:active] },
-                              notice:  "Updated #{res[:surname]}")
-            else
-              content = show_partial { Masterfiles::Parties::Person::Edit.call(id, params[:person], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_person(id, params[:person])
+          if res.success
+            update_grid_row(id, changes: { title: res.instance[:title],
+                                           first_name: res.instance[:first_name],
+                                           surname: res.instance[:surname],
+                                           vat_number: res.instance[:vat_number]},
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Person::Edit.call(id, params[:person], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = PersonRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_person(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'people' do
+      interactor = PersonInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('masterfiles', 'new')
-            show_partial { Masterfiles::Parties::Person::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'new')
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
-        res = PersonSchema.call(params[:person])
-        # update_dialog_content(content: 'AAAARGH')
-        errors = res.messages
-        if errors.empty?
-          repo = PersonRepo.new
-          repo.create_person(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_person(params[:person])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Masterfiles::Parties::Person::New.call(form_values: params[:person],
+                                                         form_errors: res.errors,
+                                                         remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Masterfiles::Parties::Person::New.call(params[:person], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Masterfiles::Parties::Person::New.call(form_values: params[:person],
+                                                         form_errors: res.errors,
+                                                         remote: false)
+          end
         end
       end
+    end
+
+    r.on 'addresses', Integer do |id|
+      interactor = AddressInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:addresses, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        if authorised?('parties', 'edit')
+          show_partial { Masterfiles::Parties::Address::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.is do
+        r.get do       # SHOW
+          if authorised?('parties', 'read')
+            show_partial { Masterfiles::Parties::Address::Show.call(id) }
+          else
+            dialog_permission_error
+          end
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_address(id, params[:address])
+          if res.success
+            update_grid_row(id, changes: { address_type_id: res.instance[:address_type_id], address_line_1: res.instance[:address_line_1], address_line_2: res.instance[:address_line_2], address_line_3: res.instance[:address_line_3], city: res.instance[:city], postal_code: res.instance[:postal_code], country: res.instance[:country], active: res.instance[:active] },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::Address::Edit.call(id, params[:address], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
+          res = interactor.delete_address(id)
+          delete_grid_row(id, notice: res.message)
+        end
+      end
+    end
+    r.on 'addresses' do
+      interactor = AddressInteractor.new(current_user, {}, {}, {})
+      r.on 'new' do    # NEW
+        if authorised?('parties', 'new')
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
+        end
+      end
+      r.post do        # CREATE
+        res = interactor.create_address(params[:address])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Masterfiles::Parties::Address::New.call(form_values: params[:address],
+                                                    form_errors: res.errors,
+                                                    remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
+        else
+          flash[:error] = res.message
+          show_page do
+            Masterfiles::Parties::Address::New.call(form_values: params[:security_group],
+                                                    form_errors: res.errors,
+                                                    remote: false)
+          end
+        end
+      end
+    end
+
+    r.on 'contact_methods', Integer do |id|
+      interactor = ContactMethodInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:contact_methods, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        if authorised?('parties', 'edit')
+          show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.is do
+        r.get do       # SHOW
+          if authorised?('parties', 'read')
+            show_partial { Masterfiles::Parties::ContactMethod::Show.call(id) }
+          else
+            dialog_permission_error
+          end
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_contact_method(id, params[:contact_method])
+          if res.success
+            update_grid_row(id, changes: { contact_method_type_id: res.instance[:contact_method_type_id], contact_method_code: res.instance[:contact_method_code], active: res.instance[:active] },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id, params[:contact_method], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
+          res = interactor.delete_contact_method(id)
+          delete_grid_row(id, notice: res.message)
+        end
+      end
+    end
+    r.on 'contact_methods' do
+      interactor = ContactMethodInteractor.new(current_user, {}, {}, {})
+      r.on 'new' do    # NEW
+        if authorised?('parties', 'new')
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
+        end
+      end
+      r.post do        # CREATE
+        res = interactor.create_contact_method(params[:contact_method])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Masterfiles::Parties::ContactMethod::New.call(form_values: params[:contact_method],
+                                                          form_errors: res.errors,
+                                                          remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
+        else
+          flash[:error] = res.message
+          show_page do
+            Masterfiles::Parties::ContactMethod::New.call(form_values: params[:security_group],
+                                                          form_errors: res.errors,
+                                                          remote: false)
+          end
+        end
+      end
+    end
+
+    r.on 'roles', Integer do |party_id|
+
     end
   end
 end

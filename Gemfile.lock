@@ -1,5 +1,5 @@
 PATH
-  remote: /home/james/ra/crossbeams/crossbeams-dataminer_interface
+  remote: /home/violet/crossbeams/crossbeams-dataminer_interface
   specs:
     crossbeams-dataminer_interface (0.1.0)
       axlsx
@@ -10,13 +10,13 @@ PATH
       tilt
 
 PATH
-  remote: /home/james/ra/crossbeams/crossbeams-dataminer
+  remote: /home/violet/crossbeams/crossbeams-dataminer
   specs:
     crossbeams-dataminer (0.1.0)
       pg_query (= 0.11.5)
 
 PATH
-  remote: /home/james/ra/crossbeams/crossbeams-label_designer
+  remote: /home/violet/crossbeams/crossbeams-label_designer
   specs:
     crossbeams-label_designer (0.1.0)
       dry-configurable
@@ -24,20 +24,20 @@ PATH
       json
 
 PATH
-  remote: /home/james/ra/crossbeams/crossbeams-layout
+  remote: /home/violet/crossbeams/crossbeams-layout
   specs:
     crossbeams-layout (0.1.0)
       rouge
 
 PATH
-  remote: /home/james/ra/crossbeams/crossbeams-rack_middleware
+  remote: /home/violet/crossbeams/crossbeams-rack_middleware
   specs:
     crossbeams-rack_middleware (0.1.0)
       erubis
       rack
 
 PATH
-  remote: /home/james/ra/crossbeams/roda-data_grid
+  remote: /home/violet/crossbeams/roda-data_grid
   specs:
     roda-data_grid (0.1.0)
       axlsx

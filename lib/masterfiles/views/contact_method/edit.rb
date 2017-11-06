@@ -2,10 +2,10 @@
 
 module Masterfiles
   module Parties
-    module Party
-      class New
-        def self.call(form_values = nil, form_errors = nil)
-          ui_rule = UiRules::Compiler.new(:party, :new, form_values: form_values)
+    module ContactMethod
+      class Edit
+        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:contact_method, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,9 +13,11 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action '/masterfiles/parties/parties'
+              form.action "/masterfiles/parties/contact_methods/#{id}"
               form.remote!
-              form.add_field :party_type
+              form.method :update
+              form.add_field :contact_method_type_id
+              form.add_field :contact_method_code
               form.add_field :active
             end
           end

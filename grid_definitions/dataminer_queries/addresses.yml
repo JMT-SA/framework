@@ -1,0 +1,199 @@
+---
+:caption: Addresses
+:sql: SELECT "addresses"."id", "addresses"."address_type_id", "addresses"."address_line_1",
+  "addresses"."address_line_2", "addresses"."address_line_3", "addresses"."city",
+  "addresses"."postal_code", "addresses"."country", "addresses"."active", "addresses"."created_at",
+  "addresses"."updated_at", "address_types"."address_type" FROM "addresses" JOIN "address_types"
+  ON "address_types"."id" = "addresses"."address_type_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: addresses.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  address_type_id:
+    :name: address_type_id
+    :sequence_no: 2
+    :caption: Address type
+    :namespaced_name: addresses.address_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  address_line_1:
+    :name: address_line_1
+    :sequence_no: 3
+    :caption: Address line 1
+    :namespaced_name: addresses.address_line_1
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  address_line_2:
+    :name: address_line_2
+    :sequence_no: 4
+    :caption: Address line 2
+    :namespaced_name: addresses.address_line_2
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  address_line_3:
+    :name: address_line_3
+    :sequence_no: 5
+    :caption: Address line 3
+    :namespaced_name: addresses.address_line_3
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  city:
+    :name: city
+    :sequence_no: 6
+    :caption: City
+    :namespaced_name: addresses.city
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  postal_code:
+    :name: postal_code
+    :sequence_no: 7
+    :caption: Postal code
+    :namespaced_name: addresses.postal_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  country:
+    :name: country
+    :sequence_no: 8
+    :caption: Country
+    :namespaced_name: addresses.country
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: addresses.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: addresses.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: addresses.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  address_type:
+    :name: address_type
+    :sequence_no: 12
+    :caption: Address type
+    :namespaced_name: address_types.address_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: addresses.address_type_id
+  :caption: Address type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT address_type, id FROM address_types ORDER BY address_type

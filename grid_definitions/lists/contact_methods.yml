@@ -1,0 +1,24 @@
+---
+:dataminer_definition: contact_methods
+:actions:
+- :url: "/masterfiles/parties/contact_methods/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/masterfiles/parties/contact_methods/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/parties/contact_methods/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/parties/contact_methods/new"
+  :text: New Contact Method
+  :style: :button
+  :behaviour: :popup

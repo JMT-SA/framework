@@ -151,13 +151,23 @@ class Framework < Roda
           show_page { render_data_grid_page(id) }
         end
 
+        r.on 'with_params' do
+          p "PARAMS #{request.query_string} - #{params.inspect}"
+          session[:last_grid_url] = "/list/#{id}/with_params?#{request.query_string}"
+          show_page { render_data_grid_page(id, query_string: request.query_string) }
+        end
+
         r.on 'multi' do
           show_page { render_data_grid_page_multiselect(id, params) }
         end
 
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
-          render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })
+          if params
+            render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, params)
+          else
+            render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })
+          end
         end
 
         r.on 'grid_multi', String do |key|

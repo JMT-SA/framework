@@ -1,0 +1,78 @@
+link:/developer_documentation/start[Back to documentation home]
+
+== Grids
+
+=== List filtered by url parameter
+
+To achieve this you add a `:conditions` section to your list yaml file. NB all `col` values must have a query parameter definition in the dataminer report as defined in `dataminer_queries`.
+
+This section can have more than one set of conditions as they can have separate keys. This allows you to use the same list file in different ways - see (3) below.
+
+==== 1. As a page
+
+Given a URL like this: `/list/order_items/with_params?key=standard&id=1` we will display a list of order items where the order id is `1`.
+
+To achieve this, the `order_items.yml` file would include the following:
+[source,yaml]
+----
+:conditions:
+  :standard:          # <1>
+    - :col: order_id  # <2>
+      :op: =          # <3>
+      :val: $:id$     # <4>
+----
+<1> This matches the value of the `key` parameter from the page url.
+<2> The column to be filtered. There can be more than one set of columns (repeated with a `-` as YAML array items).
+<3> The operator. This will usually be `=`, but can be another operator.
+<4> The parameter from the page url (in this case `id`) is wrapped in `$:` and `$`.
+
+This will become a WHERE clause like this: `WHERE order_id = 1`.
+
+==== 2. As a section of a page
+
+In this case you have a page with a form for header data and a grid for item data. As an example, we use order and order items - where `order_items` has an `order_id` column (belongs_to `id` on `orders`). And we use the same `order_items.yml` fila as above.
+
+[source,ruby]
+----
+layout = Crossbeams::Layout::Page.new form_object: obj
+layout.build do |page, page_config|
+  page.section do |section|
+    section.form do
+      # ...
+    end
+  end
+  page.section do |section|
+    section.add_grid('order_grid',
+                     '/list/order_items',     # <1>
+                     caption: 'Order Items',
+                     grid_params: params)     # <2>
+  end
+end
+----
+<1> The url contains the yaml file name (`order_items`).
+<2> Pass in the parameters which in this case should be `{ key: 'standard', id: 1 }`. These will match in the same way as set out above.
+
+==== 3. Several conditions in one list YAML file
+
+This example of `order_items.yml` list file will return different rows for the following two urls:
+
+* `/list/order_items/with_params?key=standard&id=1`
+* `/list/order_items/with_params?key=customer&id=5&active=false`
+
+[source,yaml]
+----
+:conditions:
+  :standard:          # <1>
+    - :col: order_id
+      :op: =
+      :val: $:id$
+  :customer:          # <2>
+    - :col: customer_id
+      :op: =
+      :val: $:id$
+    - :col: active
+      :op: =
+      :val: $:active$
+----
+<1> Key is `standard`, uses `WHERE order_id = 1`
+<2> Key is `customer`, uses `WHERE customer_id = 5 AND NOT active`

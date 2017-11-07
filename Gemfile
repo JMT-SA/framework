@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+gem 'asciidoctor'
 gem 'awesome_print', '~> 1.7'
 gem 'bcrypt'
 gem 'dotenv'

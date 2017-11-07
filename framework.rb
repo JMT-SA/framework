@@ -18,6 +18,7 @@ require 'yaml'
 require 'base64'
 require 'dry-struct'
 require 'dry-validation'
+require 'asciidoctor'
 # require 'pry' # TODO: Put this in based on dev env.
 
 module Types
@@ -114,6 +115,18 @@ class Framework < Roda
       </p>
       HTML
       view(inline: s)
+    end
+
+    r.on 'developer_documentation', String do |file|
+      content = File.read(File.join(File.dirname(__FILE__), 'developer_documentation', "#{file}.adoc"))
+      view(inline: <<~HTML)
+        <% content_for :late_head do %>
+          <link rel="stylesheet" href="/css/asciidoc.css">
+        <% end %>
+        <div id="asciidoc-content">
+          #{Asciidoctor.convert(content, safe: :safe)}
+        </div>
+      HTML
     end
 
     r.multi_route

@@ -1,0 +1,70 @@
+link:/developer_documentation/start[Back to documentation home]
+
+== Renderers
+
+=== Input
+
+Renders input text boxes. Many other renderers use this one e.g. `numeric`, `date` etc.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:subtype
+|Specific input type
+a|
+* :integer
+* :numeric
+* :number
+* :email
+* :url
+* :date
+* :datetime
+* :month
+* :time
+|text
+
+|:datalist
+|An array of values that the user can choose from (or just enter text).
+|Array
+|n/a
+
+|:pattern
+|Pattern to restrict input in the browser. (If no :title given, this will be the input's title)
+a|
+* :no_spaces (user cannot type in a space)
+* :lowercase_underscore (can only type underscore or lowercase)
+* A regular expression used as the HTML5 `pattern` attribute of the input.
+|n/a
+
+|:force_lowercase
+|Whatever the user types will convert to lowercase.
+|true
+|n/a
+
+|:force_uppercase
+|Whatever the user types will convert to uppercase.
+|true
+|n/a
+
+|:placeholder
+|Placeholder text
+|Any text
+|n/a
+
+|:title
+|Title (hint)
+|Any text
+|None, unless a `pattern` has been provided.
+
+|===
+
+=== Hidden
+
+A hidden input field.
+

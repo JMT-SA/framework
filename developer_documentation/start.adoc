@@ -1,6 +1,7 @@
-== Crossbeams framework
-
+= Docs
 :toc:
+
+== Crossbeams framework
 
 * link:/developer_documentation/grids[Grids]
 * link:/developer_documentation/renderers[Renderers]

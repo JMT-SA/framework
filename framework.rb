@@ -118,6 +118,8 @@ class Framework < Roda
     end
 
     r.on 'developer_documentation', String do |file|
+      # Docs are in developer_documentation in asciidoc format named file.adoc.
+      # Guide to writing docs: http://asciidoctor.org/docs/asciidoc-writers-guide
       content = File.read(File.join(File.dirname(__FILE__), 'developer_documentation', "#{file}.adoc"))
       view(inline: <<~HTML)
         <% content_for :late_head do %>

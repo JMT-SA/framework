@@ -5,9 +5,54 @@ link:/developer_documentation/start[Back to documentation home]
 
 == Renderers
 
-=== Input
+The following renderers are available to a page:
+
+|===
+|renderer symbol |Crossbeams::Layout class
+
+|:checkbox
+|Renderer::Checkbox
+
+|:email
+|Renderer::Input
+
+|:hidden
+|Renderer::Hidden
+
+|:integer
+|Renderer::Input
+
+|:label
+|Renderer::Label
+
+|:multi
+|Renderer::Multi
+
+|:number
+|Renderer::Input
+
+|:numeric
+|Renderer::Input
+
+|:select
+|Renderer::Select
+
+|:text
+|Renderer::Input
+
+|:textarea
+|Renderer::Textarea
+
+|:url
+|Renderer::Input
+
+|===
+
+=== Renderer::Input
 
 Renders input text boxes. Many other renderers use this one e.g. `numeric`, `date` etc.
+
+This is the default renderer. If a UI Rule does not specify a specific renderer, this one will be used.
 
 |===
 |attribute |description |possible values |default
@@ -19,7 +64,9 @@ Renders input text boxes. Many other renderers use this one e.g. `numeric`, `dat
 and all words start with initial capital letter.
 
 |:subtype
-|Specific input type
+|Specific input type. Date, time and month all render using the browser's HTML5 datepickers.
+Integer, numeric and number render with numeric inputs that only accept digits (and `-` and `.`) and have step-up and step-down arrows.
+:url and :email are rendered with patterns that check for valid formats. Note :url must include the protocol (`http:` etc.)
 a|
 * :integer
 * :numeric
@@ -65,9 +112,43 @@ a|
 |Any text
 |None, unless a `pattern` has been provided.
 
+|:length
+|HTML `size` attribute. This does not affect the input's width, but the number of characters that can be typed in.
+|Any number
+|n/a
+
+|:minlength
+|HTML `minlength` attribute. Validates in the browser that the contents are at least that long.
+|Any number
+|n/a
+
+|:readonly
+|HTML `readonly` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the value cannot be changed in the browser.
+|true or false
+|false
+
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
+
+|:required
+|HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain if no value is provided.
+|true or false
+|false
+
 |===
 
-=== Hidden
+=== Renderer::Hidden
 
 A hidden input field.
 
+=== Renderer::Checkbox
+
+=== Renderer::Label
+
+=== Renderer::Multi
+
+=== Renderer::Select
+
+=== Renderer::Textarea

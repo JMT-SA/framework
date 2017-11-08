@@ -131,12 +131,12 @@ const crossbeamsUtils = {
    * @param {string} [title] - optional title for the dialog.
    * @returns {void}
    */
-  alert: function alert({ prompt, title }) {
+  alert: function alert({ prompt, title, type = 'info' }) {
     swal({
       title: title === undefined ? '' : title,
       text: prompt,
-      type: 'info',
-    });
+      type,
+    }).catch(swal.noop);
   },
 
   /**

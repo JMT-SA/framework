@@ -221,4 +221,38 @@ and all words start with initial capital letter.
 
 === Renderer::Select
 
+Renders a select box.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:searchable
+|Can the items be searched (using Selectr js library)
+|`true` or `false`.
+|`true`.
+
+|:prompt
+|Pre-selected items.
+|any text, or `true` - in which case the prompt will be `'Select a value'`.
+|n/a
+
+|:options
+|Options for selecting.
+|an array of values. Can be 2D array in which case the text comes before the value. (e.g. `['Choose me', 1]`).
+For a 1D array, the option value and text will be the same.
+|`[]` - an empty array. #NOTE: what is the default? and will the control work with an empty string?
+
+|:selected
+|Pre-selected item.
+|any value matching one of the options.
+|The value of the column in the record for this field.
+
+|===
+
 === Renderer::Textarea

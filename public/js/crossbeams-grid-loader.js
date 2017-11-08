@@ -73,15 +73,15 @@ const crossbeamsGridEvents = {
    * @param {string} url - the URL to receive the fetch request.
    * @returns {void}
    */
-  saveSelectedRows: function saveSelectedRows(gridId, url) {
+  saveSelectedRows: function saveSelectedRows(gridId, url, can_be_cleared) {
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
     const ids = _.map(gridOptions.api.getSelectedRows(), (m) => m.id );
-    crossbeamsUtils.alert({prompt: ids.join(','), title: url});
+    // crossbeamsUtils.alert({prompt: ids.join(','), title: url});
     let msg;
-    // if(!can_be_cleared && ids.length === 0) {
-    //   alert("You have not selected any items to submit!");
-    // }
-    // else {
+    if(!can_be_cleared && ids.length === 0) {
+      crossbeamsUtils.alert({prompt: 'You have not selected any items to submit!', type: 'error'});
+    }
+    else {
       if(ids.length === 0) {
         msg = 'Are you sure you want to submit an empty selection?'
       }
@@ -107,7 +107,7 @@ const crossbeamsGridEvents = {
           form.submit();
         },
       });
-    // }
+    }
   },
 
   /**

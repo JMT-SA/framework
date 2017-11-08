@@ -4,3 +4,5 @@
   :program_users:
     :url: "/security/functional_areas/programs/link_users/$:id$"
     :preselect: "SELECT program_id AS id FROM programs_users WHERE user_id = $:id$"
+    :section_caption: "SELECT 'Assign programs to ' || user_name FROM users WHERE id = $:id$"
+    :can_be_cleared: true

@@ -11,40 +11,40 @@ The following renderers are available to a page:
 |renderer symbol |Crossbeams::Layout class
 
 |:checkbox
-|Renderer::Checkbox
+|<<Renderer::Checkbox>>
 
 |:email
-|Renderer::Input
+|<<Renderer::Input>>
 
 |:hidden
-|Renderer::Hidden
+|<<Renderer::Hidden>>
 
 |:integer
-|Renderer::Input
+|<<Renderer::Input>>
 
 |:label
-|Renderer::Label
+|<<Renderer::Label>>
 
 |:multi
-|Renderer::Multi
+|<<Renderer::Multi>>
 
 |:number
-|Renderer::Input
+|<<Renderer::Input>>
 
 |:numeric
-|Renderer::Input
+|<<Renderer::Input>>
 
 |:select
-|Renderer::Select
+|<<Renderer::Select>>
 
 |:text
-|Renderer::Input
+|<<Renderer::Input>>
 
 |:textarea
-|Renderer::Textarea
+|<<Renderer::Textarea>>
 
 |:url
-|Renderer::Input
+|<<Renderer::Input>>
 
 |===
 
@@ -143,11 +143,81 @@ a|
 
 A hidden input field.
 
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|===
+
 === Renderer::Checkbox
+
+The checkbox will be unchecked if the field value is `false`, `f` or `0`. Otherwise it will be checked.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|===
 
 === Renderer::Label
 
+This is roughly the same as an input renderer with the `readonly` attribute set.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:with_value
+|Text to appear in the input.
+|any text
+|The value of the column in the record for this field.
+
+|===
+
 === Renderer::Multi
+
+A javascript-rich multiselect control that allows selecting/deselecting using two lists.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:prompt
+|Pre-selected items.
+|any text, or `true` - in which case the prompt will be `'Select a value'`.
+|n/a
+
+|:options
+|Options for selecting.
+|an array of values.
+|`[]` - an empty array. #NOTE: what is the default? and will the control work with an empty string?
+
+|:selected
+|Pre-selected items.
+|an array of values.
+|`[]` - an empty array.
+
+|===
 
 === Renderer::Select
 

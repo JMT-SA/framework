@@ -7,7 +7,9 @@
 === Reference
 
 * link:/developer_documentation/grids[Grids]
-* link:/developer_documentation/renderers[Renderers]
+* link:/developer_documentation/field_renderers[Field Renderers]
+* Non-field Renderers
+* Page layout
 
 === Tutorials
 

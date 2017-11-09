@@ -7,6 +7,7 @@
 === Reference
 
 * link:/developer_documentation/grids.adoc[Grids]
+* link:/developer_documentation/grid_actions.adoc[Grid actions]
 * link:/developer_documentation/page_layout.adoc[Page layout]
 * link:/developer_documentation/non_field_renderers.adoc[Non-field Renderers]
 * link:/developer_documentation/field_renderers.adoc[Field Renderers]

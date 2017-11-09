@@ -1,0 +1,97 @@
+= Non-field Renderers
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Non-field Renderers
+
+The following renderers that do not bind to fields in a form are available:
+
+* <<Link>>
+* <<Text>>
+* <<SortableList>>
+* <<Grid>>
+* <<Form>>
+
+=== Link
+
+This page control displays a link in a page.
+
+|===
+|attribute |description |possible values |default
+
+|:text
+|The link text
+|any text
+|None. must be provided.
+
+|:url
+|The url to be called.
+|a valid endpoint.
+|None. must be provided.
+
+|:style
+|How the link is styled - as a normal link, or to look like a button.
+|`:link` or `:button`.
+|`:link`
+
+|:behaviour
+|How the link behaves when clicked. Can open the url in a new page, or can open the url in a popup dialog.
+|`:popup`.
+|n/a
+
+|===
+
+=== Text
+
+This page control places the given text in a div with class `"crossbeams-field"`.
+
+|===
+|attribute |description |possible values |default
+
+|:preformatted
+|Display the text within <pre> tags.
+|`true` or `false`.
+|`false`
+
+|:syntax
+|Syntax highlighter to apply to the text.
+a|* :ruby
+* :sql
+* :yaml or :yml
+|n/a
+
+|===
+
+=== SortableList
+
+Render a list of items that can be dragged and dropped to change the sort-order.
+
+e.g.
+[source,ruby]
+----
+form.add_sortable_list('deals', [['FP', 1], ['MGP', 2], ['CONS', 3]])
+
+# access returned parameters:
+sorted_id_list = params[:deals_sorted_ids] #=> '1,2,3'
+----
+
+|===
+|attribute |description |possible values |default
+
+|prefix
+|The prefix to be used in identifying this group of items.
+|any text starting with a letter, without spaces.
+|None. This is required.
+
+|items
+|The items to be sorted. The text will be displayed and the ids will be returned in order in a parameter named `"#{prefix}_sorted_ids"`.
+|An Array of `[text, id]` elements.
+|None. This is required.
+
+|===
+
+=== Grid
+
+=== Form
+

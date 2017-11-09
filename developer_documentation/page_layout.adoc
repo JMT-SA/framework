@@ -1,0 +1,38 @@
+= Page layout
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Page layout
+
+Pages a laid out using a DSL which allows nesting of elements like sections, rows, columns and forms.
+
+=== Simplest way of laying out a form
+
+[source,ruby]
+----
+layout = Crossbeams::Layout::Page.build(rules) do |page| #<1>
+  page.form_object ui_rule.form_object                   #<2>
+  page.form_values form_values                           #<3>
+  page.form_errors form_errors                           #<4>
+  page.form do |form|
+    form.action '/path/to/save_form'                     #<5>
+    form.remote!                                         #<6>
+    form.add_field :a_field                              #<7>
+  end
+end
+----
+<1> rules is the page_config.
+<2> The form object that contains the field values to bind to the form.
+<3> These values (a Hash or nil) will take precedence ov the values in form_object when present.
+<4> A Hash of errors or nil - for errors to be displayed in the form next to the relevant field.
+<5> The form action to be called on submit.
+<6> Optional. Call this to make the form call the action remotely - vi a javascript `fetch` call.
+<7> A field to be rendered. The form object should return a value when sent this method, and the rules should include a renderer spec for it.
+
+=== Sections
+
+==== Callback sections
+
+=== Rows and columns
+

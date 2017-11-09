@@ -7,10 +7,10 @@
 === Reference
 
 * link:/developer_documentation/grids.adoc[Grids]
+* link:/developer_documentation/page_layout.adoc[Page layout]
+* link:/developer_documentation/non_field_renderers.adoc[Non-field Renderers]
 * link:/developer_documentation/field_renderers.adoc[Field Renderers]
 * Field renderer behaviours
-* Non-field Renderers
-* Page layout
 
 === Tutorials
 
@@ -20,6 +20,7 @@
 
 * How to disable/enable a field based on the value of another field.
 * How to layout a multi-column form.
+* How to layout a page to include a form and a grid.
 
 === Notes
 

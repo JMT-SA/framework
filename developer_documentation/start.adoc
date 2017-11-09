@@ -6,8 +6,9 @@
 
 === Reference
 
-* link:/developer_documentation/grids[Grids]
-* link:/developer_documentation/field_renderers[Field Renderers]
+* link:/developer_documentation/grids.adoc[Grids]
+* link:/developer_documentation/field_renderers.adoc[Field Renderers]
+* Field renderer behaviours
 * Non-field Renderers
 * Page layout
 
@@ -18,6 +19,7 @@
 === How-to guides
 
 * How to disable/enable a field based on the value of another field.
+* How to layout a multi-column form.
 
 === Notes
 

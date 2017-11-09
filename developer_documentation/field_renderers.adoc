@@ -1,7 +1,7 @@
 = Renderers
 :toc:
 
-link:/developer_documentation/start[Back to documentation home]
+link:/developer_documentation/start.adoc[Back to documentation home]
 
 == Renderers
 
@@ -210,7 +210,7 @@ and all words start with initial capital letter.
 |:options
 |Options for selecting.
 |an array of values.
-|`[]` - an empty array. #NOTE: what is the default? and will the control work with an empty string?
+|`[]` - an empty array.
 
 |:selected
 |Pre-selected items.
@@ -246,7 +246,7 @@ and all words start with initial capital letter.
 |Options for selecting.
 |an array of values. Can be 2D array in which case the text comes before the value. (e.g. `['Choose me', 1]`).
 For a 1D array, the option value and text will be the same.
-|`[]` - an empty array. #NOTE: what is the default? and will the control work with an empty string?
+|`[]` - an empty array.
 
 |:selected
 |Pre-selected item.
@@ -256,3 +256,61 @@ For a 1D array, the option value and text will be the same.
 |===
 
 === Renderer::Textarea
+
+Renders a text area.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:cols
+|Number of columns to display (width).
+|any number
+|20
+
+|:rows
+|Number of rows to display (height).
+|any number
+|10
+
+|:placeholder
+|Placeholder text
+|Any text
+|n/a
+
+|:title
+|Title (hint)
+|Any text
+|None.
+
+|:maxlength
+|HTML `maxlength` attribute. Validates in the browser that the contents are less than this value long.
+|Any number
+|n/a
+
+|:minlength
+|HTML `minlength` attribute. Validates in the browser that the contents are at least that long.
+|Any number
+|n/a
+
+|:readonly
+|HTML `readonly` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the value cannot be changed in the browser.
+|true or false
+|false
+
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
+
+|:required
+|HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain if no value is provided.
+|true or false
+|false
+
+|===

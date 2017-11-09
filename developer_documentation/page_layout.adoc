@@ -5,7 +5,7 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 == Page layout
 
-Pages a laid out using a DSL which allows nesting of elements like sections, rows, columns and forms.
+Pages are laid out using a DSL which allows nesting of elements like sections, rows, columns and forms.
 
 === Simplest way of laying out a form
 
@@ -32,7 +32,206 @@ end
 
 === Sections
 
+Sections are divisions in a page. They can optionally display a caption (the default is no caption).
+They can be replaceable via AJAX calls - without affecting the rest of the page.
+
 ==== Callback sections
+
+A callback section is a special type if section that has no content initially.
+Its only attributes are the (optional) caption and the url to call once the page has loaded.
+The called url is responsible for providing the content. This is a useful way of loading the same page in different ways and in different pages. It can also be useful if the page will take some time to load, as the page will display a loading indicator while the section is being fetched.
 
 === Rows and columns
 
+Using rows and columns, a page can display columns of information alongside each other. The responsive design will try to adapt the flow of columns to suit smaller/larger screens.
+
+=== DSL methods
+
+These are the methods used in building a page layout.
+
+==== Page
+
+|===
+|method |args |description
+
+|add_csrf_tag
+|tag
+|Adds tags to all nodes in a page (only forms will actually apply the tag)
+
+|form_object
+|object
+|Set the form_object attribute of the page config.
+
+|form_values
+|Hash
+|Set the form values in the page config.
+
+|form_errors
+|Hash
+|Set the form errors in the page config.
+
+|section
+|block
+|builds a Section using the block.
+
+|callback_section
+|block
+|builds a CalllbackSection using the block.
+
+|row
+|block
+|builds a Row using the block.
+
+|form
+|block
+|builds a form in the block.
+
+|with_form
+|block
+|builds a form in the block and returns the page object. Used when the page will only contain a form and nothing else.
+
+|add_grid
+|grid_id (String), url (String), options (Hash)
+|Add a grid to the page.
+
+|render
+|
+|Renders all nodes in the page.
+
+|===
+
+==== Section
+
+|===
+|method |args |description
+
+|row
+|block
+|builds a Row using the block.
+
+|form
+|block
+|builds a form in the block.
+
+|add_grid
+|grid_id (String), url (String), options (Hash)
+|Add a Grid to the section.
+
+|add_text
+|text (String), options (Hash)
+|Add a block of Text to the section.
+
+|add_control
+|page_control_definition (Hash)
+|Add a control (link / button) to the section.
+
+|render
+|
+|Renders the section and all nodes within it.
+
+|===
+
+==== Row
+
+|===
+|method |args |description
+
+|column
+|column_size (Symbol) - optional -- `:full/:half/:third/:quarter`. Currently ignored.
+|Add a column within the row.
+
+|render
+|
+|Renders the row and all columns within it.
+
+|===
+
+==== Column
+
+|===
+|method |args |description
+
+|column
+|column_size (Symbol) - optional -- :full/:half. Currently ignored.
+|Add a column within the row.
+
+|add_field
+|name (String), options (Hash)
+|Add a Field to the column.
+
+|add_text
+|text (String), options (Hash)
+|Add a block of Text to the column.
+
+|add_grid
+|grid_id (String), url (String), options (Hash)
+|Add a Grid to the column.
+
+|render
+|
+|Renders the column and all nodes within it.
+
+|===
+
+==== Form
+
+|===
+|method |args |description
+
+|form_config=
+|value (Hash)
+|Provide page config for the form. Use this when a page has more than one form in it. Otherwise the form will pick up this config from the page.
+
+|form_values
+|Hash
+|Set the form values for the form config (when there is more than one form in the page).
+
+|form_errors
+|Hash
+|Set the form errors for the form config (when there is more than one form in the page).
+
+|add_csrf_tag
+|tag
+|Adds a csrf tag to the form.
+
+|remote!
+|
+|Make this a remote form that will be submitted via a javascript `fetch`.
+
+|view_only!
+|
+|Make this a view-only form that cannot be submitted, only closed.
+
+|action
+|action (String)
+|Set the URL action to which the form will be submitted.
+
+|method
+|method (Symbol).
+|Set the method for form submission -- can be `:create` or `:update`. Default is `:create`.
+
+|row
+|block
+|builds a Row using the block.
+
+|add_field
+|name (String), options (Hash)
+|Add a Field to the form.
+
+|add_text
+|text (String), options (Hash)
+|Add a block of Text to the form.
+
+|add_sortable_list
+|prefix (String), items (Array).
+|Add a sortable list control for sorting a list of ids using text values linked to the ids.
+
+|submit_captions
+|value (String), disabled_value (String), optional.
+|The caption for the submit button, and optionally the caption to show when the button is disabled while the form is being submitted. Disabled caption defaults to caption.
+
+|render
+|
+|Renders the form and all fields and other nodes within it.
+
+|===

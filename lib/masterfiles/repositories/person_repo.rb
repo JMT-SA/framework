@@ -50,6 +50,7 @@ class PersonRepo < RepoBase
     DB.transaction do
       DB[:party_roles].where(person_id: id).delete
       DB[:security_groups].where(id: id).delete
+      DB[:people].where(id: id).delete
     end
   end
 end

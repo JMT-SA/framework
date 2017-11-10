@@ -1,21 +1,6 @@
 # frozen_string_literal: true
 
 class AddressInteractor < BaseInteractor
-  def address_repo
-    @address_repo ||= AddressRepo.new
-  end
-
-  def address(cached = true)
-    if cached
-      @address ||= address_repo.find(@id)
-    else
-      @address = address_repo.find(@id)
-    end
-  end
-
-  def validate_address_params(params)
-    AddressSchema.call(params)
-  end
 
   def create_address(params)
     res = validate_address_params(params)
@@ -42,4 +27,22 @@ class AddressInteractor < BaseInteractor
     address_repo.delete(id)
     success_response("Deleted address #{name}")
   end
+
+  private
+  def address_repo
+    @address_repo ||= AddressRepo.new
+  end
+
+  def address(cached = true)
+    if cached
+      @address ||= address_repo.find(@id)
+    else
+      @address = address_repo.find(@id)
+    end
+  end
+
+  def validate_address_params(params)
+    AddressSchema.call(params)
+  end
+
 end

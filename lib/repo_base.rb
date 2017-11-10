@@ -47,6 +47,12 @@ class RepoBase
     DB[main_table_name].where(id: id).first
   end
 
+  def find_where(key, val)
+    #TODO: check to see if key exists first, and whether this check is even necessary
+    #Note: this works
+    DB[main_table_name].where("#{key}": val).first
+  end
+
   def exists?(args)
     DB.select(1).where(DB[main_table_name].where(args).exists).one?
   end

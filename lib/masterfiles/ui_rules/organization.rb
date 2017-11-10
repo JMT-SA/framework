@@ -16,10 +16,13 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      party_id_label = PartyRepo.new.find(@form_object.party_id)&.party_type
-      parent_id_label = OrganizationRepo.new.find(@form_object.parent_id)&.short_description
+      # party_id_label = PartyRepo.new.find(@form_object.party_id)&.party_type
       # fields[:party_id] = { renderer: :label, with_value: party_id_label }
-      # fields[:parent_id] = { renderer: :label, with_value: parent_id_label }
+
+      parent_id_label = OrganizationRepo.new.find(@form_object.parent_id)&.short_description
+      #TODO Add roles to view
+      # Add addresses to view?
+      fields[:parent_id] = { renderer: :label, with_value: parent_id_label }
       fields[:short_description] = { renderer: :label }
       fields[:medium_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
@@ -37,8 +40,7 @@ module UiRules
 
     def common_fields
       {
-        # party_id: { renderer: :select, options: PartyRepo.new.for_select },
-        # parent_id: { renderer: :select, options: OrganizationRepo.new.for_select },
+        parent_id: { renderer: :select, options: OrganizationRepo.new.for_select.reject{|i| i.include?(@options[:id])} },
         short_description: {},
         medium_description: {},
         long_description: {},

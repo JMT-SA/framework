@@ -1,21 +1,6 @@
 # frozen_string_literal: true
 
 class ContactMethodInteractor < BaseInteractor
-  def contact_method_repo
-    @contact_method_repo ||= ContactMethodRepo.new
-  end
-
-  def contact_method(cached = true)
-    if cached
-      @contact_method ||= contact_method_repo.find(@id)
-    else
-      @contact_method = contact_method_repo.find(@id)
-    end
-  end
-
-  def validate_contact_method_params(params)
-    ContactMethodSchema.call(params)
-  end
 
   def create_contact_method(params)
     res = validate_contact_method_params(params)
@@ -42,4 +27,22 @@ class ContactMethodInteractor < BaseInteractor
     contact_method_repo.delete(id)
     success_response("Deleted contact method #{name}")
   end
+
+  private
+  def contact_method_repo
+    @contact_method_repo ||= ContactMethodRepo.new
+  end
+
+  def contact_method(cached = true)
+    if cached
+      @contact_method ||= contact_method_repo.find(@id)
+    else
+      @contact_method = contact_method_repo.find(@id)
+    end
+  end
+
+  def validate_contact_method_params(params)
+    ContactMethodSchema.call(params)
+  end
+
 end

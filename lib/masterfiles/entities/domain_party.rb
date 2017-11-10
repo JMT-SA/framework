@@ -5,20 +5,12 @@ class DomainParty < SimpleDelegator
   def initialize(party)
     super(party)
     @roles = []
-    # @party
+    # @addresses
+    # @contact_methods
   end
-
-  def id
-    party_id
-  end
-
-  # def organization?
-  #   party_type == 'O'
-  # end
 
   def role_list
     roles.map(&:name).join('; ')
-    # roles.active.map(&:name).join('; ')
   end
 
   def name

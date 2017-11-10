@@ -32,7 +32,6 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           end
         end
-
         show_partial { Masterfiles::Parties::Organization::Roles.call(id) }
       end
       r.on 'addresses' do
@@ -406,8 +405,35 @@ class Framework < Roda
       end
     end
 
-    r.on 'roles', Integer do |party_id|
+    r.on 'link_addresses', Integer do |id|
+      r.post do
+        interactor = PartyInteractor.new(current_user, {}, {}, {})
+        res = interactor.link_addresses(id, params)
 
+        party = PartyRoleRepo.new.find_where('party_id', id)
+        type = party[:organization_id] ? 'organizations' : 'people'
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect "/list/#{type}"
+      end
+    end
+    r.on 'link_contact_methods', Integer do |id|
+      r.post do
+        interactor = PartyInteractor.new(current_user, {}, {}, {})
+        res = interactor.link_contact_methods(id, params)
+
+        party = PartyRoleRepo.new.find_where('party_id', id)
+        type = party[:organization_id] ? 'organizations' : 'people'
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect "/list/#{type}"
+      end
     end
   end
 end

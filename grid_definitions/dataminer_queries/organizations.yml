@@ -1,0 +1,248 @@
+---
+:caption: Organizations
+:sql: "  SELECT \"organizations\".\"id\", \"organizations\".\"party_id\", \"organizations\".\"parent_id\",
+  \"organizations\".\"short_description\", \"organizations\".\"medium_description\",
+  \"organizations\".\"long_description\", \"organizations\".\"vat_number\", \"organizations\".\"variants\",
+  \"organizations\".\"active\", \"organizations\".\"created_at\", \"organizations\".\"updated_at\",
+  \"organizations\".\"short_description\" AS organizations_short_description, \"parties\".\"party_type\",
+  \"parent\".\"short_description\" AS parent FROM \"organizations\" LEFT JOIN \"organizations\"
+  \"parent\" ON \"parent\".\"id\" = \"organizations\".\"parent_id\" JOIN \"parties\"
+  ON \"parties\".\"id\" = \"organizations\".\"party_id\"\r\n  "
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: organizations.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_id:
+    :name: party_id
+    :sequence_no: 2
+    :caption: Party
+    :namespaced_name: organizations.party_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  parent_id:
+    :name: parent_id
+    :sequence_no: 3
+    :caption: Parent
+    :namespaced_name: organizations.parent_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  short_description:
+    :name: short_description
+    :sequence_no: 4
+    :caption: Short description
+    :namespaced_name: organizations.short_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  medium_description:
+    :name: medium_description
+    :sequence_no: 5
+    :caption: Medium description
+    :namespaced_name: organizations.medium_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  long_description:
+    :name: long_description
+    :sequence_no: 6
+    :caption: Long description
+    :namespaced_name: organizations.long_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vat_number:
+    :name: vat_number
+    :sequence_no: 7
+    :caption: Vat number
+    :namespaced_name: organizations.vat_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variants:
+    :name: variants
+    :sequence_no: 8
+    :caption: Variants
+    :namespaced_name: organizations.variants
+    :data_type: :string_array
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: organizations.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: organizations.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: organizations.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  organizations_short_description:
+    :name: organizations_short_description
+    :sequence_no: 12
+    :caption: Organizations short description
+    :namespaced_name: organizations.short_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_type:
+    :name: party_type
+    :sequence_no: 13
+    :caption: Party type
+    :namespaced_name: parties.party_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  parent:
+    :name: parent
+    :sequence_no: 14
+    :caption: Parent
+    :namespaced_name: parent.short_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: organizations.party_id
+  :caption: Party
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT party_type, id FROM parties ORDER BY party_type
+- :column: organizations.parent_id
+  :caption: Parent
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT short_description, id FROM organizations ORDER BY short_description
+- :column: organizations.short_description
+  :caption: Short description
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

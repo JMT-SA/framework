@@ -1,27 +1,7 @@
 # frozen_string_literal: true
 
 class PersonInteractor < BaseInteractor
-  def person_repo
-    @person_repo ||= PersonRepo.new
-  end
 
-  def person_name
-    [person.title, person.first_name, person.surname].join(' ')
-  end
-
-  def person(cached = true)
-    if cached
-      @person ||= person_repo.find(@id)#find_relative_party
-    else
-      @person = person_repo.find(@id)#find_relative_party
-    end
-  end
-
-  def validate_person_params(params)
-    PersonSchema.call(params)
-  end
-
-  # --| actions
   def create_person(params)
     res = validate_person_params(params)
     return validation_failed_response(res) unless res.messages.empty?
@@ -44,8 +24,8 @@ class PersonInteractor < BaseInteractor
 
   def delete_person(id)
     @id = id
-    name = person.name
-    person_repo.delete_with_roles(id)
+    name = person_name
+    person_repo.delete_with_all(id)
     success_response("Deleted person #{name}")
   end
 
@@ -58,6 +38,27 @@ class PersonInteractor < BaseInteractor
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
     end
+  end
+
+  private
+  def person_repo
+    @person_repo ||= PersonRepo.new
+  end
+
+  def person_name
+    [person.title, person.first_name, person.surname].join(' ')
+  end
+
+  def person(cached = true)
+    if cached
+      @person ||= person_repo.find(@id)#find_relative_party
+    else
+      @person = person_repo.find(@id)#find_relative_party
+    end
+  end
+
+  def validate_person_params(params)
+    PersonSchema.call(params)
   end
 
 

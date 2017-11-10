@@ -1,0 +1,168 @@
+---
+:caption: People
+:sql: SELECT "people"."id", "people"."party_id", "people"."surname", "people"."first_name",
+  "people"."title", "people"."vat_number", "people"."active", "people"."created_at",
+  "people"."updated_at", "parties"."party_type" FROM "people" JOIN "parties" ON "parties"."id"
+  = "people"."party_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: people.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_id:
+    :name: party_id
+    :sequence_no: 2
+    :caption: Party
+    :namespaced_name: people.party_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  surname:
+    :name: surname
+    :sequence_no: 3
+    :caption: Surname
+    :namespaced_name: people.surname
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  first_name:
+    :name: first_name
+    :sequence_no: 4
+    :caption: First name
+    :namespaced_name: people.first_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  title:
+    :name: title
+    :sequence_no: 5
+    :caption: Title
+    :namespaced_name: people.title
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vat_number:
+    :name: vat_number
+    :sequence_no: 6
+    :caption: Vat number
+    :namespaced_name: people.vat_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 7
+    :caption: Active
+    :namespaced_name: people.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 8
+    :caption: Created at
+    :namespaced_name: people.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 9
+    :caption: Updated at
+    :namespaced_name: people.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_type:
+    :name: party_type
+    :sequence_no: 10
+    :caption: Party type
+    :namespaced_name: parties.party_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: people.party_id
+  :caption: Party
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT party_type, id FROM parties ORDER BY party_type

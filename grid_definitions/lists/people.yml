@@ -16,6 +16,17 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
+- :url: "/masterfiles/parties/people/$:id$/roles"
+  :text: roles
+  :icon: fa-list
+  :title: Roles
+  :popup: true
+- :url: "/list/party_contact_methods/multi?key=parties&id=$:id$"
+  :text: contact methods
+  :icon: fa-list
+- :url: "/list/party_addresses/multi?key=parties&id=$:id$"
+  :text: addresses
+  :icon: fa-list
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/parties/people/new"

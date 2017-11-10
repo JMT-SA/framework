@@ -16,25 +16,22 @@ module UiRules
     end
 
     def set_show_fields
-      party_id_label = PartyRepo.new.find(@form_object.party_id)&.party_type
-      # fields[:party_id] = { renderer: :label, with_value: party_id_label }
       fields[:surname] = { renderer: :label }
       fields[:first_name] = { renderer: :label }
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      fields[:role_id] = { renderer: :label }
+      # fields[:roles] = { renderer: :label }
       # fields[:active] = { renderer: :label }
     end
 
     def set_role_fields
-    roles_repo = RoleRepo.new
+      roles_repo = RoleRepo.new
       fields[:roles] = { renderer: :multi, options: roles_repo.for_select, selected: @form_object.roles.map(&:id) }
       fields[:name]  = { renderer: :label }
     end
 
     def common_fields
       {
-        # party_id: { renderer: :select, options: PartyRepo.new.for_select },
         surname: {},
         first_name: {},
         title: {},

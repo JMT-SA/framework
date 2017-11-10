@@ -1,10 +1,16 @@
 ---
 :caption: Contact Methods
-:sql: SELECT "contact_methods"."id", "contact_methods"."contact_method_type_id", "contact_methods"."contact_method_code",
-  "contact_methods"."active", "contact_methods"."created_at", "contact_methods"."updated_at",
-  "contact_method_types"."contact_method_code" AS contact_method_types_contact_method_code
-  FROM "contact_methods" JOIN "contact_method_types" ON "contact_method_types"."id"
-  = "contact_methods"."contact_method_type_id"
+:sql: "    SELECT \"contact_methods\".\"id\", \"contact_methods\".\"contact_method_type_id\",
+  \"contact_methods\".\"contact_method_code\", \"contact_methods\".\"active\", \"contact_methods\".\"created_at\",
+  \"contact_methods\".\"updated_at\", \"contact_method_types\".\"contact_method_code\"
+  AS contact_method_type, string_agg(DISTINCT fn_party_role_name(party_roles.id),
+  '; ') AS linked_parties\r\nFROM \"contact_methods\"\r\nJOIN \"contact_method_types\"
+  ON \"contact_method_types\".\"id\" = \"contact_methods\".\"contact_method_type_id\"\r\nLEFT
+  OUTER JOIN party_contact_methods ON party_contact_methods.contact_method_id = contact_methods.id\r\nLEFT
+  OUTER JOIN party_roles ON party_roles.party_id = party_contact_methods.party_id\r\nGROUP
+  BY \"contact_methods\".\"id\", \"contact_methods\".\"contact_method_type_id\", \"contact_methods\".\"contact_method_code\",
+  \"contact_methods\".\"active\", \"contact_methods\".\"created_at\", \"contact_methods\".\"updated_at\",
+  \"contact_method_types\".\"contact_method_code\"\r\n\r\n  "
 :limit: 
 :offset: 
 :columns:
@@ -25,7 +31,7 @@
     :group_max: false
   contact_method_type_id:
     :name: contact_method_type_id
-    :sequence_no: 2
+    :sequence_no: 8
     :caption: Contact method type
     :namespaced_name: contact_methods.contact_method_type_id
     :data_type: :integer
@@ -40,8 +46,8 @@
     :group_max: false
   contact_method_code:
     :name: contact_method_code
-    :sequence_no: 3
-    :caption: Contact method code
+    :sequence_no: 4
+    :caption: Contact method
     :namespaced_name: contact_methods.contact_method_code
     :data_type: :string
     :width: 
@@ -55,7 +61,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Active
     :namespaced_name: contact_methods.active
     :data_type: :boolean
@@ -70,7 +76,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: contact_methods.created_at
     :data_type: :datetime
@@ -85,7 +91,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: contact_methods.updated_at
     :data_type: :datetime
@@ -98,11 +104,26 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  contact_method_types_contact_method_code:
-    :name: contact_method_types_contact_method_code
-    :sequence_no: 7
-    :caption: Contact method types contact method code
+  contact_method_type:
+    :name: contact_method_type
+    :sequence_no: 3
+    :caption: Type
     :namespaced_name: contact_method_types.contact_method_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  linked_parties:
+    :name: linked_parties
+    :sequence_no: 2
+    :caption: Linked parties
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 

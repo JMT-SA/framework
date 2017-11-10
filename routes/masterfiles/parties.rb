@@ -408,12 +408,9 @@ class Framework < Roda
     r.on 'link_addresses', Integer do |id|
       r.post do
         interactor = PartyInteractor.new(current_user, {}, {}, {})
-        res = interactor.link_addresses(id, params)
+        res = interactor.link_addresses(id, multiselect_grid_choices(params))
 
-        # party = PartyRoleRepo.new.find_where('party_id', id)
-        # type = party[:organization_id] ? 'organizations' : 'people'
-        party = PartyRoleRepo.new.where(party_id: id)
-        type = party.is_organization? ? 'organizations' : 'people'
+        type = res.instance[:type]
         if res.success
           flash[:notice] = res.message
         else

@@ -10,6 +10,7 @@ The following renderers that do not bind to fields in a form are available:
 * <<Link>>
 * <<Text>>
 * <<SortableList>>
+* <<Address>>
 * <<Grid>>
 * <<Form>>
 
@@ -88,6 +89,27 @@ sorted_id_list = params[:deals_sorted_ids] #=> '1,2,3'
 |The items to be sorted. The text will be displayed and the ids will be returned in order in a parameter named `"#{prefix}_sorted_ids"`.
 |An Array of `[text, id]` elements.
 |None. This is required.
+
+|===
+
+=== Address
+
+This page control renders one or more addresses. Provide a single address entity or an array of address entities.
+
+e.g.
+[source,ruby]
+----
+form.add_address(address)
+form.add_address(address_array, include_address_type: false)
+----
+
+|===
+|attribute |description |possible values |default
+
+|:include_address_type
+|Show the type of address in the heading.
+|`true` or `false`.
+|`true`
 
 |===
 

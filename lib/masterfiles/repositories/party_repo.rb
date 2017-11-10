@@ -42,4 +42,13 @@ class PartyRepo < RepoBase
   def existing_contact_method_ids_for_party(party_id)
     DB[:party_contact_methods].where(party_id: party_id).select_map(:contact_method_id)
   end
+
+  def all_hash
+    DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties"].all
+  end
+
+  def where_hash(args)
+    DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties"].where(args).first
+  end
+
 end

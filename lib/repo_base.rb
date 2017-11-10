@@ -21,7 +21,7 @@ class RepoBase
 
   def all
     raise Crossbeams::FrameworkError, "#{self.class.name}: Cannot call 'all' on a repo that was not initialized with a wrapper. Use a wrapper or 'all_hash'." if wrapper.nil?
-    DB[main_table_name].map { |r| wrapper.new(r) }
+    all_hash.map { |r| wrapper.new(r) }
   end
 
   def all_hash
@@ -56,12 +56,6 @@ class RepoBase
   def where_hash(args)
     DB[main_table_name].where(args).first
   end
-
-  # def find_where(key, val)
-  #   #TODO: check to see if key exists first, and whether this check is even necessary
-  #   #Note: this works
-  #   DB[main_table_name].where("#{key}": val).first
-  # end
 
   def exists?(args)
     DB.select(1).where(DB[main_table_name].where(args).exists).one?

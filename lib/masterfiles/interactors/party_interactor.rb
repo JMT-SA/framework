@@ -6,24 +6,23 @@ class PartyInteractor < BaseInteractor
     repo = PartyRepo.new
     repo.link_addresses(id, address_ids)
 
-    type = repo.find(id).party_type == 'O' ? 'organizations' : 'people'
-
+    party = repo.find(id)
     if (repo.existing_address_ids_for_party(id) == address_ids)
-      success_response('Addresses linked successfully', type: type)
+      success_response('Addresses linked successfully', party)
     else
-      failed_response('Some addresses were not linked', type: type)
+      failed_response('Some addresses were not linked', party)
     end
   end
 
-  def link_contact_methods(id, params)
+  def link_contact_methods(id, contact_method_ids)
     repo = PartyRepo.new
-    contact_method_ids = CommonHelpers.multiselect_grid_choices(params)
     repo.link_contact_methods(id, contact_method_ids)
 
-    if (repo.existing_contact_method_ids_for_party(id) == address_ids)
-      success_response('Contact methods linked successfully')
+    party = repo.find(id)
+    if (repo.existing_contact_method_ids_for_party(id) == contact_method_ids)
+      success_response('Contact methods linked successfully', party)
     else
-      failed_response('Some contact methods were not linked')
+      failed_response('Some contact methods were not linked', party)
     end
   end
 

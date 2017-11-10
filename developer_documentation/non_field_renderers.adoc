@@ -117,6 +117,7 @@ form.add_address(address_array, include_address_type: false)
 === ContactMethod
 
 This page control renders one or more contact methods. Provide a single contact method entity or an array of contact method entities.
+Matches a lowercase version of the contact method's `contact_method_type` to an internal lookup to decide which icon to display. An extra set of lookups can be provided.
 
 e.g.
 [source,ruby]
@@ -131,7 +132,7 @@ form.add_address(contact_method_array, icon_lookup: { 'telephone' => 'tel', 'e-m
 |:icon_lookup
 |Add method_type to icon shortcut for the icons to display next to the method type.
 |Each key in the Hash should correspond to a method type and the value should be one of `tel`, `cell`, `fax`, `email`, `social`.
-|`{'tels' => 'tel', 'cell' => 'cell', 'fax' => 'fax', 'email' => 'email', 'social' => 'social'}`
+|`{'tel' => 'tel', 'cell' => 'cell', 'fax' => 'fax', 'email' => 'email', 'social' => 'social'}`
 
 |===
 

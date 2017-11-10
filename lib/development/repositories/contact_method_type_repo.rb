@@ -4,8 +4,8 @@ class ContactMethodTypeRepo < RepoBase
   def initialize
     main_table :contact_method_types
     table_wrapper ContactMethodType
-    for_select_options label: :contact_method_code,
+    for_select_options label: :contact_method_type,
                        value: :id,
-                       order_by: :contact_method_code
+                       order_by: :contact_method_type
   end
 end

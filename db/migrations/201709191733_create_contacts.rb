@@ -4,11 +4,11 @@ Sequel.migration do
     extension :pg_triggers
     create_table(:contact_method_types, ignore_index_errors: true) do
       primary_key :id
-      String :contact_method_code, size: 255, null:false
+      String :contact_method_type, size: 255, null:false
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
-      index [:contact_method_code], name: :contact_method_types_unique_code, unique: true
+      index [:contact_method_type], name: :contact_method_types_unique_code, unique: true
     end
 
     pgt_created_at(:contact_method_types,

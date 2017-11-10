@@ -207,8 +207,8 @@ class Framework < Roda
             if errors.empty?
               repo = ContactMethodTypeRepo.new
               repo.update(id, res)
-              update_grid_row(id, changes: { contact_method_code: res[:contact_method_code] },
-                              notice:  "Updated #{res[:contact_method_code]}")
+              update_grid_row(id, changes: { contact_method_type: res[:contact_method_type] },
+                              notice:  "Updated #{res[:contact_method_type]}")
             else
               content = show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], errors) }
               update_dialog_content(content: content, error: 'Validation error')

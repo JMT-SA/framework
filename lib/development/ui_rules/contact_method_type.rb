@@ -15,12 +15,12 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:contact_method_code] = { renderer: :label }
+      fields[:contact_method_type] = { renderer: :label }
     end
 
     def common_fields
       {
-        contact_method_code: {}
+        contact_method_type: {}
       }
     end
 
@@ -31,7 +31,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(contact_method_code: nil)
+      @form_object = OpenStruct.new(contact_method_type: nil)
     end
   end
 end

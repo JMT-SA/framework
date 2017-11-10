@@ -2,7 +2,7 @@
 :caption: Contact Methods
 :sql: "    SELECT \"contact_methods\".\"id\", \"contact_methods\".\"contact_method_type_id\",
   \"contact_methods\".\"contact_method_code\", \"contact_methods\".\"active\", \"contact_methods\".\"created_at\",
-  \"contact_methods\".\"updated_at\", \"contact_method_types\".\"contact_method_code\"
+  \"contact_methods\".\"updated_at\", \"contact_method_types\".\"contact_method_type\"
   AS contact_method_type, string_agg(DISTINCT fn_party_role_name(party_roles.id),
   '; ') AS linked_parties\r\nFROM \"contact_methods\"\r\nJOIN \"contact_method_types\"
   ON \"contact_method_types\".\"id\" = \"contact_methods\".\"contact_method_type_id\"\r\nLEFT
@@ -10,7 +10,7 @@
   OUTER JOIN party_roles ON party_roles.party_id = party_contact_methods.party_id\r\nGROUP
   BY \"contact_methods\".\"id\", \"contact_methods\".\"contact_method_type_id\", \"contact_methods\".\"contact_method_code\",
   \"contact_methods\".\"active\", \"contact_methods\".\"created_at\", \"contact_methods\".\"updated_at\",
-  \"contact_method_types\".\"contact_method_code\"\r\n\r\n  "
+  \"contact_method_types\".\"contact_method_type\"\r\n\r\n  "
 :limit: 
 :offset: 
 :columns:
@@ -108,7 +108,7 @@
     :name: contact_method_type
     :sequence_no: 3
     :caption: Type
-    :namespaced_name: contact_method_types.contact_method_code
+    :namespaced_name: contact_method_types.contact_method_type
     :data_type: :string
     :width: 
     :format: 
@@ -142,4 +142,4 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT contact_method_code, id FROM contact_method_types ORDER BY contact_method_code
+  :list_def: SELECT contact_method_type, id FROM contact_method_types ORDER BY contact_method_type

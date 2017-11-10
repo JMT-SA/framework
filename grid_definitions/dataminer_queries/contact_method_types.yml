@@ -1,6 +1,6 @@
 ---
 :caption: Contact Method Types
-:sql: SELECT "contact_method_types"."id", "contact_method_types"."contact_method_code",
+:sql: SELECT "contact_method_types"."id", "contact_method_types"."contact_method_type",
         "contact_method_types"."created_at", "contact_method_types"."updated_at" FROM "contact_method_types"
 :limit:
 :offset:
@@ -20,11 +20,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  contact_method_code:
-    :name: contact_method_code
+  contact_method_type:
+    :name: contact_method_type
     :sequence_no: 2
-    :caption: Contact method code
-    :namespaced_name: contact_method_types.contact_method_code
+    :caption: Contact method type
+    :namespaced_name: contact_method_types.contact_method_type
     :data_type: :string
     :width:
     :format:

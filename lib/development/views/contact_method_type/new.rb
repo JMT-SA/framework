@@ -15,7 +15,7 @@ module Development
             page.form do |form|
               form.action '/development/masterfiles/contact_method_types'
               form.remote!
-              form.add_field :contact_method_code
+              form.add_field :contact_method_type
             end
           end
 

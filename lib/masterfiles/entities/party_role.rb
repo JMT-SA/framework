@@ -7,4 +7,8 @@ class PartyRole < Dry::Struct
   attribute :organization_id, Types::Int
   attribute :person_id, Types::Int
   attribute :active, Types::Bool
+
+  def is_organization?
+    @person_id.nil?
+  end
 end

@@ -1,0 +1,24 @@
+---
+:dataminer_definition: std_fruit_size_counts
+:actions:
+- :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/fruit/std_fruit_size_counts/new"
+  :text: New Std Fruit Size Count
+  :style: :button
+  :behaviour: :popup

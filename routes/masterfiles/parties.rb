@@ -320,7 +320,7 @@ class Framework < Roda
         else
           flash[:error] = res.message
           show_page do
-            Masterfiles::Parties::Address::New.call(form_values: params[:security_group],
+            Masterfiles::Parties::Address::New.call(form_values: params[:address],
                                                     form_errors: res.errors,
                                                     remote: false)
           end
@@ -397,7 +397,7 @@ class Framework < Roda
         else
           flash[:error] = res.message
           show_page do
-            Masterfiles::Parties::ContactMethod::New.call(form_values: params[:security_group],
+            Masterfiles::Parties::ContactMethod::New.call(form_values: params[:contact_method],
                                                           form_errors: res.errors,
                                                           remote: false)
           end

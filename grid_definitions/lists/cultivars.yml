@@ -1,0 +1,24 @@
+---
+:dataminer_definition: cultivars
+:actions:
+- :url: "/masterfiles/fruit/cultivars/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/masterfiles/fruit/cultivars/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/fruit/cultivars/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/fruit/cultivars/new"
+  :text: New Cultivar
+  :style: :button
+  :behaviour: :popup

@@ -1,0 +1,109 @@
+---
+:caption: Destination Countries
+:sql: SELECT "destination_countries"."id", "destination_countries"."destination_region_id",
+  "destination_countries"."country_name", "destination_countries"."created_at", "destination_countries"."updated_at",
+  "destination_regions"."destination_region_name" FROM "destination_countries" JOIN
+  "destination_regions" ON "destination_regions"."id" = "destination_countries"."destination_region_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: destination_countries.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  destination_region_id:
+    :name: destination_region_id
+    :sequence_no: 2
+    :caption: Destination region
+    :namespaced_name: destination_countries.destination_region_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  country_name:
+    :name: country_name
+    :sequence_no: 3
+    :caption: Country name
+    :namespaced_name: destination_countries.country_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: destination_countries.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 5
+    :caption: Updated at
+    :namespaced_name: destination_countries.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  destination_region_name:
+    :name: destination_region_name
+    :sequence_no: 6
+    :caption: Destination region name
+    :namespaced_name: destination_regions.destination_region_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: destination_countries.destination_region_id
+  :caption: Destination region
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT destination_region_name, id FROM destination_regions ORDER BY
+    destination_region_name

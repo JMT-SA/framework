@@ -16,7 +16,7 @@ module Masterfiles
               form.action '/masterfiles/parties/organizations'
               form.remote!
               # form.add_field :party_id
-              # form.add_field :parent_id
+              form.add_field :parent_id
               form.add_field :short_description
               form.add_field :medium_description
               form.add_field :long_description

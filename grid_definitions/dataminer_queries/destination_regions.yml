@@ -1,0 +1,68 @@
+---
+:caption: Destination Regions
+:sql: SELECT "destination_regions"."id", "destination_regions"."destination_region_name",
+  "destination_regions"."created_at", "destination_regions"."updated_at" FROM "destination_regions"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: destination_regions.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  destination_region_name:
+    :name: destination_region_name
+    :sequence_no: 2
+    :caption: Destination region name
+    :namespaced_name: destination_regions.destination_region_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 3
+    :caption: Created at
+    :namespaced_name: destination_regions.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 4
+    :caption: Updated at
+    :namespaced_name: destination_regions.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

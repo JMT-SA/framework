@@ -1,0 +1,24 @@
+---
+:dataminer_definition: basic_pack_codes
+:actions:
+- :url: "/masterfiles/fruit/basic_pack_codes/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/masterfiles/fruit/basic_pack_codes/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/fruit/basic_pack_codes/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/fruit/basic_pack_codes/new"
+  :text: New Basic Pack Code
+  :style: :button
+  :behaviour: :popup

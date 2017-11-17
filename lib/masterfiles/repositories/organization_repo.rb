@@ -27,7 +27,7 @@ class OrganizationRepo < RepoBase
   def find_with_roles(id)
     organization = find(id)
     domain_obj = DomainParty.new(organization)
-    ids = select_values("SELECT role_id FROM party_roles WHERE organization_id = #{id}")
+    ids = DB[:party_roles].where(organization_id: id).map{|r| r[:role_id] }
     domain_obj.roles = DB[:roles].where(id: ids).map { |r| Role.new(r) } # :name && :active
     domain_obj
   end
@@ -35,14 +35,14 @@ class OrganizationRepo < RepoBase
   def assign_roles(id, role_ids)
     return { error: 'Choose at least one role' } if role_ids.empty?
     organization = find(id)
-    del = "DELETE FROM party_roles WHERE organization_id = #{id};"
-    ins = String.new
-    role_ids.each do |r_id|
-      ins << "INSERT INTO party_roles (party_id, role_id, organization_id) VALUES(#{organization.party_id}, #{r_id}, #{id});"
-    end
     DB.transaction do
-      DB.execute(del)
-      DB.execute(ins)
+      DB[:party_roles].where(organization_id: id).delete
+      role_ids.each do |r_id|
+        DB[:party_roles].insert({ party_id: organization.party_id,
+                                  role_id: r_id,
+                                  organization_id: id
+                                })
+      end
     end
     { success: true }
   end

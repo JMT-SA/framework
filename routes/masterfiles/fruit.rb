@@ -173,7 +173,7 @@ class Framework < Roda
     # CULTIVAR GROUPS
     # --------------------------------------------------------------------------
     r.on 'cultivar_groups', Integer do |id|
-      interactor = CultivarGroupInteractor.new(current_user, {}, {}, {})
+      interactor = CultivarInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cultivar_groups, id) do
@@ -214,7 +214,7 @@ class Framework < Roda
       end
     end
     r.on 'cultivar_groups' do
-      interactor = CultivarGroupInteractor.new(current_user, {}, {}, {})
+      interactor = CultivarInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
@@ -263,6 +263,59 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::Cultivar::Edit.call(id) }
         else
           dialog_permission_error
+        end
+      end
+
+      # MARKETING VARIETIES
+      # --------------------------------------------------------------------------
+      r.on 'link_marketing_varieties' do
+        r.post do
+          interactor = CultivarInteractor.new(current_user, {}, {}, {})
+          res = interactor.link_marketing_varieties(id, multiselect_grid_choices(params))
+
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          r.redirect "/list/cultivar_marketing_varieties/multi?key=cultivars&id=#{id}"
+        end
+      end
+      r.on 'marketing_varieties' do
+        interactor = CultivarInteractor.new(current_user, {}, {}, {})
+        r.on 'new' do    # NEW
+          if authorised?('fruit', 'new')
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
+          else
+            fetch?(r) ? dialog_permission_error : show_unauthorised
+          end
+        end
+        r.post do        # CREATE
+          res = interactor.create_marketing_variety(id, params[:marketing_variety])
+          if res.success
+            flash[:notice] = res.message
+            if fetch?(r)
+              redirect_via_json_to_last_grid
+            else
+              redirect_to_last_grid(r)
+            end
+          elsif fetch?(r)
+            content = show_partial do
+              Masterfiles::Fruit::MarketingVariety::New.call(parent_id: id,
+                                                             form_values: params[:marketing_variety],
+                                                             form_errors: res.errors,
+                                                             remote: true)
+            end
+            update_dialog_content(content: content, error: res.message)
+          else
+            flash[:error] = res.message
+            show_page do
+              Masterfiles::Fruit::MarketingVariety::New.call(parent_id: id,
+                                                             form_values: params[:marketing_variety],
+                                                             form_errors: res.errors,
+                                                             remote: false)
+            end
+          end
         end
       end
       r.is do
@@ -322,6 +375,42 @@ class Framework < Roda
             Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
                                                    form_errors: res.errors,
                                                    remote: false)
+          end
+        end
+      end
+    end
+    r.on 'marketing_varieties', Integer do |id|
+      interactor = CultivarInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:marketing_varieties, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        if authorised?('fruit', 'edit')
+          show_partial { Masterfiles::Fruit::MarketingVariety::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.is do
+        r.get do       # SHOW
+          if authorised?('fruit', 'read')
+            show_partial { Masterfiles::Fruit::MarketingVariety::Show.call(id) }
+          else
+            dialog_permission_error
+          end
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_marketing_variety(id, params[:marketing_variety])
+          if res.success
+            update_grid_row(id, changes: { marketing_variety_code: res.instance[:marketing_variety_code], description: res.instance[:description] },
+            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Fruit::MarketingVariety::Edit.call(id, params[:marketing_variety], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
       end

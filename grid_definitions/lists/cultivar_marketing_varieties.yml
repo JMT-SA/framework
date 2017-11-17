@@ -1,0 +1,7 @@
+---
+:dataminer_definition: marketing_varieties
+:multiselect:
+  :cultivars:
+    :url: "/masterfiles/fruit/cultivars/$:id$/link_marketing_varieties"
+    :preselect: "SELECT marketing_variety_id AS id FROM marketing_varieties_for_cultivars WHERE cultivar_id = $:id$"
+    :section_caption: "SELECT cultivar_name FROM cultivars WHERE id = $:id$"

@@ -3,7 +3,7 @@
 module UiRules
   class Cultivar < Base
     def generate_rules
-      @this_repo = CultivarRepo.new
+      @repo = CultivarRepo.new
       make_form_object
       apply_form_values
 
@@ -16,7 +16,7 @@ module UiRules
 
     def set_show_fields
       commodity_id_label = CommodityRepo.new.find(@form_object.commodity_id)&.code
-      cultivar_group_id_label = CultivarGroupRepo.new.find(@form_object.cultivar_group_id)&.cultivar_group_code
+      cultivar_group_id_label = @repo.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
       fields[:cultivar_group_id] = { renderer: :label, with_value: cultivar_group_id_label }
       fields[:cultivar_name] = { renderer: :label }
@@ -26,7 +26,7 @@ module UiRules
     def common_fields
       {
         commodity_id: { renderer: :select, options: CommodityRepo.new.for_select },
-        cultivar_group_id: { renderer: :select, options: CultivarGroupRepo.new.for_select },
+        cultivar_group_id: { renderer: :select, options: @repo.cultivar_groups_for_select },
         cultivar_name: {},
         description: {}
       }
@@ -35,7 +35,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find_cultivar(@options[:id])
     end
 
     def make_new_form_object

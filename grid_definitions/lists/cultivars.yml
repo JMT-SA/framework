@@ -16,6 +16,14 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
+- :url: "/masterfiles/fruit/cultivars/$:id$/marketing_varieties/new"
+  :text: add marketing variety
+  :icon: fa-plus
+  :title: New Marketing Variety
+  :popup: true
+- :url: "/list/cultivar_marketing_varieties/multi?key=cultivars&id=$:id$"
+  :text: marketing varieties list
+  :icon: fa-list
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/cultivars/new"

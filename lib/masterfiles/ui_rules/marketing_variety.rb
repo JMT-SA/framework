@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class CultivarGroup < Base
+  class MarketingVariety < Base
     def generate_rules
       @repo = CultivarRepo.new
       make_form_object
@@ -11,17 +11,17 @@ module UiRules
 
       set_show_fields if @mode == :show
 
-      form_name 'cultivar_group'
+      form_name 'marketing_variety'
     end
 
     def set_show_fields
-      fields[:cultivar_group_code] = { renderer: :label }
+      fields[:marketing_variety_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
     end
 
     def common_fields
       {
-        cultivar_group_code: {},
+        marketing_variety_code: {},
         description: {}
       }
     end
@@ -29,11 +29,11 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find_cultivar_group(@options[:id])
+      @form_object = @repo.find_marketing_variety(@options[:id])
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(cultivar_group_code: nil,
+      @form_object = OpenStruct.new(marketing_variety_code: nil,
                                     description: nil)
     end
   end

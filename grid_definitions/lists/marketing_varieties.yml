@@ -1,0 +1,13 @@
+---
+:dataminer_definition: marketing_varieties
+:actions:
+- :url: "/masterfiles/fruit/marketing_varieties/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/masterfiles/fruit/marketing_varieties/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true

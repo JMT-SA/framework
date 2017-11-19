@@ -304,6 +304,10 @@ input[readonly] {
 // }
 /* END: SEARCH MENU RESULTS */
 
+.menu-prog-selected {
+  background: rgba(53, 136, 94, 0.85);
+}
+
 .thinbordertable {
   border-collapse: collapse;
 }
@@ -380,7 +384,7 @@ tr.roweven {
 .dialog-content {
   padding: 1em;
   max-width: 90%;
-  width: 600px;
+  /* width: 600px; */
   border-radius: 2px;
 }
 

@@ -17,7 +17,9 @@ module MenuHelpers
   def build_progs(rows, progs, progfuncs)
     rows.each do |row|
       progs[row[:functional_area_id]] << { name: row[:program_name], id: row[:program_id] }
-      progfuncs[row[:program_id]] << { name: row[:program_function_name], group_name: row[:group_name], url: row[:url], id: row[:id] }
+      progfuncs[row[:program_id]] << { name: row[:program_function_name], group_name: row[:group_name],
+                                       url: row[:url], id: row[:id], func_id: row[:functional_area_id],
+                                       prog_id: row[:program_id] }
     end
   end
 

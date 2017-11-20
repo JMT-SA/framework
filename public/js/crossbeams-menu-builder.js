@@ -28,7 +28,7 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
 
     progItems.forEach((elem) => {
       pfMenu = buildThirdLevelMenu(elem.id);
-      pSel = (selectedProgId === elem.id) ? ' menu-prog-selected' : ''
+      pSel = (selectedProgId === elem.id) ? ' menu-prog-selected' : '';
       if (pfMenu === '') {
         progMenu += `<li><a href="#" data-menu-level2="${elem.id}">${elem.name}</a></li>`;
       } else {
@@ -86,7 +86,7 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
     const searchBox = document.querySelector('#menuSearch');
     const resultsList = document.querySelector('#menuSearchResults');
 
-    searchBox.addEventListener('keyup', () => {
+    searchBox.addEventListener('keyup', (event) => {
       if (event.keyCode === 27) { // ESC
         resultsList.innerHTML = '';
         resultsList.style.display = 'none';
@@ -94,10 +94,10 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
     });
 
     searchBox.addEventListener('change', () => {
-      const results = crossbeamsMenuBuilder.searchMenu(searchBox.value);
+      const results = searchMenu(searchBox.value);
       let listItems = '';
       results.forEach((menu) => {
-        listItems += `<li><a href="${menu.url}">${menu.name}</a></li>`;
+        listItems += `<li><a href="${menu.url}" data-menu-parent="${menu.prog_id}" data-menu-level3="${menu.id}" data-menu-func="${menu.func_id}">${menu.name}</a></li>`;
       });
       resultsList.innerHTML = listItems;
       resultsList.style.display = 'block';
@@ -118,8 +118,10 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
         event.preventDefault();
       }
       if (event.target.dataset.menuLevel3) {
-        // console.log('clicked', event.target.dataset.menuLevel3, 'parent:', event.target.dataset.menuParent);
         crossbeamsLocalStorage.setItem('selectedProgMenu', event.target.dataset.menuParent);
+        if (event.target.dataset.menuFunc) {
+          crossbeamsLocalStorage.setItem('selectedFuncMenu', event.target.dataset.menuFunc);
+        }
       }
     });
   });

@@ -64,7 +64,10 @@ const crossbeamsGridEvents = {
    */
   toFullScreen: function toFullScreen(gridId) {
     const grid = document.getElementById(gridId);
-    (grid.requestFullscreen || grid.webkitRequestFullscreen || grid.mozRequestFullScreen || grid.msRequestFullscreen || function(){}).call(grid);
+    (grid.requestFullscreen
+     || grid.webkitRequestFullscreen
+     || grid.mozRequestFullScreen
+     || grid.msRequestFullscreen || (() => {})).call(grid);
   },
 
   /**
@@ -73,31 +76,31 @@ const crossbeamsGridEvents = {
    * @param {string} url - the URL to receive the fetch request.
    * @returns {void}
    */
-  saveSelectedRows: function saveSelectedRows(gridId, url, can_be_cleared) {
+  saveSelectedRows: function saveSelectedRows(gridId, url, canBeCleared) {
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
-    const ids = _.map(gridOptions.api.getSelectedRows(), (m) => m.id );
+    const ids = _.map(gridOptions.api.getSelectedRows(), m => m.id);
     // crossbeamsUtils.alert({prompt: ids.join(','), title: url});
     let msg;
-    if(!can_be_cleared && ids.length === 0) {
-      crossbeamsUtils.alert({prompt: 'You have not selected any items to submit!', type: 'error'});
+    if (!canBeCleared && ids.length === 0) {
+      crossbeamsUtils.alert({ prompt: 'You have not selected any items to submit!', type: 'error' });
     }
     else {
-      if(ids.length === 0) {
-        msg = 'Are you sure you want to submit an empty selection?'
+      if (ids.length === 0) {
+        msg = 'Are you sure you want to submit an empty selection?';
       }
       else {
-        msg = 'Are you sure you want to submit this selection?(' + ids.length.toString() + ' items)'
+        msg = `Are you sure you want to submit this selection?(${ids.length.toString()} items)`;
       }
 
       crossbeamsUtils.confirm({
         prompt: msg,
         okFunc: () => {
           const form = document.createElement('form');
-          let element1 = document.createElement("input");
-          let csrf = document.createElement("input");
+          const element1 = document.createElement('input');
+          const csrf = document.createElement('input');
           form.method = 'POST';
           form.action = url;
-          element1.value = ids.join(',')
+          element1.value = ids.join(',');
           element1.name = 'selection[list]';
           csrf.value = document.querySelector('meta[name="_csrf"]').content;
           csrf.name = '_csrf';
@@ -135,9 +138,9 @@ const crossbeamsGridEvents = {
   makeColumnScrollList: function makeColumnScrollList(gridId, colDefs) {
     const select = document.getElementById(`${gridId}-scrollcol`);
     let option;
-    colDefs.sort((a, b) => a.headerName.localeCompare(b.headerName) ).forEach((col) => {
+    colDefs.sort((a, b) => a.headerName.localeCompare(b.headerName)).forEach((col) => {
       if (col.field !== undefined && !col.hide) {
-        option = document.createElement("option");
+        option = document.createElement('option');
         option.text = col.headerName;
         option.value = col.field;
         select.appendChild(option);
@@ -261,31 +264,38 @@ const crossbeamsGridEvents = {
     if (rowNode === undefined) {
       rowNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
     }
+    const useKeys = gridOptions.columnApi.getAllDisplayedColumns().filter(c => c.colDef.headerName !== '' && c.colDef.headerName !== 'Group').map(c => c.colDef.field);
 
-    // TODO: smarten table, use grid value getters/formatters etc for boolean, right-justify etc.
-    //       - row highlight.
+    // TODO:
     //       - sort keys. (and un-sort)
     //       - next/prev navigation of table
     //       - button in UI
-    //       - skip hidden columns
     //       - skip grouped rows in going for first selected
     //       - skip if data does not have a columndef (e.g. dataminer reports grid)
-    // const content = `<div style="position:absolute;overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
     const content = `<div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
-      <table class="thinbordertable">
+      <table class="thinbordertable" style="margin:0 0.5em">
       <thead>
       <tr><th>Column</th><th>Value</th></tr>
       </thead>
       <tbody>
-      ${Object.keys(rowNode.data).map((k) => `
-        <tr class="hover-row ${(() => {cnt += 1; return cnt % 2 === 0 ? 'roweven' : 'rowodd';})()}"><td>
+      ${useKeys.map(k => `
+        <tr class="hover-row ${(() => { cnt += 1; return cnt % 2 === 0 ? 'roweven' : 'rowodd'; })()}"><td>
           ${gridOptions.api.getColumnDef(k).headerName}
-          </td><td>
-          ${rowNode.data[k]}
+          </td><td class="${gridOptions.api.getColumnDef(k).cellClass ? gridOptions.api.getColumnDef(k).cellClass : ''}">
+          ${((data) => {
+            if (data === null) {
+              return '';
+            } else if (data === true) {
+              return '<span class="ac_icon_check">&nbsp;</span>';
+            } else if (data === false) {
+              return '<span class="ac_icon_uncheck">&nbsp;</span>';
+            }
+            return data;
+          })(rowNode.data[k])}
         </td></tr>`).join('')}
       </tbody>
       </table>
-      </div>`
+      </div>`;
     crossbeamsUtils.showHtmlInDialog('Selected Row', content);
   },
 
@@ -326,11 +336,17 @@ const crossbeamsGridFormatters = {
 
   makeContextNode: function makeContextNode(key, prefix, items, item, params) {
     let node = {};
-    let urlComponents;
+    let urlComponents = [];
     let url;
     let subKey = 'a';
     let subPrefix = '';
     let subnode;
+    let titleValue;
+    if (item.title_field) {
+      titleValue = params.data[item.title_field];
+    } else {
+      titleValue = item.title ? item.title : '';
+    }
     if (item.is_separator) {
       if (items.length > 0 && _.last(items).value !== '---') {
         return { key: `${prefix}${key}`, name: item.text, value: '---' };
@@ -350,7 +366,10 @@ const crossbeamsGridFormatters = {
       item.items.forEach((subitem) => {
         subKey = crossbeamsGridFormatters.nextChar(subKey);
         subPrefix = `${prefix}${key}_`;
-        subnode = crossbeamsGridFormatters.makeContextNode(subKey, subPrefix, node.items, subitem, params);
+        subnode = crossbeamsGridFormatters.makeContextNode(subKey,
+                                                           subPrefix,
+                                                           node.items,
+                                                           subitem, params);
         if (subnode !== null) {
           node.items.push(subnode);
         }
@@ -376,7 +395,7 @@ const crossbeamsGridFormatters = {
       prompt: item.prompt,
       method: item.method,
       title: item.title,
-      title_field: item.title_field ? params.data[item.title_field] : item.title ? item.title : '',
+      title_field: titleValue,
       icon: item.icon,
       popup: item.popup,
     };
@@ -600,14 +619,14 @@ Level2PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
   const parentRecord = params.node.parent.data;
 
   const template =
-    '<div class="full-width-panel">' +
-    '  <div class="full-width-grid" style="height:100%"></div>' +
-    '  <div class="full-width-grid-toolbar">' +
-    '       <b>Functional area: </b>' + parentRecord.functional_area_name + // TODO: ................
-    '       <input class="full-width-search" placeholder="Search..."/>' +
-    '       <a href="/security/functional_areas/programs/$:functional_area_id$/new">Add a Program</a>' +
-    '  </div>' +
-    '</div>';
+    `<div class="full-width-panel">
+       <div class="full-width-grid" style="height:100%"></div>
+       <div class="full-width-grid-toolbar">
+            <b>Functional area: </b>${parentRecord.functional_area_name}
+            <input class="full-width-search" placeholder="Search..."/>
+            <a href="/security/functional_areas/programs/$:functional_area_id$/new">Add a Program</a>
+       </div>
+     </div>`;
 
   return template;
 };
@@ -691,14 +710,14 @@ Level3PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
   const parentRecord = params.node.parent.data;
 
   const template =
-    '<div class="full-width-panel"style="background-color: silver">' +
-    '  <div class="full-width-grid" style="height:100%"></div>' +
-    '  <div class="full-width-grid-toolbar">' +
-    '       <b>Program: </b>' + parentRecord.program_name + // TODO: .........................
-    '       <input class="full-width-search" placeholder="Search..."/>' +
-    '       <button>Add a Program Function</button>' +
-    '  </div>' +
-    '</div>';
+    `<div class="full-width-panel"style="background-color: silver">
+       <div class="full-width-grid" style="height:100%"></div>
+       <div class="full-width-grid-toolbar">
+            <b>Program: </b>s${parentRecord.program_name}
+            <input class="full-width-search" placeholder="Search..."/>
+            <button>Add a Program Function</button>
+       </div>
+     </div>`;
 
   return template;
 };
@@ -793,7 +812,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           // In that case, AG Grid will hide any rows below the null group.
           if (col[attr] === 'blankWhenNull') {
             newCol.valueGetter = function valueGetter(params) {
-              const result = params.data ? params.data[params.colDef.field]: "";
+              const result = params.data ? params.data[params.colDef.field] : '';
               if (result === null || result === undefined) {
                 return '';
               }
@@ -832,9 +851,9 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         }
         gridOptions.api.setColumnDefs(newColDefs); // TODO.............. ????
         gridOptions.api.setRowData(httpResult.rowDefs);
-        gridOptions.api.forEachLeafNode((n) => { rows += 1; });
+        gridOptions.api.forEachLeafNode(() => { rows += 1; });
         if (httpResult.multiselect_ids) {
-          gridOptions.api.forEachNode( function (node) {
+          gridOptions.api.forEachNode((node) => {
             if (node.data && _.includes(httpResult.multiselect_ids, node.data.id)) {
               node.setSelected(true);
             }
@@ -902,7 +921,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       } else {
         gridOptions = {
           context: { domGridId: gridId },
-          //columnDefs: null,
+          // columnDefs: null,
           rowDefs: null,
           enableColResize: true,
           enableSorting: true,
@@ -912,10 +931,10 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           enableRangeSelection: true,
           enableStatusBar: true,
           suppressAggFuncInHeader: true,
-          onFilterChanged: function () {
+          onFilterChanged() {
             let filterLength = 0;
             let rows = 0;
-            this.api.forEachLeafNode((n) => { rows += 1; });
+            this.api.forEachLeafNode(() => { rows += 1; });
             this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
             crossbeamsGridEvents.displayRowCounts(gridId, filterLength, rows);
           },
@@ -950,7 +969,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
   });
 
   return {
-    listenForGrid: listenForGrid
+    listenForGrid,
   };
 }).call();
 
@@ -1045,46 +1064,46 @@ $(() => {
                   method: 'POST',
                   credentials: 'same-origin',
                   headers: new Headers({
-                    'X-Custom-Request-Type': 'Fetch'
+                    'X-Custom-Request-Type': 'Fetch',
                   }),
                   body: form,
-                }).then((response) => response.json())
-                  .then(function(data) {
-                  if (data.redirect) {
-                    window.location = data.redirect;
-                  } else if (data.removeGridRowInPlace) {
-                    const gridId = crossbeamsLocalStorage.getItem('popupOnGrid');
-                    // TODO: move to own function..
-                    const gridOptions = crossbeamsGridStore.getGrid(gridId);
-                    let rowNode = gridOptions.api.getRowNode(data.removeGridRowInPlace.id);
-                    gridOptions.api.updateRowData({remove: [rowNode]})
-                  } else if (data.updateGridInPlace) {
-                    const gridId = crossbeamsLocalStorage.getItem('popupOnGrid');
-                    // TODO: move to own function..
-                    const gridOptions = crossbeamsGridStore.getGrid(gridId);
-                    let rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
-                    for (const k in data.updateGridInPlace.changes) {
+                }).then(response => response.json())
+                  .then((data) => {
+                    if (data.redirect) {
+                      window.location = data.redirect;
+                    } else if (data.removeGridRowInPlace) {
+                      const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+                      // TODO: move to own function..
+                      const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+                      const rowNode = gridOptions.api.getRowNode(data.removeGridRowInPlace.id);
+                      gridOptions.api.updateRowData({ remove: [rowNode] });
+                    } else if (data.updateGridInPlace) {
+                      const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+                      // TODO: move to own function..
+                      const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+                      const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
+                      for (const k in data.updateGridInPlace.changes) {
                         rowNode.setDataValue(k, data.updateGridInPlace.changes[k]);
-                    };
-                  } else {
-                    console.log('Not sure what to do with this:', data);
-                  }
-                  // Only if not redirect...
-                  if (data.flash) {
-                    if (data.flash.notice) {
-                      Jackbox.success(data.flash.notice);
+                      }
+                    } else {
+                      console.log('Not sure what to do with this:', data);
                     }
-                    if (data.flash.error) {
-                      if (data.exception) {
-                        Jackbox.error(data.flash.error, { time: 20 });
-                      } else {
-                        Jackbox.error(data.flash.error);
+                    // Only if not redirect...
+                    if (data.flash) {
+                      if (data.flash.notice) {
+                        Jackbox.success(data.flash.notice);
+                      }
+                      if (data.flash.error) {
+                        if (data.exception) {
+                          Jackbox.error(data.flash.error, { time: 20 });
+                        } else {
+                          Jackbox.error(data.flash.error);
+                        }
                       }
                     }
-                  }
-                }).catch(function(data) {
-                    Jackbox.error(`An error occurred ${data}`, { time: 20 });
-                });
+                  }).catch((data) => {
+                      Jackbox.error(`An error occurred ${data}`, { time: 20 });
+                  });
               } else {
                 document.body.innerHTML += `<form id="dynForm" action="${item.url}" method="post">
                   <input name="_method" type="hidden" value="${item.method}" />

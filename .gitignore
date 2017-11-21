@@ -40,3 +40,7 @@ public/fonts
 ## Rubymine
 .idea/
 .rake_tasks~
+
+## Vim
+tags
+.srclist

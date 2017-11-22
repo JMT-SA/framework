@@ -8,23 +8,18 @@ class Framework < Roda
     # COMMODITY GROUPS
     # --------------------------------------------------------------------------
     r.on 'commodity_groups', Integer do |id|
-      repo = CommodityGroupRepo.new
-      commodity_group = repo.find(id)
+      interactor = CommodityInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on commodity_group.nil? do
+      r.on !interactor.exists?(:commodity_groups, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('fruit', 'edit')
-            show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('fruit', 'edit')
+          show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id) }
+        else
+          dialog_permission_error
         end
       end
       r.is do
@@ -36,77 +31,73 @@ class Framework < Roda
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = CommodityGroupSchema.call(params[:commodity_group])
-            errors = res.messages
-            if errors.empty?
-              repo = CommodityGroupRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { code: res[:code], description: res[:description], active: res[:active] },
-                                  notice:  "Updated #{res[:code]}")
-            else
-              content = show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id, params[:commodity_group], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_commodity_group(id, params[:commodity_group])
+          if res.success
+            update_grid_row(id, changes: { code: res.instance[:code], description: res.instance[:description], active: res.instance[:active] },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id, params[:commodity_group], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = CommodityGroupRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_commodity_group(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'commodity_groups' do
+      interactor = CommodityInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('fruit', 'new')
-            show_partial { Masterfiles::Fruit::CommodityGroup::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('fruit', 'new')
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
-        res = CommodityGroupSchema.call(params[:commodity_group])
-        errors = res.messages
-        if errors.empty?
-          repo = CommodityGroupRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_commodity_group(params[:commodity_group])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Masterfiles::Fruit::CommodityGroup::New.call(form_values: params[:commodity_group],
+                                                         form_errors: res.errors,
+                                                         remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Masterfiles::Fruit::CommodityGroup::New.call(params[:commodity_group], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Masterfiles::Fruit::CommodityGroup::New.call(form_values: params[:commodity_group],
+                                                         form_errors: res.errors,
+                                                         remote: false)
+          end
         end
       end
     end
     # COMMODITIES
     # --------------------------------------------------------------------------
     r.on 'commodities', Integer do |id|
-      repo = CommodityRepo.new
-      commodity = repo.find(id)
+      interactor = CommodityInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on commodity.nil? do
+      r.on !interactor.exists?(:commodities, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('fruit', 'edit')
-            show_partial { Masterfiles::Fruit::Commodity::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('fruit', 'edit')
+          show_partial { Masterfiles::Fruit::Commodity::Edit.call(id) }
+        else
+          dialog_permission_error
         end
       end
       r.is do
@@ -118,55 +109,60 @@ class Framework < Roda
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = CommoditySchema.call(params[:commodity])
-            errors = res.messages
-            if errors.empty?
-              repo = CommodityRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { commodity_group_id: res[:commodity_group_id], code: res[:code], description: res[:description], hs_code: res[:hs_code], active: res[:active] },
-                                  notice:  "Updated #{res[:code]}")
-            else
-              content = show_partial { Masterfiles::Fruit::Commodity::Edit.call(id, params[:commodity], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_commodity(id, params[:commodity])
+          if res.success
+            update_grid_row(id,
+                            changes: { commodity_group_id: res.instance[:commodity_group_id],
+                                       code: res.instance[:code],
+                                       description: res.instance[:description],
+                                       hs_code: res.instance[:hs_code],
+                                       active: res.instance[:active] },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Fruit::Commodity::Edit.call(id, params[:commodity], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = CommodityRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_commodity(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'commodities' do
+      interactor = CommodityInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('fruit', 'new')
-            show_partial { Masterfiles::Fruit::Commodity::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('fruit', 'new')
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
-        res = CommoditySchema.call(params[:commodity])
-        errors = res.messages
-        puts errors.inspect
-        if errors.empty?
-          repo = CommodityRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_commodity(params[:commodity])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Masterfiles::Fruit::Commodity::New.call(form_values: params[:commodity],
+                                                    form_errors: res.errors,
+                                                    remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Masterfiles::Fruit::Commodity::New.call(params[:commodity], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Masterfiles::Fruit::Commodity::New.call(form_values: params[:commodity],
+                                                    form_errors: res.errors,
+                                                    remote: false)
+          end
         end
       end
     end
@@ -199,7 +195,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_cultivar_group(id, params[:cultivar_group])
           if res.success
-            update_grid_row(id, changes: { cultivar_group_code: res.instance[:cultivar_group_code], description: res.instance[:description] },
+            update_grid_row(id,
+                            changes: { cultivar_group_code: res.instance[:cultivar_group_code],
+                                           description: res.instance[:description] },
                             notice:  res.message)
           else
             content = show_partial { Masterfiles::Fruit::CultivarGroup::Edit.call(id, params[:cultivar_group], res.errors) }
@@ -235,7 +233,7 @@ class Framework < Roda
           content = show_partial do
             Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
                                                         form_errors: res.errors,
-                                                             remote: true)
+                                                        remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else

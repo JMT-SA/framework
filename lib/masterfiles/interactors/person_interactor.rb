@@ -5,21 +5,16 @@ class PersonInteractor < BaseInteractor
   def create_person(params)
     res = validate_person_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_party
     @id = person_repo.create(res.to_h)
-    success_response("Created person #{person_name}",
-                     person)
+    success_response("Created person #{person_name}", person)
   end
 
   def update_person(id, params)
-    # party = PartyRepo.find(id)
-    @id = id #party.person_id || party.person_id
+    @id = id
     res = validate_person_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_party... etc.
     person_repo.update(id, res.to_h)
-    success_response("Updated person #{person_name}",
-                     person(false))
+    success_response("Updated person #{person_name}", person(false))
   end
 
   def delete_person(id)
@@ -33,8 +28,7 @@ class PersonInteractor < BaseInteractor
     if params[:roles]
       person_repo.assign_roles(id, params[:roles].map(&:to_i))
       party_ex = person_repo.find_with_roles(id)
-      success_response("Updated roles on party #{[party_ex.title, party_ex.first_name, party_ex.surname].join(' ')}",
-                       party_ex)
+      success_response("Updated roles on party #{[party_ex.title, party_ex.first_name, party_ex.surname].join(' ')}", party_ex)
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
     end
@@ -51,9 +45,9 @@ class PersonInteractor < BaseInteractor
 
   def person(cached = true)
     if cached
-      @person ||= person_repo.find(@id)#find_relative_party
+      @person ||= person_repo.find(@id)
     else
-      @person = person_repo.find(@id)#find_relative_party
+      @person = person_repo.find(@id)
     end
   end
 

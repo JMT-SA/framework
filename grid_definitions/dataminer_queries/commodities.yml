@@ -142,4 +142,20 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-:query_parameter_definitions: []
+:query_parameter_definitions:
+- :column: commodities.commodity_group_id
+  :caption: Commodity group
+  :data_type: :integer
+  :control_type: :list
+  :default_value:
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodity_groups ORDER BY code
+- :column: commodities.code
+  :caption: Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list:
+  :ui_priority: 1
+  :list_def:

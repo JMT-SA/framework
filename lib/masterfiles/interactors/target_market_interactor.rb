@@ -4,13 +4,13 @@ class TargetMarketInteractor < BaseInteractor
   def create_tm_group_type(params)
     res = validate_tm_group_type_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = target_market_repo.create_tm_group_type(res.to_h)
+    @tm_group_type_id = target_market_repo.create_tm_group_type(res.to_h)
     success_response("Created target market group type #{tm_group_type.target_market_group_type_code}",
                      tm_group_type)
   end
 
   def update_tm_group_type(id, params)
-    @id = id
+    @tm_group_type_id = id
     res = validate_tm_group_type_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     target_market_repo.update_tm_group_type(id, res.to_h)
@@ -19,7 +19,7 @@ class TargetMarketInteractor < BaseInteractor
   end
 
   def delete_tm_group_type(id)
-    @id = id
+    @tm_group_type_id = id
     name = tm_group_type.target_market_group_type_code
     target_market_repo.delete_tm_group_type(id)
     success_response("Deleted target market group type #{name}")
@@ -28,12 +28,12 @@ class TargetMarketInteractor < BaseInteractor
   def create_tm_group(params)
     res = validate_tm_group_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = target_market_repo.create_tm_group(res.to_h)
+    @tm_group_id = target_market_repo.create_tm_group(res.to_h)
     success_response("Created target market group #{tm_group.target_market_group_name}", tm_group)
   end
 
   def update_tm_group(id, params)
-    @id = id
+    @tm_group_id = id
     res = validate_tm_group_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     target_market_repo.update_tm_group(id, res.to_h)
@@ -41,7 +41,7 @@ class TargetMarketInteractor < BaseInteractor
   end
 
   def delete_tm_group(id)
-    @id = id
+    @tm_group_id = id
     name = tm_group.target_market_group_name
     target_market_repo.delete_tm_group(id)
     success_response("Deleted target market group #{name}")
@@ -52,14 +52,14 @@ class TargetMarketInteractor < BaseInteractor
     tm_group_ids = params.delete(:tm_group_ids)
     res = validate_target_market_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = target_market_repo.create_target_market(res.to_h)
+    @target_market_id = target_market_repo.create_target_market(res.to_h)
     country_response = link_countries(@id, country_ids)
     tm_groups_response = link_tm_groups(@id, tm_group_ids)
     success_response("Created target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market)
   end
 
   def update_target_market(id, params)
-    @id = id
+    @target_market_id = id
     res = validate_target_market_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     target_market_repo.update_target_market(id, res.to_h)
@@ -67,7 +67,7 @@ class TargetMarketInteractor < BaseInteractor
   end
 
   def delete_target_market(id)
-    @id = id
+    @target_market_id = id
     name = target_market.target_market_name
     target_market_repo.delete_target_market(id)
     success_response("Deleted target market #{name}")
@@ -101,9 +101,9 @@ class TargetMarketInteractor < BaseInteractor
 
   def tm_group_type(cached = true)
     if cached
-      @tm_group_type ||= target_market_repo.find_tm_group_type(@id)
+      @tm_group_type ||= target_market_repo.find_tm_group_type(@tm_group_type_id)
     else
-      @tm_group_type = target_market_repo.find_tm_group_type(@id)
+      @tm_group_type = target_market_repo.find_tm_group_type(@tm_group_type_id)
     end
   end
 
@@ -113,9 +113,9 @@ class TargetMarketInteractor < BaseInteractor
 
   def tm_group(cached = true)
     if cached
-      @tm_group ||= target_market_repo.find_tm_group(@id)
+      @tm_group ||= target_market_repo.find_tm_group(@tm_group_id)
     else
-      @tm_group = target_market_repo.find_tm_group(@id)
+      @tm_group = target_market_repo.find_tm_group(@tm_group_id)
     end
   end
 
@@ -125,9 +125,9 @@ class TargetMarketInteractor < BaseInteractor
 
   def target_market(cached = true)
     if cached
-      @target_market ||= target_market_repo.find_target_market(@id)
+      @target_market ||= target_market_repo.find_target_market(@target_market_id)
     else
-      @target_market = target_market_repo.find_target_market(@id)
+      @target_market = target_market_repo.find_target_market(@target_market_id)
     end
   end
 

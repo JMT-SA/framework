@@ -5,7 +5,6 @@ class AddressInteractor < BaseInteractor
   def create_address(params)
     res = validate_address_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_address... etc.
     @id = address_repo.create(res.to_h)
     success_response("Created address #{address.address_line_1}",
                      address)
@@ -15,7 +14,6 @@ class AddressInteractor < BaseInteractor
     @id = id
     res = validate_address_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_address... etc.
     address_repo.update(id, res.to_h)
     success_response("Updated address #{address.address_line_1}",
                      address(false))

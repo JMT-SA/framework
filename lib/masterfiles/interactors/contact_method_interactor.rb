@@ -5,7 +5,6 @@ class ContactMethodInteractor < BaseInteractor
   def create_contact_method(params)
     res = validate_contact_method_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_contact_method... etc.
     @id = contact_method_repo.create(res.to_h)
     success_response("Created contact method #{contact_method.contact_method_code}",
                      contact_method)
@@ -15,7 +14,6 @@ class ContactMethodInteractor < BaseInteractor
     @id = id
     res = validate_contact_method_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_contact_method... etc.
     contact_method_repo.update(id, res.to_h)
     success_response("Updated contact method #{contact_method.contact_method_code}",
                      contact_method(false))

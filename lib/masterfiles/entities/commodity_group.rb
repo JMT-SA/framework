@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CommodityGroup < Dry::Struct
   attribute :id, Types::Int
   attribute :code, Types::String

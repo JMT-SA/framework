@@ -20,7 +20,6 @@ class BasicPackCodeInteractor < BaseInteractor
   def create_basic_pack_code(params)
     res = validate_basic_pack_code_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_basic_pack_code... etc.
     @id = basic_pack_code_repo.create(res.to_h)
     success_response("Created basic pack code #{basic_pack_code.basic_pack_code}",
                      basic_pack_code)
@@ -30,7 +29,6 @@ class BasicPackCodeInteractor < BaseInteractor
     @id = id
     res = validate_basic_pack_code_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_basic_pack_code... etc.
     basic_pack_code_repo.update(id, res.to_h)
     success_response("Updated basic pack code #{basic_pack_code.basic_pack_code}",
                      basic_pack_code(false))

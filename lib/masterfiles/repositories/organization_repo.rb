@@ -27,7 +27,7 @@ class OrganizationRepo < RepoBase
   def find_with_roles(id)
     organization = find(id)
     domain_obj = DomainParty.new(organization)
-    ids = DB[:party_roles].where(organization_id: id).map{|r| r[:role_id] }
+    ids = DB[:party_roles].where(organization_id: id).map { |r| r[:role_id] }
     domain_obj.roles = DB[:roles].where(id: ids).map { |r| Role.new(r) } # :name && :active
     domain_obj
   end
@@ -38,17 +38,15 @@ class OrganizationRepo < RepoBase
     DB.transaction do
       DB[:party_roles].where(organization_id: id).delete
       role_ids.each do |r_id|
-        DB[:party_roles].insert({ party_id: organization.party_id,
-                                  role_id: r_id,
-                                  organization_id: id
-                                })
+        DB[:party_roles].insert(party_id: organization.party_id,
+                                role_id: r_id,
+                                organization_id: id)
       end
     end
     { success: true }
   end
 
   def delete_with_all(id)
-    organization = find(id)
     DB.transaction do
       DB[:party_roles].where(organization_id: id).delete
       DB[:security_groups].where(id: id).delete

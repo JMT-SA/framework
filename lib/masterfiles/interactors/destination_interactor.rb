@@ -5,12 +5,12 @@ class DestinationInteractor < BaseInteractor
   def create_region(params)
     res = validate_region_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = destination_repo.create_region(res.to_h)
+    @region_id = destination_repo.create_region(res.to_h)
     success_response("Created destination region #{region.destination_region_name}", region)
   end
 
   def update_region(id, params)
-    @id = id
+    @region_id = id
     res = validate_region_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     destination_repo.update_region(id, res.to_h)
@@ -18,7 +18,7 @@ class DestinationInteractor < BaseInteractor
   end
 
   def delete_region(id)
-    @id = id
+    @region_id = id
     name = region.destination_region_name
     destination_repo.delete_region(id)
     success_response("Deleted destination region #{name}")
@@ -27,12 +27,12 @@ class DestinationInteractor < BaseInteractor
   def create_country(params)
     res = validate_country_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = destination_repo.create_country(res.to_h)
+    @country_id = destination_repo.create_country(res.to_h)
     success_response("Created destination country #{country.country_name}", country)
   end
 
   def update_country(id, params)
-    @id = id
+    @country_id = id
     res = validate_country_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     destination_repo.update_country(id, res.to_h)
@@ -40,7 +40,7 @@ class DestinationInteractor < BaseInteractor
   end
 
   def delete_country(id)
-    @id = id
+    @country_id = id
     name = country.country_name
     destination_repo.delete_country(id)
     success_response("Deleted destination country #{name}")
@@ -49,22 +49,20 @@ class DestinationInteractor < BaseInteractor
   def create_city(params)
     res = validate_city_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_city... etc.
-    @id = destination_repo.create_city(res.to_h)
+    @city_id = destination_repo.create_city(res.to_h)
     success_response("Created destination city #{city.city_name}", city)
   end
 
   def update_city(id, params)
-    @id = id
+    @city_id = id
     res = validate_city_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_city... etc.
     destination_repo.update_city(id, res.to_h)
     success_response("Updated destination city #{city.city_name}", city(false))
   end
 
   def delete_city(id)
-    @id = id
+    @city_id = id
     name = city.city_name
     destination_repo.delete_city(id)
     success_response("Deleted destination city #{name}")
@@ -78,9 +76,9 @@ class DestinationInteractor < BaseInteractor
 
   def region(cached = true)
     if cached
-      @region ||= destination_repo.find_region(@id)
+      @region ||= destination_repo.find_region(@region_id)
     else
-      @region = destination_repo.find_region(@id)
+      @region = destination_repo.find_region(@region_id)
     end
   end
 
@@ -90,9 +88,9 @@ class DestinationInteractor < BaseInteractor
 
   def country(cached = true)
     if cached
-      @country ||= destination_repo.find_country(@id)
+      @country ||= destination_repo.find_country(@country_id)
     else
-      @country = destination_repo.find_country(@id)
+      @country = destination_repo.find_country(@country_id)
     end
   end
 
@@ -102,9 +100,9 @@ class DestinationInteractor < BaseInteractor
 
   def city(cached = true)
     if cached
-      @city ||= destination_repo.find_city(@id)
+      @city ||= destination_repo.find_city(@city_id)
     else
-      @city = destination_repo.find_city(@id)
+      @city = destination_repo.find_city(@city_id)
     end
   end
 

@@ -5,22 +5,16 @@ class OrganizationInteractor < BaseInteractor
   def create_organization(params)
     res = validate_organization_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_party
     @id = organization_repo.create(res.to_h)
-
-    success_response("Created organization #{organization.short_description}",
-                     organization)
+    success_response("Created organization #{organization.short_description}", organization)
   end
 
   def update_organization(id, params)
-    # party = PartyRepo.find(id)
-    @id = id #party.organization_id || party.person_id
+    @id = id
     res = validate_organization_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_party... etc.
     organization_repo.update(id, res.to_h)
-    success_response("Updated organization #{organization.short_description}",
-                     organization(false))
+    success_response("Updated organization #{organization.short_description}", organization(false))
   end
 
   def delete_organization(id)
@@ -34,8 +28,7 @@ class OrganizationInteractor < BaseInteractor
     if params[:roles]
       organization_repo.assign_roles(id, params[:roles].map(&:to_i))
       party_ex = organization_repo.find_with_roles(id)
-      success_response("Updated roles on party #{party_ex.short_description}",
-                       party_ex)
+      success_response("Updated roles on party #{party_ex.short_description}", party_ex)
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
     end

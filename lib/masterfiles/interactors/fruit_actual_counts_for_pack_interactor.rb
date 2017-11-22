@@ -21,7 +21,6 @@ class FruitActualCountsForPackInteractor < BaseInteractor
     params[:std_fruit_size_count_id] = parent_id
     res = validate_fruit_actual_counts_for_pack_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_fruit_actual_counts_for_pack... etc.
     @id = fruit_actual_counts_for_pack_repo.create(res.to_h)
     success_response("Created fruit actual counts for pack #{fruit_actual_counts_for_pack.size_count_variation}",
                      fruit_actual_counts_for_pack)
@@ -31,7 +30,6 @@ class FruitActualCountsForPackInteractor < BaseInteractor
     @id = id
     res = validate_fruit_actual_counts_for_pack_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_fruit_actual_counts_for_pack... etc.
     fruit_actual_counts_for_pack_repo.update(id, res.to_h)
     success_response("Updated fruit actual counts for pack #{fruit_actual_counts_for_pack.size_count_variation}",
                      fruit_actual_counts_for_pack(false))

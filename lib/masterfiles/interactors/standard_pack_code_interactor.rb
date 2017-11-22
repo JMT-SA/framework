@@ -20,20 +20,16 @@ class StandardPackCodeInteractor < BaseInteractor
   def create_standard_pack_code(params)
     res = validate_standard_pack_code_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_standard_pack_code... etc.
     @id = standard_pack_code_repo.create(res.to_h)
-    success_response("Created standard pack code #{standard_pack_code.standard_pack_code}",
-                     standard_pack_code)
+    success_response("Created standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code)
   end
 
   def update_standard_pack_code(id, params)
     @id = id
     res = validate_standard_pack_code_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    # res = validate_standard_pack_code... etc.
     standard_pack_code_repo.update(id, res.to_h)
-    success_response("Updated standard pack code #{standard_pack_code.standard_pack_code}",
-                     standard_pack_code(false))
+    success_response("Updated standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code(false))
   end
 
   def delete_standard_pack_code(id)

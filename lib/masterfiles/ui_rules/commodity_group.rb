@@ -5,6 +5,7 @@ module UiRules
     def generate_rules
       @this_repo = CommodityGroupRepo.new
       make_form_object
+      apply_form_values
 
       common_values_for_fields common_fields
 

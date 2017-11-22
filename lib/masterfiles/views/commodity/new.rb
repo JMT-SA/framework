@@ -4,8 +4,8 @@ module Masterfiles
   module Fruit
     module Commodity
       class New
-        def self.call(form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:commodity, :new)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:commodity, :new, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -14,7 +14,7 @@ module Masterfiles
             page.form_errors form_errors
             page.form do |form|
               form.action '/masterfiles/fruit/commodities'
-              form.remote!
+              form.remote! if remote
               form.add_field :commodity_group_id
               form.add_field :code
               form.add_field :description

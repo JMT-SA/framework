@@ -22,8 +22,8 @@ class CultivarRepo < RepoBase
   end
 
   def cultivar_groups_for_select
-    self.set_for_cultivar_groups
-    self.for_select
+    set_for_cultivar_groups
+    for_select
   end
 
   def create_cultivar(attrs)

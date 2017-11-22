@@ -1,20 +1,22 @@
 ---
 :caption: Commodity Groups
-:sql: SELECT id, code, description, active FROM commodity_groups
-:limit: 
-:offset: 
+:sql: SELECT "commodity_groups"."id", "commodity_groups"."code", "commodity_groups"."description",
+  "commodity_groups"."active", "commodity_groups"."created_at", "commodity_groups"."updated_at"
+  FROM "commodity_groups"
+:limit:
+:offset:
 :columns:
   id:
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: id
+    :namespaced_name: commodity_groups.id
     :data_type: :integer
-    :width: 
-    :format: 
-    :hide: false
+    :width:
+    :format:
+    :hide: true
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -23,13 +25,13 @@
     :name: code
     :sequence_no: 2
     :caption: Code
-    :namespaced_name: code
+    :namespaced_name: commodity_groups.code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :groupable: false
-    :group_by_seq: 
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -38,13 +40,13 @@
     :name: description
     :sequence_no: 3
     :caption: Description
-    :namespaced_name: description
+    :namespaced_name: commodity_groups.description
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :groupable: false
-    :group_by_seq: 
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -53,15 +55,53 @@
     :name: active
     :sequence_no: 4
     :caption: Active
-    :namespaced_name: active
+    :namespaced_name: commodity_groups.active
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :groupable: false
-    :group_by_seq: 
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-:query_parameter_definitions: []
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: commodity_groups.created_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: commodity_groups.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: commodity_groups.code
+  :caption: Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list:
+  :ui_priority: 1
+  :list_def:

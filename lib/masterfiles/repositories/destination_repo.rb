@@ -56,8 +56,8 @@ class DestinationRepo < RepoBase
     country_hash = DB[:destination_countries].where(id: hash[:destination_country_id]).first
     if country_hash
       region_hash = DB[:destination_regions].where(id: country_hash[:destination_region_id]).first
-      hash.merge!(country_name: country_hash[:country_name]) if country_hash
-      hash.merge!(region_name: region_hash[:destination_region_name]) if region_hash
+      hash[:country_name] = country_hash[:country_name] if country_hash
+      hash[:region_name] = region_hash[:destination_region_name] if region_hash
     end
 
     DestinationCity.new(hash)
@@ -72,13 +72,13 @@ class DestinationRepo < RepoBase
   end
 
   def regions_for_select
-    self.set_for_regions
-    self.for_select
+    set_for_regions
+    for_select
   end
 
   def countries_for_select
-    self.set_for_countries
-    self.for_select
+    set_for_countries
+    for_select
   end
 
   def set_for_regions

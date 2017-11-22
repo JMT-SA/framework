@@ -5,12 +5,12 @@ class CultivarInteractor < BaseInteractor
   def create_cultivar_group(params)
     res = validate_cultivar_group_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = cultivar_repo.create_cultivar_group(res.to_h)
+    @cultivar_group_id = cultivar_repo.create_cultivar_group(res.to_h)
     success_response("Created cultivar group #{cultivar_group.cultivar_group_code}", cultivar_group)
   end
 
   def update_cultivar_group(id, params)
-    @id = id
+    @cultivar_group_id = id
     res = validate_cultivar_group_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     cultivar_repo.update_cultivar_group(id, res.to_h)
@@ -18,7 +18,7 @@ class CultivarInteractor < BaseInteractor
   end
 
   def delete_cultivar_group(id)
-    @id = id
+    @cultivar_group_id = id
     name = cultivar_group.cultivar_group_code
     cultivar_repo.delete_cultivar_group(id)
     success_response("Deleted cultivar group #{name}")
@@ -27,12 +27,12 @@ class CultivarInteractor < BaseInteractor
   def create_cultivar(params)
     res = validate_cultivar_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = cultivar_repo.create_cultivar(res.to_h)
+    @cultivar_id = cultivar_repo.create_cultivar(res.to_h)
     success_response("Created cultivar #{cultivar.cultivar_name}", cultivar)
   end
 
   def update_cultivar(id, params)
-    @id = id
+    @cultivar_id = id
     res = validate_cultivar_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     cultivar_repo.update_cultivar(id, res.to_h)
@@ -40,7 +40,7 @@ class CultivarInteractor < BaseInteractor
   end
 
   def delete_cultivar(id)
-    @id = id
+    @cultivar_id = id
     name = cultivar.cultivar_name
     cultivar_repo.delete_cultivar(id)
     success_response("Deleted cultivar #{name}")
@@ -49,12 +49,12 @@ class CultivarInteractor < BaseInteractor
   def create_marketing_variety(cultivar_id, params)
     res = validate_marketing_variety_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = cultivar_repo.create_marketing_variety(cultivar_id, res.to_h)
+    @marketing_variety_id = cultivar_repo.create_marketing_variety(cultivar_id, res.to_h)
     success_response("Created marketing variety #{marketing_variety.marketing_variety_code}", marketing_variety)
   end
 
   def update_marketing_variety(id, params)
-    @id = id
+    @marketing_variety_id = id
     res = validate_marketing_variety_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     cultivar_repo.update_marketing_variety(id, res.to_h)
@@ -62,7 +62,7 @@ class CultivarInteractor < BaseInteractor
   end
 
   def delete_marketing_variety(id)
-    @id = id
+    @marketing_variety_id = id
     name = marketing_variety.marketing_variety_code
     cultivar_repo.delete_marketing_variety(id)
     success_response("Deleted marketing variety #{name}")
@@ -86,9 +86,9 @@ class CultivarInteractor < BaseInteractor
 
   def cultivar_group(cached = true)
     if cached
-      @cultivar_group ||= cultivar_repo.find_cultivar_group(@id)
+      @cultivar_group ||= cultivar_repo.find_cultivar_group(@cultivar_group_id)
     else
-      @cultivar_group = cultivar_repo.find_cultivar_group(@id)
+      @cultivar_group = cultivar_repo.find_cultivar_group(@cultivar_group_id)
     end
   end
 
@@ -98,9 +98,9 @@ class CultivarInteractor < BaseInteractor
 
   def cultivar(cached = true)
     if cached
-      @cultivar ||= cultivar_repo.find_cultivar(@id)
+      @cultivar ||= cultivar_repo.find_cultivar(@cultivar_id)
     else
-      @cultivar = cultivar_repo.find_cultivar(@id)
+      @cultivar = cultivar_repo.find_cultivar(@cultivar_id)
     end
   end
 
@@ -110,9 +110,9 @@ class CultivarInteractor < BaseInteractor
 
   def marketing_variety(cached = true)
     if cached
-      @marketing_variety ||= cultivar_repo.find_marketing_variety(@id)
+      @marketing_variety ||= cultivar_repo.find_marketing_variety(@marketing_variety_id)
     else
-      @marketing_variety = cultivar_repo.find_marketing_variety(@id)
+      @marketing_variety = cultivar_repo.find_marketing_variety(@marketing_variety_id)
     end
   end
 

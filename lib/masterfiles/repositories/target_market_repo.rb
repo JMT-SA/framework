@@ -37,20 +37,6 @@ class TargetMarketRepo < RepoBase
     DB[:target_market_groups].where(id: id).delete
   end
 
-  # def find_city(id)
-  #   hash = DB[:destination_cities].where(id: id).first
-  #   return nil if hash.nil?
-  #
-  #   country_hash = DB[:destination_countries].where(id: hash[:destination_country_id]).first
-  #   if country_hash
-  #     region_hash = DB[:destination_regions].where(id: country_hash[:destination_region_id]).first
-  #     hash[:country_name] = country_hash[:country_name] if country_hash
-  #     hash[:region_name] = region_hash[:destination_region_name] if region_hash
-  #   end
-  #
-  #   DestinationCity.new(hash)
-  # end
-
   def create_target_market(attrs)
     DB[:target_markets].insert(attrs.to_h)
   end

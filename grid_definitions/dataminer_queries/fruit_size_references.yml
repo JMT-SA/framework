@@ -1,0 +1,110 @@
+---
+:caption: Fruit Size References
+:sql: SELECT "fruit_size_references"."id", "fruit_size_references"."fruit_actual_counts_for_pack_id",
+  "fruit_size_references"."size_reference", "fruit_size_references"."created_at",
+  "fruit_size_references"."updated_at", "fruit_actual_counts_for_packs"."size_count_variation"
+  FROM "fruit_size_references" JOIN "fruit_actual_counts_for_packs" ON "fruit_actual_counts_for_packs"."id"
+  = "fruit_size_references"."fruit_actual_counts_for_pack_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: fruit_size_references.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_actual_counts_for_pack_id:
+    :name: fruit_actual_counts_for_pack_id
+    :sequence_no: 2
+    :caption: Fruit actual counts for pack
+    :namespaced_name: fruit_size_references.fruit_actual_counts_for_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_reference:
+    :name: size_reference
+    :sequence_no: 3
+    :caption: Size reference
+    :namespaced_name: fruit_size_references.size_reference
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: fruit_size_references.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 5
+    :caption: Updated at
+    :namespaced_name: fruit_size_references.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_count_variation:
+    :name: size_count_variation
+    :sequence_no: 6
+    :caption: Size count variation
+    :namespaced_name: fruit_actual_counts_for_packs.size_count_variation
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: fruit_size_references.fruit_actual_counts_for_pack_id
+  :caption: Fruit actual counts for pack
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_count_variation, id FROM fruit_actual_counts_for_packs ORDER
+    BY size_count_variation

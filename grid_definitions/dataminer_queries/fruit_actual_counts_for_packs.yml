@@ -1,0 +1,205 @@
+---
+:caption: Fruit Actual Counts For Packs
+:sql: SELECT "fruit_actual_counts_for_packs"."id", "fruit_actual_counts_for_packs"."std_fruit_size_count_id",
+  "fruit_actual_counts_for_packs"."basic_pack_code_id", "fruit_actual_counts_for_packs"."standard_pack_code_id",
+  "fruit_actual_counts_for_packs"."actual_count_for_pack", "fruit_actual_counts_for_packs"."size_count_variation",
+  "fruit_actual_counts_for_packs"."created_at", "fruit_actual_counts_for_packs"."updated_at",
+  "basic_pack_codes"."basic_pack_code", "standard_pack_codes"."standard_pack_code",
+  "std_fruit_size_counts"."size_count_description" FROM "fruit_actual_counts_for_packs"
+  JOIN "basic_pack_codes" ON "basic_pack_codes"."id" = "fruit_actual_counts_for_packs"."basic_pack_code_id"
+  JOIN "standard_pack_codes" ON "standard_pack_codes"."id" = "fruit_actual_counts_for_packs"."standard_pack_code_id"
+  JOIN "std_fruit_size_counts" ON "std_fruit_size_counts"."id" = "fruit_actual_counts_for_packs"."std_fruit_size_count_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: fruit_actual_counts_for_packs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_fruit_size_count_id:
+    :name: std_fruit_size_count_id
+    :sequence_no: 2
+    :caption: Std fruit size count
+    :namespaced_name: fruit_actual_counts_for_packs.std_fruit_size_count_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack_code_id:
+    :name: basic_pack_code_id
+    :sequence_no: 3
+    :caption: Basic pack code
+    :namespaced_name: fruit_actual_counts_for_packs.basic_pack_code_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_code_id:
+    :name: standard_pack_code_id
+    :sequence_no: 4
+    :caption: Standard pack code
+    :namespaced_name: fruit_actual_counts_for_packs.standard_pack_code_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count_for_pack:
+    :name: actual_count_for_pack
+    :sequence_no: 5
+    :caption: Actual count for pack
+    :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_count_variation:
+    :name: size_count_variation
+    :sequence_no: 6
+    :caption: Size count variation
+    :namespaced_name: fruit_actual_counts_for_packs.size_count_variation
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: fruit_actual_counts_for_packs.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: fruit_actual_counts_for_packs.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack_code:
+    :name: basic_pack_code
+    :sequence_no: 9
+    :caption: Basic pack code
+    :namespaced_name: basic_pack_codes.basic_pack_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_code:
+    :name: standard_pack_code
+    :sequence_no: 10
+    :caption: Standard pack code
+    :namespaced_name: standard_pack_codes.standard_pack_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_count_description:
+    :name: size_count_description
+    :sequence_no: 11
+    :caption: Size count description
+    :namespaced_name: std_fruit_size_counts.size_count_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: fruit_actual_counts_for_packs.std_fruit_size_count_id
+  :caption: Std fruit size count
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT size_count_description, id FROM std_fruit_size_counts ORDER BY
+    size_count_description
+- :column: fruit_actual_counts_for_packs.basic_pack_code_id
+  :caption: Basic pack code
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT basic_pack_code, id FROM basic_pack_codes ORDER BY basic_pack_code
+- :column: fruit_actual_counts_for_packs.standard_pack_code_id
+  :caption: Standard pack code
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT standard_pack_code, id FROM standard_pack_codes ORDER BY standard_pack_code

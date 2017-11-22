@@ -16,6 +16,14 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
+- :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$/fruit_actual_counts_for_packs/new"
+  :text: add actual count
+  :icon: fa-plus
+  :title: New Actual Count for Pack
+  :popup: true
+- :url: "/list/fruit_actual_counts_for_packs"
+  :text: actual counts list
+  :icon: fa-list
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/std_fruit_size_counts/new"

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class PartyRepo < RepoBase
-  def initialize
-    main_table :parties
-    table_wrapper Party
-    for_select_options label: :party_type,
-                       value: :id,
-                       order_by: :party_type
+
+  def find_party(id)
+    hash = DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties"].where(id: id).first
+    return nil if hash.nil?
+
+    Party.new(hash)
   end
 
   def link_addresses(party_id, address_ids)
@@ -41,14 +41,6 @@ class PartyRepo < RepoBase
 
   def existing_contact_method_ids_for_party(party_id)
     DB[:party_contact_methods].where(party_id: party_id).select_map(:contact_method_id)
-  end
-
-  def all_hash
-    DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties"].all
-  end
-
-  def where_hash(args)
-    DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties"].where(args).first
   end
 
 end

@@ -3,7 +3,7 @@
 module UiRules
   class TargetMarketGroup < Base
     def generate_rules
-      @this_repo = TargetMarketGroupRepo.new
+      @repo = TargetMarketRepo.new
       make_form_object
       apply_form_values
 
@@ -15,14 +15,14 @@ module UiRules
     end
 
     def set_show_fields
-      target_market_group_type_id_label = TargetMarketGroupTypeRepo.new.find(@form_object.target_market_group_type_id)&.target_market_group_type_code
-      fields[:target_market_group_type_id] = { renderer: :label, with_value: target_market_group_type_id_label }
+      tm_group_type_id_label = @repo.find_tm_group_type(@form_object.target_market_group_type_id)&.target_market_group_type_code
+      fields[:target_market_group_type_id] = { renderer: :label, with_value: tm_group_type_id_label }
       fields[:target_market_group_name] = { renderer: :label }
     end
 
     def common_fields
       {
-        target_market_group_type_id: { renderer: :select, options: TargetMarketGroupTypeRepo.new.for_select },
+        target_market_group_type_id: { renderer: :select, options: @repo.tm_group_types_for_select },
         target_market_group_name: {}
       }
     end
@@ -30,7 +30,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find_tm_group(@options[:id])
     end
 
     def make_new_form_object

@@ -1,9 +1,11 @@
 ---
 :caption: Destination Cities
-:sql: SELECT "destination_cities"."id", "destination_cities"."destination_country_id",
-  "destination_cities"."city_name", "destination_cities"."updated_at", "destination_cities"."created_at",
-  "destination_countries"."country_name" FROM "destination_cities" JOIN "destination_countries"
-  ON "destination_countries"."id" = "destination_cities"."destination_country_id"
+:sql: "SELECT \"destination_cities\".\"id\",\r\n  \"destination_cities\".\"city_name\",\r\n
+  \ \"destination_countries\".\"country_name\",\r\n  \"destination_regions\".\"destination_region_name\",\r\n
+  \ \"destination_cities\".\"updated_at\", \"destination_cities\".\"created_at\"\r\nFROM
+  \"destination_cities\"\r\nJOIN \"destination_countries\" ON \"destination_countries\".\"id\"
+  = \"destination_cities\".\"destination_country_id\"\r\nJOIN \"destination_regions\"
+  ON \"destination_regions\".\"id\" = \"destination_countries\".\"destination_region_id\""
 :limit: 
 :offset: 
 :columns:
@@ -22,24 +24,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  destination_country_id:
-    :name: destination_country_id
-    :sequence_no: 2
-    :caption: Destination country
-    :namespaced_name: destination_cities.destination_country_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   city_name:
     :name: city_name
-    :sequence_no: 3
+    :sequence_no: 2
     :caption: City name
     :namespaced_name: destination_cities.city_name
     :data_type: :string
@@ -52,9 +39,39 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  country_name:
+    :name: country_name
+    :sequence_no: 3
+    :caption: Country name
+    :namespaced_name: destination_countries.country_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  destination_region_name:
+    :name: destination_region_name
+    :sequence_no: 4
+    :caption: Destination region name
+    :namespaced_name: destination_regions.destination_region_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Updated at
     :namespaced_name: destination_cities.updated_at
     :data_type: :datetime
@@ -69,7 +86,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: destination_cities.created_at
     :data_type: :datetime
@@ -77,21 +94,6 @@
     :format: 
     :hide: true
     :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  country_name:
-    :name: country_name
-    :sequence_no: 6
-    :caption: Country name
-    :namespaced_name: destination_countries.country_name
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

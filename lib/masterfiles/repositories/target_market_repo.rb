@@ -1,0 +1,147 @@
+# frozen_string_literal: true
+
+class TargetMarketRepo < RepoBase
+  def create_tm_group_type(attrs)
+    DB[:target_market_group_types].insert(attrs.to_h)
+  end
+
+  def find_tm_group_type(id)
+    hash = DB[:target_market_group_types].where(id: id).first
+    return nil if hash.nil?
+    TargetMarketGroupType.new(hash)
+  end
+
+  def update_tm_group_type(id, attrs)
+    DB[:target_market_group_types].where(id: id).update(attrs.to_h)
+  end
+
+  def delete_tm_group_type(id)
+    DB[:target_market_group_types].where(id: id).delete
+  end
+
+  def create_tm_group(attrs)
+    DB[:target_market_groups].insert(attrs.to_h)
+  end
+
+  def find_tm_group(id)
+    hash = DB[:target_market_groups].where(id: id).first
+    return nil if hash.nil?
+    TargetMarketGroup.new(hash)
+  end
+
+  def update_tm_group(id, attrs)
+    DB[:target_market_groups].where(id: id).update(attrs.to_h)
+  end
+
+  def delete_tm_group(id)
+    DB[:target_market_groups].where(id: id).delete
+  end
+
+  # def find_city(id)
+  #   hash = DB[:destination_cities].where(id: id).first
+  #   return nil if hash.nil?
+  #
+  #   country_hash = DB[:destination_countries].where(id: hash[:destination_country_id]).first
+  #   if country_hash
+  #     region_hash = DB[:destination_regions].where(id: country_hash[:destination_region_id]).first
+  #     hash[:country_name] = country_hash[:country_name] if country_hash
+  #     hash[:region_name] = region_hash[:destination_region_name] if region_hash
+  #   end
+  #
+  #   DestinationCity.new(hash)
+  # end
+
+  def create_target_market(attrs)
+    DB[:target_markets].insert(attrs.to_h)
+  end
+
+  def find_target_market(id)
+    hash = DB[:target_markets].where(id: id).first
+    return nil if hash.nil?
+    hash[:country_ids] = existing_country_ids_for_target_market(id)
+    hash[:tm_group_ids] = existing_tm_group_ids_for_target_market(id)
+    TargetMarket.new(hash)
+  end
+
+  def update_target_market(id, attrs)
+    DB[:target_markets].where(id: id).update(attrs.to_h)
+  end
+
+  def delete_target_market(id)
+    DB[:target_markets].where(id: id).delete
+  end
+
+  def link_countries(target_market_id, country_ids)
+    existing_ids      = existing_country_ids_for_target_market(target_market_id)
+    old_ids           = existing_ids - country_ids
+    new_ids           = country_ids - existing_ids
+
+    DB.transaction do
+      DB[:target_markets_for_countries].where(target_market_id: target_market_id).where(destination_country_id: old_ids).delete
+      new_ids.each do |prog_id|
+        DB[:target_markets_for_countries].insert(target_market_id: target_market_id, destination_country_id: prog_id)
+      end
+    end
+  end
+
+  def existing_country_ids_for_target_market(target_market_id)
+    DB[:target_markets_for_countries].where(target_market_id: target_market_id).select_map(:destination_country_id)
+  end
+
+  def link_tm_groups(target_market_id, tm_group_ids)
+    existing_ids      = existing_tm_group_ids_for_target_market(target_market_id)
+    old_ids           = existing_ids - tm_group_ids
+    new_ids           = tm_group_ids - existing_ids
+
+    DB.transaction do
+      DB[:target_markets_for_groups].where(target_market_id: target_market_id).where(target_market_group_id: old_ids).delete
+      new_ids.each do |prog_id|
+        DB[:target_markets_for_groups].insert(target_market_id: target_market_id, target_market_group_id: prog_id)
+      end
+    end
+  end
+
+  def existing_tm_group_ids_for_target_market(target_market_id)
+    DB[:target_markets_for_groups].where(target_market_id: target_market_id).select_map(:target_market_group_id)
+  end
+
+  def tm_group_types_for_select
+    set_for_tm_group_types
+    for_select
+  end
+
+  def tm_groups_for_select
+    set_for_tm_groups
+    for_select
+  end
+
+  def set_for_tm_groups
+    @main_table_name = :target_market_groups
+    @wrapper = TargetMarketGroup
+    @select_options = {
+      label: :target_market_group_name,
+      value: :id,
+      order_by: :target_market_group_name
+    }
+  end
+
+  def set_for_tm_group_types
+    @main_table_name = :target_market_group_types
+    @wrapper = TargetMarketGroupType
+    @select_options = {
+      label: :target_market_group_type_code,
+      value: :id,
+      order_by: :target_market_group_type_code
+    }
+  end
+
+  def set_for_target_markets
+    @main_table_name = :target_markets
+    @wrapper = TargetMarket
+    @select_options = {
+      label: :target_market_name,
+      value: :id,
+      order_by: :target_market_name
+    }
+  end
+end

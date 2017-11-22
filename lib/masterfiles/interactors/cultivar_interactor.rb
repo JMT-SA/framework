@@ -71,11 +71,10 @@ class CultivarInteractor < BaseInteractor
   def link_marketing_varieties(cultivar_id, marketing_variety_ids)
     cultivar_repo.link_marketing_varieties(cultivar_id, marketing_variety_ids)
 
-    cultivar = cultivar_repo.find_cultivar(cultivar_id)
     if cultivar_repo.existing_mv_ids_for_cultivar(cultivar_id) == marketing_variety_ids
-      success_response('Contact methods linked successfully')
+      success_response('Marketing varieties linked successfully')
     else
-      failed_response('Some contact methods were not linked')
+      failed_response('Some marketing varieties were not linked')
     end
   end
 

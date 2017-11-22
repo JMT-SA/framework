@@ -28,14 +28,14 @@ module UiRules
 
     def common_fields
       {
-          address_type_id: { renderer: :select, options: AddressTypeRepo.new.for_select },
-          address_line_1: {},
-          address_line_2: {},
-          address_line_3: {},
-          city: {},
-          postal_code: {},
-          country: {},
-          active: { renderer: :checkbox }
+        address_type_id: { renderer: :select, options: AddressTypeRepo.new.for_select },
+        address_line_1: {},
+        address_line_2: {},
+        address_line_3: {},
+        city: {},
+        postal_code: {},
+        country: {},
+        active: { renderer: :checkbox }
       }
     end
 

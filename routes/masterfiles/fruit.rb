@@ -588,6 +588,43 @@ class Framework < Roda
           dialog_permission_error
         end
       end
+      r.on 'fruit_actual_counts_for_packs' do
+        interactor = FruitActualCountsForPackInteractor.new(current_user, {}, {}, {})
+        r.on 'new' do    # NEW
+          if authorised?('fruit', 'new')
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
+          else
+            fetch?(r) ? dialog_permission_error : show_unauthorised
+          end
+        end
+        r.post do        # CREATE
+          res = interactor.create_fruit_actual_counts_for_pack(id, params[:fruit_actual_counts_for_pack])
+          if res.success
+            flash[:notice] = res.message
+            if fetch?(r)
+              redirect_via_json_to_last_grid
+            else
+              redirect_to_last_grid(r)
+            end
+          elsif fetch?(r)
+            content = show_partial do
+              Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
+                                                                     form_values: params[:fruit_actual_counts_for_pack],
+                                                                     form_errors: res.errors,
+                                                                     remote: true)
+            end
+            update_dialog_content(content: content, error: res.message)
+          else
+            flash[:error] = res.message
+            show_page do
+              Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
+                                                                     form_values: params[:fruit_actual_counts_for_pack],
+                                                                     form_errors: res.errors,
+                                                                     remote: false)
+            end
+          end
+        end
+      end
       r.is do
         r.get do       # SHOW
           if authorised?('fruit', 'read')
@@ -649,10 +686,136 @@ class Framework < Roda
         end
       end
     end
+    r.on 'fruit_actual_counts_for_packs', Integer do |id|
+      interactor = FruitActualCountsForPackInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:fruit_actual_counts_for_packs, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        if authorised?('fruit', 'edit')
+          show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.on 'fruit_size_references' do
+        interactor = FruitSizeReferenceInteractor.new(current_user, {}, {}, {})
+        r.on 'new' do    # NEW
+          if authorised?('fruit', 'new')
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
+          else
+            fetch?(r) ? dialog_permission_error : show_unauthorised
+          end
+        end
+        r.post do        # CREATE
+          res = interactor.create_fruit_size_reference(id, params[:fruit_size_reference])
+          if res.success
+            flash[:notice] = res.message
+            if fetch?(r)
+              redirect_via_json_to_last_grid
+            else
+              redirect_to_last_grid(r)
+            end
+          elsif fetch?(r)
+            content = show_partial do
+              Masterfiles::Fruit::FruitSizeReference::New.call(id,
+                                                               form_values: params[:fruit_size_reference],
+                                                               form_errors: res.errors,
+                                                               remote: true)
+            end
+            update_dialog_content(content: content, error: res.message)
+          else
+            flash[:error] = res.message
+            show_page do
+              Masterfiles::Fruit::FruitSizeReference::New.call(id,
+                                                               form_values: params[:fruit_size_reference],
+                                                               form_errors: res.errors,
+                                                               remote: false)
+            end
+          end
+        end
+      end
+      r.is do
+        r.get do       # SHOW
+          if authorised?('fruit', 'read')
+            show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Show.call(id) }
+          else
+            dialog_permission_error
+          end
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_fruit_actual_counts_for_pack(id, params[:fruit_actual_counts_for_pack])
+          if res.success
+            update_grid_row(id,
+                            changes: { std_fruit_size_count_id: res.instance[:std_fruit_size_count_id],
+                                       basic_pack_code_id: res.instance[:basic_pack_code_id],
+                                       standard_pack_code_id: res.instance[:standard_pack_code_id],
+                                       actual_count_for_pack: res.instance[:actual_count_for_pack],
+                                       size_count_variation: res.instance[:size_count_variation] },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id, params[:fruit_actual_counts_for_pack], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
+          res = interactor.delete_fruit_actual_counts_for_pack(id)
+          delete_grid_row(id, notice: res.message)
+        end
+      end
+    end
+    # FRUIT SIZE REFERENCES
+    # --------------------------------------------------------------------------
+    r.on 'fruit_size_references', Integer do |id|
+      interactor = FruitSizeReferenceInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:fruit_size_references, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        if authorised?('fruit', 'edit')
+          show_partial { Masterfiles::Fruit::FruitSizeReference::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.is do
+        r.get do       # SHOW
+          if authorised?('fruit', 'read')
+            show_partial { Masterfiles::Fruit::FruitSizeReference::Show.call(id) }
+          else
+            dialog_permission_error
+          end
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_fruit_size_reference(id, params[:fruit_size_reference])
+          if res.success
+            update_grid_row(id, changes: { fruit_actual_counts_for_pack_id: res.instance[:fruit_actual_counts_for_pack_id], size_reference: res.instance[:size_reference] },
+                            notice:  res.message)
+          else
+            content = show_partial { Masterfiles::Fruit::FruitSizeReference::Edit.call(id, params[:fruit_size_reference], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
+          res = interactor.delete_fruit_size_reference(id)
+          delete_grid_row(id, notice: res.message)
+        end
+      end
+    end
     # TARGET MARKET GROUP TYPES
     # --------------------------------------------------------------------------
     r.on 'target_market_group_types', Integer do |id|
-      interactor = TargetMarketGroupTypeInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_market_group_types, id) do
@@ -676,7 +839,7 @@ class Framework < Roda
         end
         r.patch do     # UPDATE
           response['Content-Type'] = 'application/json'
-          res = interactor.update_target_market_group_type(id, params[:target_market_group_type])
+          res = interactor.update_tm_group_type(id, params[:target_market_group_type])
           if res.success
             update_grid_row(id, changes: { target_market_group_type_code: res.instance[:target_market_group_type_code] },
                             notice:  res.message)
@@ -687,13 +850,13 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          res = interactor.delete_target_market_group_type(id)
+          res = interactor.delete_tm_group_type(id)
           delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'target_market_group_types' do
-      interactor = TargetMarketGroupTypeInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::TargetMarketGroupType::New.call(remote: fetch?(r)) }
@@ -702,7 +865,7 @@ class Framework < Roda
         end
       end
       r.post do        # CREATE
-        res = interactor.create_target_market_group_type(params[:target_market_group_type])
+        res = interactor.create_tm_group_type(params[:target_market_group_type])
         if res.success
           flash[:notice] = res.message
           if fetch?(r)
@@ -730,7 +893,7 @@ class Framework < Roda
     # TARGET MARKET GROUPS
     # --------------------------------------------------------------------------
     r.on 'target_market_groups', Integer do |id|
-      interactor = TargetMarketGroupInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_market_groups, id) do
@@ -754,7 +917,7 @@ class Framework < Roda
         end
         r.patch do     # UPDATE
           response['Content-Type'] = 'application/json'
-          res = interactor.update_target_market_group(id, params[:target_market_group])
+          res = interactor.update_tm_group(id, params[:target_market_group])
           if res.success
             update_grid_row(id, changes: { target_market_group_type_id: res.instance[:target_market_group_type_id], target_market_group_name: res.instance[:target_market_group_name] },
                             notice:  res.message)
@@ -765,13 +928,13 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          res = interactor.delete_target_market_group(id)
+          res = interactor.delete_tm_group(id)
           delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'target_market_groups' do
-      interactor = TargetMarketGroupInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::TargetMarketGroup::New.call(remote: fetch?(r)) }
@@ -780,7 +943,7 @@ class Framework < Roda
         end
       end
       r.post do        # CREATE
-        res = interactor.create_target_market_group(params[:target_market_group])
+        res = interactor.create_tm_group(params[:target_market_group])
         if res.success
           flash[:notice] = res.message
           if fetch?(r)
@@ -801,6 +964,107 @@ class Framework < Roda
             Masterfiles::Fruit::TargetMarketGroup::New.call(form_values: params[:target_market_group],
                                                             form_errors: res.errors,
                                                             remote: false)
+          end
+        end
+      end
+    end
+    # TARGET MARKETS
+    # --------------------------------------------------------------------------
+    r.on 'target_markets', Integer do |id|
+      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:target_markets, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        if authorised?('fruit', 'edit')
+          show_partial { Masterfiles::Fruit::TargetMarket::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.on 'link_countries' do
+        r.post do
+          res = interactor.link_countries(id, multiselect_grid_choices(params))
+
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          r.redirect "/list/target_market_countries/multi?key=target_markets&id=#{id}"
+        end
+      end
+      r.on 'link_tm_groups' do
+        r.post do
+          res = interactor.link_tm_groups(id, multiselect_grid_choices(params))
+
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          r.redirect "/list/target_market_tm_groups/multi?key=target_markets&id=#{id}"
+        end
+      end
+      r.is do
+        r.get do       # SHOW
+          if authorised?('fruit', 'read')
+            show_partial { Masterfiles::Fruit::TargetMarket::Show.call(id) }
+          else
+            dialog_permission_error
+          end
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_target_market(id, params[:target_market])
+          if res.success
+            update_grid_row(id, changes: { target_market_name: res.instance[:target_market_name] }, notice: res.message)
+          else
+            content = show_partial { Masterfiles::Fruit::TargetMarket::Edit.call(id, params[:target_market], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
+          res = interactor.delete_target_market(id)
+          delete_grid_row(id, notice: res.message)
+        end
+      end
+    end
+    r.on 'target_markets' do
+      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+      r.on 'new' do    # NEW
+        if authorised?('fruit', 'new')
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::TargetMarket::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
+        end
+      end
+      r.post do        # CREATE
+        res = interactor.create_target_market(params[:target_market])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Masterfiles::Fruit::TargetMarket::New.call(form_values: params[:target_market],
+                                                       form_errors: res.errors,
+                                                       remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
+        else
+          flash[:error] = res.message
+          show_page do
+            Masterfiles::Fruit::TargetMarket::New.call(form_values: params[:target_market],
+                                                       form_errors: res.errors,
+                                                       remote: false)
           end
         end
       end
@@ -870,7 +1134,7 @@ class Framework < Roda
           content = show_partial do
             Masterfiles::Fruit::DestinationCity::New.call(form_values: params[:destination_city],
                                                           form_errors: res.errors,
-                                                              remote: true)
+                                                          remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else

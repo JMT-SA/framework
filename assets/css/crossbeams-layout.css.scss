@@ -298,11 +298,19 @@ input[readonly] {
 #menuSearchResults > li:hover {
   background-color: rgba(0,0,0,0.1);
 }
+.search-menu-result-ancestor {
+  font-size: smaller;
+  color: #333;
+}
 
 // #menuSearch:focus + #menuSearchResults {
 //   display: block;
 // }
 /* END: SEARCH MENU RESULTS */
+
+.menu-prog-selected {
+  background: rgba(53, 136, 94, 0.85);
+}
 
 .thinbordertable {
   border-collapse: collapse;
@@ -380,7 +388,7 @@ tr.roweven {
 .dialog-content {
   padding: 1em;
   max-width: 90%;
-  width: 600px;
+  /* width: 600px; */
   border-radius: 2px;
 }
 

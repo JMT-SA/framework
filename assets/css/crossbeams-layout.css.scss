@@ -298,6 +298,10 @@ input[readonly] {
 #menuSearchResults > li:hover {
   background-color: rgba(0,0,0,0.1);
 }
+.search-menu-result-ancestor {
+  font-size: smaller;
+  color: #333;
+}
 
 // #menuSearch:focus + #menuSearchResults {
 //   display: block;

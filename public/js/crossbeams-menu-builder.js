@@ -76,7 +76,7 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
     _.forEach(menuLevels.program_functions, (v) => { interim.push(v); });
     matches = _.filter(_.flatten(interim),
       pf => pf.name.toUpperCase().indexOf(term.toUpperCase()) > -1);
-    return matches; // TODO: include func & program & group...
+    return matches;
   };
 
   /**
@@ -96,8 +96,12 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
     searchBox.addEventListener('change', () => {
       const results = searchMenu(searchBox.value);
       let listItems = '';
+      let progName = '';
+      let funcName = '';
       results.forEach((menu) => {
-        listItems += `<li><a href="${menu.url}" data-menu-parent="${menu.prog_id}" data-menu-level3="${menu.id}" data-menu-func="${menu.func_id}">${menu.name}</a></li>`;
+        funcName = menuLevels.functional_areas.find(elem => elem.id === menu.func_id).name;
+        progName = menuLevels.programs[menu.func_id].find(elem => elem.id === menu.prog_id).name;
+        listItems += `<li><a href="${menu.url}" data-menu-parent="${menu.prog_id}" data-menu-level3="${menu.id}" data-menu-func="${menu.func_id}"><span class="search-menu-result-ancestor">${funcName}/${progName}:</span> ${menu.name}</a></li>`;
       });
       resultsList.innerHTML = listItems;
       resultsList.style.display = 'block';

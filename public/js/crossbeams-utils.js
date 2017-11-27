@@ -89,12 +89,12 @@ const crossbeamsUtils = {
 
       // TODO: Split this up into modular pieces based on rules in data- attributes...
       if (sel.dataset && sel.dataset.changeValues) {
-        holdSel.on('selectr.change', function(option) {
+        holdSel.on('selectr.change', (option) => {
           sel.dataset.changeValues.split(',').forEach((el) => {
-            let target = document.getElementById(el);
+            const target = document.getElementById(el);
             if (target && (target.dataset && target.dataset.enableOnValues)) {
-              let vals = target.dataset.enableOnValues;
-              if(_.includes(vals, option.value)) {
+              const vals = target.dataset.enableOnValues;
+              if (_.includes(vals, option.value)) {
                 target.disabled = false;
               } else {
                 target.disabled = true;
@@ -258,16 +258,16 @@ const crossbeamsUtils = {
    */
   makeListSortable: function makeListSortable(prefix) {
     const el = document.getElementById(`${prefix}-sortable-items`);
-    const sorted_ids = document.getElementById(`${prefix}-sorted_ids`);
-    const sortable = Sortable.create(el, {
+    const sortedIds = document.getElementById(`${prefix}-sorted_ids`);
+    Sortable.create(el, {
       animation: 150,
-      handle: ".crossbeams-drag-handle",
-      ghostClass: "crossbeams-sortable-ghost",  // Class name for the drop placeholder
-      dragClass: "crossbeams-sortable-drag",  // Class name for the dragging item
-      onEnd: function (/**Event*/evt) {
-        let id_list = [];
-        for(child of el.children) { id_list.push(child.id.replace('si_', '')); } // strip si_ part...
-        sorted_ids.value = id_list.join(',');
+      handle: '.crossbeams-drag-handle',
+      ghostClass: 'crossbeams-sortable-ghost',  // Class name for the drop placeholder
+      dragClass: 'crossbeams-sortable-drag',  // Class name for the dragging item
+      onEnd: () => {
+        const idList = [];
+        Array.from(el.children).forEach((child) => { idList.push(child.id.replace('si_', '')); });// strip si_ part...
+        sortedIds.value = idList.join(',');
       },
     });
   },

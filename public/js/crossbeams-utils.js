@@ -19,21 +19,24 @@ const crossbeamsUtils = {
     fetch(href, {
       method: 'GET',
       headers: new Headers({
-        'X-Custom-Request-Type': 'Fetch'
+        'X-Custom-Request-Type': 'Fetch',
       }),
       credentials: 'same-origin',
-    }).then(function(response) {
-      return response.text();
-      })
-      .then(function(data) {
-      document.getElementById('dialog-content').innerHTML = data;
-      crossbeamsUtils.makeMultiSelects();
-      crossbeamsUtils.makeSearchableSelects();
-    }).catch(function(data) {
-      Jackbox.error('The action was unsuccessful...');
-      const htmlText = data.responseText ? data.responseText : '';
-      document.getElementById('dialog-content').innerHTML = htmlText;
-    });
+    }).then(response => response.text())
+      .then((data) => {
+        const dlg = document.getElementById('dialog-content');
+        dlg.innerHTML = data;
+        crossbeamsUtils.makeMultiSelects();
+        crossbeamsUtils.makeSearchableSelects();
+        const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
+        if (sortable.length > 0) {
+          crossbeamsUtils.makeListSortable(sortable[0].dataset.sortablePrefix);
+        }
+      }).catch((data) => {
+        Jackbox.error('The action was unsuccessful...');
+        const htmlText = data.responseText ? data.responseText : '';
+        document.getElementById('dialog-content').innerHTML = htmlText;
+      });
     crossbeamsDialog.show();
   },
 

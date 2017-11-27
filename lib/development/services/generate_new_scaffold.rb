@@ -168,7 +168,6 @@ class GenerateNewScaffold < BaseService
           def create_#{opts.singlename}(params)
             res = validate_#{opts.singlename}_params(params)
             return validation_failed_response(res) unless res.messages.empty?
-            # res = validate_#{opts.singlename}... etc.
             @id = #{opts.singlename}_repo.create(res.to_h)
             success_response("Created #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename})
@@ -178,7 +177,6 @@ class GenerateNewScaffold < BaseService
             @id = id
             res = validate_#{opts.singlename}_params(params)
             return validation_failed_response(res) unless res.messages.empty?
-            # res = validate_#{opts.singlename}... etc.
             #{opts.singlename}_repo.update(id, res.to_h)
             success_response("Updated #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename}(false))
@@ -441,14 +439,14 @@ class GenerateNewScaffold < BaseService
                 elsif fetch?(r)
                   content = show_partial do
                     #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
-                                                                                   form_errors: #res.errors,
+                                                                                   form_errors: res.errors,
                                                                                    remote: true)
                   end
                   update_dialog_content(content: content, error: res.message)
                 else
                   flash[:error] = res.message
                   show_page do
-                    #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:security_group],
+                    #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
                                                                                    form_errors: res.errors,
                                                                                    remote: false)
                   end

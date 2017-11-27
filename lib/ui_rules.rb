@@ -59,6 +59,8 @@ module UiRules
 
     def apply_form_values
       return unless @options && @options[:form_values]
+      # We need to apply values to the form object, so make sure it is not immutable first.
+      @form_object = OpenStruct.new(@form_object.to_h)
 
       @options[:form_values].each do |k, v|
         @form_object.public_send("#{k}=", v)

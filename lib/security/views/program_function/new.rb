@@ -1,6 +1,6 @@
 module Security
   module FunctionalAreas
-    module ProgramFunctions
+    module ProgramFunction
       class New
         def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:program_function, :new, id: id)

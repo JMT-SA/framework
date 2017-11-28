@@ -216,17 +216,17 @@ class Framework < Roda
           # TODO: might work better with a redirect?
           flash.now[:error] = 'Unable to create program function'
           show_page do
-            Security::FunctionalAreas::ProgramFunctions::New.call(params[:program_function][:program_id],
-                                                                  params[:program_function], errors)
+            Security::FunctionalAreas::ProgramFunction::New.call(params[:program_function][:program_id],
+                                                                 params[:program_function], errors)
           end
         end
       end
       r.on :id do |id|
         r.on 'new' do
-          show_page { Security::FunctionalAreas::ProgramFunctions::New.call(id) }
+          show_page { Security::FunctionalAreas::ProgramFunction::New.call(id) }
         end
         r.on 'edit' do
-          show_page { Security::FunctionalAreas::ProgramFunctions::Edit.call(id) }
+          show_page { Security::FunctionalAreas::ProgramFunction::Edit.call(id) }
         end
         r.post do
           r.on 'update' do
@@ -252,8 +252,8 @@ class Framework < Roda
             else
               flash.now[:error] = 'Unable to create program function'
               show_page do
-                Security::FunctionalAreas::ProgramFunctions::Edit.call(id,
-                                                                       params[:program_function], errors)
+                Security::FunctionalAreas::ProgramFunction::Edit.call(id,
+                                                                      params[:program_function], errors)
               end
             end
           end

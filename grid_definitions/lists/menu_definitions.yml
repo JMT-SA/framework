@@ -24,9 +24,11 @@
       - :url: /security/functional_areas/programs/$:functional_area_id$/new
         :text: new program
         :icon: fa-plus-circle
+        :popup: true
       - :url: /security/functional_areas/programs/$:program_id$/edit
         :text: edit program
         :icon: fa-edit
+        :popup: true
         :hide_if_null: :program_id
       - :url: /security/functional_areas/programs/$:program_id$
         :text: delete program

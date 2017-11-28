@@ -86,77 +86,106 @@ class Framework < Roda
       end
     end
 
-    r.on 'programs' do
-      r.on 'create' do
-        res = ProgramSchema.call(params[:program])
-        errors = res.messages
-        # schema = Dry::Validation.Schema do
-        #   required(:program_name).filled(:str?)
-        # end
-        # errors = schema.call(params[:program]).messages
-        if errors.empty?
-          repo = ProgramRepo.new
-          # changeset = repo.changeset(NewChangeset).data(params[:program])
-          repo.create(:programs, res)
-          flash[:notice] = 'Created'
-          r.redirect '/list/menu_definitions'
+    # PROGRAMS
+    # --------------------------------------------------------------------------
+    r.on 'programs', Integer do |id|
+      interactor = ProgramInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:programs, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'new' do    # NEW
+        if authorised?('menu', 'new')
+          show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::Program::New.call(id, remote: fetch?(r)) }
         else
-          flash.now[:error] = 'Unable to create program'
-          show_page { Security::FunctionalAreas::Programs::New.call(params[:program][:functional_area_id], params[:program], errors) }
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
 
+      r.on 'edit' do   # EDIT
+        if authorised?('menu', 'edit')
+          show_partial { Security::FunctionalAreas::Program::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.is do
+        p 'IS'
+        r.get do       # SHOW
+          if authorised?('menu', 'read')
+            show_partial { Security::FunctionalAreas::Program::Show.call(id) }
+          else
+            dialog_permission_error
+          end
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_program(id, params[:program])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json_to_last_grid
+          else
+            content = show_partial { Security::FunctionalAreas::Program::Edit.call(id, params[:program], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
+          res = interactor.delete_program(id)
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        end
+      end
+
+      r.on 'reorder' do
+        show_partial { Security::FunctionalAreas::Program::Reorder.call(id) }
+      end
+
+      r.on 'save_reorder' do
+        res = interactor.reorder_program_functions(params[:pf_sorted_ids])
+        flash[:notice] = res.message
+        redirect_via_json_to_last_grid
+      end
+    end
+
+    r.on 'programs' do
+      interactor = ProgramInteractor.new(current_user, {}, {}, {})
+
       r.on 'link_users', Integer do |id|
         r.post do
-          repo = ProgramRepo.new
-          repo.link_user(id, multiselect_grid_choices(params))
+          res = interactor.link_user(id, multiselect_grid_choices(params))
+          flash[:notice] = res.message
           r.redirect '/list/users'
         end
       end
 
-      r.on :id do |id|
-        r.on 'new' do
-          show_page { Security::FunctionalAreas::Programs::New.call(id) }
-        end
-        r.on 'edit' do
-          show_page { Security::FunctionalAreas::Programs::Edit.call(id) }
-        end
-        r.post do
-          r.on 'update' do
-            res = ProgramSchema.call(params[:program])
-            errors = res.messages
-            # schema = Dry::Validation.Schema do
-            #   required(:program_name).filled(:str?)
-            # end
-            # errors = schema.call(params[:program]).messages
-            if errors.empty?
-              repo = ProgramRepo.new
-              # changeset = repo.changeset(id, params[:program]).map(:touch)
-              repo.update(:programs, id, res)
-              flash[:notice] = 'Updated'
-              redirect_to_last_grid(r)
-            else
-              flash.now[:error] = 'Unable to update program'
-              show_page { Security::FunctionalAreas::Programs::Edit.call(id, params[:program], errors) }
-            end
-          end
-          r.on 'save_reorder' do
-            repo = ProgramRepo.new
-            # FIXME: ... Should this be in the repo? or in objects sent to the repo to update?
-            repo.re_order_program_functions(params[:pf_sorted_ids])
-            flash[:notice] = 'Re-ordered'
+      r.post do        # CREATE
+        res = interactor.create_program(params[:program])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
             redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
           end
-        end
-        r.delete do
-          repo = ProgramRepo.new
-          repo.delete(:programs, id)
-          flash[:notice] = 'Deleted'
-          redirect_to_last_grid(r)
-        end
-
-        r.on 'reorder' do
-          show_partial { Security::FunctionalAreas::Programs::Reorder.call(id) }
+        elsif fetch?(r)
+          content = show_partial do # params[:program][:functional_area_id]
+            Security::FunctionalAreas::Program::New.call(res.functional_area_id,
+                                                         form_values: params[:program],
+                                                         form_errors: res.errors,
+                                                         remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
+        else
+          flash[:error] = res.message
+          show_page do
+            Security::FunctionalAreas::Program::New.call(res.functional_area_id,
+                                                         form_values: params[:program],
+                                                         form_errors: res.errors,
+                                                         remote: false)
+          end
         end
       end
     end

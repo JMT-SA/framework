@@ -1,6 +1,6 @@
 module Security
   module FunctionalAreas
-    module Programs
+    module Program
       class Reorder
         def self.call(id)
           this_repo = ProgramRepo.new

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module Security
   module FunctionalAreas
-    module Programs
+    module Program
       class New
-        def self.call(id, form_values = nil, form_errors = nil)
-          ui_rule = UiRules::Compiler.new(:program, :new, id: id)
+        def self.call(id, form_values: nil, form_errors: nil, remote: true)
+          ui_rule = UiRules::Compiler.new(:program, :new, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -11,7 +13,8 @@ module Security
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action '/security/functional_areas/programs/create'
+              form.action '/security/functional_areas/programs'
+              form.remote! if remote
               form.add_field :functional_area_id
               form.add_field :program_name
               form.add_field :active

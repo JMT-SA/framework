@@ -107,10 +107,12 @@ class GenerateNewScaffold < BaseService
         'Types::String'
       when :boolean
         'Types::Bool'
+      when :float
+        'Types::Float'
       when :datetime
         'Types::DateTime'
       else
-        "Types::??? (#{@col_lookup[column][:type]}"
+        "Types::??? (#{@col_lookup[column][:type]})"
       end
     end
 
@@ -128,12 +130,14 @@ class GenerateNewScaffold < BaseService
         ':date?'
       when :time
         ':time?'
+      when :float
+        ':float?'
         # float? equivalent to type?(Float)
         # decimal? equivalent to type?(BigDecimal)
         # array? equivalent to type?(Array)
         # hash? equivalent to type?(Hash)
       else
-        "Types::??? (#{@col_lookup[column][:type]}"
+        "Types::??? (#{@col_lookup[column][:type]})"
       end
     end
   end

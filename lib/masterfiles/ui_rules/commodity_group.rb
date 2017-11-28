@@ -3,7 +3,7 @@
 module UiRules
   class CommodityGroup < Base
     def generate_rules
-      @this_repo = CommodityGroupRepo.new
+      @repo = CommodityRepo.new
       make_form_object
       apply_form_values
 
@@ -31,7 +31,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find_commodity_group(@options[:id])
     end
 
     def make_new_form_object

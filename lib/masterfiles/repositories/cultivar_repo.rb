@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class CultivarRepo < RepoBase
-
   def create_cultivar_group(attrs)
     DB[:cultivar_groups].insert(attrs.to_h)
   end
@@ -76,6 +75,7 @@ class CultivarRepo < RepoBase
         DB[:marketing_varieties_for_cultivars].insert(cultivar_id: cultivar_id, marketing_variety_id: prog_id)
       end
     end
+    { success: true }
   end
 
   def orphaned_marketing_varieties(id_set)
@@ -84,7 +84,7 @@ class CultivarRepo < RepoBase
   end
 
   def existing_mv_ids_for_cultivar(cultivar_id)
-    DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).select_map(:marketing_variety_id)
+    DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).select_map(:marketing_variety_id).sort
   end
 
   def set_for_cultivar_groups

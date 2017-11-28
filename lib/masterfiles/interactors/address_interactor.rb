@@ -5,37 +5,36 @@ class AddressInteractor < BaseInteractor
   def create_address(params)
     res = validate_address_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = address_repo.create(res.to_h)
-    success_response("Created address #{address.address_line_1}",
-                     address)
+    @address_id = party_repo.create_address(res.to_h)
+    success_response("Created address #{address.address_line_1}", address)
   end
 
   def update_address(id, params)
-    @id = id
+    @address_id = id
     res = validate_address_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    address_repo.update(id, res.to_h)
-    success_response("Updated address #{address.address_line_1}",
-                     address(false))
+    party_repo.update_address(id, res.to_h)
+    success_response("Updated address #{address.address_line_1}", address(false))
   end
 
   def delete_address(id)
-    @id = id
+    @address_id = id
     name = address.address_line_1
-    address_repo.delete(id)
+    party_repo.delete_address(id)
     success_response("Deleted address #{name}")
   end
 
   private
-  def address_repo
-    @address_repo ||= AddressRepo.new
+
+  def party_repo
+    @party_repo ||= PartyRepo.new
   end
 
   def address(cached = true)
     if cached
-      @address ||= address_repo.find(@id)
+      @address ||= party_repo.find_address(@address_id)
     else
-      @address = address_repo.find(@id)
+      @address = party_repo.find_address(@address_id)
     end
   end
 

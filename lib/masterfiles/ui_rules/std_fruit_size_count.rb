@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_id_label = CommodityRepo.new.find(@form_object.commodity_id)&.code
+      commodity_id_label = CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
       fields[:size_count_description] = { renderer: :label }
       fields[:marketing_size_range_mm] = { renderer: :label }
@@ -32,15 +32,15 @@ module UiRules
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: CommodityRepo.new.for_select },
+        commodity_id: { renderer: :select, options: CommodityRepo.new.commodities_for_select },
         size_count_description: {},
         marketing_size_range_mm: {},
         marketing_weight_range: {},
         size_count_interval_group: {},
         size_count_value: {},
-        minimum_size_mm: {},
-        maximum_size_mm: {},
-        average_size_mm: {},
+        minimum_size_mm: { caption: 'min' },
+        maximum_size_mm: { caption: 'max' },
+        average_size_mm: { caption: 'avg' },
         minimum_weight_gm: {},
         maximum_weight_gm: {},
         average_weight_gm: {}

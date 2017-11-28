@@ -16,6 +16,8 @@ module UiRules
 
     def set_show_fields
       fields[:target_market_name] = { renderer: :label }
+      # fields[:tm_group_ids] = { renderer: :label }
+      # fields[:country_ids] = { renderer: :label }
     end
 
     def common_fields

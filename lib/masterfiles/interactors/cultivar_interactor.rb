@@ -71,7 +71,8 @@ class CultivarInteractor < BaseInteractor
   def link_marketing_varieties(cultivar_id, marketing_variety_ids)
     cultivar_repo.link_marketing_varieties(cultivar_id, marketing_variety_ids)
 
-    if cultivar_repo.existing_mv_ids_for_cultivar(cultivar_id) == marketing_variety_ids
+    existing_ids = cultivar_repo.existing_mv_ids_for_cultivar(cultivar_id)
+    if existing_ids.eql?(marketing_variety_ids.sort)
       success_response('Marketing varieties linked successfully')
     else
       failed_response('Some marketing varieties were not linked')

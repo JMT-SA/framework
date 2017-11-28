@@ -12,7 +12,7 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
-              form.add_field :contact_method_type_id
+              form.add_field :contact_method_type
               form.add_field :contact_method_code
               form.add_field :active
             end

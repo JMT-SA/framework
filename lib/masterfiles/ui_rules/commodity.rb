@@ -3,7 +3,7 @@
 module UiRules
   class Commodity < Base
     def generate_rules
-      @this_repo = CommodityRepo.new
+      @repo = CommodityRepo.new
       make_form_object
 
       common_values_for_fields common_fields
@@ -14,7 +14,7 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_group_id_label = CommodityGroupRepo.new.find(@form_object.commodity_group_id)&.code
+      commodity_group_id_label = CommodityRepo.new.find_commodity_group(@form_object.commodity_group_id)&.code
       fields[:commodity_group_id] = { renderer: :label, with_value: commodity_group_id_label }
       fields[:code] = { renderer: :label }
       fields[:description] = { renderer: :label }
@@ -24,7 +24,7 @@ module UiRules
 
     def common_fields
       {
-        commodity_group_id: { renderer: :select, options: CommodityGroupRepo.new.for_select },
+        commodity_group_id: { renderer: :select, options: CommodityRepo.new.commodity_groups_for_select },
         code: {},
         description: {},
         hs_code: {},
@@ -35,7 +35,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find_commodity(@options[:id])
     end
 
     def make_new_form_object

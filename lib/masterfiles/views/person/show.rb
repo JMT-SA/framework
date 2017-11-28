@@ -12,13 +12,12 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
-              # form.add_field :party_id
               form.add_field :title
               form.add_field :first_name
               form.add_field :surname
               form.add_field :vat_number
-              # form.add_field :active
-              # form.add_field :roles
+              form.add_field :active
+              form.add_field :role_names
             end
           end
 

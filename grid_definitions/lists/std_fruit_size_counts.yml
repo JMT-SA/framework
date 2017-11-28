@@ -21,7 +21,7 @@
   :icon: fa-plus
   :title: New Actual Count for Pack
   :popup: true
-- :url: "/list/fruit_actual_counts_for_packs"
+- :url: "/list/fruit_actual_counts_for_packs/with_params?key=standard&fruit_actual_counts_for_packs.std_fruit_size_count_id=$:id$"
   :text: actual counts list
   :icon: fa-list
 :page_controls:

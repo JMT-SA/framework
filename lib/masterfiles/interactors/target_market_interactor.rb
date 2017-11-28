@@ -53,17 +53,21 @@ class TargetMarketInteractor < BaseInteractor
     res = validate_target_market_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     @target_market_id = target_market_repo.create_target_market(res.to_h)
-    country_response = link_countries(@id, country_ids)
-    tm_groups_response = link_tm_groups(@id, tm_group_ids)
+    country_response = link_countries(@target_market_id, country_ids)
+    tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
     success_response("Created target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market)
   end
 
   def update_target_market(id, params)
+    country_ids = params.delete(:country_ids)
+    tm_group_ids = params.delete(:tm_group_ids)
     @target_market_id = id
     res = validate_target_market_params(params)
     return validation_failed_response(res) unless res.messages.empty?
+    country_response = link_countries(@target_market_id, country_ids)
+    tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
     target_market_repo.update_target_market(id, res.to_h)
-    success_response("Updated target market #{target_market.target_market_name}", target_market(false))
+    success_response("Updated target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market(false))
   end
 
   def delete_target_market(id)
@@ -76,7 +80,8 @@ class TargetMarketInteractor < BaseInteractor
   def link_countries(target_market_id, country_ids)
     target_market_repo.link_countries(target_market_id, country_ids)
 
-    if target_market_repo.existing_country_ids_for_target_market(target_market_id) == country_ids
+    existing_ids = target_market_repo.existing_country_ids_for_target_market(target_market_id)
+    if existing_ids.eql?(country_ids.sort)
       success_response('Countries linked successfully')
     else
       failed_response('Some countries were not linked')
@@ -86,7 +91,8 @@ class TargetMarketInteractor < BaseInteractor
   def link_tm_groups(target_market_id, tm_group_ids)
     target_market_repo.link_tm_groups(target_market_id, tm_group_ids)
 
-    if target_market_repo.existing_tm_group_ids_for_target_market(target_market_id) == tm_group_ids
+    existing_ids = target_market_repo.existing_tm_group_ids_for_target_market(target_market_id)
+    if existing_ids.eql?(tm_group_ids.sort)
       success_response('Target market groups linked successfully')
     else
       failed_response('Some target market groups were not linked')

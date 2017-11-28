@@ -3,14 +3,13 @@
 module UiRules
   class Person < Base
     def generate_rules
-      @this_repo = PersonRepo.new
+      @repo = PartyRepo.new
       make_form_object
       apply_form_values
 
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
-      set_role_fields if @mode == :roles
 
       form_name 'person'
     end
@@ -20,14 +19,8 @@ module UiRules
       fields[:first_name] = { renderer: :label }
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      # fields[:roles] = { renderer: :label }
-      # fields[:active] = { renderer: :label }
-    end
-
-    def set_role_fields
-      roles_repo = RoleRepo.new
-      fields[:roles] = { renderer: :multi, options: roles_repo.for_select, selected: @form_object.roles.map(&:id) }
-      fields[:name]  = { renderer: :label }
+      fields[:active] = { renderer: :label }
+      fields[:role_names] = { renderer: :label, caption: "Roles", with_value: @form_object.role_names.map(&:capitalize!).join(', ') }
     end
 
     def common_fields
@@ -36,16 +29,15 @@ module UiRules
         first_name: {},
         title: {},
         vat_number: {},
-        # active: { renderer: :checkbox },
-        role_id: { renderer: :select, options: RoleRepo.new.for_select }
+        active: { renderer: :checkbox },
+        role_ids: { renderer: :multi, options: @repo.roles_for_select, selected: @form_object.role_ids }
       }
     end
 
     def make_form_object
       make_new_form_object && return if @mode == :new
-      make_roles_form_object && return if @mode == :roles
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find_person(@options[:id])
     end
 
     def make_new_form_object
@@ -53,12 +45,9 @@ module UiRules
                                     first_name: nil,
                                     title: nil,
                                     vat_number: nil,
-                                    role_id: nil)
-                                    # active: true)
+                                    active: true,
+                                    role_ids: [])
     end
 
-    def make_roles_form_object
-      @form_object = @this_repo.find_with_roles(@options[:id])
-    end
   end
 end

@@ -13,6 +13,8 @@ module Masterfiles
             page.form do |form|
               form.view_only!
               form.add_field :target_market_name
+              form.add_field :tm_group_ids
+              form.add_field :country_ids
             end
           end
 

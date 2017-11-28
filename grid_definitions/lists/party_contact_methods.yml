@@ -4,3 +4,4 @@
   :parties:
     :url: "/masterfiles/parties/link_contact_methods/$:id$"
     :preselect: "SELECT contact_method_id AS id FROM party_contact_methods WHERE party_id = $:id$"
+    :can_be_cleared: true

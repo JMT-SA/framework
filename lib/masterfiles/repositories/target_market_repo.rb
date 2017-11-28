@@ -71,7 +71,7 @@ class TargetMarketRepo < RepoBase
   end
 
   def existing_country_ids_for_target_market(target_market_id)
-    DB[:target_markets_for_countries].where(target_market_id: target_market_id).select_map(:destination_country_id)
+    DB[:target_markets_for_countries].where(target_market_id: target_market_id).select_map(:destination_country_id).sort
   end
 
   def link_tm_groups(target_market_id, tm_group_ids)
@@ -88,7 +88,7 @@ class TargetMarketRepo < RepoBase
   end
 
   def existing_tm_group_ids_for_target_market(target_market_id)
-    DB[:target_markets_for_groups].where(target_market_id: target_market_id).select_map(:target_market_group_id)
+    DB[:target_markets_for_groups].where(target_market_id: target_market_id).select_map(:target_market_group_id).sort
   end
 
   def tm_group_types_for_select

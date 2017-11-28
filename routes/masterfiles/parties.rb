@@ -13,26 +13,12 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      r.on 'edit' do   # EDIT
+      r.on 'edit' do
         if authorised?('menu', 'edit')
           show_partial { Masterfiles::Parties::Organization::Edit.call(id) }
         else
           dialog_permission_error
         end
-      end
-      r.on 'roles' do
-        r.post do
-          response['Content-Type'] = 'application/json'
-          res = interactor.assign_roles(id, params[:organization])
-          if res.success
-            update_grid_row(id, changes: { roles: res.instance.role_list },
-                            notice:  res.message)
-          else
-            content = show_partial { Masterfiles::Parties::Organization::Roles.call(id, params[:organization], res.errors) }
-            update_dialog_content(content: content, error: res.message)
-          end
-        end
-        show_partial { Masterfiles::Parties::Organization::Roles.call(id) }
       end
       r.on 'addresses' do
         r.post do
@@ -65,14 +51,14 @@ class Framework < Roda
         show_partial { Masterfiles::Parties::Organization::ContactMethods.call(id) }
       end
       r.is do
-        r.get do       # SHOW
+        r.get do
           if authorised?('menu', 'read')
             show_partial { Masterfiles::Parties::Organization::Show.call(id) }
           else
             dialog_permission_error
           end
         end
-        r.patch do     # UPDATE
+        r.patch do
           response['Content-Type'] = 'application/json'
           res = interactor.update_organization(id, params[:organization])
           if res.success
@@ -83,7 +69,7 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           end
         end
-        r.delete do    # DELETE
+        r.delete do
           response['Content-Type'] = 'application/json'
           res = interactor.delete_organization(id)
           delete_grid_row(id, notice: res.message)
@@ -92,14 +78,14 @@ class Framework < Roda
     end
     r.on 'organizations' do
       interactor = OrganizationInteractor.new(current_user, {}, {}, {})
-      r.on 'new' do    # NEW
+      r.on 'new' do
         if authorised?('menu', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
-      r.post do        # CREATE
+      r.post do
         res = interactor.create_organization(params[:organization])
         if res.success
           flash[:notice] = res.message
@@ -134,35 +120,36 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      r.on 'edit' do   # EDIT
+      r.on 'edit' do
         if authorised?('menu', 'edit')
           show_partial { Masterfiles::Parties::Person::Edit.call(id) }
         else
           dialog_permission_error
         end
       end
-      r.on 'roles' do
-        r.post do
-          response['Content-Type'] = 'application/json'
-          res = interactor.assign_roles(id, params[:person])
-          if res.success
-            update_grid_row(id, changes: { roles: res.instance.role_list },
-                            notice:  res.message)
-          else
-            content = show_partial { Masterfiles::Parties::Person::Roles.call(id, params[:person], res.errors) }
-            update_dialog_content(content: content, error: res.message)
-          end
-        end
-
-        show_partial { Masterfiles::Parties::Person::Roles.call(id) }
-      end
+      # r.on 'roles' do
+      #   r.post do
+      #     response['Content-Type'] = 'application/json'
+      #     res = interactor.assign_person_roles(id, params[:person])
+      #     if res.success
+      #       update_grid_row(id,
+      #                       changes: { roles: res.instance.role_list },
+      #                       notice: res.message)
+      #     else
+      #       content = show_partial { Masterfiles::Parties::Person::Roles.call(id, params[:person], res.errors) }
+      #       update_dialog_content(content: content, error: res.message)
+      #     end
+      #   end
+      #
+      #   show_partial { Masterfiles::Parties::Person::Roles.call(id) }
+      # end
       r.on 'addresses' do
         r.post do
           response['Content-Type'] = 'application/json'
           res = interactor.assign_addresses(id, params[:person])
           if res.success
             update_grid_row(id, changes: { addresses: res.instance.address_list },
-                            notice:  res.message)
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Person::Addresses.call(id, params[:person], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -177,7 +164,7 @@ class Framework < Roda
           res = interactor.assign_contact_methods(id, params[:person])
           if res.success
             update_grid_row(id, changes: { contact_methods: res.instance.contact_method_list },
-                            notice:  res.message)
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Person::ContactMethods.call(id, params[:person], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -187,14 +174,14 @@ class Framework < Roda
         show_partial { Masterfiles::Parties::Person::ContactMethods.call(id) }
       end
       r.is do
-        r.get do       # SHOW
+        r.get do
           if authorised?('menu', 'read')
             show_partial { Masterfiles::Parties::Person::Show.call(id) }
           else
             dialog_permission_error
           end
         end
-        r.patch do     # UPDATE
+        r.patch do
           response['Content-Type'] = 'application/json'
           res = interactor.update_person(id, params[:person])
           if res.success
@@ -202,13 +189,13 @@ class Framework < Roda
                                            first_name: res.instance[:first_name],
                                            surname: res.instance[:surname],
                                            vat_number: res.instance[:vat_number]},
-                            notice:  res.message)
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Person::Edit.call(id, params[:person], res.errors) }
             update_dialog_content(content: content, error: res.message)
           end
         end
-        r.delete do    # DELETE
+        r.delete do
           response['Content-Type'] = 'application/json'
           res = interactor.delete_person(id)
           delete_grid_row(id, notice: res.message)
@@ -217,14 +204,14 @@ class Framework < Roda
     end
     r.on 'people' do
       interactor = PersonInteractor.new(current_user, {}, {}, {})
-      r.on 'new' do    # NEW
+      r.on 'new' do
         if authorised?('menu', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
-      r.post do        # CREATE
+      r.post do
         res = interactor.create_person(params[:person])
         if res.success
           flash[:notice] = res.message
@@ -259,7 +246,7 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      r.on 'edit' do   # EDIT
+      r.on 'edit' do
         if authorised?('parties', 'edit')
           show_partial { Masterfiles::Parties::Address::Edit.call(id) }
         else
@@ -267,14 +254,14 @@ class Framework < Roda
         end
       end
       r.is do
-        r.get do       # SHOW
+        r.get do
           if authorised?('parties', 'read')
             show_partial { Masterfiles::Parties::Address::Show.call(id) }
           else
             dialog_permission_error
           end
         end
-        r.patch do     # UPDATE
+        r.patch do
           response['Content-Type'] = 'application/json'
           res = interactor.update_address(id, params[:address])
           if res.success
@@ -285,7 +272,7 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           end
         end
-        r.delete do    # DELETE
+        r.delete do
           response['Content-Type'] = 'application/json'
           res = interactor.delete_address(id)
           delete_grid_row(id, notice: res.message)
@@ -294,14 +281,14 @@ class Framework < Roda
     end
     r.on 'addresses' do
       interactor = AddressInteractor.new(current_user, {}, {}, {})
-      r.on 'new' do    # NEW
+      r.on 'new' do
         if authorised?('parties', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
-      r.post do        # CREATE
+      r.post do
         res = interactor.create_address(params[:address])
         if res.success
           flash[:notice] = res.message
@@ -336,7 +323,7 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      r.on 'edit' do   # EDIT
+      r.on 'edit' do
         if authorised?('parties', 'edit')
           show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id) }
         else
@@ -344,25 +331,28 @@ class Framework < Roda
         end
       end
       r.is do
-        r.get do       # SHOW
+        r.get do
           if authorised?('parties', 'read')
             show_partial { Masterfiles::Parties::ContactMethod::Show.call(id) }
           else
             dialog_permission_error
           end
         end
-        r.patch do     # UPDATE
+        r.patch do
           response['Content-Type'] = 'application/json'
           res = interactor.update_contact_method(id, params[:contact_method])
           if res.success
-            update_grid_row(id, changes: { contact_method_type_id: res.instance[:contact_method_type_id], contact_method_code: res.instance[:contact_method_code], active: res.instance[:active] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { contact_method_type_id: res.instance[:contact_method_type_id],
+                                       contact_method_code: res.instance[:contact_method_code],
+                                       active: res.instance[:active] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id, params[:contact_method], res.errors) }
             update_dialog_content(content: content, error: res.message)
           end
         end
-        r.delete do    # DELETE
+        r.delete do
           response['Content-Type'] = 'application/json'
           res = interactor.delete_contact_method(id)
           delete_grid_row(id, notice: res.message)
@@ -371,14 +361,14 @@ class Framework < Roda
     end
     r.on 'contact_methods' do
       interactor = ContactMethodInteractor.new(current_user, {}, {}, {})
-      r.on 'new' do    # NEW
+      r.on 'new' do
         if authorised?('parties', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
-      r.post do        # CREATE
+      r.post do
         res = interactor.create_contact_method(params[:contact_method])
         if res.success
           flash[:notice] = res.message

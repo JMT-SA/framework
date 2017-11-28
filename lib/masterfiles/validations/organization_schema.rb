@@ -8,7 +8,7 @@ OrganizationSchema = Dry::Validation.Form do
   required(:medium_description).maybe(:str?)
   required(:long_description).maybe(:str?)
   required(:vat_number).maybe(:str?)
-  optional(:role_id).maybe(:int?)
+  required(:role_ids).each(:int?)
   # required(:variants).maybe(:str?)
   # required(:active).maybe(:bool?)
 end

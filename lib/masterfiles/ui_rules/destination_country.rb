@@ -15,8 +15,6 @@ module UiRules
     end
 
     def set_show_fields
-      # destination_region_id_label = @repo.find_region(@form_object.destination_region_id)&.destination_region_name
-      # fields[:destination_region_id] = { renderer: :label, with_value: destination_region_id_label }
       fields[:region_name] = { renderer: :label }
       fields[:country_name] = { renderer: :label }
     end

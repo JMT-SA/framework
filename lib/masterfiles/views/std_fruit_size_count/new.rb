@@ -15,18 +15,37 @@ module Masterfiles
             page.form do |form|
               form.action '/masterfiles/fruit/std_fruit_size_counts'
               form.remote! if remote
-              form.add_field :commodity_id
-              form.add_field :size_count_description
-              form.add_field :marketing_size_range_mm
-              form.add_field :marketing_weight_range
-              form.add_field :size_count_interval_group
-              form.add_field :size_count_value
-              form.add_field :minimum_size_mm
-              form.add_field :maximum_size_mm
-              form.add_field :average_size_mm
-              form.add_field :minimum_weight_gm
-              form.add_field :maximum_weight_gm
-              form.add_field :average_weight_gm
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :commodity_id
+                  col.add_field :size_count_description
+                  col.add_field :marketing_size_range_mm
+                  col.add_field :marketing_weight_range
+                  col.add_field :size_count_interval_group
+                  col.add_field :size_count_value
+                end
+              end
+              form.row do |row|
+                # row.column do |col|
+                #   col.add_text "Label"
+                # end
+                row.column do |col|
+                  col.add_field :minimum_size_mm
+                end
+                row.column do |col|
+                  col.add_field :maximum_size_mm
+                end
+                row.column do |col|
+                  col.add_field :average_size_mm
+                end
+              end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :minimum_weight_gm
+                  col.add_field :maximum_weight_gm
+                  col.add_field :average_weight_gm
+                end
+              end
             end
           end
 

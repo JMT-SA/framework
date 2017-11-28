@@ -16,3 +16,9 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
+:conditions:
+  :standard:
+    - :col: fruit_size_references.fruit_actual_counts_for_pack_id
+      :op: =
+      :val: $:fruit_size_references.fruit_actual_counts_for_pack_id$
+

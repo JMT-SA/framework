@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_id_label = CommodityRepo.new.find(@form_object.commodity_id)&.code
+      commodity_id_label = CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       cultivar_group_id_label = @repo.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
       fields[:cultivar_group_id] = { renderer: :label, with_value: cultivar_group_id_label }
@@ -25,7 +25,7 @@ module UiRules
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: CommodityRepo.new.for_select },
+        commodity_id: { renderer: :select, options: CommodityRepo.new.commodities_for_select},
         cultivar_group_id: { renderer: :select, options: @repo.cultivar_groups_for_select },
         cultivar_name: {},
         description: {}

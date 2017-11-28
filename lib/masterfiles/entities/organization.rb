@@ -8,4 +8,7 @@ class Organization < Dry::Struct
   attribute :vat_number, Types::String
   attribute :variants, Types::String
   attribute :active, Types::Bool
+  attribute :role_ids, Types::Array
+  attribute :role_names, Types::Array
+  attribute :parent_organization, Types::String
 end

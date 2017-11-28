@@ -10,4 +10,5 @@ class Address < Dry::Struct
   attribute :postal_code, Types::String
   attribute :country, Types::String
   attribute :active, Types::Bool
+  attribute :address_type, Types::String
 end

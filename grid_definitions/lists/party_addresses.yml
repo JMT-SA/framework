@@ -5,3 +5,4 @@
     :url: "/masterfiles/parties/link_addresses/$:id$"
     :preselect: "SELECT address_id AS id FROM party_addresses WHERE party_id = $:id$"
     :section_caption: "SELECT fn_party_name($:id$)"
+    :can_be_cleared: true

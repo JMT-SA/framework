@@ -16,11 +16,6 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
-- :url: "/masterfiles/parties/organizations/$:id$/roles"
-  :text: roles
-  :icon: fa-list
-  :title: Roles
-  :popup: true
 - :url: "/list/party_contact_methods/multi?key=parties&id=$:party_id$"
   :text: contact methods
   :icon: fa-list

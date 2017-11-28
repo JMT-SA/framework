@@ -3,7 +3,7 @@
 module UiRules
   class ContactMethod < Base
     def generate_rules
-      @this_repo = ContactMethodRepo.new
+      @repo = PartyRepo.new
       make_form_object
       apply_form_values
 
@@ -15,15 +15,16 @@ module UiRules
     end
 
     def set_show_fields
-      contact_method_type_id_label = ContactMethodTypeRepo.new.find(@form_object.contact_method_type_id)&.contact_method_code
+      contact_method_type_id_label = ContactMethodTypeRepo.new.find(@form_object.contact_method_type_id)&.contact_method_type
       fields[:contact_method_type_id] = { renderer: :label, with_value: contact_method_type_id_label }
+      fields[:contact_method_type] = { renderer: :label }
       fields[:contact_method_code] = { renderer: :label }
       fields[:active] = { renderer: :label }
     end
 
     def common_fields
       {
-        contact_method_type_id: { renderer: :select, options: ContactMethodTypeRepo.new.for_select },
+        contact_method_type_id: { renderer: :select, options: @repo.contact_method_types_for_select },
         contact_method_code: {},
         active: { renderer: :checkbox }
       }
@@ -32,7 +33,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find_contact_method(@options[:id])
     end
 
     def make_new_form_object

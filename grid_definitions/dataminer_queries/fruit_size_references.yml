@@ -1,10 +1,11 @@
 ---
 :caption: Fruit Size References
-:sql: SELECT "fruit_size_references"."id", "fruit_size_references"."fruit_actual_counts_for_pack_id",
-  "fruit_size_references"."size_reference", "fruit_size_references"."created_at",
-  "fruit_size_references"."updated_at", "fruit_actual_counts_for_packs"."size_count_variation"
-  FROM "fruit_size_references" JOIN "fruit_actual_counts_for_packs" ON "fruit_actual_counts_for_packs"."id"
-  = "fruit_size_references"."fruit_actual_counts_for_pack_id"
+:sql: "  SELECT \"fruit_size_references\".\"id\", \"fruit_size_references\".\"fruit_actual_counts_for_pack_id\",
+  \"fruit_size_references\".\"size_reference\", \"fruit_size_references\".\"created_at\",
+  \"fruit_size_references\".\"updated_at\", \"fruit_actual_counts_for_packs\".\"size_count_variation\",
+  \"fruit_actual_counts_for_packs\".\"std_fruit_size_count_id\"\r\nFROM \"fruit_size_references\"\r\nJOIN
+  \"fruit_actual_counts_for_packs\" ON \"fruit_actual_counts_for_packs\".\"id\" =
+  \"fruit_size_references\".\"fruit_actual_counts_for_pack_id\"\r\n\r\n  "
 :limit: 
 :offset: 
 :columns:
@@ -93,6 +94,21 @@
     :format: 
     :hide: false
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_fruit_size_count_id:
+    :name: std_fruit_size_count_id
+    :sequence_no: 7
+    :caption: Std fruit size count
+    :namespaced_name: fruit_actual_counts_for_packs.std_fruit_size_count_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

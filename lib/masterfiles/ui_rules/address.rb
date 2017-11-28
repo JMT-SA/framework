@@ -3,7 +3,7 @@
 module UiRules
   class Address < Base
     def generate_rules
-      @this_repo = AddressRepo.new
+      @repo = PartyRepo.new
       make_form_object
       apply_form_values
 
@@ -15,8 +15,7 @@ module UiRules
     end
 
     def set_show_fields
-      address_type_id_label = AddressTypeRepo.new.find(@form_object.address_type_id)&.address_type
-      fields[:address_type_id] = { renderer: :label, with_value: address_type_id_label }
+      fields[:address_type] = { renderer: :label }
       fields[:address_line_1] = { renderer: :label }
       fields[:address_line_2] = { renderer: :label }
       fields[:address_line_3] = { renderer: :label }
@@ -42,7 +41,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find_address(@options[:id])
     end
 
     def make_new_form_object

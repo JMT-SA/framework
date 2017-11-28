@@ -21,6 +21,16 @@
   :icon: fa-plus
   :title: New Size Reference
   :popup: true
-- :url: "/list/fruit_size_references"
+- :url: "/list/fruit_size_references/with_params?key=standard&fruit_size_references.fruit_actual_counts_for_pack_id=$:id$"
   :text: size references list
   :icon: fa-list
+:page_controls:
+- :control_type: :link
+  :url: "/list/std_fruit_size_counts"
+  :text: Back
+  :style: :button
+:conditions:
+  :standard:
+    - :col: fruit_actual_counts_for_packs.std_fruit_size_count_id
+      :op: =
+      :val: $:fruit_actual_counts_for_packs.std_fruit_size_count_id$

@@ -29,4 +29,8 @@ module UtilityFunctions
   def comma_newline_and_spaces(no)
     ",\n#{' ' * no}"
   end
+
+  def spaces_from_string_lengths(initial_spaces, *strings)
+    ' ' * ((initial_spaces || 0) + strings.sum(&:length))
+  end
 end

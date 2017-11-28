@@ -439,16 +439,16 @@ class GenerateNewScaffold < BaseService
                 elsif fetch?(r)
                   content = show_partial do
                     #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
-                                                                                   form_errors: res.errors,
-                                                                                   remote: true)
+                    #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}form_errors: res.errors,
+                    #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}remote: true)
                   end
                   update_dialog_content(content: content, error: res.message)
                 else
                   flash[:error] = res.message
                   show_page do
                     #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
-                                                                                   form_errors: res.errors,
-                                                                                   remote: false)
+                    #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}form_errors: res.errors,
+                    #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}remote: false)
                   end
                 end
               end

@@ -1,5 +1,5 @@
 module UiRules
-  class SecurityGroups < Base
+  class SecurityGroupsRule < Base
     def generate_rules
       @this_repo = SecurityGroupRepo.new
       make_form_object

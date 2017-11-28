@@ -1,5 +1,5 @@
 module UiRules
-  class Scaffolds < Base
+  class ScaffoldsRule < Base
     def generate_rules
       @this_repo = DevelopmentRepo.new
       make_form_object

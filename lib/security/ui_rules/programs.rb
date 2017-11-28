@@ -1,5 +1,5 @@
 module UiRules
-  class Programs < Base
+  class ProgramsRule < Base
     def generate_rules
       @this_repo = ProgramRepo.new
       make_form_object

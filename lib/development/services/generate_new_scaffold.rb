@@ -468,7 +468,7 @@ class GenerateNewScaffold < BaseService
         # frozen_string_literal: true
 
         module UiRules
-          class #{opts.klassname} < Base
+          class #{opts.klassname}Rule < Base
             def generate_rules
               @this_repo = #{opts.klassname}Repo.new
               make_form_object

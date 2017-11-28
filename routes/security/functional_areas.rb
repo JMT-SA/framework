@@ -335,90 +335,169 @@ class Framework < Roda
     # SECURITY PERMISSIONS
     # --------------------------------------------------------------------------
     r.on 'security_permissions', Integer do |id|
-      repo                = SecurityGroupRepo.new
-      security_permission = repo.find(:security_permissions, SecurityPermission, id)
+      interactor = SecurityPermissionInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on security_permission.nil? do
+      r.on !interactor.exists?(:security_permissions, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('menu', 'edit')
-            show_partial { Security::FunctionalAreas::SecurityPermissions::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'edit')
+          show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id) }
+        else
+          dialog_permission_error
         end
       end
       r.is do
         r.get do       # SHOW
           if authorised?('menu', 'read')
-            show_partial { Security::FunctionalAreas::SecurityPermissions::Show.call(id) }
+            show_partial { Security::FunctionalAreas::SecurityPermission::Show.call(id) }
           else
             dialog_permission_error
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = SecurityPermissionSchema.call(params[:security_permission])
-            errors = res.messages
-            if errors.empty?
-              repo = SecurityGroupRepo.new
-              repo.update(:security_permissions, id, res)
-              # flash[:notice] = 'Updated'
-              # redirect_via_json_to_last_grid
-              update_grid_row(id, changes: { security_permission: res[:security_permission] },
-                                  notice:  "Updated #{res[:security_permission]}")
-            else
-              content = show_partial { Security::FunctionalAreas::SecurityPermissions::Edit.call(id, params[:security_permission], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_security_permission(id, params[:security_permission])
+          if res.success
+            update_grid_row(id, changes: { security_permission: res.instance[:security_permission] },
+                                notice:  res.message)
+          else
+            content = show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id, params[:security_permission], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = SecurityGroupRepo.new
-          repo.delete(:security_permissions, id)
-          # flash[:notice] = 'Deleted'
-          # redirect_to_last_grid(r)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_security_permission(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
+
     r.on 'security_permissions' do
+      interactor = SecurityPermissionInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('menu', 'new')
-            # show_page { Security::FunctionalAreas::SecurityPermissions::New.call }
-            show_partial { Security::FunctionalAreas::SecurityPermissions::New.call }
-          else
-            dialog_permission_error
-            # show_unauthorised
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('menu', 'new')
+          show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::SecurityPermission::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
-        res = SecurityPermissionSchema.call(params[:security_permission])
-        errors = res.messages
-        if errors.empty?
-          repo = SecurityGroupRepo.new
-          repo.create(:security_permissions, res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_security_permission(params[:security_permission])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Security::FunctionalAreas::SecurityPermission::New.call(form_values: params[:security_permission],
+                                                                    form_errors: res.errors,
+                                                                    remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Security::FunctionalAreas::SecurityPermissions::New.call(params[:security_permission], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Security::FunctionalAreas::SecurityPermission::New.call(form_values: params[:security_permission],
+                                                                    form_errors: res.errors,
+                                                                    remote: false)
+          end
         end
       end
     end
+    # # SECURITY PERMISSIONS
+    # # --------------------------------------------------------------------------
+    # r.on 'security_permissions', Integer do |id|
+    #   repo                = SecurityGroupRepo.new
+    #   security_permission = repo.find(:security_permissions, SecurityPermission, id)
+    #
+    #   # Check for notfound:
+    #   r.on security_permission.nil? do
+    #     handle_not_found(r)
+    #   end
+    #
+    #   r.on 'edit' do   # EDIT
+    #     begin
+    #       if authorised?('menu', 'edit')
+    #         show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id) }
+    #       else
+    #         dialog_permission_error
+    #       end
+    #     rescue StandardError => e
+    #       dialog_error(e)
+    #     end
+    #   end
+    #   r.is do
+    #     r.get do       # SHOW
+    #       if authorised?('menu', 'read')
+    #         show_partial { Security::FunctionalAreas::SecurityPermission::Show.call(id) }
+    #       else
+    #         dialog_permission_error
+    #       end
+    #     end
+    #     r.patch do     # UPDATE
+    #       begin
+    #         response['Content-Type'] = 'application/json'
+    #         res = SecurityPermissionSchema.call(params[:security_permission])
+    #         errors = res.messages
+    #         if errors.empty?
+    #           repo = SecurityGroupRepo.new
+    #           repo.update(:security_permissions, id, res)
+    #           # flash[:notice] = 'Updated'
+    #           # redirect_via_json_to_last_grid
+    #           update_grid_row(id, changes: { security_permission: res[:security_permission] },
+    #                               notice:  "Updated #{res[:security_permission]}")
+    #         else
+    #           content = show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id, params[:security_permission], errors) }
+    #           update_dialog_content(content: content, error: 'Validation error')
+    #         end
+    #       rescue StandardError => e
+    #         handle_json_error(e)
+    #       end
+    #     end
+    #     r.delete do    # DELETE
+    #       response['Content-Type'] = 'application/json'
+    #       repo = SecurityGroupRepo.new
+    #       repo.delete(:security_permissions, id)
+    #       # flash[:notice] = 'Deleted'
+    #       # redirect_to_last_grid(r)
+    #       delete_grid_row(id, notice: 'Deleted')
+    #     end
+    #   end
+    # end
+    # r.on 'security_permissions' do
+    #   r.on 'new' do    # NEW
+    #     begin
+    #       if authorised?('menu', 'new')
+    #         # show_page { Security::FunctionalAreas::SecurityPermission::New.call }
+    #         show_partial { Security::FunctionalAreas::SecurityPermission::New.call }
+    #       else
+    #         dialog_permission_error
+    #         # show_unauthorised
+    #       end
+    #     rescue StandardError => e
+    #       dialog_error(e)
+    #     end
+    #   end
+    #   r.post do        # CREATE
+    #     res = SecurityPermissionSchema.call(params[:security_permission])
+    #     errors = res.messages
+    #     if errors.empty?
+    #       repo = SecurityGroupRepo.new
+    #       repo.create(:security_permissions, res)
+    #       flash[:notice] = 'Created'
+    #       redirect_via_json_to_last_grid
+    #     else
+    #       content = show_partial { Security::FunctionalAreas::SecurityPermission::New.call(params[:security_permission], errors) }
+    #       update_dialog_content(content: content, error: 'Validation error')
+    #     end
+    #   end
+    # end
   end
 end

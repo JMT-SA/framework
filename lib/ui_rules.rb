@@ -9,7 +9,7 @@ module UiRules
     def initialize(rule, mode, options = {})
       @options = options
       authorizer = options.delete(:authorizer) || BlockAuth.new
-      klass    = UiRules.const_get(rule.to_s.split('_').map(&:capitalize).join)
+      klass    = UiRules.const_get("#{rule.to_s.split('_').map(&:capitalize).join}Rule")
       @rule    = klass.new(mode, authorizer, options)
     end
 

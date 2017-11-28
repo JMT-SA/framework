@@ -1,9 +1,9 @@
 module Security
   module FunctionalAreas
-    module SecurityPermissions
+    module SecurityPermission
       class Edit
         def self.call(id, form_values = nil, form_errors = nil)
-          ui_rule = UiRules::Compiler.new(:security_permissions, :edit, id: id)
+          ui_rule = UiRules::Compiler.new(:security_permission, :edit, id: id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

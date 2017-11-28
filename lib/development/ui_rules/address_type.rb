@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class AddressType < Base
+  class AddressTypeRule < Base
     def generate_rules
       @this_repo = AddressTypeRepo.new
       make_form_object

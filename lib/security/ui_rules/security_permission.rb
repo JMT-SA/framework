@@ -1,14 +1,17 @@
+# frozen_string_literal: true
+
 module UiRules
-  class SecurityPermissions < Base
+  class SecurityPermissionRule < Base
     def generate_rules
       @this_repo = SecurityGroupRepo.new
       make_form_object
+      apply_form_values
 
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
 
-      form_name 'security_permission'.freeze
+      form_name 'security_permission'
     end
 
     def set_show_fields

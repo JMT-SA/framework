@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ContactMethodType < Base
+  class ContactMethodTypeRule < Base
     def generate_rules
       @this_repo = ContactMethodTypeRepo.new
       make_form_object

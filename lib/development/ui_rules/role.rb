@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class Role < Base
+  class RoleRule < Base
     def generate_rules
       @this_repo = RoleRepo.new
       make_form_object

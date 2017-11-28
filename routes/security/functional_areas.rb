@@ -36,7 +36,7 @@ class Framework < Roda
         errors = res.messages
         if errors.empty?
           repo = FunctionalAreaRepo.new
-          repo.create(res)
+          repo.create(:functional_areas, res)
           flash[:notice] = 'Created'
           redirect_to_last_grid(r)
         else
@@ -69,7 +69,7 @@ class Framework < Roda
               errors = res.messages
               if errors.empty?
                 repo = FunctionalAreaRepo.new
-                repo.update(id, res)
+                repo.update(:functional_areas, id, res)
                 flash[:notice] = 'Updated'
                 redirect_via_json_to_last_grid
                 # flash[:notice] = 'Updated'
@@ -89,7 +89,7 @@ class Framework < Roda
         end
         r.delete do
           repo = FunctionalAreaRepo.new
-          repo.delete(id)
+          repo.delete(:functional_areas, id)
           flash[:notice] = 'Deleted'
           redirect_to_last_grid(r)
         end
@@ -107,7 +107,7 @@ class Framework < Roda
         if errors.empty?
           repo = ProgramRepo.new
           # changeset = repo.changeset(NewChangeset).data(params[:program])
-          repo.create(res)
+          repo.create(:programs, res)
           flash[:notice] = 'Created'
           r.redirect '/list/menu_definitions'
         else
@@ -142,7 +142,7 @@ class Framework < Roda
             if errors.empty?
               repo = ProgramRepo.new
               # changeset = repo.changeset(id, params[:program]).map(:touch)
-              repo.update(id, res)
+              repo.update(:programs, id, res)
               flash[:notice] = 'Updated'
               redirect_to_last_grid(r)
             else
@@ -160,7 +160,7 @@ class Framework < Roda
         end
         r.delete do
           repo = ProgramRepo.new
-          repo.delete(id)
+          repo.delete(:programs, id)
           flash[:notice] = 'Deleted'
           redirect_to_last_grid(r)
         end
@@ -190,7 +190,7 @@ class Framework < Roda
           repo = ProgramFunctionRepo.new
           # changeset = repo.changeset(params[:functional_area]).map(:add_timestamps)
           # changeset = repo.changeset(NewChangeset).data(result.to_h) # + hidden params...
-          repo.create(res)
+          repo.create(:program_functions, res)
           flash[:notice] = 'Created'
           r.redirect '/list/menu_definitions'
         else
@@ -227,7 +227,7 @@ class Framework < Roda
               repo = ProgramFunctionRepo.new
               # changeset = repo.changeset(id, result.to_h).map(:touch)
               # changeset = repo.changeset(id, UpdateChangeset).data(result.to_h)
-              repo.update(id, res)
+              repo.update(:program_functions, id, res)
               flash[:notice] = 'Updated'
               redirect_to_last_grid(r)
             else
@@ -241,7 +241,7 @@ class Framework < Roda
         end
         r.delete do
           repo = ProgramFunctionRepo.new
-          repo.delete(id)
+          repo.delete(:program_functions, id)
           flash[:notice] = 'Deleted'
           redirect_to_last_grid(r)
         end

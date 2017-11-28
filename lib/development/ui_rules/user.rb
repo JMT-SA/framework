@@ -35,7 +35,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @this_repo.find(:users, User, @options[:id])
     end
 
     def make_new_form_object

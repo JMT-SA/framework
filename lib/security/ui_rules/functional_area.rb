@@ -1,5 +1,5 @@
 module UiRules
-  class FunctionalAreasRule < Base
+  class FunctionalAreaRule < Base
     def generate_rules
       @this_repo = FunctionalAreaRepo.new
       make_form_object

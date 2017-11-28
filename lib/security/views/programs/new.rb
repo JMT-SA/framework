@@ -3,7 +3,7 @@ module Security
     module Programs
       class New
         def self.call(id, form_values = nil, form_errors = nil)
-          ui_rule = UiRules::Compiler.new(:programs, :new, id: id)
+          ui_rule = UiRules::Compiler.new(:program, :new, id: id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

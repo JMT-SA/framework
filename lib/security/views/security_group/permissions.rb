@@ -3,7 +3,7 @@ module Security
     module SecurityGroup
       class Permissions
         def self.call(id, form_values = nil, form_errors = nil)
-          ui_rule = UiRules::Compiler.new(:security_groups, :permissions, id: id)
+          ui_rule = UiRules::Compiler.new(:security_group, :permissions, id: id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

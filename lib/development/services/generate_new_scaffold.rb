@@ -159,9 +159,9 @@ class GenerateNewScaffold < BaseService
 
           def #{opts.singlename}(cached = true)
             if cached
-              @#{opts.singlename} ||= repo.find(:#{opts.table}, :#{opts.klassname}, @id)
+              @#{opts.singlename} ||= repo.find(:#{opts.table}, #{opts.klassname}, @id)
             else
-              @#{opts.singlename} = repo.find(:#{opts.table}, :#{opts.klassname}, @id)
+              @#{opts.singlename} = repo.find(:#{opts.table}, #{opts.klassname}, @id)
             end
           end
 

@@ -3,95 +3,85 @@
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
 
-Dir['./lib/security/functional_areas/**/*.rb'].each { |f| require f }
-Dir['./lib/security/programs/**/*.rb'].each { |f| require f }
-Dir['./lib/security/program_functions/**/*.rb'].each { |f| require f }
 class Framework < Roda
   route 'functional_areas', 'security' do |r|
-    # --- see empty root plugin...
-    # puts ">>>> URL: #{request.url}"
-    # puts ">>>> SCHEME: #{request.scheme}"
-    # puts ">>>> TYPE: #{request.content_type}"
-    # puts ">>>> MEDIA: #{request.media_type}"
-    # puts ">>>> XHR? #{request.xhr?}"
-    # puts ">>>> GET? #{request.get?}"
-    # puts ">>>> METHOD #{request.request_method}"
-    r.on 'functional_areas' do
-      # r.root do
-      #   render(inline: '<h2>functional_areas</h2>')
-      # end
-      r.on 'new' do
-        begin
-          if authorised?('menu', 'new')
-            show_partial { Security::FunctionalAreas::FunctionalAreas::New.call }
+    # FUNCTIONAL AREAS
+    # --------------------------------------------------------------------------
+    r.on 'functional_areas', Integer do |id|
+      interactor = FunctionalAreaInteractor.new(current_user, {}, {}, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:functional_areas, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        if authorised?('menu', 'edit')
+          show_partial { Security::FunctionalAreas::FunctionalArea::Edit.call(id) }
+        else
+          dialog_permission_error
+        end
+      end
+      r.is do
+        r.get do       # SHOW
+          if authorised?('menu', 'read')
+            show_partial { Security::FunctionalAreas::FunctionalArea::Show.call(id) }
           else
             dialog_permission_error
           end
-        rescue StandardError => e
-          dialog_error(e)
+        end
+        r.patch do     # UPDATE
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_functional_area(id, params[:functional_area])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json_to_last_grid
+          else
+            content = show_partial { Security::FunctionalAreas::FunctionalArea::Edit.call(id, params[:functional_area], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          response['Content-Type'] = 'application/json'
+          res = interactor.delete_functional_area(id)
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
         end
       end
-      r.on 'create' do
-        res = FunctionalAreaSchema.call(params[:functional_area])
-        errors = res.messages
-        if errors.empty?
-          repo = FunctionalAreaRepo.new
-          repo.create(:functional_areas, res)
-          flash[:notice] = 'Created'
-          redirect_to_last_grid(r)
+    end
+
+    r.on 'functional_areas' do
+      interactor = FunctionalAreaInteractor.new(current_user, {}, {}, {})
+      r.on 'new' do    # NEW
+        if authorised?('menu', 'new')
+          show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::FunctionalArea::New.call(remote: fetch?(r)) }
         else
-          flash.now[:error] = 'Unable to create functional area'
-          show_page { Security::FunctionalAreas::FunctionalAreas::New.call(params[:functional_area], errors) }
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
-      r.on :id do |id|
-        r.on 'edit' do
-          begin
-            if authorised?('menu', 'edit')
-              show_partial { Security::FunctionalAreas::FunctionalAreas::Edit.call(id) }
-            else
-              dialog_permission_error
-            end
-          rescue StandardError => e
-            dialog_error(e)
+      r.post do        # CREATE
+        res = interactor.create_functional_area(params[:functional_area])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
           end
-        end
-        # define a routes result object:
-        # - success?
-        # - flash_message - or should the action do this?
-        # - errors
-        # - result
-        r.post do
-          r.on 'update' do
-            begin
-              response['Content-Type'] = 'application/json'
-              res = FunctionalAreaSchema.call(params[:functional_area])
-              errors = res.messages
-              if errors.empty?
-                repo = FunctionalAreaRepo.new
-                repo.update(:functional_areas, id, res)
-                flash[:notice] = 'Updated'
-                redirect_via_json_to_last_grid
-                # flash[:notice] = 'Updated'
-                # redirect_to_last_grid(r)
-                # update_grid_row(id, changes: res.to_h,
-                #                     notice: "Updated #{res[:functional_area_name]}")
-              else
-                # flash.now[:error] = 'Unable to update functional area'
-                # show_page { Security::FunctionalAreas::FunctionalAreas::Edit.call(id, params[:functional_area], errors) }
-                content = show_partial { Security::FunctionalAreas::FunctionalAreas::Edit.call(id, params[:functional_area], errors) }
-                update_dialog_content(content: content, error: 'Validation error')
-              end
-            rescue StandardError => e
-              handle_json_error(e)
-            end
+        elsif fetch?(r)
+          content = show_partial do
+            Security::FunctionalAreas::FunctionalArea::New.call(form_values: params[:functional_area],
+                                                                form_errors: res.errors,
+                                                                remote: true)
           end
-        end
-        r.delete do
-          repo = FunctionalAreaRepo.new
-          repo.delete(:functional_areas, id)
-          flash[:notice] = 'Deleted'
-          redirect_to_last_grid(r)
+          update_dialog_content(content: content, error: res.message)
+        else
+          flash[:error] = res.message
+          show_page do
+            Security::FunctionalAreas::FunctionalArea::New.call(form_values: params[:functional_area],
+                                                                form_errors: res.errors,
+                                                                remote: false)
+          end
         end
       end
     end

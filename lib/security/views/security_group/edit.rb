@@ -1,6 +1,6 @@
 module Security
   module FunctionalAreas
-    module SecurityGroups
+    module SecurityGroup
       class Edit
         def self.call(id, form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:security_groups, :edit, id: id)

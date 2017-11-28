@@ -1,6 +1,6 @@
 module Security
   module FunctionalAreas
-    module SecurityGroups
+    module SecurityGroup
       class Show
         def self.call(id)
           ui_rule = UiRules::Compiler.new(:security_groups, :show, id: id)

@@ -1,9 +1,9 @@
 module Security
   module FunctionalAreas
-    module SecurityGroups
-      class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
-          ui_rule = UiRules::Compiler.new(:security_groups, :new)
+    module SecurityGroup
+      class Permissions
+        def self.call(id, form_values = nil, form_errors = nil)
+          ui_rule = UiRules::Compiler.new(:security_groups, :permissions, id: id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -11,9 +11,10 @@ module Security
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action '/security/functional_areas/security_groups'
-              form.remote! if remote
+              form.action "/security/functional_areas/security_groups/#{id}/permissions"
+              form.remote!
               form.add_field :security_group_name
+              form.add_field :security_permissions
             end
           end
 

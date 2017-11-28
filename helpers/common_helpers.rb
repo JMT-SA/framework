@@ -50,7 +50,7 @@ module CommonHelpers
 
   def current_user
     return nil unless session[:user_id]
-    @current_user ||= UserRepo.new.find(session[:user_id])
+    @current_user ||= UserRepo.new.find(:users, User, session[:user_id])
   end
 
   def authorised?(programs, sought_permission)

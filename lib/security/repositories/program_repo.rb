@@ -1,9 +1,4 @@
 class ProgramRepo < RepoBase
-  def initialize
-    main_table :programs
-    table_wrapper Program
-  end
-
   def authorise?(user, programs, sought_permission)
     query = <<-SQL
     SELECT security_permissions.id

@@ -1,7 +1,7 @@
 module UiRules
   class SecurityPermissions < Base
     def generate_rules
-      @this_repo = SecurityPermissionRepo.new
+      @this_repo = SecurityGroupRepo.new
       make_form_object
 
       common_values_for_fields common_fields
@@ -24,7 +24,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @this_repo.find(:security_permissions, SecurityPermission, @options[:id])
     end
 
     def make_new_form_object

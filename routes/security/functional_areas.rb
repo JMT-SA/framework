@@ -345,8 +345,8 @@ class Framework < Roda
     # SECURITY PERMISSIONS
     # --------------------------------------------------------------------------
     r.on 'security_permissions', Integer do |id|
-      repo                = SecurityPermissionRepo.new
-      security_permission = repo.find(id)
+      repo                = SecurityGroupRepo.new
+      security_permission = repo.find(:security_permissions, SecurityPermission, id)
 
       # Check for notfound:
       r.on security_permission.nil? do
@@ -378,8 +378,8 @@ class Framework < Roda
             res = SecurityPermissionSchema.call(params[:security_permission])
             errors = res.messages
             if errors.empty?
-              repo = SecurityPermissionRepo.new
-              repo.update(id, res)
+              repo = SecurityGroupRepo.new
+              repo.update(:security_permissions, id, res)
               # flash[:notice] = 'Updated'
               # redirect_via_json_to_last_grid
               update_grid_row(id, changes: { security_permission: res[:security_permission] },
@@ -394,8 +394,8 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = SecurityPermissionRepo.new
-          repo.delete(id)
+          repo = SecurityGroupRepo.new
+          repo.delete(:security_permissions, id)
           # flash[:notice] = 'Deleted'
           # redirect_to_last_grid(r)
           delete_grid_row(id, notice: 'Deleted')
@@ -420,8 +420,8 @@ class Framework < Roda
         res = SecurityPermissionSchema.call(params[:security_permission])
         errors = res.messages
         if errors.empty?
-          repo = SecurityPermissionRepo.new
-          repo.create(res)
+          repo = SecurityGroupRepo.new
+          repo.create(:security_permissions, res)
           flash[:notice] = 'Created'
           redirect_via_json_to_last_grid
         else

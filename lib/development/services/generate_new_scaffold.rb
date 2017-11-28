@@ -153,15 +153,15 @@ class GenerateNewScaffold < BaseService
         # frozen_string_literal: true
 
         class #{opts.klassname}Interactor < BaseInteractor
-          def #{opts.singlename}_repo
-            @#{opts.singlename}_repo ||= #{opts.klassname}Repo.new
+          def repo
+            @repo ||= #{opts.klassname}Repo.new
           end
 
           def #{opts.singlename}(cached = true)
             if cached
-              @#{opts.singlename} ||= #{opts.singlename}_repo.find(@id)
+              @#{opts.singlename} ||= repo.find(:#{opts.table}, :#{opts.klassname}, @id)
             else
-              @#{opts.singlename} = #{opts.singlename}_repo.find(@id)
+              @#{opts.singlename} = repo.find(:#{opts.table}, :#{opts.klassname}, @id)
             end
           end
 
@@ -172,7 +172,7 @@ class GenerateNewScaffold < BaseService
           def create_#{opts.singlename}(params)
             res = validate_#{opts.singlename}_params(params)
             return validation_failed_response(res) unless res.messages.empty?
-            @id = #{opts.singlename}_repo.create(res.to_h)
+            @id = repo.create(:#{opts.table}, res.to_h)
             success_response("Created #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename})
           end
@@ -181,7 +181,7 @@ class GenerateNewScaffold < BaseService
             @id = id
             res = validate_#{opts.singlename}_params(params)
             return validation_failed_response(res) unless res.messages.empty?
-            #{opts.singlename}_repo.update(id, res.to_h)
+            repo.update(:#{opts.table}, id, res.to_h)
             success_response("Updated #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename}(false))
           end
@@ -189,7 +189,7 @@ class GenerateNewScaffold < BaseService
           def delete_#{opts.singlename}(id)
             @id = id
             name = #{opts.singlename}.#{opts.label_field}
-            #{opts.singlename}_repo.delete(id)
+            repo.delete(:#{opts.table}, id)
             success_response("Deleted #{opts.singlename.tr('_', ' ')} \#{name}")
           end
         end
@@ -208,24 +208,12 @@ class GenerateNewScaffold < BaseService
         # frozen_string_literal: true
 
         class #{opts.klassname}Repo < RepoBase
-          def initialize
-            main_table :#{opts.table}
-            table_wrapper #{opts.klassname}#{for_select}
-          end
+          build_for_select :#{opts.table},
+                           label: :#{opts.label_field},
+                           value: :id,
+                           order_by: :#{opts.label_field}
         end
       RUBY
-    end
-
-    private
-
-    def for_select
-      return nil if opts.label_field.empty?
-      code = [
-        "    for_select_options label: :#{opts.label_field},",
-        '                   value: :id,',
-        "                   order_by: :#{opts.label_field}"
-      ]
-      "\n#{code.join(UtilityFunctions.newline_and_spaces(4))}"
     end
   end
 
@@ -506,7 +494,7 @@ class GenerateNewScaffold < BaseService
             def make_form_object
               make_new_form_object && return if @mode == :new
 
-              @form_object = @this_repo.find(@options[:id])
+              @form_object = @this_repo.find(:#{opts.table}, #{opts.klassname}, @options[:id])
             end
 
             def make_new_form_object

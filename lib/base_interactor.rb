@@ -10,7 +10,7 @@ class BaseInteractor
 
   def exists?(entity, id)
     repo = RepoBase.new
-    repo.row_exists?(entity, id: id)
+    repo.exists?(entity, id: id)
   end
 
   def validation_failed_response(validation_results)

@@ -1,9 +1,4 @@
 class ProgramFunctionRepo < RepoBase
-  def initialize
-    main_table :program_functions
-    table_wrapper ProgramFunction
-  end
-
   def menu_for_user(user)
     query = <<-SQL
     SELECT f.id AS functional_area_id, p.id AS program_id, pf.id,

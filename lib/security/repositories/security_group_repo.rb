@@ -1,13 +1,19 @@
 # frozen_string_literal: true
 
 class SecurityGroupRepo < RepoBase
-  def initialize
-    main_table :security_groups
-    table_wrapper SecurityGroup
-  end
-
+  build_for_select :security_permissions, label: :security_permission,
+                                          value: :id,
+                                          order_by: :security_permission
+  # build_for_select :security_permissions, label: :security_permission,
+  #                                         value: :id,
+  #                                         order_by: :security_permission,
+  #                                         desc: true,
+  #                                         alias: :secperms
+  # build_for_select :roles, label: :name,
+  #                          value: :id,
+  #                          order_by: :id
   def find_with_permissions(id)
-    security_group = find(id)
+    security_group = find(:security_groups, SecurityGroup, id)
     domain_obj = DomainSecurityGroup.new(security_group)
     ids = select_values("SELECT security_permission_id FROM security_groups_security_permissions WHERE security_group_id = #{id}")
     domain_obj.security_permissions = DB[:security_permissions].where(id: ids).map { |sp| SecurityPermission.new(sp) }

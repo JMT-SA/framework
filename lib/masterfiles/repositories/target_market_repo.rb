@@ -1,6 +1,35 @@
 # frozen_string_literal: true
 
 class TargetMarketRepo < RepoBase
+  build_for_select :target_markets,
+                   label: :target_market_name,
+                   value: :id,
+                   order_by: :target_market_name
+
+  build_for_select :target_market_groups,
+                   label: :target_market_group_name,
+                   value: :id,
+                   order_by: :target_market_group_name
+
+  build_for_select :target_market_group_types,
+                   label: :target_market_group_type_code,
+                   value: :id,
+                   order_by: :target_market_group_type_code
+
+  def tm_group_types_for_select
+    set_for_tm_group_types
+    for_select
+  end
+
+  def tm_groups_for_select
+    set_for_tm_groups
+    for_select
+  end
+  # Wrappers:
+  # TargetMarketGroup
+  # TargetMarketGroupType
+  # TargetMarket
+
   def create_tm_group_type(attrs)
     DB[:target_market_group_types].insert(attrs.to_h)
   end
@@ -89,45 +118,5 @@ class TargetMarketRepo < RepoBase
 
   def existing_tm_group_ids_for_target_market(target_market_id)
     DB[:target_markets_for_groups].where(target_market_id: target_market_id).select_map(:target_market_group_id).sort
-  end
-
-  def tm_group_types_for_select
-    set_for_tm_group_types
-    for_select
-  end
-
-  def tm_groups_for_select
-    set_for_tm_groups
-    for_select
-  end
-
-  def set_for_tm_groups
-    @main_table_name = :target_market_groups
-    @wrapper = TargetMarketGroup
-    @select_options = {
-      label: :target_market_group_name,
-      value: :id,
-      order_by: :target_market_group_name
-    }
-  end
-
-  def set_for_tm_group_types
-    @main_table_name = :target_market_group_types
-    @wrapper = TargetMarketGroupType
-    @select_options = {
-      label: :target_market_group_type_code,
-      value: :id,
-      order_by: :target_market_group_type_code
-    }
-  end
-
-  def set_for_target_markets
-    @main_table_name = :target_markets
-    @wrapper = TargetMarket
-    @select_options = {
-      label: :target_market_name,
-      value: :id,
-      order_by: :target_market_name
-    }
   end
 end

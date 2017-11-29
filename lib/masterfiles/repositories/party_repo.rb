@@ -1,6 +1,27 @@
 # frozen_string_literal: true
 
 class PartyRepo < RepoBase
+  build_for_select :roles,
+                   label: :name,
+                   value: :id,
+                   order_by: :name
+  build_for_select :people,
+                   label: :surname,
+                   value: :id,
+                   order_by: :surname
+  build_for_select :organizations,
+                   label: :short_description,
+                   value: :id,
+                   order_by: :short_description
+
+  def for_select_contact_method_types
+    ContactMethodTypeRepo.new.for_select_contact_method_types
+  end
+
+  def for_select_address_types
+    AddressTypeRepo.new.for_select_address_types
+  end
+
   def find_party(id)
     hash = DB['SELECT parties.* , fn_party_name(id) AS party_name FROM parties'].where(id: id).first
     return nil if hash.nil?
@@ -36,7 +57,7 @@ class PartyRepo < RepoBase
   end
 
   def update_organization(id, attrs)
-    DB[:organizations].where(id: id).update(attrs.to_h)
+    update(:organizations, id, attrs)
   end
 
   def assign_organization_roles(id, role_ids)
@@ -55,7 +76,8 @@ class PartyRepo < RepoBase
   def delete_organization(id)
     DB.transaction do
       DB[:party_roles].where(organization_id: id).delete
-      DB[:security_groups].where(id: id).delete
+      # TODO: This doesn't make sense ->
+      # DB[:security_groups].where(id: id).delete
       DB[:organizations].where(id: id).delete
     end
   end
@@ -77,7 +99,7 @@ class PartyRepo < RepoBase
   end
 
   def find_person(id)
-    hash = DB[:people].where(id: id).first
+    hash = find_hash(:people, id)
     return nil if hash.nil?
     hash = add_dependent_ids(hash)
     hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
@@ -86,14 +108,14 @@ class PartyRepo < RepoBase
 
   def add_dependent_ids(hash)
     party_id = hash[:party_id]
-    hash[:contact_method_ids] = existing_contact_method_ids_for_party(party_id)
-    hash[:address_ids] = existing_address_ids_for_party(party_id)
-    hash[:role_ids] = existing_role_ids_for_party(party_id)
+    hash[:contact_method_ids] = party_contact_method_ids(party_id)
+    hash[:address_ids] = party_address_ids(party_id)
+    hash[:role_ids] = party_role_ids(party_id)
     hash
   end
 
   def update_person(id, attrs)
-    DB[:people].where(id: id).update(attrs.to_h)
+    update(:people, id, attrs)
   end
 
   def assign_person_roles(id, role_ids)
@@ -112,13 +134,14 @@ class PartyRepo < RepoBase
   def delete_person(id)
     DB.transaction do
       DB[:party_roles].where(person_id: id).delete
-      DB[:security_groups].where(id: id).delete
+      # TODO: This doesn't make sense ->
+      # DB[:security_groups].where(id: id).delete
       DB[:people].where(id: id).delete
     end
   end
 
   def create_contact_method(attrs)
-    DB[:contact_methods].insert(attrs.to_h)
+    create(:contact_methods, attrs)
   end
 
   def find_contact_method(id)
@@ -131,36 +154,36 @@ class PartyRepo < RepoBase
   end
 
   def update_contact_method(id, attrs)
-    DB[:contact_methods].where(id: id).update(attrs.to_h)
+    update(:contact_methods, id, attrs)
   end
 
   def delete_contact_method(id)
-    DB[:contact_methods].where(id: id).delete
+    delete(:contact_methods, id)
   end
 
   def create_address(attrs)
-    DB[:addresses].insert(attrs.to_h)
+    create(:addresses, attrs)
   end
 
   def find_address(id)
-    hash = DB[:addresses].where(id: id).first
+    hash = find_hash(:addresses, id)
     return nil if hash.nil?
     address_type_id = hash[:address_type_id]
-    address_type_hash = DB[:address_types].where(id: address_type_id).first
+    address_type_hash = find_hash(:address_types, address_type_id)
     hash[:address_type] = address_type_hash[:address_type]
     Address.new(hash)
   end
 
   def update_address(id, attrs)
-    DB[:addresses].where(id: id).update(attrs.to_h)
+    update(:addresses, id, attrs)
   end
 
   def delete_address(id)
-    DB[:addresses].where(id: id).delete
+    delete(:addresses, id)
   end
 
   def link_addresses(party_id, address_ids)
-    existing_ids      = existing_address_ids_for_party(party_id)
+    existing_ids      = party_address_ids(party_id)
     old_ids           = existing_ids - address_ids
     new_ids           = address_ids - existing_ids
 
@@ -173,7 +196,7 @@ class PartyRepo < RepoBase
   end
 
   def link_contact_methods(party_id, contact_method_ids)
-    existing_ids      = existing_contact_method_ids_for_party(party_id)
+    existing_ids      = party_contact_method_ids(party_id)
     old_ids           = existing_ids - contact_method_ids
     new_ids           = contact_method_ids - existing_ids
 
@@ -185,75 +208,15 @@ class PartyRepo < RepoBase
     end
   end
 
-  def existing_address_ids_for_party(party_id)
+  def party_address_ids(party_id)
     DB[:party_addresses].where(party_id: party_id).select_map(:address_id).sort
   end
 
-  def existing_contact_method_ids_for_party(party_id)
+  def party_contact_method_ids(party_id)
     DB[:party_contact_methods].where(party_id: party_id).select_map(:contact_method_id).sort
   end
 
-  def existing_role_ids_for_party(party_id)
+  def party_role_ids(party_id)
     DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
-  end
-
-  def roles_for_select
-    set_for_roles
-    for_select
-  end
-
-  def set_for_roles
-    @main_table_name = :roles
-    @wrapper = Role
-    @select_options = {
-      label: :name,
-      value: :id,
-      order_by: :name
-    }
-  end
-
-  def contact_method_types_for_select
-    set_for_contact_method_types
-    for_select
-  end
-
-  def set_for_contact_method_types
-    @main_table_name = :contact_method_types
-    @wrapper = ContactMethodType
-    @select_options = {
-      label: :contact_method_type,
-      value: :id,
-      order_by: :contact_method_type
-    }
-  end
-
-  def people_for_select
-    set_for_people
-    for_select
-  end
-
-  def set_for_people
-    @main_table_name = :people
-    @wrapper = Person
-    @select_options = {
-      label: :surname,
-      value: :id,
-      order_by: :surname
-    }
-  end
-
-  def organizations_for_select
-    set_for_organizations
-    for_select
-  end
-
-  def set_for_organizations
-    @main_table_name = :organizations
-    @wrapper = Organization
-    @select_options = {
-      label: :short_description,
-      value: :id,
-      order_by: :short_description
-    }
   end
 end

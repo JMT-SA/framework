@@ -29,12 +29,12 @@ module UiRules
       # p @repo.roles_for_select
       # p @form_object
       {
-        parent_id: { renderer: :select, options: @repo.organizations_for_select.reject{ |i| i.include?(@options[:id]) }, prompt: true },
+        parent_id: { renderer: :select, options: @repo.for_select_organizations.reject{ |i| i.include?(@options[:id]) }, prompt: true },
         short_description: {},
         medium_description: {},
         long_description: {},
         vat_number: {},
-        role_ids: { renderer: :multi, options: @repo.roles_for_select, selected: @form_object.role_ids }
+        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids }
         # variants: {},
         # active: { renderer: :checkbox }
       }

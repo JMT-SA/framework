@@ -40,7 +40,7 @@ class OrganizationInteractor < BaseInteractor
     party_id = organization.party_id
     party_repo.assign_organization_roles(id, role_ids)
 
-    existing_ids = party_repo.existing_role_ids_for_party(party_id)
+    existing_ids = party_repo.party_role_ids(party_id)
     if existing_ids.eql?(role_ids.sort)
       success_response('Roles assigned successfully')
     else

@@ -14,8 +14,8 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_group_id_label = CommodityRepo.new.find_commodity_group(@form_object.commodity_group_id)&.code
-      fields[:commodity_group_id] = { renderer: :label, with_value: commodity_group_id_label }
+      fields[:commodity_group_id] = { renderer: :label,
+                                      with_value: @repo.find_commodity_group(@form_object.commodity_group_id)&.code }
       fields[:code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:hs_code] = { renderer: :label }
@@ -24,7 +24,7 @@ module UiRules
 
     def common_fields
       {
-        commodity_group_id: { renderer: :select, options: CommodityRepo.new.commodity_groups_for_select },
+        commodity_group_id: { renderer: :select, options: @repo.commodity_groups_for_select },
         code: {},
         description: {},
         hs_code: {},

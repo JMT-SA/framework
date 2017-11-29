@@ -15,8 +15,8 @@ module UiRules
     end
 
     def set_show_fields
-      contact_method_type_id_label = ContactMethodTypeRepo.new.find(@form_object.contact_method_type_id)&.contact_method_type
-      fields[:contact_method_type_id] = { renderer: :label, with_value: contact_method_type_id_label }
+      fields[:contact_method_type_id] = { renderer: :label,
+                                          with_value: @repo.find_contact_method(@form_object.contact_method_type_id)&.contact_method_type }
       fields[:contact_method_type] = { renderer: :label }
       fields[:contact_method_code] = { renderer: :label }
       fields[:active] = { renderer: :label }
@@ -24,7 +24,7 @@ module UiRules
 
     def common_fields
       {
-        contact_method_type_id: { renderer: :select, options: @repo.contact_method_types_for_select },
+        contact_method_type_id: { renderer: :select, options: @repo.for_select_contact_method_types },
         contact_method_code: {},
         active: { renderer: :checkbox }
       }

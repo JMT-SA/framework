@@ -10,7 +10,7 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
         pfMenu += '</ul></li>';
       }
       if (group !== elem.group_name && elem.group_name !== null) {
-        pfMenu += `<li class="-hasSubmenu"><a href="#">${elem.group_name}</a><ul>`;
+        pfMenu += `<li class="-hasSubmenu -hasLevel3Submenu"><a href="#">${elem.group_name}</a><ul>`;
       }
       group = elem.group_name;
       pfMenu += `<li><a href="${elem.url}" data-menu-parent="${progId}" data-menu-level3="${elem.id}">${elem.name}</a></li>`;

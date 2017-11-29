@@ -1,4 +1,4 @@
-(function() {
+(function crossbeamsMenuHandler() {
   function qsl(selector, context) {
     return (context || document).querySelectorAll(selector);
   }
@@ -44,11 +44,6 @@
     );
   }
 
-  /** TODO:
-   * 1. open submenus on hover. (mouseenter : maybe use datalist instead of class to recognise)
-   * 2. Clean up code and move into crossbeamsMenu.
-   */
-
   document.addEventListener('DOMContentLoaded', () => {
     document.body.addEventListener('click', hideAllInactiveMenus);
     document.body.addEventListener('click', (event) => {
@@ -58,5 +53,20 @@
         event.preventDefault();
       }
     });
+
+    /**
+     * Show level 3 submenus on hover of the parent menu item.
+     */
+    forEach(
+      qsl('#programs-menu'),
+      (e) => {
+        e.addEventListener('mouseover', (event) => {
+          if (event.target.parentNode && event.target.parentNode.classList.contains('-hasLevel3Submenu')) {
+            hideAllInactiveMenus(event.target);
+            showMenu(event.target.parentNode);
+          }
+        });
+      },
+    );
   });
-})();
+}());

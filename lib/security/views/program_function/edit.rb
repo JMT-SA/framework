@@ -11,7 +11,9 @@ module Security
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/security/functional_areas/program_functions/#{id}/update"
+              form.action "/security/functional_areas/program_functions/#{id}"
+              form.remote!
+              form.method :update
               form.add_field :program_function_name
               form.add_field :group_name
               form.add_field :url

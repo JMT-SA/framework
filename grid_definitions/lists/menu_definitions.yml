@@ -49,20 +49,23 @@
       - :url: /security/functional_areas/program_functions/$:program_id$/new
         :text: new program function
         :icon: fa-plus-circle
+        :popup: true
         :hide_if_null: :program_id
       - :url: /security/functional_areas/program_functions/$:id$/edit
         :text: edit program function
         :icon: fa-edit
+        :popup: true
         :hide_if_null: :id
       - :url: /security/functional_areas/program_functions/$:id$
         :text: delete program function
         :icon: fa-remove
         :is_delete: true
         :hide_if_null: :id
-      - :url: /security/functional_areas/program_functions/$:id$/link_users
+      - :url: "/list/users/multi?key=progfunc_users&id=$:id$"
         :text: restrict program function to specific users
         :icon: fa-lock
         :hide_if_null: :id
+        :hide_if_false: :restricted_user_access
 :page_controls:
   - :control_type: :link
     :url: /security/functional_areas/functional_areas/new

@@ -29,4 +29,21 @@ class ProgramFunctionRepo < RepoBase
     SQL
     DB[query].map { |r| r[:group_name] }
   end
+
+  def link_users(program_function_id, user_ids)
+    existing_ids      = existing_ids_for_program_function(program_function_id)
+    old_ids           = existing_ids - user_ids
+    new_ids           = user_ids - existing_ids
+
+    DB.transaction do
+      DB[:program_functions_users].where(program_function_id: program_function_id).where(user_id: old_ids).delete
+      new_ids.each do |user_id|
+        DB[:program_functions_users].insert(program_function_id: program_function_id, user_id: user_id)
+      end
+    end
+  end
+
+  def existing_ids_for_program_function(program_function_id)
+    DB[:program_functions_users].where(program_function_id: program_function_id).select_map(:user_id)
+  end
 end

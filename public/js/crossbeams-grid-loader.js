@@ -361,6 +361,9 @@ const crossbeamsGridFormatters = {
     } else if (item.hide_if_true && params.data[item.hide_if_true] === true) {
       // No show of item
       return null;
+    } else if (item.hide_if_false && params.data[item.hide_if_false] === false) {
+      // No show of item
+      return null;
     } else if (item.is_submenu) {
       node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true };
       item.items.forEach((subitem) => {

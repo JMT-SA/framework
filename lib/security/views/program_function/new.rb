@@ -2,7 +2,7 @@ module Security
   module FunctionalAreas
     module ProgramFunction
       class New
-        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:program_function, :new, id: id)
           rules   = ui_rule.compile
 
@@ -12,6 +12,7 @@ module Security
             page.form_errors form_errors
             page.form do |form|
               form.action '/security/functional_areas/program_functions/create'
+              form.remote! if remote
               form.add_field :program_id
               form.add_field :program_function_name
               form.add_field :group_name

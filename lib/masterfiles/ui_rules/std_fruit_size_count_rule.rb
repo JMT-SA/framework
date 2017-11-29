@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class StdFruitSizeCount < Base
+  class StdFruitSizeCountRule < Base
     def generate_rules
       @this_repo = StdFruitSizeCountRepo.new
       make_form_object

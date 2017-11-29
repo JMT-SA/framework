@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class CultivarGroup < Base
+  class CultivarGroupRule < Base
     def generate_rules
       @repo = CultivarRepo.new
       make_form_object

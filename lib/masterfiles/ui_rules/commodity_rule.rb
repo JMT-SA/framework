@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class Commodity < Base
+  class CommodityRule < Base
     def generate_rules
       @repo = CommodityRepo.new
       make_form_object

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class FruitActualCountsForPack < Base
+  class FruitActualCountsForPackRule < Base
     def generate_rules
       @this_repo = FruitActualCountsForPackRepo.new
       make_form_object

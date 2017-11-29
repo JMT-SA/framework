@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class TargetMarketRule < Base
+  class TargetMarketRuleRule < Base
     def generate_rules
       @this_repo = TargetMarketRepo.new
       make_form_object

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class DestinationCity < Base
+  class DestinationCityRule < Base
     def generate_rules
       @repo = DestinationRepo.new
       make_form_object

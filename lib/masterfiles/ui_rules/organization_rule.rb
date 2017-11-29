@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class Organization < Base
+  class OrganizationRule < Base
     def generate_rules
       @repo = PartyRepo.new
       make_form_object

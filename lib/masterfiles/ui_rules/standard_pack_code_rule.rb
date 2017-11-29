@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class StandardPackCode < Base
+  class StandardPackCodeRule < Base
     def generate_rules
       @this_repo = StandardPackCodeRepo.new
       make_form_object

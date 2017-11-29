@@ -8,23 +8,18 @@ class Framework < Roda
     # ROLES
     # --------------------------------------------------------------------------
     r.on 'roles', Integer do |id|
-      repo = RoleRepo.new
-      role = repo.find(id)
+      interactor = RoleInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on role.nil? do
+      r.on !interactor.exists?(:roles, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('masterfiles', 'edit')
-            show_partial { Development::Masterfiles::Role::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('masterfiles', 'edit')
+          show_partial { Development::Masterfiles::Role::Edit.call(id) }
+        else
+          dialog_permission_error
         end
       end
       r.is do
@@ -36,77 +31,73 @@ class Framework < Roda
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = RoleSchema.call(params[:role])
-            errors = res.messages
-            if errors.empty?
-              repo = RoleRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { name: res[:name], active: res[:active] },
-                                  notice:  "Updated #{res[:name]}")
-            else
-              content = show_partial { Development::Masterfiles::Role::Edit.call(id, params[:role], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_role(id, params[:role])
+          if res.success
+            update_grid_row(id, changes: { name: res.instance[:name], active: res.instance[:active] },
+                            notice:  res.message)
+          else
+            content = show_partial { Development::Masterfiles::Role::Edit.call(id, params[:role], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = RoleRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_role(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'roles' do
+      interactor = RoleInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        # begin
         if authorised?('masterfiles', 'new')
-          show_partial { Development::Masterfiles::Role::New.call }
+          show_partial_or_page(fetch?(r)) { Development::Masterfiles::Role::New.call(remote: fetch?(r)) }
         else
-          dialog_permission_error
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
-        # rescue StandardError => e
-        #   dialog_error(e)
-        # end
       end
       r.post do        # CREATE
-        res = RoleSchema.call(params[:role])
-        errors = res.messages
-        if errors.empty?
-          repo = RoleRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_role(params[:role])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Development::Masterfiles::Role::New.call(form_values: params[:role],
+                                                     form_errors: res.errors,
+                                                     remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Development::Masterfiles::Role::New.call(params[:role], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Development::Masterfiles::Role::New.call(form_values: params[:role],
+                                                     form_errors: res.errors,
+                                                     remote: false)
+          end
         end
       end
     end
     # ADDRESS TYPES
     # --------------------------------------------------------------------------
     r.on 'address_types', Integer do |id|
-      repo = AddressTypeRepo.new
-      address_type = repo.find(id)
+      interactor = AddressTypeInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on address_type.nil? do
+      r.on !interactor.exists?(:address_types, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('masterfiles', 'edit')
-            show_partial { Development::Masterfiles::AddressType::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('masterfiles', 'edit')
+          show_partial { Development::Masterfiles::AddressType::Edit.call(id) }
+        else
+          dialog_permission_error
         end
       end
       r.is do
@@ -118,77 +109,73 @@ class Framework < Roda
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = AddressTypeSchema.call(params[:address_type])
-            errors = res.messages
-            if errors.empty?
-              repo = AddressTypeRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { address_type: res[:address_type], active: res[:active] },
-                                  notice:  "Updated #{res[:address_type]}")
-            else
-              content = show_partial { Development::Masterfiles::AddressType::Edit.call(id, params[:address_type], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_address_type(id, params[:address_type])
+          if res.success
+            update_grid_row(id, changes: { address_type: res.instance[:address_type], active: res.instance[:active] },
+                            notice:  res.message)
+          else
+            content = show_partial { Development::Masterfiles::AddressType::Edit.call(id, params[:address_type], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = AddressTypeRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_address_type(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'address_types' do
+      interactor = AddressTypeInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('masterfiles', 'new')
-            show_partial { Development::Masterfiles::AddressType::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('masterfiles', 'new')
+          show_partial_or_page(fetch?(r)) { Development::Masterfiles::AddressType::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
-        res = AddressTypeSchema.call(params[:address_type])
-        errors = res.messages
-        if errors.empty?
-          repo = AddressTypeRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_address_type(params[:address_type])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Development::Masterfiles::AddressType::New.call(form_values: params[:address_type],
+                                                            form_errors: res.errors,
+                                                            remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Development::Masterfiles::AddressType::New.call(params[:address_type], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Development::Masterfiles::AddressType::New.call(form_values: params[:address_type],
+                                                            form_errors: res.errors,
+                                                            remote: false)
+          end
         end
       end
     end
     # CONTACT METHOD TYPES
     # --------------------------------------------------------------------------
     r.on 'contact_method_types', Integer do |id|
-      repo = ContactMethodTypeRepo.new
-      contact_method_type = repo.find(id)
+      interactor = ContactMethodTypeInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
-      r.on contact_method_type.nil? do
+      r.on !interactor.exists?(:contact_method_types, id) do
         handle_not_found(r)
       end
 
       r.on 'edit' do   # EDIT
-        begin
-          if authorised?('masterfiles', 'edit')
-            show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id) }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('masterfiles', 'edit')
+          show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id) }
+        else
+          dialog_permission_error
         end
       end
       r.is do
@@ -200,58 +187,58 @@ class Framework < Roda
           end
         end
         r.patch do     # UPDATE
-          begin
-            response['Content-Type'] = 'application/json'
-            res = ContactMethodTypeSchema.call(params[:contact_method_type])
-            errors = res.messages
-            if errors.empty?
-              repo = ContactMethodTypeRepo.new
-              repo.update(id, res)
-              update_grid_row(id, changes: { contact_method_type: res[:contact_method_type] },
-                                  notice:  "Updated #{res[:contact_method_type]}")
-            else
-              content = show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], errors) }
-              update_dialog_content(content: content, error: 'Validation error')
-            end
-          rescue StandardError => e
-            handle_json_error(e)
+          response['Content-Type'] = 'application/json'
+          res = interactor.update_contact_method_type(id, params[:contact_method_type])
+          if res.success
+            update_grid_row(id, changes: { contact_method_type: res.instance[:contact_method_type] },
+                            notice:  res.message)
+          else
+            content = show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], res.errors) }
+            update_dialog_content(content: content, error: res.message)
           end
         end
         r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
-          repo = ContactMethodTypeRepo.new
-          repo.delete(id)
-          delete_grid_row(id, notice: 'Deleted')
+          res = interactor.delete_contact_method_type(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'contact_method_types' do
+      interactor = ContactMethodTypeInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
-        begin
-          if authorised?('masterfiles', 'new')
-            show_partial { Development::Masterfiles::ContactMethodType::New.call }
-          else
-            dialog_permission_error
-          end
-        rescue StandardError => e
-          dialog_error(e)
+        if authorised?('masterfiles', 'new')
+          show_partial_or_page(fetch?(r)) { Development::Masterfiles::ContactMethodType::New.call(remote: fetch?(r)) }
+        else
+          fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
       r.post do        # CREATE
-        res = ContactMethodTypeSchema.call(params[:contact_method_type])
-        errors = res.messages
-        if errors.empty?
-          repo = ContactMethodTypeRepo.new
-          repo.create(res)
-          flash[:notice] = 'Created'
-          redirect_via_json_to_last_grid
+        res = interactor.create_contact_method_type(params[:contact_method_type])
+        if res.success
+          flash[:notice] = res.message
+          if fetch?(r)
+            redirect_via_json_to_last_grid
+          else
+            redirect_to_last_grid(r)
+          end
+        elsif fetch?(r)
+          content = show_partial do
+            Development::Masterfiles::ContactMethodType::New.call(form_values: params[:contact_method_type],
+                                                                  form_errors: res.errors,
+                                                                  remote: true)
+          end
+          update_dialog_content(content: content, error: res.message)
         else
-          content = show_partial { Development::Masterfiles::ContactMethodType::New.call(params[:contact_method_type], errors) }
-          update_dialog_content(content: content, error: 'Validation error')
+          flash[:error] = res.message
+          show_page do
+            Development::Masterfiles::ContactMethodType::New.call(form_values: params[:contact_method_type],
+                                                                  form_errors: res.errors,
+                                                                  remote: false)
+          end
         end
       end
     end
-
     # USERS
     # --------------------------------------------------------------------------
     r.on 'users', Integer do |id|

@@ -44,7 +44,7 @@ class Framework < Roda
               repo = RoleRepo.new
               repo.update(id, res)
               update_grid_row(id, changes: { name: res[:name], active: res[:active] },
-                              notice:  "Updated #{res[:name]}")
+                                  notice:  "Updated #{res[:name]}")
             else
               content = show_partial { Development::Masterfiles::Role::Edit.call(id, params[:role], errors) }
               update_dialog_content(content: content, error: 'Validation error')
@@ -64,11 +64,11 @@ class Framework < Roda
     r.on 'roles' do
       r.on 'new' do    # NEW
         # begin
-          if authorised?('masterfiles', 'new')
-            show_partial { Development::Masterfiles::Role::New.call }
-          else
-            dialog_permission_error
-          end
+        if authorised?('masterfiles', 'new')
+          show_partial { Development::Masterfiles::Role::New.call }
+        else
+          dialog_permission_error
+        end
         # rescue StandardError => e
         #   dialog_error(e)
         # end
@@ -126,7 +126,7 @@ class Framework < Roda
               repo = AddressTypeRepo.new
               repo.update(id, res)
               update_grid_row(id, changes: { address_type: res[:address_type], active: res[:active] },
-                              notice:  "Updated #{res[:address_type]}")
+                                  notice:  "Updated #{res[:address_type]}")
             else
               content = show_partial { Development::Masterfiles::AddressType::Edit.call(id, params[:address_type], errors) }
               update_dialog_content(content: content, error: 'Validation error')
@@ -208,7 +208,7 @@ class Framework < Roda
               repo = ContactMethodTypeRepo.new
               repo.update(id, res)
               update_grid_row(id, changes: { contact_method_type: res[:contact_method_type] },
-                              notice:  "Updated #{res[:contact_method_type]}")
+                                  notice:  "Updated #{res[:contact_method_type]}")
             else
               content = show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], errors) }
               update_dialog_content(content: content, error: 'Validation error')
@@ -316,16 +316,16 @@ class Framework < Roda
         elsif fetch?(r)
           content = show_partial do
             Development::Masterfiles::User::New.call(form_values: params[:user],
-                                                                           form_errors: res.errors,
-                                                                           remote: true)
+                                                     form_errors: res.errors,
+                                                     remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
           show_page do
             Development::Masterfiles::User::New.call(form_values: params[:security_group],
-                                                                           form_errors: res.errors,
-                                                                           remote: false)
+                                                     form_errors: res.errors,
+                                                     remote: false)
           end
         end
       end

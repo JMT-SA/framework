@@ -4,10 +4,20 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
   const buildThirdLevelMenu = (progId) => {
     const pfItems = menuLevels.program_functions[progId];
     let pfMenu = '<ul>';
-    pfItems.forEach((elem) => { // TODO: handle groups...
-      // console.log('pid:', progId, 'elem:',elem.id);
+    let group = null;
+    pfItems.forEach((elem) => {
+      if (group !== null && group !== elem.group_name) {
+        pfMenu += '</ul></li>';
+      }
+      if (group !== elem.group_name && elem.group_name !== null) {
+        pfMenu += `<li class="-hasSubmenu"><a href="#">${elem.group_name}</a><ul>`;
+      }
+      group = elem.group_name;
       pfMenu += `<li><a href="${elem.url}" data-menu-parent="${progId}" data-menu-level3="${elem.id}">${elem.name}</a></li>`;
     });
+    if (group !== null) {
+      pfMenu += '</ul></li>';
+    }
     pfMenu += '</ul>';
 
     return pfMenu;
@@ -35,7 +45,7 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
         progMenu += `<li class="-hasSubmenu${pSel}"><a href="#" data-menu-level2="${elem.id}">${elem.name}</a>${pfMenu}</li>`;
       }
     });
-    progLevel.innerHTML = progMenu; // TODO: also build sublevels
+    progLevel.innerHTML = progMenu;
   };
 
   const buildSecondLevelMenu = (firstLevelMenu) => {
@@ -63,8 +73,6 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
       buildSecondLevelMenu(selected);
     }
   };
-
-  // observe level-1 to build level-2
 
   /**
    * Search 3rd level menu captions for matches on the term.

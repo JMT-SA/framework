@@ -15,7 +15,16 @@ class ProgramFunctionRepo < RepoBase
         AND f.active
         AND p.active
         AND pf.active
-    ORDER BY f.functional_area_name, p.program_sequence, p.program_name, pf.group_name, pf.program_function_sequence
+    ORDER BY f.functional_area_name, p.program_sequence, p.program_name,
+    CASE WHEN pf.group_name IS NULL THEN
+      pf.program_function_sequence
+    ELSE
+      (SELECT MIN(program_function_sequence)
+       FROM program_functions
+       WHERE program_id = pf.program_id
+         AND group_name = pf.group_name)
+    END,
+    pf.group_name, pf.program_function_sequence
     SQL
     DB[query].all
   end

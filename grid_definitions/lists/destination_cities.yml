@@ -22,3 +22,8 @@
   :text: New Destination City
   :style: :button
   :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: destination_cities.destination_country_id
+      :op: =
+      :val: $:destination_cities.destination_country_id$

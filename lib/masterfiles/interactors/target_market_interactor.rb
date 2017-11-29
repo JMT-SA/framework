@@ -80,7 +80,7 @@ class TargetMarketInteractor < BaseInteractor
   def link_countries(target_market_id, country_ids)
     target_market_repo.link_countries(target_market_id, country_ids)
 
-    existing_ids = target_market_repo.existing_country_ids_for_target_market(target_market_id)
+    existing_ids = target_market_repo.target_market_country_ids(target_market_id)
     if existing_ids.eql?(country_ids.sort)
       success_response('Countries linked successfully')
     else
@@ -91,7 +91,7 @@ class TargetMarketInteractor < BaseInteractor
   def link_tm_groups(target_market_id, tm_group_ids)
     target_market_repo.link_tm_groups(target_market_id, tm_group_ids)
 
-    existing_ids = target_market_repo.existing_tm_group_ids_for_target_market(target_market_id)
+    existing_ids = target_market_repo.target_market_tm_group_ids(target_market_id)
     if existing_ids.eql?(tm_group_ids.sort)
       success_response('Target market groups linked successfully')
     else
@@ -141,47 +141,3 @@ class TargetMarketInteractor < BaseInteractor
     TargetMarketSchema.call(params)
   end
 end
-#
-# # frozen_string_literal: true
-#
-# class TargetMarketInteractor < BaseInteractor
-#   def repo
-#     @repo ||= TargetMarketRepo.new
-#   end
-#
-#   def target_market(cached = true)
-#     if cached
-#       @target_market ||= repo.find(:target_markets, TargetMarket, @id)
-#     else
-#       @target_market = repo.find(:target_markets, TargetMarket, @id)
-#     end
-#   end
-#
-#   def validate_target_market_params(params)
-#     TargetMarketSchema.call(params)
-#   end
-#
-#   def create_target_market(params)
-#     res = validate_target_market_params(params)
-#     return validation_failed_response(res) unless res.messages.empty?
-#     @id = repo.create(:target_markets, res.to_h)
-#     success_response("Created target market #{target_market.target_market_name}",
-#                      target_market)
-#   end
-#
-#   def update_target_market(id, params)
-#     @id = id
-#     res = validate_target_market_params(params)
-#     return validation_failed_response(res) unless res.messages.empty?
-#     repo.update(:target_markets, id, res.to_h)
-#     success_response("Updated target market #{target_market.target_market_name}",
-#                      target_market(false))
-#   end
-#
-#   def delete_target_market(id)
-#     @id = id
-#     name = target_market.target_market_name
-#     repo.delete(:target_markets, id)
-#     success_response("Deleted target market #{name}")
-#   end
-# end

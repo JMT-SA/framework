@@ -21,7 +21,7 @@ module UiRules
 
     def common_fields
       {
-        destination_region_id: { renderer: :select, options: @repo.regions_for_select },
+        destination_region_id: { renderer: :select, options: @repo.for_select_destination_regions },
         country_name: {}
       }
     end
@@ -33,8 +33,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(destination_region_id: nil,
-                                    country_name: nil)
+      @form_object = OpenStruct.new(destination_region_id: nil, country_name: nil)
     end
   end
 end

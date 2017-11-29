@@ -22,7 +22,7 @@ module UiRules
 
     def common_fields
       {
-        destination_country_id: { renderer: :select, options: @repo.countries_for_select },
+        destination_country_id: { renderer: :select, options: @repo.for_select_destination_countries },
         city_name: {}
       }
     end

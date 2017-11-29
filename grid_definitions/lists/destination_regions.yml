@@ -16,11 +16,9 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
-- :url: "/masterfiles/fruit/destination_regions/$:id$/destination_countries"
+- :url: "/list/destination_countries/with_params?key=standard&destination_countries.destination_region_id=$:id$"
   :text: countries
   :icon: fa-list
-  :title: Countries
-  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/destination_regions/new"

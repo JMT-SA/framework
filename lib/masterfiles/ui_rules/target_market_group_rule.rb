@@ -22,7 +22,7 @@ module UiRules
 
     def common_fields
       {
-        target_market_group_type_id: { renderer: :select, options: @repo.tm_group_types_for_select },
+        target_market_group_type_id: { renderer: :select, options: @repo.for_select_target_market_group_types },
         target_market_group_name: {}
       }
     end

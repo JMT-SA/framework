@@ -16,9 +16,18 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
+- :url: "/list/destination_cities/with_params?key=standard&destination_cities.destination_country_id=$:id$"
+  :text: cities
+  :icon: fa-list
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/destination_countries/new"
   :text: New Destination Country
   :style: :button
   :behaviour: :popup
+  :hide_if_present: destination_countries.destination_region_id
+:conditions:
+  :standard:
+    - :col: destination_countries.destination_region_id
+      :op: =
+      :val: $:destination_countries.destination_region_id$

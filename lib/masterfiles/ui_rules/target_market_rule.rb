@@ -23,8 +23,8 @@ module UiRules
     def common_fields
       {
         target_market_name: {},
-        tm_group_ids: { renderer: :multi, options: @repo.tm_groups_for_select, selected: @form_object.tm_group_ids },
-        country_ids: { renderer: :multi, options: DestinationRepo.new.countries_for_select, selected: @form_object.country_ids }
+        tm_group_ids: { renderer: :multi, options: @repo.for_select_target_market_groups, selected: @form_object.tm_group_ids },
+        country_ids: { renderer: :multi, options: DestinationRepo.new.for_select_destination_countries, selected: @form_object.country_ids }
       }
     end
 

@@ -25,7 +25,7 @@ class RepoBase
     where_hash(table_name, id: id)
   end
 
-  def where(table_name, args)
+  def where(table_name, wrapper, args)
     hash = where_hash(table_name, args)
     return nil if hash.nil?
     wrapper.new(hash)

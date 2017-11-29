@@ -16,78 +16,65 @@ class TargetMarketRepo < RepoBase
                    value: :id,
                    order_by: :target_market_group_type_code
 
-  def tm_group_types_for_select
-    set_for_tm_group_types
-    for_select
-  end
-
-  def tm_groups_for_select
-    set_for_tm_groups
-    for_select
-  end
   # Wrappers:
   # TargetMarketGroup
   # TargetMarketGroupType
   # TargetMarket
 
   def create_tm_group_type(attrs)
-    DB[:target_market_group_types].insert(attrs.to_h)
+    create(:target_market_group_types, attrs)
   end
 
   def find_tm_group_type(id)
-    hash = DB[:target_market_group_types].where(id: id).first
-    return nil if hash.nil?
-    TargetMarketGroupType.new(hash)
+    find(:target_market_group_types, TargetMarketGroupType, id)
   end
 
   def update_tm_group_type(id, attrs)
-    DB[:target_market_group_types].where(id: id).update(attrs.to_h)
+    update(:target_market_group_types, id, attrs)
   end
 
   def delete_tm_group_type(id)
-    DB[:target_market_group_types].where(id: id).delete
+    delete(:target_market_group_types, id)
   end
 
   def create_tm_group(attrs)
-    DB[:target_market_groups].insert(attrs.to_h)
+    create(:target_market_groups, attrs)
   end
 
   def find_tm_group(id)
-    hash = DB[:target_market_groups].where(id: id).first
-    return nil if hash.nil?
-    TargetMarketGroup.new(hash)
+    find(:target_market_groups, TargetMarketGroup, id)
   end
 
   def update_tm_group(id, attrs)
-    DB[:target_market_groups].where(id: id).update(attrs.to_h)
+    update(:target_market_groups, id, attrs)
   end
 
   def delete_tm_group(id)
-    DB[:target_market_groups].where(id: id).delete
+    delete(:target_market_groups, id)
   end
 
   def create_target_market(attrs)
-    DB[:target_markets].insert(attrs.to_h)
+    create(:target_markets, attrs)
   end
 
   def find_target_market(id)
-    hash = DB[:target_markets].where(id: id).first
+    hash = find_hash(:target_markets, id)
     return nil if hash.nil?
-    hash[:country_ids] = existing_country_ids_for_target_market(id)
-    hash[:tm_group_ids] = existing_tm_group_ids_for_target_market(id)
+    hash[:country_ids] = target_market_country_ids(id)
+    hash[:tm_group_ids] = target_market_tm_group_ids(id)
     TargetMarket.new(hash)
   end
 
   def update_target_market(id, attrs)
-    DB[:target_markets].where(id: id).update(attrs.to_h)
+    update(:target_markets, id, attrs)
   end
 
   def delete_target_market(id)
-    DB[:target_markets].where(id: id).delete
+    delete(:target_markets, id)
   end
 
   def link_countries(target_market_id, country_ids)
-    existing_ids      = existing_country_ids_for_target_market(target_market_id)
+    existing_ids      = target_market_country_ids(target_market_id)
     old_ids           = existing_ids - country_ids
     new_ids           = country_ids - existing_ids
 
@@ -99,12 +86,12 @@ class TargetMarketRepo < RepoBase
     end
   end
 
-  def existing_country_ids_for_target_market(target_market_id)
+  def target_market_country_ids(target_market_id)
     DB[:target_markets_for_countries].where(target_market_id: target_market_id).select_map(:destination_country_id).sort
   end
 
   def link_tm_groups(target_market_id, tm_group_ids)
-    existing_ids      = existing_tm_group_ids_for_target_market(target_market_id)
+    existing_ids      = target_market_tm_group_ids(target_market_id)
     old_ids           = existing_ids - tm_group_ids
     new_ids           = tm_group_ids - existing_ids
 
@@ -116,7 +103,7 @@ class TargetMarketRepo < RepoBase
     end
   end
 
-  def existing_tm_group_ids_for_target_market(target_market_id)
+  def target_market_tm_group_ids(target_market_id)
     DB[:target_markets_for_groups].where(target_market_id: target_market_id).select_map(:target_market_group_id).sort
   end
 end

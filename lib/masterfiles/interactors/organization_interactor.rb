@@ -35,11 +35,14 @@ class OrganizationInteractor < BaseInteractor
     success_response("Deleted organization #{name}")
   end
 
-  def assign_organization_roles(id, params)
-    if params[:roles]
-      party_repo.assign_organization_roles(id, params[:roles].map(&:to_i))
-      party_ex = party_repo.find_organization_with_roles(id)
-      success_response("Updated roles on party #{party_ex.short_description}", party_ex)
+  def assign_organization_roles(id, role_ids)
+    organization = party_repo.find_organization(id)
+    party_id = organization.party_id
+    party_repo.assign_organization_roles(id, role_ids)
+
+    existing_ids = party_repo.existing_role_ids_for_party(party_id)
+    if existing_ids.eql?(role_ids.sort)
+      success_response('Roles assigned successfully')
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
     end

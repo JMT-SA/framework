@@ -31,10 +31,12 @@ class PersonInteractor < BaseInteractor
   end
 
   def assign_person_roles(id, role_ids)
-    # TODO: Check if IDs are correct???
-    party_repo.assign_person_roles(person_id, role_ids)
+    person = party_repo.find_person(id)
+    party_id = person.party_id
+    party_repo.assign_person_roles(id, role_ids)
 
-    if party_repo.existing_role_ids_for_party(person_id) == role_ids
+    existing_ids = party_repo.existing_role_ids_for_party(party_id)
+    if existing_ids.eql?(role_ids.sort)
       success_response('Roles assigned successfully')
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))

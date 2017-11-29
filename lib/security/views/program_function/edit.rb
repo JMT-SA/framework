@@ -1,6 +1,6 @@
 module Security
   module FunctionalAreas
-    module ProgramFunctions
+    module ProgramFunction
       class Edit
         def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:program_function, :edit, id: id)
@@ -11,7 +11,9 @@ module Security
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/security/functional_areas/program_functions/#{id}/update"
+              form.action "/security/functional_areas/program_functions/#{id}"
+              form.remote!
+              form.method :update
               form.add_field :program_function_name
               form.add_field :group_name
               form.add_field :url

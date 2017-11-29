@@ -91,6 +91,10 @@ a|Currently the system uses FontAwesome icons - e.g.:
 |Name of a field in the grid.
 |The item will not appear if the named field's value is `true`.
 
+|:hide_if_false
+|Name of a field in the grid.
+|The item will not appear if the named field's value is `false`.
+
 |:is_delete
 |`true` or `false`
 |If `true`, a prompt dialog will force the user to choose OK to continue or Cancel. The link will be POSTed to the server with `_method` = `'DELETE'` if the user chooses OK.

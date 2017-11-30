@@ -344,6 +344,13 @@ tr.roweven {
 }
 /* END  : Table row alternate background and hover background */
 
+/* Overides for SelectR control */
+.selectr-container {
+  padding: 0;
+}
+.selectr-input {
+  width: calc(100% - 4em);
+}
 /* A11Y DIALOG /
 
 /* -------------------------------------------------------------------------- *\

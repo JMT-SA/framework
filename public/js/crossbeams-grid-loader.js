@@ -263,6 +263,10 @@ const crossbeamsGridEvents = {
     let cnt = 0;
     if (rowNode === undefined) {
       rowNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
+      if (rowNode.group) {
+        crossbeamsUtils.alert({ prompt: 'Select a detail row first', type: 'info' });
+        return null;
+      }
     }
     const useKeys = gridOptions.columnApi.getAllDisplayedColumns().filter(c => c.colDef.headerName !== '' && c.colDef.headerName !== 'Group').map(c => c.colDef.field);
 
@@ -270,7 +274,6 @@ const crossbeamsGridEvents = {
     //       - sort keys. (and un-sort)
     //       - next/prev navigation of table
     //       - button in UI
-    //       - skip grouped rows in going for first selected
     //       - skip if data does not have a columndef (e.g. dataminer reports grid)
     const content = `<div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
       <table class="thinbordertable" style="margin:0 0.5em">
@@ -297,6 +300,7 @@ const crossbeamsGridEvents = {
       </table>
       </div>`;
     crossbeamsUtils.showHtmlInDialog('Selected Row', content);
+    return null;
   },
 
   /**

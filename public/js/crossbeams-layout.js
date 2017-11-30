@@ -82,9 +82,9 @@
    * so the user can re-submit the form once the error has been
    * corrected.
    */
-  document.addEventListener('invalid', function(e){
+  document.addEventListener('invalid', (e) => {
     window.setTimeout(() => {
-      e.target.form.querySelectorAll('[disabled]').forEach( (el) => revertDisabledButton(el) );
+      e.target.form.querySelectorAll('[disabled]').forEach(el => revertDisabledButton(el));
     }, 0); // Disable the button with a delay so the form still submits...
   }, true);
 
@@ -92,9 +92,9 @@
    * Assign a click handler to buttons that need to be disabled.
    */
   document.addEventListener('DOMContentLoaded', () => {
-    const logout_link = document.querySelector('#logout');
-    if (logout_link) {
-      logout_link.addEventListener('click', (event) => {
+    const logoutLink = document.querySelector('#logout');
+    if (logoutLink) {
+      logoutLink.addEventListener('click', () => {
         crossbeamsLocalStorage.removeItem('selectedFuncMenu');
       });
     }
@@ -128,80 +128,81 @@
         this.name = 'HttpError';
         this.response = response;
       }
-    };
+    }
 
     /**
      * Turn a form into a remote (AJAX) form on submit.
      */
-    document.body.addEventListener('submit', function(event) {
+    document.body.addEventListener('submit', (event) => {
       if (event.target.dataset && event.target.dataset.remote === 'true') {
         fetch(event.target.action, {
           method: 'POST', // GET?
           credentials: 'same-origin',
           headers: new Headers({
-            'X-Custom-Request-Type': 'Fetch'
+            'X-Custom-Request-Type': 'Fetch',
           }),
           body: new FormData(event.target),
         })
-        .then(response => {
-          if (response.status == 200) {
+        .then((response) => {
+          if (response.status === 200) {
             return response.json();
-          } else {
-            throw new HttpError(response);
           }
+          throw new HttpError(response);
         })
-        .then(function(data) {
-          let closeDialog = true;
-          if (data.redirect) {
-            window.location = data.redirect;
-          } else if (data.updateGridInPlace) {
-            const gridId = crossbeamsLocalStorage.getItem('popupOnGrid');
-            // TODO: move to own function..
-            const gridOptions = crossbeamsGridStore.getGrid(gridId);
-            let rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
-            for (const k in data.updateGridInPlace.changes) {
-                rowNode.setDataValue(k, data.updateGridInPlace.changes[k]);
-            };
-          } else if (data.replaceDialog) {
-            closeDialog = false;
-            document.getElementById('dialog-content').innerHTML = data.replaceDialog.content;
-          } else {
-            console.log('Not sure what to do with this:', data);
-          }
-          // Only if not redirect...
-          if (data.flash) {
-            if (data.flash.notice) {
-              Jackbox.success(data.flash.notice);
+          .then((data) => {
+            let closeDialog = true;
+            if (data.redirect) {
+              window.location = data.redirect;
+            } else if (data.updateGridInPlace) {
+              const gridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+              // TODO: move to own function..
+              const gridOptions = crossbeamsGridStore.getGrid(gridId);
+              const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
+              Object.keys(data.updateGridInPlace.changes).forEach((key) => {
+                rowNode.setDataValue(key, data.updateGridInPlace.changes[key]);
+              });
+            } else if (data.replaceDialog) {
+              closeDialog = false;
+              document.getElementById('dialog-content').innerHTML = data.replaceDialog.content;
+              crossbeamsUtils.makeMultiSelects();
+              crossbeamsUtils.makeSearchableSelects();
+            } else {
+              console.log('Not sure what to do with this:', data);
             }
-            if (data.flash.error) {
-              if (data.exception) {
-                Jackbox.error(data.flash.error, { time: 20 });
-              } else {
-                Jackbox.error(data.flash.error);
+            // Only if not redirect...
+            if (data.flash) {
+              if (data.flash.notice) {
+                Jackbox.success(data.flash.notice);
+              }
+              if (data.flash.error) {
+                if (data.exception) {
+                  Jackbox.error(data.flash.error, { time: 20 });
+                } else {
+                  Jackbox.error(data.flash.error);
+                }
               }
             }
-          }
-          if (closeDialog && !data.exception) {
-            crossbeamsUtils.closePopupDialog();
-          }
-        }).catch(function(data) {
-          if (data.response.status === 500) {
-            data.response.text().then(body => {
-              document.getElementById('dialog-content').innerHTML = body
-            });
-          }
-          Jackbox.error(`An error occurred ${data}`, { time: 20 });
-        });
-      event.stopPropagation();
-      event.preventDefault();
+            if (closeDialog && !data.exception) {
+              crossbeamsUtils.closePopupDialog();
+            }
+          }).catch((data) => {
+            if (data.response.status === 500) {
+              data.response.text().then((body) => {
+                document.getElementById('dialog-content').innerHTML = body;
+              });
+            }
+            Jackbox.error(`An error occurred ${data}`, { time: 20 });
+          });
+        event.stopPropagation();
+        event.preventDefault();
       }
     });
   });
 }());
 
-function testEvt(gridId) {
-  console.log('got grid', gridId, self);
-};
+// function testEvt(gridId) {
+//   console.log('got grid', gridId, self);
+// }
 // CODE FROM HERE...
 // This is an alternative way of loading sections...
 // (js can be in head of page)

@@ -20,6 +20,8 @@ module.exports = {
     "_": false,
     "swal": false,
     "agGrid": false,
+    "Jackbox": false,
+    "crossbeamsGridStore": false,
     "crossbeamsUtils": false,
     "crossbeamsLocalStorage": false
   }

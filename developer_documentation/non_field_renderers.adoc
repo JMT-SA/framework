@@ -123,7 +123,7 @@ e.g.
 [source,ruby]
 ----
 form.add_contact_method(contact_method)
-form.add_address(contact_method_array, icon_lookup: { 'telephone' => 'tel', 'e-mail' => 'email' })
+form.add_contact_method(contact_method_array, icon_lookup: { 'telephone' => 'tel', 'e-mail' => 'email' })
 ----
 
 |===

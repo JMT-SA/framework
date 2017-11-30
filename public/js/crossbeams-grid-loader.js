@@ -1053,66 +1053,65 @@ $(() => {
               } else {
                 window.location = item.url;
               }
+            // TODO: This section needs a rethink. It works, but:
+            // - not intuitive to use .popup here
+            // - this is probably ONLY for deletes. Any other?
+            //   [It can only be a url with id - there is no form data to post...
+            // - should ALL deletes from grids be done through fetches? Probably.
+            } else if (item.popup) {
+              crossbeamsLocalStorage.setItem('popupOnGrid', item.domGridId);
+              form = new FormData();
+              form.append('_method', item.method);
+              form.append('_csrf', document.querySelector('meta[name="_csrf"]').content);
+              fetch(item.url, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: new Headers({
+                  'X-Custom-Request-Type': 'Fetch',
+                }),
+                body: form,
+              }).then(response => response.json())
+                .then((data) => {
+                  if (data.redirect) {
+                    window.location = data.redirect;
+                  } else if (data.removeGridRowInPlace) {
+                    const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+                    // TODO: move to own function..
+                    const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+                    const rowNode = gridOptions.api.getRowNode(data.removeGridRowInPlace.id);
+                    gridOptions.api.updateRowData({ remove: [rowNode] });
+                  } else if (data.updateGridInPlace) {
+                    const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+                    // TODO: move to own function..
+                    const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+                    const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
+                    Object.keys(data.updateGridInPlace.changes).forEach((k) => {
+                      rowNode.setDataValue(k, data.updateGridInPlace.changes[k]);
+                    });
+                  } else {
+                    console.log('Not sure what to do with this:', data);
+                  }
+                  // Only if not redirect...
+                  if (data.flash) {
+                    if (data.flash.notice) {
+                      Jackbox.success(data.flash.notice);
+                    }
+                    if (data.flash.error) {
+                      if (data.exception) {
+                        Jackbox.error(data.flash.error, { time: 20 });
+                      } else {
+                        Jackbox.error(data.flash.error);
+                      }
+                    }
+                  }
+                }).catch((data) => {
+                  Jackbox.error(`An error occurred ${data}`, { time: 20 });
+                });
             } else {
-              // TODO: This section needs a rethink. It works, but:
-              // - not intuitive to use .popup here
-              // - this is probably ONLY for deletes. Any other? [It can only be a url with id - there is no form data to post...
-              // - should ALL deletes from grids be done through fetches? Probably.
-              if (item.popup) {
-                crossbeamsLocalStorage.setItem('popupOnGrid', item.domGridId);
-                form = new FormData();
-                form.append('_method', item.method);
-                form.append('_csrf', document.querySelector('meta[name="_csrf"]').content);
-                fetch(item.url, {
-                  method: 'POST',
-                  credentials: 'same-origin',
-                  headers: new Headers({
-                    'X-Custom-Request-Type': 'Fetch',
-                  }),
-                  body: form,
-                }).then(response => response.json())
-                  .then((data) => {
-                    if (data.redirect) {
-                      window.location = data.redirect;
-                    } else if (data.removeGridRowInPlace) {
-                      const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
-                      // TODO: move to own function..
-                      const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
-                      const rowNode = gridOptions.api.getRowNode(data.removeGridRowInPlace.id);
-                      gridOptions.api.updateRowData({ remove: [rowNode] });
-                    } else if (data.updateGridInPlace) {
-                      const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
-                      // TODO: move to own function..
-                      const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
-                      const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
-                      for (const k in data.updateGridInPlace.changes) {
-                        rowNode.setDataValue(k, data.updateGridInPlace.changes[k]);
-                      }
-                    } else {
-                      console.log('Not sure what to do with this:', data);
-                    }
-                    // Only if not redirect...
-                    if (data.flash) {
-                      if (data.flash.notice) {
-                        Jackbox.success(data.flash.notice);
-                      }
-                      if (data.flash.error) {
-                        if (data.exception) {
-                          Jackbox.error(data.flash.error, { time: 20 });
-                        } else {
-                          Jackbox.error(data.flash.error);
-                        }
-                      }
-                    }
-                  }).catch((data) => {
-                      Jackbox.error(`An error occurred ${data}`, { time: 20 });
-                  });
-              } else {
-                document.body.innerHTML += `<form id="dynForm" action="${item.url}" method="post">
-                  <input name="_method" type="hidden" value="${item.method}" />
-                  <input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" /></form>`;
-                document.getElementById('dynForm').submit(); // TODO: csrf...
-              }
+              document.body.innerHTML += `<form id="dynForm" action="${item.url}" method="post">
+                <input name="_method" type="hidden" value="${item.method}" />
+                <input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" /></form>`;
+              document.getElementById('dynForm').submit(); // TODO: csrf...
             }
           };
           if (item.prompt !== undefined) {

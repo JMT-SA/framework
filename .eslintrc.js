@@ -21,6 +21,10 @@ module.exports = {
     "swal": false,
     "agGrid": false,
     "Jackbox": false,
+    "Selectr": false,
+    "Sortable": false,
+    "multi": false,
+    "crossbeamsDialog": false,
     "crossbeamsGridStore": false,
     "crossbeamsUtils": false,
     "crossbeamsLocalStorage": false

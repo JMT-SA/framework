@@ -44,3 +44,6 @@ public/fonts
 ## Vim
 tags
 .srclist
+
+## TEMP - until crossbeams gems are published
+Gemfile.lock

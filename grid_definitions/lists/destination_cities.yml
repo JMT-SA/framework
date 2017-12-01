@@ -1,24 +1,24 @@
 ---
 :dataminer_definition: destination_cities
 :actions:
-- :url: "/masterfiles/fruit/destination_cities/$:id$"
+- :url: "/masterfiles/target_markets/destination_cities/$:id$"
   :text: view
   :icon: fa-eye
   :title: View
   :popup: true
-- :url: "/masterfiles/fruit/destination_cities/$:id$/edit"
+- :url: "/masterfiles/target_markets/destination_cities/$:id$/edit"
   :text: edit
   :icon: fa-edit
   :title: Edit
   :popup: true
-- :url: "/masterfiles/fruit/destination_cities/$:id$"
+- :url: "/masterfiles/target_markets/destination_cities/$:id$"
   :text: delete
   :icon: fa-remove
   :is_delete: true
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/fruit/destination_cities/new"
+  :url: "/masterfiles/target_markets/destination_cities/new"
   :text: New Destination City
   :style: :button
   :behaviour: :popup

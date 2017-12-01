@@ -1,24 +1,24 @@
 ---
 :dataminer_definition: target_market_groups
 :actions:
-- :url: "/masterfiles/fruit/target_market_groups/$:id$"
+- :url: "/masterfiles/target_markets/target_market_groups/$:id$"
   :text: view
   :icon: fa-eye
   :title: View
   :popup: true
-- :url: "/masterfiles/fruit/target_market_groups/$:id$/edit"
+- :url: "/masterfiles/target_markets/target_market_groups/$:id$/edit"
   :text: edit
   :icon: fa-edit
   :title: Edit
   :popup: true
-- :url: "/masterfiles/fruit/target_market_groups/$:id$"
+- :url: "/masterfiles/target_markets/target_market_groups/$:id$"
   :text: delete
   :icon: fa-remove
   :is_delete: true
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/fruit/target_market_groups/new"
+  :url: "/masterfiles/target_markets/target_market_groups/new"
   :text: New Target Market Group
   :style: :button
   :behaviour: :popup

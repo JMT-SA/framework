@@ -1,17 +1,17 @@
 ---
 :dataminer_definition: destination_countries
 :actions:
-- :url: "/masterfiles/fruit/destination_countries/$:id$"
+- :url: "/masterfiles/target_markets/destination_countries/$:id$"
   :text: view
   :icon: fa-eye
   :title: View
   :popup: true
-- :url: "/masterfiles/fruit/destination_countries/$:id$/edit"
+- :url: "/masterfiles/target_markets/destination_countries/$:id$/edit"
   :text: edit
   :icon: fa-edit
   :title: Edit
   :popup: true
-- :url: "/masterfiles/fruit/destination_countries/$:id$"
+- :url: "/masterfiles/target_markets/destination_countries/$:id$"
   :text: delete
   :icon: fa-remove
   :is_delete: true
@@ -21,7 +21,7 @@
   :icon: fa-list
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/fruit/destination_countries/new"
+  :url: "/masterfiles/target_markets/destination_countries/new"
   :text: New Destination Country
   :style: :button
   :behaviour: :popup

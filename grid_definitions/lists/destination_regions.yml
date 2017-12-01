@@ -1,17 +1,17 @@
 ---
 :dataminer_definition: destination_regions
 :actions:
-- :url: "/masterfiles/fruit/destination_regions/$:id$"
+- :url: "/masterfiles/target_markets/destination_regions/$:id$"
   :text: view
   :icon: fa-eye
   :title: View
   :popup: true
-- :url: "/masterfiles/fruit/destination_regions/$:id$/edit"
+- :url: "/masterfiles/target_markets/destination_regions/$:id$/edit"
   :text: edit
   :icon: fa-edit
   :title: Edit
   :popup: true
-- :url: "/masterfiles/fruit/destination_regions/$:id$"
+- :url: "/masterfiles/target_markets/destination_regions/$:id$"
   :text: delete
   :icon: fa-remove
   :is_delete: true
@@ -21,7 +21,7 @@
   :icon: fa-list
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/fruit/destination_regions/new"
+  :url: "/masterfiles/target_markets/destination_regions/new"
   :text: New Destination Region
   :style: :button
   :behaviour: :popup

@@ -2,6 +2,6 @@
 :dataminer_definition: target_market_groups
 :multiselect:
   :target_markets:
-    :url: "/masterfiles/fruit/target_markets/$:id$/link_tm_groups"
+    :url: "/masterfiles/target_markets/target_markets/$:id$/link_tm_groups"
     :preselect: "SELECT target_market_group_id AS id FROM target_markets_for_groups WHERE target_market_id = $:id$"
     :section_caption: "SELECT target_market_name FROM target_markets WHERE id = $:id$"

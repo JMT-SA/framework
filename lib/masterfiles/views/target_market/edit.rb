@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/masterfiles/fruit/target_markets/#{id}"
+              form.action "/masterfiles/target_markets/target_markets/#{id}"
               form.remote!
               form.method :update
               form.add_field :target_market_name

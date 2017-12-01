@@ -16,11 +16,6 @@ class TargetMarketRepo < RepoBase
                    value: :id,
                    order_by: :target_market_group_type_code
 
-  # Wrappers:
-  # TargetMarketGroup
-  # TargetMarketGroupType
-  # TargetMarket
-
   def create_tm_group_type(attrs)
     create(:target_market_group_types, attrs)
   end

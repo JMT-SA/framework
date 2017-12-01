@@ -2,6 +2,6 @@
 :dataminer_definition: destination_countries
 :multiselect:
   :target_markets:
-    :url: "/masterfiles/fruit/target_markets/$:id$/link_countries"
+    :url: "/masterfiles/target_markets/target_markets/$:id$/link_countries"
     :preselect: "SELECT destination_country_id AS id FROM target_markets_for_countries WHERE target_market_id = $:id$"
     :section_caption: "SELECT target_market_name FROM target_markets WHERE id = $:id$"

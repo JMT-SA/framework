@@ -25,8 +25,8 @@ module UiRules
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: CommodityRepo.new.commodities_for_select},
-        cultivar_group_id: { renderer: :select, options: @repo.cultivar_groups_for_select },
+        commodity_id: { renderer: :select, options: CommodityRepo.new.for_select_commodities},
+        cultivar_group_id: { renderer: :select, options: @repo.for_select_cultivar_groups },
         cultivar_name: {},
         description: {}
       }

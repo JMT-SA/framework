@@ -405,13 +405,14 @@ class Framework < Roda
         interactor = PartyInteractor.new(current_user, {}, {}, {})
         res = interactor.link_addresses(id, multiselect_grid_choices(params))
 
-        type = res.instance.party_type == 'O' ? 'organizations' : 'people'
         if res.success
           flash[:notice] = res.message
+          r.redirect "/list/party_addresses/multi?key=parties&id=#{id}"
         else
           flash[:error] = res.message
+          type = res.instance.party_type == 'O' ? 'organizations' : 'people'
+          r.redirect "/list/#{type}"
         end
-        r.redirect "/list/#{type}"
       end
     end
     r.on 'link_contact_methods', Integer do |id|
@@ -419,14 +420,18 @@ class Framework < Roda
         interactor = PartyInteractor.new(current_user, {}, {}, {})
         res = interactor.link_contact_methods(id, multiselect_grid_choices(params))
 
-        type = res.instance.party_type == 'O' ? 'organizations' : 'people'
         if res.success
           flash[:notice] = res.message
+          r.redirect "/list/party_contact_methods/multi?key=parties&id=#{id}"
         else
           flash[:error] = res.message
+          type = res.instance.party_type == 'O' ? 'organizations' : 'people'
+          r.redirect "/list/#{type}"
         end
-        r.redirect "/list/#{type}"
       end
     end
   end
 end
+
+
+

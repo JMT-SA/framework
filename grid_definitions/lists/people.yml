@@ -16,10 +16,10 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
-- :url: "/list/party_contact_methods/multi?key=parties&id=$:id$"
+- :url: "/list/party_contact_methods/multi?key=parties&id=$:party_id$"
   :text: contact methods
   :icon: fa-list
-- :url: "/list/party_addresses/multi?key=parties&id=$:id$"
+- :url: "/list/party_addresses/multi?key=parties&id=$:party_id$"
   :text: addresses
   :icon: fa-list
 :page_controls:

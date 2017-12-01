@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 class StandardPackCodeInteractor < BaseInteractor
-  def standard_pack_code_repo
-    @standard_pack_code_repo ||= StandardPackCodeRepo.new
+  def fruit_size_repo
+    @fruit_size_repo ||= FruitSizeRepo.new
   end
 
   def standard_pack_code(cached = true)
     if cached
-      @standard_pack_code ||= standard_pack_code_repo.find(@id)
+      @standard_pack_code ||= fruit_size_repo.find_standard_pack_code(@id)
     else
-      @standard_pack_code = standard_pack_code_repo.find(@id)
+      @standard_pack_code = fruit_size_repo.find_standard_pack_code(@id)
     end
   end
 
@@ -20,7 +20,7 @@ class StandardPackCodeInteractor < BaseInteractor
   def create_standard_pack_code(params)
     res = validate_standard_pack_code_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = standard_pack_code_repo.create(res.to_h)
+    @id = fruit_size_repo.create_standard_pack_code(res.to_h)
     success_response("Created standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code)
   end
 
@@ -28,14 +28,14 @@ class StandardPackCodeInteractor < BaseInteractor
     @id = id
     res = validate_standard_pack_code_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    standard_pack_code_repo.update(id, res.to_h)
+    fruit_size_repo.update_standard_pack_code(id, res.to_h)
     success_response("Updated standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code(false))
   end
 
   def delete_standard_pack_code(id)
     @id = id
     name = standard_pack_code.standard_pack_code
-    standard_pack_code_repo.delete(id)
+    fruit_size_repo.delete_standard_pack_code(id)
     success_response("Deleted standard pack code #{name}")
   end
 end

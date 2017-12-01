@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 class FruitActualCountsForPackInteractor < BaseInteractor
-  def fruit_actual_counts_for_pack_repo
-    @fruit_actual_counts_for_pack_repo ||= FruitActualCountsForPackRepo.new
+  def fruit_size_repo
+    @fruit_size_repo ||= FruitSizeRepo.new
   end
 
   def fruit_actual_counts_for_pack(cached = true)
     if cached
-      @fruit_actual_counts_for_pack ||= fruit_actual_counts_for_pack_repo.find(@id)
+      @fruit_actual_counts_for_pack ||= fruit_size_repo.find_fruit_actual_counts_for_pack(@id)
     else
-      @fruit_actual_counts_for_pack = fruit_actual_counts_for_pack_repo.find(@id)
+      @fruit_actual_counts_for_pack = fruit_size_repo.find_fruit_actual_counts_for_pack(@id)
     end
   end
 
@@ -21,7 +21,7 @@ class FruitActualCountsForPackInteractor < BaseInteractor
     params[:std_fruit_size_count_id] = parent_id
     res = validate_fruit_actual_counts_for_pack_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @id = fruit_actual_counts_for_pack_repo.create(res.to_h)
+    @id = fruit_size_repo.create_fruit_actual_counts_for_pack(res.to_h)
     success_response("Created fruit actual counts for pack #{fruit_actual_counts_for_pack.size_count_variation}",
                      fruit_actual_counts_for_pack)
   end
@@ -30,7 +30,7 @@ class FruitActualCountsForPackInteractor < BaseInteractor
     @id = id
     res = validate_fruit_actual_counts_for_pack_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    fruit_actual_counts_for_pack_repo.update(id, res.to_h)
+    fruit_size_repo.update_fruit_actual_counts_for_pack(id, res.to_h)
     success_response("Updated fruit actual counts for pack #{fruit_actual_counts_for_pack.size_count_variation}",
                      fruit_actual_counts_for_pack(false))
   end
@@ -38,7 +38,7 @@ class FruitActualCountsForPackInteractor < BaseInteractor
   def delete_fruit_actual_counts_for_pack(id)
     @id = id
     name = fruit_actual_counts_for_pack.size_count_variation
-    fruit_actual_counts_for_pack_repo.delete(id)
+    fruit_size_repo.delete_fruit_actual_counts_for_pack(id)
     success_response("Deleted fruit actual counts for pack #{name}")
   end
 end

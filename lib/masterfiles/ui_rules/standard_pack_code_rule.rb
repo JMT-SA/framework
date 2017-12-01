@@ -3,7 +3,7 @@
 module UiRules
   class StandardPackCodeRule < Base
     def generate_rules
-      @this_repo = StandardPackCodeRepo.new
+      @this_repo = FruitSizeRepo.new
       make_form_object
       apply_form_values
 
@@ -27,7 +27,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @this_repo.find_standard_pack_code(@options[:id])
     end
 
     def make_new_form_object

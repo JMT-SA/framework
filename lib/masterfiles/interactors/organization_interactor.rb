@@ -2,25 +2,25 @@
 
 class OrganizationInteractor < BaseInteractor
   def create_organization(params)
-    role_ids = params.delete(:role_ids)
     res = validate_organization_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @organization_id = party_repo.create_organization(res.to_h)
-    roles_response = assign_organization_roles(@organization_id, role_ids)
-    if roles_response.success
-      success_response("Created organization #{organization.short_description}, #{roles_response.message}", organization)
+    response = party_repo.create_organization(res.to_h)
+    if response[:id]
+      @organization_id = response[:id]
+      success_response("Created organization #{organization.short_description}", organization)
     else
-      validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
+      validation_failed_response(OpenStruct.new(messages: response[:error]))
     end
   end
 
   def update_organization(id, params)
-    role_ids = params.delete(:role_ids)
     @organization_id = id
     res = validate_organization_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    party_repo.update_organization(id, res.to_h)
+    attrs = res.to_h
+    role_ids = attrs.delete(:role_ids)
     roles_response = assign_organization_roles(@organization_id, role_ids)
+    party_repo.update_organization(id, attrs)
     if roles_response.success
       success_response("Updated organization #{organization.short_description}, #{roles_response.message}", organization(false))
     else
@@ -31,13 +31,16 @@ class OrganizationInteractor < BaseInteractor
   def delete_organization(id)
     @organization_id = id
     name = organization.short_description
-    party_repo.delete_organization(id)
-    success_response("Deleted organization #{name}")
+    response = party_repo.delete_organization(id)
+    if response[:success]
+      success_response("Deleted organization #{name}")
+    else
+      validation_failed_response(OpenStruct.new(messages: response[:error]))
+    end
   end
 
   def assign_organization_roles(id, role_ids)
-    organization = party_repo.find_organization(id)
-    party_id = organization.party_id
+    party_id = party_repo.party_id_from_organization(id)
     party_repo.assign_organization_roles(id, role_ids)
 
     existing_ids = party_repo.party_role_ids(party_id)

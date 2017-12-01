@@ -63,7 +63,7 @@ class Framework < Roda
           res = interactor.update_organization(id, params[:organization])
           if res.success
             update_grid_row(id, changes: { short_description: res.instance[:short_description] },
-                            notice:  res.message)
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -72,7 +72,14 @@ class Framework < Roda
         r.delete do
           response['Content-Type'] = 'application/json'
           res = interactor.delete_organization(id)
-          delete_grid_row(id, notice: res.message)
+          p "TODO: inside DELETE"
+          p res
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            p 'do I get in here'
+            flash[:error] = res.errors
+          end
         end
       end
     end

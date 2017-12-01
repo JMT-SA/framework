@@ -26,8 +26,6 @@ module UiRules
     end
 
     def common_fields
-      # p @repo.roles_for_select
-      # p @form_object
       {
         parent_id: { renderer: :select, options: @repo.for_select_organizations.reject{ |i| i.include?(@options[:id]) }, prompt: true },
         short_description: {},

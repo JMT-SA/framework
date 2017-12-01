@@ -31,7 +31,7 @@ class PartyRepo < RepoBase
   def create_organization(attrs)
     params = attrs.to_h
     role_ids = params.delete(:role_ids)
-    return { error: 'Choose at least one role' } if role_ids.empty?
+    return { error: { roles: ['You did not choose a role'] } } if role_ids.empty?
     params[:medium_description] = params[:short_description] unless params[:medium_description]
     params[:long_description] = params[:short_description] unless params[:long_description]
     DB.transaction do
@@ -42,7 +42,7 @@ class PartyRepo < RepoBase
                                 role_id: r_id,
                                 organization_id: org_id)
       end
-      org_id
+      { id: org_id }
     end
   end
 
@@ -53,6 +53,7 @@ class PartyRepo < RepoBase
     hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
     parent_hash = DB[:organizations].where(id: hash[:parent_id]).first
     hash[:parent_organization] = parent_hash ? parent_hash[:short_description] : nil
+    p hash
     Organization.new(hash)
   end
 
@@ -74,12 +75,17 @@ class PartyRepo < RepoBase
   end
 
   def delete_organization(id)
+    children = DB[:organizations].where(parent_id: id)
+    return { error: 'This organization is set as a parent' } if children.any?
+    party_id = party_id_from_organization(id)
     DB.transaction do
       DB[:party_roles].where(organization_id: id).delete
       # TODO: This doesn't make sense ->
       # DB[:security_groups].where(id: id).delete
       DB[:organizations].where(id: id).delete
+      DB[:parties].where(id: party_id).delete
     end
+    { success: true }
   end
 
   def create_person(attrs)
@@ -94,7 +100,7 @@ class PartyRepo < RepoBase
                                 role_id: r_id,
                                 person_id: person_id)
       end
-      person_id
+      { id: person_id }
     end
   end
 
@@ -129,14 +135,17 @@ class PartyRepo < RepoBase
                                 person_id: id)
       end
     end
+    { success: true }
   end
 
   def delete_person(id)
+    party_id = party_id_from_person(id)
     DB.transaction do
       DB[:party_roles].where(person_id: id).delete
       # TODO: This doesn't make sense ->
       # DB[:security_groups].where(id: id).delete
       DB[:people].where(id: id).delete
+      DB[:parties].where(id: party_id).delete
     end
   end
 
@@ -206,6 +215,44 @@ class PartyRepo < RepoBase
         DB[:party_contact_methods].insert(party_id: party_id, contact_method_id: prog_id)
       end
     end
+  end
+
+  def addresses_for_party(party_id: nil, organization_id: nil, person_id: nil)
+    id = party_id unless party_id.nil?
+    id = party_id_from_organization(organization_id) unless organization_id.nil?
+    id = party_id_from_person(person_id) unless person_id.nil?
+
+    query = <<~SQL
+      SELECT addresses.*, address_types.address_type
+      FROM party_addresses
+      JOIN addresses ON addresses.id = party_addresses.address_id
+      JOIN address_types ON address_types.id = addresses.address_type_id
+      WHERE party_addresses.party_id = #{id}
+    SQL
+    DB[query].map { |r| Address.new(r) }
+  end
+
+  def contact_methods_for_party(party_id: nil, organization_id: nil, person_id: nil)
+    id = party_id unless party_id.nil?
+    id = party_id_from_organization(organization_id) unless organization_id.nil?
+    id = party_id_from_person(person_id) unless person_id.nil?
+
+    query = <<~SQL
+      SELECT contact_methods.*, contact_method_types.contact_method_type
+      FROM party_contact_methods
+      JOIN contact_methods ON contact_methods.id = party_contact_methods.contact_method_id
+      JOIN contact_method_types ON contact_method_types.id = contact_methods.contact_method_type_id
+      WHERE party_contact_methods.party_id = #{id}
+    SQL
+    DB[query].map { |r| ContactMethod.new(r) }
+  end
+
+  def party_id_from_organization(id)
+    DB[:organizations].where(id: id).select(:party_id).single_value
+  end
+
+  def party_id_from_person(id)
+    DB[:people].where(id: id).select(:party_id).single_value
   end
 
   def party_address_ids(party_id)

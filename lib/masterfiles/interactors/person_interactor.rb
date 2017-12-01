@@ -5,17 +5,23 @@ class PersonInteractor < BaseInteractor
   def create_person(params)
     res = validate_person_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    @person_id = party_repo.create_person(res.to_h)
-    success_response("Created person #{person_name}", person)
+    response = party_repo.create_person(res.to_h)
+    if response[:id]
+      @person_id = response[:id]
+      success_response("Created person #{person_name}", person)
+    else
+      validation_failed_response(OpenStruct.new(messages: response[:error]))
+    end
   end
 
   def update_person(id, params)
-    role_ids = params.delete(:role_ids)
     @person_id = id
     res = validate_person_params(params)
     return validation_failed_response(res) unless res.messages.empty?
+    attrs = res.to_h
+    role_ids = attrs.delete(:role_ids)
     roles_response = assign_person_roles(@person_id, role_ids)
-    party_repo.update_person(id, res.to_h)
+    party_repo.update_person(id, attrs)
     if roles_response.success
       success_response("Updated person #{person_name}, #{roles_response.message}", person(false))
     else
@@ -31,8 +37,7 @@ class PersonInteractor < BaseInteractor
   end
 
   def assign_person_roles(id, role_ids)
-    person = party_repo.find_person(id)
-    party_id = person.party_id
+    party_id = party_repo.party_id_from_person(id)
     party_repo.assign_person_roles(id, role_ids)
 
     existing_ids = party_repo.party_role_ids(party_id)

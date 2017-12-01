@@ -1,7 +1,6 @@
 require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
 
 class TestOrganizationInteractor < Minitest::Test
-
   def test_nothing
     x = OrganizationInteractor.new.create_organization_party
     p x
@@ -32,5 +31,4 @@ class TestOrganizationInteractor < Minitest::Test
 
   # it "creates a contact method"
   # it "returns all contact methods"
-
 end

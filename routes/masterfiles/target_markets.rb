@@ -34,8 +34,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_tm_group_type(id, params[:target_market_group_type])
           if res.success
-            update_grid_row(id, changes: { target_market_group_type_code: res.instance[:target_market_group_type_code] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { target_market_group_type_code: res.instance[:target_market_group_type_code] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::TargetMarketGroupType::Edit.call(id, params[:target_market_group_type], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -112,8 +113,10 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_tm_group(id, params[:target_market_group])
           if res.success
-            update_grid_row(id, changes: { target_market_group_type_id: res.instance[:target_market_group_type_id], target_market_group_name: res.instance[:target_market_group_name] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { target_market_group_type_id: res.instance[:target_market_group_type_id],
+                                       target_market_group_name: res.instance[:target_market_group_name] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::TargetMarketGroup::Edit.call(id, params[:target_market_group], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -214,7 +217,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_target_market(id, params[:target_market])
           if res.success
-            update_grid_row(id, changes: { target_market_name: res.instance[:target_market_name] }, notice: res.message)
+            update_grid_row(id,
+                            changes: { target_market_name: res.instance[:target_market_name] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::TargetMarket::Edit.call(id, params[:target_market], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -291,8 +296,10 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_city(id, params[:destination_city])
           if res.success
-            update_grid_row(id, changes: { destination_country_id: res.instance[:destination_country_id], city_name: res.instance[:city_name] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { destination_country_id: res.instance[:destination_country_id],
+                                       city_name: res.instance[:city_name] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::DestinationCity::Edit.call(id, params[:destination_city], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -369,8 +376,10 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_country(id, params[:destination_country])
           if res.success
-            update_grid_row(id, changes: { destination_region_id: res.instance[:destination_region_id], country_name: res.instance[:country_name] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { destination_region_id: res.instance[:destination_region_id],
+                                       country_name: res.instance[:country_name] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::DestinationCountry::Edit.call(id, params[:destination_country], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -429,7 +438,7 @@ class Framework < Roda
       end
 
       r.on 'destination_countries' do
-        show_partial { Masterfiles::Fruit::DestinationCountry::Edit.call(1) } #TODO: Show countries grid here (redirect, Not multiselect)
+        show_partial { Masterfiles::Fruit::DestinationCountry::Edit.call(1) } # TODO: Show countries grid here (redirect, Not multiselect)
       end
       r.on 'edit' do   # EDIT
         if authorised?('fruit', 'edit')
@@ -450,8 +459,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_region(id, params[:destination_region])
           if res.success
-            update_grid_row(id, changes: { destination_region_name: res.instance[:destination_region_name] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { destination_region_name: res.instance[:destination_region_name] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::DestinationRegion::Edit.call(id, params[:destination_region], res.errors) }
             update_dialog_content(content: content, error: res.message)

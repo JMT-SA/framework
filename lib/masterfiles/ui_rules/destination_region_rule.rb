@@ -28,7 +28,7 @@ module UiRules
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_region(@options[:id])
-      #TODO: move -> DestinationInteractor.find_region(id) ?
+      # TODO: move -> DestinationInteractor.find_region(id) ?
     end
 
     def make_new_form_object

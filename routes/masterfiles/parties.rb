@@ -25,8 +25,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.assign_addresses(id, params[:organization])
           if res.success
-            update_grid_row(id, changes: { addresses: res.instance.address_list },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { addresses: res.instance.address_list },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Organization::Addresses.call(id, params[:organization], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -40,8 +41,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.assign_contact_methods(id, params[:organization])
           if res.success
-            update_grid_row(id, changes: { contact_methods: res.instance.contact_method_list },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { contact_methods: res.instance.contact_method_list },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Organization::ContactMethods.call(id, params[:organization], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -62,7 +64,8 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_organization(id, params[:organization])
           if res.success
-            update_grid_row(id, changes: { short_description: res.instance[:short_description] },
+            update_grid_row(id,
+                            changes: { short_description: res.instance[:short_description] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
@@ -72,7 +75,7 @@ class Framework < Roda
         r.delete do
           response['Content-Type'] = 'application/json'
           res = interactor.delete_organization(id)
-          p "TODO: inside DELETE"
+          p 'TODO: inside DELETE'
           p res
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -104,16 +107,16 @@ class Framework < Roda
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
-                                                                form_errors: res.errors,
-                                                                remote: true)
+                                                         form_errors: res.errors,
+                                                         remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
           show_page do
             Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
-                                                                form_errors: res.errors,
-                                                                remote: false)
+                                                         form_errors: res.errors,
+                                                         remote: false)
           end
         end
       end
@@ -134,28 +137,13 @@ class Framework < Roda
           dialog_permission_error
         end
       end
-      # r.on 'roles' do
-      #   r.post do
-      #     response['Content-Type'] = 'application/json'
-      #     res = interactor.assign_person_roles(id, params[:person])
-      #     if res.success
-      #       update_grid_row(id,
-      #                       changes: { roles: res.instance.role_list },
-      #                       notice: res.message)
-      #     else
-      #       content = show_partial { Masterfiles::Parties::Person::Roles.call(id, params[:person], res.errors) }
-      #       update_dialog_content(content: content, error: res.message)
-      #     end
-      #   end
-      #
-      #   show_partial { Masterfiles::Parties::Person::Roles.call(id) }
-      # end
       r.on 'addresses' do
         r.post do
           response['Content-Type'] = 'application/json'
           res = interactor.assign_addresses(id, params[:person])
           if res.success
-            update_grid_row(id, changes: { addresses: res.instance.address_list },
+            update_grid_row(id,
+                            changes: { addresses: res.instance.address_list },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Person::Addresses.call(id, params[:person], res.errors) }
@@ -170,7 +158,8 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.assign_contact_methods(id, params[:person])
           if res.success
-            update_grid_row(id, changes: { contact_methods: res.instance.contact_method_list },
+            update_grid_row(id,
+                            changes: { contact_methods: res.instance.contact_method_list },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Person::ContactMethods.call(id, params[:person], res.errors) }
@@ -192,10 +181,11 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_person(id, params[:person])
           if res.success
-            update_grid_row(id, changes: { title: res.instance[:title],
-                                           first_name: res.instance[:first_name],
-                                           surname: res.instance[:surname],
-                                           vat_number: res.instance[:vat_number]},
+            update_grid_row(id,
+                            changes: { title: res.instance[:title],
+                                       first_name: res.instance[:first_name],
+                                       surname: res.instance[:surname],
+                                       vat_number: res.instance[:vat_number] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Person::Edit.call(id, params[:person], res.errors) }
@@ -230,16 +220,16 @@ class Framework < Roda
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Parties::Person::New.call(form_values: params[:person],
-                                                         form_errors: res.errors,
-                                                         remote: true)
+                                                   form_errors: res.errors,
+                                                   remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
           show_page do
             Masterfiles::Parties::Person::New.call(form_values: params[:person],
-                                                         form_errors: res.errors,
-                                                         remote: false)
+                                                   form_errors: res.errors,
+                                                   remote: false)
           end
         end
       end
@@ -272,8 +262,16 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_address(id, params[:address])
           if res.success
-            update_grid_row(id, changes: { address_type_id: res.instance[:address_type_id], address_line_1: res.instance[:address_line_1], address_line_2: res.instance[:address_line_2], address_line_3: res.instance[:address_line_3], city: res.instance[:city], postal_code: res.instance[:postal_code], country: res.instance[:country], active: res.instance[:active] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { address_type_id: res.instance[:address_type_id],
+                                       address_line_1: res.instance[:address_line_1],
+                                       address_line_2: res.instance[:address_line_2],
+                                       address_line_3: res.instance[:address_line_3],
+                                       city: res.instance[:city],
+                                       postal_code: res.instance[:postal_code],
+                                       country: res.instance[:country],
+                                       active: res.instance[:active] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Address::Edit.call(id, params[:address], res.errors) }
             update_dialog_content(content: content, error: res.message)

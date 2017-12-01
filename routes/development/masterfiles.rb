@@ -34,8 +34,10 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_role(id, params[:role])
           if res.success
-            update_grid_row(id, changes: { name: res.instance[:name], active: res.instance[:active] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { name: res.instance[:name],
+                                       active: res.instance[:active] },
+                            notice: res.message)
           else
             content = show_partial { Development::Masterfiles::Role::Edit.call(id, params[:role], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -112,8 +114,10 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_address_type(id, params[:address_type])
           if res.success
-            update_grid_row(id, changes: { address_type: res.instance[:address_type], active: res.instance[:active] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { address_type: res.instance[:address_type],
+                                       active: res.instance[:active] },
+                            notice: res.message)
           else
             content = show_partial { Development::Masterfiles::AddressType::Edit.call(id, params[:address_type], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -190,8 +194,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_contact_method_type(id, params[:contact_method_type])
           if res.success
-            update_grid_row(id, changes: { contact_method_type: res.instance[:contact_method_type] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { contact_method_type: res.instance[:contact_method_type] },
+                            notice: res.message)
           else
             content = show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -268,8 +273,13 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_user(id, params[:user])
           if res.success
-            update_grid_row(id, changes: { login_name: res.instance[:login_name], user_name: res.instance[:user_name], password_hash: res.instance[:password_hash], email: res.instance[:email], active: res.instance[:active] },
-                                notice:  res.message)
+            update_grid_row(id,
+                            changes: { login_name: res.instance[:login_name],
+                                       user_name: res.instance[:user_name],
+                                       password_hash: res.instance[:password_hash],
+                                       email: res.instance[:email],
+                                       active: res.instance[:active] },
+                            notice: res.message)
           else
             content = show_partial { Development::Masterfiles::User::Edit.call(id, params[:user], res.errors) }
             update_dialog_content(content: content, error: res.message)

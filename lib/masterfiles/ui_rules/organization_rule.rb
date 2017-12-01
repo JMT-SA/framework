@@ -27,7 +27,7 @@ module UiRules
 
     def common_fields
       {
-        parent_id: { renderer: :select, options: @repo.for_select_organizations.reject{ |i| i.include?(@options[:id]) }, prompt: true },
+        parent_id: { renderer: :select, options: @repo.for_select_organizations.reject { |i| i.include?(@options[:id]) }, prompt: true },
         short_description: {},
         medium_description: {},
         long_description: {},
@@ -49,9 +49,9 @@ module UiRules
                                     medium_description: nil,
                                     long_description: nil,
                                     vat_number: nil,
-                                    role_ids: [])
                                     # variants: nil,
-                                    # active: true)
+                                    # active: true,
+                                    role_ids: [])
     end
   end
 end

@@ -305,8 +305,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.assign_security_permissions(id, params[:security_group])
           if res.success
-            update_grid_row(id, changes: { permissions: res.instance.permission_list },
-                                notice:  res.message)
+            update_grid_row(id,
+                            changes: { permissions: res.instance.permission_list },
+                            notice: res.message)
           else
             content = show_partial { Security::FunctionalAreas::SecurityGroup::Permissions.call(id, params[:security_group], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -327,8 +328,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_security_group(id, params[:security_group])
           if res.success
-            update_grid_row(id, changes: { security_group_name: res.instance[:security_group_name] },
-                                notice:  res.message)
+            update_grid_row(id,
+                            changes: { security_group_name: res.instance[:security_group_name] },
+                            notice: res.message)
           else
             content = show_partial { Security::FunctionalAreas::SecurityGroup::Edit.call(id, params[:security_group], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -406,8 +408,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_security_permission(id, params[:security_permission])
           if res.success
-            update_grid_row(id, changes: { security_permission: res.instance[:security_permission] },
-                                notice:  res.message)
+            update_grid_row(id,
+                            changes: { security_permission: res.instance[:security_permission] },
+                            notice: res.message)
           else
             content = show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id, params[:security_permission], res.errors) }
             update_dialog_content(content: content, error: res.message)

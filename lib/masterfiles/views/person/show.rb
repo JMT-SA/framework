@@ -4,7 +4,7 @@ module Masterfiles
   module Parties
     module Person
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:person, :show, id: id)
           rules   = ui_rule.compile
           addresses = PartyRepo.new.addresses_for_party(person_id: id)

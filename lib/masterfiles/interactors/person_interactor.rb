@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PersonInteractor < BaseInteractor
-
   def create_person(params)
     res = validate_person_params(params)
     return validation_failed_response(res) unless res.messages.empty?
@@ -69,5 +68,4 @@ class PersonInteractor < BaseInteractor
   def validate_person_params(params)
     PersonSchema.call(params)
   end
-
 end

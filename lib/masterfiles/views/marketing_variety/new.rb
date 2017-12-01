@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module MarketingVariety
       class New
-        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:marketing_variety, :new, form_values: form_values)
           rules   = ui_rule.compile
 

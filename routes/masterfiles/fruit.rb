@@ -34,8 +34,11 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_commodity_group(id, params[:commodity_group])
           if res.success
-            update_grid_row(id, changes: { code: res.instance[:code], description: res.instance[:description], active: res.instance[:active] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { code: res.instance[:code],
+                                       description: res.instance[:description],
+                                       active: res.instance[:active] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id, params[:commodity_group], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -197,8 +200,8 @@ class Framework < Roda
           if res.success
             update_grid_row(id,
                             changes: { cultivar_group_code: res.instance[:cultivar_group_code],
-                                           description: res.instance[:description] },
-                            notice:  res.message)
+                                       description: res.instance[:description] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::CultivarGroup::Edit.call(id, params[:cultivar_group], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -328,8 +331,12 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_cultivar(id, params[:cultivar])
           if res.success
-            update_grid_row(id, changes: { commodity_id: res.instance[:commodity_id], cultivar_group_id: res.instance[:cultivar_group_id], cultivar_name: res.instance[:cultivar_name], description: res.instance[:description] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { commodity_id: res.instance[:commodity_id],
+                                       cultivar_group_id: res.instance[:cultivar_group_id],
+                                       cultivar_name: res.instance[:cultivar_name],
+                                       description: res.instance[:description] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::Cultivar::Edit.call(id, params[:cultivar], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -364,7 +371,7 @@ class Framework < Roda
           content = show_partial do
             Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
                                                    form_errors: res.errors,
-                                                       remote: true)
+                                                   remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
@@ -404,8 +411,10 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_marketing_variety(id, params[:marketing_variety])
           if res.success
-            update_grid_row(id, changes: { marketing_variety_code: res.instance[:marketing_variety_code], description: res.instance[:description] },
-            notice:  res.message)
+            update_grid_row(id,
+                            changes: { marketing_variety_code: res.instance[:marketing_variety_code],
+                                       description: res.instance[:description] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::MarketingVariety::Edit.call(id, params[:marketing_variety], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -442,8 +451,13 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_basic_pack_code(id, params[:basic_pack_code])
           if res.success
-            update_grid_row(id, changes: { basic_pack_code: res.instance[:basic_pack_code], description: res.instance[:description], length_mm: res.instance[:length_mm], width_mm: res.instance[:width_mm], height_mm: res.instance[:height_mm] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { basic_pack_code: res.instance[:basic_pack_code],
+                                       description: res.instance[:description],
+                                       length_mm: res.instance[:length_mm],
+                                       width_mm: res.instance[:width_mm],
+                                       height_mm: res.instance[:height_mm] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::BasicPackCode::Edit.call(id, params[:basic_pack_code], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -478,7 +492,7 @@ class Framework < Roda
           content = show_partial do
             Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
                                                         form_errors: res.errors,
-                                                            remote: true)
+                                                        remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
@@ -520,8 +534,9 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_standard_pack_code(id, params[:standard_pack_code])
           if res.success
-            update_grid_row(id, changes: { standard_pack_code: res.instance[:standard_pack_code] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { standard_pack_code: res.instance[:standard_pack_code] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::StandardPackCode::Edit.call(id, params[:standard_pack_code], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -556,7 +571,7 @@ class Framework < Roda
           content = show_partial do
             Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
                                                            form_errors: res.errors,
-                                                               remote: true)
+                                                           remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
@@ -635,8 +650,20 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_std_fruit_size_count(id, params[:std_fruit_size_count])
           if res.success
-            update_grid_row(id, changes: { commodity_id: res.instance[:commodity_id], size_count_description: res.instance[:size_count_description], marketing_size_range_mm: res.instance[:marketing_size_range_mm], marketing_weight_range: res.instance[:marketing_weight_range], size_count_interval_group: res.instance[:size_count_interval_group], size_count_value: res.instance[:size_count_value], minimum_size_mm: res.instance[:minimum_size_mm], maximum_size_mm: res.instance[:maximum_size_mm], average_size_mm: res.instance[:average_size_mm], minimum_weight_gm: res.instance[:minimum_weight_gm], maximum_weight_gm: res.instance[:maximum_weight_gm], average_weight_gm: res.instance[:average_weight_gm] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { commodity_id: res.instance[:commodity_id],
+                                       size_count_description: res.instance[:size_count_description],
+                                       marketing_size_range_mm: res.instance[:marketing_size_range_mm],
+                                       marketing_weight_range: res.instance[:marketing_weight_range],
+                                       size_count_interval_group: res.instance[:size_count_interval_group],
+                                       size_count_value: res.instance[:size_count_value],
+                                       minimum_size_mm: res.instance[:minimum_size_mm],
+                                       maximum_size_mm: res.instance[:maximum_size_mm],
+                                       average_size_mm: res.instance[:average_size_mm],
+                                       minimum_weight_gm: res.instance[:minimum_weight_gm],
+                                       maximum_weight_gm: res.instance[:maximum_weight_gm],
+                                       average_weight_gm: res.instance[:average_weight_gm] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id, params[:std_fruit_size_count], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -671,7 +698,7 @@ class Framework < Roda
           content = show_partial do
             Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
                                                             form_errors: res.errors,
-                                                                remote: true)
+                                                            remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
@@ -796,8 +823,10 @@ class Framework < Roda
           response['Content-Type'] = 'application/json'
           res = interactor.update_fruit_size_reference(id, params[:fruit_size_reference])
           if res.success
-            update_grid_row(id, changes: { fruit_actual_counts_for_pack_id: res.instance[:fruit_actual_counts_for_pack_id], size_reference: res.instance[:size_reference] },
-                            notice:  res.message)
+            update_grid_row(id,
+                            changes: { fruit_actual_counts_for_pack_id: res.instance[:fruit_actual_counts_for_pack_id],
+                                       size_reference: res.instance[:size_reference] },
+                            notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::FruitSizeReference::Edit.call(id, params[:fruit_size_reference], res.errors) }
             update_dialog_content(content: content, error: res.message)

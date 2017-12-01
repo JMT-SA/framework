@@ -74,5 +74,4 @@ class CommodityInteractor < BaseInteractor
   def validate_commodity_params(params)
     CommoditySchema.call(params)
   end
-
 end

@@ -5,7 +5,7 @@ module Development
         def self.call(form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:scaffolds, :new, form_values: form_values)
           rules   = ui_rule.compile
-          # Apply custom error to its applicable field: #TODO: is there a better way?
+          # Apply custom error to its applicable field: # TODO: is there a better way?
           # if form_errors && form_errors[:applet_is_other]
           #   form_errors[:other] = form_errors[:applet_is_other]
           # end

@@ -87,5 +87,4 @@ class CultivarRepo < RepoBase
   def cultivar_marketing_variety_ids(cultivar_id)
     DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).select_map(:marketing_variety_id).sort
   end
-
 end

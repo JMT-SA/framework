@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AddressInteractor < BaseInteractor
-
   def create_address(params)
     res = validate_address_params(params)
     return validation_failed_response(res) unless res.messages.empty?
@@ -41,5 +40,4 @@ class AddressInteractor < BaseInteractor
   def validate_address_params(params)
     AddressSchema.call(params)
   end
-
 end

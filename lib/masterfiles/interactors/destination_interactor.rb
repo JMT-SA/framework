@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class DestinationInteractor < BaseInteractor
-
   def create_region(params)
     res = validate_region_params(params)
     return validation_failed_response(res) unless res.messages.empty?
@@ -109,5 +108,4 @@ class DestinationInteractor < BaseInteractor
   def validate_city_params(params)
     DestinationCitySchema.call(params)
   end
-
 end

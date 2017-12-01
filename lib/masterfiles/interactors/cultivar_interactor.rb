@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class CultivarInteractor < BaseInteractor
-
   def create_cultivar_group(params)
     res = validate_cultivar_group_params(params)
     return validation_failed_response(res) unless res.messages.empty?
@@ -120,5 +119,4 @@ class CultivarInteractor < BaseInteractor
   def validate_marketing_variety_params(params)
     MarketingVarietySchema.call(params)
   end
-
 end

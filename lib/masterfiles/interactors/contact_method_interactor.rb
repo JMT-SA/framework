@@ -44,5 +44,4 @@ class ContactMethodInteractor < BaseInteractor
   def validate_contact_method_params(params)
     ContactMethodSchema.call(params)
   end
-
 end

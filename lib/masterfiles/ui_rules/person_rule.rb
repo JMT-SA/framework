@@ -20,7 +20,7 @@ module UiRules
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
       fields[:active] = { renderer: :label }
-      fields[:role_names] = { renderer: :label, caption: "Roles", with_value: @form_object.role_names.map(&:capitalize!).join(', ') }
+      fields[:role_names] = { renderer: :label, caption: 'Roles', with_value: @form_object.role_names.map(&:capitalize!).join(', ') }
     end
 
     def common_fields
@@ -48,6 +48,5 @@ module UiRules
                                     active: true,
                                     role_ids: [])
     end
-
   end
 end

@@ -15,6 +15,7 @@ module UiRules
     end
 
     def set_show_fields
+      fields[:party_name] = { renderer: :label, caption: 'Full Name' }
       fields[:surname] = { renderer: :label }
       fields[:first_name] = { renderer: :label }
       fields[:title] = { renderer: :label }

@@ -16,6 +16,7 @@ module UiRules
 
     def set_show_fields
       fields[:parent_organization] = { renderer: :label, caption: 'Parent' }
+      fields[:party_name] = { renderer: :label, caption: 'Organization Name' }
       fields[:short_description] = { renderer: :label }
       fields[:medium_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }

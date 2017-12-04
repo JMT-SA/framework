@@ -23,7 +23,7 @@ class PartyRepo < RepoBase
   end
 
   def find_party(id)
-    hash = DB['SELECT parties.* , fn_party_name(id) AS party_name FROM parties'].where(id: id).first
+    hash = DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties WHERE parties.id = #{id}"].first
     return nil if hash.nil?
     Party.new(hash)
   end
@@ -50,6 +50,7 @@ class PartyRepo < RepoBase
     hash = DB[:organizations].where(id: id).first
     return nil if hash.nil?
     hash = add_dependent_ids(hash)
+    hash = add_party_name(hash)
     hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
     parent_hash = DB[:organizations].where(id: hash[:parent_id]).first
     hash[:parent_organization] = parent_hash ? parent_hash[:short_description] : nil
@@ -108,8 +109,16 @@ class PartyRepo < RepoBase
     hash = find_hash(:people, id)
     return nil if hash.nil?
     hash = add_dependent_ids(hash)
+    hash = add_party_name(hash)
     hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
     Person.new(hash)
+  end
+
+  def add_party_name(hash)
+    party_id = hash[:party_id]
+    party_hash = DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties WHERE parties.id = #{party_id}"].first
+    hash[:party_name] = party_hash[:party_name]
+    hash
   end
 
   def add_dependent_ids(hash)

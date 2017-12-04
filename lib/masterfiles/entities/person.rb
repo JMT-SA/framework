@@ -3,6 +3,7 @@
 class Person < Dry::Struct
   attribute :id, Types::Int
   attribute :party_id, Types::Int
+  attribute :party_name, Types::String
   attribute :surname, Types::String
   attribute :first_name, Types::String
   attribute :title, Types::String

@@ -7,7 +7,7 @@ class OrganizationInteractor < BaseInteractor
     response = party_repo.create_organization(res.to_h)
     if response[:id]
       @organization_id = response[:id]
-      success_response("Created organization #{organization.short_description}", organization)
+      success_response("Created organization #{organization.party_name}", organization)
     else
       validation_failed_response(OpenStruct.new(messages: response[:error]))
     end
@@ -22,7 +22,7 @@ class OrganizationInteractor < BaseInteractor
     roles_response = assign_organization_roles(@organization_id, role_ids)
     party_repo.update_organization(id, attrs)
     if roles_response.success
-      success_response("Updated organization #{organization.short_description}, #{roles_response.message}", organization(false))
+      success_response("Updated organization #{organization.party_name}, #{roles_response.message}", organization(false))
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
     end
@@ -30,7 +30,7 @@ class OrganizationInteractor < BaseInteractor
 
   def delete_organization(id)
     @organization_id = id
-    name = organization.short_description
+    name = organization.party_name
     response = party_repo.delete_organization(id)
     if response[:success]
       success_response("Deleted organization #{name}")

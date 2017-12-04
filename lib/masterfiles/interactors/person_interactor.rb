@@ -7,7 +7,7 @@ class PersonInteractor < BaseInteractor
     response = party_repo.create_person(res.to_h)
     if response[:id]
       @person_id = response[:id]
-      success_response("Created person #{person_name}", person)
+      success_response("Created person #{person.party_name}", person)
     else
       validation_failed_response(OpenStruct.new(messages: response[:error]))
     end
@@ -22,7 +22,7 @@ class PersonInteractor < BaseInteractor
     roles_response = assign_person_roles(@person_id, role_ids)
     party_repo.update_person(id, attrs)
     if roles_response.success
-      success_response("Updated person #{person_name}, #{roles_response.message}", person(false))
+      success_response("Updated person #{person.party_name}, #{roles_response.message}", person(false))
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
     end
@@ -30,7 +30,7 @@ class PersonInteractor < BaseInteractor
 
   def delete_person(id)
     @person_id = id
-    name = person_name
+    name = person.party_name
     party_repo.delete_person(id)
     success_response("Deleted person #{name}")
   end
@@ -51,10 +51,6 @@ class PersonInteractor < BaseInteractor
 
   def party_repo
     @party_repo ||= PartyRepo.new
-  end
-
-  def person_name
-    [person.title, person.first_name, person.surname].join(' ')
   end
 
   def person(cached = true)

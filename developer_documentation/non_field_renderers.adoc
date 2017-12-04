@@ -138,5 +138,29 @@ form.add_contact_method(contact_method_array, icon_lookup: { 'telephone' => 'tel
 
 === Grid
 
+Render a data grid. Pass the grid id and the url followed by a hash of options.
+If there is more than one grid on a page, each must have a unique grid id.
+
+e.g.
+[source,ruby]
+----
+section.add_grid 'tickets', '/list/tickets', caption: 'Movie tickets', height: 8
+----
+
+|===
+|attribute |description |possible values |default
+
+|caption
+|The caption to be shown in the grid header
+|any text.
+|None (no caption will be shown in the header).
+
+|height
+|The height in css ems of the grid body (excludes the grid header).
+|An integer greater than or equal to 6.
+|20. If a value less than 6 is given, it will be fixed to 6.
+
+|===
+
 === Form
 

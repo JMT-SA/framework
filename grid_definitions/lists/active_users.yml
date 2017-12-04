@@ -7,6 +7,7 @@
     :text: delete
     :is_delete: true
 :conditions:
-  - :col: users.active
-    :op: =
-    :val: true
+  :standard:
+    - :col: users.active
+      :op: =
+      :val: true

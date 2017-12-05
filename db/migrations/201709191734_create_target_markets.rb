@@ -6,6 +6,7 @@ Sequel.migration do
       primary_key :id
       String :target_market_group_type_code, null: false
 
+      TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
     end
@@ -17,6 +18,7 @@ Sequel.migration do
       foreign_key :target_market_group_type_id, :target_market_group_types, null: false, key: [:id]
       String :target_market_group_name, null: false
 
+      TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
@@ -30,8 +32,11 @@ Sequel.migration do
       primary_key :id
       String :target_market_name, null: false
 
+      TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
+
+      unique [:target_market_name]
     end
     pgt_created_at(:target_markets, :created_at, function_name: :target_markets_set_created_at, trigger_name: :set_created_at)
     pgt_updated_at(:target_markets, :updated_at, function_name: :target_markets_set_updated_at, trigger_name: :set_updated_at)
@@ -50,6 +55,7 @@ Sequel.migration do
       primary_key :id
       String :destination_region_name, null: false
 
+      TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
     end
@@ -61,6 +67,7 @@ Sequel.migration do
       foreign_key :destination_region_id, :destination_regions, null: false, key: [:id]
       String :country_name, null: false
 
+      TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       index [:destination_region_id], name: :fki_destination_countries_destination_regions
@@ -73,6 +80,7 @@ Sequel.migration do
       foreign_key :destination_country_id, :destination_countries, null: false, key: [:id]
       String :city_name, null: false
 
+      TrueClass :active, default: true
       DateTime :updated_at, null: false
       DateTime :created_at, null: false
 
@@ -116,17 +124,17 @@ Sequel.migration do
 
     drop_table(:target_markets_for_groups)
 
-    drop_trigger(:target_markets, :set_created_at)
-    drop_function(:target_markets_set_created_at)
-    drop_trigger(:target_markets, :set_updated_at)
-    drop_function(:target_markets_set_updated_at)
-    drop_table(:target_markets)
-
     drop_trigger(:target_market_groups, :set_created_at)
     drop_function(:target_market_groups_set_created_at)
     drop_trigger(:target_market_groups, :set_updated_at)
     drop_function(:target_market_groups_set_updated_at)
     drop_table(:target_market_groups)
+
+    drop_trigger(:target_markets, :set_created_at)
+    drop_function(:target_markets_set_created_at)
+    drop_trigger(:target_markets, :set_updated_at)
+    drop_function(:target_markets_set_updated_at)
+    drop_table(:target_markets)
 
     drop_trigger(:target_market_group_types, :set_created_at)
     drop_function(:target_market_group_types_set_created_at)

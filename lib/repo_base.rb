@@ -77,6 +77,19 @@ class RepoBase
 end
 
 module MethodBuilder
+  # Define a +for_select_table_name+ method in a repo.
+  # The method returns an array of values for use in e.g. a select dropdown.
+  # Options:
+  # alias: String
+  # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
+  # label: String
+  # - The display column. Defaults to the value column.
+  # value: String
+  # - The value column. Required.
+  # order_by: String
+  # - The column to order by.
+  # desc: Boolean
+  # - Use descending order if this option is present and truthy.
   def build_for_select(table_name, options = {})
     define_method(:"for_select_#{options[:alias] || table_name}") do
       dataset = DB[table_name]
@@ -87,6 +100,25 @@ module MethodBuilder
     end
   end
 
+  # Define CRUD methods for a table in a repo.
+  # Call like this: +crud_calls_for+ :table_name.
+  # This creates find_name, create_name, update_name and delete_name methods for the repo.
+  # There are 2 optional params.
+  #
+  #     crud_calls_for :table_name, name: :table, wrapper: Table
+  #
+  # This produces the following methods:
+  #
+  #     find_table(id)
+  #     create_table(attrs)
+  #     update_table(id, attrs)
+  #     delete_table(id)
+  #
+  # Options:
+  # name: String
+  # - Change the name portion of the method. default: table_name.
+  # wrapper: Class
+  # - The wrapper class. If not provided, there will be no +find_+ method.
   def crud_calls_for(table_name, options = {})
     name    = options[:name] || table_name
     wrapper = options[:wrapper]

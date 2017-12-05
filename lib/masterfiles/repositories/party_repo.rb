@@ -23,7 +23,7 @@ class PartyRepo < RepoBase
   end
 
   def find_party(id)
-    hash = DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties WHERE parties.id = #{id}"].first
+    hash = DB['SELECT parties.* , fn_party_name(?) AS party_name FROM parties WHERE parties.id = ?', id, id].first
     return nil if hash.nil?
     Party.new(hash)
   end
@@ -54,7 +54,6 @@ class PartyRepo < RepoBase
     hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
     parent_hash = DB[:organizations].where(id: hash[:parent_id]).first
     hash[:parent_organization] = parent_hash ? parent_hash[:short_description] : nil
-    p hash
     Organization.new(hash)
   end
 
@@ -81,8 +80,6 @@ class PartyRepo < RepoBase
     party_id = party_id_from_organization(id)
     DB.transaction do
       DB[:party_roles].where(organization_id: id).delete
-      # TODO: This doesn't make sense ->
-      # DB[:security_groups].where(id: id).delete
       DB[:organizations].where(id: id).delete
       DB[:parties].where(id: party_id).delete
     end
@@ -116,8 +113,7 @@ class PartyRepo < RepoBase
 
   def add_party_name(hash)
     party_id = hash[:party_id]
-    party_hash = DB["SELECT parties.* , fn_party_name(id) AS party_name FROM parties WHERE parties.id = #{party_id}"].first
-    hash[:party_name] = party_hash[:party_name]
+    hash[:party_name] = DB['SELECT fn_party_name(?)', party_id].single_value
     hash
   end
 
@@ -151,8 +147,6 @@ class PartyRepo < RepoBase
     party_id = party_id_from_person(id)
     DB.transaction do
       DB[:party_roles].where(person_id: id).delete
-      # TODO: This doesn't make sense ->
-      # DB[:security_groups].where(id: id).delete
       DB[:people].where(id: id).delete
       DB[:parties].where(id: party_id).delete
     end

@@ -212,6 +212,8 @@ class GenerateNewScaffold < BaseService
                            label: :#{opts.label_field},
                            value: :id,
                            order_by: :#{opts.label_field}
+
+          crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
         end
       RUBY
     end

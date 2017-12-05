@@ -72,11 +72,11 @@ class RepoBase
   end
 
   def self.inherited(klass)
-    klass.extend(ForSelectBuilder)
+    klass.extend(MethodBuilder)
   end
 end
 
-module ForSelectBuilder
+module MethodBuilder
   def build_for_select(table_name, options = {})
     define_method(:"for_select_#{options[:alias] || table_name}") do
       dataset = DB[table_name]
@@ -84,6 +84,29 @@ module ForSelectBuilder
       lbl = options[:label] || options[:value]
       val = options[:value]
       lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)
+    end
+  end
+
+  def crud_calls_for(table_name, options = {})
+    name    = options[:name] || table_name
+    wrapper = options[:wrapper]
+
+    unless wrapper.nil?
+      define_method(:"find_#{name}") do |id|
+        find(table_name, wrapper, id)
+      end
+    end
+
+    define_method(:"create_#{name}") do |attrs|
+      create(table_name, attrs)
+    end
+
+    define_method(:"update_#{name}") do |id, attrs|
+      update(table_name, id, attrs)
+    end
+
+    define_method(:"delete_#{name}") do |id|
+      delete(table_name, id)
     end
   end
 end

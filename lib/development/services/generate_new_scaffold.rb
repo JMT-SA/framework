@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/AbcSize
-# rubocop:disable Metrics/CyclomaticComplexity
 
 class GenerateNewScaffold < BaseService
   include UtilityFunctions
@@ -72,6 +71,25 @@ class GenerateNewScaffold < BaseService
 
   class TableMeta
     attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup, :indexed_columns
+
+    DRY_TYPE_LOOKUP = {
+      integer: 'Types::Int',
+      string: 'Types::String',
+      boolean: 'Types::Bool',
+      float: 'Types::Float',
+      datetime: 'Types::DateTime'
+    }.freeze
+
+    VALIDATION_TYPE_LOOKUP = {
+      integer: ':int?',
+      string: ':str?',
+      boolean: ':bool?',
+      datetime: ':date_time?',
+      date: ':date?',
+      time: ':time?',
+      float: ':float?'
+    }.freeze
+
     def initialize(table)
       repo             = DevelopmentRepo.new
       @columns         = repo.table_columns(table)
@@ -100,45 +118,11 @@ class GenerateNewScaffold < BaseService
     end
 
     def column_dry_type(column)
-      case @col_lookup[column][:type]
-      when :integer
-        'Types::Int'
-      when :string
-        'Types::String'
-      when :boolean
-        'Types::Bool'
-      when :float
-        'Types::Float'
-      when :datetime
-        'Types::DateTime'
-      else
-        "Types::??? (#{@col_lookup[column][:type]})"
-      end
+      DRY_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
     end
 
     def column_dry_validation_type(column)
-      case @col_lookup[column][:type]
-      when :integer
-        ':int?'
-      when :string
-        ':str?'
-      when :boolean
-        ':bool?'
-      when :datetime
-        ':date_time?'
-      when :date
-        ':date?'
-      when :time
-        ':time?'
-      when :float
-        ':float?'
-        # float? equivalent to type?(Float)
-        # decimal? equivalent to type?(BigDecimal)
-        # array? equivalent to type?(Array)
-        # hash? equivalent to type?(Hash)
-      else
-        "Types::??? (#{@col_lookup[column][:type]})"
-      end
+      VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
     end
   end
 

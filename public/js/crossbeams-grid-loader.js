@@ -875,104 +875,117 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
   };
 
   const listenForGrid = function listenForGrid() {
-    let gridOptions = null;
-    let gridId = null;
-    let forPrint = false;
-    let multisel = false;
     const grids = document.querySelectorAll('[data-grid]');
+    let gridId = null;
+    let event = null;
     grids.forEach((grid) => {
       gridId = grid.getAttribute('id');
-      forPrint = grid.dataset.gridPrint;
-      multisel = grid.dataset.gridMulti;
-      // lookup of grid ids? populate here and clear when grid unloaded...
-      if (grid.dataset.nestedGrid) {
-        gridOptions = {
-          context: { domGridId: gridId },
-          columnDefs: null,
-          rowDefs: null,
-          enableColResize: true,
-          enableSorting: true,
-          enableFilter: true,
-          suppressScrollLag: true, // TODO: remove with version 13...
-          enableRangeSelection: true,
-          enableStatusBar: true,
-          suppressAggFuncInHeader: true,
-          isFullWidthCell: function isFullWidthCell(rowNode) {
-            return rowNode.level === 1;
-          },
-          onGridReady: function onGridReady(params) {
-            params.api.sizeColumnsToFit();
-          },
-          // see ag-Grid docs cellRenderer for details on how to build cellRenderers
-          fullWidthCellRenderer: Level2PanelCellRenderer,
-          getRowHeight: function getRowHeight(params) {
-            const rowIsDetailRow = params.node.level === 1;
-            // return 100 when detail row, otherwise return 25
-            return rowIsDetailRow ? 400 : 25;
-          },
-          getNodeChildDetails: function getNodeChildDetails(record) {
-            if (record.level2) {
-              return {
-                group: true,
-                // the key is used by the default group cellRenderer
-                key: record.functional_area_name, // ......................TODO: level1 expand_col...
-                // provide ag-Grid with the children of this group
-                children: [record.level2],
-                // for demo, expand the third row by default
-                // expanded: record.account === 177005
-              };
-            }
-            return null;
-          },
-        };
-      } else {
-        gridOptions = {
-          context: { domGridId: gridId },
-          // columnDefs: null,
-          rowDefs: null,
-          enableColResize: true,
-          enableSorting: true,
-          enableFilter: true,
-          suppressScrollLag: true,
-          rowSelection: 'single',
-          enableRangeSelection: true,
-          enableStatusBar: true,
-          suppressAggFuncInHeader: true,
-          onFilterChanged() {
-            let filterLength = 0;
-            let rows = 0;
-            this.api.forEachLeafNode(() => { rows += 1; });
-            this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
-            crossbeamsGridEvents.displayRowCounts(gridId, filterLength, rows);
-          },
-          // suppressCopyRowsToClipboard: true
-        };
-      }
-
-      if (forPrint) {
-        gridOptions.forPrint = true;
-        gridOptions.enableStatusBar = false;
-      }
-
-      if (multisel) {
-        gridOptions.rowSelection = 'multiple';
-        gridOptions.rowDeselection = true;
-        gridOptions.suppressRowClickSelection = true;
-        gridOptions.groupSelectsChildren = true;
-        gridOptions.groupSelectsFiltered = true;
-      }
-
-      // Index rows by the id column...
-      gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
-
-      new agGrid.Grid(grid, gridOptions);
-      crossbeamsGridStore.addGrid(gridId, gridOptions);
-      loadGrid(grid, gridOptions);
+      event = new CustomEvent('gridLoad', { detail: gridId });
+      document.dispatchEvent(event);
     });
+  };
+
+  const makeGrid = function makeGrid(event) {
+    const gridId = event.detail;
+    let gridOptions = null;
+    let forPrint = false;
+    let multisel = false;
+    const grid = document.getElementById(gridId);
+
+    forPrint = grid.dataset.gridPrint;
+    multisel = grid.dataset.gridMulti;
+    // lookup of grid ids? populate here and clear when grid unloaded...
+    if (grid.dataset.nestedGrid) {
+      gridOptions = {
+        context: { domGridId: gridId },
+        columnDefs: null,
+        rowDefs: null,
+        enableColResize: true,
+        enableSorting: true,
+        enableFilter: true,
+        suppressScrollLag: true, // TODO: remove with version 13...
+        enableRangeSelection: true,
+        enableStatusBar: true,
+        suppressAggFuncInHeader: true,
+        isFullWidthCell: function isFullWidthCell(rowNode) {
+          return rowNode.level === 1;
+        },
+        onGridReady: function onGridReady(params) {
+          params.api.sizeColumnsToFit();
+        },
+        // see ag-Grid docs cellRenderer for details on how to build cellRenderers
+        fullWidthCellRenderer: Level2PanelCellRenderer,
+        getRowHeight: function getRowHeight(params) {
+          const rowIsDetailRow = params.node.level === 1;
+          // return 100 when detail row, otherwise return 25
+          return rowIsDetailRow ? 400 : 25;
+        },
+        getNodeChildDetails: function getNodeChildDetails(record) {
+          if (record.level2) {
+            return {
+              group: true,
+              // the key is used by the default group cellRenderer
+              key: record.functional_area_name, // ......................TODO: level1 expand_col...
+              // provide ag-Grid with the children of this group
+              children: [record.level2],
+              // for demo, expand the third row by default
+              // expanded: record.account === 177005
+            };
+          }
+          return null;
+        },
+      };
+    } else {
+      gridOptions = {
+        context: { domGridId: gridId },
+        // columnDefs: null,
+        rowDefs: null,
+        enableColResize: true,
+        enableSorting: true,
+        enableFilter: true,
+        suppressScrollLag: true,
+        rowSelection: 'single',
+        enableRangeSelection: true,
+        enableStatusBar: true,
+        suppressAggFuncInHeader: true,
+        onFilterChanged() {
+          let filterLength = 0;
+          let rows = 0;
+          this.api.forEachLeafNode(() => { rows += 1; });
+          this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
+          crossbeamsGridEvents.displayRowCounts(gridId, filterLength, rows);
+        },
+        // suppressCopyRowsToClipboard: true
+      };
+    }
+
+    if (forPrint) {
+      gridOptions.forPrint = true;
+      gridOptions.enableStatusBar = false;
+    }
+
+    if (multisel) {
+      gridOptions.rowSelection = 'multiple';
+      gridOptions.rowDeselection = true;
+      gridOptions.suppressRowClickSelection = true;
+      gridOptions.groupSelectsChildren = true;
+      gridOptions.groupSelectsFiltered = true;
+    }
+
+    // Index rows by the id column...
+    gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
+
+    new agGrid.Grid(grid, gridOptions);
+    crossbeamsGridStore.addGrid(gridId, gridOptions);
+    loadGrid(grid, gridOptions);
   };
 
   document.addEventListener('DOMContentLoaded', () => {
     listenForGrid();
+  });
+
+  document.addEventListener('gridLoad', (gridId) => {
+    makeGrid(gridId);
   });
 
   return {

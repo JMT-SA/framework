@@ -28,6 +28,12 @@ const crossbeamsUtils = {
         dlg.innerHTML = data;
         crossbeamsUtils.makeMultiSelects();
         crossbeamsUtils.makeSearchableSelects();
+        const grids = dlg.querySelectorAll('[data-grid]');
+        grids.forEach((grid) => {
+          const gridId = grid.getAttribute('id');
+          const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+          document.dispatchEvent(gridEvent);
+        });
         const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
         if (sortable.length > 0) {
           crossbeamsUtils.makeListSortable(sortable[0].dataset.sortablePrefix);

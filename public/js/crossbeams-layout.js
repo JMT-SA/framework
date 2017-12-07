@@ -163,9 +163,16 @@
               });
             } else if (data.replaceDialog) {
               closeDialog = false;
-              document.getElementById('dialog-content').innerHTML = data.replaceDialog.content;
+              const dlgContent = document.getElementById('dialog-content');
+              dlgContent.innerHTML = data.replaceDialog.content;
               crossbeamsUtils.makeMultiSelects();
               crossbeamsUtils.makeSearchableSelects();
+              const grids = dlgContent.querySelectorAll('[data-grid]');
+              grids.forEach((grid) => {
+                const gridId = grid.getAttribute('id');
+                const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+                document.dispatchEvent(gridEvent);
+              });
             } else {
               console.log('Not sure what to do with this:', data);
             }

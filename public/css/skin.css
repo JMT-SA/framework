@@ -1,138 +1,140 @@
 .Menu, .functional-area-menu ul {
-    color: black;
+  color: black;
 }
-    /* Foreground */
-    .Menu,
-    .Menu li.-hasSubmenu > a:after {
-        color: black;
-        border-color: black; /* chevron colour */
-    }
-    .Menu li.-hasSubmenu > ul {
-      z-index: 1;
-    }
+/* Foreground */
+.Menu,
+.Menu li.-hasSubmenu > a:after {
+  color: black;
+  border-color: black; /* chevron colour */
+}
+.Menu li.-hasSubmenu > ul {
+  z-index: 1;
+}
 
-    /* Background */
-    .Menu,
-    .Menu li ul {
-        background: white;
-    }
+/* Background */
+.Menu,
+.Menu li ul {
+  background: white;
+}
 
-    /* Border */
-    .Menu,
-    .Menu li ul {
-        box-shadow: none;
-    }
+/* Border */
+.Menu,
+.Menu li ul {
+  box-shadow: none;
+}
 
-    .Menu li ul,
-    .Menu.-floating {
-        border-radius: 3px;
-    }
-    .Menu.-horizontal > li > ul {
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
-    }
-    .Menu:not(.-alignRight) li > ul,
-    .Menu.-floating:not(.-alignRight) {
-        border-top-left-radius: 0px;
-    }
-    .Menu.-alignRight li > ul,
-    .Menu.-floating.-alignRight {
-        border-top-right-radius: 0px;
-    }
+.Menu li ul,
+.Menu.-floating {
+  border-radius: 3px;
+}
+.Menu.-horizontal > li > ul {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+.Menu:not(.-alignRight) li > ul,
+.Menu.-floating:not(.-alignRight) {
+  border-top-left-radius: 0px;
+}
+.Menu.-alignRight li > ul,
+.Menu.-floating.-alignRight {
+  border-top-right-radius: 0px;
+}
 
 /* Drop shadow on Menus and header */
 .Header,
 .Menu li ul,
 .Menu.-floating {
-    box-shadow:
-        0px 0px 0px 1px rgba(0,0,0,0.2),
-        0px 3px 1px 0px rgba(0,0,0,0.2),
-        0px 6px 12px 0px rgba(0,0,0,0.15)
-    ;
+  box-shadow:
+  0px 0px 0px 1px rgba(0,0,0,0.2),
+  0px 3px 1px 0px rgba(0,0,0,0.2),
+  0px 6px 12px 0px rgba(0,0,0,0.15)
+  ;
 }
 .functional-area-menu {
-    position: absolute; /* fixed; */
-    display: block;
-    /*
-    z-index: 90;
-    */
-    top: 40px;
-    left: 0px;
-    right: 0px;
+  position: absolute; /* fixed; */
+  display: block;
+  /*
+  z-index: 90;
+   */
+  top: 40px;
+  left: 0px;
+  right: 0px;
 }
 .Header {
-    position: absolute; /* fixed; */
-    display: block;
-    /*
-    z-index: 100;
-    */
-    top: 80px;
-    left: 0px;
-    right: 0px;
+  position: absolute; /* fixed; */
+  display: block;
+  /*
+  z-index: 100;
+   */
+  top: 80px;
+  left: 0px;
+  right: 0px;
 }
-    /* Header and Menu sizing */
-    .Header .Menu, .functional-area-menu ul {
-        line-height: 40px;
-    }
-    .Header,
-    .functional-area-menu, .functional-area-menu ul,
-    .functional-area-menu ul li, .functional-area-menu ul li > :first-child,
-    .Header .Menu.-horizontal,
-    .Header .Menu li,
-    .Header .Menu li > :first-child {
-        height: 40px;
-    }
-    .Header .Menu *[data-icon]:before,
-    .Header .Menu .Icon {
-        width: 40px;
-        height: 40px;
-    }
-    .Header .Menu *[data-icon] {
-        min-width: 40px;
-        min-height: 40px;
-        padding-left: 40px;
-    }
- .functional-area-menu ul {
-        position: absolute;
-        top: 0px;
-        left: 0px;
- }
-    /* Menu positioning in Header */
-    .Header .Menu.-horizontal {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-    }
-    .Header .Menu.-horizontal.-alignRight {
-        left: auto;
-        right: 0px;
-    }
+/* Header and Menu sizing */
+.Header .Menu, .functional-area-menu ul {
+  line-height: 40px;
+}
+.Header,
+.functional-area-menu, .functional-area-menu ul,
+.functional-area-menu ul li, .functional-area-menu ul li > :first-child,
+.Header .Menu.-horizontal,
+.Header .Menu li,
+.Header .Menu li > :first-child {
+  height: 40px;
+}
+.Header .Menu *[data-icon]:before,
+.Header .Menu .Icon {
+  width: 40px;
+  height: 40px;
+}
+.Header .Menu *[data-icon] {
+  min-width: 40px;
+  min-height: 40px;
+  padding-left: 40px;
+}
+.functional-area-menu ul {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+/* Menu positioning in Header */
+.Header .Menu.-horizontal {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+.Header .Menu.-horizontal.-alignRight {
+  left: auto;
+  right: 0px;
+}
 
-    /* Colouring/styling of Header and its Menus */
-    .functional-area-menu {
-        background: #0f8b99;
-    }
-    .Header {
-        /*background: rgba(0,0,0,0.8);*/
-        background: #0f9962;
-    }
-    .Header .Menu, .functional-area-menu ul {
-        background: none;
-    }
-    .Header .Menu, .functional-area-menu ul,
-    .Header .Menu > li.-hasSubmenu > a:after {
-        color: white;
-        border-color: white;
-    }
-    .Header .Menu li ul{
-        color: black;
-    }
-    .Header .Menu > li:hover > a:first-child,
-    .Header .Menu > li.-active > a:first-child {
-        background-color: rgba(255,255,255,0.2);
-    }
-    .functional-area-menu ul > li:hover > a:first-child,
-    .functional-area-menu ul > li.-active > a:first-child {
-        background-color: rgba(255,255,255,0.2);
-    }
-
+/* Colouring/styling of Header and its Menus */
+.functional-area-menu {
+  background: #0f8b99;
+}
+.Header {
+  /*background: rgba(0,0,0,0.8);*/
+  background: #0f9962;
+}
+.Header .Menu, .functional-area-menu ul {
+  background: none;
+}
+.Header .Menu, .functional-area-menu ul,
+.Header .Menu > li.-hasSubmenu > a:after {
+  color: white;
+  border-color: white;
+}
+.Header .Menu li ul{
+  color: black;
+}
+.Header .Menu > li:hover > a:first-child,
+.Header .Menu > li.-active > a:first-child {
+  background-color: rgba(255,255,255,0.2);
+}
+.functional-area-menu ul > li:hover > a:first-child,
+.functional-area-menu ul > li.-active > a:first-child {
+  background-color: rgba(255,255,255,0.2);
+}
+.Header .Menu > li > ul > li > a:hover {
+  background-color: #d6d6e0;
+}

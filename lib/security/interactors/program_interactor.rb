@@ -47,7 +47,9 @@ class ProgramInteractor < BaseInteractor
   end
 
   def link_user(user_id, program_ids)
-    repo.link_user(user_id, program_ids)
+    DB.transaction do
+      repo.link_user(user_id, program_ids)
+    end
     success_response('Linked programs to user')
   end
 end

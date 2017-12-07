@@ -27,18 +27,14 @@ class SecurityGroupRepo < RepoBase
     perm_ids.each do |p_id|
       ins << "INSERT INTO security_groups_security_permissions (security_group_id, security_permission_id) VALUES(#{id}, #{p_id});"
     end
-    DB.transaction do
-      DB.execute(del)
-      DB.execute(ins)
-    end
+    DB.execute(del)
+    DB.execute(ins)
     { success: true }
   end
 
   def delete_with_permissions(id)
-    DB.transaction do
-      DB[:security_groups_security_permissions].where(security_group_id: id).delete
-      DB[:security_groups].where(id: id).delete
-    end
+    DB[:security_groups_security_permissions].where(security_group_id: id).delete
+    DB[:security_groups].where(id: id).delete
   end
 
   def default_security_group_id

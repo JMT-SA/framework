@@ -40,13 +40,17 @@ class SecurityGroupInteractor < BaseInteractor
   def delete_security_group(id)
     @id = id
     name = security_group.security_group_name
-    repo.delete_with_permissions(id)
+    DB.transaction do
+      repo.delete_with_permissions(id)
+    end
     success_response("Deleted security group #{name}")
   end
 
   def assign_security_permissions(id, params)
     if params[:security_permissions]
-      repo.assign_security_permissions(id, params[:security_permissions].map(&:to_i))
+      DB.transaction do
+        repo.assign_security_permissions(id, params[:security_permissions].map(&:to_i))
+      end
       security_group_ex = repo.find_with_permissions(id)
       success_response("Updated permissions on security group #{security_group_ex.security_group_name}",
                        security_group_ex)

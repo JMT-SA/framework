@@ -143,9 +143,9 @@ class GenerateNewScaffold < BaseService
 
           def #{opts.singlename}(cached = true)
             if cached
-              @#{opts.singlename} ||= repo.find(:#{opts.table}, #{opts.klassname}, @id)
+              @#{opts.singlename} ||= repo.find_#{opts.singlename}(@id)
             else
-              @#{opts.singlename} = repo.find(:#{opts.table}, #{opts.klassname}, @id)
+              @#{opts.singlename} = repo.find_#{opts.singlename}(@id)
             end
           end
 
@@ -156,7 +156,7 @@ class GenerateNewScaffold < BaseService
           def create_#{opts.singlename}(params)
             res = validate_#{opts.singlename}_params(params)
             return validation_failed_response(res) unless res.messages.empty?
-            @id = repo.create(:#{opts.table}, res.to_h)
+            @id = repo.create_#{opts.singlename}(res)
             success_response("Created #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename})
           end
@@ -165,7 +165,7 @@ class GenerateNewScaffold < BaseService
             @id = id
             res = validate_#{opts.singlename}_params(params)
             return validation_failed_response(res) unless res.messages.empty?
-            repo.update(:#{opts.table}, id, res.to_h)
+            repo.update_#{opts.singlename}(id, res)
             success_response("Updated #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename}(false))
           end
@@ -173,7 +173,7 @@ class GenerateNewScaffold < BaseService
           def delete_#{opts.singlename}(id)
             @id = id
             name = #{opts.singlename}.#{opts.label_field}
-            repo.delete(:#{opts.table}, id)
+            repo.delete_#{opts.singlename}(id)
             success_response("Deleted #{opts.singlename.tr('_', ' ')} \#{name}")
           end
         end
@@ -480,7 +480,7 @@ class GenerateNewScaffold < BaseService
             def make_form_object
               make_new_form_object && return if @mode == :new
 
-              @form_object = @this_repo.find(:#{opts.table}, #{opts.klassname}, @options[:id])
+              @form_object = @this_repo.find_#{opts.singlename}(@options[:id])
             end
 
             def make_new_form_object
@@ -507,7 +507,8 @@ class GenerateNewScaffold < BaseService
         klassname   = UtilityFunctions.camelize(singlename)
         fk_repo = "#{klassname}Repo"
         code = tm.likely_label_field
-        flds << "#{f}_label = #{fk_repo}.new.find(@form_object.#{f})&.#{code}"
+        flds << "# #{f}_label = #{fk_repo}.new.find_#{singlename}(@form_object.#{f})&.#{code}"
+        flds << "#{f}_label = @this_repo.new.find(:#{fk[:table]}, #{klassname}, @form_object.#{f})&.#{code}"
       end
 
       flds + fields_to_use.map do |f|
@@ -543,7 +544,7 @@ class GenerateNewScaffold < BaseService
       klassname   = UtilityFunctions.camelize(singlename)
       fk_repo = "#{klassname}Repo"
       # get fk data & make select - or (if no fk....)
-      "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select }"
+      "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]} }"
     end
 
     # use default values (or should the use of struct be changed to something that knows the db?)

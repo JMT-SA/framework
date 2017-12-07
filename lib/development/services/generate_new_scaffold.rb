@@ -508,7 +508,7 @@ class GenerateNewScaffold < BaseService
         fk_repo = "#{klassname}Repo"
         code = tm.likely_label_field
         flds << "# #{f}_label = #{fk_repo}.new.find_#{singlename}(@form_object.#{f})&.#{code}"
-        flds << "#{f}_label = @this_repo.new.find(:#{fk[:table]}, #{klassname}, @form_object.#{f})&.#{code}"
+        flds << "#{f}_label = @this_repo.find(:#{fk[:table]}, #{klassname}, @form_object.#{f})&.#{code}"
       end
 
       flds + fields_to_use.map do |f|

@@ -1,0 +1,46 @@
+= Migrations
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Migrations
+
+=== Notes
+
+The framework uses the Sequel migrations syntax and methods: link:http://sequel.jeremyevans.net/rdoc/files/doc/migration_rdoc.html[Sequel migrations].
+
+Migration sequences use the datetime format (`YYYYMMDDHHMMSS`), not the integer format. So a migration for creating a users table on 15 September 2011 in the afternoon would look something line this: `20110915154521_create_users`.
+
+=== Create a migration file
+
+Migration files live in the `db/migrations` dir.
+
+You can create a migration file using either of the following Rake tasks:
+
+* `rake db:create_table_migration`
++
+Use this to create a migration file with skeleton code for creating a table. You must specify the table name using the NAME variable:
+e.g. `rake db:create_table_migration NAME=users`.
+
+* `rake db:new_migration`
++
+Use this to create an empty migration file. You must specify the filename using the NAME variable:
+e.g. `rake db:new_migration NAME=add_title_to_users`.
+
+You would typically use the first for creating a new table and the second for altering a table or creating an index.
+
+=== Run and rollback migrations
+
+`rake db:version` shows the latest version in the db.
+
+`rake db:migrate` will run all outstanding migrations.
+
+`rake db:migrate[version]` will migrate down (rollback) or up to a particular version (depending on the current version in the db).
+
+e.g. `rake db:migrate[20170101201533]` will:
+
+* undo all the migrations that come after `20170101201533` if the current migration is higher (e.g. `20170101201545`).
+* run all the migrations up to and including `20170101201533` if the current migration is lower (e.g. `20161222201545`).
+
+`rake db:recent_migrations` lists the 10 most recent migrations in decending order. This is useful to find the version for rolling back migrations.
+

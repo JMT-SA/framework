@@ -22,6 +22,7 @@
 * How to disable/enable a field based on the value of another field.
 * How to layout a multi-column form.
 * How to layout a page to include a form and a grid.
+* How to link:/developer_documentation/migrations.adoc[generate and run migrations].
 
 === Notes
 

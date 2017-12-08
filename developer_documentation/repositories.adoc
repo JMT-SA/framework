@@ -93,7 +93,7 @@ delete_users(id)
 ```
 
 ```ruby
-crud_calls_for :users, name: people, wrapper: User
+crud_calls_for :users, name: 'people', wrapper: User
 
 # Generates the following methods for the repo:
 find_people(id)

@@ -73,11 +73,9 @@ class TargetMarketRepo < RepoBase
     old_ids           = existing_ids - country_ids
     new_ids           = country_ids - existing_ids
 
-    DB.transaction do
-      DB[:target_markets_for_countries].where(target_market_id: target_market_id).where(destination_country_id: old_ids).delete
-      new_ids.each do |prog_id|
-        DB[:target_markets_for_countries].insert(target_market_id: target_market_id, destination_country_id: prog_id)
-      end
+    DB[:target_markets_for_countries].where(target_market_id: target_market_id).where(destination_country_id: old_ids).delete
+    new_ids.each do |prog_id|
+      DB[:target_markets_for_countries].insert(target_market_id: target_market_id, destination_country_id: prog_id)
     end
   end
 
@@ -90,11 +88,9 @@ class TargetMarketRepo < RepoBase
     old_ids           = existing_ids - tm_group_ids
     new_ids           = tm_group_ids - existing_ids
 
-    DB.transaction do
-      DB[:target_markets_for_groups].where(target_market_id: target_market_id).where(target_market_group_id: old_ids).delete
-      new_ids.each do |prog_id|
-        DB[:target_markets_for_groups].insert(target_market_id: target_market_id, target_market_group_id: prog_id)
-      end
+    DB[:target_markets_for_groups].where(target_market_id: target_market_id).where(target_market_group_id: old_ids).delete
+    new_ids.each do |prog_id|
+      DB[:target_markets_for_groups].insert(target_market_id: target_market_id, target_market_group_id: prog_id)
     end
   end
 

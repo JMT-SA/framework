@@ -4,7 +4,10 @@ class PersonInteractor < BaseInteractor
   def create_person(params)
     res = validate_person_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    response = party_repo.create_person(res.to_h)
+    response = nil
+    DB.transaction do
+      response = party_repo.create_person(res.to_h)
+    end
     if response[:id]
       @person_id = response[:id]
       success_response("Created person #{person.party_name}", person)
@@ -20,7 +23,9 @@ class PersonInteractor < BaseInteractor
     attrs = res.to_h
     role_ids = attrs.delete(:role_ids)
     roles_response = assign_person_roles(@person_id, role_ids)
-    party_repo.update_person(id, attrs)
+    DB.transaction do
+      party_repo.update_person(id, attrs)
+    end
     if roles_response.success
       success_response("Updated person #{person.party_name}, #{roles_response.message}", person(false))
     else
@@ -31,13 +36,17 @@ class PersonInteractor < BaseInteractor
   def delete_person(id)
     @person_id = id
     name = person.party_name
-    party_repo.delete_person(id)
+    DB.transaction do
+      party_repo.delete_person(id)
+    end
     success_response("Deleted person #{name}")
   end
 
   def assign_person_roles(id, role_ids)
     party_id = party_repo.party_id_from_person(id)
-    party_repo.assign_person_roles(id, role_ids)
+    DB.transaction do
+      party_repo.assign_person_roles(id, role_ids)
+    end
 
     existing_ids = party_repo.party_role_ids(party_id)
     if existing_ids.eql?(role_ids.sort)

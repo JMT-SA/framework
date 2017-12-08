@@ -4,7 +4,10 @@ class OrganizationInteractor < BaseInteractor
   def create_organization(params)
     res = validate_organization_params(params)
     return validation_failed_response(res) unless res.messages.empty?
-    response = party_repo.create_organization(res.to_h)
+    response = nil
+    DB.transaction do
+      response = party_repo.create_organization(res.to_h)
+    end
     if response[:id]
       @organization_id = response[:id]
       success_response("Created organization #{organization.party_name}", organization)
@@ -20,7 +23,9 @@ class OrganizationInteractor < BaseInteractor
     attrs = res.to_h
     role_ids = attrs.delete(:role_ids)
     roles_response = assign_organization_roles(@organization_id, role_ids)
-    party_repo.update_organization(id, attrs)
+    DB.transaction do
+      party_repo.update_organization(id, attrs)
+    end
     if roles_response.success
       success_response("Updated organization #{organization.party_name}, #{roles_response.message}", organization(false))
     else
@@ -31,7 +36,10 @@ class OrganizationInteractor < BaseInteractor
   def delete_organization(id)
     @organization_id = id
     name = organization.party_name
-    response = party_repo.delete_organization(id)
+    response = nil
+    DB.transaction do
+      response = party_repo.delete_organization(id)
+    end
     if response[:success]
       success_response("Deleted organization #{name}")
     else
@@ -41,7 +49,9 @@ class OrganizationInteractor < BaseInteractor
 
   def assign_organization_roles(id, role_ids)
     party_id = party_repo.party_id_from_organization(id)
-    party_repo.assign_organization_roles(id, role_ids)
+    DB.transaction do
+      party_repo.assign_organization_roles(id, role_ids)
+    end
 
     existing_ids = party_repo.party_role_ids(party_id)
     if existing_ids.eql?(role_ids.sort)

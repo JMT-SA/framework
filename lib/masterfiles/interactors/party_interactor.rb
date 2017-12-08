@@ -2,7 +2,9 @@
 
 class PartyInteractor < BaseInteractor
   def link_addresses(id, address_ids)
-    party_repo.link_addresses(id, address_ids)
+    DB.transaction do
+      party_repo.link_addresses(id, address_ids)
+    end
 
     party = party_repo.find_party(id)
     existing_ids = party_repo.party_address_ids(id)
@@ -14,7 +16,9 @@ class PartyInteractor < BaseInteractor
   end
 
   def link_contact_methods(id, contact_method_ids)
-    party_repo.link_contact_methods(id, contact_method_ids)
+    DB.transaction do
+      party_repo.link_contact_methods(id, contact_method_ids)
+    end
 
     party = party_repo.find_party(id)
     existing_ids = party_repo.party_contact_method_ids(id)

@@ -78,7 +78,9 @@ class TargetMarketInteractor < BaseInteractor
   end
 
   def link_countries(target_market_id, country_ids)
-    target_market_repo.link_countries(target_market_id, country_ids)
+    DB.transaction do
+      target_market_repo.link_countries(target_market_id, country_ids)
+    end
 
     existing_ids = target_market_repo.target_market_country_ids(target_market_id)
     if existing_ids.eql?(country_ids.sort)
@@ -89,7 +91,9 @@ class TargetMarketInteractor < BaseInteractor
   end
 
   def link_tm_groups(target_market_id, tm_group_ids)
-    target_market_repo.link_tm_groups(target_market_id, tm_group_ids)
+    DB.transaction do
+      target_market_repo.link_tm_groups(target_market_id, tm_group_ids)
+    end
 
     existing_ids = target_market_repo.target_market_tm_group_ids(target_market_id)
     if existing_ids.eql?(tm_group_ids.sort)

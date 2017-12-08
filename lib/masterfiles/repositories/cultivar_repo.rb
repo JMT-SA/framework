@@ -67,14 +67,12 @@ class CultivarRepo < RepoBase
     old_ids           = existing_ids - marketing_variety_ids
     new_ids           = marketing_variety_ids - existing_ids
 
-    DB.transaction do
-      DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).where(marketing_variety_id: old_ids).delete
-      orphan_ids = orphaned_marketing_varieties(old_ids)
-      DB[:marketing_varieties].where(id: orphan_ids).delete
+    DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).where(marketing_variety_id: old_ids).delete
+    orphan_ids = orphaned_marketing_varieties(old_ids)
+    DB[:marketing_varieties].where(id: orphan_ids).delete
 
-      new_ids.each do |prog_id|
-        DB[:marketing_varieties_for_cultivars].insert(cultivar_id: cultivar_id, marketing_variety_id: prog_id)
-      end
+    new_ids.each do |prog_id|
+      DB[:marketing_varieties_for_cultivars].insert(cultivar_id: cultivar_id, marketing_variety_id: prog_id)
     end
     { success: true }
   end

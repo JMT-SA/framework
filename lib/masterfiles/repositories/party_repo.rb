@@ -34,16 +34,14 @@ class PartyRepo < RepoBase
     return { error: { roles: ['You did not choose a role'] } } if role_ids.empty?
     params[:medium_description] = params[:short_description] unless params[:medium_description]
     params[:long_description] = params[:short_description] unless params[:long_description]
-    DB.transaction do
-      party_id = DB[:parties].insert(party_type: 'O')
-      org_id = DB[:organizations].insert(params.merge(party_id: party_id))
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: party_id,
-                                role_id: r_id,
-                                organization_id: org_id)
-      end
-      { id: org_id }
+    party_id = DB[:parties].insert(party_type: 'O')
+    org_id = DB[:organizations].insert(params.merge(party_id: party_id))
+    role_ids.each do |r_id|
+      DB[:party_roles].insert(party_id: party_id,
+                              role_id: r_id,
+                              organization_id: org_id)
     end
+    { id: org_id }
   end
 
   def find_organization(id)
@@ -64,13 +62,11 @@ class PartyRepo < RepoBase
   def assign_organization_roles(id, role_ids)
     return { error: 'Choose at least one role' } if role_ids.empty?
     organization = find_organization(id)
-    DB.transaction do
-      DB[:party_roles].where(organization_id: id).delete
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: organization.party_id,
-                                role_id: r_id,
-                                organization_id: id)
-      end
+    DB[:party_roles].where(organization_id: id).delete
+    role_ids.each do |r_id|
+      DB[:party_roles].insert(party_id: organization.party_id,
+                              role_id: r_id,
+                              organization_id: id)
     end
   end
 
@@ -78,11 +74,8 @@ class PartyRepo < RepoBase
     children = DB[:organizations].where(parent_id: id)
     return { error: 'This organization is set as a parent' } if children.any?
     party_id = party_id_from_organization(id)
-    DB.transaction do
-      DB[:party_roles].where(organization_id: id).delete
-      DB[:organizations].where(id: id).delete
-      DB[:parties].where(id: party_id).delete
-    end
+    DB[:organizations].where(id: id).delete
+    delete_party_dependents(party_id)
     { success: true }
   end
 
@@ -90,16 +83,14 @@ class PartyRepo < RepoBase
     params = attrs.to_h
     role_ids = params.delete(:role_ids)
     return { error: 'Choose at least one role' } if role_ids.empty?
-    DB.transaction do
-      party_id = DB[:parties].insert(party_type: 'P')
-      person_id = DB[:people].insert(params.merge(party_id: party_id))
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: party_id,
-                                role_id: r_id,
-                                person_id: person_id)
-      end
-      { id: person_id }
+    party_id = DB[:parties].insert(party_type: 'P')
+    person_id = DB[:people].insert(params.merge(party_id: party_id))
+    role_ids.each do |r_id|
+      DB[:party_roles].insert(party_id: party_id,
+                              role_id: r_id,
+                              person_id: person_id)
     end
+    { id: person_id }
   end
 
   def find_person(id)
@@ -111,20 +102,6 @@ class PartyRepo < RepoBase
     Person.new(hash)
   end
 
-  def add_party_name(hash)
-    party_id = hash[:party_id]
-    hash[:party_name] = DB['SELECT fn_party_name(?)', party_id].single_value
-    hash
-  end
-
-  def add_dependent_ids(hash)
-    party_id = hash[:party_id]
-    hash[:contact_method_ids] = party_contact_method_ids(party_id)
-    hash[:address_ids] = party_address_ids(party_id)
-    hash[:role_ids] = party_role_ids(party_id)
-    hash
-  end
-
   def update_person(id, attrs)
     update(:people, id, attrs)
   end
@@ -132,24 +109,19 @@ class PartyRepo < RepoBase
   def assign_person_roles(id, role_ids)
     return { error: 'Choose at least one role' } if role_ids.empty?
     person = find_person(id)
-    DB.transaction do
-      DB[:party_roles].where(person_id: id).delete
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: person.party_id,
-                                role_id: r_id,
-                                person_id: id)
-      end
+    DB[:party_roles].where(person_id: id).delete
+    role_ids.each do |r_id|
+      DB[:party_roles].insert(party_id: person.party_id,
+                              role_id: r_id,
+                              person_id: id)
     end
     { success: true }
   end
 
   def delete_person(id)
     party_id = party_id_from_person(id)
-    DB.transaction do
-      DB[:party_roles].where(person_id: id).delete
-      DB[:people].where(id: id).delete
-      DB[:parties].where(id: party_id).delete
-    end
+    DB[:people].where(id: id).delete
+    delete_party_dependents(party_id)
   end
 
   def create_contact_method(attrs)
@@ -199,11 +171,9 @@ class PartyRepo < RepoBase
     old_ids           = existing_ids - address_ids
     new_ids           = address_ids - existing_ids
 
-    DB.transaction do
-      DB[:party_addresses].where(party_id: party_id).where(address_id: old_ids).delete
-      new_ids.each do |prog_id|
-        DB[:party_addresses].insert(party_id: party_id, address_id: prog_id)
-      end
+    DB[:party_addresses].where(party_id: party_id).where(address_id: old_ids).delete
+    new_ids.each do |prog_id|
+      DB[:party_addresses].insert(party_id: party_id, address_id: prog_id)
     end
   end
 
@@ -212,11 +182,9 @@ class PartyRepo < RepoBase
     old_ids           = existing_ids - contact_method_ids
     new_ids           = contact_method_ids - existing_ids
 
-    DB.transaction do
-      DB[:party_contact_methods].where(party_id: party_id).where(contact_method_id: old_ids).delete
-      new_ids.each do |prog_id|
-        DB[:party_contact_methods].insert(party_id: party_id, contact_method_id: prog_id)
-      end
+    DB[:party_contact_methods].where(party_id: party_id).where(contact_method_id: old_ids).delete
+    new_ids.each do |prog_id|
+      DB[:party_contact_methods].insert(party_id: party_id, contact_method_id: prog_id)
     end
   end
 
@@ -268,5 +236,28 @@ class PartyRepo < RepoBase
 
   def party_role_ids(party_id)
     DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
+  end
+
+  private
+
+  def add_party_name(hash)
+    party_id = hash[:party_id]
+    hash[:party_name] = DB['SELECT fn_party_name(?)', party_id].single_value
+    hash
+  end
+
+  def add_dependent_ids(hash)
+    party_id = hash[:party_id]
+    hash[:contact_method_ids] = party_contact_method_ids(party_id)
+    hash[:address_ids] = party_address_ids(party_id)
+    hash[:role_ids] = party_role_ids(party_id)
+    hash
+  end
+
+  def delete_party_dependents(party_id)
+    DB[:party_addresses].where(party_id: party_id).delete
+    DB[:party_roles].where(party_id: party_id).delete
+    DB[:party_contact_methods].where(party_id: party_id).delete
+    DB[:parties].where(id: party_id).delete
   end
 end

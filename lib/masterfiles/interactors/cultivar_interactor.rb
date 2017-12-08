@@ -68,7 +68,9 @@ class CultivarInteractor < BaseInteractor
   end
 
   def link_marketing_varieties(cultivar_id, marketing_variety_ids)
-    cultivar_repo.link_marketing_varieties(cultivar_id, marketing_variety_ids)
+    DB.transaction do
+      cultivar_repo.link_marketing_varieties(cultivar_id, marketing_variety_ids)
+    end
 
     existing_ids = cultivar_repo.cultivar_marketing_variety_ids(cultivar_id)
     if existing_ids.eql?(marketing_variety_ids.sort)

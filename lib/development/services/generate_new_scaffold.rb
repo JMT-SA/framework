@@ -124,6 +124,10 @@ class GenerateNewScaffold < BaseService
     def column_dry_validation_type(column)
       VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
     end
+
+    def active_column_present?
+      @column_names.include?(:active)
+    end
   end
 
   class InteractorMaker < BaseService
@@ -188,18 +192,38 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      <<~RUBY
-        # frozen_string_literal: true
+      if @opts.table_meta.active_column_present?
+        <<~RUBY
+          # frozen_string_literal: true
 
-        class #{opts.klassname}Repo < RepoBase
-          build_for_select :#{opts.table},
-                           label: :#{opts.label_field},
-                           value: :id,
-                           order_by: :#{opts.label_field}
+          class #{opts.klassname}Repo < RepoBase
+            build_for_select :#{opts.table},
+                             label: :#{opts.label_field},
+                             value: :id,
+                             order_by: :#{opts.label_field}
+            build_inactive_select :#{opts.table},
+                                  label: :#{opts.label_field},
+                                  value: :id,
+                                  order_by: :#{opts.label_field}
 
-          crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
-        end
-      RUBY
+            crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
+          end
+        RUBY
+      else
+        <<~RUBY
+          # frozen_string_literal: true
+
+          class #{opts.klassname}Repo < RepoBase
+            build_for_select :#{opts.table},
+                             label: :#{opts.label_field},
+                             value: :id,
+                             no_active_check: true,
+                             order_by: :#{opts.label_field}
+
+            crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
+          end
+        RUBY
+      end
     end
   end
 
@@ -516,7 +540,7 @@ class GenerateNewScaffold < BaseService
         if fk.nil?
           "fields[:#{f}] = { renderer: :label }"
         else
-          "fields[:#{f}] = { renderer: :label, with_value: #{f}_label }"
+          "fields[:#{f}] = { renderer: :label, with_value: #{f}_label, caption: '#{f.to_s.chomp('_id')}' }"
         end
       end
     end
@@ -544,7 +568,12 @@ class GenerateNewScaffold < BaseService
       klassname   = UtilityFunctions.camelize(singlename)
       fk_repo = "#{klassname}Repo"
       # get fk data & make select - or (if no fk....)
-      "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]} }"
+      tm = TableMeta.new(fk[:table])
+      if tm.active_column_present?
+        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_inactive_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}' }"
+      else
+        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}' }"
+      end
     end
 
     # use default values (or should the use of struct be changed to something that knows the db?)

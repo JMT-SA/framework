@@ -248,6 +248,11 @@ and all words start with initial capital letter.
 For a 1D array, the option value and text will be the same.
 |`[]` - an empty array.
 
+|:disabled_options
+|Options that cannot be selected, but will display if the selected value is in the list of diabled_options.
+|an array of values. Must use the same format as for `:options`.
+|n/a
+
 |:selected
 |Pre-selected item.
 |any value matching one of the options.

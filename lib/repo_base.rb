@@ -64,11 +64,11 @@ class RepoBase
   end
 
   def select_single(dataset, value_name)
-    dataset.map { |rec| rec[value_name] }
+    dataset.select(value_name).map { |rec| rec[value_name] }
   end
 
   def select_two(dataset, label_name, value_name)
-    dataset.map { |rec| [rec[label_name], rec[value_name]] }
+    dataset.select(label_name, value_name).map { |rec| [rec[label_name], rec[value_name]] }
   end
 
   def self.inherited(klass)
@@ -90,10 +90,33 @@ module MethodBuilder
   # - The column to order by.
   # desc: Boolean
   # - Use descending order if this option is present and truthy.
+  # no_activity_check: Boolean
+  # - Set to true if this table does not have an +active+ column,
+  #   or to return inactive records as well as active ones.
   def build_for_select(table_name, options = {})
-    define_method(:"for_select_#{options[:alias] || table_name}") do
+    define_method(:"for_select_#{options[:alias] || table_name}") do |opts = {}|
       dataset = DB[table_name]
       dataset = make_order(dataset, options) if options[:order_by]
+      dataset = dataset.where(:active) unless options[:no_active_check]
+      dataset = dataset.where(opts[:where]) if opts[:where]
+      lbl = options[:label] || options[:value]
+      val = options[:value]
+      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)
+    end
+  end
+
+  # Define a +for_select_inactive_table_name+ method in a repo.
+  # The method returns an array of values from inactive rows for use in e.g. a select dropdown's +disabled_options+.
+  # Options:
+  # alias: String
+  # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
+  # label: String
+  # - The display column. Defaults to the value column.
+  # value: String
+  # - The value column. Required.
+  def build_inactive_select(table_name, options = {})
+    define_method(:"for_select_inactive_#{options[:alias] || table_name}") do
+      dataset = DB[table_name].exclude(:active)
       lbl = options[:label] || options[:value]
       val = options[:value]
       lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)

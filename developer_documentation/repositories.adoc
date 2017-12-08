@@ -1,0 +1,103 @@
+= Repositories
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Repositories
+
+The repository layer handles all database access and modification.
+
+=== Helper methods for lookup arrays
+
+These methods can be placed in any repository to provide methods to select arrays of values from the specified table.
+
+==== for_select_table_name
+
+This method returns a list of records from the table. It is built like this:
+
+`build_for_select(table_name, options = {})`
+
+required options
+
+* `:value` - the name of the column in the table that provides the lookup value.
+
+optional options
+
+* `:label` - the name of the column in the table that provides the display value. Defaults to the value parameter.
+* `:alias` - An alias for the suffix of the for_select call. Defaults to the table_name.
+* `:order_by` - A column name to use in the ORDER BY clause.
+* `:desc` - If true and there is an `:order_by` setting, return in descending sequence.
+* `:no_active_check` - Return all rows (including where active is false). This is required for tables that do not have and `active` column.
+
+Example:
+
+```ruby
+build_for_select :commodities,
+                 label: :code,
+                 value: :id,
+                 order_by: :code
+```
+Which is called like this: `repo.for_select_commodities`.
+
+The results can be restricted by providing a where clause:
+
+`repo.for_select_commodities where: { commodity_group_id: 123 }`
+
+==== for_select_inactive_table_name
+
+This method returns a list of records from the table that have their active column set to false.
+This is mostly used as the value of `disabled_options` in a UI Rule for a `Crossbeams::Layout::Select`.
+It is built like this:
+
+`build_inactive_select(table_name, options = {})`
+
+required options
+
+* `:value` - the name of the column in the table that provides the lookup value.
+
+optional options
+
+* `:label` - the name of the column in the table that provides the display value. Defaults to the value parameter.
+* `:alias` - An alias for the suffix of the for_select call. Defaults to the table_name.
+
+```ruby
+build_inactive_select :commodities,
+                      label: :code,
+                      value: :id,
+                      order_by: :code
+```
+and called like this: `repo.for_select_inactive_commodities`. You cannot provide a WHERE clause.
+
+=== Helper methods for simple CRUD
+
+Use the `crud_calls_for` method to generate CRUD methods on a repository.
+
+This generates appropriate `find`, `create`, `update` and `delete` methods for the given table.
+
+`crud_calls_for(table_name, options = {})`
+
+options
+
+* `:name` - use this as the name suffix instead of table_name. i.e. `find_name` instead of `find_table_name`.
+* `:wrapper` - The wrapper class to return from the `find`. If not provided, a `find` method is not generated.
+
+Examples:
+
+```ruby
+crud_calls_for :users
+
+# Generates the following methods for the repo:
+create_users(attrs)
+update_users(id, attrs)
+delete_users(id)
+```
+
+```ruby
+crud_calls_for :users, name: people, wrapper: User
+
+# Generates the following methods for the repo:
+find_people(id)
+create_people(attrs)
+update_people(id, attrs)
+delete_people(id)
+```

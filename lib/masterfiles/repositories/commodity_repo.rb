@@ -5,6 +5,9 @@ class CommodityRepo < RepoBase
                    label: :code,
                    value: :id,
                    order_by: :code
+  build_inactive_select :commodity_groups,
+                        label: :code,
+                        value: :id
 
   build_for_select :commodities,
                    label: :code,

@@ -12,6 +12,7 @@
 * link:/developer_documentation/non_field_renderers.adoc[Non-field Renderers]
 * link:/developer_documentation/field_renderers.adoc[Field Renderers]
 * Field renderer behaviours
+* link:/developer_documentation/repositories.adoc[Repositories]
 
 === Tutorials
 
@@ -19,10 +20,10 @@
 
 === How-to guides
 
+* How to link:/developer_documentation/migrations.adoc[generate and run migrations].
 * How to disable/enable a field based on the value of another field.
 * How to layout a multi-column form.
 * How to layout a page to include a form and a grid.
-* How to link:/developer_documentation/migrations.adoc[generate and run migrations].
 
 === Notes
 

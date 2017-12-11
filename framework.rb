@@ -167,13 +167,20 @@ class Framework < Roda
         end
 
         r.on 'with_params' do
-          p "PARAMS #{request.query_string} - #{params.inspect}"
-          session[:last_grid_url] = "/list/#{id}/with_params?#{request.query_string}"
-          show_page { render_data_grid_page(id, query_string: request.query_string) }
+          if fetch?(r)
+            show_partial { render_data_grid_page(id, query_string: request.query_string) }
+          else
+            session[:last_grid_url] = "/list/#{id}/with_params?#{request.query_string}"
+            show_page { render_data_grid_page(id, query_string: request.query_string) }
+          end
         end
 
         r.on 'multi' do
-          show_page { render_data_grid_page_multiselect(id, params) }
+          if fetch?(r)
+            show_partial { render_data_grid_page_multiselect(id, params) }
+          else
+            show_page { render_data_grid_page_multiselect(id, params) }
+          end
         end
 
         r.on 'grid' do

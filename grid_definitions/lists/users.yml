@@ -19,6 +19,7 @@
 - :url: "/list/programs/multi?key=program_users&id=$:id$"
   :text: select programs
   :icon: fa-list
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/development/masterfiles/users/new"

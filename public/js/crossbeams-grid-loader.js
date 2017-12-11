@@ -1064,8 +1064,7 @@ $(() => {
             let form = null;
             if (item.method === undefined) {
               if (item.popup) {
-                crossbeamsLocalStorage.setItem('popupOnGrid', item.domGridId);
-                // crossbeamsUtils.jmtPopupDialog(100, 100, item.title_field, '', item.url);
+                crossbeamsUtils.recordGridIdForPopup(item.domGridId);
                 crossbeamsUtils.popupDialog(item.title_field, item.url);
               } else {
                 window.location = item.url;
@@ -1076,7 +1075,7 @@ $(() => {
             //   [It can only be a url with id - there is no form data to post...
             // - should ALL deletes from grids be done through fetches? Probably.
             } else if (item.popup) {
-              crossbeamsLocalStorage.setItem('popupOnGrid', item.domGridId);
+              crossbeamsUtils.recordGridIdForPopup(item.domGridId);
               form = new FormData();
               form.append('_method', item.method);
               form.append('_csrf', document.querySelector('meta[name="_csrf"]').content);
@@ -1092,13 +1091,13 @@ $(() => {
                   if (data.redirect) {
                     window.location = data.redirect;
                   } else if (data.removeGridRowInPlace) {
-                    const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+                    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
                     // TODO: move to own function..
                     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
                     const rowNode = gridOptions.api.getRowNode(data.removeGridRowInPlace.id);
                     gridOptions.api.updateRowData({ remove: [rowNode] });
                   } else if (data.updateGridInPlace) {
-                    const thisGridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+                    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
                     // TODO: move to own function..
                     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
                     const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);

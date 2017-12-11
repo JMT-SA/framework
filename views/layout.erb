@@ -59,13 +59,24 @@
       <%= yield %>
     </div>
 
-    <div class="dialog" aria-hidden="true" id="crossbeams-popup-dialog">
+    <div class="dialog" aria-hidden="true" id="crossbeams-popup-dialog-level1">
       <div class="dialog-overlay" tabindex="-1"></div> <!-- data-a11y-dialog-hide></div> -->
-      <div class="dialog-content" aria-labelledby="dialogTitle" aria-describedby="dialogDescription" role="dialog">
+      <div class="dialog-content" aria-labelledby="dialogTitleLevel1" aria-describedby="dialogDescription" role="dialog">
         <div role="document">
           <button data-a11y-dialog-hide class="dialog-close" aria-label="Close this dialog window">&times;</button>
-          <h1 id="dialogTitle">Dialog title</h1>
-          <div id="dialog-content"></div>
+          <h1 id="dialogTitleLevel1">Dialog title</h1>
+          <div id="dialog-content-level1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog" aria-hidden="true" id="crossbeams-popup-dialog-level2">
+      <div class="dialog-overlay" tabindex="-1"></div> <!-- data-a11y-dialog-hide></div> -->
+      <div class="dialog-content" aria-labelledby="dialogTitleLevel2" aria-describedby="dialogDescription" role="dialog">
+        <div role="document">
+          <button data-a11y-dialog-hide class="dialog-close" aria-label="Close this dialog window">&times;</button>
+          <h1 id="dialogTitleLevel2">Dialog title</h1>
+          <div id="dialog-content-level2"></div>
         </div>
       </div>
     </div>
@@ -93,7 +104,8 @@
     <script src="/js/multi.min.js" type="text/javascript"></script>
     <script src="/js/a11y-dialog.min.js" type="text/javascript"></script>
     <script>
-      let crossbeamsDialog;
+      let crossbeamsDialogLevel1;
+      let crossbeamsDialogLevel2;
       // Prefix all jQuery AJAX post requests with the CSRF token.
       const csrf_token = $('meta[name="_csrf"]').attr('content');
       $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
@@ -108,12 +120,39 @@
       });
 
       document.addEventListener('DOMContentLoaded', function () {
-        const dialogEl = document.getElementById('crossbeams-popup-dialog');
-        crossbeamsDialog = new window.A11yDialog(dialogEl);
+        const dialogEl1 = document.getElementById('crossbeams-popup-dialog-level1');
+        crossbeamsDialogLevel1 = new window.A11yDialog(dialogEl1);
+        const dialogEl2 = document.getElementById('crossbeams-popup-dialog-level2');
+        crossbeamsDialogLevel2 = new window.A11yDialog(dialogEl2);
       });
 
       // Build the menu.
       crossbeamsMenuBuilder.buildMenu(<%= menu_items %>);
+
+      // Override the dialog keypress handler so that we can
+      // trap the ESC key on grid searches.
+      A11yDialog.prototype._bindKeypress = function (event) {
+        // if (this.shown && event.which === 27) { // ESCAPE_KEY) {
+        //   console.log('trapped esc', this);
+        //   if (event.target.dataset && event.target.dataset.gridSearch) {
+        //     return;
+        //   }
+        // }
+        // TODO: Handle ESC outside of the prototype so that we can close
+        //       only the topmost dialog. Currently the ESC goes to all
+        //       dialogs and so the lower one thinks it is no longer showing.
+        // FOR NOW, do not close on ESC...
+        // if (this.shown && event.which === 27) { // ESCAPE_KEY) {
+        //   event.preventDefault();
+        //   this.hide();
+        // }
+
+        // If the dialog is shown and the TAB key is being pressed, make sure the
+        // focus stays trapped within the dialog element
+        if (this.shown && event.which === 9) { // TAB_KEY) {
+          trapTabKey(this.node, event);
+        }
+      }
 
       Jackbox.init();
       <% if flash[:notice] %>

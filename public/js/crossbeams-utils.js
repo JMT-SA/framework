@@ -6,6 +6,112 @@
  */
 const crossbeamsUtils = {
 
+  currentDialogLevel: function currentDialogLevel() {
+    if (crossbeamsDialogLevel2.shown) {
+      return 2;
+    }
+    if (crossbeamsDialogLevel1.shown) {
+      return 1;
+    }
+    return 0;
+  },
+
+  nextDialogContent: function nextDialogContent() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return 'dialog-content-level2';
+      case 1:
+        return 'dialog-content-level2';
+      default:
+        return 'dialog-content-level1';
+    }
+  },
+
+  nextDialogTitle: function nextDialogTitle() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return 'dialogTitleLevel2';
+      case 1:
+        return 'dialogTitleLevel2';
+      default:
+        return 'dialogTitleLevel1';
+    }
+  },
+
+  nextDialog: function nextDialog() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return crossbeamsDialogLevel2;
+      case 1:
+        return crossbeamsDialogLevel2;
+      default:
+        return crossbeamsDialogLevel1;
+    }
+  },
+
+  activeDialogContent: function activeDialogContent() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return 'dialog-content-level2';
+      case 1:
+        return 'dialog-content-level1';
+      default:
+        return 'dialog-content-level1';
+    }
+  },
+
+  activeDialogTitle: function activeDialogTitle() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return 'dialogTitleLevel2';
+      case 1:
+        return 'dialogTitleLevel1';
+      default:
+        return 'dialogTitleLevel1';
+    }
+  },
+
+  activeDialog: function activeDialog() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return crossbeamsDialogLevel2;
+      case 1:
+        return crossbeamsDialogLevel1;
+      default:
+        return crossbeamsDialogLevel1;
+    }
+  },
+
+  recordGridIdForPopup: function recordGridIdForPopup(gridId) {
+    let key = '';
+    switch (this.currentDialogLevel()) {
+      case 2:
+        key = 'level2PopupOnGrid';
+        break;
+      case 1:
+        key = 'level1PopupOnGrid';
+        break;
+      default:
+        key = 'level0PopupOnGrid';
+    }
+    crossbeamsLocalStorage.setItem(key, gridId);
+  },
+
+  baseGridIdForPopup: function baseGridIdForPopup() {
+    let key = '';
+    switch (this.currentDialogLevel()) {
+      case 2:
+        key = 'level1PopupOnGrid';
+        break;
+      case 1:
+        key = 'level0PopupOnGrid';
+        break;
+      default:
+        key = 'level0PopupOnGrid';
+    }
+    return crossbeamsLocalStorage.getItem(key);
+  },
+
   // Popup a modal dialog.
   /**
    * Show a popup dialog window and make an AJAX call to populate the dialog.
@@ -14,8 +120,8 @@ const crossbeamsUtils = {
    * @returns {void}
    */
   popupDialog: function popupDialog(title, href) {
-    document.getElementById('dialogTitle').innerHTML = title;
-    document.getElementById('dialog-content').innerHTML = '';
+    document.getElementById(this.nextDialogTitle()).innerHTML = title;
+    document.getElementById(this.nextDialogContent()).innerHTML = '';
     fetch(href, {
       method: 'GET',
       headers: new Headers({
@@ -24,7 +130,7 @@ const crossbeamsUtils = {
       credentials: 'same-origin',
     }).then(response => response.text())
       .then((data) => {
-        const dlg = document.getElementById('dialog-content');
+        const dlg = document.getElementById(this.activeDialogContent());
         dlg.innerHTML = data;
         crossbeamsUtils.makeMultiSelects();
         crossbeamsUtils.makeSearchableSelects();
@@ -41,9 +147,9 @@ const crossbeamsUtils = {
       }).catch((data) => {
         Jackbox.error('The action was unsuccessful...');
         const htmlText = data.responseText ? data.responseText : '';
-        document.getElementById('dialog-content').innerHTML = htmlText;
+        document.getElementById(this.activeDialogContent()).innerHTML = htmlText;
       });
-    crossbeamsDialog.show();
+    this.nextDialog().show();
   },
 
   /**
@@ -51,7 +157,7 @@ const crossbeamsUtils = {
    * @returns {void}
    */
   closePopupDialog: function closePopupDialog() {
-    crossbeamsDialog.hide();
+    this.activeDialog().hide();
   },
 
   /**
@@ -61,9 +167,9 @@ const crossbeamsUtils = {
    * @returns {void}
    */
   showHtmlInDialog: function showHtmlInDialog(title, text) {
-    document.getElementById('dialogTitle').innerHTML = title;
-    document.getElementById('dialog-content').innerHTML = text;
-    crossbeamsDialog.show();
+    document.getElementById(this.nextDialogTitle()).innerHTML = title;
+    document.getElementById(this.nextDialogContent()).innerHTML = text;
+    this.nextDialog().show();
   },
 
   /**

@@ -24,7 +24,8 @@ module.exports = {
     "Selectr": false,
     "Sortable": false,
     "multi": false,
-    "crossbeamsDialog": false,
+    "crossbeamsDialogLevel1": false,
+    "crossbeamsDialogLevel2": false,
     "crossbeamsGridStore": false,
     "crossbeamsUtils": false,
     "crossbeamsLocalStorage": false

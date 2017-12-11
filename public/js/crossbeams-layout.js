@@ -110,7 +110,6 @@
         preventMultipleSubmitsBriefly(event.target);
       }
       if (event.target.dataset && event.target.dataset.popupDialog) {
-        // crossbeamsUtils.jmtPopupDialog(100, 100, event.target.text, '', event.target.href);
         crossbeamsUtils.popupDialog(event.target.text, event.target.href);
         event.stopPropagation();
         event.preventDefault();
@@ -154,7 +153,7 @@
             if (data.redirect) {
               window.location = data.redirect;
             } else if (data.updateGridInPlace) {
-              const gridId = crossbeamsLocalStorage.getItem('popupOnGrid');
+              const gridId = crossbeamsUtils.baseGridIdForPopup();
               // TODO: move to own function..
               const gridOptions = crossbeamsGridStore.getGrid(gridId);
               const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
@@ -163,7 +162,7 @@
               });
             } else if (data.replaceDialog) {
               closeDialog = false;
-              const dlgContent = document.getElementById('dialog-content');
+              const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());
               dlgContent.innerHTML = data.replaceDialog.content;
               crossbeamsUtils.makeMultiSelects();
               crossbeamsUtils.makeSearchableSelects();
@@ -195,7 +194,7 @@
           }).catch((data) => {
             if (data.response.status === 500) {
               data.response.text().then((body) => {
-                document.getElementById('dialog-content').innerHTML = body;
+                document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
               });
             }
             Jackbox.error(`An error occurred ${data}`, { time: 20 });

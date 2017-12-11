@@ -178,7 +178,7 @@ class Framework < Roda
 
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
-          if params
+          if params && !params.empty?
             render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, params)
           else
             render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })

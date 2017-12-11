@@ -248,7 +248,7 @@ class GenerateNewScaffold < BaseService
 
     def columnise
       attr = []
-      opts.table_meta.columns_without(%i[created_at updated_at]).each do |col|
+      opts.table_meta.columns_without(%i[created_at updated_at active]).each do |col|
         attr << "attribute :#{col}, #{opts.table_meta.column_dry_type(col)}"
       end
       attr
@@ -276,7 +276,7 @@ class GenerateNewScaffold < BaseService
 
     def columnise
       attr = []
-      opts.table_meta.columns_without(%i[created_at updated_at]).each do |col|
+      opts.table_meta.columns_without(%i[created_at updated_at active]).each do |col|
         detail = opts.table_meta.col_lookup[col]
         fill_opt = detail[:allow_null] ? 'maybe' : 'filled'
         max = detail[:max_length] && detail[:max_length] < 200 ? "max_size?: #{detail[:max_length]}" : nil
@@ -518,7 +518,7 @@ class GenerateNewScaffold < BaseService
     private
 
     def fields_to_use
-      opts.table_meta.columns_without(%i[id created_at updated_at])
+      opts.table_meta.columns_without(%i[id created_at updated_at active])
     end
 
     def show_fields
@@ -610,7 +610,7 @@ class GenerateNewScaffold < BaseService
     private
 
     def fields_to_use
-      opts.table_meta.columns_without(%i[id created_at updated_at])
+      opts.table_meta.columns_without(%i[id created_at updated_at active])
     end
 
     def form_fields

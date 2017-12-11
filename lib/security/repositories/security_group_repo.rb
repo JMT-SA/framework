@@ -3,15 +3,9 @@
 class SecurityGroupRepo < RepoBase
   build_for_select :security_permissions, label: :security_permission,
                                           value: :id,
+                                          no_active_check: true,
                                           order_by: :security_permission
-  # build_for_select :security_permissions, label: :security_permission,
-  #                                         value: :id,
-  #                                         order_by: :security_permission,
-  #                                         desc: true,
-  #                                         alias: :secperms
-  # build_for_select :roles, label: :name,
-  #                          value: :id,
-  #                          order_by: :id
+
   def find_with_permissions(id)
     security_group = find(:security_groups, SecurityGroup, id)
     domain_obj = DomainSecurityGroup.new(security_group)

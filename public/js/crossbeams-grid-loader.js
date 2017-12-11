@@ -1091,7 +1091,7 @@ $(() => {
                   if (data.redirect) {
                     window.location = data.redirect;
                   } else if (data.removeGridRowInPlace) {
-                    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
+                    const thisGridId = crossbeamsUtils.currentGridIdForPopup();
                     // TODO: move to own function..
                     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
                     const rowNode = gridOptions.api.getRowNode(data.removeGridRowInPlace.id);

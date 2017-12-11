@@ -97,6 +97,21 @@ const crossbeamsUtils = {
     crossbeamsLocalStorage.setItem(key, gridId);
   },
 
+  currentGridIdForPopup: function currentGridIdForPopup() {
+    let key = '';
+    switch (this.currentDialogLevel()) {
+      case 2:
+        key = 'level2PopupOnGrid';
+        break;
+      case 1:
+        key = 'level1PopupOnGrid';
+        break;
+      default:
+        key = 'level0PopupOnGrid';
+    }
+    return crossbeamsLocalStorage.getItem(key);
+  },
+
   baseGridIdForPopup: function baseGridIdForPopup() {
     let key = '';
     switch (this.currentDialogLevel()) {

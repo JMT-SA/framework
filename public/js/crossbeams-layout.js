@@ -153,13 +153,8 @@
             if (data.redirect) {
               window.location = data.redirect;
             } else if (data.updateGridInPlace) {
-              const gridId = crossbeamsUtils.baseGridIdForPopup();
-              // TODO: move to own function..
-              const gridOptions = crossbeamsGridStore.getGrid(gridId);
-              const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
-              Object.keys(data.updateGridInPlace.changes).forEach((key) => {
-                rowNode.setDataValue(key, data.updateGridInPlace.changes[key]);
-              });
+              crossbeamsGridEvents.updateGridInPlace(data.updateGridInPlace.id,
+                                     data.updateGridInPlace.changes);
             } else if (data.replaceDialog) {
               closeDialog = false;
               const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());
@@ -189,6 +184,7 @@
               }
             }
             if (closeDialog && !data.exception) {
+              // Do we need to clear grids etc from memory?
               crossbeamsUtils.closePopupDialog();
             }
           }).catch((data) => {

@@ -156,8 +156,12 @@ class Framework < Roda
       r.on 'link_users', Integer do |id|
         r.post do
           res = interactor.link_user(id, multiselect_grid_choices(params))
-          flash[:notice] = res.message
-          r.redirect '/list/users'
+          if fetch?(r)
+            show_json_notice(res.message)
+          else
+            flash[:notice] = res.message
+            r.redirect '/list/users'
+          end
         end
       end
 

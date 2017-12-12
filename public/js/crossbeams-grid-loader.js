@@ -71,44 +71,113 @@ const crossbeamsGridEvents = {
   },
 
   /**
+   * Change the values of certain columns of a row of a grid.
+   * @param {integer} id - the id of the grid's row.
+   * @param {object} changes - the changes to be applied to the grid's row.
+   * @returns {void}
+   */
+  updateGridInPlace: function updateGridInPlace(id, changes) {
+    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
+    const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+    const rowNode = gridOptions.api.getRowNode(id);
+    Object.keys(changes).forEach((k) => {
+      rowNode.setDataValue(k, changes[k]);
+    });
+  },
+
+  /**
+   * Remove a row from a grid.
+   * @param {integer} id - the id of the grid's row.
+   * @returns {void}
+   */
+  removeGridRowInPlace: function removeGridRowInPlace(id) {
+    const thisGridId = crossbeamsUtils.currentGridIdForPopup();
+    const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+    const rowNode = gridOptions.api.getRowNode(id);
+    gridOptions.api.updateRowData({ remove: [rowNode] });
+  },
+
+  /**
    * Save row ids from a multiselect grid.
    * @param {string} gridId - the DOM id of the grid.
    * @param {string} url - the URL to receive the fetch request.
    * @returns {void}
    */
-  saveSelectedRows: function saveSelectedRows(gridId, url, canBeCleared) {
+  saveSelectedRows: function saveSelectedRows(gridId, url, canBeCleared, remoteSave) {
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
     const ids = _.map(gridOptions.api.getSelectedRows(), m => m.id);
-    // crossbeamsUtils.alert({prompt: ids.join(','), title: url});
     let msg;
     if (!canBeCleared && ids.length === 0) {
       crossbeamsUtils.alert({ prompt: 'You have not selected any items to submit!', type: 'error' });
-    }
-    else {
+    } else {
       if (ids.length === 0) {
         msg = 'Are you sure you want to submit an empty selection?';
-      }
-      else {
+      } else {
         msg = `Are you sure you want to submit this selection?(${ids.length.toString()} items)`;
       }
 
+      // Save via a standard HTTP call.
+      const saveStd = () => {
+        const form = document.createElement('form');
+        const element1 = document.createElement('input');
+        const csrf = document.createElement('input');
+        form.method = 'POST';
+        form.action = url;
+        element1.value = ids.join(',');
+        element1.name = 'selection[list]';
+        csrf.value = document.querySelector('meta[name="_csrf"]').content;
+        csrf.name = '_csrf';
+        form.appendChild(element1);
+        form.appendChild(csrf);
+        document.body.appendChild(form);
+        form.submit();
+      };
+
+      // Save via a remote fetch call.
+      const saveRemote = () => {
+        const form = new FormData();
+        form.append('selection[list]', ids.join(','));
+        form.append('_csrf', document.querySelector('meta[name="_csrf"]').content);
+        fetch(url, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: new Headers({
+            'X-Custom-Request-Type': 'Fetch',
+          }),
+          body: form,
+        }).then(response => response.json())
+          .then((data) => {
+            if (data.redirect) {
+              window.location = data.redirect;
+            } else if (data.updateGridInPlace) {
+              this.updateGridInPlace(data.updateGridInPlace.id, data.updateGridInPlace.changes);
+            } else {
+              console.log('Not sure what to do with this:', data);
+            }
+            crossbeamsUtils.closePopupDialog();
+            // Only if not redirect...
+            if (data.flash) {
+              if (data.flash.notice) {
+                Jackbox.success(data.flash.notice);
+              }
+              if (data.flash.error) {
+                if (data.exception) {
+                  Jackbox.error(data.flash.error, { time: 20 });
+                } else {
+                  Jackbox.error(data.flash.error);
+                }
+              }
+            }
+          }).catch((data) => {
+            Jackbox.error(`An error occurred ${data}`, { time: 20 });
+          });
+      };
+
+      const saveFunc = remoteSave ? saveRemote : saveStd;
+
       crossbeamsUtils.confirm({
         prompt: msg,
-        okFunc: () => {
-          const form = document.createElement('form');
-          const element1 = document.createElement('input');
-          const csrf = document.createElement('input');
-          form.method = 'POST';
-          form.action = url;
-          element1.value = ids.join(',');
-          element1.name = 'selection[list]';
-          csrf.value = document.querySelector('meta[name="_csrf"]').content;
-          csrf.name = '_csrf';
-          form.appendChild(element1);
-          form.appendChild(csrf);
-          document.body.appendChild(form);
-          form.submit();
-        },
+        okFunc: saveFunc,
       });
     }
   },
@@ -1091,19 +1160,10 @@ $(() => {
                   if (data.redirect) {
                     window.location = data.redirect;
                   } else if (data.removeGridRowInPlace) {
-                    const thisGridId = crossbeamsUtils.currentGridIdForPopup();
-                    // TODO: move to own function..
-                    const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
-                    const rowNode = gridOptions.api.getRowNode(data.removeGridRowInPlace.id);
-                    gridOptions.api.updateRowData({ remove: [rowNode] });
+                    crossbeamsGridEvents.removeGridRowInPlace(data.removeGridRowInPlace.id);
                   } else if (data.updateGridInPlace) {
-                    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
-                    // TODO: move to own function..
-                    const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
-                    const rowNode = gridOptions.api.getRowNode(data.updateGridInPlace.id);
-                    Object.keys(data.updateGridInPlace.changes).forEach((k) => {
-                      rowNode.setDataValue(k, data.updateGridInPlace.changes[k]);
-                    });
+                    crossbeamsGridEvents.updateGridInPlace(data.updateGridInPlace.id,
+                                           data.updateGridInPlace.changes);
                   } else {
                     console.log('Not sure what to do with this:', data);
                   }

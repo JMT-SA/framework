@@ -86,6 +86,10 @@ module CommonHelpers
     { redirect: url }.to_json
   end
 
+  def show_json_notice(message)
+    { flash: { notice: message } }.to_json
+  end
+
   def update_grid_row(id, changes:, notice: nil)
     res = { updateGridInPlace: { id: id.to_i, changes: changes } }
     res[:flash] = { notice: notice } if notice

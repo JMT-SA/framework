@@ -390,6 +390,7 @@ tr.roweven {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   max-height: 600px; /* depend on viewport? */
+  resize: both;
   overflow-y: auto;
 }
 

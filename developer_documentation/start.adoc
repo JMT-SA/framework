@@ -11,8 +11,9 @@
 * link:/developer_documentation/page_layout.adoc[Page layout]
 * link:/developer_documentation/non_field_renderers.adoc[Non-field Renderers]
 * link:/developer_documentation/field_renderers.adoc[Field Renderers]
-* Field renderer behaviours
+* link:/developer_documentation/field_renderer_behaviours.adoc[Field renderer behaviours]
 * link:/developer_documentation/repositories.adoc[Repositories]
+* link:/developer_documentation/app_config.adoc[App Configuration]
 
 === Tutorials
 

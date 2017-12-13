@@ -1,0 +1,23 @@
+= App config
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== App configuration
+
+The application environment is set in the `RACK_ENV` environment variable.
+
+Environments can be:
+
+* development (default)
+* production
+* test
+
+Environment variable loading uses the dotenv gem (https://github.com/bkeepers/dotenv).
+
+Development environment variables are set in the `.env` file in the root dir.
+Per-machine overrides can be specified in a `.env.local` file (which is not checked in to version control).
+
+TODO: client-specific
+
+TODO: paths

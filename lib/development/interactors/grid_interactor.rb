@@ -114,7 +114,21 @@ class GridInteractor < BaseInteractor
      { headerName: 'Key', field: 'key' },
      { headerName: 'URL', field: 'url', width: 500 },
      { headerName: 'Preselect', field: 'preselect', width: 500 },
-     { headerName: 'Section Caption', field: 'section_caption', width: 500 }]
+     { headerName: 'Section Caption', field: 'section_caption', width: 500 },
+     {
+       headerName: 'Can clear?',
+       field: 'can_be_cleared',
+       cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
+       cellClass: 'grid-boolean-column',
+       width: 100
+     },
+     {
+       headerName: 'Remote?',
+       field: 'multiselect_save_remote',
+       cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
+       cellClass: 'grid-boolean-column',
+       width: 100
+     }]
   end
 
   def multiselect_row_defs(file)
@@ -125,7 +139,9 @@ class GridInteractor < BaseInteractor
         key: key,
         url: control.url,
         preselect: control.preselect,
-        section_caption: control.section_caption
+        section_caption: control.section_caption,
+        can_be_cleared: control.can_be_cleared,
+        multiselect_save_remote: control.multiselect_save_remote
       }
     end
     rows

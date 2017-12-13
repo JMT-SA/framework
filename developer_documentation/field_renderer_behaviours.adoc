@@ -1,0 +1,49 @@
+= Behaviours
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Behaviours
+
+Behaviours are used to bring dynamic changes to forms in the UI.
+e.g. To limit the options of one dropdown based on the current selection of another.
+
+The following behaviours can be specified for a field renderer:
+
+* <<Enable>>
+
+=== Add a behaviour
+
+In a UiRule, behaviours are added like this:
+```.ruby
+behaviours do |behaviour|
+  behaviour.enable :other, when: :applet, changes_to: ['other']
+end
+```
+
+=== Enable
+
+Description:
+
+This behaviour attaches to a source field and enables/disables a target field based on the value of the source field.
+
+Format:
+
+`enable(target_field, conditions = {})`
+
+`target_field` is the name of the field to be enabled/disabled.
+
+Conditions:
+
+* `when:` Symbol
++
+The source field to observe.
+* `changes_to:` Array
++
+
+Example:
+```.ruby
+behaviours do |behaviour|
+  behaviour.enable :more_info, when: :refferred_by, changes_to: ['unknown', 'other']
+end
+```

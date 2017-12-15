@@ -114,8 +114,9 @@ GEM
       ruby_dep (~> 1.2)
     method_source (0.9.0)
     mini_portile2 (2.3.0)
-    minitest (5.11.3)
+    minitest (5.10.3)
     minitest-hooks (1.4.2)
+    minitest-stub_any_instance (1.0.2)
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
     parallel (1.12.1)
@@ -199,8 +200,9 @@ DEPENDENCIES
   dotenv
   dry-struct
   dry-validation
-  minitest
-  minitest-hooks
+  minitest (~> 5.10.3)
+  minitest-hooks (= 1.4.2)
+  minitest-stub_any_instance (~> 1.0.1)
   pg
   pry
   pry-byebug

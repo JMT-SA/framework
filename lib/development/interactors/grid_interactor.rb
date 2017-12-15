@@ -24,7 +24,7 @@ class GridInteractor < BaseInteractor
   def grid_page_controls(file)
     row_defs = page_control_row_defs(file)
     {
-      columnDefs: page_control_col_defs,
+      columnDefs: page_control_col_defs(file),
       rowDefs:    row_defs
     }
   end
@@ -53,6 +53,23 @@ class GridInteractor < BaseInteractor
     }
   end
 
+  def page_control(file, index)
+    page_controls = load_list_file(file)[:page_controls]
+    page_controls[index].merge(list_file: file, index: index)
+  end
+
+  def update_page_control(params)
+    file = params[:list_file]
+    index = params[:index].to_i
+    list = load_list_file(file)
+    page_control = list[:page_controls][index]
+    page_control[:text] = params[:text]
+    list[:page_controls][index] = page_control
+    save_list_file(file, list)
+    success_response("Updated #{params[:text]}",
+                     page_control)
+  end
+
   private
 
   def file_path(file)
@@ -67,8 +84,12 @@ class GridInteractor < BaseInteractor
     YAML.load(File.read(file_path(file)))                               # rubocop: disable Security/YAMLLoad
   end
 
-  def page_control_col_defs
-    action_cols = [{ text: 'edit', icon: 'fa-edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
+  def save_list_file(file, list)
+    File.open(file_path(file), 'w') { |f| f << list.to_yaml }
+  end
+
+  def page_control_col_defs(file)
+    action_cols = [{ text: 'edit', icon: 'fa-edit', url: "/development/grids/grid_page_controls/#{file}/$col0$", col0: 'id', popup: true, title: 'Edit page control' }]
 
     [{ headerName: '', pinned: 'left',
        width: 60,
@@ -82,19 +103,21 @@ class GridInteractor < BaseInteractor
      { headerName: 'Control Type', field: 'control_type' },
      { headerName: 'Style', field: 'style' },
      { headerName: 'Behaviour', field: 'behaviour' },
-     { headerName: 'URL', field: 'url', width: 500 }]
+     { headerName: 'URL', field: 'url', width: 500 },
+     { headerName: 'Index', field: 'id', hide: true }]
   end
 
   def page_control_row_defs(file)
     rows = []
-    (load_list_file(file)[:page_controls] || []).each do |page_control|
+    (load_list_file(file)[:page_controls] || []).each_with_index do |page_control, index|
       control = OpenStruct.new(page_control)
       rows << {
         text: control.text,
         control_type: control.control_type,
         style: control.style,
         behaviour: control.behaviour,
-        url: control.url
+        url: control.url,
+        id: index
       }
     end
     rows
@@ -280,4 +303,5 @@ class GridInteractor < BaseInteractor
     end
     { file: index, dm_file: list_hash[:dataminer_definition], caption: caption }
   end
+
 end

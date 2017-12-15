@@ -43,5 +43,22 @@ class Framework < Roda
         grid_interactor.grid_conditions(list_file).to_json
       end
     end
+
+    r.on 'grid_page_controls', String, Integer do |list_file, index|
+      grid_interactor = GridInteractor.new(current_user, {}, {}, {})
+
+      r.patch do
+        res = grid_interactor.update_page_control(params[:page_control])
+        update_grid_row(index, changes: { text: res.instance[:text],
+                                          url: res.instance[:url],
+                                          control_type: res.instance[:control_type],
+                                          style: res.instance[:style],
+                                          behaviour: res.instance[:behaviour] },
+                               notice: res.message)
+      end
+
+      res = grid_interactor.page_control(list_file, index)
+      show_partial { Development::Grids::PageControl::Edit.call(res) }
+    end
   end
 end

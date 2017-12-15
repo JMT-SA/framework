@@ -1,0 +1,15 @@
+= How to use multiselect grids
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to use multiselect grids
+
+=== link to multiselect page and back
+
+=== link to multiselect in a dialog
+
+=== Pre-select rows
+
+=== Save selection
+

@@ -23,10 +23,10 @@ class PersonInteractor < BaseInteractor
     attrs = res.to_h
     role_ids = attrs.delete(:role_ids)
     roles_response = assign_person_roles(@person_id, role_ids)
-    DB.transaction do
-      party_repo.update_person(id, attrs)
-    end
     if roles_response.success
+      DB.transaction do
+        party_repo.update_person(id, attrs)
+      end
       success_response("Updated person #{person.party_name}, #{roles_response.message}", person(false))
     else
       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
@@ -43,17 +43,11 @@ class PersonInteractor < BaseInteractor
   end
 
   def assign_person_roles(id, role_ids)
-    party_id = party_repo.party_id_from_person(id)
+    return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
     DB.transaction do
-      party_repo.assign_person_roles(id, role_ids)
+      party_repo.assign_roles(person_id: id, role_ids: role_ids)
     end
-
-    existing_ids = party_repo.party_role_ids(party_id)
-    if existing_ids.eql?(role_ids.sort)
-      success_response('Roles assigned successfully')
-    else
-      validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
-    end
+    success_response('Roles assigned successfully')
   end
 
   private

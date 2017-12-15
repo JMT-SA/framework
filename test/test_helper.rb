@@ -1,5 +1,9 @@
 require 'minitest/autorun'
+<<<<<<< a6fc6626d5a041be14678f89261bcb51f733db5b
 require "mocha/mini_test"
+=======
+require 'minitest/stub_any_instance'
+>>>>>>> WIP
 require 'crossbeams/layout'
 require 'yaml'
 require 'dry-struct'

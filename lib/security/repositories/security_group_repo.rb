@@ -6,6 +6,8 @@ class SecurityGroupRepo < RepoBase
                                           no_active_check: true,
                                           order_by: :security_permission
 
+  crud_calls_for :security_groups, name: :security_group, wrapper: SecurityGroup
+
   def find_with_permissions(id)
     security_group = find(:security_groups, SecurityGroup, id)
     domain_obj = DomainSecurityGroup.new(security_group)

@@ -25,6 +25,7 @@ gem 'crossbeams-rack_middleware',     path: File.expand_path('../../crossbeams-r
 gem 'roda-data_grid',                 path: File.expand_path('../../roda-data_grid', __FILE__)
 
 gem 'minitest'
+gem 'minitest-hooks', '1.4.2'
 gem 'pry'
 gem 'pry-byebug'
 gem 'pry-clipboard'

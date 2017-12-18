@@ -29,9 +29,16 @@ require File.join(File.expand_path('../../fake_repositories/', __FILE__), 'fake_
 class TestOrganizationInteractor < Minitest::Test
 
   def test_create_organization
-    PartyRepo.stub_any_instance :create_organization do
+    p "do I get in here"
+    PartyRepo.stub_any_instance :create_organization, nil do
       {id: 1}
     end
+    x = PartyRepo.new()
+    y = x.create_organization(blah: 'blah')
+    p y
+    # PartyRepo.stub_any_instance :create_organization do
+    #   {id: 1}
+    # end
     # PartyRepo.send(:const_set, create_organization, FakePartyRepo.create_organization)
     p "after first line"
     organization_attrs = {
@@ -45,7 +52,7 @@ class TestOrganizationInteractor < Minitest::Test
       vat_number: '789456',
       variants: [],
       active: true,
-      role_ids: [1,2,3],
+      role_ids: [1, 2, 3],
       role_names: ['One', 'Two', 'Three'],
       parent_organization: 'Test Parent Organization'
     }
@@ -111,19 +118,19 @@ class TestOrganizationInteractor < Minitest::Test
 
   def organization_attrs
     {
-    id: 1,
-    party_id: 1,
-    party_name: 'Test Organization Party',
-    parent_id: 1,
-    short_description: 'Test Organization Party',
-    medium_description: 'Medium Description',
-    long_description: 'Long Description',
-    vat_number: 789456,
-    variants: [],
-    active: true,
-    role_ids: [1,2,3],
-    role_names: ['One', 'Two', 'Three'],
-    parent_organization: 'Test Parent Organization'
+      id: 1,
+      party_id: 1,
+      party_name: 'Test Organization Party',
+      parent_id: 1,
+      short_description: 'Test Organization Party',
+      medium_description: 'Medium Description',
+      long_description: 'Long Description',
+      vat_number: 789456,
+      variants: [],
+      active: true,
+      role_ids: [1,2,3],
+      role_names: ['One', 'Two', 'Three'],
+      parent_organization: 'Test Parent Organization'
     }
   end
 

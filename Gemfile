@@ -37,7 +37,7 @@ gem 'roda-data_grid', git: 'https://github.com/NoSoft-SA/roda-data_grid.git'
 group :test do
   gem 'minitest', '~>5.10.3'
   gem 'minitest-hooks', '1.4.2'
-  gem 'minitest-stub_any_instance', '~>1.0.1'
+  gem 'mocha', '~>1.3.0'
 end
 
 group :development do
@@ -48,4 +48,3 @@ group :development do
   gem 'rack-console'
   gem 'rerun'
 end
-

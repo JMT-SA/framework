@@ -1,47 +1,79 @@
 require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
 require File.join(File.expand_path('../../fake_repositories/', __FILE__), 'fake_party_repo')
-# require 'minitest/mock'
-
-# class Book; end
-#
-# desired_title = 'War and Peace'
-# return_value = desired_title
-# method = :title
-# book_instance_stub = Minitest::Mock.new
-# number_of_title_invocations = 2
-# number_of_title_invocations.times do
-#   book_instance_stub.expect method, return_value
-# end
-#
-# return_value = book_instance_stub
-# method_to_redefine = :new
-# Book.stub method_to_redefine, return_value do
-#   some_book = Book.new
-#   puts some_book.title #=> "War and Peace"
-#   puts some_book.title #=> "War and Peace"
-# end
-# book_instance_stub.verify
-
-# require 'minitest/stub_any_instance'
-
-
 
 class TestOrganizationInteractor < Minitest::Test
 
   def test_create_organization
-    p "do I get in here"
-    PartyRepo.stub_any_instance :create_organization, nil do
-      {id: 1}
-    end
-    x = PartyRepo.new()
-    y = x.create_organization(blah: 'blah')
-    p y
-    # PartyRepo.stub_any_instance :create_organization do
-    #   {id: 1}
+    PartyRepo.any_instance.stubs(:create_organization).returns(id: 1)
+    PartyRepo.any_instance.stubs(:find_organization).returns(Organization.new(organization_attrs))
+
+    x = interactor.create_organization(invalid_organization_for_create)
+    assert !x.success
+    assert_equal('Validation error', x.message)
+    assert_equal(['must be a string'], x.errors[:vat_number]) # TODO: This is rather a test for validate_organization_params
+
+    x = interactor.create_organization(organization_for_create)
+    assert x.success
+    assert_instance_of(Organization, x.instance)
+    assert_equal('Created organization Test Organization Party', x.message)
+  end
+
+  def test_party_repo
+    x = interactor.send(:party_repo)
+    assert x.is_a?(PartyRepo)
+  end
+
+  def test_organization
+    PartyRepo.any_instance.stubs(:find_organization).returns(Organization.new(organization_attrs))
+    x = interactor.send(:organization)
+    assert x.is_a?(Organization)
+  end
+
+  def test_validate_organization_params
+    x = interactor.send(:validate_organization_params, organization_attrs)
+    assert_empty x.errors
+
+    # optional(:id).filled(:int?)
+    my_org = organization_attrs
+    my_org[:parent_id] = '1'
+    p my_org
+    x = interactor.send(:validate_organization_params, my_org)
+    refute_empty x.errors
+
+    org_attrs_without_id = organization_attrs.reject{ |k, _| k == :id }
+    x = interactor.send(:validate_organization_params, org_attrs_without_id)
+    assert_empty x.errors
+
+    org_attrs_without_short_description = organization_attrs.reject{ |k, _| k == :short_description }
+    x = interactor.send(:validate_organization_params, org_attrs_without_short_description)
+    refute_empty x.errors
+
+    org_attrs_without_medium_description = organization_attrs.reject{ |k, _| k == :medium_description }
+    x = interactor.send(:validate_organization_params, org_attrs_without_medium_description)
+    refute_empty x.errors
+
+    org_attrs_without_long_description = organization_attrs.reject{ |k, _| k == :long_description }
+    x = interactor.send(:validate_organization_params, org_attrs_without_long_description)
+    refute_empty x.errors
+
+    org_attrs_without_long_description = organization_attrs.reject{ |k, _| k == :long_description }
+    x = interactor.send(:validate_organization_params, org_attrs_without_long_description)
+    refute_empty x.errors
+
+    # OrganizationSchema = Dry::Validation.Form do
+    #   optional(:parent_id).maybe(:int?)
+    #   required(:short_description).filled(:str?)
+    #   required(:medium_description).maybe(:str?)
+    #   required(:long_description).maybe(:str?)
+    #   required(:vat_number).maybe(:str?)
+    #   required(:role_ids).each(:int?)
+    #   # required(:party_id).filled(:int?)
+    #   # required(:variants).maybe(:str?)
+    #   # required(:active).maybe(:bool?)
     # end
-    # PartyRepo.send(:const_set, create_organization, FakePartyRepo.create_organization)
-    p "after first line"
-    organization_attrs = {
+
+
+    {
       id: 1,
       party_id: 1,
       party_name: 'Test Organization Party',
@@ -52,16 +84,57 @@ class TestOrganizationInteractor < Minitest::Test
       vat_number: '789456',
       variants: [],
       active: true,
-      role_ids: [1, 2, 3],
+      role_ids: [1,2,3],
       role_names: ['One', 'Two', 'Three'],
       parent_organization: 'Test Parent Organization'
     }
-    keys = [:short_description, :medium_description, :long_description, :vat_number, :active, :role_ids]
-    organization_for_create = organization_attrs.select { |key, _| keys.include?(key) }
+    keys = %i[short_description medium_description long_description vat_number active role_ids]
+    org_attrs = organization_attrs.select { |key, _| keys.include?(key) }
+    org_attrs[:vat_number] = 789456
+    org_attrs
 
-    assert interactor.create_organization(organization_for_create)
-    # PartyRepo.send(:remove_const, :create_organization)
+
+
+
+
   end
+
+  #   def validate_organization_params(params)
+  #     OrganizationSchema.call(params)
+  #   end
+  #   def validation_failed_response(validation_results)
+  #     OpenStruct.new(success: false,
+  #                    instance: {},
+  #                    errors: validation_results.messages,
+  #                    message: 'Validation error')
+  #   end
+  #
+  #   def failed_response(message, instance = nil)
+  #     OpenStruct.new(success: false,
+  #                    instance: instance,
+  #                    errors: {},
+  #                    message: message)
+  #   end
+  #
+  #   def success_response(message, instance = nil)
+  #     OpenStruct.new(success: true,
+  #                    instance: instance,
+  #                    errors: {},
+  #                    message: message)
+  #   end
+
+  #
+  #   def organization(cached = true)
+  #     if cached
+  #       @organization ||= party_repo.find_organization(@organization_id)
+  #     else
+  #       @organization = party_repo.find_organization(@organization_id)
+  #     end
+  #   end
+  #
+  #   def validate_organization_params(params)
+  #     OrganizationSchema.call(params)
+  #   end
 
   # it "creates an organization party"
   # it "creates a person party"
@@ -88,28 +161,7 @@ class TestOrganizationInteractor < Minitest::Test
   # it "creates a contact method"
   # it "returns all contact methods"
   #
-  #
-  # before do
-  #   # exploit Ruby's constant lookup mechanism
-  #   # when BookRepository is referenced in Book.find_all_short_and_unread
-  #   # then this class will be used instead of the real BookRepository
-  #   OrganizationInteractor.send(:const_set, PartyRepo, FakePartyRepo)
-  # end
-  #
-  # after do
-  #   # clean up after ourselves so future tests will not be affected
-  #   OrganizationInteractor.send(:remove_const, :PartyRepo)
-  # end
-  #
-  # # let(:fake_party_repo) do
-  # #   Class.new(BookRepository)
-  # # end
 
-
-
-  def party_repo_create_organization(attrs)
-    { id: 1 }
-  end
   private
 
   def interactor
@@ -125,7 +177,7 @@ class TestOrganizationInteractor < Minitest::Test
       short_description: 'Test Organization Party',
       medium_description: 'Medium Description',
       long_description: 'Long Description',
-      vat_number: 789456,
+      vat_number: '789456',
       variants: [],
       active: true,
       role_ids: [1,2,3],
@@ -135,8 +187,15 @@ class TestOrganizationInteractor < Minitest::Test
   end
 
   def organization_for_create
-    keys = [:short_description, :medium_description, :long_description, :vat_number, :active, :role_ids]
+    keys = %i[short_description medium_description long_description vat_number active role_ids]
     organization_attrs.select { |key, _| keys.include?(key) }
+  end
+
+  def invalid_organization_for_create
+    keys = %i[short_description medium_description long_description vat_number active role_ids]
+    org_attrs = organization_attrs.select { |key, _| keys.include?(key) }
+    org_attrs[:vat_number] = 789456
+    org_attrs
   end
 end
 

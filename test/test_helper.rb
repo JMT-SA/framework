@@ -4,6 +4,7 @@ require 'crossbeams/layout'
 require 'yaml'
 require 'dry-struct'
 require 'dry-validation'
+require 'sequel'
 
 ENV['RACK_ENV'] = 'test'
 require './config/environment'

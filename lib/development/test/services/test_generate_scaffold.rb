@@ -24,7 +24,6 @@ class GenerateNewScaffoldTest < MiniTestWithHooks
   end
 
   def test_nothing
-    p "hello world"
     assert true
   end
 

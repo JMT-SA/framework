@@ -25,7 +25,8 @@ namespace :db do
   task version: :dotenv do
     require 'sequel'
     Sequel.extension :migration
-    db = Sequel.connect(ENV.fetch('FM_DATABASE_URL'))
+    db_name = "#{ENV.fetch('FM_DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db = Sequel.connect(db_name)
     version = if db.tables.include?(:schema_migrations)
                 db[:schema_migrations].reverse(:filename).first[:filename]
               end || 0
@@ -37,7 +38,8 @@ namespace :db do
   task recent_migrations: :dotenv do
     require 'sequel'
     Sequel.extension :migration
-    db = Sequel.connect(ENV.fetch('FM_DATABASE_URL'))
+    db_name = "#{ENV.fetch('FM_DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db = Sequel.connect(db_name)
     migrations = if db.tables.include?(:schema_migrations)
                    db[:schema_migrations].reverse(:filename).first(10).map { |r| r[:filename] }
                  else
@@ -51,7 +53,8 @@ namespace :db do
   task :migrate, [:version] => :dotenv do |_, args|
     require 'sequel'
     Sequel.extension :migration
-    db = Sequel.connect(ENV.fetch('FM_DATABASE_URL'))
+    db_name = "#{ENV.fetch('FM_DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db = Sequel.connect(db_name)
     if args[:version]
       puts "Migrating to version #{args[:version]}"
       Sequel::Migrator.run(db, 'db/migrations', target: args[:version].to_i)

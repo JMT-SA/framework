@@ -4,6 +4,9 @@ require 'yaml'
 require 'dry-struct'
 require 'dry-validation'
 
+ENV['RACK_ENV'] = 'test'
+require './config/environment'
+
 module Types
   include Dry::Types.module
 end

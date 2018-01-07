@@ -25,6 +25,7 @@ module Types
   include Dry::Types.module
 end
 
+require './lib/crossbeams_responses'
 require './lib/repo_base'
 require './lib/base_interactor'
 require './lib/base_service'

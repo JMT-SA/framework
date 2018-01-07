@@ -1,6 +1,4 @@
 class RepoBase
-  attr_reader :main_table_name, :wrapper, :select_options
-
   def all(table_name, wrapper)
     all_hash(table_name).map { |r| wrapper.new(r) }
   end
@@ -68,7 +66,11 @@ class RepoBase
   end
 
   def select_two(dataset, label_name, value_name)
-    dataset.select(label_name, value_name).map { |rec| [rec[label_name], rec[value_name]] }
+    if label_name.is_a?(Array)
+      dataset.select(*label_name, value_name).map { |rec| [label_name.map { |nm| rec[nm] }.join(' - '), rec[value_name]] }
+    else
+      dataset.select(label_name, value_name).map { |rec| [rec[label_name], rec[value_name]] }
+    end
   end
 
   def self.inherited(klass)
@@ -82,8 +84,8 @@ module MethodBuilder
   # Options:
   # alias: String
   # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
-  # label: String
-  # - The display column. Defaults to the value column.
+  # label: String or Array
+  # - The display column. Defaults to the value column. If an Array, will display each column separated by ' - '
   # value: String
   # - The value column. Required.
   # order_by: String
@@ -110,8 +112,8 @@ module MethodBuilder
   # Options:
   # alias: String
   # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
-  # label: String
-  # - The display column. Defaults to the value column.
+  # label: String or Array
+  # - The display column. Defaults to the value column. If an Array, will display each column separated by ' - '
   # value: String
   # - The value column. Required.
   def build_inactive_select(table_name, options = {})

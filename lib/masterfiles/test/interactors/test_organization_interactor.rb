@@ -2,22 +2,6 @@ require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helpe
 require File.join(File.expand_path('../../fake_repositories/', __FILE__), 'fake_party_repo')
 
 class TestOrganizationInteractor < Minitest::Test
-
-  def test_create_organization
-    PartyRepo.any_instance.stubs(:create_organization).returns(id: 1)
-    PartyRepo.any_instance.stubs(:find_organization).returns(Organization.new(organization_attrs))
-
-    x = interactor.create_organization(invalid_organization_for_create)
-    assert !x.success
-    assert_equal('Validation error', x.message)
-    assert_equal(['must be a string'], x.errors[:vat_number]) # TODO: This is rather a test for validate_organization_params
-
-    x = interactor.create_organization(organization_for_create)
-    assert x.success
-    assert_instance_of(Organization, x.instance)
-    assert_equal('Created organization Test Organization Party', x.message)
-  end
-
   def test_party_repo
     x = interactor.send(:party_repo)
     assert x.is_a?(PartyRepo)
@@ -34,133 +18,172 @@ class TestOrganizationInteractor < Minitest::Test
     assert_empty x.errors
 
     # optional(:id).filled(:int?)
-    my_org = organization_attrs
-    my_org[:parent_id] = '1'
-    p my_org
-    x = interactor.send(:validate_organization_params, my_org)
-    refute_empty x.errors
-
-    org_attrs_without_id = organization_attrs.reject{ |k, _| k == :id }
+    org_attrs_without_id = organization_attrs.reject { |k, _| k == :id }
     x = interactor.send(:validate_organization_params, org_attrs_without_id)
     assert_empty x.errors
 
-    org_attrs_without_short_description = organization_attrs.reject{ |k, _| k == :short_description }
+    # optional(:parent_id).maybe(:int?)
+    my_org = organization_attrs
+    my_org[:parent_id] = 'Some string value'
+    x = interactor.send(:validate_organization_params, my_org)
+    assert_equal(['must be an integer'], x.errors[:parent_id])
+    refute_empty x.errors
+
+    my_org[:parent_id] = '1'
+    x = interactor.send(:validate_organization_params, my_org)
+    assert_empty x.errors
+
+    # required(:short_description).filled(:str?)
+    org_attrs_without_short_description = organization_attrs.reject { |k, _| k == :short_description }
+    x = interactor.send(:validate_organization_params, org_attrs_without_short_description)
+    assert_equal(['is missing'], x.errors[:short_description])
+    refute_empty x.errors
+
+    org_attrs_without_short_description[:short_description] = 1
     x = interactor.send(:validate_organization_params, org_attrs_without_short_description)
     refute_empty x.errors
+    expected = {short_description: ['must be a string']}
+    assert_equal(expected, x.errors)
 
-    org_attrs_without_medium_description = organization_attrs.reject{ |k, _| k == :medium_description }
+    # required(:medium_description).maybe(:str?)
+    org_attrs_without_medium_description = organization_attrs.reject { |k, _| k == :medium_description }
     x = interactor.send(:validate_organization_params, org_attrs_without_medium_description)
+    assert_equal(['is missing'], x.errors[:medium_description])
     refute_empty x.errors
+    org_attrs_without_medium_description[:medium_description] = 'name'
+    x = interactor.send(:validate_organization_params, org_attrs_without_medium_description)
+    assert_empty x.errors
+    org_attrs_without_medium_description[:medium_description] = 1
+    x = interactor.send(:validate_organization_params, org_attrs_without_medium_description)
+    expected = {medium_description: ['must be a string']}
+    assert_equal(x.errors, expected)
 
-    org_attrs_without_long_description = organization_attrs.reject{ |k, _| k == :long_description }
+    # required(:long_description).maybe(:str?)
+    org_attrs_without_long_description = organization_attrs.reject { |k, _| k == :long_description }
     x = interactor.send(:validate_organization_params, org_attrs_without_long_description)
+    assert_equal(['is missing'], x.errors[:long_description])
     refute_empty x.errors
-
-    org_attrs_without_long_description = organization_attrs.reject{ |k, _| k == :long_description }
+    org_attrs_without_long_description[:long_description] = 'name'
     x = interactor.send(:validate_organization_params, org_attrs_without_long_description)
-    refute_empty x.errors
+    assert_empty x.errors
+    org_attrs_without_long_description[:long_description] = 1
+    x = interactor.send(:validate_organization_params, org_attrs_without_long_description)
+    expected = {long_description: ['must be a string']}
+    assert_equal(expected, x.errors)
 
+    # required(:vat_number).maybe(:str?)
+    org_attrs_without_vat_number = organization_attrs.reject { |k, _| k == :vat_number }
+    x = interactor.send(:validate_organization_params, org_attrs_without_vat_number)
+    assert_equal(['is missing'], x.errors[:vat_number])
+    refute_empty x.errors
+    org_attrs_without_vat_number[:vat_number] = '1'
+    x = interactor.send(:validate_organization_params, org_attrs_without_vat_number)
+    assert_empty x.errors
+    org_attrs_without_vat_number[:vat_number] = 1
+    x = interactor.send(:validate_organization_params, org_attrs_without_vat_number)
+    expected = {vat_number: ['must be a string']}
+    assert_equal(expected, x.errors)
+
+
+    # required(:role_ids).each(:int?)
+    org_attrs_without_role_ids = organization_attrs.reject { |k, _| k == :role_ids }
+    x = interactor.send(:validate_organization_params, org_attrs_without_role_ids)
+    assert_equal(['is missing'], x.errors[:role_ids])
+    refute_empty x.errors
+    org_attrs_without_role_ids[:role_ids] = ['String one', 'String two', 'String three']
+    x = interactor.send(:validate_organization_params, org_attrs_without_role_ids)
+    refute_empty x.errors
+    expected = { role_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
+    assert_equal(expected, x.errors)
+
+    # assert_equal(['must be a string'], x.errors[:vat_number]) # TODO: This is rather a test for validate_organization_params
     # OrganizationSchema = Dry::Validation.Form do
-    #   optional(:parent_id).maybe(:int?)
-    #   required(:short_description).filled(:str?)
-    #   required(:medium_description).maybe(:str?)
-    #   required(:long_description).maybe(:str?)
-    #   required(:vat_number).maybe(:str?)
-    #   required(:role_ids).each(:int?)
     #   # required(:party_id).filled(:int?)
     #   # required(:variants).maybe(:str?)
     #   # required(:active).maybe(:bool?)
     # end
-
-
-    {
-      id: 1,
-      party_id: 1,
-      party_name: 'Test Organization Party',
-      parent_id: 1,
-      short_description: 'Test Organization Party',
-      medium_description: 'Medium Description',
-      long_description: 'Long Description',
-      vat_number: '789456',
-      variants: [],
-      active: true,
-      role_ids: [1,2,3],
-      role_names: ['One', 'Two', 'Three'],
-      parent_organization: 'Test Parent Organization'
-    }
-    keys = %i[short_description medium_description long_description vat_number active role_ids]
-    org_attrs = organization_attrs.select { |key, _| keys.include?(key) }
-    org_attrs[:vat_number] = 789456
-    org_attrs
-
-
-
-
-
   end
 
-  #   def validate_organization_params(params)
-  #     OrganizationSchema.call(params)
-  #   end
-  #   def validation_failed_response(validation_results)
-  #     OpenStruct.new(success: false,
-  #                    instance: {},
-  #                    errors: validation_results.messages,
-  #                    message: 'Validation error')
-  #   end
-  #
-  #   def failed_response(message, instance = nil)
-  #     OpenStruct.new(success: false,
-  #                    instance: instance,
-  #                    errors: {},
-  #                    message: message)
-  #   end
-  #
-  #   def success_response(message, instance = nil)
-  #     OpenStruct.new(success: true,
-  #                    instance: instance,
-  #                    errors: {},
-  #                    message: message)
-  #   end
+  def test_assign_org_roles
+    x = interactor.assign_organization_roles(1, [])
+    assert_equal(false, x.success)
+    assert_equal('Validation error', x.message)
+    assert_equal(['You did not choose a role'], x.errors[:roles])
 
-  #
-  #   def organization(cached = true)
-  #     if cached
-  #       @organization ||= party_repo.find_organization(@organization_id)
-  #     else
-  #       @organization = party_repo.find_organization(@organization_id)
-  #     end
-  #   end
-  #
-  #   def validate_organization_params(params)
-  #     OrganizationSchema.call(params)
-  #   end
+    PartyRepo.any_instance.stubs(:assign_roles).returns(true)
+    x = interactor.assign_organization_roles(1, [1, 2, 3])
+    assert x.success
+    assert_equal('Roles assigned successfully', x.message)
+  end
 
-  # it "creates an organization party"
-  # it "creates a person party"
+  def test_create_organization
+    PartyRepo.any_instance.stubs(:create_organization).returns(id: 1)
+    PartyRepo.any_instance.stubs(:find_organization).returns(fake_organization)
 
-  # it "updates an organization party"
-  # it "updates a person party"
+    x = interactor.create_organization(invalid_organization)
+    assert_equal(false, x.success)
+    assert_equal('Validation error', x.message)
+    # assert_equal(['must be a string'], x.errors[:vat_number]) # TODO: This is rather a test for validate_organization_params
 
-  # it "deletes an organization party"
-  # it "deletes a person party"
+    x = interactor.create_organization(organization_for_create)
+    assert x.success
+    assert_instance_of(Organization, x.instance)
+    assert_equal('Created organization Test Organization Party', x.message)
+  end
 
-  # it "returns an organization party"
-  # it "returns a person party"
+  def test_update_organization
+    # Fails on invalid update
+    x = interactor.update_organization(1, invalid_organization)
+    assert_equal(false, x.success)
 
-  # it "returns all parties"
-  # it "returns all organization parties"
-  # it "returns all person parties"
+    # Updates successfully
+    success_response = OpenStruct.new(success: true,
+                                      instance: nil,
+                                      errors: {},
+                                      message: 'Roles assigned successfully')
+    OrganizationInteractor.any_instance.stubs(:assign_organization_roles).returns(success_response)
+    PartyRepo.any_instance.stubs(:update_organization).returns(true)
+    OrganizationInteractor.any_instance.stubs(:organization).returns(fake_organization)
+    update_attrs = organization_attrs.merge(vat_number: '7894561230')
+    x = interactor.update_organization(1, update_attrs)
+    expected = interactor.success_response('Updated organization Test Organization Party, Roles assigned successfully', fake_organization)
+    assert_equal(expected, x)
+    assert x.success
 
-  # it "creates a role"
-  # it "returns all roles"
+    # Gives validation failed response on fail
+    failed_response = OpenStruct.new(success: false,
+                                     instance: nil,
+                                     errors: {},
+                                     message: 'Roles assigned successfully')
+    OrganizationInteractor.any_instance.stubs(:assign_organization_roles).returns(failed_response)
+    x = interactor.update_organization(1, update_attrs)
+    expected = interactor.validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
+    assert_equal(expected, x)
+  end
 
-  # it "creates an address type"
-  # it "returns all address types"
+  def test_delete_organization
+    PartyRepo.any_instance.stubs(:delete_organization).returns({success: true})
+    OrganizationInteractor.any_instance.stubs(:organization).returns(fake_organization)
+    x = interactor.delete_organization(1)
+    expected = interactor.success_response('Deleted organization Test Organization Party')
+    assert_equal(expected, x)
 
-  # it "creates a contact method"
-  # it "returns all contact methods"
-  #
+    PartyRepo.any_instance.stubs(:delete_organization).returns(error: 'something went wrong')
+    x = interactor.delete_organization(1)
+    expected = interactor.validation_failed_response(OpenStruct.new(messages: 'something went wrong'))
+    assert_equal(expected, x)
+  end
+
+  def test_assign_organization_roles
+    x = interactor.assign_organization_roles(1, [])
+    expected = interactor.validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
+    assert_equal(expected, x)
+
+    PartyRepo.any_instance.stubs(:assign_roles).returns(true)
+    x = interactor.assign_organization_roles(1, [1, 2, 3])
+    expected = interactor.success_response('Roles assigned successfully')
+    assert_equal(expected, x)
+  end
 
   private
 
@@ -180,7 +203,7 @@ class TestOrganizationInteractor < Minitest::Test
       vat_number: '789456',
       variants: [],
       active: true,
-      role_ids: [1,2,3],
+      role_ids: [1, 2, 3],
       role_names: ['One', 'Two', 'Three'],
       parent_organization: 'Test Parent Organization'
     }
@@ -191,87 +214,14 @@ class TestOrganizationInteractor < Minitest::Test
     organization_attrs.select { |key, _| keys.include?(key) }
   end
 
-  def invalid_organization_for_create
+  def invalid_organization
     keys = %i[short_description medium_description long_description vat_number active role_ids]
     org_attrs = organization_attrs.select { |key, _| keys.include?(key) }
     org_attrs[:vat_number] = 789456
     org_attrs
   end
+
+  def fake_organization
+    Organization.new(organization_attrs)
+  end
 end
-
-
-# frozen_string_literal: true
-#
-# class OrganizationInteractor < BaseInteractor
-#   def create_organization(params)
-#     res = validate_organization_params(params)
-#     return validation_failed_response(res) unless res.messages.empty?
-#     response = nil
-#     DB.transaction do
-#       response = party_repo.create_organization(res.to_h)
-#     end
-#     if response[:id]
-#       @organization_id = response[:id]
-#       success_response("Created organization #{organization.party_name}", organization)
-#     else
-#       validation_failed_response(OpenStruct.new(messages: response[:error]))
-#     end
-#   end
-#
-#   def update_organization(id, params)
-#     @organization_id = id
-#     res = validate_organization_params(params)
-#     return validation_failed_response(res) unless res.messages.empty?
-#     attrs = res.to_h
-#     role_ids = attrs.delete(:role_ids)
-#     roles_response = assign_organization_roles(@organization_id, role_ids)
-#     if roles_response.success
-#       DB.transaction do
-#         party_repo.update_organization(id, attrs)
-#       end
-#       success_response("Updated organization #{organization.party_name}, #{roles_response.message}", organization(false))
-#     else
-#       validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
-#     end
-#   end
-#
-#   def delete_organization(id)
-#     @organization_id = id
-#     name = organization.party_name
-#     response = nil
-#     DB.transaction do
-#       response = party_repo.delete_organization(id)
-#     end
-#     if response[:success]
-#       success_response("Deleted organization #{name}")
-#     else
-#       validation_failed_response(OpenStruct.new(messages: response[:error]))
-#     end
-#   end
-#
-#   def assign_organization_roles(id, role_ids)
-#     return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
-#     DB.transaction do
-#       party_repo.assign_roles(organization_id: id, role_ids: role_ids)
-#     end
-#     success_response('Roles assigned successfully')
-#   end
-#
-#   private
-#
-#   def party_repo
-#     @party_repo ||= PartyRepo.new
-#   end
-#
-#   def organization(cached = true)
-#     if cached
-#       @organization ||= party_repo.find_organization(@organization_id)
-#     else
-#       @organization = party_repo.find_organization(@organization_id)
-#     end
-#   end
-#
-#   def validate_organization_params(params)
-#     OrganizationSchema.call(params)
-#   end
-# end

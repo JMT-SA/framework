@@ -29,7 +29,6 @@ class PartyRepo < RepoBase
   end
 
   def create_organization(attrs)
-    p "If you see this - stub is not working properly"
     params = attrs.to_h
     role_ids = params.delete(:role_ids)
     return { error: { roles: ['You did not choose a role'] } } if role_ids.empty?

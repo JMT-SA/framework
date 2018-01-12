@@ -1,5 +1,4 @@
 require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
-require File.join(File.expand_path('../../fake_repositories/', __FILE__), 'fake_party_repo')
 
 class TestOrganizationInteractor < Minitest::Test
   def test_party_repo
@@ -83,7 +82,6 @@ class TestOrganizationInteractor < Minitest::Test
     x = interactor.send(:validate_organization_params, org_attrs_without_vat_number)
     expected = {vat_number: ['must be a string']}
     assert_equal(expected, x.errors)
-
 
     # required(:role_ids).each(:int?)
     org_attrs_without_role_ids = organization_attrs.reject { |k, _| k == :role_ids }

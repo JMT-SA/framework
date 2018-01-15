@@ -163,6 +163,8 @@ class GenerateNewScaffold < BaseService
             @id = repo.create_#{opts.singlename}(res)
             success_response("Created #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
                              #{opts.singlename})
+          rescue Sequel::UniqueConstraintViolation
+            validation_failed_response(OpenStruct.new(messages: { #{opts.label_field}: ['This #{opts.singlename.tr('_', ' ')} already exists'] }))
           end
 
           def update_#{opts.singlename}(id, params)

@@ -14,7 +14,6 @@ module Development
               form.view_only!
               form.add_field :login_name
               form.add_field :user_name
-              # form.add_field :password_hash
               form.add_field :email
               form.add_field :active
             end

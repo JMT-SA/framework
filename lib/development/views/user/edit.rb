@@ -4,7 +4,7 @@ module Development
   module Masterfiles
     module User
       class Edit
-        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:user, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -18,9 +18,7 @@ module Development
               form.method :update
               form.add_field :login_name
               form.add_field :user_name
-              # form.add_field :password_hash
               form.add_field :email
-              form.add_field :active
             end
           end
 

@@ -17,9 +17,9 @@ module Development
               form.remote! if remote
               form.add_field :login_name
               form.add_field :user_name
-              # form.add_field :password_hash
+              form.add_field :password
+              form.add_field :password_confirmation
               form.add_field :email
-              form.add_field :active
             end
           end
 

@@ -76,6 +76,42 @@
     }, 0); // Disable the button with a delay so the form still submits...
   }
 
+  class HttpError extends Error {
+    constructor(response) {
+      super(`${response.status} for ${response.url}`);
+      this.name = 'HttpError';
+      this.response = response;
+    }
+  }
+
+  function loadDialogContent(url) {
+    fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+      // body: new FormData(event.target),
+    })
+    .then(response => response.text())
+    .then((data) => {
+      const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());
+      dlgContent.innerHTML = data;
+      crossbeamsUtils.makeMultiSelects();
+      crossbeamsUtils.makeSearchableSelects();
+      const grids = dlgContent.querySelectorAll('[data-grid]');
+      grids.forEach((grid) => {
+        const gridId = grid.getAttribute('id');
+        const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+        document.dispatchEvent(gridEvent);
+      });
+    }).catch((data) => {
+      Jackbox.error('The action was unsuccessful...');
+      const htmlText = data.responseText ? data.responseText : '';
+      document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = htmlText;
+    });
+  }
+
   /**
    * When an input is invalid according to HTML5 rules and
    * the submit button has been disabled, we need to re-enable it
@@ -121,14 +157,6 @@
       }
     });
 
-    class HttpError extends Error {
-      constructor(response) {
-        super(`${response.status} for ${response.url}`);
-        this.name = 'HttpError';
-        this.response = response;
-      }
-    }
-
     /**
      * Turn a form into a remote (AJAX) form on submit.
      */
@@ -152,6 +180,9 @@
             let closeDialog = true;
             if (data.redirect) {
               window.location = data.redirect;
+            } else if (data.loadNewUrl) {
+              closeDialog = false;
+              loadDialogContent(data.loadNewUrl); // promise...
             } else if (data.updateGridInPlace) {
               crossbeamsGridEvents.updateGridInPlace(data.updateGridInPlace.id,
                                      data.updateGridInPlace.changes);

@@ -3,6 +3,7 @@
 /coverage/
 /hold/
 /InstalledFiles
+/log/
 /pkg/
 /spec/reports/
 /spec/examples.txt
@@ -13,6 +14,7 @@
 *.old
 /.sass-cache/
 lib/applets/.sass-cache/
+public/assets/*.*
 public/js/ag-enterprise-activation.js
 public/js/ag-grid-*.*
 public/js/jackbox*.*
@@ -47,3 +49,6 @@ tags
 
 ## TEMP - until crossbeams gems are published
 Gemfile.lock
+
+# Assets plugin metadata file
+prestyle.css

@@ -83,6 +83,9 @@
 
     <footer class="footness">
       <p>NOSOFT 2017
+        <% if ENV['RACK_ENV'] == 'development' %>
+          ASSETS: <i class="fa <%= assets_paths(:css).any? { |p| p.include?('scss') } ? 'fa-bug' : 'fa-eye' %>"></i>
+        <% end %>
     </footer>
 
     <script src="/js/lodash.js" type="text/javascript"></script>

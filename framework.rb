@@ -62,7 +62,7 @@ class Framework < Roda
   plugin :all_verbs
   plugin :render
   plugin :partials
-  plugin :assets, css: 'style.scss' # , js: 'behave.js'
+  plugin :assets, css: 'style.scss', precompiled: 'prestyle.css'  # , js: 'behave.js'
   plugin :public # serve assets from public folder.
   plugin :view_options
   plugin :multi_route
@@ -186,23 +186,42 @@ class Framework < Roda
 
         r.on 'grid' do
           response['Content-Type'] = 'application/json'
-          if params && !params.empty?
-            render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, params)
-          else
-            render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })
+          begin
+            if params && !params.empty?
+              render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, params)
+            else
+              render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })
+            end
+          rescue StandardError => e
+            show_json_error(e)
           end
         end
 
         r.on 'grid_multi', String do |key|
           response['Content-Type'] = 'application/json'
-          render_data_grid_multiselect_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, key, params)
+          begin
+            render_data_grid_multiselect_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, key, params)
+          rescue StandardError => e
+            show_json_error(e)
+          end
         end
 
         r.on 'nested_grid' do
           response['Content-Type'] = 'application/json'
-          render_data_grid_nested_rows(id)
+          begin
+            render_data_grid_nested_rows(id)
+          rescue StandardError => e
+            show_json_error(e)
+          end
         end
       end
+    end
+
+    r.on 'print_grid' do
+      @layout = Crossbeams::Layout::Page.build(grid_url: params[:grid_url]) do |page, _|
+        page.add_grid('crossbeamsPrintGrid', params[:grid_url], caption: 'Print', for_print: true)
+      end
+      view('crossbeams_layout_page', layout: 'print_layout')
     end
 
     # - :url: "/list/users/multi?key=program_users&id=$:id$/"

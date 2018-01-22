@@ -1,5 +1,6 @@
 require 'dotenv/tasks'
 require 'rake/testtask'
+require 'rake/clean'
 require 'yard'
 require 'rubocop/rake_task'
 
@@ -19,6 +20,16 @@ RuboCop::RakeTask.new(:rubocop) do |t|
 end
 
 task default: :test
+
+namespace :assets do
+  desc 'Precompile the assets'
+  task :precompile do
+    require_relative 'config/environment'
+    require './framework'
+    Framework.compile_assets
+  end
+  CLEAN << 'prestyle.css'
+end
 
 namespace :db do
   desc 'Prints current schema version'

@@ -1,0 +1,77 @@
+---
+:caption: Product Code Column Names
+:sql: "    SELECT product_column_names.id, product_column_names.column_name, product_types_product_column_names.product_type_id,
+  product_column_names.group_name\r\nFROM product_column_names\r\nJOIN product_types_product_column_names
+  ON product_column_name_id = product_column_names.id\r\n  \r\n  "
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: product_column_names.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  column_name:
+    :name: column_name
+    :sequence_no: 2
+    :caption: Column name
+    :namespaced_name: product_column_names.column_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_type_id:
+    :name: product_type_id
+    :sequence_no: 3
+    :caption: Product type
+    :namespaced_name: product_types_product_column_names.product_type_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  group_name:
+    :name: group_name
+    :sequence_no: 4
+    :caption: Group name
+    :namespaced_name: product_column_names.group_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: product_types_product_column_names.product_type_id
+  :caption: Product Type
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

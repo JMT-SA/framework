@@ -815,13 +815,7 @@ class GenerateNewScaffold < BaseService
     private
 
     def make_param_for(col)
-      control_type = if col.name.end_with?('_id')
-                       :list
-                     elsif %i[date datetime].include?(col.data_type)
-                       :daterange
-                     else
-                       :text
-                     end
+      control_type = control_type_for(col)
       opts = {
         control_type: control_type,
         data_type: col.data_type,
@@ -829,6 +823,20 @@ class GenerateNewScaffold < BaseService
       }
       opts[:list_def] = make_list_def_for(col) if control_type == :list
       Crossbeams::Dataminer::QueryParameterDefinition.new(col.namespaced_name, opts)
+    end
+
+    def control_type_for(col)
+      if col.name.end_with?('_id')
+        if opts.table_meta.fk_lookup.empty? || opts.table_meta.fk_lookup[col.name.to_sym].nil?
+          :text
+        else
+          :list
+        end
+      elsif %i[date datetime].include?(col.data_type)
+        :daterange
+      else
+        :text
+      end
     end
 
     def make_list_def_for(col)

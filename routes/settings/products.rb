@@ -243,7 +243,6 @@ class Framework < Roda
     # --------------------------------------------------------------------------
     r.on 'products', Integer do |id|
       interactor = ProductTypeInteractor.new(current_user, {}, {}, {})
-      # interactor = ProductInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:products, id) do
@@ -285,7 +284,6 @@ class Framework < Roda
     end
     r.on 'products' do
       interactor = ProductTypeInteractor.new(current_user, {}, {}, {})
-      # interactor = ProductInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('products', 'new')
           show_partial_or_page(fetch?(r)) { Settings::Products::Product::New.call(remote: fetch?(r)) }

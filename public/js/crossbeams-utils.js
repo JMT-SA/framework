@@ -207,6 +207,110 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Replace the options of a Selectr dropdown.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceSelectrOptions: function replaceSelectrOptions(action) {
+    const elem = document.getElementById(action.replace_options.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_options.id}"`,
+        title: 'Dropdown-change: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    const select = elem.selectr;
+    let nVal = '';
+    let nText = '';
+    select.removeAll();
+    action.replace_options.options.forEach((item) => {
+      if (item.constructor === Array) {
+        nVal = (item[1] || item[0]);
+        nText = item[0];
+      } else {
+        nVal = item;
+        nText = item;
+      }
+      select.add({
+        value: nVal,
+        text: nText,
+      });
+    });
+    select.setPlaceholder();
+  },
+
+  /**
+   * Calls all urls for observeChange behaviour and applies changes to the DOM as required..
+   * @param {string} url - the url to be called.
+   * @returns {void}
+   */
+  fetchDropdownChanges: function fetchDropdownChanges(url) {
+    fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      throw new HttpError(response);
+    })
+    .then((data) => {
+      if (data.actions) {
+        data.actions.forEach((action) => {
+          if (action.replace_options) {
+            this.replaceSelectrOptions(action);
+          }
+        });
+      }
+      if (data.flash) {
+        if (data.flash.notice) {
+          Jackbox.success(data.flash.notice);
+        }
+        if (data.flash.error) {
+          if (data.exception) {
+            Jackbox.error(data.flash.error, { time: 20 });
+          } else {
+            Jackbox.error(data.flash.error);
+          }
+        }
+      }
+    }).catch((data) => {
+      if (data.response && data.response.status === 500) {
+        data.response.text().then((body) => {
+          document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
+        });
+      }
+      Jackbox.error(`An error occurred ${data}`, { time: 20 });
+    });
+  },
+
+  /**
+   * Creates a url for observeChange behaviour.
+   * @param {element} select - Select that has changed.
+   * @param {string} option - the option of the DOM select that has become selected.
+   * @returns {string} the url.
+   */
+  buildObserveChangeUrl: function buildObserveChangeUrl(element, option) {
+    const optVal = option ? option.value : '';
+    let queryParam = `?changed_value=${optVal}`;
+    element.param_keys.forEach((key) => {
+      let val = element.param_values[key];
+      if (val === undefined) {
+        const e = document.getElementById(key);
+        val = e.value;
+      }
+      queryParam += `&${key}=${val}`;
+    });
+    return `${element.url}${queryParam}`;
+  },
+
+  /**
    * Changes select tags into Selectr elements.
    * @returns {void}
    */
@@ -224,7 +328,8 @@ const crossbeamsUtils = {
       // Store a reference on the DOM node.
       sel.selectr = holdSel;
 
-      // TODO: Split this up into modular pieces based on rules in data- attributes...
+      // changeValues behaviour - check if another element should be
+      // enabled/disabled based on the current selected value.
       if (sel.dataset && sel.dataset.changeValues) {
         holdSel.on('selectr.change', (option) => {
           sel.dataset.changeValues.split(',').forEach((el) => {
@@ -241,87 +346,15 @@ const crossbeamsUtils = {
         });
       }
 
+      // observeChange behaviour - get reules from select element and
+      // call the supplied url(s).
       if (sel.dataset && sel.dataset.observeChange) {
         holdSel.on('selectr.change', (option) => {
           const s = sel.dataset.observeChange;
           const j = JSON.parse(s);
-          const buildUrl = (el) => {
-            let queryParam = `?changed_value=${option.value}`;
-            el.param_keys.forEach((key) => {
-              let val = el.param_values[key];
-              if (val === undefined) {
-                const e = document.getElementById(key);
-                // Need to check if this is a select or something else...
-                val = e.value;
-              }
-              queryParam += `&${key}=${val}`;
-            });
-            return `${el.url}${queryParam}`;
-          };
-          const urls = j.map(el => buildUrl(el));
+          const urls = j.map(el => this.buildObserveChangeUrl(el, option));
 
-          const fetchDropdownChanges = (url) => {
-            fetch(url, {
-              method: 'GET',
-              credentials: 'same-origin',
-              headers: new Headers({
-                'X-Custom-Request-Type': 'Fetch',
-              }),
-            })
-            .then((response) => {
-              if (response.status === 200) {
-                return response.json();
-              }
-              throw new HttpError(response);
-            })
-            .then((data) => {
-              if (data.actions) {
-                data.actions.forEach((action) => {
-                  if (action.replace_options) {
-                    const select = document.getElementById(action.replace_options.id).selectr;
-                    let nVal = '';
-                    let nText = '';
-                    // let optStr = '';
-                    select.removeAll(); // This makes the placeholder == 'No options available'
-                    action.replace_options.options.forEach((item) => {
-                      if (item.constructor === Array) {
-                        nVal = (item[1] || item[0]);
-                        nText = item[0];
-                      } else {
-                        nVal = item;
-                        nText = item;
-                      }
-                      select.add({
-                        value: nVal,
-                        text: nText,
-                      });
-                    });
-                    select.setPlaceholder();
-                  }
-                });
-              }
-              if (data.flash) {
-                if (data.flash.notice) {
-                  Jackbox.success(data.flash.notice);
-                }
-                if (data.flash.error) {
-                  if (data.exception) {
-                    Jackbox.error(data.flash.error, { time: 20 });
-                  } else {
-                    Jackbox.error(data.flash.error);
-                  }
-                }
-              }
-            }).catch((data) => {
-              if (data.response.status === 500) {
-                data.response.text().then((body) => {
-                  document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
-                });
-              }
-              Jackbox.error(`An error occurred ${data}`, { time: 20 });
-            });
-          };
-          urls.forEach(url => fetchDropdownChanges(url));
+          urls.forEach(url => this.fetchDropdownChanges(url));
         });
       }
     });
@@ -330,7 +363,7 @@ const crossbeamsUtils = {
   /**
    * Toggle the visibility of en element in the DOM:
    * @param {string} id - the id of the DOM element.
-   * @param {elelment} [button] - optional. Button to add the pure-button-active class (Pure.css)
+   * @param {element} [button] - optional. Button to add the pure-button-active class (Pure.css)
    * @returns {void}
    */
   toggleVisibility: function toggleVisibility(id, button) {

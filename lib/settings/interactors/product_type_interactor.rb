@@ -147,4 +147,50 @@ class ProductTypeInteractor < BaseInteractor
       failed_response('Some code columns were not linked')#, product_type)
     end
   end
+
+  def product(cached = true)
+    if cached
+      @product ||= repo.find_product(@id)
+    else
+      @product = repo.find_product(@id)
+    end
+  end
+
+  def validate_product_params(params)
+    ProductSchema.call(params)
+  end
+
+  def create_product(params)
+    res = validate_product_params(params)
+    return validation_failed_response(res) unless res.messages.empty?
+    @id = repo.create_product(res)
+    success_response("Created product #{product.variant}",
+                     product)
+  rescue Sequel::UniqueConstraintViolation
+    validation_failed_response(OpenStruct.new(messages: { variant: ['This product already exists'] }))
+  end
+
+  def update_product(id, params)
+    @id = id
+    res = validate_product_params(params)
+    return validation_failed_response(res) unless res.messages.empty?
+    repo.update_product(id, res)
+    success_response("Updated product #{product.variant}",
+                     product(false))
+  end
+
+  def delete_product(id)
+    @id = id
+    name = product.variant
+    repo.delete_product(id)
+    success_response("Deleted product #{name}")
+  end
+
+  def reorder_product_code_column_names(id, column_codes_sorted_ids)
+    if repo.store_product_code_column_ordering(id, column_codes_sorted_ids)
+      success_response("Product code column ordering has been updated")
+    else
+      failed_response("Something went wrong")
+    end
+  end
 end

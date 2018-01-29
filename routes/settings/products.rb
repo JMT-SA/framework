@@ -242,7 +242,7 @@ class Framework < Roda
     # PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'products', Integer do |id|
-      interactor = ProductInteractor.new(current_user, {}, {}, {})
+      interactor = ProductTypeInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:products, id) do
@@ -283,7 +283,7 @@ class Framework < Roda
       end
     end
     r.on 'products' do
-      interactor = ProductInteractor.new(current_user, {}, {}, {})
+      interactor = ProductTypeInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('products', 'new')
           show_partial_or_page(fetch?(r)) { Settings::Products::Product::New.call(remote: fetch?(r)) }
@@ -345,23 +345,19 @@ class Framework < Roda
 
     r.on 'reorder_product_code_column_names', Integer do |id|
       r.get do
-        content = show_partial { Settings::Products::ProductType::SortProductCodeColumnNames.call(id) }
-        update_dialog_content(content: content, notice: 'Re-order the product code column names')
+        show_partial { Settings::Products::ProductType::SortProductCodeColumnNames.call(id) }
+      end
+      r.post do
+        interactor = ProductTypeInteractor.new(current_user, {}, {}, {})
+
+        res = interactor.reorder_product_code_column_names(id, params[:columncodes_sorted_ids])
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_via_json_to_last_grid
       end
     end
-    # r.on 'reorder_product_code_column_names', Integer do |id|
-    #   r.post do
-    #     p ""
-    #     interactor = ProductTypeInteractor.new(current_user, {}, {}, {})
-    #
-    #     res = interactor.reorder_product_code_column_names(id, multiselect_grid_choices(params))
-    #     if res.success
-    #       flash[:notice] = res.message
-    #     else
-    #       flash[:error] = res.message
-    #     end
-    #     redirect_to_last_grid(r)
-    #   end
-    # end
   end
 end

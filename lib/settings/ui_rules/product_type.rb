@@ -12,6 +12,8 @@ module UiRules
       set_show_fields if @mode == :show
 
       form_name 'product_type'
+
+      add_behaviours
     end
 
     def set_show_fields
@@ -37,6 +39,12 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(packing_material_product_type_id: nil,
                                     packing_material_product_sub_type_id: nil)
+    end
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :packing_material_product_type_id, notify: [{ url: '/settings/products/product_types/select_change_for_product_sub_type_name' }]
+      end
     end
   end
 end

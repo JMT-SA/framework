@@ -29,6 +29,7 @@ Sequel.migration do
       primary_key :id
       foreign_key :packing_material_product_type_id, :packing_material_product_types, null: false, key: [:id]
       foreign_key :packing_material_product_sub_type_id, :packing_material_product_sub_types, null: false, key: [:id]
+      column :product_code_column_name_ordering, 'text[]'
 
       TrueClass :active, default: true
       DateTime :created_at, null: false

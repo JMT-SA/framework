@@ -3,7 +3,7 @@
 module UiRules
   class ProductRule < Base
     def generate_rules
-      @this_repo = ProductRepo.new
+      @this_repo = ProductTypeRepo.new
       make_form_object
       apply_form_values
 

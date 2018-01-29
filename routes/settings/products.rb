@@ -50,6 +50,12 @@ class Framework < Roda
     end
     r.on 'product_types' do
       interactor = ProductTypeInteractor.new(current_user, {}, {}, {})
+      r.on 'select_change_for_product_sub_type_name' do
+        repo = ProductTypeRepo.new
+        sel = repo.for_select_packing_material_product_sub_types(where: { packing_material_product_type_id: params[:changed_value] })
+
+        json_replace_select_options('product_type_packing_material_product_sub_type_id', sel)
+      end
       r.on 'new' do    # NEW
         if authorised?('products', 'new')
           show_partial_or_page(fetch?(r)) { Settings::Products::ProductType::New.call(remote: fetch?(r)) }

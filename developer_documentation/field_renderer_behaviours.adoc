@@ -10,6 +10,7 @@ e.g. To limit the options of one dropdown based on the current selection of anot
 
 The following behaviours can be specified for a field renderer:
 
+* <<DropdownChange>>
 * <<Enable>>
 
 === Add a behaviour
@@ -18,6 +19,58 @@ In a UiRule, behaviours are added like this:
 ```.ruby
 behaviours do |behaviour|
   behaviour.enable :other, when: :applet, changes_to: ['other']
+end
+```
+
+=== Dropdown Change
+
+Description:
+
+This behaviour attaches to a select field and triggers a call to a url when the selected value changes.
+
+Format:
+
+`dropdown_change(field_to_observe, conditions = {})`
+
+`field_to_observe` is the name of the dropdown field to observe for changes.
+
+Conditions:
+
+* `notify:` Array of Hashes
++
+Notify Hash elements:
+* `url:` String - the url to call when the selected value changes.
+* `param_keys` [OPTIONAL] Array of Symbols - If matching an id in the form, the key+value will be sent as a parameter to the `url`. You can also define non-form keys which will use the matching value in `param_values`.
+* `param_values` [OPTIONAL] Hash - a key must match a Symbol in `param_keys`. The value in the Hash will be sent with the key as a parameter to the `url`.
++
+
+Example:
+```.ruby
+behaviours do |behaviour|
+  # The typical case - one url notified of a change:
+  behaviour.dropdown_change :program_id, notify: [{ url: '/a/path/to/somewhere' }]
+
+  # Another possible case - two urls called and the second returns two extra parameters
+  # - one from the form and one defined in the UiRules file.
+  behaviour.dropdown_change :function_id, notify: [{ url: '/a/path/to/somewhere' },
+                                                   { url: '/a/path/to/somewhere/else',
+                                                     param_keys: %i[this_id users_user_login],
+                                                     param_values: { this_id: 123 }
+                                                   }]
+end
+```
+
+Each declared `url` will receive a param named `changed_value` which contains the newly selected value from the select.
+If the behaviour had any `param_keys` set, these will also be included in the params.
+
+Here is a simple example of a url route that updates a select's options when another select's selected item changes:
+_(Note that the first two lines would normally be in an interactor - this example is just for illustration purposes.)_
+
+```.ruby
+r.on 'select_change_for_pf' do
+  repo = FunctionalAreaRepo.new
+  sel = repo.for_select_program_functions(where: { program_id: params[:changed_value] })
+  json_replace_select_options('functional_area_program_function_id', sel)
 end
 ```
 

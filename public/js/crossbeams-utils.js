@@ -1,5 +1,13 @@
 /* exported crossbeamsUtils */
 
+class HttpError extends Error {
+  constructor(response) {
+    super(`${response.status} for ${response.url}`);
+    this.name = 'HttpError';
+    this.response = response;
+  }
+}
+
 /**
  * General utility functions for Crossbeams.
  * @namespace
@@ -213,6 +221,8 @@ const crossbeamsUtils = {
         allowDeselect: false,
         clearable: true,       // should configure via data...
       }); // select that can be searched.
+      // Store a reference on the DOM node.
+      sel.selectr = holdSel;
 
       // TODO: Split this up into modular pieces based on rules in data- attributes...
       if (sel.dataset && sel.dataset.changeValues) {
@@ -228,6 +238,90 @@ const crossbeamsUtils = {
               }
             }
           });
+        });
+      }
+
+      if (sel.dataset && sel.dataset.observeChange) {
+        holdSel.on('selectr.change', (option) => {
+          const s = sel.dataset.observeChange;
+          const j = JSON.parse(s);
+          const buildUrl = (el) => {
+            let queryParam = `?changed_value=${option.value}`;
+            el.param_keys.forEach((key) => {
+              let val = el.param_values[key];
+              if (val === undefined) {
+                const e = document.getElementById(key);
+                // Need to check if this is a select or something else...
+                val = e.value;
+              }
+              queryParam += `&${key}=${val}`;
+            });
+            return `${el.url}${queryParam}`;
+          };
+          const urls = j.map(el => buildUrl(el));
+
+          const fetchDropdownChanges = (url) => {
+            fetch(url, {
+              method: 'GET',
+              credentials: 'same-origin',
+              headers: new Headers({
+                'X-Custom-Request-Type': 'Fetch',
+              }),
+            })
+            .then((response) => {
+              if (response.status === 200) {
+                return response.json();
+              }
+              throw new HttpError(response);
+            })
+            .then((data) => {
+              if (data.actions) {
+                data.actions.forEach((action) => {
+                  if (action.replace_options) {
+                    const select = document.getElementById(action.replace_options.id).selectr;
+                    let nVal = '';
+                    let nText = '';
+                    // let optStr = '';
+                    select.removeAll(); // This makes the placeholder == 'No options available'
+                    action.replace_options.options.forEach((item) => {
+                      if (item.constructor === Array) {
+                        nVal = (item[1] || item[0]);
+                        nText = item[0];
+                      } else {
+                        nVal = item;
+                        nText = item;
+                      }
+                      select.add({
+                        value: nVal,
+                        text: nText,
+                      });
+                    });
+                    select.setPlaceholder();
+                  }
+                });
+              }
+              if (data.flash) {
+                if (data.flash.notice) {
+                  Jackbox.success(data.flash.notice);
+                }
+                if (data.flash.error) {
+                  if (data.exception) {
+                    Jackbox.error(data.flash.error, { time: 20 });
+                  } else {
+                    Jackbox.error(data.flash.error);
+                  }
+                }
+              }
+            }).catch((data) => {
+              if (data.response.status === 500) {
+                data.response.text().then((body) => {
+                  document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
+                });
+              }
+              Jackbox.error(`An error occurred ${data}`, { time: 20 });
+            });
+          };
+          urls.forEach(url => fetchDropdownChanges(url));
         });
       }
     });

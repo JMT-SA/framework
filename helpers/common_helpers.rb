@@ -122,6 +122,13 @@ module CommonHelpers
     { exception: err.class.name, flash: { error: "An error occurred: #{err.message}" } }.to_json
   end
 
+  # TODO: same for multiple selects.
+  def json_replace_select_options(dom_id, options_array, message = nil)
+    res = { actions: [{ replace_options: { id: dom_id, options: options_array } }] }
+    res[:flash] = { notice: message } unless message.nil?
+    res.to_json
+  end
+
   def handle_error(err)
     response.status = 500
     view(inline: "<div class='crossbeams-error-note'><strong>Error</strong><br>#{err}</div>")

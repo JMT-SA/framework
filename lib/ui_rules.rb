@@ -80,5 +80,18 @@ module UiRules
       @rules << { observer => { change_affects: field_to_enable } }
       @rules << { field_to_enable => { enable_on_change: change_values } }
     end
+
+    def dropdown_change(field_name, conditions = {})
+      raise(ArgumentError, 'Dropdown change behaviour requires `notify: url`.') if conditions[:notify].any? { |c| c[:url].nil? }
+      @rules << { field_name => {
+        notify: conditions[:notify].map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
   end
 end

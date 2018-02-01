@@ -33,7 +33,7 @@ class GenerateNewScaffold < BaseService
     sources[:paths][:entity] = "lib/#{opts.applet}/entities/#{opts.singlename}.rb"
     sources[:paths][:validation] = "lib/#{opts.applet}/validations/#{opts.singlename}_schema.rb"
     sources[:paths][:route] = "routes/#{opts.applet}/#{opts.program}.rb"
-    sources[:paths][:uirule] = "lib/#{opts.applet}/ui_rules/#{opts.singlename}.rb"
+    sources[:paths][:uirule] = "lib/#{opts.applet}/ui_rules/#{opts.singlename}_rule.rb"
     sources[:paths][:view] = {
       new: "lib/#{opts.applet}/views/#{opts.singlename}/new.rb",
       edit: "lib/#{opts.applet}/views/#{opts.singlename}/edit.rb",

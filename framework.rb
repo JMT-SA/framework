@@ -14,6 +14,7 @@ require 'crossbeams/dataminer'
 require 'crossbeams/dataminer_interface'
 require 'crossbeams/label_designer'
 require 'crossbeams/rack_middleware'
+require 'roda/data_grid'
 require 'yaml'
 require 'base64'
 require 'dry-struct'
@@ -152,7 +153,12 @@ class Framework < Roda
                                        :rackmid,
                                        :datagrid,
                                        :ag_grid,
-                                       :selectr).to_html)
+                                       :selectr,
+                                       :sortable,
+                                       :konva,
+                                       :lodash,
+                                       :multi,
+                                       :sweetalert).to_html)
     end
 
     r.is 'not_found' do

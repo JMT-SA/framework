@@ -7,5 +7,5 @@
 #         password_hash: BCrypt::Password.create('user_password')
 #       }
 # repo = UserRepo.new
-# repo.create(usr)
+# repo.create(:users, usr)
 raise 'This is not for running!'

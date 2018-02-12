@@ -10,7 +10,12 @@ class LibraryVersions
     rackmid: [:gemver, 'Crossbeams::RackMiddleware'],
     datagrid: [:gemver, 'Roda::DataGrid'],
     ag_grid: %i[jsver ag_grid],
-    selectr: %i[jsver selectr]
+    selectr: %i[jsver selectr],
+    sweetalert: %i[jsver sweetalert],
+    sortable: %i[jsver sortable],
+    konva: %i[jsver konva],
+    lodash: %i[jsver lodash],
+    multi: %i[jsver multi]
   }.freeze
 
   def initialize(*requested_libs)
@@ -19,23 +24,47 @@ class LibraryVersions
 
   def to_html
     version_strings = requested_libs.map { |r| resolve(r) }
-    s = String.new('<h2>Gem and js library Versions</h2><ul><li>')
-    s << version_strings.join('</li><li>')
-    s << '</li></ul>'
+    version_strings.unshift(format_lib('Application', ENV['VERSION']))
     <<~HTML
       <h2>Gem and js library Versions</h2>
-      <ul><li>
-        #{version_strings.join('</li><li>')}
-      </li></ul>
+      #{format(version_strings)}
     HTML
   end
+
+  private
 
   def resolve(r)
     send(*LIB_STRATEGIES[r])
   end
 
+  def format(strings)
+    # <<~HTML
+    #   <ul><li>
+    #     #{strings.join('</li><li>')}
+    #   </li></ul>
+    # HTML
+    <<~HTML
+      <table class="thinbordertable">
+        <thead>
+          <tr>
+            <th>Library</th>
+            <th>Version</th>
+          </tr>
+        </thead>
+        <tbody>
+          #{strings.join("\n")}
+        </tbody>
+      </table>
+    HTML
+  end
+
+  def format_lib(lib, version)
+    # "<li>#{lib}: #{version}</li>"
+    "<tr class='hover-row'><td>#{lib}</td><td align='right'>#{version}</td></tr>"
+  end
+
   def gemver(klass)
-    "#{klass}: #{Object.const_get(klass).const_get('VERSION')}"
+    format_lib(klass, Object.const_get(klass).const_get('VERSION'))
   end
 
   def jsver(key)
@@ -44,16 +73,52 @@ class LibraryVersions
       ag_grid_version
     when :selectr
       selectr_version
+    when :sweetalert
+      sweetalert_version
+    when :sortable
+      sortable_version
+    when :konva
+      konva_version
+    when :lodash
+      lodash_version
+    when :multi
+      multi_version
     else
-      "Unknown directive: #{key}"
+      "<tr><td>Unknown directive</td><td>#{key}</td></tr>"
     end
   end
 
   def ag_grid_version
-    "AG-Grid: #{File.readlines('public/js/ag-grid-enterprise.min.js').first.chomp.split(' v').last}"
+    format_lib('AG-Grid', File.readlines('public/js/ag-grid-enterprise.min.js').first.chomp.split(' v').last)
   end
 
   def selectr_version
-    "Selectr: #{File.readlines('public/js/selectr.min.js')[1].chomp.split(' ').last}"
+    format_lib('Selectr', File.readlines('public/js/selectr.min.js')[1].chomp.split(' ').last)
+  end
+
+  def sweetalert_version
+    s = File.read('public/js/sweetalert2.min.js')
+    m = s.match(/\.version="(.+)"/)
+    format_lib('Sweet Alert2', m.nil? ? 'UNKNOWN' : m[1])
+  end
+
+  def sortable_version
+    m = File.readlines('public/js/Sortable.min.js').first.match(/Sortable (.+) - MIT/)
+    format_lib('Sortable', m.nil? ? 'UNKNOWN' : m[1])
+  end
+
+  def konva_version
+    format_lib('Konva', File.readlines('public/js/konva.min.js')[1].chomp.split(' v').last)
+  end
+
+  def lodash_version
+    s = File.read('public/js/lodash.js')
+    m = s.match(/VERSION = '(.+)'/)
+    format_lib('Lodash', m.nil? ? 'UNKNOWN' : m[1])
+  end
+
+  def multi_version
+    m = File.readlines('public/js/multi.min.js').first.match(/multi.js (.+) /)
+    format_lib('Multi', m.nil? ? 'UNKNOWN' : m[1])
   end
 end

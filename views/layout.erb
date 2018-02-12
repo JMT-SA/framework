@@ -105,7 +105,7 @@
     <script src="/js/crossbeams-menu-builder.js" type="text/javascript"></script>
     <script src="/js/selectr.min.js" type="text/javascript"></script>
     <script src="/js/multi.min.js" type="text/javascript"></script>
-    <script src="/js/a11y-dialog.min.js" type="text/javascript"></script>
+    <script src="/js/a11y-dialog-cbeam.js" type="text/javascript"></script>
     <script>
       let crossbeamsDialogLevel1;
       let crossbeamsDialogLevel2;
@@ -131,31 +131,6 @@
 
       // Build the menu.
       crossbeamsMenuBuilder.buildMenu(<%= menu_items %>);
-
-      // Override the dialog keypress handler so that we can
-      // trap the ESC key on grid searches.
-      A11yDialog.prototype._bindKeypress = function (event) {
-        // if (this.shown && event.which === 27) { // ESCAPE_KEY) {
-        //   console.log('trapped esc', this);
-        //   if (event.target.dataset && event.target.dataset.gridSearch) {
-        //     return;
-        //   }
-        // }
-        // TODO: Handle ESC outside of the prototype so that we can close
-        //       only the topmost dialog. Currently the ESC goes to all
-        //       dialogs and so the lower one thinks it is no longer showing.
-        // FOR NOW, do not close on ESC...
-        // if (this.shown && event.which === 27) { // ESCAPE_KEY) {
-        //   event.preventDefault();
-        //   this.hide();
-        // }
-
-        // If the dialog is shown and the TAB key is being pressed, make sure the
-        // focus stays trapped within the dialog element
-        if (this.shown && event.which === 9) { // TAB_KEY) {
-          trapTabKey(this.node, event);
-        }
-      }
 
       Jackbox.init();
       <% if flash[:notice] %>

@@ -73,6 +73,11 @@ class RepoBase
     end
   end
 
+  # Helper to convert a Ruby Hash into a string that postgresql will understand.
+  def hash_to_jsonb_str(hash)
+    "{#{hash.map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
+  end
+
   def self.inherited(klass)
     klass.extend(MethodBuilder)
   end

@@ -439,6 +439,9 @@ const crossbeamsGridFormatters = {
       titleValue = params.data[item.title_field];
     } else {
       titleValue = item.title ? item.title : '';
+      if (titleValue.indexOf('$:') > -1) {
+        titleValue = titleValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
+      }
     }
     if (item.is_separator) {
       if (items.length > 0 && _.last(items).value !== '---') {

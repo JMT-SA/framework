@@ -47,8 +47,5 @@ public/fonts
 tags
 .srclist
 
-## TEMP - until crossbeams gems are published
-Gemfile.lock
-
 # Assets plugin metadata file
 prestyle.css

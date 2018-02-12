@@ -35,6 +35,7 @@ Dir['./helpers/**/*.rb'].each { |f| require f }
 Dir['./lib/applets/*.rb'].each { |f| require f }
 
 ENV['ROOT'] = File.dirname(__FILE__)
+ENV['VERSION'] = File.read('VERSION')
 
 class Framework < Roda
   include CommonHelpers

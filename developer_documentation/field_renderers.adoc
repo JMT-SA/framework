@@ -67,6 +67,7 @@ and all words start with initial capital letter.
 |Specific input type. Date, time and month all render using the browser's HTML5 datepickers.
 Integer, numeric and number render with numeric inputs that only accept digits (and `-` and `.`) and have step-up and step-down arrows.
 :url and :email are rendered with patterns that check for valid formats. Note :url must include the protocol (`http:` etc.)
+Password renders with obscured characters.
 a|
 * :integer
 * :numeric
@@ -77,6 +78,7 @@ a|
 * :datetime
 * :month
 * :time
+* :password
 |text
 
 |:datalist
@@ -112,8 +114,8 @@ a|
 |Any text
 |None, unless a `pattern` has been provided.
 
-|:length
-|HTML `size` attribute. This does not affect the input's width, but the number of characters that can be typed in.
+|:maxlength
+|HTML `maxlength` attribute. This does not affect the input's width, but the number of characters that can be typed in.
 |Any number
 |n/a
 

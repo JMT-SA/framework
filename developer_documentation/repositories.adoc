@@ -101,3 +101,17 @@ create_people(attrs)
 update_people(id, attrs)
 delete_people(id)
 ```
+
+=== Built-in methods
+
+These methods are available to all repositories that inherit from `BaseRepo`.
+For straightforward usage, use the generated CRUD calls, but the builtin methods can also be used within developer-generated repository methods.
+
+<!--
+==== all_hash
+
+parameters: table_name (Symbol), wrapper (wrapper class)
+Returns an array of hashes.
+
+Use YARD Docs and make this just a list of methods.
+-->

@@ -1,0 +1,12 @@
+= How to use repositories
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to use repositories
+
+* Repositories are the layer between application code and the database.
+* Repositories handle all the database reads and writes.
+* Application code should not perform any database calls directly - only through a repository method - and all SQL should be defined in repository methods.
+* The only exception to this is in the SQL in dataminer yml query definition files.
+* A repository method should return only `Hash`es, `Dry::Struct`s, `OpenStruct`s -- or `Array`s of one of the three.

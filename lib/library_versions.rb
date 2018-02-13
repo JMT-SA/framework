@@ -22,13 +22,14 @@ class LibraryVersions
     @requested_libs = requested_libs
   end
 
-  def to_html
-    version_strings = requested_libs.map { |r| resolve(r) }
-    version_strings.unshift(format_lib('Application', ENV['VERSION']))
-    <<~HTML
-      <h2>Gem and js library Versions</h2>
-      #{format(version_strings)}
-    HTML
+  def columns
+    %i[library version]
+  end
+
+  def to_a
+    version_list = requested_libs.map { |r| resolve(r) }
+    version_list.unshift(format_lib('Application', ENV['VERSION']))
+    version_list
   end
 
   private
@@ -37,30 +38,8 @@ class LibraryVersions
     send(*LIB_STRATEGIES[r])
   end
 
-  def format(strings)
-    # <<~HTML
-    #   <ul><li>
-    #     #{strings.join('</li><li>')}
-    #   </li></ul>
-    # HTML
-    <<~HTML
-      <table class="thinbordertable">
-        <thead>
-          <tr>
-            <th>Library</th>
-            <th>Version</th>
-          </tr>
-        </thead>
-        <tbody>
-          #{strings.join("\n")}
-        </tbody>
-      </table>
-    HTML
-  end
-
   def format_lib(lib, version)
-    # "<li>#{lib}: #{version}</li>"
-    "<tr class='hover-row'><td>#{lib}</td><td align='right'>#{version}</td></tr>"
+    { library: lib, version: version }
   end
 
   def gemver(klass)
@@ -84,7 +63,7 @@ class LibraryVersions
     when :multi
       multi_version
     else
-      "<tr><td>Unknown directive</td><td>#{key}</td></tr>"
+      format_lib('Unknown directive', key)
     end
   end
 

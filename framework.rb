@@ -147,18 +147,25 @@ class Framework < Roda
     end
 
     r.is 'versions' do
-      view(inline: LibraryVersions.new(:layout,
-                                       :dataminer,
-                                       :label_designer,
-                                       :rackmid,
-                                       :datagrid,
-                                       :ag_grid,
-                                       :selectr,
-                                       :sortable,
-                                       :konva,
-                                       :lodash,
-                                       :multi,
-                                       :sweetalert).to_html)
+      versions = LibraryVersions.new(:layout,
+                                     :dataminer,
+                                     :label_designer,
+                                     :rackmid,
+                                     :datagrid,
+                                     :ag_grid,
+                                     :selectr,
+                                     :sortable,
+                                     :konva,
+                                     :lodash,
+                                     :multi,
+                                     :sweetalert)
+      @layout = Crossbeams::Layout::Page.build(grid_url: params[:grid_url]) do |page, _|
+        page.section do |section|
+          section.add_text('Gem and Javascript library versions', wrapper: :h2)
+          section.add_table(versions.to_a, versions.columns, alignment: { version: :right })
+        end
+      end
+      view('crossbeams_layout_page')
     end
 
     r.is 'not_found' do

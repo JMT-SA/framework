@@ -14,6 +14,7 @@ The following renderers that do not bind to fields in a form are available:
 * <<ContactMethod>>
 * <<Grid>>
 * <<Form>>
+* <<Table>>
 
 === Link
 
@@ -48,6 +49,13 @@ This page control displays a link in a page.
 
 This page control places the given text in a div with class `"crossbeams-field"`.
 
+e.g.
+[source,ruby]
+----
+section.add_text('Some text', wrapper: %i[p b])
+section.add_text('def a_ruby_method(text)', syntax: :ruby)
+----
+
 |===
 |attribute |description |possible values |default
 
@@ -62,6 +70,17 @@ a|* :ruby
 * :sql
 * :yaml or :yml
 |n/a
+
+|:wrapper
+|Tag(s) to wrap the text in. Can be a Symbol or Array of Symbols.
+a|* :p
+* :h1
+* :h2
+* :h3
+* :h4
+* :i or :em
+* :b or :strong
+|None
 
 |===
 
@@ -164,3 +183,36 @@ section.add_grid 'tickets', '/list/tickets', caption: 'Movie tickets', height: 8
 
 === Form
 
+
+=== Table
+
+Render a table. The table renders with thin borders and highlights each row on hover.
+
+e.g.
+[source,ruby]
+----
+section.add_table [{ keys: 'a', values: 1, amounts: 22 },
+                   { keys: 'b', values: 2, amounts: 33 }],
+                   %i[keys values amounts],
+                   alignments: { amounts: :right }
+----
+
+|===
+|attribute |description |possible values |default
+
+|rows
+|Rows containing the data to be shown
+|An Array of Hashes of the format `{ column1_name: value, column2_name: value }`.
+|None. This is required.
+
+|columns
+|An array of column names. Must match names in rows.
+|`Symbol` or `String`.
+|None (no column headers will be shown).
+
+|options
+|A Hash of options
+|`alignment: { col: :right }`. The hash should only contain columns that should not be left-aligned. The value for the column can be `:right` or `:center`.
+|None.
+
+|===

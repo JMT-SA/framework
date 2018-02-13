@@ -159,7 +159,7 @@ class Framework < Roda
                                      :lodash,
                                      :multi,
                                      :sweetalert)
-      @layout = Crossbeams::Layout::Page.build(grid_url: params[:grid_url]) do |page, _|
+      @layout = Crossbeams::Layout::Page.build do |page, _|
         page.section do |section|
           section.add_text('Gem and Javascript library versions', wrapper: :h2)
           section.add_table(versions.to_a, versions.columns, alignment: { version: :right })

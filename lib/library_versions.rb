@@ -68,36 +68,36 @@ class LibraryVersions
   end
 
   def ag_grid_version
-    format_lib('AG-Grid', File.readlines('public/js/ag-grid-enterprise.min.js').first.chomp.split(' v').last)
+    format_lib('AG-Grid', File.readlines('public/js/ag-grid-enterprise.min.js', encoding: 'UTF-8').first.chomp.split(' v').last)
   end
 
   def selectr_version
-    format_lib('Selectr', File.readlines('public/js/selectr.min.js')[1].chomp.split(' ').last)
+    format_lib('Selectr', File.readlines('public/js/selectr.min.js', encoding: 'UTF-8')[1].chomp.split(' ').last)
   end
 
   def sweetalert_version
-    s = File.read('public/js/sweetalert2.min.js')
+    s = File.read('public/js/sweetalert2.min.js', encoding: 'UTF-8')
     m = s.match(/\.version="(.+)"/)
     format_lib('Sweet Alert2', m.nil? ? 'UNKNOWN' : m[1])
   end
 
   def sortable_version
-    m = File.readlines('public/js/Sortable.min.js').first.match(/Sortable (.+) - MIT/)
+    m = File.readlines('public/js/Sortable.min.js', encoding: 'UTF-8').first.match(/Sortable (.+) - MIT/)
     format_lib('Sortable', m.nil? ? 'UNKNOWN' : m[1])
   end
 
   def konva_version
-    format_lib('Konva', File.readlines('public/js/konva.min.js')[1].chomp.split(' v').last)
+    format_lib('Konva', File.readlines('public/js/konva.min.js', encoding: 'UTF-8')[1].chomp.split(' v').last)
   end
 
   def lodash_version
-    s = File.read('public/js/lodash.js')
+    s = File.read('public/js/lodash.js', encoding: 'UTF-8')
     m = s.match(/VERSION = '(.+)'/)
     format_lib('Lodash', m.nil? ? 'UNKNOWN' : m[1])
   end
 
   def multi_version
-    m = File.readlines('public/js/multi.min.js').first.match(/multi.js (.+) /)
+    m = File.readlines('public/js/multi.min.js', encoding: 'UTF-8').first.match(/multi.js (.+) /)
     format_lib('Multi', m.nil? ? 'UNKNOWN' : m[1])
   end
 end

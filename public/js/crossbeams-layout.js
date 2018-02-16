@@ -150,6 +150,13 @@
         event.stopPropagation();
         event.preventDefault();
       }
+      if (event.target.dataset && event.target.dataset.cbHintFor) {
+        const id = event.target.dataset.cbHintFor;
+        const el = document.querySelector(`[data-cb-hint='${id}']`);
+        if (el) {
+          crossbeamsUtils.showHtmlInDialog('Hint', el.innerHTML);
+        }
+      }
       if (event.target.classList.contains('close-dialog')) {
         crossbeamsUtils.closePopupDialog();
         event.stopPropagation();

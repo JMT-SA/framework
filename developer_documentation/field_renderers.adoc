@@ -139,6 +139,11 @@ a|
 |true or false
 |false
 
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
+
 |===
 
 === Renderer::Hidden
@@ -169,6 +174,11 @@ The checkbox will be unchecked if the field value is `false`, `f` or `0`. Otherw
 |The field name with underscores converted to spaces
 and all words start with initial capital letter.
 
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
+
 |===
 
 === Renderer::Label
@@ -188,6 +198,11 @@ and all words start with initial capital letter.
 |Text to appear in the input.
 |any text
 |The value of the column in the record for this field.
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
 
 |===
 
@@ -218,6 +233,11 @@ and all words start with initial capital letter.
 |Pre-selected items.
 |an array of values.
 |`[]` - an empty array.
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
 
 |===
 
@@ -259,6 +279,11 @@ For a 1D array, the option value and text will be the same.
 |Pre-selected item.
 |any value matching one of the options.
 |The value of the column in the record for this field.
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
 
 |===
 
@@ -319,5 +344,10 @@ and all words start with initial capital letter.
 |HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain if no value is provided.
 |true or false
 |false
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
 
 |===

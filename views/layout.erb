@@ -127,6 +127,12 @@
         crossbeamsDialogLevel1 = new window.A11yDialog(dialogEl1);
         const dialogEl2 = document.getElementById('crossbeams-popup-dialog-level2');
         crossbeamsDialogLevel2 = new window.A11yDialog(dialogEl2);
+
+        const sortable = Array.from(document.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
+        if (sortable.length > 0) {
+          crossbeamsUtils.makeListSortable(sortable[0].dataset.sortablePrefix);
+        }
+
       });
 
       // Build the menu.

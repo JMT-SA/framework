@@ -16,6 +16,9 @@ The following renderers are available to a page:
 |:email
 |<<Renderer::Input>>
 
+|:file
+|<<Renderer::Input>>
+
 |:hidden
 |<<Renderer::Hidden>>
 
@@ -68,6 +71,7 @@ and all words start with initial capital letter.
 Integer, numeric and number render with numeric inputs that only accept digits (and `-` and `.`) and have step-up and step-down arrows.
 :url and :email are rendered with patterns that check for valid formats. Note :url must include the protocol (`http:` etc.)
 Password renders with obscured characters.
+File renders a browser file picker.
 a|
 * :integer
 * :numeric
@@ -79,6 +83,7 @@ a|
 * :month
 * :time
 * :password
+* :file
 |text
 
 |:datalist
@@ -128,6 +133,11 @@ a|
 |HTML `readonly` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the value cannot be changed in the browser.
 |true or false
 |false
+
+|accept
+|Filter for limiting filetpye of files that can be uploaded. Only applies to subtype `:file`.
+|String. e.g. `.yml`.
+|n/a
 
 |:disabled
 |HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.

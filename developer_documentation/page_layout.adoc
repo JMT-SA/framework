@@ -202,6 +202,14 @@ These are the methods used in building a page layout.
 |
 |Make this a view-only form that cannot be submitted, only closed.
 
+|multipart!
+|
+|Make this a multipart form for including file uploads.
+
+|inline!
+|
+|Include the submit button on the same line as an input. This only works if the form is not specified with rows and columns.
+
 |action
 |action (String)
 |Set the URL action to which the form will be submitted.

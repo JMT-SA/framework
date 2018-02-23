@@ -341,6 +341,9 @@ const crossbeamsUtils = {
               } else {
                 target.disabled = true;
               }
+              if (target.selectr) {
+                target.selectr.disable(target.disabled === true);
+              }
             }
           });
         });

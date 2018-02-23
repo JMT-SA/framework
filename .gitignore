@@ -46,6 +46,10 @@ public/fonts
 ## Vim
 tags
 .srclist
+.smartgf*
 
 # Assets plugin metadata file
 prestyle.css
+
+# Client-specific config.
+config/dataminer_connections.yml

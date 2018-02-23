@@ -48,6 +48,9 @@ section.crossbeams_layout {
   background-color: yellow;
   text-align: right;
 }
+.grid-context-menu {
+  line-height: initial;
+}
 .ac_icon {
   width: 16px;
   height: 16px;
@@ -420,7 +423,7 @@ tr.roweven {
 
 .dialog-content {
   background-color: rgb(255, 255, 255);
-  z-index: 3;
+  z-index: 30;
   position: fixed;
   top: 50%;
   left: 50%;

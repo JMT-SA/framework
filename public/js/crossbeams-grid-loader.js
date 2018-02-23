@@ -408,7 +408,7 @@ const crossbeamsGridEvents = {
       showCancelButton: true,
     }).then(() => {
       document.body.innerHTML += `<form id="dynForm" action="${url}"
-        method="post"><input name="_method" type="hidden" value="${+method}" /></form>`;
+        method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" /><input name="_method" type="hidden" value="${+method}" /></form>`;
       document.getElementById('dynForm').submit();
     });
     // TODO: make call via AJAX & reload grid? Or http to server to figure it out?.....
@@ -522,7 +522,7 @@ const crossbeamsGridFormatters = {
     // If items are hidden, the last item(s) could be separators.
     // Remove them here.
     items = _.dropRightWhile(items, ['value', '---']);
-    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'>list</button>`;
+    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'>&nbsp;<i class="fa fa-chevron-right blue"></i>&nbsp;</button>`;
   },
 
   // Return a number with thousand separator and at least 2 digits after the decimal.

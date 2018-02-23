@@ -6,3 +6,4 @@ db_name = "#{ENV.fetch('FM_DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 
 require 'sequel'
 DB = Sequel.connect(db_name)
 DB.extension :pg_array
+DB.extension :pg_json

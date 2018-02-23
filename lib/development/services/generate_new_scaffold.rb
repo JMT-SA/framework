@@ -426,7 +426,11 @@ class GenerateNewScaffold < BaseService
               interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
               r.on 'new' do    # NEW
                 if authorised?('#{opts.program}', 'new')
-                  show_partial_or_page(fetch?(r)) { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(remote: fetch?(r)) }
+                  if flash[:stashed_page]
+                    show_page { flash[:stashed_page] }
+                  else
+                    show_partial_or_page(fetch?(r)) { #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(remote: fetch?(r)) }
+                  end
                 else
                   fetch?(r) ? dialog_permission_error : show_unauthorised
                 end
@@ -449,11 +453,10 @@ class GenerateNewScaffold < BaseService
                   update_dialog_content(content: content, error: res.message)
                 else
                   flash[:error] = res.message
-                  show_page do
-                    #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
-                    #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}form_errors: res.errors,
-                    #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}remote: false)
-                  end
+                  flash[:stashed_page] = #{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
+                                       #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}form_errors: res.errors,
+                                       #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}remote: false)
+                  r.redirect '/#{opts.applet}/#{opts.program}/#{opts.table}/new'
                 end
               end
             end

@@ -1,22 +1,30 @@
 ---
-:caption: Products
-:sql: "SELECT \"products\".\"id\", \"products\".\"product_type_id\", \"products\".\"variant\",
-  \"products\".\"style\",\r\n\"products\".\"assembly_type\", \"products\".\"market_major\",
-  \"products\".\"commodity\", \"products\".\"variety\",\r\n\"products\".\"ctn_size_basic\",
-  \"products\".\"ctn_size_old_pack\", \"products\".\"pls_pack_code\",\r\n\"products\".\"fruit_mass_nett_kg\",
-  \"products\".\"holes\", \"products\".\"perforation\", \"products\".\"image\",\r\n\"products\".\"length_mm\",
-  \"products\".\"width_mm\", \"products\".\"height_mm\", \"products\".\"diameter_mm\",
-  \"products\".\"thick_mm\",\r\n\"products\".\"thick_mic\", \"products\".\"colour\",
-  \"products\".\"grade\", \"products\".\"mass\", \"products\".\"material_type\",\r\n\"products\".\"treatment\",
-  \"products\".\"specification_notes\", \"products\".\"artwork_commodity\",\r\n\"products\".\"artwork_marketing_variety_group\",
-  \"products\".\"artwork_variety\", \"products\".\"artwork_nett_mass\",\r\n\"products\".\"artwork_brand\",
-  \"products\".\"artwork_class\", \"products\".\"artwork_plu_number\", \"products\".\"artwork_other\",\r\n\"products\".\"artwork_image\",
-  \"products\".\"marketer\", \"products\".\"retailer\", \"products\".\"supplier\",\r\n\"products\".\"supplier_stock_code\",
-  \"products\".\"product_alternative\", \"products\".\"product_joint_use\",\r\n\"products\".\"ownership\",
-  \"products\".\"consignment_stock\", \"products\".\"start_date\", \"products\".\"end_date\",\r\n\"products\".\"active\",
-  \"products\".\"remarks\", \"products\".\"created_at\", \"products\".\"updated_at\",
-  \"product_types\".\"id\" AS\r\nproduct_types_id\r\nFROM \"products\"\r\nJOIN \"product_types\"
-  ON \"product_types\".\"id\" = \"products\".\"product_type_id\""
+:caption: Pack Material Products
+:sql: SELECT "pack_material_products"."id", "pack_material_products"."material_resource_sub_type_id",
+  "pack_material_products"."product_number", "pack_material_products"."description",
+  "pack_material_products"."commodity_id", "pack_material_products"."variety_id",
+  "pack_material_products"."style", "pack_material_products"."assembly_type", "pack_material_products"."market_major",
+  "pack_material_products"."ctn_size_basic", "pack_material_products"."ctn_size_old_pack",
+  "pack_material_products"."pls_pack_code", "pack_material_products"."fruit_mass_nett_kg",
+  "pack_material_products"."holes", "pack_material_products"."perforation", "pack_material_products"."image",
+  "pack_material_products"."length_mm", "pack_material_products"."width_mm", "pack_material_products"."height_mm",
+  "pack_material_products"."diameter_mm", "pack_material_products"."thick_mm", "pack_material_products"."thick_mic",
+  "pack_material_products"."colour", "pack_material_products"."grade", "pack_material_products"."mass",
+  "pack_material_products"."material_type", "pack_material_products"."treatment",
+  "pack_material_products"."specification_notes", "pack_material_products"."artwork_commodity",
+  "pack_material_products"."artwork_marketing_variety_group", "pack_material_products"."artwork_variety",
+  "pack_material_products"."artwork_nett_mass", "pack_material_products"."artwork_brand",
+  "pack_material_products"."artwork_class", "pack_material_products"."artwork_plu_number",
+  "pack_material_products"."artwork_other", "pack_material_products"."artwork_image",
+  "pack_material_products"."marketer", "pack_material_products"."retailer", "pack_material_products"."supplier",
+  "pack_material_products"."supplier_stock_code", "pack_material_products"."product_alternative",
+  "pack_material_products"."product_joint_use", "pack_material_products"."ownership",
+  "pack_material_products"."consignment_stock", "pack_material_products"."start_date",
+  "pack_material_products"."end_date", "pack_material_products"."active", "pack_material_products"."remarks",
+  "pack_material_products"."created_at", "pack_material_products"."updated_at", "commodities"."code",
+  "material_resource_sub_types"."sub_type_name" FROM "pack_material_products" JOIN
+  "commodities" ON "commodities"."id" = "pack_material_products"."commodity_id" JOIN
+  "material_resource_sub_types" ON "material_resource_sub_types"."id" = "pack_material_products"."material_resource_sub_type_id"
 :limit: 
 :offset: 
 :columns:
@@ -24,7 +32,37 @@
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: products.id
+    :namespaced_name: pack_material_products.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  material_resource_sub_type_id:
+    :name: material_resource_sub_type_id
+    :sequence_no: 2
+    :caption: Material resource sub type
+    :namespaced_name: pack_material_products.material_resource_sub_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_number:
+    :name: product_number
+    :sequence_no: 3
+    :caption: Product number
+    :namespaced_name: pack_material_products.product_number
     :data_type: :integer
     :width: 
     :format: 
@@ -35,26 +73,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  product_type_id:
-    :name: product_type_id
-    :sequence_no: 2
-    :caption: Product type
-    :namespaced_name: products.product_type_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: false
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  variant:
-    :name: variant
-    :sequence_no: 3
-    :caption: Variant
-    :namespaced_name: products.variant
+  description:
+    :name: description
+    :sequence_no: 4
+    :caption: Description
+    :namespaced_name: pack_material_products.description
     :data_type: :string
     :width: 
     :format: 
@@ -65,11 +88,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 5
+    :caption: Commodity
+    :namespaced_name: pack_material_products.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variety_id:
+    :name: variety_id
+    :sequence_no: 6
+    :caption: Variety
+    :namespaced_name: pack_material_products.variety_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   style:
     :name: style
-    :sequence_no: 4
+    :sequence_no: 7
     :caption: Style
-    :namespaced_name: products.style
+    :namespaced_name: pack_material_products.style
     :data_type: :string
     :width: 
     :format: 
@@ -82,9 +135,9 @@
     :group_max: false
   assembly_type:
     :name: assembly_type
-    :sequence_no: 5
+    :sequence_no: 8
     :caption: Assembly type
-    :namespaced_name: products.assembly_type
+    :namespaced_name: pack_material_products.assembly_type
     :data_type: :string
     :width: 
     :format: 
@@ -97,39 +150,9 @@
     :group_max: false
   market_major:
     :name: market_major
-    :sequence_no: 6
+    :sequence_no: 9
     :caption: Market major
-    :namespaced_name: products.market_major
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  commodity:
-    :name: commodity
-    :sequence_no: 7
-    :caption: Commodity
-    :namespaced_name: products.commodity
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  variety:
-    :name: variety
-    :sequence_no: 8
-    :caption: Variety
-    :namespaced_name: products.variety
+    :namespaced_name: pack_material_products.market_major
     :data_type: :string
     :width: 
     :format: 
@@ -142,9 +165,9 @@
     :group_max: false
   ctn_size_basic:
     :name: ctn_size_basic
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Ctn size basic
-    :namespaced_name: products.ctn_size_basic
+    :namespaced_name: pack_material_products.ctn_size_basic
     :data_type: :string
     :width: 
     :format: 
@@ -157,9 +180,9 @@
     :group_max: false
   ctn_size_old_pack:
     :name: ctn_size_old_pack
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Ctn size old pack
-    :namespaced_name: products.ctn_size_old_pack
+    :namespaced_name: pack_material_products.ctn_size_old_pack
     :data_type: :string
     :width: 
     :format: 
@@ -172,9 +195,9 @@
     :group_max: false
   pls_pack_code:
     :name: pls_pack_code
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Pls pack code
-    :namespaced_name: products.pls_pack_code
+    :namespaced_name: pack_material_products.pls_pack_code
     :data_type: :string
     :width: 
     :format: 
@@ -187,9 +210,9 @@
     :group_max: false
   fruit_mass_nett_kg:
     :name: fruit_mass_nett_kg
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Fruit mass nett kg
-    :namespaced_name: products.fruit_mass_nett_kg
+    :namespaced_name: pack_material_products.fruit_mass_nett_kg
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -202,9 +225,9 @@
     :group_max: false
   holes:
     :name: holes
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Holes
-    :namespaced_name: products.holes
+    :namespaced_name: pack_material_products.holes
     :data_type: :string
     :width: 
     :format: 
@@ -217,9 +240,9 @@
     :group_max: false
   perforation:
     :name: perforation
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Perforation
-    :namespaced_name: products.perforation
+    :namespaced_name: pack_material_products.perforation
     :data_type: :string
     :width: 
     :format: 
@@ -232,9 +255,9 @@
     :group_max: false
   image:
     :name: image
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Image
-    :namespaced_name: products.image
+    :namespaced_name: pack_material_products.image
     :data_type: :string
     :width: 
     :format: 
@@ -247,9 +270,9 @@
     :group_max: false
   length_mm:
     :name: length_mm
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Length mm
-    :namespaced_name: products.length_mm
+    :namespaced_name: pack_material_products.length_mm
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -262,9 +285,9 @@
     :group_max: false
   width_mm:
     :name: width_mm
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Width mm
-    :namespaced_name: products.width_mm
+    :namespaced_name: pack_material_products.width_mm
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -277,9 +300,9 @@
     :group_max: false
   height_mm:
     :name: height_mm
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Height mm
-    :namespaced_name: products.height_mm
+    :namespaced_name: pack_material_products.height_mm
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -292,9 +315,9 @@
     :group_max: false
   diameter_mm:
     :name: diameter_mm
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Diameter mm
-    :namespaced_name: products.diameter_mm
+    :namespaced_name: pack_material_products.diameter_mm
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -307,9 +330,9 @@
     :group_max: false
   thick_mm:
     :name: thick_mm
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Thick mm
-    :namespaced_name: products.thick_mm
+    :namespaced_name: pack_material_products.thick_mm
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -322,9 +345,9 @@
     :group_max: false
   thick_mic:
     :name: thick_mic
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Thick mic
-    :namespaced_name: products.thick_mic
+    :namespaced_name: pack_material_products.thick_mic
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -337,9 +360,9 @@
     :group_max: false
   colour:
     :name: colour
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Colour
-    :namespaced_name: products.colour
+    :namespaced_name: pack_material_products.colour
     :data_type: :string
     :width: 
     :format: 
@@ -352,9 +375,9 @@
     :group_max: false
   grade:
     :name: grade
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Grade
-    :namespaced_name: products.grade
+    :namespaced_name: pack_material_products.grade
     :data_type: :string
     :width: 
     :format: 
@@ -367,9 +390,9 @@
     :group_max: false
   mass:
     :name: mass
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Mass
-    :namespaced_name: products.mass
+    :namespaced_name: pack_material_products.mass
     :data_type: :string
     :width: 
     :format: 
@@ -382,9 +405,9 @@
     :group_max: false
   material_type:
     :name: material_type
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Material type
-    :namespaced_name: products.material_type
+    :namespaced_name: pack_material_products.material_type
     :data_type: :string
     :width: 
     :format: 
@@ -397,9 +420,9 @@
     :group_max: false
   treatment:
     :name: treatment
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Treatment
-    :namespaced_name: products.treatment
+    :namespaced_name: pack_material_products.treatment
     :data_type: :string
     :width: 
     :format: 
@@ -412,9 +435,9 @@
     :group_max: false
   specification_notes:
     :name: specification_notes
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Specification notes
-    :namespaced_name: products.specification_notes
+    :namespaced_name: pack_material_products.specification_notes
     :data_type: :string
     :width: 
     :format: 
@@ -427,9 +450,9 @@
     :group_max: false
   artwork_commodity:
     :name: artwork_commodity
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Artwork commodity
-    :namespaced_name: products.artwork_commodity
+    :namespaced_name: pack_material_products.artwork_commodity
     :data_type: :string
     :width: 
     :format: 
@@ -442,9 +465,9 @@
     :group_max: false
   artwork_marketing_variety_group:
     :name: artwork_marketing_variety_group
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Artwork marketing variety group
-    :namespaced_name: products.artwork_marketing_variety_group
+    :namespaced_name: pack_material_products.artwork_marketing_variety_group
     :data_type: :string
     :width: 
     :format: 
@@ -457,9 +480,9 @@
     :group_max: false
   artwork_variety:
     :name: artwork_variety
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Artwork variety
-    :namespaced_name: products.artwork_variety
+    :namespaced_name: pack_material_products.artwork_variety
     :data_type: :string
     :width: 
     :format: 
@@ -472,9 +495,9 @@
     :group_max: false
   artwork_nett_mass:
     :name: artwork_nett_mass
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Artwork nett mass
-    :namespaced_name: products.artwork_nett_mass
+    :namespaced_name: pack_material_products.artwork_nett_mass
     :data_type: :string
     :width: 
     :format: 
@@ -487,9 +510,9 @@
     :group_max: false
   artwork_brand:
     :name: artwork_brand
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Artwork brand
-    :namespaced_name: products.artwork_brand
+    :namespaced_name: pack_material_products.artwork_brand
     :data_type: :string
     :width: 
     :format: 
@@ -502,9 +525,9 @@
     :group_max: false
   artwork_class:
     :name: artwork_class
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Artwork class
-    :namespaced_name: products.artwork_class
+    :namespaced_name: pack_material_products.artwork_class
     :data_type: :string
     :width: 
     :format: 
@@ -517,9 +540,9 @@
     :group_max: false
   artwork_plu_number:
     :name: artwork_plu_number
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Artwork plu number
-    :namespaced_name: products.artwork_plu_number
+    :namespaced_name: pack_material_products.artwork_plu_number
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -532,9 +555,9 @@
     :group_max: false
   artwork_other:
     :name: artwork_other
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Artwork other
-    :namespaced_name: products.artwork_other
+    :namespaced_name: pack_material_products.artwork_other
     :data_type: :string
     :width: 
     :format: 
@@ -547,9 +570,9 @@
     :group_max: false
   artwork_image:
     :name: artwork_image
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Artwork image
-    :namespaced_name: products.artwork_image
+    :namespaced_name: pack_material_products.artwork_image
     :data_type: :string
     :width: 
     :format: 
@@ -562,9 +585,9 @@
     :group_max: false
   marketer:
     :name: marketer
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Marketer
-    :namespaced_name: products.marketer
+    :namespaced_name: pack_material_products.marketer
     :data_type: :string
     :width: 
     :format: 
@@ -577,9 +600,9 @@
     :group_max: false
   retailer:
     :name: retailer
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Retailer
-    :namespaced_name: products.retailer
+    :namespaced_name: pack_material_products.retailer
     :data_type: :string
     :width: 
     :format: 
@@ -592,9 +615,9 @@
     :group_max: false
   supplier:
     :name: supplier
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: Supplier
-    :namespaced_name: products.supplier
+    :namespaced_name: pack_material_products.supplier
     :data_type: :string
     :width: 
     :format: 
@@ -607,9 +630,9 @@
     :group_max: false
   supplier_stock_code:
     :name: supplier_stock_code
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: Supplier stock code
-    :namespaced_name: products.supplier_stock_code
+    :namespaced_name: pack_material_products.supplier_stock_code
     :data_type: :string
     :width: 
     :format: 
@@ -622,9 +645,9 @@
     :group_max: false
   product_alternative:
     :name: product_alternative
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Product alternative
-    :namespaced_name: products.product_alternative
+    :namespaced_name: pack_material_products.product_alternative
     :data_type: :string
     :width: 
     :format: 
@@ -637,9 +660,9 @@
     :group_max: false
   product_joint_use:
     :name: product_joint_use
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: Product joint use
-    :namespaced_name: products.product_joint_use
+    :namespaced_name: pack_material_products.product_joint_use
     :data_type: :string
     :width: 
     :format: 
@@ -652,9 +675,9 @@
     :group_max: false
   ownership:
     :name: ownership
-    :sequence_no: 43
+    :sequence_no: 44
     :caption: Ownership
-    :namespaced_name: products.ownership
+    :namespaced_name: pack_material_products.ownership
     :data_type: :string
     :width: 
     :format: 
@@ -667,9 +690,9 @@
     :group_max: false
   consignment_stock:
     :name: consignment_stock
-    :sequence_no: 44
+    :sequence_no: 45
     :caption: Consignment stock
-    :namespaced_name: products.consignment_stock
+    :namespaced_name: pack_material_products.consignment_stock
     :data_type: :boolean
     :width: 
     :format: 
@@ -682,9 +705,9 @@
     :group_max: false
   start_date:
     :name: start_date
-    :sequence_no: 45
+    :sequence_no: 46
     :caption: Start date
-    :namespaced_name: products.start_date
+    :namespaced_name: pack_material_products.start_date
     :data_type: :date
     :width: 
     :format: 
@@ -697,9 +720,9 @@
     :group_max: false
   end_date:
     :name: end_date
-    :sequence_no: 46
+    :sequence_no: 47
     :caption: End date
-    :namespaced_name: products.end_date
+    :namespaced_name: pack_material_products.end_date
     :data_type: :date
     :width: 
     :format: 
@@ -712,9 +735,9 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 47
+    :sequence_no: 48
     :caption: Active
-    :namespaced_name: products.active
+    :namespaced_name: pack_material_products.active
     :data_type: :boolean
     :width: 
     :format: 
@@ -727,9 +750,9 @@
     :group_max: false
   remarks:
     :name: remarks
-    :sequence_no: 48
+    :sequence_no: 49
     :caption: Remarks
-    :namespaced_name: products.remarks
+    :namespaced_name: pack_material_products.remarks
     :data_type: :string
     :width: 
     :format: 
@@ -742,13 +765,13 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 49
+    :sequence_no: 50
     :caption: Created at
-    :namespaced_name: products.created_at
+    :namespaced_name: pack_material_products.created_at
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -757,32 +780,71 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 50
+    :sequence_no: 51
     :caption: Updated at
-    :namespaced_name: products.updated_at
+    :namespaced_name: pack_material_products.updated_at
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  product_types_id:
-    :name: product_types_id
-    :sequence_no: 51
-    :caption: Product types
-    :namespaced_name: product_types.id
+  code:
+    :name: code
+    :sequence_no: 52
+    :caption: Code
+    :namespaced_name: commodities.code
     :data_type: :string
     :width: 
     :format: 
     :hide: false
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-:query_parameter_definitions: []
+  sub_type_name:
+    :name: sub_type_name
+    :sequence_no: 53
+    :caption: Sub type name
+    :namespaced_name: material_resource_sub_types.sub_type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: pack_material_products.material_resource_sub_type_id
+  :caption: Material resource sub type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT sub_type_name, id FROM material_resource_sub_types ORDER BY sub_type_name
+- :column: pack_material_products.commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodities ORDER BY code
+- :column: pack_material_products.variety_id
+  :caption: Variety
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

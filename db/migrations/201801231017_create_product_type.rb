@@ -67,7 +67,7 @@ Sequel.migration do
       String :market_major
       String :commodity #Lookup
       String :variety #Lookup
-      String :ctn_size_basic #Lookup
+      String :ctn_size_basic_pack #Lookup
       String :ctn_size_old_pack #Lookup
       String :pls_pack_code #Lookup
       Numeric :fruit_mass_nett_kg #NOTE: should we add a unit in here for LB or KG

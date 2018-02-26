@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ContactMethodInteractor < BaseInteractor
-  # TODO: Add finds into interactors, Views should not be talking to my repositories?
-  # def find_contact_method(params)
   def create_contact_method(params)
     res = validate_contact_method_params(params)
     return validation_failed_response(res) unless res.messages.empty?

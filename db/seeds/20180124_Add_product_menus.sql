@@ -66,7 +66,6 @@ FROM packing_material_product_types pt
 JOIN (SELECT * FROM (VALUES ('glue', 1), ('promotion',1 ), ('sealing', 1)) AS t(str, n)) sub ON sub.n = 1
 WHERE pt.packing_material_type_name = 'other';
 
-
 INSERT INTO product_column_names (group_name, column_name)
 VALUES ('classification', 'variant'),
        ('classification', 'style'),
@@ -114,4 +113,3 @@ VALUES ('classification', 'variant'),
        ('inventory_management', 'end_date'),
        ('inventory_management', 'active'),
        ('inventory_management', 'remarks');
-

@@ -1,0 +1,50 @@
+---
+:dataminer_definition: material_resource_type_configs
+:actions:
+- :url: "/settings/pack_material_products/material_resource_type_configs/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/settings/pack_material_products/material_resource_type_configs/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/settings/pack_material_products/material_resource_type_configs/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+- :url: "/list/material_resource_product_columns/multi?key=material_resource_type_configs&id=$:id$"
+  :text: product columns
+  :icon: fa-list
+  :popup: true
+- :url: "/list/material_resource_type_product_code_columns/multi?key=material_resource_type_configs&id=$:id$"
+  :text: product code columns
+  :icon: fa-list
+  :popup: true
+- :url: "/settings/pack_material_products/reorder_product_code_column_names/$:id$"
+  :text: order product code columns
+  :icon: fa-list
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/settings/pack_material_products/material_resource_type_configs/new"
+  :text: New Material Resource Type Config
+  :style: :button
+  :behaviour: :popup
+
+
+#- :url: "/list/product_column_names/multi?key=product_types&id=$:id$"
+#  :text: product columns
+#  :icon: fa-list
+#  :popup: true
+#- :url: "/list/product_code_column_names/multi?key=product_types&id=$:id$"
+#  :text: product code columns
+#  :icon: fa-list
+#  :popup: true
+#- :url: "/settings/products/reorder_product_code_column_names/$:id$"
+#  :text: order product code columns
+#  :icon: fa-list
+#  :popup: true

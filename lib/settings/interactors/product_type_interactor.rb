@@ -21,8 +21,7 @@ class ProductTypeInteractor < BaseInteractor
     res = validate_product_type_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     @id = repo.create_product_type(res)
-    success_response("Created product type #{'product_type.name'}", # TODO - Create a combined product type name
-                     product_type)
+    success_response("Created product type #{product_type.name}", product_type)
   rescue Sequel::UniqueConstraintViolation
     validation_failed_response(OpenStruct.new(messages: { product_type_name: ['This product type already exists'] }))
   end
@@ -32,15 +31,14 @@ class ProductTypeInteractor < BaseInteractor
     res = validate_product_type_params(params)
     return validation_failed_response(res) unless res.messages.empty?
     repo.update_product_type(id, res)
-    success_response("Updated product type #{'product_type.name'}",
-                     product_type(false))
+    success_response("Updated product type #{product_type.name}", product_type(false))
   end
 
   def delete_product_type(id)
     @id = id
-    # name = product_type.product_columns_options
+    name = product_type.name
     repo.delete_product_type(id)
-    success_response("Deleted product type #{'name'}")
+    success_response("Deleted product type #{name}")
   end
 
   def packing_material_product_type(cached = true)
@@ -124,12 +122,11 @@ class ProductTypeInteractor < BaseInteractor
       repo.link_product_column_names(id, product_column_name_ids)
     end
 
-    # product_type = repo.find_product_type(id)
-    existing_ids = repo.product_type_product_column_name_ids(id)
+    existing_ids = repo.link_product_column_names(id)
     if existing_ids.eql?(product_column_name_ids.sort)
-      success_response('Product columns linked successfully')#, product_type)
+      success_response('Product columns linked successfully')
     else
-      failed_response('Some product columns were not linked')#, product_type)
+      failed_response('Some product columns were not linked')
     end
   end
 
@@ -148,49 +145,4 @@ class ProductTypeInteractor < BaseInteractor
     end
   end
 
-  def product(cached = true)
-    if cached
-      @product ||= repo.find_product(@id)
-    else
-      @product = repo.find_product(@id)
-    end
-  end
-
-  def validate_product_params(params)
-    ProductSchema.call(params)
-  end
-
-  def create_product(params)
-    res = validate_product_params(params)
-    return validation_failed_response(res) unless res.messages.empty?
-    @id = repo.create_product(res)
-    success_response("Created product #{product.variant}",
-                     product)
-  rescue Sequel::UniqueConstraintViolation
-    validation_failed_response(OpenStruct.new(messages: { variant: ['This product already exists'] }))
-  end
-
-  def update_product(id, params)
-    @id = id
-    res = validate_product_params(params)
-    return validation_failed_response(res) unless res.messages.empty?
-    repo.update_product(id, res)
-    success_response("Updated product #{product.variant}",
-                     product(false))
-  end
-
-  def delete_product(id)
-    @id = id
-    name = product.variant
-    repo.delete_product(id)
-    success_response("Deleted product #{name}")
-  end
-
-  def reorder_product_code_column_names(id, column_codes_sorted_ids)
-    if repo.store_product_code_column_ordering(id, column_codes_sorted_ids)
-      success_response("Product code column ordering has been updated")
-    else
-      failed_response("Something went wrong")
-    end
-  end
 end

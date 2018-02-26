@@ -1,0 +1,86 @@
+---
+:caption: Material Resource Sub Types
+:sql: SELECT "material_resource_sub_types"."id", "material_resource_sub_types"."material_resource_type_id",
+  "material_resource_sub_types"."sub_type_name", "material_resource_types"."type_name"
+  FROM "material_resource_sub_types" JOIN "material_resource_types" ON "material_resource_types"."id"
+  = "material_resource_sub_types"."material_resource_type_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: material_resource_sub_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  material_resource_type_id:
+    :name: material_resource_type_id
+    :sequence_no: 2
+    :caption: Material resource type
+    :namespaced_name: material_resource_sub_types.material_resource_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sub_type_name:
+    :name: sub_type_name
+    :sequence_no: 3
+    :caption: Sub type name
+    :namespaced_name: material_resource_sub_types.sub_type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  type_name:
+    :name: type_name
+    :sequence_no: 4
+    :caption: Type name
+    :namespaced_name: material_resource_types.type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: material_resource_sub_types.material_resource_type_id
+  :caption: Material resource type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT type_name, id FROM material_resource_types ORDER BY type_name
+- :column: material_resource_sub_types.sub_type_name
+  :caption: Sub type name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

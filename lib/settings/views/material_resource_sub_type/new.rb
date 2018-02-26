@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Settings
-  module Products
-    module ProductType
+  module PackMaterialProducts
+    module MaterialResourceSubType
       class New
         def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:product_type, :new, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:material_resource_sub_type, :new, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,11 +13,10 @@ module Settings
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action '/settings/products/product_types'
+              form.action '/settings/pack_material_products/material_resource_sub_types'
               form.remote! if remote
-              form.add_field :packing_material_product_type_id
-              form.add_field :packing_material_product_sub_type_id
-              # form.add_field :product_columns_options
+              form.add_field :material_resource_type_id
+              form.add_field :sub_type_name
             end
           end
 

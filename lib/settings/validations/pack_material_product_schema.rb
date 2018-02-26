@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
-ProductSchema = Dry::Validation.Form do
+PackMaterialProductSchema = Dry::Validation.Form do
   optional(:id).filled(:int?)
   required(:product_type_id).filled(:int?)
+  optional(:commodity_id).maybe(:int?)
+  optional(:active).filled(:bool?)
   optional(:variant).maybe(:str?)
   optional(:style).maybe(:str?)
   optional(:assembly_type).maybe(:str?)
   optional(:market_major).maybe(:str?)
-  optional(:commodity).maybe(:str?)
   optional(:variety).maybe(:str?)
-  optional(:ctn_size_basic).maybe(:str?)
+  optional(:ctn_size_basic_pack).maybe(:str?)
   optional(:ctn_size_old_pack).maybe(:str?)
   optional(:pls_pack_code).maybe(:str?)
   optional(:fruit_mass_nett_kg).maybe(:decimal?)

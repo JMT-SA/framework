@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Product < Dry::Struct
+class PackMaterialProduct < Dry::Struct
   attribute :id, Types::Int
   attribute :product_type_id, Types::Int
   attribute :product_type_name, Types::String
@@ -10,7 +10,7 @@ class Product < Dry::Struct
   attribute :style, Types::String
   attribute :assembly_type, Types::String
   attribute :market_major, Types::String
-  attribute :commodity, Types::String
+  attribute :commodity_id, Types::Int
   attribute :variety, Types::String
   attribute :ctn_size_basic_pack, Types::String
   attribute :ctn_size_old_pack, Types::String

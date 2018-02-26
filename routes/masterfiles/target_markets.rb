@@ -437,9 +437,10 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      r.on 'destination_countries' do
-        show_partial { Masterfiles::Fruit::DestinationCountry::Edit.call(1) } # TODO: Show countries grid here (redirect, Not multiselect)
-      end
+      # r.on 'destination_countries' do
+      #   # TODO: Show countries grid here (redirect, Not multiselect)
+      #   show_partial { Masterfiles::Fruit::DestinationCountry::Edit.call(1) }
+      # end
       r.on 'edit' do   # EDIT
         if authorised?('fruit', 'edit')
           show_partial { Masterfiles::Fruit::DestinationRegion::Edit.call(id) }

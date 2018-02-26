@@ -24,6 +24,13 @@ class ProgramRepo < RepoBase
     DB[query].map { |rec| [rec[:program_function_name], rec[:id]] }
   end
 
+  def create_program(res, webapp)
+    DB.transaction do
+      id = create(:programs, res)
+      create(:programs_webapps, program_id: id, webapp: webapp)
+    end
+  end
+
   def re_order_program_functions(sorted_ids)
     upd = []
     sorted_ids.split(',').each_with_index do |id, index|

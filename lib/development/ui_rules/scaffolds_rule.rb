@@ -46,7 +46,6 @@ module UiRules
       behaviours do |behaviour|
         behaviour.enable :other, when: :applet, changes_to: ['other']
         behaviour.dropdown_change :table, notify: [{ url: '/development/generators/scaffolds/table_changed' }]
-        # TODO:  behaviour - set short_name from tablename
       end
     end
 

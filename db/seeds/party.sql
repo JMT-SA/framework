@@ -3,6 +3,9 @@
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('Parties', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles'));
 
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Parties' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles')), 'Framework');
+
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Parties' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles')), 'Commodity Groups', '/list/commodity_groups', 1);

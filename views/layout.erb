@@ -136,7 +136,7 @@
       });
 
       // Build the menu.
-      crossbeamsMenuBuilder.buildMenu(<%= menu_items %>);
+      crossbeamsMenuBuilder.buildMenu(<%= menu_items(self.class.name) %>);
 
       Jackbox.init();
       <% if flash[:notice] %>

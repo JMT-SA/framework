@@ -166,7 +166,7 @@ class Framework < Roda
       end
 
       r.post do        # CREATE
-        res = interactor.create_program(params[:program])
+        res = interactor.create_program(params[:program], self.class.name)
         if res.success
           flash[:notice] = res.message
           if fetch?(r)

@@ -12,8 +12,9 @@ class GenerateNewScaffold < BaseService
     @opts             = OpenStruct.new(params)
     @opts.new_applet  = @opts.applet == 'other'
     @opts.applet      = params[:other] if @opts.applet == 'other'
+    @opts.applet_module = "#{@opts.applet.capitalize}App"
     @opts.program   ||= 'progname'
-    @opts.singlename  = simple_single(@opts.table)
+    @opts.singlename  = simple_single(@opts.short_name)
     @opts.klassname   = camelize(@opts.singlename)
     @opts.query_name  = params[:query_name]  || @opts.table
     @opts.list_name   = params[:list_name]   || @opts.table
@@ -140,47 +141,49 @@ class GenerateNewScaffold < BaseService
       <<~RUBY
         # frozen_string_literal: true
 
-        class #{opts.klassname}Interactor < BaseInteractor
-          def repo
-            @repo ||= #{opts.klassname}Repo.new
-          end
-
-          def #{opts.singlename}(cached = true)
-            if cached
-              @#{opts.singlename} ||= repo.find_#{opts.singlename}(@id)
-            else
-              @#{opts.singlename} = repo.find_#{opts.singlename}(@id)
+        module #{opts.applet_module}
+          class #{opts.klassname}Interactor < BaseInteractor
+            def repo
+              @repo ||= #{opts.klassname}Repo.new
             end
-          end
 
-          def validate_#{opts.singlename}_params(params)
-            #{opts.klassname}Schema.call(params)
-          end
+            def #{opts.singlename}(cached = true)
+              if cached
+                @#{opts.singlename} ||= repo.find_#{opts.singlename}(@id)
+              else
+                @#{opts.singlename} = repo.find_#{opts.singlename}(@id)
+              end
+            end
 
-          def create_#{opts.singlename}(params)
-            res = validate_#{opts.singlename}_params(params)
-            return validation_failed_response(res) unless res.messages.empty?
-            @id = repo.create_#{opts.singlename}(res)
-            success_response("Created #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
-                             #{opts.singlename})
-          rescue Sequel::UniqueConstraintViolation
-            validation_failed_response(OpenStruct.new(messages: { #{opts.label_field}: ['This #{opts.singlename.tr('_', ' ')} already exists'] }))
-          end
+            def validate_#{opts.singlename}_params(params)
+              #{opts.klassname}Schema.call(params)
+            end
 
-          def update_#{opts.singlename}(id, params)
-            @id = id
-            res = validate_#{opts.singlename}_params(params)
-            return validation_failed_response(res) unless res.messages.empty?
-            repo.update_#{opts.singlename}(id, res)
-            success_response("Updated #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
-                             #{opts.singlename}(false))
-          end
+            def create_#{opts.singlename}(params)
+              res = validate_#{opts.singlename}_params(params)
+              return validation_failed_response(res) unless res.messages.empty?
+              @id = repo.create_#{opts.singlename}(res)
+              success_response("Created #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
+                               #{opts.singlename})
+            rescue Sequel::UniqueConstraintViolation
+              validation_failed_response(OpenStruct.new(messages: { #{opts.label_field}: ['This #{opts.singlename.tr('_', ' ')} already exists'] }))
+            end
 
-          def delete_#{opts.singlename}(id)
-            @id = id
-            name = #{opts.singlename}.#{opts.label_field}
-            repo.delete_#{opts.singlename}(id)
-            success_response("Deleted #{opts.singlename.tr('_', ' ')} \#{name}")
+            def update_#{opts.singlename}(id, params)
+              @id = id
+              res = validate_#{opts.singlename}_params(params)
+              return validation_failed_response(res) unless res.messages.empty?
+              repo.update_#{opts.singlename}(id, res)
+              success_response("Updated #{opts.singlename.tr('_', ' ')} \#{#{opts.singlename}.#{opts.label_field}}",
+                               #{opts.singlename}(false))
+            end
+
+            def delete_#{opts.singlename}(id)
+              @id = id
+              name = #{opts.singlename}.#{opts.label_field}
+              repo.delete_#{opts.singlename}(id)
+              success_response("Deleted #{opts.singlename.tr('_', ' ')} \#{name}")
+            end
           end
         end
       RUBY
@@ -198,31 +201,35 @@ class GenerateNewScaffold < BaseService
         <<~RUBY
           # frozen_string_literal: true
 
-          class #{opts.klassname}Repo < RepoBase
-            build_for_select :#{opts.table},
-                             label: :#{opts.label_field},
-                             value: :id,
-                             order_by: :#{opts.label_field}
-            build_inactive_select :#{opts.table},
-                                  label: :#{opts.label_field},
-                                  value: :id,
-                                  order_by: :#{opts.label_field}
+          module #{opts.applet_module}
+            class #{opts.klassname}Repo < RepoBase
+              build_for_select :#{opts.table},
+                               label: :#{opts.label_field},
+                               value: :id,
+                               order_by: :#{opts.label_field}
+              build_inactive_select :#{opts.table},
+                                    label: :#{opts.label_field},
+                                    value: :id,
+                                    order_by: :#{opts.label_field}
 
-            crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
+              crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
+            end
           end
         RUBY
       else
         <<~RUBY
           # frozen_string_literal: true
 
-          class #{opts.klassname}Repo < RepoBase
-            build_for_select :#{opts.table},
-                             label: :#{opts.label_field},
-                             value: :id,
-                             no_active_check: true,
-                             order_by: :#{opts.label_field}
+          module #{opts.applet_module}
+            class #{opts.klassname}Repo < RepoBase
+              build_for_select :#{opts.table},
+                               label: :#{opts.label_field},
+                               value: :id,
+                               no_active_check: true,
+                               order_by: :#{opts.label_field}
 
-            crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
+              crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.klassname}
+            end
           end
         RUBY
       end
@@ -240,8 +247,10 @@ class GenerateNewScaffold < BaseService
       <<~RUBY
         # frozen_string_literal: true
 
-        class #{opts.klassname} < Dry::Struct
-          #{attr.join("\n  ")}
+        module #{opts.applet_module}
+          class #{opts.klassname} < Dry::Struct
+            #{attr.join("\n    ")}
+          end
         end
       RUBY
     end
@@ -268,8 +277,10 @@ class GenerateNewScaffold < BaseService
       <<~RUBY
         # frozen_string_literal: true
 
-        #{opts.klassname}Schema = Dry::Validation.Form do
-          #{attr.join("\n  ")}
+        module #{opts.applet_module}
+          #{opts.klassname}Schema = Dry::Validation.Form do
+            #{attr.join("\n    ")}
+          end
         end
       RUBY
     end
@@ -382,7 +393,7 @@ class GenerateNewScaffold < BaseService
             # #{opts.table.upcase.tr('_', ' ')}
             # --------------------------------------------------------------------------
             r.on '#{opts.table}', Integer do |id|
-              interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
+              interactor = #{opts.applet_module}::#{opts.klassname}Interactor.new(current_user, {}, {}, {})
 
               # Check for notfound:
               r.on !interactor.exists?(:#{opts.table}, id) do
@@ -423,7 +434,7 @@ class GenerateNewScaffold < BaseService
               end
             end
             r.on '#{opts.table}' do
-              interactor = #{opts.klassname}Interactor.new(current_user, {}, {}, {})
+              interactor = #{opts.applet_module}::#{opts.klassname}Interactor.new(current_user, {}, {}, {})
               r.on 'new' do    # NEW
                 if authorised?('#{opts.program}', 'new')
                   if flash[:stashed_page]
@@ -485,7 +496,7 @@ class GenerateNewScaffold < BaseService
         module UiRules
           class #{opts.klassname}Rule < Base
             def generate_rules
-              @this_repo = #{opts.klassname}Repo.new
+              @repo = #{opts.applet_module}::#{opts.klassname}Repo.new
               make_form_object
               apply_form_values
 
@@ -509,7 +520,7 @@ class GenerateNewScaffold < BaseService
             def make_form_object
               make_new_form_object && return if @mode == :new
 
-              @form_object = @this_repo.find_#{opts.singlename}(@options[:id])
+              @form_object = @repo.find_#{opts.singlename}(@options[:id])
             end
 
             def make_new_form_object
@@ -537,7 +548,7 @@ class GenerateNewScaffold < BaseService
         fk_repo = "#{klassname}Repo"
         code = tm.likely_label_field
         flds << "# #{f}_label = #{fk_repo}.new.find_#{singlename}(@form_object.#{f})&.#{code}"
-        flds << "#{f}_label = @this_repo.find(:#{fk[:table]}, #{klassname}, @form_object.#{f})&.#{code}"
+        flds << "#{f}_label = @repo.find(:#{fk[:table]}, #{klassname}, @form_object.#{f})&.#{code}"
       end
 
       flds + fields_to_use.map do |f|
@@ -880,6 +891,9 @@ class GenerateNewScaffold < BaseService
         Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].each { |f| require f }
+
+        module #{opts.applet_module}
+        end
       RUBY
     end
   end

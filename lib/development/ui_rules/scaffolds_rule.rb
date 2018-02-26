@@ -20,7 +20,8 @@ module UiRules
         applet: { renderer: :select, options: applets_list },
         other: { force_lowercase: true },
         program: { force_lowercase: true },
-        label_field: {}
+        label_field: {},
+        short_name: { caption: 'Short name based on table name' }
       }
     end
 
@@ -35,7 +36,8 @@ module UiRules
                                     applet: nil,
                                     other: nil,
                                     program: nil,
-                                    label_field: nil)
+                                    label_field: nil,
+                                    short_name: nil)
     end
 
     private
@@ -43,6 +45,8 @@ module UiRules
     def add_behaviour
       behaviours do |behaviour|
         behaviour.enable :other, when: :applet, changes_to: ['other']
+        behaviour.dropdown_change :table, notify: [{ url: '/development/generators/scaffolds/table_changed' }]
+        # TODO:  behaviour - set short_name from tablename
       end
     end
 

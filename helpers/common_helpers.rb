@@ -164,6 +164,12 @@ module CommonHelpers
     res.to_json
   end
 
+  def json_replace_input_value(dom_id, value, message = nil)
+    res = { actions: [{ replace_input_value: { id: dom_id, value: value } }] }
+    res[:flash] = { notice: message } unless message.nil?
+    res.to_json
+  end
+
   def handle_error(err)
     response.status = 500
     view(inline: "<div class='crossbeams-error-note'><strong>Error</strong><br>#{err}</div>")

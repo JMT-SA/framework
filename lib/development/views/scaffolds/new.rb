@@ -21,6 +21,7 @@ module Development
               form.add_field :other
               form.add_field :program
               form.add_field :label_field
+              form.add_field :short_name
             end
           end
 

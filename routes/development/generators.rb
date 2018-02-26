@@ -38,6 +38,10 @@ class Framework < Roda
           show_page { Development::Generators::Scaffolds::New.call(params[:scaffold], errors) }
         end
       end
+
+      r.on 'table_changed' do
+        json_replace_input_value('scaffold_short_name', params[:changed_value])
+      end
     end
   end
 end

@@ -240,6 +240,23 @@ const crossbeamsUtils = {
     });
     select.setPlaceholder();
   },
+  /**
+   * Replace the value of an Input element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceInputValue: function replaceInputValue(action) {
+    const elem = document.getElementById(action.replace_input_value.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_input_value.id}"`,
+        title: 'Dropdown-change: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    elem.value = action.replace_input_value.value;
+  },
 
   /**
    * Calls all urls for observeChange behaviour and applies changes to the DOM as required..
@@ -265,6 +282,9 @@ const crossbeamsUtils = {
         data.actions.forEach((action) => {
           if (action.replace_options) {
             this.replaceSelectrOptions(action);
+          }
+          if (action.replace_input_value) {
+            this.replaceInputValue(action);
           }
         });
       }

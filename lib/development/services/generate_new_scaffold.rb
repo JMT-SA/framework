@@ -12,7 +12,7 @@ class GenerateNewScaffold < BaseService
     @opts             = OpenStruct.new(params)
     @opts.new_applet  = @opts.applet == 'other'
     @opts.applet      = params[:other] if @opts.applet == 'other'
-    @opts.applet_module = "#{@opts.applet.capitalize}App"
+    @opts.applet_module = "#{@opts.applet.split('_').map(&:capitalize).join}App"
     @opts.program   ||= 'progname'
     @opts.singlename  = simple_single(@opts.short_name)
     @opts.klassname   = camelize(@opts.singlename)

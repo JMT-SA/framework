@@ -1,14 +1,16 @@
 ---
 :caption: Menu definitions
-:sql: "SELECT \r\nf.id AS functional_area_id, p.id AS program_id, pf.id, f.functional_area_name,
+:sql: "  SELECT \r\nf.id AS functional_area_id, p.id AS program_id, pf.id, f.functional_area_name,
   f.active AS f_active, f.created_at AS f_created_at, f.updated_at AS f_updated_at,\r\np.program_name,
   p.active AS p_active, p.created_at AS p_created_at, p.updated_at AS p_updated_at,
   -- p.functional_area_id\r\npf.group_name, pf.program_function_name, pf.url, pf.program_function_sequence,
   \r\n       pf.restricted_user_access, pf.active AS pf_active, pf.created_at AS pf_created_at,
-  pf.updated_at AS pf_updated_at\r\n  FROM functional_areas f\r\n LEFT OUTER JOIN
-  programs p ON p.functional_area_id = f.id\r\n LEFT OUTER JOIN program_functions
-  pf ON pf.program_id = p.id\r\nORDER BY f.functional_area_name, p.program_name, pf.group_name,
-  pf.program_function_sequence, pf.program_function_name"
+  pf.updated_at AS pf_updated_at,\r\n  (SELECT string_agg(webapp, '; ') FROM (SELECT
+  webapp FROM programs_webapps WHERE program_id = p.id) sub) AS webapps\r\n  FROM
+  functional_areas f\r\n LEFT OUTER JOIN programs p ON p.functional_area_id = f.id\r\n
+  LEFT OUTER JOIN program_functions pf ON pf.program_id = p.id\r\nORDER BY f.functional_area_name,
+  p.program_name, pf.group_name, pf.program_function_sequence, pf.program_function_name\r\n
+  \ "
 :limit: 
 :offset: 
 :columns:
@@ -20,7 +22,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -35,7 +37,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -50,7 +52,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -75,7 +77,7 @@
   f_active:
     :name: f_active
     :sequence_no: 11
-    :caption: Active
+    :caption: FA Active
     :namespaced_name: f.active
     :data_type: :boolean
     :width: 
@@ -95,7 +97,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -110,7 +112,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -135,7 +137,7 @@
   p_active:
     :name: p_active
     :sequence_no: 15
-    :caption: Active
+    :caption: Prog Active
     :namespaced_name: p.active
     :data_type: :boolean
     :width: 
@@ -155,7 +157,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -170,7 +172,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -225,7 +227,7 @@
   program_function_sequence:
     :name: program_function_sequence
     :sequence_no: 7
-    :caption: Program function sequence
+    :caption: Sequence
     :namespaced_name: pf.program_function_sequence
     :data_type: :integer
     :width: 
@@ -255,7 +257,7 @@
   pf_active:
     :name: pf_active
     :sequence_no: 9
-    :caption: Active
+    :caption: PF Active
     :namespaced_name: pf.active
     :data_type: :boolean
     :width: 
@@ -275,7 +277,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -288,6 +290,21 @@
     :caption: Updated at
     :namespaced_name: pf.updated_at
     :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  webapps:
+    :name: webapps
+    :sequence_no: 20
+    :caption: Webapps
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: false

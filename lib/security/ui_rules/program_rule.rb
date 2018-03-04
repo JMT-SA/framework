@@ -1,12 +1,19 @@
 module UiRules
   class ProgramRule < Base
     def generate_rules
-      @this_repo = ProgramRepo.new
+      @repo = ProgramRepo.new
       make_form_object
 
       common_values_for_fields common_fields
 
       fields[:functional_area_id] = { renderer: :hidden } if @mode == :new
+      if @mode == :edit
+        fields[:webapps] = {
+          renderer: :multi,
+          options: @repo.available_webapps,
+          selected: @repo.selected_webapps(@options[:id])
+        }
+      end
 
       form_name 'program'.freeze
     end
@@ -21,7 +28,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(:programs, Program, @options[:id])
+      @form_object = @repo.find(:programs, Program, @options[:id])
     end
 
     def make_new_form_object

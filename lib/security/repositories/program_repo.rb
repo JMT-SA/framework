@@ -31,6 +31,17 @@ class ProgramRepo < RepoBase
     end
   end
 
+  def update_program(id, res)
+    webapps = res.delete(:webapps)
+    DB.transaction do
+      update(:programs, id, res)
+      DB[:programs_webapps].where(program_id: id).delete
+      webapps.each do |webapp|
+        create(:programs_webapps, program_id: id, webapp: webapp)
+      end
+    end
+  end
+
   def re_order_program_functions(sorted_ids)
     upd = []
     sorted_ids.split(',').each_with_index do |id, index|
@@ -52,5 +63,15 @@ class ProgramRepo < RepoBase
 
   def existing_ids_for_user(user_id)
     DB[:programs_users].where(user_id: user_id).select_map(:program_id)
+  end
+
+  def available_webapps
+    query = 'SELECT DISTINCT webapp FROM programs_webapps'
+    DB[query].map { |rec| rec[:webapp] }
+  end
+
+  def selected_webapps(program_id)
+    query = 'SELECT DISTINCT webapp FROM programs_webapps WHERE program_id = ?'
+    DB[query, program_id].map { |rec| rec[:webapp] }
   end
 end

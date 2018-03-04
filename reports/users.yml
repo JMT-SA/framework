@@ -131,8 +131,8 @@
   :ordered_list: 
   :ui_priority: 1
   :list_def: 
-- :column: users.user_name
-  :caption: Login name
+- :column: login_name
+  :caption: Login
   :data_type: :string
   :control_type: :text
   :default_value: 

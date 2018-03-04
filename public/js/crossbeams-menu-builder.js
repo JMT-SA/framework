@@ -76,6 +76,8 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
 
   /**
    * Search 3rd level menu captions for matches on the term.
+   * @param {string} term - the search term to match against menu items..
+   * @returns {array} matches - the matching menu items.
    */
   const searchMenu = (term) => {
     if (term === '') { return []; }

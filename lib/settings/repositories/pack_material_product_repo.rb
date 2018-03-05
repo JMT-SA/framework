@@ -10,5 +10,5 @@ class PackMaterialProductRepo < RepoBase
                         value: :id,
                         order_by: :description
 
-  crud_calls_for :pack_material_products, name: :product, wrapper: Product
+  crud_calls_for :pack_material_products, name: :product, wrapper: PackMaterialProduct
 end

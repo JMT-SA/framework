@@ -188,7 +188,7 @@ class Framework < Roda
         end
         r.patch do     # UPDATE
           response['Content-Type'] = 'application/json'
-          config = MaterialResourceRepo.new.find_material_resource_type_config_for_sub_type(id)
+          config = PackMaterialRepo.new.find_material_resource_type_config_for_sub_type(id)
           config_id = config.id
           res = interactor.update_material_resource_type_config(config_id, params[:material_resource_sub_type])
           if res.success
@@ -286,6 +286,21 @@ class Framework < Roda
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
 
         res = interactor.link_mr_product_code_columns(id, multiselect_grid_choices(params))
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+        # TODO: fix this redirect
+        # r.redirect("/settings/pack_material_products/material_resource_sub_types/#{res.instance.id}/config/edit")
+      end
+    end
+    r.on 'assign_product_code_columns', Integer do |id|
+      r.post do
+        interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
+
+        res = interactor.assign_non_variant_product_code_columns(id, params)
         if res.success
           flash[:notice] = res.message
         else
@@ -425,7 +440,7 @@ class Framework < Roda
                                            style: res.instance[:style],
                                            assembly_type: res.instance[:assembly_type],
                                            market_major: res.instance[:market_major],
-                                           ctn_size_basic: res.instance[:ctn_size_basic],
+                                           ctn_size_basic_pack: res.instance[:ctn_size_basic_pack],
                                            ctn_size_old_pack: res.instance[:ctn_size_old_pack],
                                            pls_pack_code: res.instance[:pls_pack_code],
                                            fruit_mass_nett_kg: res.instance[:fruit_mass_nett_kg],

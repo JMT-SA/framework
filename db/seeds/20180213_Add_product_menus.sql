@@ -1,113 +1,70 @@
-INSERT INTO functional_areas (functional_area_name) VALUES ('settings');
+-- NEW
+INSERT INTO functional_areas (functional_area_name) VALUES ('Pack Material');
 
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
-VALUES ('Pack material products', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'settings'));
+VALUES ('Config', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'Pack Material'));
 
--- NEW menu item
-/*
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'New MaterialResourceType', '/settings/pack_material_products/material_resource_types/new', 1);
-*/
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Config' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Pack Material')), 'Framework');
 
 -- LIST menu item
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Pack material products'
-                                       AND functional_area_id = (SELECT id FROM functional_areas
-WHERE functional_area_name = 'settings')),
-        'MR types', '/list/material_resource_types', 2);
+VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+AND functional_area_id = (SELECT id FROM functional_areas
+WHERE functional_area_name = 'Pack Material')),
+'Types', '/list/material_resource_types', 2);
 
--- SEARCH menu item
-/*
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'Search Material_resource_types', '/search/material_resource_types', 2);
-*/
+VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+AND functional_area_id = (SELECT id FROM functional_areas
+WHERE functional_area_name = 'Pack Material')),
+'Sub Types', '/list/material_resource_sub_types', 2);
 
--- NEW menu item
-/*
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'New MaterialResourceDomain', '/settings/pack_material_products/material_resource_domains/new', 1);
-*/
-
--- LIST menu item
+VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+AND functional_area_id = (SELECT id FROM functional_areas
+WHERE functional_area_name = 'Pack Material')),
+'Product Codes', '/list/pack_material_products', 2);
+--
 -- INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
--- VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
---                                        AND functional_area_id = (SELECT id FROM functional_areas
+-- VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+-- AND functional_area_id = (SELECT id FROM functional_areas
+-- WHERE functional_area_name = 'Pack Material')),
+-- 'Variant Product Codes', '/list/pack_material_products', 2);
+--
+-- INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+-- VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+-- AND functional_area_id = (SELECT id FROM functional_areas
+-- WHERE functional_area_name = 'Pack Material')),
+-- 'Composite Products', '/list/pack_material_products', 2);
+
+------------------------------------------------------------------------------
+
+--
+-- INSERT INTO functional_areas (functional_area_name) VALUES ('settings');
+--
+-- INSERT INTO programs (program_name, program_sequence, functional_area_id)
+-- VALUES ('Pack material products', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'settings'));
+--
+-- INSERT INTO programs_webapps (program_id, webapp)
+-- VALUES ((SELECT id FROM programs WHERE program_name = 'Pack material products' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'settings')), 'Framework');
+--
+-- INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+-- VALUES ((SELECT id FROM programs WHERE program_name = 'Pack material products'
+-- AND functional_area_id = (SELECT id FROM functional_areas
 -- WHERE functional_area_name = 'settings')),
---         'MR domains', '/list/material_resource_domains', 2);
-
--- SEARCH menu item
-/*
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'Search Material_resource_domains', '/search/material_resource_domains', 2);
-*/
-
--- NEW menu item
-/*
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'New MaterialResourceProductColumn', '/settings/pack_material_products/material_resource_product_columns/new', 1);
-*/
+-- 'MR types', '/list/material_resource_types', 2);
 --
 -- -- LIST menu item
 -- INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
--- VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
---                                        AND functional_area_id = (SELECT id FROM functional_areas
+-- VALUES ((SELECT id FROM programs WHERE program_name = 'Pack material products'
+-- AND functional_area_id = (SELECT id FROM functional_areas
 -- WHERE functional_area_name = 'settings')),
---         'MR product columns', '/list/material_resource_product_columns', 2);
-
--- SEARCH menu item
-/*
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'Search Material_resource_product_columns', '/search/material_resource_product_columns', 2);
-*/
-
--- NEW menu item
-/*
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'New MaterialResourceSubType', '/settings/pack_material_products/material_resource_sub_types/new', 1);
-*/
-
--- LIST menu item
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Pack material products'
-                                       AND functional_area_id = (SELECT id FROM functional_areas
-WHERE functional_area_name = 'settings')),
-        'MR sub types', '/list/material_resource_sub_types', 2);
-
--- SEARCH menu item
-/*
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'pack_material_products'
-         AND functional_area_id = (SELECT id FROM functional_areas
-                                   WHERE functional_area_name = 'settings')),
-         'Search Material_resource_sub_types', '/search/material_resource_sub_types', 2);
-*/
-
+-- 'MR sub types', '/list/material_resource_sub_types', 2);
 
 -- This is created in the backend per domain - NO CRUD AVAILABLE for users
 INSERT INTO material_resource_domains (domain_name, product_table_name, variant_table_name)
-VALUES ('Packing Materials', 'pack_material_products', 'pack_material_product_variants');
-
+VALUES ('Pack Material', 'pack_material_products', 'pack_material_product_variants');
 
 -- Make seed for all the product columns for this domain - ALSO NO CRUD
 --  column_name, material_resource_domain_id, group_name, is_variant_column
@@ -161,7 +118,7 @@ JOIN (SELECT * FROM (VALUES ('classification', 'variant', FALSE, 1),
   ('inventory_management', 'active', FALSE, 1),
   ('inventory_management', 'remarks', FALSE, 1))
     AS t(group_name, column_name, is_variant_column, n)) sub ON sub.n = 1
-WHERE dom.domain_name = 'Packing Materials';
+WHERE dom.domain_name = 'Pack Material';
 
 
 -- retail_unit: %w(bag_fruit punnet tray protective bag_liner),
@@ -170,19 +127,19 @@ WHERE dom.domain_name = 'Packing Materials';
 -- label: %w(sticker fruit card ribbon),
 -- other: %w(glue promotion sealing),
 INSERT INTO material_resource_types (type_name, material_resource_domain_id)
-VALUES ('Retail Unit', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Packing Materials'));
+VALUES ('Retail Unit', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
 
 INSERT INTO material_resource_types (type_name, material_resource_domain_id)
-VALUES ('Trade Unit', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Packing Materials'));
+VALUES ('Trade Unit', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
 
 INSERT INTO material_resource_types (type_name, material_resource_domain_id)
-VALUES ('Logistics Unit', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Packing Materials'));
+VALUES ('Logistics Unit', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
 
 INSERT INTO material_resource_types (type_name, material_resource_domain_id)
-VALUES ('Label', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Packing Materials'));
+VALUES ('Label', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
 
 INSERT INTO material_resource_types (type_name, material_resource_domain_id)
-VALUES ('Other', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Packing Materials'));
+VALUES ('Other', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
 
 INSERT INTO material_resource_sub_types (material_resource_type_id, sub_type_name)
   SELECT pt.id, sub.str

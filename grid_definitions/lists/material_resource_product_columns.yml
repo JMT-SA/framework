@@ -7,9 +7,9 @@
     :section_caption: "SELECT 'Select product columns'"
     :can_be_cleared: false
     :multiselect_save_remote: true
-    :conditions: material_resource_type_config
-:conditions:
-  :material_resource_type_config:
-    - :col: material_resource_product_columns.is_variant_column
-      :op: =
-      :val: $:variant_bool$
+#    :conditions: material_resource_type_config
+#:conditions:
+#  :material_resource_type_config:
+#    - :col: material_resource_product_columns.is_variant_column
+#      :op: =
+#      :val: $:variant_bool$

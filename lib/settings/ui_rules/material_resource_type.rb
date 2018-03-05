@@ -3,7 +3,7 @@
 module UiRules
   class MaterialResourceTypeRule < Base
     def generate_rules
-      @this_repo = MaterialResourceRepo.new
+      @this_repo = PackMaterialRepo.new
       make_form_object
       apply_form_values
 
@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields
-      # material_resource_domain_id_label = MaterialResourceRepo.new.find_material_resource_domain(@form_object.material_resource_domain_id)&.domain_name
+      # material_resource_domain_id_label = PackMaterialRepo.new.find_material_resource_domain(@form_object.material_resource_domain_id)&.domain_name
       material_resource_domain_id_label = @this_repo.find(:material_resource_domains, MaterialResourceDomain, @form_object.material_resource_domain_id)&.domain_name
       fields[:material_resource_domain_id] = { renderer: :label, with_value: material_resource_domain_id_label, caption: 'Domain' }
       fields[:type_name] = { renderer: :label }
@@ -23,7 +23,7 @@ module UiRules
 
     def common_fields
       {
-        material_resource_domain_id: { renderer: :select, options: MaterialResourceRepo.new.for_select_material_resource_domains, caption: 'Domain' },
+        material_resource_domain_id: { renderer: :select, options: PackMaterialRepo.new.for_select_material_resource_domains, caption: 'Domain' },
         type_name: {}
       }
     end

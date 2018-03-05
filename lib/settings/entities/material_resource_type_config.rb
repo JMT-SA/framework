@@ -11,4 +11,9 @@ class MaterialResourceTypeConfig < Dry::Struct
   attribute :domain_name, Types::String
   attribute :type_name, Types::String
   attribute :sub_type_name, Types::String
+  attribute :non_variant_product_code_column_ids, Types::Array
+  attribute :variant_product_code_column_ids, Types::Array
+  attribute :for_selected_non_variant_product_code_column_ids, Types::Array
+  attribute :for_selected_variant_product_code_column_ids, Types::Array
+  # attribute :product_code_columns, Types::Array #Possibly a for_select value here
 end

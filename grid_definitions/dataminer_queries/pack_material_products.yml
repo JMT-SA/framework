@@ -4,7 +4,7 @@
   "pack_material_products"."product_number", "pack_material_products"."description",
   "pack_material_products"."commodity_id", "pack_material_products"."variety_id",
   "pack_material_products"."style", "pack_material_products"."assembly_type", "pack_material_products"."market_major",
-  "pack_material_products"."ctn_size_basic", "pack_material_products"."ctn_size_old_pack",
+  "pack_material_products"."ctn_size_basic_pack", "pack_material_products"."ctn_size_old_pack",
   "pack_material_products"."pls_pack_code", "pack_material_products"."fruit_mass_nett_kg",
   "pack_material_products"."holes", "pack_material_products"."perforation", "pack_material_products"."image",
   "pack_material_products"."length_mm", "pack_material_products"."width_mm", "pack_material_products"."height_mm",
@@ -163,11 +163,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  ctn_size_basic:
-    :name: ctn_size_basic
+  ctn_size_basic_pack:
+    :name: ctn_size_basic_pack
     :sequence_no: 10
     :caption: Ctn size basic
-    :namespaced_name: pack_material_products.ctn_size_basic
+    :namespaced_name: pack_material_products.ctn_size_basic_pack
     :data_type: :string
     :width: 
     :format: 

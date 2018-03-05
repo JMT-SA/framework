@@ -7,4 +7,6 @@ MaterialResourceTypeConfigSchema = Dry::Validation.Form do
   required(:has_suppliers).filled(:bool?)
   required(:has_marketers).filled(:bool?)
   required(:has_retailer).filled(:bool?)
+  optional(:product_code_column_ids).each(:int?)
+  optional(:product_variant_code_column_ids).each(:int?)
 end

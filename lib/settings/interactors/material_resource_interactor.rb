@@ -95,6 +95,26 @@ class MaterialResourceInteractor < BaseInteractor
       failed_response('Some product code columns were not linked', sub_type)
     end
   end
+  # assign_non_variant_product_code_columns(config_id, col_ids)
+  # assign_variant_product_code_columns(config_id, col_ids)
+
+  def assign_non_variant_product_code_columns(id, params)
+    non_variant_col_ids = params[:product_code_columns][:product_code_column_ids].map(&:to_i)
+    p "<<<<<<<<Interactor", non_variant_col_ids
+    DB.transaction do
+      repo.assign_non_variant_product_code_columns(id, non_variant_col_ids)
+    end
+    existing_ids = repo.non_variant_product_code_column_ids(id)
+    p "<<<<<<<<< Existing", existing_ids
+    if existing_ids.eql?(non_variant_col_ids.sort)
+      success_response('Code columns assigned successfully')
+    else
+      validation_failed_response(OpenStruct.new(messages: { product_code_columns: ['You did not choose any product code columns'] }))
+    end
+  end
+
+
+
 
   def reorder_product_code_columns(id, sorted_product_code_column_ids)
     DB.transaction do
@@ -106,7 +126,7 @@ class MaterialResourceInteractor < BaseInteractor
   private
 
   def repo
-    @repo ||= MaterialResourceRepo.new
+    @repo ||= PackMaterialRepo.new
   end
 
   def material_resource_type(cached = true)

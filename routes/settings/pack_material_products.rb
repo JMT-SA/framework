@@ -311,6 +311,22 @@ class Framework < Roda
         # r.redirect("/settings/pack_material_products/material_resource_sub_types/#{res.instance.id}/config/edit")
       end
     end
+    r.on 'assign_variant_product_code_columns', Integer do |id|
+      r.post do
+        interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
+
+        p 'params', params
+        res = interactor.assign_variant_product_code_columns(id, params)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+        # TODO: fix this redirect
+        # r.redirect("/settings/pack_material_products/material_resource_sub_types/#{res.instance.id}/config/edit")
+      end
+    end
     r.on 'reorder_product_code_columns', Integer do |id|
       r.post do
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
@@ -321,6 +337,7 @@ class Framework < Roda
         else
           flash[:error] = res.message
         end
+        redirect_to_last_grid(r)
         r.redirect("/settings/pack_material_products/material_resource_sub_types/#{id}/config/edit")
       end
     end

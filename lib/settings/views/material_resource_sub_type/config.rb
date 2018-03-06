@@ -81,15 +81,19 @@ module Settings
             # TODO: the following two sections need to be one form and in two columns
             page.section do |section|
               section.form do |form|
+                var_options = repo.for_select_variant_product_code_column_ids(config.id)
+                p 'var_options', var_options
+                var_selected = config.for_selected_variant_product_code_column_ids
+                p 'var_selected', var_selected
                 form.form_config = {
-                  name: 'product_variant_code_columns',
+                  name: 'variant_product_code_columns',
                   fields: {
-                    variant_product_code_column_ids: { renderer: :multi, options: repo.for_select_variant_product_code_column_ids(config.id), selected: config.for_selected_variant_product_code_column_ids }
+                    variant_product_code_column_ids: { renderer: :multi, options: var_options, selected: var_selected }
                   }
                 }
-                form.form_object OpenStruct.new(variant_product_code_column_ids: [])#OpenStruct.new(path: path, value: Base64.encode64(code))
-                form.action '/development/generators/scaffolds/save_snippet' # TODO: fix url
-                form.method :update
+                form.form_object OpenStruct.new(variant_product_code_column_ids: [])
+                form.action "/settings/pack_material_products/assign_variant_product_code_columns/#{config.id}"
+                form.method :create
                 form.remote!
                 form.add_field :variant_product_code_column_ids
                 # form.submit_captions 'Save', 'Saving'

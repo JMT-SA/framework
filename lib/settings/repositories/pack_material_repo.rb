@@ -193,11 +193,8 @@ class PackMaterialRepo < RepoBase
   def assign_non_variant_product_code_columns(config_id, col_ids)
     return { error: 'Choose at least one product code column' } if col_ids.empty?
     old_ids = non_variant_product_column_ids(config_id)
-    p "col_ids", col_ids
-    p "old_ids", old_ids
     old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
       .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{|r| r[:id]}
-    p "old_link ids", old_link_ids
     DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
 
     col_ids.each_with_index do |new_id, idx|
@@ -218,14 +215,21 @@ class PackMaterialRepo < RepoBase
   def assign_variant_product_code_columns(config_id, col_ids)
     return { error: 'Choose at least one product code column' } if col_ids.empty?
     old_ids = variant_product_column_ids(config_id)
+    p "col_ids", col_ids
+    p "old_ids", old_ids
     old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
       .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{ |r| r[:id] }
+    p "old_link ids", old_link_ids
     DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
 
     col_ids.each_with_index do |new_id, idx|
       link = DB[:material_resource_product_columns_for_material_resource_types]
         .where(material_resource_product_column_id: new_id, material_resource_type_config_id: config_id).first
+      p link
+      p 'new id', new_id
+      p 'index', idx
       if link
+        p "I finally get in here"
         buffer = non_variant_product_column_ids(config_id).count
         DB[:material_resource_type_product_code_columns].insert(material_resource_product_columns_for_material_resource_type_id: link[:id], position: (buffer + idx))
       end

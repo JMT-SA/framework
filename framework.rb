@@ -109,6 +109,7 @@ class Framework < Roda
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do
+      # flash.now[:error] = 'A TEST' # <=== Add this...
       s = <<-HTML
       <h2>Kromco packhouse</h2>
       <p>There are currently 99 bins and 99 pallets on site.</p>

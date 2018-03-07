@@ -94,6 +94,23 @@ module PackMaterialApp
       update(:material_resource_type_configs, id, attrs)
     end
 
+    def link_product_columns(config_id, col_ids)
+      existing_ids      = type_product_column_ids(config_id)
+      old_ids           = existing_ids - col_ids
+      new_ids           = col_ids - existing_ids
+
+      old_set = DB[:material_resource_product_columns_for_material_resource_types].where(material_resource_type_config_id: config_id).where(material_resource_product_column_id: old_ids)
+      DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_set.map { |r| r[:id] }).delete
+      old_set.delete
+      new_ids.each do |prog_id|
+        DB[:material_resource_product_columns_for_material_resource_types].insert(material_resource_type_config_id: config_id, material_resource_product_column_id: prog_id)
+      end
+    end
+
+    def type_product_column_ids(config_id)
+      DB[:material_resource_product_columns_for_material_resource_types].where(material_resource_type_config_id: config_id).select_map(:material_resource_product_column_id).sort
+    end
+
     private
 
     def add_heritage(mr_type_hash)

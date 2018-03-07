@@ -53,52 +53,20 @@ module PackMaterialApp
       success_response("Deleted sub type #{name}")
     end
 
-    # def update_material_resource_type_config(id, params)
-    #   @id = id
-    #   res = validate_material_resource_type_config_params(params)
-    #   return validation_failed_response(res) unless res.messages.empty?
-    #   repo.update_material_resource_type_config(id, res)
-    #   success_response("Updated config successfully", material_resource_type_config(false))
-    # end
-    #
-    # def link_mr_product_columns(id, product_column_ids)
-    #   DB.transaction do
-    #     repo.link_mr_product_columns(id, product_column_ids)
-    #   end
-    #
-    #   config = repo.find_material_resource_type_config(id)
-    #   sub_type = repo.find_material_resource_sub_type(config.material_resource_sub_type_id)
-    #   p "SUB TYPE in interactor"
-    #   existing_ids = repo.mr_type_mr_product_column_ids(id)
-    #   if existing_ids.eql?(product_column_ids.sort)
-    #     success_response('Product columns linked successfully', sub_type)
-    #   else
-    #     failed_response('Some product columns were not linked', sub_type)
-    #   end
-    # end
-    #
-    # def link_mr_product_code_columns(id, product_code_column_ids)
-    #   DB.transaction do
-    #     repo.link_mr_product_code_columns(id, product_code_column_ids)
-    #   end
-    #
-    #   config = repo.find_material_resource_type_config(id)
-    #   sub_type = repo.find_material_resource_sub_type(config.material_resource_sub_type_id)
-    #   p "SUB TYPE in interactor"
-    #   existing_ids = repo.mr_type_mr_product_code_column_ids(id)
-    #   if existing_ids.eql?(product_code_column_ids.sort)
-    #     success_response('Product code columns linked successfully', sub_type)
-    #   else
-    #     failed_response('Some product code columns were not linked', sub_type)
-    #   end
-    # end
-    #
-    # def reorder_product_code_columns(id, sorted_product_code_column_ids)
-    #   DB.transaction do
-    #     repo.reorder_product_code_columns(id, sorted_product_code_column_ids)
-    #   end
-    #   success_response('Product code columns reordered')
-    # end
+    def link_product_columns(id, col_ids)
+      DB.transaction do
+        repo.link_product_columns(id, col_ids)
+      end
+
+      config = repo.find_matres_config(id)
+      sub_type = repo.find_matres_sub_type(config.material_resource_sub_type_id)
+      existing_ids = repo.type_product_column_ids(id)
+      if existing_ids.eql?(col_ids.sort)
+        success_response('Product columns linked successfully', sub_type)
+      else
+        failed_response('Some product columns were not linked', sub_type)
+      end
+    end
 
     private
 
@@ -115,7 +83,6 @@ module PackMaterialApp
     end
 
     def validate_matres_type_params(params)
-      p "params:", params
       MatresTypeSchema.call(params)
     end
 
@@ -130,18 +97,5 @@ module PackMaterialApp
     def validate_matres_sub_type_params(params)
       MatresSubTypeSchema.call(params)
     end
-
-    # def material_resource_type_config(cached = true)
-    #   if cached
-    #     @material_resource_type_config ||= repo.find_material_resource_type_config(@id)
-    #   else
-    #     @material_resource_type_config = repo.find_material_resource_type_config(@id)
-    #   end
-    # end
-    #
-    # def validate_material_resource_type_config_params(params)
-    #   MaterialResourceTypeConfigSchema.call(params)
-    # end
-
   end
 end

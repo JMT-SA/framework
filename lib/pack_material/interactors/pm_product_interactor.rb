@@ -20,6 +20,7 @@ module PackMaterialApp
 
     def create_pm_product(params)
       res = validate_pm_product_params(params)
+      p res
       return validation_failed_response(res) unless res.messages.empty?
       @id = repo.create_pm_product(res)
       success_response("Created pm product #{pm_product.description}",

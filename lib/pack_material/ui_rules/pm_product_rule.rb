@@ -4,6 +4,8 @@ module UiRules
   class PmProductRule < Base
     def generate_rules
       @repo = PackMaterialApp::PmProductRepo.new
+      @config_repo = PackMaterialApp::ConfigRepo.new
+      @commodity_repo = CommodityRepo.new
       make_form_object
       apply_form_values
 
@@ -15,10 +17,8 @@ module UiRules
     end
 
     def set_show_fields
-      # material_resource_sub_type_id_label = MaterialResourceSubTypeRepo.new.find_material_resource_sub_type(@form_object.material_resource_sub_type_id)&.sub_type_name
-      material_resource_sub_type_id_label = @repo.find(:material_resource_sub_types, MaterialResourceSubType, @form_object.material_resource_sub_type_id)&.sub_type_name
-      # commodity_id_label = CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
-      commodity_id_label = @repo.find(:commodities, Commodity, @form_object.commodity_id)&.code
+      material_resource_sub_type_id_label = @config_repo.find_material_resource_sub_type(@form_object.material_resource_sub_type_id)&.sub_type_name
+      commodity_id_label = @commodity_repo.find_commodity(@form_object.commodity_id)&.code
       fields[:material_resource_sub_type_id] = { renderer: :label, with_value: material_resource_sub_type_id_label, caption: 'material_resource_sub_type' }
       fields[:product_number] = { renderer: :label }
       fields[:description] = { renderer: :label }
@@ -70,10 +70,10 @@ module UiRules
 
     def common_fields
       {
-        material_resource_sub_type_id: { renderer: :select, options: MaterialResourceSubTypeRepo.new.for_select_material_resource_sub_types, caption: 'material_resource_sub_type' },
+        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_material_resource_sub_types, caption: 'material_resource_sub_type' },
         product_number: {},
         description: {},
-        commodity_id: { renderer: :select, options: CommodityRepo.new.for_select_commodities, disabled_options: CommodityRepo.new.for_inactive_select_commodities, caption: 'commodity' },
+        commodity_id: { renderer: :select, options: @commodity_repo.for_select_commodities, disabled_options: @commodity_repo.for_select_inactive_commodities, caption: 'commodity' },
         variety_id: {},
         style: {},
         assembly_type: {},

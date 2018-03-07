@@ -70,7 +70,6 @@ module PackMaterialApp
         { success: true }
       else
         associated_product_ids = products.map{|r| r[:id] }
-        p "Sub Type Deletion failed", associated_product_ids
         { success: false, associated_product_ids: associated_product_ids }
       end
     end

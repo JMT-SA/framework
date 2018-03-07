@@ -7,7 +7,7 @@ Sequel.migration do
       Integer :product_number, null: false
       String :description
 
-      foreign_key :commodity_id, :commodities, null: false, key: [:id]
+      foreign_key :commodity_id, :commodities, key: [:id]
       # foreign_key :variety_id, :varieties, null: false, key: [:id]
       # String :commodity_id #Lookup
       String :variety_id #Lookup

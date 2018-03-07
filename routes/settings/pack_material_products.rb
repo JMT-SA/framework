@@ -300,7 +300,7 @@ class Framework < Roda
       r.post do
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
 
-        res = interactor.assign_non_variant_product_code_columns(id, params)
+        res = interactor.assign_non_variant_product_code_columns(id, params[:product_code_columns])
         if res.success
           flash[:notice] = res.message
         else
@@ -316,7 +316,8 @@ class Framework < Roda
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
 
         p 'params', params
-        res = interactor.assign_variant_product_code_columns(id, params)
+        res = interactor.assign_variant_product_code_columns(id, params[:variant_product_code_columns])
+        p res
         if res.success
           flash[:notice] = res.message
         else

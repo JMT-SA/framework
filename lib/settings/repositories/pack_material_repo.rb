@@ -195,7 +195,10 @@ class PackMaterialRepo < RepoBase
     old_ids = non_variant_product_column_ids(config_id)
     old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
       .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{|r| r[:id]}
-    DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
+    thing = DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids)
+    p "Hello world"
+    p thing
+      thing.delete
 
     col_ids.each_with_index do |new_id, idx|
       link = DB[:material_resource_product_columns_for_material_resource_types]
@@ -213,7 +216,7 @@ class PackMaterialRepo < RepoBase
   end
 
   def assign_variant_product_code_columns(config_id, col_ids)
-    return { error: 'Choose at least one product code column' } if col_ids.empty?
+    return { error: 'Choose at least one variant product code column' } if col_ids.empty?
     old_ids = variant_product_column_ids(config_id)
     p "col_ids", col_ids
     p "old_ids", old_ids

@@ -279,7 +279,7 @@ class Framework < Roda
     # PACK MATERIAL PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_products', Integer do |id|
-      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
+      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, {}, {})
 
       # check for notfound
       r.on !interactor.exists?(:pack_material_products, id) do
@@ -367,7 +367,7 @@ class Framework < Roda
       end
     end
     r.on 'pack_material_products' do
-      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
+      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, {}, {})
       r.on 'new' do
         if authorised?('Pack Material Products', 'new')
           show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::PmProduct::New.call(remote: fetch?(r)) }

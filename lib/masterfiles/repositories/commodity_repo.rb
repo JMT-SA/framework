@@ -13,6 +13,9 @@ class CommodityRepo < RepoBase
                    label: :code,
                    value: :id,
                    order_by: :code
+  build_inactive_select :commodities,
+                        label: :code,
+                        value: :id
 
   def create_commodity_group(attrs)
     create(:commodity_groups, attrs)

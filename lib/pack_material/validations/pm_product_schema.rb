@@ -6,7 +6,8 @@ module PackMaterialApp
     required(:material_resource_sub_type_id).filled(:int?)
     required(:product_number).filled(:int?)
     required(:description).maybe(:str?)
-    required(:commodity_id).filled(:int?)
+    # TODO: The key should return if it is seen on the form, at the moment the key is not being sent back if there are no options
+    optional(:commodity_id).filled(:int?)
     required(:variety_id).maybe(:str?)
     required(:style).maybe(:str?)
     required(:assembly_type).maybe(:str?)

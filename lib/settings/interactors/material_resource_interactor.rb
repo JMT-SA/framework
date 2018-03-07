@@ -98,7 +98,7 @@ class MaterialResourceInteractor < BaseInteractor
     res = validate_material_resource_type_config_code_columns_params(params || { non_variant_product_code_column_ids: [] })
     return validation_failed_response(res) unless res.messages.empty?
 
-    non_variant_col_ids = params[:product_code_columns][:non_variant_product_code_column_ids]&.map(&:to_i) || []
+    non_variant_col_ids = res[:non_variant_product_code_column_ids]
     DB.transaction do
       repo.assign_non_variant_product_code_columns(id, non_variant_col_ids)
     end
@@ -111,19 +111,14 @@ class MaterialResourceInteractor < BaseInteractor
   end
 
   def assign_variant_product_code_columns(id, params)
-    p 'did i get in here'
     res = validate_material_resource_type_config_variant_code_columns_params(params || { variant_product_code_column_ids: [] })
-    p res
     return validation_failed_response(res) unless res.messages.empty?
-    p 'and here'
-    p "TEST AND FIX", res.variant_product_code_column_ids
-    variant_col_ids = params[:variant_product_code_columns][:variant_product_code_column_ids]&.map(&:to_i)
-    p variant_col_ids
+
+    variant_col_ids = res[:variant_product_code_column_ids]
     DB.transaction do
       repo.assign_variant_product_code_columns(id, variant_col_ids)
     end
     existing_ids = repo.variant_product_code_column_ids(id)
-    p existing_ids
     if existing_ids.eql?(variant_col_ids.sort)
       success_response('Variant code columns assigned successfully')
     else

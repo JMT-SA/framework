@@ -195,20 +195,12 @@ class PackMaterialRepo < RepoBase
     old_ids = non_variant_product_column_ids(config_id)
     old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
       .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{|r| r[:id]}
-    thing = DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids)
-    p "Hello world"
-    p thing
-      thing.delete
+    DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
 
     col_ids.each_with_index do |new_id, idx|
       link = DB[:material_resource_product_columns_for_material_resource_types]
         .where(material_resource_product_column_id: new_id, material_resource_type_config_id: config_id).first
-      p link
-      p 'new id', new_id
-      p 'index', idx
       if link
-        p "I finally get in here"
-        # next_pos = next_non_variant_product_code_column_position(config_id)
         DB[:material_resource_type_product_code_columns].insert(material_resource_product_columns_for_material_resource_type_id: link[:id], position: idx)
       end
     end
@@ -289,60 +281,15 @@ class PackMaterialRepo < RepoBase
     end
   end
 
-
   def for_select_non_variant_product_code_column_ids(config_id)
     ids = non_variant_product_column_ids(config_id)
-    x=DB[:material_resource_product_columns].where(id: ids).map{ |r| [r[:column_name], r[:id]] }
-    # [['name', 1], ['other', 2], ['another', 3]]
-    # x = product_code_columns(config_id).map{ |r| [r[:col], r[:id]] }
-    p x
-    x
+    DB[:material_resource_product_columns].where(id: ids).map{ |r| [r[:column_name], r[:id]] }
   end
 
   def for_select_variant_product_code_column_ids(config_id)
     ids = variant_product_column_ids(config_id)
-    x=DB[:material_resource_product_columns].where(id: ids).map{ |r| [r[:column_name], r[:id]] }
-    # [['name', 1], ['other', 2], ['another', 3]]
-    x
+    DB[:material_resource_product_columns].where(id: ids).map{ |r| [r[:column_name], r[:id]] }
   end
-
-  # x = product_code_columns(config_id).map{ |r| [r[:col], r[:id]] }
-  # p x
-  # x
-
-  #
-  # def product_column_options(product_id)
-  #   options = {}
-  #   product_type_id = DB[:products].where(id: product_id).select(:product_type_id).single_value
-  #   product_column_ids = DB[:product_types_product_column_names].where(product_type_id: product_type_id).select_map(:product_column_name_id)
-  #   product_columns = DB[:product_column_names].where(id: product_column_ids).select_map{|x| [x.group_name, x.column_name] }
-  #   product_columns.each do |col|
-  #     options[:"#{col[0]}"] = {} unless options[:"#{col[0]}"]
-  #     options[:"#{col[0]}"][:"#{col[1]}"] = true
-  #   end
-  #   options
-  # end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   # def find_product(id)
   #   hash = find_hash(:products, id)

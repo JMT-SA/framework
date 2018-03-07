@@ -59,17 +59,6 @@ class PartyRepo < RepoBase
     update(:organizations, id, attrs)
   end
 
-  def assign_organization_roles(id, role_ids)
-    return { error: 'Choose at least one role' } if role_ids.empty?
-    organization = find_organization(id)
-    DB[:party_roles].where(organization_id: id).delete
-    role_ids.each do |r_id|
-      DB[:party_roles].insert(party_id: organization.party_id,
-                              role_id: r_id,
-                              organization_id: id)
-    end
-  end
-
   def delete_organization(id)
     children = DB[:organizations].where(parent_id: id)
     return { error: 'This organization is set as a parent' } if children.any?
@@ -106,17 +95,6 @@ class PartyRepo < RepoBase
     update(:people, id, attrs)
   end
 
-  def assign_person_roles(id, role_ids)
-    return { error: 'Choose at least one role' } if role_ids.empty?
-    person = find_person(id)
-    DB[:party_roles].where(person_id: id).delete
-    role_ids.each do |r_id|
-      DB[:party_roles].insert(party_id: person.party_id,
-                              role_id: r_id,
-                              person_id: id)
-    end
-    { success: true }
-  end
 
   def delete_person(id)
     party_id = party_id_from_person(id)
@@ -236,6 +214,22 @@ class PartyRepo < RepoBase
 
   def party_role_ids(party_id)
     DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
+  end
+
+  def assign_roles(organization_id = nil, person_id = nil, role_ids)
+    return { error: 'Choose at least one role' } if role_ids.empty?
+    # return { error: 'Need at least one party id' } if organization_id.nil? && person_id.nil?
+    organization = find_organization(organization_id) if organization_id
+    person = find_person(person_id) if person_id
+    DB[:party_roles].where(organization_id: id).delete if organization
+    DB[:party_roles].where(person_id: id).delete if person
+
+    role_ids.each do |r_id|
+      DB[:party_roles].insert(party_id: (person ? person.party_id : organization.party_id),
+                              organization_id: organization_id,
+                              person_id: person_id,
+                              role_id: r_id)
+    end
   end
 
   private

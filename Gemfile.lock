@@ -112,10 +112,13 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
+    metaclass (0.0.4)
     method_source (0.9.0)
     mini_portile2 (2.3.0)
-    minitest (5.11.3)
+    minitest (5.10.3)
     minitest-hooks (1.4.2)
+    mocha (1.3.0)
+      metaclass (~> 0.0.1)
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
     parallel (1.12.1)
@@ -199,8 +202,9 @@ DEPENDENCIES
   dotenv
   dry-struct
   dry-validation
-  minitest
-  minitest-hooks
+  minitest (~> 5.10.3)
+  minitest-hooks (= 1.4.2)
+  mocha (~> 1.3.0)
   pg
   pry
   pry-byebug

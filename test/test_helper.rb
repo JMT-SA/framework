@@ -1,8 +1,10 @@
 require 'minitest/autorun'
+require "mocha/mini_test"
 require 'crossbeams/layout'
 require 'yaml'
 require 'dry-struct'
 require 'dry-validation'
+require 'sequel'
 
 ENV['RACK_ENV'] = 'test'
 require './config/environment'
@@ -25,4 +27,15 @@ Dir["#{root_dir}/lib/applets/*.rb"].each { |f| require f }
 require 'minitest/hooks/test'
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
+end
+
+def current_user
+  User.new(
+    id: 1,
+    login_name: 'usr_login',
+    user_name: 'User Name',
+    password_hash: '$2a$10$wZQEHY77JEp93JgUUyVqgOkwhPb8bYZLswD5NVTWOKwU1ssQTYa.K',
+    email: 'current_user@example.com',
+    active: true
+  )
 end

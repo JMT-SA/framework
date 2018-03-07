@@ -190,92 +190,19 @@ class Framework < Roda
         end
       end
     end
-    r.on 'link_mr_product_columns', Integer do |id|
+    r.on 'link_product_columns', Integer do |id|
       r.post do
         interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
-        res = interactor.link_mr_product_columns(id, multiselect_grid_choices(params))
+        res = interactor.link_product_columns(id, multiselect_grid_choices(params))
         if res.success
           flash[:notice] = res.message
         else
           flash[:error] = res.message
         end
+        # TODO: Fix
         redirect_to_last_grid(r)
-        # p "instance:", res.instance
-        # r.redirect("/settings/pack_material_products/material_resource_sub_types/#{res.instance.id}/config/edit")
       end
     end
-    r.on 'link_mr_product_code_columns', Integer do |id|
-      r.post do
-        interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
-
-        res = interactor.link_mr_product_code_columns(id, multiselect_grid_choices(params))
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
-        redirect_to_last_grid(r)
-        # TODO: fix this redirect
-        # r.redirect("/settings/pack_material_products/material_resource_sub_types/#{res.instance.id}/config/edit")
-      end
-    end
-    r.on 'reorder_product_code_columns', Integer do |id|
-      r.post do
-        interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
-
-        res = interactor.reorder_product_code_columns(id, params[:columncodes_sorted_ids])
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
-        r.redirect("/settings/pack_material_products/material_resource_sub_types/#{id}/config/edit")
-      end
-    end
-
-    # # MATERIAL RESOURCE PRODUCT COLUMNS
-    # TODO:
-    # Strong enough reasoning not to allow show or edit
-    # If they want to edit they need to do it with migrations
-    # If they want to view it, they can see it on all the configs
-    # # --------------------------------------------------------------------------
-    # r.on 'material_resource_product_columns', Integer do |id|
-    #   interactor = MaterialResourceProductColumnInteractor.new(current_user, {}, {}, {})
-    #
-    #   # Check for notfound:
-    #   r.on !interactor.exists?(:material_resource_product_columns, id) do
-    #     handle_not_found(r)
-    #   end
-    #
-    #   r.on 'edit' do   # EDIT
-    #     if authorised?('Pack material products', 'edit')
-    #       show_partial { Settings::PackMaterialProducts::MaterialResourceProductColumn::Edit.call(id) }
-    #     else
-    #       dialog_permission_error
-    #     end
-    #   end
-    #   r.is do
-    #     r.get do       # SHOW
-    #       if authorised?('Pack material products', 'read')
-    #         show_partial { Settings::PackMaterialProducts::MaterialResourceProductColumn::Show.call(id) }
-    #       else
-    #         dialog_permission_error
-    #       end
-    #     end
-    #     r.patch do     # UPDATE
-    #       response['Content-Type'] = 'application/json'
-    #       res = interactor.update_material_resource_product_column(id, params[:material_resource_product_column])
-    #       if res.success
-    #         update_grid_row(id, changes: { material_resource_domain_id: res.instance[:material_resource_domain_id], column_name: res.instance[:column_name], group_name: res.instance[:group_name], is_variant_column: res.instance[:is_variant_column] },
-    #                         notice: res.message)
-    #       else
-    #         content = show_partial { Settings::PackMaterialProducts::MaterialResourceProductColumn::Edit.call(id, params[:material_resource_product_column], res.errors) }
-    #         update_dialog_content(content: content, error: res.message)
-    #       end
-    #     end
-    #   end
-    # end
-
     # PACK MATERIAL PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_products', Integer do |id|

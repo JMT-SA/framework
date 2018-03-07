@@ -28,6 +28,21 @@ module PackMaterialApp
 
               form.submit_captions "Update config"
             end
+
+            # Product Columns
+            page.section do |section|
+              section.add_text 'Assign Product Columns'
+              section.add_grid('productColumnsGrid',
+                               '/list/material_resource_product_columns/grid_multi/material_resource_type_configs',
+                               caption: 'Assign Product Columns',
+                               is_multiselect: true,
+                               # multiselect_url: "/settings/pack_material_products/link_mr_product_columns/#{config.id}",
+                               multiselect_url: "/pack_material/config/link_product_columns/#{config.id}",
+                               multiselect_key: 'material_resource_type_config',
+                               multiselect_params: { id: config.id },# variant_bool: false},
+                               can_be_cleared: true,
+                               multiselect_save_remote: false)
+            end
           end
 
           layout

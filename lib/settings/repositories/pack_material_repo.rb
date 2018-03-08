@@ -175,12 +175,25 @@ class PackMaterialRepo < RepoBase
     set.map { |x| [x[:col] + ', ' + x[:group_name], x[:product_column_id]] }
   end
 
+  def non_variant_product_code_column_name_list(config_id)
+    set = product_code_columns(config_id)
+    set.reject { |x| x[:is_variant] }.sort_by { |x| x[:pos] }
+       .map { |x| [x[:col] + ', ' + x[:group_name], x[:product_column_id], "pos: #{x[:pos]}"] }
+  end
+
+  def variant_product_code_column_name_list(config_id)
+    set = product_code_columns(config_id)
+    set.select { |x| x[:is_variant] }.sort_by { |x| x[:pos] }
+       .map { |x| [x[:col] + ', ' + x[:group_name], x[:product_column_id]] }
+  end
+
   def product_code_columns(mr_type_config_id)
     product_code_columns_pure(mr_type_config_id).all
   end
 
   def product_code_columns_pure(mr_type_config_id)
-    DB["SELECT mrtpcc.id as id, mrtpcc.position as pos, mrpc.column_name as col, mrpc.group_name as group_name, mrpc.id as product_column_id
+    DB["SELECT mrtpcc.id as id, mrtpcc.position as pos, mrpc.column_name as col, mrpc.group_name as group_name,
+          mrpc.id as product_column_id, mrpc.is_variant_column as is_variant
         FROM  material_resource_product_columns_for_material_resource_types mrpcfmrt,
               material_resource_type_product_code_columns mrtpcc,
               material_resource_product_columns mrpc
@@ -210,21 +223,14 @@ class PackMaterialRepo < RepoBase
   def assign_variant_product_code_columns(config_id, col_ids)
     return { error: 'Choose at least one variant product code column' } if col_ids.empty?
     old_ids = variant_product_column_ids(config_id)
-    p "col_ids", col_ids
-    p "old_ids", old_ids
     old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
-      .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{ |r| r[:id] }
-    p "old_link ids", old_link_ids
+                   .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{ |r| r[:id] }
     DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
 
     col_ids.each_with_index do |new_id, idx|
       link = DB[:material_resource_product_columns_for_material_resource_types]
-        .where(material_resource_product_column_id: new_id, material_resource_type_config_id: config_id).first
-      p link
-      p 'new id', new_id
-      p 'index', idx
+             .where(material_resource_product_column_id: new_id, material_resource_type_config_id: config_id).first
       if link
-        p "I finally get in here"
         buffer = non_variant_product_column_ids(config_id).count
         DB[:material_resource_type_product_code_columns].insert(material_resource_product_columns_for_material_resource_type_id: link[:id], position: (buffer + idx))
       end
@@ -266,18 +272,15 @@ class PackMaterialRepo < RepoBase
   end
 
   def reorder_product_code_columns(mr_type_config_id, mr_product_code_column_ids)
-    # TODO: TEST THE REORDERING
     product_column_ids = mr_product_code_column_ids.split(',')
-    link_ids = DB[:material_resource_product_columns_for_material_resource_types]
-      .where(material_resource_product_column_id: product_column_ids,
-             material_resource_type_config_id: mr_type_config_id)
-      .map{ |r| r[:id] }
-
-    set = DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: link_ids)
-    product_column_ids.each_with_index do |i, col_id|
-      p 'col_id', col_id
-      p 'idx', i
-      set.where(id: col_id).update(position: i)
+    product_column_ids.each_with_index do |col_id, idx|
+      link_id = DB[:material_resource_product_columns_for_material_resource_types]
+                .where(material_resource_product_column_id: col_id,
+                       material_resource_type_config_id: mr_type_config_id)
+                .first[:id]
+      DB[:material_resource_type_product_code_columns]
+      .where(material_resource_product_columns_for_material_resource_type_id: link_id)
+      .update(position: idx)
     end
   end
 

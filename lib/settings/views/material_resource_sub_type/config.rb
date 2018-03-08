@@ -70,11 +70,11 @@ module Settings
             end
 
             page.section do |section|
-              product_code_column_name_list = repo.product_code_column_name_list(id)
+              non_variant_name_list = repo.non_variant_product_code_column_name_list(id)
               section.form do |form|
                 form.action "/settings/pack_material_products/reorder_product_code_columns/#{id}"
                 form.add_text 'Drag and drop to set the Product code column order. Press submit to save the new order.'
-                form.add_sortable_list('columncodes', product_code_column_name_list)
+                form.add_sortable_list('columncodes', non_variant_name_list)
               end
             end
 
@@ -101,12 +101,12 @@ module Settings
             end
 
             page.section do |section|
-              product_code_column_name_list = repo.product_code_column_name_list(id)
+              variant_name_list = repo.variant_product_code_column_name_list(id)
               section.form do |form|
                 # TODO: This still needs to be applied for variants  -THIS IS A COPY
-                form.action "/settings/pack_material_products/reorder_product_code_columns/#{id}"
+                form.action "/settings/pack_material_products/reorder_variant_product_code_columns/#{id}"
                 form.add_text 'Drag and drop to set the Product code column order. Press submit to save the new order.'
-                form.add_sortable_list('columncodes', product_code_column_name_list)
+                form.add_sortable_list('columncodes', variant_name_list)
               end
             end
 

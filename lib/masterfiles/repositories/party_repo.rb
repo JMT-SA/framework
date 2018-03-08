@@ -216,16 +216,20 @@ class PartyRepo < RepoBase
     DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
   end
 
-  def assign_roles(organization_id = nil, person_id = nil, role_ids)
+  def assign_roles(id, role_ids, type = 'organization')
     return { error: 'Choose at least one role' } if role_ids.empty?
-    # return { error: 'Need at least one party id' } if organization_id.nil? && person_id.nil?
-    organization = find_organization(organization_id) if organization_id
-    person = find_person(person_id) if person_id
-    DB[:party_roles].where(organization_id: id).delete if organization
-    DB[:party_roles].where(person_id: id).delete if person
-
+    organization_id = person_id = nil
+    if type == 'organization'
+      party = find_organization(id)
+      DB[:party_roles].where(organization_id: id).delete
+      organization_id = id
+    else
+      party = find_person(id)
+      DB[:party_roles].where(person_id: id).delete
+      person_id = id
+    end
     role_ids.each do |r_id|
-      DB[:party_roles].insert(party_id: (person ? person.party_id : organization.party_id),
+      DB[:party_roles].insert(party_id: party.party_id,
                               organization_id: organization_id,
                               person_id: person_id,
                               role_id: r_id)

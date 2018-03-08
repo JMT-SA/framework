@@ -75,8 +75,6 @@ class Framework < Roda
         r.delete do
           response['Content-Type'] = 'application/json'
           res = interactor.delete_organization(id)
-          p 'TODO: inside DELETE'
-          p res
           if res.success
             delete_grid_row(id, notice: res.message)
           else

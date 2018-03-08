@@ -22,7 +22,7 @@ class OrganizationInteractor < BaseInteractor
     return validation_failed_response(res) unless res.messages.empty?
     attrs = res.to_h
     role_ids = attrs.delete(:role_ids)
-    roles_response = assign_organization_roles(@organization_id, role_ids)
+    roles_response = assign_organization_roles(id, role_ids)
     if roles_response.success
       DB.transaction do
         party_repo.update_organization(id, attrs)
@@ -50,7 +50,7 @@ class OrganizationInteractor < BaseInteractor
   def assign_organization_roles(id, role_ids)
     return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
     DB.transaction do
-      party_repo.assign_roles(organization_id: id, role_ids: role_ids)
+      party_repo.assign_roles(id, role_ids, 'organization')
     end
     success_response('Roles assigned successfully')
   end

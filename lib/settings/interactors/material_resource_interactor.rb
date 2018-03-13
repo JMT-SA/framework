@@ -71,12 +71,12 @@ class MaterialResourceInteractor < BaseInteractor
 
     config = repo.find_material_resource_type_config(id)
     sub_type = repo.find_material_resource_sub_type(config.material_resource_sub_type_id)
-    existing_ids = repo.mr_type_mr_product_column_ids(id)
-    if existing_ids.eql?(product_column_ids.sort)
+    # existing_ids = repo.mr_type_mr_product_column_ids(id)
+    # if existing_ids.eql?(product_column_ids.sort)
       success_response('Product columns linked successfully', sub_type)
-    else
-      failed_response('Some product columns were not linked', sub_type)
-    end
+    # else
+    #   failed_response('Some product columns were not linked', sub_type)
+    # end
   end
 
   def link_mr_product_code_columns(id, product_code_column_ids)

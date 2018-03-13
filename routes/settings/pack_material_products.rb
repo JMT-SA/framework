@@ -192,9 +192,10 @@ class Framework < Roda
           config_id = config.id
           res = interactor.update_material_resource_type_config(config_id, params[:material_resource_sub_type])
           if res.success
-            flash[:notice] = res.message
+            # flash[:notice] = res.message
             if fetch?(r)
-              redirect_via_json_to_last_grid
+              # redirect_via_json_to_last_grid
+              show_json_notice(res.message) # TODO: Should also be able to re-enable submit button...
             else
               redirect_to_last_grid(r)
             end
@@ -271,6 +272,10 @@ class Framework < Roda
       r.post do
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
         res = interactor.link_mr_product_columns(id, multiselect_grid_choices(params))
+        # PLAN:
+        # 1) populate non-variant and variant multis.
+        # 2) make selected items for both
+        # 3) populate sortables with already-selected.
         if res.success
           flash[:notice] = res.message
         else

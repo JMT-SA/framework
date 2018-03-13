@@ -157,15 +157,39 @@ module CommonHelpers
     { exception: err.class.name, flash: { error: "An error occurred: #{err.message}" } }.to_json
   end
 
-  # TODO: same for multiple selects.
   def json_replace_select_options(dom_id, options_array, message = nil)
-    res = { actions: [{ replace_options: { id: dom_id, options: options_array } }] }
-    res[:flash] = { notice: message } unless message.nil?
-    res.to_json
+    json_actions(OpenStruct.new(type: :replace_select_options, dom_id: dom_id, options_array: options_array), message)
+  end
+
+  def json_replace_multi_options(dom_id, options_array, message = nil)
+    json_actions(OpenStruct.new(type: :replace_multi_options, dom_id: dom_id, options_array: options_array), message)
   end
 
   def json_replace_input_value(dom_id, value, message = nil)
-    res = { actions: [{ replace_input_value: { id: dom_id, value: value } }] }
+    json_actions(OpenStruct.new(type: :replace_input_value, dom_id: dom_id, value: value), message)
+  end
+
+  # This could be built in a class and receive send messages....
+  def build_json_action(action)
+    return action_replace_input_value(action) if action.type == :replace_input_value
+    return action_replace_select_options(action) if action.type == :replace_select_options
+    return action_replace_multi_options(action) if action.type == :replace_multi_options
+  end
+
+  def action_replace_select_options(action)
+    { replace_options: { id: action.dom_id, options: action.options_array } }
+  end
+
+  def action_replace_multi_options(action)
+    { replace_multi_options: { id: action.dom_id, options: action.options_array } }
+  end
+
+  def action_replace_input_value(action)
+    { replace_input_value: { id: action.dom_id, value: action.value } }
+  end
+
+  def json_actions(actions, message = nil)
+    res = { actions: Array(actions).map { |a| build_json_action(a) } }
     res[:flash] = { notice: message } unless message.nil?
     res.to_json
   end

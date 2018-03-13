@@ -29,11 +29,11 @@ class PackMaterialRepo < RepoBase
   #                       value: :id,
   #                       order_by: :product_code_separator
 
-  # build_for_select :material_resource_product_columns,
-  #                  label: :column_name,
-  #                  value: :id,
-  #                  no_active_check: true,
-  #                  order_by: :column_name
+  build_for_select :material_resource_product_columns,
+                   label: :column_name,
+                   value: :id,
+                   no_active_check: true,
+                   order_by: :column_name
 
   # crud_calls_for :material_resource_type_configs, name: :material_resource_type_config, wrapper: MaterialResourceTypeConfig
   # crud_calls_for :material_resource_product_columns, name: :material_resource_product_column, wrapper: MaterialResourceProductColumn

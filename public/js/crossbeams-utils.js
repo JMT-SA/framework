@@ -240,6 +240,40 @@ const crossbeamsUtils = {
     });
     select.setPlaceholder();
   },
+
+  /**
+   * Replace the options of a Multi select.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceMultiOptions: function replaceMultiOptions(action) {
+    const elem = document.getElementById(action.replace_multi_options.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_multi_options.id}"`,
+        title: 'Dropdown-change: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    let nVal = '';
+    let nText = '';
+    while (elem.options.length) elem.remove(0);
+    action.replace_multi_options.options.forEach((item) => {
+      if (item.constructor === Array) {
+        nVal = (item[1] || item[0]);
+        nText = item[0];
+      } else {
+        nVal = item;
+        nText = item;
+      }
+      const option = document.createElement('option');
+      option.value = nVal;
+      option.text = nText;
+      elem.appendChild(option);
+    });
+    elem.dispatchEvent(new Event('change'));
+  },
   /**
    * Replace the value of an Input element.
    * @param {object} action - the action object returned from the backend.
@@ -282,6 +316,9 @@ const crossbeamsUtils = {
         data.actions.forEach((action) => {
           if (action.replace_options) {
             this.replaceSelectrOptions(action);
+          }
+          if (action.replace_multi_options) {
+            this.replaceMultiOptions(action);
           }
           if (action.replace_input_value) {
             this.replaceInputValue(action);

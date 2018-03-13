@@ -167,6 +167,10 @@ These are the methods used in building a page layout.
 |grid_id (String), url (String), options (Hash)
 |Add a Grid to the column.
 
+|add_sortable_list
+|prefix (String), items (Array), options (Hash)
+|Add a sortable list control for sorting a list of ids using text values linked to the ids.
+
 |render
 |
 |Renders the column and all nodes within it.
@@ -231,7 +235,7 @@ These are the methods used in building a page layout.
 |Add a block of Text to the form.
 
 |add_sortable_list
-|prefix (String), items (Array).
+|prefix (String), items (Array), options (Hash)
 |Add a sortable list control for sorting a list of ids using text values linked to the ids.
 
 |submit_captions

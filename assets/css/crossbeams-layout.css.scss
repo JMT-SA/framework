@@ -214,6 +214,11 @@ header,
   text-transform: lowercase;
 }
 
+.cbl-sortable-items {
+  border: #ccc thin solid;
+  min-height: 4em;
+}
+
 /* flexbox styles */
 /* fieldset div { */
 .crossbeams-field {

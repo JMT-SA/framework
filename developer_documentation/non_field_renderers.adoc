@@ -110,6 +110,11 @@ sorted_id_list = params[:deals_sorted_ids] #=> '1,2,3'
 |An Array of `[text, id]` elements.
 |None. This is required.
 
+|:caption
+|A caption to display above the list.
+|Any string
+|None.
+
 |===
 
 === Address

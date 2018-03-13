@@ -27,6 +27,18 @@ Dir["#{root_dir}/lib/applets/*.rb"].each { |f| require f }
 require 'minitest/hooks/test'
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
+
+  def around
+    DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
+      super
+    end
+  end
+
+  def around_all
+    DB.transaction(rollback: :always) do
+      super
+    end
+  end
 end
 
 def current_user

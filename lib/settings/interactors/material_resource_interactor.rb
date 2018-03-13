@@ -79,6 +79,13 @@ class MaterialResourceInteractor < BaseInteractor
     # end
   end
 
+  def chosen_product_columns(ids)
+    code_items = repo.for_select_material_resource_product_columns(where: { is_variant_column: false }).select { |i| ids.include?(i[1]) }
+    var_items = repo.for_select_material_resource_product_columns(where: { is_variant_column: true }).select { |i| ids.include?(i[1]) }
+    # items = repo.for_select_material_resource_product_columns.select { |i| ids.include?(i[1]) }
+    success_response('got_items', code: code_items, var: var_items)
+  end
+
   def link_mr_product_code_columns(id, product_code_column_ids)
     DB.transaction do
       repo.link_mr_product_code_columns(id, product_code_column_ids)

@@ -268,22 +268,13 @@ class Framework < Roda
         end
       end
     end
-    r.on 'link_mr_product_columns', Integer do |id|
+    r.on 'link_mr_product_columns', Integer do |id| # TODO: This does not have to be per id....
       r.post do
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
-        res = interactor.link_mr_product_columns(id, multiselect_grid_choices(params))
-        # PLAN:
-        # 1) populate non-variant and variant multis.
-        # 2) make selected items for both
-        # 3) populate sortables with already-selected.
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
-        redirect_to_last_grid(r)
-        # p "instance:", res.instance
-        # r.redirect("/settings/pack_material_products/material_resource_sub_types/#{res.instance.id}/config/edit")
+        res = interactor.chosen_product_columns(multiselect_grid_choices(params))
+        json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_non_variant_product_code_column_ids', options_array: res.instance[:code]),
+                      OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_variant_product_code_column_ids', options_array: res.instance[:var])],
+                     'Re-assigned product columns')
       end
     end
     r.on 'link_mr_product_code_columns', Integer do |id|

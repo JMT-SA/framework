@@ -46,7 +46,7 @@ module Settings
                                multiselect_key: 'material_resource_type_config',
                                multiselect_params: { id: config.id }, # variant_bool: false},
                                can_be_cleared: true,
-                               multiselect_save_remote: false)
+                               multiselect_save_remote: true)
                 end
               end
             end

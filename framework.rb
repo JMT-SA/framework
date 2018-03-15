@@ -24,6 +24,10 @@ require 'asciidoctor'
 
 module Types
   include Dry::Types.module
+  # StrippedString = Types.Constructor(String) { |value| value.to_s.strip }
+  # module DataImport
+  #   StrippedString = Strict::String.constructor { |value| value.to_s.strip }
+  # end
 end
 
 require './lib/crossbeams_responses'

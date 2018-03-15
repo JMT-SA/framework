@@ -101,20 +101,36 @@ class MaterialResourceInteractor < BaseInteractor
     end
   end
 
+  def convert_string_params_to_arrays(params)
+    params.transform_values { |v| v.is_a?(String) ? v.split(',') : v }
+  end
+
+  def prep_params_for_nonvar_pcodes(params)
+    { non_variant_product_code_column_ids: [] }.merge(convert_string_params_to_arrays(params))
+  end
+
   def assign_non_variant_product_code_columns(id, params)
-    res = validate_material_resource_type_config_code_columns_params(params || { non_variant_product_code_column_ids: [] })
+    # store 3x id sets...
+    # res = validate_material_resource_type_config_code_columns_params(params || { non_variant_product_code_column_ids: [] })
+
+    # TODO: see if we can manage the String => Array conversion in DryValidation...
+    res = validate_material_resource_type_config_code_columns_params(prep_params_for_nonvar_pcodes(params))
     return validation_failed_response(res) unless res.messages.empty?
 
-    non_variant_col_ids = res[:non_variant_product_code_column_ids]
+    # required(:chosen_column_ids).filled { each(:int?) }
+    # required(:columncodes_sorted_ids).filled { each(:int?) }
+    # required(:variantcolumncodes_sorted_ids).maybe { each(:int?) }
+    # non_variant_col_ids = res[:non_variant_product_code_column_ids]
     DB.transaction do
-      repo.assign_non_variant_product_code_columns(id, non_variant_col_ids)
+      # repo.assign_non_variant_product_code_columns(id, non_variant_col_ids)
+      repo.assign_non_variant_product_code_columns(id, res)
     end
-    existing_ids = repo.non_variant_product_code_column_ids(id)
-    if existing_ids.eql?(non_variant_col_ids.sort)
-      success_response('Code columns assigned successfully')
-    else
-      validation_failed_response(OpenStruct.new(messages: { product_code_columns: ['You did not choose any product code columns'] }))
-    end
+    # existing_ids = repo.non_variant_product_code_column_ids(id)
+    # if existing_ids.eql?(non_variant_col_ids.sort)
+    #   success_response('Code columns assigned successfully')
+    # else
+    #   validation_failed_response(OpenStruct.new(messages: { product_code_columns: ['You did not choose any product code columns'] }))
+    # end
   end
 
   def assign_variant_product_code_columns(id, params)

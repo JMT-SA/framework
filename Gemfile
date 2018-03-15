@@ -38,6 +38,7 @@ group :test do
   gem 'minitest', '~>5.10.3'
   gem 'minitest-hooks', '1.4.2'
   gem 'mocha', '~>1.3.0'
+  gem 'minitest-stub_any_instance', '~>1.0.1'
 end
 
 group :development do

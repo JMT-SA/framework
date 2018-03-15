@@ -16,8 +16,8 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
-  # - :url: "/pack_material/config/material_resource_sub_types/$:id$/config/edit"
-- :url: "/settings/pack_material_products/material_resource_sub_types/$:id$/config/edit"
+#- :url: "/settings/pack_material_products/material_resource_sub_types/$:id$/config/edit"
+- :url: "/pack_material/config/material_resource_sub_types/$:id$/config/edit"
   :text: config
   :icon: fa-list
   :title: Configuration

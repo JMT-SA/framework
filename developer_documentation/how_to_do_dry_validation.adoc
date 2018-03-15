@@ -1,0 +1,116 @@
+= How to do DRY Validation
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== DRY Validation resources
+
+See the link:http://dry-rb.org/gems/dry-validation/[dry-validation] documentation.
+
+This page gives a simple overview of usage - mainly as a reminder of typical use.
+
+== Schemas
+
+Create one or more schemas in a file (typically in `lib/applet_name/validations`.
+In most cases we want to inherit from `Dry::Validation.Form` rather than `Dry::Validation.Schema` because it is more flexible about its inputs.
+
+An example showing some simple variations:
+```.ruby
+NewThingSchema = Dry::Validation.Form do
+  optional(:id).filled(:int?)
+  required(:join_id).filled(:int?)
+  required(:code).filled(:str?)
+  required(:name).maybe(:str?)
+  required(:active).filled(:bool?)
+  required(:multiselected_ids).filled { each(:int?) }
+end
+
+```
+
+== Calling a schema
+
+Here is an example of a passing call followed by a failing call. Note how the inputs are coerced into their desired output types.
+```.ruby
+> res = NewThingSchema.call(join_id: '1', code: 'AA', name: nil, active: 't', multiselected_ids: ['1', '2'])
+=> #<Dry::Validation::Result output={:join_id=>1, :code=>"AA", :name=>nil, :active=>true, :multiselected_ids=>[1, 2]} errors={}>
+> res[:active]
+=> true                               # <1>
+> res[:active].class
+=> TrueClass
+> res[:multiselected_ids]
+=> [1, 2]                             # <2>
+> res = NewThingSchema.call(join_id: 'XXX', code: 'AA', name: nil, active: 't', multiselected_ids: [])
+=> #<Dry::Validation::Result output={:join_id=>"XXX", :code=>"AA", :name=>nil, :active=>true, :multiselected_ids=>[]} errors={:join_id=>["must be an integer"], :multiselected_ids=>["must be filled"]}>
+> res.errors                          # <3>
+=> {:join_id=>["must be an integer"], :multiselected_ids=>["must be filled"]}
+```
+<1> Note the `'t'` has become a Boolean with `true` value.
+<2> The Array input has had all its items coerced to Integers.
+<3> Errors are returned as a Hash keyed by the column name and the value is an array of one or more validation failure messages.
+
+== Rules
+
+This table provides a few example validation rules.
+
+Param required means that the parameter input to the schema call must include the column *key*.
+e.g. `{ col: nil }` If the param is not required, `{}` would be ok.
+
+Val required means that the *value* for that column key must be present.
+e.g. `{ col: 'some_value' }`
+
+|===
+|Param required |Val required |Type |Rule |Valid example
+
+|Y
+|Y
+|Integer
+|`required(:col).filled(:int?)`
+|`{col: '123'}`
+
+|Y
+|Y
+|String
+|`required(:col).filled(:str?)`
+|`{col: 'abc'}`
+
+|Y
+|Y
+|Boolean
+|`required(:col).filled(:bool?)`
+|`{col: 't'}`
+
+|Y
+|N
+|Integer
+|`required(:col).maybe(:int?)`
+|`{col: nil}`
+
+|N
+|Y
+|Integer
+|`optional(:col).filled(:int?)`
+|`{}`
+
+|N
+|N
+|Integer
+|`optional(:col).maybe(:int?)`
+|`{}`
+
+|Y
+|Y (length > 0)
+|Array of Integer
+|`required(:col).filled { each(:int?) }`
+|`{col: ['1','2']}`
+
+|Y
+|Y (can be empty)
+|Array of Integer
+|`required(:col).each(:int?)`
+|`{col: []}`
+
+|Y
+|N (length > 0)
+|Array of Integer
+|`required(:col).maybe { each(:int?) }`
+|`{col: nil}`

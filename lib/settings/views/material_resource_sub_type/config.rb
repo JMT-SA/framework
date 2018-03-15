@@ -7,6 +7,12 @@ module Settings
         def self.call(id, form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:material_resource_sub_type, :config, id: id, form_values: form_values)
           rules = ui_rule.compile
+
+          # TODO: transform form_values...
+          p "CONF: Fvals: #{form_values}"
+          order_rule = UiRules::Compiler.new(:mr_config_order, :config_order, id: id, form_values: form_values)
+          rules_for_cols = order_rule.compile
+
           repo = PackMaterialRepo.new
           config = repo.find_material_resource_type_config_for_sub_type(id)
 
@@ -53,30 +59,51 @@ module Settings
 
             page.section do |section|
               section.form do |form|
-                options = repo.for_select_non_variant_product_code_column_ids(config.id)
-                p 'options', options
-                selected = config.for_selected_non_variant_product_code_column_ids
-                p 'selected', selected
-                var_options = repo.for_select_variant_product_code_column_ids(config.id)
-                p 'var_options', var_options
-                var_selected = config.for_selected_variant_product_code_column_ids
-                p 'var_selected', var_selected
-                form.form_config = {
-                  name: 'product_code_columns',
-                  fields: {
-                    non_variant_product_code_column_ids: { renderer: :multi, options: options, selected: selected },
-                    variant_product_code_column_ids: { renderer: :multi, options: var_options, selected: var_selected }
-                  }
-                }
+                # options = repo.for_select_non_variant_product_code_column_ids(config.id)
+                # # p 'options', options
+                # selected = config.for_selected_non_variant_product_code_column_ids
+                # # p 'selected', selected
+                # var_options = repo.for_select_variant_product_code_column_ids(config.id)
+                # # p 'var_options', var_options
+                # var_selected = config.for_selected_variant_product_code_column_ids
+                # # p 'var_selected', var_selected
+                form.form_config = rules_for_cols
+                # form.form_config = {
+                #   name: 'product_code_columns',
+                #   fields: {
+                #     chosen_column_ids: { renderer: :hidden },
+                #     non_variant_product_code_column_ids: {
+                #       renderer: :multi,
+                #       options: options,
+                #       selected: selected
+                #     },
+                #     variant_product_code_column_ids: {
+                #       renderer: :multi,
+                #       options: var_options,
+                #       selected: var_selected
+                #     }
+                #   },
+                #   behaviours: [
+                #     non_variant_product_code_column_ids: {
+                #       populate_from_selected: [{ sortable: 'columncodes-sortable-items' }]
+                #     },
+                #     variant_product_code_column_ids: {
+                #       populate_from_selected: [{ sortable: 'variantcolumncodes-sortable-items' }]
+                #     }
+                #   ]
+                # }
                 non_variant_name_list = repo.non_variant_product_code_column_name_list(id)
                 variant_name_list = repo.variant_product_code_column_name_list(id)
-                form.form_object OpenStruct.new(non_variant_product_code_column_ids: [])
+                form.form_object order_rule.form_object
+                # form.form_object OpenStruct.new(non_variant_product_code_column_ids: [],
+                #                                 chosen_column_ids: (options + var_options).join(','))
                 form.action "/settings/pack_material_products/assign_product_code_columns/#{config.id}"
                 # form.action "/settings/pack_material_products/reorder_variant_product_code_columns/#{id}"
                 form.method :create
-                form.remote!
+                # form.remote!
                 form.row do |row|
                   row.column do |col|
+                    col.add_field :chosen_column_ids
                     col.add_field :non_variant_product_code_column_ids
                   end
                   row.column do |col|

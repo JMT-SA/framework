@@ -10,7 +10,10 @@ MaterialResourceTypeConfigSchema = Dry::Validation.Form do
 end
 
 MaterialResourceTypeConfigCodeColumnsSchema = Dry::Validation.Form do
-  required(:non_variant_product_code_column_ids).each(:int?)
+  # required(:non_variant_product_code_column_ids).each(:int?)
+  required(:chosen_column_ids).filled { each(:int?) }
+  required(:columncodes_sorted_ids).filled { each(:int?) }
+  required(:variantcolumncodes_sorted_ids).maybe { each(:int?) }
 end
 
 MaterialResourceTypeConfigVariantCodeColumnsSchema = Dry::Validation.Form do

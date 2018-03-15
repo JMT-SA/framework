@@ -181,7 +181,12 @@ class Framework < Roda
       r.on 'config' do  # MR type config edit
         r.is 'edit' do
           if authorised?('Pack material products', 'edit')
-            show_page { Settings::PackMaterialProducts::MaterialResourceSubType::Config.call(id) }
+            if flash[:stashed_page] # NBNBNBNBNB: session too big for cookie....
+              # p flash[:stashed_page]
+              show_page { flash[:stashed_page] }
+            else
+              show_page { Settings::PackMaterialProducts::MaterialResourceSubType::Config.call(id) }
+            end
           else
             dialog_permission_error
           end
@@ -271,9 +276,11 @@ class Framework < Roda
     r.on 'link_mr_product_columns', Integer do |id| # TODO: This does not have to be per id....
       r.post do
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
-        res = interactor.chosen_product_columns(multiselect_grid_choices(params))
+        ids = multiselect_grid_choices(params)
+        res = interactor.chosen_product_columns(ids)
         json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_non_variant_product_code_column_ids', options_array: res.instance[:code]),
-                      OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_variant_product_code_column_ids', options_array: res.instance[:var])],
+                      OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_variant_product_code_column_ids', options_array: res.instance[:var]),
+                      OpenStruct.new(type: :replace_input_value, dom_id: 'product_code_columns_chosen_column_ids', value: ids.join(','))],
                      'Re-assigned product columns')
       end
     end
@@ -295,13 +302,21 @@ class Framework < Roda
     r.on 'assign_product_code_columns', Integer do |id|
       r.post do
         interactor = MaterialResourceInteractor.new(current_user, {}, {}, {})
-
+        #
+        # # TODO: config here....
         res = interactor.assign_non_variant_product_code_columns(id, params[:product_code_columns])
+        # p res
         if res.success
           flash[:notice] = res.message
         else
           flash[:error] = res.message
+          flash[:stashed_page] = Settings::PackMaterialProducts::MaterialResourceSubType::Config.call(id, form_values: params[:product_code_columns],
+                                                                                                          form_errors: res.errors,
+                                                                                                          remote: false)
+          r.redirect "/settings/pack_material_products/material_resource_sub_types/#{id}/config/edit"
         end
+        # p params
+        # flash[:notice] = 'GOT THERE'
         redirect_to_last_grid(r)
         # TODO: fix this redirect
         # r.redirect("/settings/pack_material_products/material_resource_sub_types/#{res.instance.id}/config/edit")

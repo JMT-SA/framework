@@ -203,22 +203,80 @@ class PackMaterialRepo < RepoBase
         AND mrpc.id = mrpcfmrt.material_resource_product_column_id
         ORDER BY mrtpcc.position"]
   end
+  #
+  # def assign_non_variant_product_code_columns(config_id, col_ids)
+  #   return { error: 'Choose at least one product code column' } if col_ids.empty?
+  #   old_ids = non_variant_product_column_ids(config_id)
+  #   old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
+  #     .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{|r| r[:id]}
+  #   DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
+  #
+  #   col_ids.each_with_index do |new_id, idx|
+  #     link = DB[:material_resource_product_columns_for_material_resource_types]
+  #       .where(material_resource_product_column_id: new_id, material_resource_type_config_id: config_id).first
+  #     if link
+  #       DB[:material_resource_type_product_code_columns].insert(material_resource_product_columns_for_material_resource_type_id: link[:id], position: idx)
+  #     end
+  #   end
+  #   { success: true }
+  # end
 
-  def assign_non_variant_product_code_columns(config_id, col_ids)
-    return { error: 'Choose at least one product code column' } if col_ids.empty?
-    old_ids = non_variant_product_column_ids(config_id)
-    old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
-      .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{|r| r[:id]}
-    DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
+  def assign_non_variant_product_code_columns(config_id, res)
+    # required(:chosen_column_ids).filled { each(:int?) }
+    # required(:columncodes_sorted_ids).filled { each(:int?) }
+    # required(:variantcolumncodes_sorted_ids).maybe { each(:int?) }
+    codes_in_order = res[:column_codes_sorted_ids] + res[:variantcolumncodes_sorted_ids]
+    changes = <<~SQL
+      DELETE FROM material_resource_type_product_code_columns
+      WHERE id = #{config_id};
 
-    col_ids.each_with_index do |new_id, idx|
-      link = DB[:material_resource_product_columns_for_material_resource_types]
-        .where(material_resource_product_column_id: new_id, material_resource_type_config_id: config_id).first
-      if link
-        DB[:material_resource_type_product_code_columns].insert(material_resource_product_columns_for_material_resource_type_id: link[:id], position: idx)
-      end
-    end
-    { success: true }
+      DELETE FROM material_resource_product_columns_for_material_resource_types
+      WHERE material_resource_type_config_id = #{config_id}
+      AND material_resource_product_column_id NOT IN (#{codes_in_order.join(',')});
+
+      INSERT INTO material_resource_product_columns_for_material_resource_types (material_resource_type_config_id, material_resource_product_column_id)
+      VALUES #{res[:chosen_column_ids].map { |c| "(#{config_id}, #{c})" }.join(',')}
+      ON CONFLICT DO NOTHING;
+
+    SQL
+
+    # versus...
+
+    changes2 = <<~SQL
+      UPDATE matres_test_sub_types  -- EQUIVALENT of either the sub_types or configs table. --
+         SET product_column_ids = '{#{res[:chosen_column_ids].join(',')}}',
+             product_code_ids = '{#{codes_in_order.join(',')}}'
+      WHERE id = #{config_id};
+    SQL
+
+    DB[changes].update
+    mapping = DB[:material_resource_product_columns_for_material_resource_types].where(material_resource_type_config_id: config_id).map { |r| [r[:material_resource_product_column_id], r[:id]] }
+    mapping = Hash[mapping]
+    values = codes_in_order.each_with_index.map { |c, i| "(#{mapping[c]}, #{i})" }.join(',')
+    insert = <<~SQL
+      INSERT INTO material_resource_type_product_code_columns(material_resource_product_columns_for_material_resource_type_id, "position")
+      VALUES(#{values})
+    SQL
+    DB[insert].update
+
+    # OR...
+    DB[changes2].update
+
+    # return { error: 'Choose at least one product code column' } if col_ids.empty?
+    # old_ids = non_variant_product_column_ids(config_id)
+    # old_link_ids = DB[:material_resource_product_columns_for_material_resource_types]
+    #   .where(material_resource_product_column_id: old_ids, material_resource_type_config_id: config_id).map{|r| r[:id]}
+    # DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_link_ids).delete
+    #
+    # col_ids.each_with_index do |new_id, idx|
+    #   link = DB[:material_resource_product_columns_for_material_resource_types]
+    #     .where(material_resource_product_column_id: new_id, material_resource_type_config_id: config_id).first
+    #   if link
+    #     DB[:material_resource_type_product_code_columns].insert(material_resource_product_columns_for_material_resource_type_id: link[:id], position: idx)
+    #   end
+    # end
+    # { success: true }
+    success_response('ok')
   end
 
   def assign_variant_product_code_columns(config_id, col_ids)

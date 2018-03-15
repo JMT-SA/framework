@@ -33,7 +33,7 @@ module UiRules
 
     def common_fields
       {
-        material_resource_type_id: { renderer: :select, options: @this_repo.for_select_material_resource_types, caption: 'Type' },
+        material_resource_type_id: { renderer: :select, options: @this_repo.for_select_matres_types, caption: 'Type' },
         sub_type_name: {}
       }
     end

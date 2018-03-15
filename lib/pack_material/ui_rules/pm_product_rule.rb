@@ -70,7 +70,7 @@ module UiRules
 
     def common_fields
       {
-        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_material_resource_sub_types, caption: 'material_resource_sub_type' },
+        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_matres_sub_types, caption: 'material_resource_sub_type' },
         product_number: {},
         description: {},
         commodity_id: { renderer: :select, options: @commodity_repo.for_select_commodities, disabled_options: @commodity_repo.for_select_inactive_commodities, caption: 'commodity' },

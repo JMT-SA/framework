@@ -203,6 +203,29 @@ const crossbeamsUtils = {
     const sels = document.querySelectorAll('[data-multi]');
     sels.forEach((sel) => {
       multi(sel); // multi select with two panes...
+
+      // observeSelected behaviour - get rules from select element and
+      // add selected options to a sortable element.
+      if (sel.dataset && sel.dataset.observeSelected) {
+        sel.addEventListener('change', () => {
+          const s = sel.dataset.observeSelected;
+          const j = JSON.parse(s);
+          const targets = j.map(el => el.sortable);
+
+          targets.forEach((id) => {
+            const list = document.getElementById(id);
+            const sortedIds = document.getElementById(id.replace('-sortable-items', '-sorted_ids'));
+            let items = '';
+            const itemIds = [];
+            Array.from(sel.selectedOptions).forEach((opt) => {
+              items += `<li id="si_${opt.value}" class="crossbeams-draggable"><span class="crossbeams-drag-handle">&nbsp;&nbsp;&nbsp;&nbsp;</span>${opt.text}</li>`;
+              itemIds.push(opt.value);
+            });
+            list.innerHTML = items;
+            sortedIds.value = itemIds.join(',');
+          });
+        });
+      }
     });
   },
 
@@ -406,7 +429,7 @@ const crossbeamsUtils = {
         });
       }
 
-      // observeChange behaviour - get reules from select element and
+      // observeChange behaviour - get rules from select element and
       // call the supplied url(s).
       if (sel.dataset && sel.dataset.observeChange) {
         holdSel.on('selectr.change', (option) => {

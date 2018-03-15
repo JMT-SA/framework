@@ -82,13 +82,23 @@ module UiRules
     end
 
     def dropdown_change(field_name, conditions = {})
-      raise(ArgumentError, 'Dropdown change behaviour requires `notify: url`.') if conditions[:notify].any? { |c| c[:url].nil? }
+      raise(ArgumentError, 'Dropdown change behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
       @rules << { field_name => {
-        notify: conditions[:notify].map do |n|
+        notify: (conditions[:notify] || []).map do |n|
           {
             url: n[:url],
             param_keys: n[:param_keys] || [],
             param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
+    def populate_from_selected(field_name, conditions = {})
+      @rules << { field_name => {
+        populate_from_selected: (conditions[:populate_from_selected] || []).map do |p|
+          {
+            sortable: p[:sortable]
           }
         end
       } }

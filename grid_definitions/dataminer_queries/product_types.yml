@@ -1,0 +1,151 @@
+---
+:caption: Product Types
+:sql: SELECT "product_types"."id", "product_types"."packing_material_product_type_id",
+  "product_types"."packing_material_product_sub_type_id", "product_types"."active",
+  "product_types"."created_at", "product_types"."updated_at", "packing_material_product_sub_types"."packing_material_sub_type_name",
+  "packing_material_product_types"."packing_material_type_name" FROM "product_types"
+  JOIN "packing_material_product_sub_types" ON "packing_material_product_sub_types"."id"
+  = "product_types"."packing_material_product_sub_type_id" JOIN "packing_material_product_types"
+  ON "packing_material_product_types"."id" = "product_types"."packing_material_product_type_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: product_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packing_material_product_type_id:
+    :name: packing_material_product_type_id
+    :sequence_no: 2
+    :caption: Packing material product type
+    :namespaced_name: product_types.packing_material_product_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packing_material_product_sub_type_id:
+    :name: packing_material_product_sub_type_id
+    :sequence_no: 3
+    :caption: Packing material product sub type
+    :namespaced_name: product_types.packing_material_product_sub_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 4
+    :caption: Active
+    :namespaced_name: product_types.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: product_types.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: product_types.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packing_material_sub_type_name:
+    :name: packing_material_sub_type_name
+    :sequence_no: 7
+    :caption: Packing material sub type name
+    :namespaced_name: packing_material_product_sub_types.packing_material_sub_type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packing_material_type_name:
+    :name: packing_material_type_name
+    :sequence_no: 8
+    :caption: Packing material type name
+    :namespaced_name: packing_material_product_types.packing_material_type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: product_types.packing_material_product_type_id
+  :caption: Packing material product type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT packing_material_type_name, id FROM packing_material_product_types
+    ORDER BY packing_material_type_name
+- :column: product_types.packing_material_product_sub_type_id
+  :caption: Packing material product sub type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT packing_material_sub_type_name, id FROM packing_material_product_sub_types
+    ORDER BY packing_material_sub_type_name

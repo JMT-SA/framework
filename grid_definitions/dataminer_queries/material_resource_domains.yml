@@ -1,0 +1,124 @@
+---
+:caption: Material Resource Domains
+:sql: SELECT "material_resource_domains"."id", "material_resource_domains"."domain_name",
+  "material_resource_domains"."product_table_name", "material_resource_domains"."variant_table_name",
+  "material_resource_domains"."created_at", "material_resource_domains"."updated_at"
+  FROM "material_resource_domains"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: material_resource_domains.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  domain_name:
+    :name: domain_name
+    :sequence_no: 2
+    :caption: Domain name
+    :namespaced_name: material_resource_domains.domain_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_table_name:
+    :name: product_table_name
+    :sequence_no: 3
+    :caption: Product table name
+    :namespaced_name: material_resource_domains.product_table_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_table_name:
+    :name: variant_table_name
+    :sequence_no: 4
+    :caption: Variant table name
+    :namespaced_name: material_resource_domains.variant_table_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: material_resource_domains.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: material_resource_domains.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: material_resource_domains.domain_name
+  :caption: Domain name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 
+- :column: material_resource_domains.product_table_name
+  :caption: Product table name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 
+- :column: material_resource_domains.variant_table_name
+  :caption: Variant table name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

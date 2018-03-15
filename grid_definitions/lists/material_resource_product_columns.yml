@@ -1,0 +1,15 @@
+---
+:dataminer_definition: material_resource_product_columns
+:multiselect:
+  :material_resource_type_configs:
+    :url: "/settings/pack_material_products/link_mr_product_columns/$:id$"
+    :preselect: "SELECT material_resource_product_column_id AS id FROM material_resource_product_columns_for_material_resource_types WHERE material_resource_type_config_id = $:id$"
+    :section_caption: "SELECT 'Select product columns'"
+    :can_be_cleared: false
+    :multiselect_save_remote: true
+#    :conditions: material_resource_type_config
+#:conditions:
+#  :material_resource_type_config:
+#    - :col: material_resource_product_columns.is_variant_column
+#      :op: =
+#      :val: $:variant_bool$

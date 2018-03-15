@@ -1,4 +1,4 @@
-require 'dotenv/tasks'
+# require 'dotenv/tasks'
 require 'rake/testtask'
 require 'rake/clean'
 require 'yard'
@@ -31,9 +31,25 @@ namespace :assets do
   CLEAN << 'prestyle.css'
 end
 
+# This task ensures Local .env is considered if present:
+task :dotenv_with_override do
+  require 'dotenv'
+  Dotenv.load('.env.local', '.env')
+end
+
 namespace :db do
+  desc 'Add a new user'
+  task :add_user, %i[login_name password user_name] => [:dotenv_with_override] do |_, args|
+    raise "\nLogin name cannot include spaces.\n\n" if args[:login_name].include?(' ')
+    require 'sequel'
+    db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db = Sequel.connect(db_name)
+    id = db[:users].insert(login_name: args[:login_name], user_name: args[:user_name], password_hash: args[:password])
+    puts "Created user with id #{id}"
+  end
+
   desc 'Prints current schema version'
-  task version: :dotenv do
+  task version: :dotenv_with_override do
     require 'sequel'
     Sequel.extension :migration
     db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
@@ -46,7 +62,7 @@ namespace :db do
   end
 
   desc 'Prints previous 10 schema versions'
-  task recent_migrations: :dotenv do
+  task recent_migrations: :dotenv_with_override do
     require 'sequel'
     Sequel.extension :migration
     db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
@@ -61,7 +77,7 @@ namespace :db do
   end
 
   desc 'Run migrations'
-  task :migrate, [:version] => :dotenv do |_, args|
+  task :migrate, [:version] => :dotenv_with_override do |_, args|
     require 'sequel'
     Sequel.extension :migration
     db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"

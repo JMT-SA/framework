@@ -152,6 +152,18 @@ const crossbeamsGridEvents = {
               window.location = data.redirect;
             } else if (data.updateGridInPlace) {
               this.updateGridInPlace(data.updateGridInPlace.id, data.updateGridInPlace.changes);
+            } else if (data.actions) {
+              data.actions.forEach((action) => {
+                if (action.replace_options) {
+                  crossbeamsUtils.replaceSelectrOptions(action);
+                }
+                if (action.replace_multi_options) {
+                  crossbeamsUtils.replaceMultiOptions(action);
+                }
+                if (action.replace_input_value) {
+                  crossbeamsUtils.replaceInputValue(action);
+                }
+              });
             } else if (data.replaceDialog) {
               closeDialog = false;
               const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());

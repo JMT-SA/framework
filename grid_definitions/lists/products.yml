@@ -1,0 +1,24 @@
+---
+:dataminer_definition: products
+:actions:
+- :url: "/settings/products/products/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/settings/products/products/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/settings/products/products/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/settings/products/products/new"
+  :text: New Product
+  :style: :button
+  :behaviour: :popup

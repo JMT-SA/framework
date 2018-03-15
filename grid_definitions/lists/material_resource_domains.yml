@@ -1,0 +1,24 @@
+---
+:dataminer_definition: material_resource_domains
+:actions:
+- :url: "/development/masterfiles/material_resource_domains/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/development/masterfiles/material_resource_domains/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/development/masterfiles/material_resource_domains/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/development/masterfiles/material_resource_domains/new"
+  :text: New MR Domain
+  :style: :button
+  :behaviour: :popup

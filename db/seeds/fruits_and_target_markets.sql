@@ -14,7 +14,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Fruit'
 AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Masterfiles')),
-'Cultivar groups', '/list/cultivar_groups', 2, 'Cultivars');
+'Groups', '/list/cultivar_groups', 2, 'Cultivars');
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence, group_name)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Fruit'
@@ -33,20 +33,20 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Fruit'
 AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Masterfiles')),
-'Basic codes', '/list/basic_pack_codes', 2, 'Pack codes');
+'Basic', '/list/basic_pack_codes', 2, 'Pack codes');
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence, group_name)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Fruit'
 AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Masterfiles')),
-'Standard codes', '/list/standard_pack_codes', 2, 'Pack codes');
+'Standard', '/list/standard_pack_codes', 2, 'Pack codes');
 
 -- Not Grouped
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Fruit'
 AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Masterfiles')),
-'STD fruit size counts', '/list/std_fruit_size_counts', 2);
+'Std Fruit Size Counts', '/list/std_fruit_size_counts', 2);
 --
 -- "I don't know if I want this to be a menu item or just a submenu item yet"
 -- INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
@@ -68,24 +68,28 @@ WHERE functional_area_name = 'Masterfiles')),
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('Target Markets', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles'));
 
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Target Markets' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles')), 'Framework');
+
+
 -- Grouped in Target Markets
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence, group_name)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Target Markets'
 AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Masterfiles')),
-'TM group types', '/list/target_market_group_types', 2, 'Target Markets');
+'Types', '/list/target_market_group_types', 2, 'Target markets');
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence, group_name)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Target Markets'
 AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Masterfiles')),
-'TM groups', '/list/target_market_groups', 2, 'Target Markets');
+'Groups', '/list/target_market_groups', 2, 'Target markets');
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence, group_name)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Target Markets'
 AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Masterfiles')),
-'Target markets', '/list/target_markets', 2, 'Target Markets');
+'Target markets', '/list/target_markets', 2, 'Target markets');
 
 --Grouped in Destination
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence, group_name)

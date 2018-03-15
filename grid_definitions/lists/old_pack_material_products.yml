@@ -1,0 +1,24 @@
+---
+:dataminer_definition: pack_material_products
+:actions:
+- :url: "/settings/pack_material_products/pack_material_products/$:id$"
+  :text: view
+  :icon: fa-eye
+  :title: View
+  :popup: true
+- :url: "/settings/pack_material_products/pack_material_products/$:id$/edit"
+  :text: edit
+  :icon: fa-edit
+  :title: Edit
+  :popup: true
+- :url: "/settings/pack_material_products/pack_material_products/$:id$"
+  :text: delete
+  :icon: fa-remove
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/settings/pack_material_products/pack_material_products/new"
+  :text: New Pack Material Product
+  :style: :button
+  :behaviour: :popup

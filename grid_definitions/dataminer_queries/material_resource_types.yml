@@ -1,0 +1,86 @@
+---
+:caption: Material Resource Types
+:sql: SELECT "material_resource_types"."id", "material_resource_types"."material_resource_domain_id",
+  "material_resource_types"."type_name", "material_resource_domains"."domain_name"
+  FROM "material_resource_types" JOIN "material_resource_domains" ON "material_resource_domains"."id"
+  = "material_resource_types"."material_resource_domain_id"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: material_resource_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  material_resource_domain_id:
+    :name: material_resource_domain_id
+    :sequence_no: 2
+    :caption: Material resource domain
+    :namespaced_name: material_resource_types.material_resource_domain_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  type_name:
+    :name: type_name
+    :sequence_no: 3
+    :caption: Type name
+    :namespaced_name: material_resource_types.type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  domain_name:
+    :name: domain_name
+    :sequence_no: 4
+    :caption: Domain name
+    :namespaced_name: material_resource_domains.domain_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: material_resource_types.material_resource_domain_id
+  :caption: Material resource domain
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT domain_name, id FROM material_resource_domains ORDER BY domain_name
+- :column: material_resource_types.type_name
+  :caption: Type name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

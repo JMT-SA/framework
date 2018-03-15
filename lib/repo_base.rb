@@ -9,7 +9,8 @@ class RepoBase
 
   def find!(table_name, wrapper, id)
     hash = find_hash(table_name, id)
-    raise Crossbeams::FrameworkError, "#{table_name}: id #{id} not found." if hash.nil?
+    # raise Crossbeams::FrameworkError, "#{table_name}: id #{id} not found." if hash.nil?
+    raise "#{table_name}: id #{id} not found." if hash.nil?
     wrapper.new(hash)
   end
 

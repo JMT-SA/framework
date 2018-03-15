@@ -32,7 +32,6 @@ module Settings
                 form.add_field :has_suppliers
                 form.add_field :has_marketers
                 form.add_field :has_retailer
-                # form.add_field :product_code_column_ids # TODO: if I put it here it works?
                 form.add_field :active
 
                 form.submit_captions 'Update config'

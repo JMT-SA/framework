@@ -4,16 +4,19 @@ module PackMaterialApp
   class ConfigRepo < RepoBase
     # TODO: possibly build alias into for_selects for shorter names
     build_for_select :material_resource_domains,
+                     alias: 'domains',
                      label: :domain_name,
                      value: :id,
                      no_active_check: true,
                      order_by: :domain_name
     build_for_select :material_resource_types,
+                     alias: 'matres_types',
                      label: :type_name,
                      value: :id,
                      no_active_check: true,
                      order_by: :type_name
     build_for_select :material_resource_sub_types,
+                     alias: 'matres_sub_types',
                      label: :sub_type_name,
                      value: :id,
                      no_active_check: true,
@@ -69,7 +72,7 @@ module PackMaterialApp
         delete(:material_resource_sub_types, id)
         { success: true }
       else
-        associated_product_ids = products.map{|r| r[:id] }
+        associated_product_ids = products.map{ |r| r[:id] }
         { success: false, associated_product_ids: associated_product_ids }
       end
     end
@@ -113,14 +116,14 @@ module PackMaterialApp
 
     private
 
-    def add_heritage(mr_type_hash)
-      sub_type = find_hash(:material_resource_sub_types, mr_type_hash[:material_resource_sub_type_id])
-      mr_type_hash[:sub_type_name] = sub_type[:sub_type_name]
+    def add_heritage(hash)
+      sub_type = find_hash(:material_resource_sub_types, hash[:material_resource_sub_type_id])
+      hash[:sub_type_name] = sub_type[:sub_type_name]
       type = find_hash(:material_resource_types, sub_type[:material_resource_type_id])
-      mr_type_hash[:type_name] = type[:type_name]
+      hash[:type_name] = type[:type_name]
       domain = find_hash(:material_resource_domains, type[:material_resource_domain_id])
-      mr_type_hash[:domain_name] = domain[:domain_name]
-      mr_type_hash
+      hash[:domain_name] = domain[:domain_name]
+      hash
     end
 
   end

@@ -1,4 +1,6 @@
 class RepoBase
+  include Crossbeams::Responses
+
   def all(table_name, wrapper)
     all_hash(table_name).map { |r| wrapper.new(r) }
   end

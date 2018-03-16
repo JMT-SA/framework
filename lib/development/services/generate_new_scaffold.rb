@@ -78,17 +78,21 @@ class GenerateNewScaffold < BaseService
       string: 'Types::String',
       boolean: 'Types::Bool',
       float: 'Types::Float',
-      datetime: 'Types::DateTime'
+      datetime: 'Types::DateTime',
+      integer_array: 'Types::Array',
+      string_array: 'Types::Array'
     }.freeze
 
     VALIDATION_TYPE_LOOKUP = {
-      integer: ':int?',
-      string: ':str?',
-      boolean: ':bool?',
-      datetime: ':date_time?',
-      date: ':date?',
-      time: ':time?',
-      float: ':float?'
+      integer: '(:int?)',
+      string: '(:str?)',
+      boolean: '(:bool?)',
+      datetime: '(:date_time?)',
+      date: '(:date?)',
+      time: '(:time?)',
+      float: '(:float?)',
+      integer_array: ' { each(:int?) }',
+      string_array: ' { each(:str?) }'
     }.freeze
 
     def initialize(table)
@@ -123,7 +127,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def column_dry_validation_type(column)
-      VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+      VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "(Types::??? (#{@col_lookup[column][:type]}))"
     end
 
     def active_column_present?
@@ -295,9 +299,9 @@ class GenerateNewScaffold < BaseService
         max = detail[:max_length] && detail[:max_length] < 200 ? "max_size?: #{detail[:max_length]}" : nil
         rules = [opts.table_meta.column_dry_validation_type(col), max].compact.join(', ')
         attr << if col == :id
-                  "optional(:#{col}).#{fill_opt}(#{rules})"
+                  "optional(:#{col}).#{fill_opt}#{rules}"
                 else
-                  "required(:#{col}).#{fill_opt}(#{rules})"
+                  "required(:#{col}).#{fill_opt}#{rules}"
                 end
       end
       attr

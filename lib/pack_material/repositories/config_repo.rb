@@ -2,7 +2,6 @@
 
 module PackMaterialApp
   class ConfigRepo < RepoBase
-    # TODO: possibly build alias into for_selects for shorter names
     build_for_select :material_resource_domains,
                      alias: 'domains',
                      label: :domain_name,
@@ -21,12 +20,12 @@ module PackMaterialApp
                      value: :id,
                      no_active_check: true,
                      order_by: :sub_type_name
-    # TODO: custom for select based on product code
-    # build_for_select :pack_material_products,
-    #                  label: :product_code,
-    #                  value: :id,
-    #                  no_active_check: true,
-    #                  order_by: :product_code
+
+    build_for_select :material_resource_product_columns,
+                     label: :column_name,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :column_name
 
     crud_calls_for :material_resource_types, name: :matres_type, wrapper: MatresType
     crud_calls_for :material_resource_sub_types, name: :matres_sub_type, wrapper: MatresSubType
@@ -43,88 +42,78 @@ module PackMaterialApp
 
     # SUB TYPES
     def create_matres_sub_type(args)
-      sub_type_id = create(:material_resource_sub_types, args)
-      create(:material_resource_type_configs, material_resource_sub_type_id: sub_type_id)
-      sub_type_id
+      create(:material_resource_sub_types, args)
     end
 
     def delete_matres_sub_type(id)
-      sub_type_hash = where_hash(:material_resource_sub_types, id: id)
-      # Note: You can only delete a sub type if there are no products associated with it.
-      type_hash = where_hash(:material_resource_types, id: sub_type_hash[:material_resource_type_id])
-      domain_hash = where_hash(:material_resource_domains, id: type_hash[:material_resource_domain_id])
-
-      products = where_hash(:"#{domain_hash[:product_table_name]}", material_resource_sub_type_id: sub_type_hash[:id])
-      config_id = where_hash(:material_resource_type_configs, material_resource_sub_type_id: id)[:id]
+      query = <<~SQL
+        SELECT product_table_name
+        FROM material_resource_sub_types st
+        JOIN material_resource_types t   ON t.id = st.material_resource_type_id
+        JOIN material_resource_domains d ON d.id = t.material_resource_domain_id
+        WHERE st.id = #{id}
+      SQL
+      table_name = DB[query].single_value
+      products = where_hash(:"#{table_name}", material_resource_sub_type_id: id)
 
       if products.nil?
-        product_col_links = DB[:material_resource_product_columns_for_material_resource_types].where(material_resource_type_config_id: config_id)
-        if product_col_links.any?
-          product_col_link_ids = product_col_links.map { |r| r[:id] }
-          # Delink product code columns
-          product_code_col_links = DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: product_col_link_ids)
-          product_code_col_links.delete
-          # Delink product columns
-          product_col_links.delete
-        end
-        # Delete config
-        delete(:material_resource_type_configs, config_id)
         delete(:material_resource_sub_types, id)
-        { success: true }
+        success_response('ok')
       else
-        associated_product_ids = products.map{ |r| r[:id] }
-        { success: false, associated_product_ids: associated_product_ids }
+        associated_product_ids = products.map { |r| r[:id] }
+        failed_response('There are products linked to this sub-type', associated_product_ids: associated_product_ids)
       end
     end
 
-    # CONFIGS
-    # TODO: Consider making the Config One Entity as we are attempting to put all of it in one form anyway
-    def find_matres_config(id)
-      hash = find_hash(:material_resource_type_configs, id)
-      hash = add_heritage(hash)
-      return nil if hash.nil?
-      MatresConfig.new(hash)
+    def sub_type_chosen_columns(id, variants: false)
+      neg = variants ? '' : 'NOT'
+      query = <<~SQL
+        SELECT pc.column_name, pc.id
+        FROM unnest((SELECT st.product_column_ids FROM material_resource_sub_types st WHERE st.id = #{id})) product_code_id
+        LEFT JOIN material_resource_product_columns pc on pc.id = product_code_id
+        WHERE #{neg} pc.is_variant_column
+      SQL
+      DB[query].map { |rec| [rec[:column_name], rec[:id]] }
     end
 
-    def find_matres_config_for_sub_type(sub_type_id)
-      hash = where_hash(:material_resource_type_configs, material_resource_sub_type_id: sub_type_id)
-      hash = add_heritage(hash)
-      return nil if hash.nil?
-      MatresConfig.new(hash)
+    def chosen_non_variant_columns(id)
+      sub_type_chosen_columns(id)
     end
 
-    def update_matres_config(id, attrs)
-      update(:material_resource_type_configs, id, attrs)
+    def chosen_variant_columns(id)
+      sub_type_chosen_columns(id, variants: true)
     end
 
-    def link_product_columns(config_id, col_ids)
-      existing_ids      = type_product_column_ids(config_id)
-      old_ids           = existing_ids - col_ids
-      new_ids           = col_ids - existing_ids
-
-      old_set = DB[:material_resource_product_columns_for_material_resource_types].where(material_resource_type_config_id: config_id).where(material_resource_product_column_id: old_ids)
-      DB[:material_resource_type_product_code_columns].where(material_resource_product_columns_for_material_resource_type_id: old_set.map { |r| r[:id] }).delete
-      old_set.delete
-      new_ids.each do |prog_id|
-        DB[:material_resource_product_columns_for_material_resource_types].insert(material_resource_type_config_id: config_id, material_resource_product_column_id: prog_id)
-      end
+    def sub_type_code_columns(id, variants: false)
+      neg = variants ? '' : 'NOT'
+      query = <<~SQL
+        SELECT pc.column_name, pc.id
+        FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{id})) product_code_id
+        LEFT JOIN material_resource_product_columns pc on pc.id = product_code_id
+        WHERE #{neg} pc.is_variant_column
+      SQL
+      DB[query].map { |rec| [rec[:column_name], rec[:id]] }
     end
 
-    def type_product_column_ids(config_id)
-      DB[:material_resource_product_columns_for_material_resource_types].where(material_resource_type_config_id: config_id).select_map(:material_resource_product_column_id).sort
+    def non_variant_columns(id)
+      sub_type_code_columns(id)
     end
 
-    private
-
-    def add_heritage(hash)
-      sub_type = find_hash(:material_resource_sub_types, hash[:material_resource_sub_type_id])
-      hash[:sub_type_name] = sub_type[:sub_type_name]
-      type = find_hash(:material_resource_types, sub_type[:material_resource_type_id])
-      hash[:type_name] = type[:type_name]
-      domain = find_hash(:material_resource_domains, type[:material_resource_domain_id])
-      hash[:domain_name] = domain[:domain_name]
-      hash
+    def variant_columns(id)
+      sub_type_code_columns(id, variants: true)
     end
 
+    def update_product_code_configuration(config_id, res)
+      codes_in_order = res[:columncodes_sorted_ids] + res[:variantcolumncodes_sorted_ids]
+      changes = <<~SQL
+        UPDATE material_resource_sub_types
+           SET product_column_ids = '{#{res[:chosen_column_ids].join(',')}}',
+               product_code_ids = '{#{codes_in_order.join(',')}}'
+        WHERE id = #{config_id};
+      SQL
+
+      DB[changes].update
+      success_response('ok')
+    end
   end
 end

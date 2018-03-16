@@ -16,7 +16,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('Pack material products', 'edit') #???
+        if authorised?('Pack material products', 'edit')
           show_partial { PackMaterialApp::Config::MatresType::Edit.call(id) }
         else
           dialog_permission_error
@@ -24,7 +24,7 @@ class Framework < Roda
       end
       r.is do
         r.get do
-          if authorised?('Pack material products', 'read') #???
+          if authorised?('Pack material products', 'read')
             show_partial { PackMaterialApp::Config::MatresType::Show.call(id) }
           else
             dialog_permission_error
@@ -36,7 +36,7 @@ class Framework < Roda
           if res.success
             update_grid_row(id, changes: { material_resource_domain_id: res.instance[:material_resource_domain_id],
                                            type_name: res.instance[:type_name] },
-                            notice: res.message)
+                                notice: res.message)
           else
             content = show_partial { PackMaterialApp::Config::MatresType::Edit.call(id, params[:matres_type], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -49,6 +49,7 @@ class Framework < Roda
         end
       end
     end
+
     r.on 'material_resource_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
       r.on 'new' do
@@ -84,6 +85,7 @@ class Framework < Roda
         end
       end
     end
+
     # MATERIAL RESOURCE SUB TYPES
     # --------------------------------------------------------------------------
     r.on 'material_resource_sub_types', Integer do |id|
@@ -101,34 +103,46 @@ class Framework < Roda
           dialog_permission_error
         end
       end
+
       r.on 'config' do
         r.is 'edit' do
           if authorised?('Pack material products', 'edit')
-            show_page { PackMaterialApp::Config::MatresSubType::Config.call(id) }
+            if flash[:stashed_page] # NBNBNBNBNB: session too big for cookie....
+              show_page { flash[:stashed_page] }
+            else
+              show_page { PackMaterialApp::Config::MatresSubType::Config.call(id) }
+            end
           else
             dialog_permission_error
           end
         end
         r.patch do
           response['Content-Type'] = 'application/json'
-          config = PackMaterialApp::ConfigRepo.new.find_matres_config_for_sub_type(id)
-          config_id = config.id
-          res = interactor.update_matres_config(config_id, params[:matres_sub_type])
+          res = interactor.update_matres_config(id, params[:matres_sub_type])
           if res.success
-            flash[:notice] = res.message
-            if fetch?(r)
-              redirect_via_json_to_last_grid
-            else
-              redirect_to_last_grid(r)
-            end
+            show_json_notice(res.message)
           else
-            # TODO: test that this is working
-            p "Did we get in here now? OUTSTANDING ROUTE TEST"
-            content = show_page { PackMaterialApp::Config::MatresSubType::Config.call(id, params[:matres_sub_type], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            show_json_error(res.message)
           end
         end
       end
+
+      r.on 'update_product_code_configuration' do
+        r.post do
+          res = interactor.update_product_code_configuration(id, params[:product_code_columns])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            flash[:error] = res.message
+            flash[:stashed_page] = PackMaterialApp::Config::MatresSubType::Config.call(id, form_values: params[:product_code_columns],
+                                                                                           form_errors: res.errors,
+                                                                                           remote: false)
+            r.redirect "/pack_material_products/config/material_resource_sub_types/#{id}/config/edit"
+          end
+        end
+      end
+
       r.is do
         r.get do
           if authorised?('Pack material products', 'read')
@@ -142,7 +156,7 @@ class Framework < Roda
           res = interactor.update_matres_sub_type(id, params[:matres_sub_type])
           if res.success
             update_grid_row(id, changes: { material_resource_type_id: res.instance[:material_resource_type_id], sub_type_name: res.instance[:sub_type_name] },
-                            notice: res.message)
+                                notice: res.message)
           else
             content = show_partial { PackMaterialApp::Config::MatresSubType::Edit.call(id, params[:matres_sub_type], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -155,6 +169,7 @@ class Framework < Roda
         end
       end
     end
+
     r.on 'material_resource_sub_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
       r.on 'new' do
@@ -190,19 +205,21 @@ class Framework < Roda
         end
       end
     end
-    r.on 'link_product_columns', Integer do |id|
+
+    r.on 'link_product_columns' do # , Integer do |id| # TODO: This does not have to be per id....
       r.post do
         interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, {}, {})
-        res = interactor.link_product_columns(id, multiselect_grid_choices(params))
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
-        # TODO: Fix
-        redirect_to_last_grid(r)
+        ids = multiselect_grid_choices(params)
+        res = interactor.chosen_product_columns(ids)
+        json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_non_variant_product_code_column_ids', options_array: res.instance[:code]),
+                      OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_variant_product_code_column_ids', options_array: res.instance[:var]),
+                      OpenStruct.new(type: :replace_input_value, dom_id: 'product_code_columns_chosen_column_ids', value: ids.join(','))],
+                     'Re-assigned product columns')
       end
     end
+
+    # A THOUGHT: perhaps the pmp routes should be under their own tree?
+
     # PACK MATERIAL PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_products', Integer do |id|
@@ -280,7 +297,7 @@ class Framework < Roda
                                            end_date: res.instance[:end_date],
                                            active: res.instance[:active],
                                            remarks: res.instance[:remarks] },
-                            notice: res.message)
+                                notice: res.message)
           else
             content = show_partial { PackMaterialApp::Config::PmProduct::Edit.call(id, params[:pm_product], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -330,3 +347,5 @@ class Framework < Roda
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/BlockLength

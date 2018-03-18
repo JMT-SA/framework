@@ -61,9 +61,17 @@ module PackMaterialApp
       success_response('Updated the config')
     end
 
+    def chosen_non_variant_columns(ids)
+      repo.for_select_material_resource_product_columns(where: { is_variant_column: false }).select { |i| ids.include?(i[1]) }
+    end
+
+    def chosen_variant_columns(ids)
+      repo.for_select_material_resource_product_columns(where: { is_variant_column: true }).select { |i| ids.include?(i[1]) }
+    end
+
     def chosen_product_columns(ids)
-      code_items = repo.for_select_material_resource_product_columns(where: { is_variant_column: false }).select { |i| ids.include?(i[1]) }
-      var_items = repo.for_select_material_resource_product_columns(where: { is_variant_column: true }).select { |i| ids.include?(i[1]) }
+      code_items = chosen_non_variant_columns(ids)
+      var_items = chosen_variant_columns(ids)
       success_response('got_items', code: code_items, var: var_items)
     end
 
@@ -71,18 +79,15 @@ module PackMaterialApp
       params.transform_values { |v| v.is_a?(String) ? v.split(',') : v }
     end
 
-    def prep_params_for_nonvar_pcodes(params)
-      { non_variant_product_code_column_ids: [] }.merge(convert_string_params_to_arrays(params))
-    end
-
     def update_product_code_configuration(id, params)
       # TODO: see if we can manage the String => Array conversion in dry-validation...
-      res = validate_material_resource_type_config_code_columns_params(prep_params_for_nonvar_pcodes(params))
+      res = validate_material_resource_type_config_code_columns_params(convert_string_params_to_arrays(params))
       return validation_failed_response(res) unless res.messages.empty?
 
       DB.transaction do
         repo.update_product_code_configuration(id, res)
       end
+      success_response('Saved configuration')
     end
 
     private

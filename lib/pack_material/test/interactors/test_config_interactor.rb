@@ -1,4 +1,9 @@
-require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
+# frozen_string_literal: true
+
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
+
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
 
 module PackMaterialApp
   class TestConfigInteractor < Minitest::Test
@@ -194,7 +199,13 @@ module PackMaterialApp
       {
         id: 1,
         material_resource_type_id: 1,
-        sub_type_name: 'Bag Fruit'
+        sub_type_name: 'Bag Fruit',
+        product_code_separator: '_',
+        has_suppliers: false,
+        has_marketers: false,
+        has_retailer: false,
+        product_column_ids: [],
+        product_code_ids: []
       }
     end
 
@@ -206,22 +217,38 @@ module PackMaterialApp
       matres_sub_type_attrs.merge(sub_type_name: nil)
     end
 
-    # CONFIG
-    def test_link_product_columns
-      ConfigRepo.any_instance.stubs(:link_product_columns).returns(true)
-      ConfigRepo.any_instance.stubs(:find_matres_config).returns(OpenStruct.new(material_resource_sub_type: 1))
-      ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns(fake_matres_sub_type)
-      ConfigRepo.any_instance.stubs(:type_product_column_ids).returns([1, 2, 3])
+    def test_chosen_non_variant_columns
+      ConfigRepo.any_instance.stubs(:for_select_material_resource_product_columns).returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
+      assert_equal [['a', 1], ['a', 2], ['a', 3]], interactor.chosen_non_variant_columns([1, 2, 3, 4])
+    end
 
-      x = interactor.link_product_columns(1, [1, 2, 3])
-      assert x.success
-      assert_equal 'Product columns linked successfully', x.message
-      assert_instance_of MatresSubType, x.instance
+    def test_chosen_variant_columns
+      ConfigRepo.any_instance.stubs(:for_select_material_resource_product_columns).returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
+      assert_equal [['a', 1], ['a', 3]], interactor.chosen_variant_columns([1, 3, 4])
+    end
 
-      x = interactor.link_product_columns(1, [1, 2, 3, 4])
-      assert_equal false, x.success
-      assert_equal 'Some product columns were not linked', x.message
-      assert_instance_of MatresSubType, x.instance
+    def test_chosen_product_columns
+      non_var = [['a', 1], ['a', 2], ['a', 3]]
+      var = [['a', 4]]
+      interactor.stub(:chosen_non_variant_columns, non_var) do
+        interactor.stub(:chosen_variant_columns, var) do
+          res = interactor.chosen_product_columns([1, 2, 3, 4])
+          assert_equal [['a', 1], ['a', 2], ['a', 3]], res.instance[:code]
+          assert_equal [['a', 4]], res.instance[:var]
+        end
+      end
+    end
+
+    def test_update_product_code_config
+      ConfigRepo.any_instance.stubs(:update_product_code_configuration)
+      res = interactor.update_product_code_configuration(1, chosen_column_ids: '1,2,3', columncodes_sorted_ids: '1,2', variantcolumncodes_sorted_ids: '')
+      assert res.success
+      res = interactor.update_product_code_configuration(1, chosen_column_ids: '', columncodes_sorted_ids: '', variantcolumncodes_sorted_ids: '')
+      refute res.success
+      assert_match(/Validation/, res.message)
+      res = interactor.update_product_code_configuration(1, chosen_column_ids: '1,2,3', columncodes_sorted_ids: '', variantcolumncodes_sorted_ids: '')
+      refute res.success
+      assert_match(/Validation/, res.message)
     end
 
     private
@@ -231,3 +258,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

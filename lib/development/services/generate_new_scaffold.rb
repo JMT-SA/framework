@@ -40,6 +40,10 @@ class GenerateNewScaffold < BaseService
       edit: "lib/#{opts.applet}/views/#{opts.singlename}/edit.rb",
       show: "lib/#{opts.applet}/views/#{opts.singlename}/show.rb"
     }
+    sources[:paths][:test] = {
+      interactor: "lib/#{opts.applet}/test/interactors/test_#{opts.singlename}_interactor.rb",
+      repo: "lib/#{opts.applet}/test/repositories/test_#{opts.singlename}_repo.rb"
+    }
     report               = QueryMaker.call(opts)
     sources[:query]      = wrapped_sql_from_report(report)
     sources[:dm_query]   = DmQueryMaker.call(report, opts)
@@ -53,6 +57,7 @@ class GenerateNewScaffold < BaseService
     sources[:view]       = ViewMaker.call(opts)
     sources[:route]      = RouteMaker.call(opts)
     sources[:menu]       = MenuMaker.call(opts)
+    sources[:test]       = TestMaker.call(opts)
 
     if opts.new_applet
       sources[:paths][:applet] = "lib/applets/#{opts.applet}_applet.rb"
@@ -610,6 +615,86 @@ class GenerateNewScaffold < BaseService
 
     def default_to_string(default)
       default.is_a?(String) ? "'#{default}'" : default
+    end
+  end
+
+  class TestMaker < BaseService
+    attr_reader :opts
+    def initialize(opts)
+      @opts = opts
+    end
+
+    def call
+      {
+        interactor: test_interactor,
+        repo: test_repo
+      }
+    end
+
+    private
+
+    def test_repo
+      <<~RUBY
+        # frozen_string_literal: true
+
+        require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
+
+        # rubocop:disable Metrics/ClassLength
+        # rubocop:disable Metrics/AbcSize
+
+        module #{opts.applet_module}
+          class Test#{opts.klassname}Repo < MiniTestWithHooks
+
+            def test_for_selects
+              assert_respond_to repo, :for_select_#{opts.table}
+            end
+
+            def test_crud_calls
+              assert_respond_to repo, :find_#{opts.singlename}
+              assert_respond_to repo, :create_#{opts.singlename}
+              assert_respond_to repo, :update_#{opts.singlename}
+              assert_respond_to repo, :delete_#{opts.singlename}
+            end
+
+            private
+
+            def repo
+              #{opts.klassname}Repo.new
+            end
+          end
+        end
+        # rubocop:enable Metrics/ClassLength
+        # rubocop:enable Metrics/AbcSize
+      RUBY
+    end
+
+    def test_interactor
+      <<~RUBY
+        # frozen_string_literal: true
+
+        require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
+
+        # rubocop:disable Metrics/ClassLength
+        # rubocop:disable Metrics/AbcSize
+
+        module #{opts.applet_module}
+          class Test#{opts.klassname}Interactor < Minitest::Test
+            def test_repo
+              repo = interactor.repo
+              # repo = interactor.send(:repo)
+              assert repo.is_a?(#{opts.applet_module}::#{opts.klassname}Repo)
+            end
+
+            private
+
+            def interactor
+              @interactor ||= #{opts.klassname}Interactor.new(current_user, {}, {}, {})
+            end
+          end
+        end
+        # rubocop:enable Metrics/ClassLength
+        # rubocop:enable Metrics/AbcSize
+      RUBY
     end
   end
 

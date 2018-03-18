@@ -20,7 +20,7 @@ class Framework < Roda
 
       r.on 'save_snippet' do
         response['Content-Type'] = 'application/json'
-        FileUtils.mkpath(File.dirname(params[:snippet][:path]))
+        FileUtils.mkpath(File.join(ENV['ROOT'], File.dirname(params[:snippet][:path])))
         File.open(File.join(ENV['ROOT'], params[:snippet][:path]), 'w') do |file|
           file.puts Base64.decode64(params[:snippet][:value])
         end

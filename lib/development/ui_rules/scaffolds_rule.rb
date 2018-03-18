@@ -54,7 +54,7 @@ module UiRules
     end
 
     def applets_list
-      dir = File.expand_path('../../../applets', __FILE__)
+      dir = File.expand_path('../../applets', __dir__)
       Dir.chdir(dir)
       Dir.glob('*_applet.rb').map { |d| d.chomp('_applet.rb') }.push('other')
     end

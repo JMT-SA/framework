@@ -76,6 +76,14 @@ module Development
               section.add_text(results[:uirule], syntax: :ruby)
             end
             page.section do |section|
+              section.caption = 'Tests'
+              section.hide_caption = false
+              save_snippet_form(section, results[:paths][:test][:interactor], results[:test][:interactor])
+              section.add_text(results[:test][:interactor], syntax: :ruby)
+              save_snippet_form(section, results[:paths][:test][:repo], results[:test][:repo])
+              section.add_text(results[:test][:repo], syntax: :ruby)
+            end
+            page.section do |section|
               section.caption = 'Query to use in Dataminer'
               section.hide_caption = false
               section.add_text(<<~HTML)

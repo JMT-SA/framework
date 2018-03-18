@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.expand_path('./../', __FILE__), 'test_helper')
 
 class TestRepoBase < MiniTestWithHooks
@@ -179,22 +181,53 @@ class TestRepoBase < MiniTestWithHooks
     assert_equal expected, result
   end
 
-  # MethodBuilder tests - ASK JAMES
-  def test_build_for_select
-    repo = RepoBase.new
-    table_name = :material_resource_domains
-    options = {
-      alias: 'domains',
-      label: :domain_name,
-      value: :id,
-      no_active_check: true,
-      order_by: :domain_name
-    }
-    # x = MethodBuilder.send(:build_for_select, options)
-    # p x
+  # MethodBuilder tests
+  # ----------------------------------------------------------------------------
+  def test_build_for_select_basic
+    klass = Class.new(RepoBase)
+    klass.build_for_select(:tablename, value: :code)
+    repo = klass.new
+    assert_respond_to repo, :for_select_tablename
+  end
 
-    v = repo.build_for_select(table_name, options)
-    p v
-    assert_respond_to repo, for_select_domains
+  def test_build_for_select_alias
+    klass = Class.new(RepoBase)
+    klass.build_for_select(:tablename, value: :code, alias: 'tab')
+    repo = klass.new
+    assert_respond_to repo, :for_select_tab
+  end
+
+  def test_build_inactive_select_basic
+    klass = Class.new(RepoBase)
+    klass.build_inactive_select(:tablename, value: :code)
+    repo = klass.new
+    assert_respond_to repo, :for_select_inactive_tablename
+  end
+
+  def test_build_inactive_select_alias
+    klass = Class.new(RepoBase)
+    klass.build_inactive_select(:tablename, value: :code, alias: 'tab')
+    repo = klass.new
+    assert_respond_to repo, :for_select_inactive_tab
+  end
+
+  def test_crud_calls_without_wrapper
+    klass = Class.new(RepoBase)
+    klass.crud_calls_for(:tablename)
+    repo = klass.new
+    assert_respond_to repo, :create_tablename
+    assert_respond_to repo, :update_tablename
+    assert_respond_to repo, :delete_tablename
+    refute_respond_to repo, :find_tablename
+  end
+
+  def test_crud_calls
+    klass = Class.new(RepoBase)
+    klass.crud_calls_for(:tablename, wrapper: User)
+    repo = klass.new
+    assert_respond_to repo, :create_tablename
+    assert_respond_to repo, :update_tablename
+    assert_respond_to repo, :delete_tablename
+    assert_respond_to repo, :find_tablename
   end
 end

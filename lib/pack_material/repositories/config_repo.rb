@@ -103,6 +103,14 @@ module PackMaterialApp
       sub_type_code_columns(id, variants: true)
     end
 
+    def non_variant_columns_subset(ids)
+      for_select_material_resource_product_columns(where: { is_variant_column: false }).select { |i| ids.include?(i[1]) }
+    end
+
+    def variant_columns_subset(ids)
+      for_select_material_resource_product_columns(where: { is_variant_column: true }).select { |i| ids.include?(i[1]) }
+    end
+
     def update_product_code_configuration(config_id, res)
       codes_in_order = res[:columncodes_sorted_ids] + res[:variantcolumncodes_sorted_ids]
       changes = <<~SQL

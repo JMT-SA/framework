@@ -4,7 +4,7 @@ module PackMaterialApp
   module Config
     module MatresSubType
       class Config
-        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:matres_sub_type, :config, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -60,6 +60,7 @@ module PackMaterialApp
                 non_variant_name_list = repo.non_variant_columns(id)
                 variant_name_list     = repo.variant_columns(id)
                 form.form_object order_rule.form_object
+                form.form_errors(form_errors.transform_keys { |k| k == :columncodes_sorted_ids ? :non_variant_product_code_column_ids : k })
                 form.action "/pack_material/config/material_resource_sub_types/#{id}/update_product_code_configuration"
 
                 form.row do |row|

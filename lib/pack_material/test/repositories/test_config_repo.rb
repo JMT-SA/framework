@@ -50,6 +50,16 @@ module PackMaterialApp
       # DB[:material_resource_sub_types]
     end
 
+    def test_non_variant_column_subset
+      ConfigRepo.any_instance.stubs(:for_select_material_resource_product_columns).returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
+      assert_equal [['a', 1], ['a', 2], ['a', 3]], repo.non_variant_columns_subset([1, 2, 3, 4])
+    end
+
+    def test_variant_column_subset
+      ConfigRepo.any_instance.stubs(:for_select_material_resource_product_columns).returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
+      assert_equal [['a', 1], ['a', 3]], repo.variant_columns_subset([1, 3, 4])
+    end
+
     def repo
       ConfigRepo.new
     end

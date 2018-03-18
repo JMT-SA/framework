@@ -15,8 +15,10 @@ module UiRules
     end
 
     def common_fields
-      options     = @repo.chosen_non_variant_columns(@options[:id])
-      var_options = @repo.chosen_variant_columns(@options[:id])
+      unless @form_object.chosen_column_ids.nil?
+        options     = @repo.non_variant_columns_subset(@form_object.chosen_column_ids.split(',').map(&:to_i))
+        var_options = @repo.variant_columns_subset(@form_object.chosen_column_ids.split(',').map(&:to_i))
+      end
       {
         chosen_column_ids: { renderer: :hidden },
         non_variant_product_code_column_ids: {

@@ -107,8 +107,9 @@ class Framework < Roda
       r.on 'config' do
         r.is 'edit' do
           if authorised?('Pack material products', 'edit')
-            if flash[:stashed_page] # NBNBNBNBNB: session too big for cookie....
-              show_page { flash[:stashed_page] }
+            page = stashed_page
+            if page
+              show_page { page }
             else
               show_page { PackMaterialApp::Config::MatresSubType::Config.call(id) }
             end
@@ -135,10 +136,9 @@ class Framework < Roda
             redirect_to_last_grid(r)
           else
             flash[:error] = res.message
-            flash[:stashed_page] = PackMaterialApp::Config::MatresSubType::Config.call(id, form_values: params[:product_code_columns],
-                                                                                           form_errors: res.errors,
-                                                                                           remote: false)
-            r.redirect "/pack_material_products/config/material_resource_sub_types/#{id}/config/edit"
+            stash_page(PackMaterialApp::Config::MatresSubType::Config.call(id, form_values: params[:product_code_columns],
+                                                                               form_errors: res.errors))
+            r.redirect "/pack_material/config/material_resource_sub_types/#{id}/config/edit"
           end
         end
       end

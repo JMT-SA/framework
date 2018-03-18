@@ -217,26 +217,14 @@ module PackMaterialApp
       matres_sub_type_attrs.merge(sub_type_name: nil)
     end
 
-    def test_chosen_non_variant_columns
-      ConfigRepo.any_instance.stubs(:for_select_material_resource_product_columns).returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
-      assert_equal [['a', 1], ['a', 2], ['a', 3]], interactor.chosen_non_variant_columns([1, 2, 3, 4])
-    end
-
-    def test_chosen_variant_columns
-      ConfigRepo.any_instance.stubs(:for_select_material_resource_product_columns).returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
-      assert_equal [['a', 1], ['a', 3]], interactor.chosen_variant_columns([1, 3, 4])
-    end
-
     def test_chosen_product_columns
       non_var = [['a', 1], ['a', 2], ['a', 3]]
       var = [['a', 4]]
-      interactor.stub(:chosen_non_variant_columns, non_var) do
-        interactor.stub(:chosen_variant_columns, var) do
-          res = interactor.chosen_product_columns([1, 2, 3, 4])
-          assert_equal [['a', 1], ['a', 2], ['a', 3]], res.instance[:code]
-          assert_equal [['a', 4]], res.instance[:var]
-        end
-      end
+      ConfigRepo.any_instance.stubs(:non_variant_columns_subset).returns(non_var)
+      ConfigRepo.any_instance.stubs(:variant_columns_subset).returns(var)
+      res = interactor.chosen_product_columns([1, 2, 3, 4])
+      assert_equal [['a', 1], ['a', 2], ['a', 3]], res.instance[:code]
+      assert_equal [['a', 4]], res.instance[:var]
     end
 
     def test_update_product_code_config

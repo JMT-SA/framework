@@ -61,17 +61,9 @@ module PackMaterialApp
       success_response('Updated the config')
     end
 
-    def chosen_non_variant_columns(ids)
-      repo.for_select_material_resource_product_columns(where: { is_variant_column: false }).select { |i| ids.include?(i[1]) }
-    end
-
-    def chosen_variant_columns(ids)
-      repo.for_select_material_resource_product_columns(where: { is_variant_column: true }).select { |i| ids.include?(i[1]) }
-    end
-
     def chosen_product_columns(ids)
-      code_items = chosen_non_variant_columns(ids)
-      var_items = chosen_variant_columns(ids)
+      code_items = repo.non_variant_columns_subset(ids)
+      var_items = repo.variant_columns_subset(ids)
       success_response('got_items', code: code_items, var: var_items)
     end
 

@@ -70,8 +70,8 @@ module CommonHelpers
   end
 
   # Is this a fetch request?
-  def fetch?(r)
-    r.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE')
+  def fetch?(route)
+    route.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE')
   end
 
   def current_user
@@ -100,8 +100,8 @@ module CommonHelpers
     # current_user # && current_user[:department_name] == 'IT'
   end
 
-  def redirect_to_last_grid(r)
-    r.redirect session[:last_grid_url]
+  def redirect_to_last_grid(route)
+    route.redirect session[:last_grid_url]
   end
 
   def redirect_via_json_to_last_grid
@@ -199,11 +199,11 @@ module CommonHelpers
     view(inline: "<div class='crossbeams-error-note'><strong>Error</strong><br>#{err}</div>")
   end
 
-  def handle_not_found(r)
+  def handle_not_found(route)
     if request.xhr?
       "<div class='crossbeams-error-note'><strong>Error</strong><br>The requested resource was not found.</div>"
     else
-      r.redirect '/not_found'
+      route.redirect '/not_found'
     end
   end
 
@@ -216,8 +216,18 @@ module CommonHelpers
     "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>"
   end
 
-  def dialog_error(e, state = nil)
+  def dialog_error(err, state = nil)
     response.status = 500
-    "<div class='crossbeams-error-note'><strong>#{state || 'ERROR'}</strong><br>#{e}</div>"
+    "<div class='crossbeams-error-note'><strong>#{state || 'ERROR'}</strong><br>#{err}</div>"
+  end
+
+  def stash_page(value)
+    store = LocalStore.new(current_user.id)
+    store.write(:stashed_page, value)
+  end
+
+  def stashed_page
+    store = LocalStore.new(current_user.id)
+    store.read_once(:stashed_page)
   end
 end

@@ -217,9 +217,6 @@ class Framework < Roda
                      'Re-assigned product columns')
       end
     end
-
-    # A THOUGHT: perhaps the pmp routes should be under their own tree?
-
     # PACK MATERIAL PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_products', Integer do |id|
@@ -347,5 +344,3 @@ class Framework < Roda
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/BlockLength

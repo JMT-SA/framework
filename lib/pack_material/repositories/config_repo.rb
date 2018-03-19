@@ -41,10 +41,6 @@ module PackMaterialApp
     end
 
     # SUB TYPES
-    def create_matres_sub_type(args)
-      create(:material_resource_sub_types, args)
-    end
-
     def delete_matres_sub_type(id)
       query = <<~SQL
         SELECT product_table_name

@@ -6,7 +6,7 @@ module PackMaterialApp
     attribute :material_resource_sub_type_id, Types::Int
     attribute :product_number, Types::Int
     attribute :description, Types::String
-		attribute :active, Types::Bool
+    attribute :active, Types::Bool
 
     attribute :commodity_id, Types::Int
     attribute :variety_id, Types::String

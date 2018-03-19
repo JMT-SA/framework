@@ -8,7 +8,6 @@ module PackMaterialApp
           ui_rule = UiRules::Compiler.new(:matres_sub_type, :config, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          # TODO: transform form_values on validation error...
           order_rule = UiRules::Compiler.new(:matres_sub_type_columns, :config_order, id: id, form_values: form_values)
           rules_for_cols = order_rule.compile
 
@@ -20,7 +19,6 @@ module PackMaterialApp
             page.form_errors form_errors
 
             page.section do |section|
-              # section.add_text "Config for #{config.domain_name}: #{config.type_name}, #{config.sub_type_name}", wrapper: :h2
               section.add_text "Config for #{ui_rule.form_object.sub_type_name}", wrapper: :h2
               section.form do |form|
                 form.action "/pack_material/config/material_resource_sub_types/#{id}/config"
@@ -60,7 +58,7 @@ module PackMaterialApp
                 non_variant_name_list = repo.non_variant_columns(id)
                 variant_name_list     = repo.variant_columns(id)
                 form.form_object order_rule.form_object
-                form.form_errors(form_errors.transform_keys { |k| k == :columncodes_sorted_ids ? :non_variant_product_code_column_ids : k })
+                form.form_errors(form_errors&.transform_keys { |k| k == :columncodes_sorted_ids ? :non_variant_product_code_column_ids : k })
                 form.action "/pack_material/config/material_resource_sub_types/#{id}/update_product_code_configuration"
 
                 form.row do |row|

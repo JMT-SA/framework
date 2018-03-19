@@ -196,6 +196,31 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Take selected options from a multiselect and return them in a sequence
+   * that matches an array of selected ids.
+   * @param {node} sel - a select DOM node;
+   * @param {array} sortedIds - a list of ids in a particular sequence.
+   * @returns {array} out - the sorted options.
+   */
+  getSelectedIdsInStep: function getSelectedIdsInStep(sel, sortedIds) {
+    const usedIds = [];
+    const out = [];
+    sortedIds.forEach((id) => {
+      const found = _.find(sel.selectedOptions, ['value', id]);
+      if (found) {
+        out.push(found);
+        usedIds.push(id);
+      }
+    });
+    Array.from(sel.selectedOptions).forEach((opt) => {
+      if (usedIds.indexOf(opt.value) === -1) {
+        out.push(opt);
+      }
+    });
+    return out;
+  },
+
+  /**
    * Applies the multi skin to multiselect dropdowns.
    * @returns {void}
    */
@@ -217,7 +242,7 @@ const crossbeamsUtils = {
             const sortedIds = document.getElementById(id.replace('-sortable-items', '-sorted_ids'));
             let items = '';
             const itemIds = [];
-            Array.from(sel.selectedOptions).forEach((opt) => {
+            crossbeamsUtils.getSelectedIdsInStep(sel, sortedIds.value.split(',')).forEach((opt) => {
               items += `<li id="si_${opt.value}" class="crossbeams-draggable"><span class="crossbeams-drag-handle">&nbsp;&nbsp;&nbsp;&nbsp;</span>${opt.text}</li>`;
               itemIds.push(opt.value);
             });

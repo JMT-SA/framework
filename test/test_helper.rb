@@ -3,6 +3,8 @@
 require 'minitest/autorun'
 require "mocha/mini_test"
 require 'minitest/stub_any_instance'
+require 'minitest/hooks/test'
+
 require 'crossbeams/layout'
 require 'yaml'
 require 'dry-struct'
@@ -27,7 +29,6 @@ require './lib/ui_rules'
 
 Dir["#{root_dir}/lib/applets/*.rb"].each { |f| require f }
 
-require 'minitest/hooks/test'
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
 

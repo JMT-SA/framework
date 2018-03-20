@@ -213,6 +213,7 @@ DEPENDENCIES
   pry-clipboard
   pry-doc
   rack-console
+  rack-test
   rack_csrf
   rake
   rerun

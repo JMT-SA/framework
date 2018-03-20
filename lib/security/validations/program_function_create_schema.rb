@@ -6,4 +6,5 @@ ProgramFunctionCreateSchema = Dry::Validation.Form do
   required(:group_name).maybe(:str?)
   required(:restricted_user_access).filled(:bool?)
   required(:active).filled(:bool?)
+  optional(:show_in_iframe).filled(:bool?)
 end

@@ -19,7 +19,8 @@ module UiRules
         url: {},
         program_function_sequence: { renderer: :number },
         restricted_user_access: { renderer: :checkbox },
-        active: { renderer: :checkbox }
+        active: { renderer: :checkbox },
+        show_in_iframe: { renderer: :checkbox }
       }
     end
 
@@ -36,7 +37,8 @@ module UiRules
                                     url: nil,
                                     program_function_sequence: nil,
                                     restricted_user_access: false,
-                                    active: true)
+                                    active: true,
+                                    show_in_iframe: false)
     end
   end
 end

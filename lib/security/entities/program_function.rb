@@ -7,6 +7,7 @@ class ProgramFunction < Dry::Struct
   attribute :program_function_sequence, Types::Int
   attribute :restricted_user_access, Types::Bool
   attribute :active, Types::Bool
+  attribute :show_in_iframe, Types::Bool
 end
 __END__
 id integer NOT NULL DEFAULT nextval('program_functions_id_seq'::regclass),

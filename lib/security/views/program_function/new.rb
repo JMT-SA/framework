@@ -20,6 +20,7 @@ module Security
               form.add_field :program_function_sequence
               form.add_field :restricted_user_access
               form.add_field :active
+              form.add_field :show_in_iframe
             end
           end
 

@@ -143,6 +143,12 @@ class Framework < Roda
 
     r.multi_route
 
+    r.on 'iframe', Integer do |id|
+      repo = ProgramFunctionRepo.new
+      pf = repo.find_program_functions(id)
+      view(inline: %(<iframe src="#{pf.url}" title="#{pf.program_function_name}" width="100%" style="height:80vh"></iframe>))
+    end
+
     r.is 'test' do
       view('test_view')
     end

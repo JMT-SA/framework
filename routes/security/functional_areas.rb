@@ -132,6 +132,7 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
+          p params
           response['Content-Type'] = 'application/json'
           res = interactor.delete_program(id)
           flash[:notice] = res.message
@@ -465,3 +466,5 @@ class Framework < Roda
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/BlockLength

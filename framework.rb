@@ -78,7 +78,7 @@ class Framework < Roda
   # plugin :indifferent_params # - allows access to params by string or symbol.
   plugin :symbolized_params    # - automatically converts all keys of params to symbols.
   plugin :flash
-  plugin :csrf, raise: true  # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
+  plugin :csrf, raise: true, skip_if: ->(_) { ENV['RACK_ENV'] == 'test' }  # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
   plugin :rodauth do
     db DB # .connection
     enable :login, :logout # , :change_password

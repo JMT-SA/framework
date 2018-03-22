@@ -42,7 +42,8 @@ class GenerateNewScaffold < BaseService
     }
     sources[:paths][:test] = {
       interactor: "lib/#{opts.applet}/test/interactors/test_#{opts.singlename}_interactor.rb",
-      repo: "lib/#{opts.applet}/test/repositories/test_#{opts.singlename}_repo.rb"
+      repo: "lib/#{opts.applet}/test/repositories/test_#{opts.singlename}_repo.rb",
+      route: "test/routes/test_#{opts.singlename}_routes.rb"
     }
     report               = QueryMaker.call(opts)
     sources[:query]      = wrapped_sql_from_report(report)
@@ -476,7 +477,7 @@ class GenerateNewScaffold < BaseService
                   flash[:error] = res.message
                   stash_page(#{applet_klass}::#{program_klass}::#{opts.klassname}::New.call(form_values: params[:#{opts.singlename}],
                              #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}form_errors: res.errors,
-                             #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}remote: false)
+                             #{UtilityFunctions.spaces_from_string_lengths(15, applet_klass, program_klass, opts.klassname)}remote: false))
                   r.redirect '/#{opts.applet}/#{opts.program}/#{opts.table}/new'
                 end
               end
@@ -628,7 +629,8 @@ class GenerateNewScaffold < BaseService
     def call
       {
         interactor: test_interactor,
-        repo: test_repo
+        repo: test_repo,
+        route: test_route
       }
     end
 
@@ -695,6 +697,120 @@ class GenerateNewScaffold < BaseService
         end
         # rubocop:enable Metrics/ClassLength
         # rubocop:enable Metrics/AbcSize
+      RUBY
+    end
+
+    def test_route
+      base_route    = "#{opts.applet}/#{opts.program}/"
+      applet_klass  = UtilityFunctions.camelize(opts.applet)
+      program_klass = UtilityFunctions.camelize(opts.program)
+      <<~RUBY
+        # frozen_string_literal: true
+
+        require File.join(File.expand_path('./../../', __FILE__), 'test_helper_for_routes')
+
+        class Test#{opts.klassname}Routes < RouteTester
+          def around
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:exists?).returns(true)
+            super
+          end
+
+          def test_edit
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.stub(:call, bland_page) do
+              get '#{base_route}#{opts.table}/1/edit', {}, 'rack.session' => { user_id: 1 }
+            end
+            expect_bland_page
+          end
+
+          def test_edit_fail
+            authorise_fail!
+            get '#{base_route}#{opts.table}/1/edit', {}, 'rack.session' => { user_id: 1 }
+            expect_permission_error
+          end
+
+          def test_show
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::Show.stub(:call, bland_page) do
+              get '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1 }
+            end
+            expect_bland_page
+          end
+
+          def test_show_fail
+            authorise_fail!
+            get '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1 }
+            refute last_response.ok?
+            assert_match(/permission/i, last_response.body)
+          end
+
+          def test_update
+            row_vals = Hash.new(1)
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:update_#{opts.singlename}).returns(ok_response(instance: row_vals))
+            patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            expect_json_update_grid
+          end
+
+          def test_update_fail
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:update_#{opts.singlename}).returns(bad_response)
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::Edit.stub(:call, bland_page) do
+              patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            end
+            expect_json_replace_dialog(has_error: true)
+          end
+
+          def test_delete
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:delete_#{opts.singlename}).returns(ok_response)
+            delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            expect_json_delete_from_grid
+          end
+          #
+          # def test_delete_fail
+          #   #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
+          #   delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+          #   expect_bad_redirect
+          # end
+
+          def test_new
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::New.stub(:call, bland_page) do
+              get  '#{base_route}#{opts.table}/new', {}, 'rack.session' => { user_id: 1 }
+            end
+            expect_bland_page
+          end
+
+          def test_new_fail
+            authorise_fail!
+            get '#{base_route}#{opts.table}/new', {}, 'rack.session' => { user_id: 1 }
+            refute last_response.ok?
+            assert_match(/permission/i, last_response.body)
+          end
+
+          def test_create
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
+            post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            expect_ok_redirect
+          end
+
+          def test_create_remotely
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
+            post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            expect_ok_json_redirect
+          end
+
+          def test_create_fail
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::New.stub(:call, bland_page) do
+              post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            end
+            expect_bad_redirect(url: '/#{base_route}#{opts.table}/new')
+          end
+
+          def test_create_remotely_fail
+            #{opts.applet_module}::#{opts.klassname}Interactor.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
+            #{applet_klass}::#{program_klass}::#{opts.klassname}::New.stub(:call, bland_page) do
+              post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            end
+            expect_json_replace_dialog
+          end
+        end
       RUBY
     end
   end

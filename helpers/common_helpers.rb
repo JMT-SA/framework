@@ -90,6 +90,7 @@ module CommonHelpers
   end
 
   def show_unauthorised
+    response.status = 404
     view(inline: "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>")
   end
 

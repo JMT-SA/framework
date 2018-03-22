@@ -10,9 +10,11 @@ OUTER_APP = Rack::Builder.parse_file('config.ru').first
 class RouteTester < Minitest::Test
   include Rack::Test::Methods
   include Minitest::Hooks
+  include Crossbeams::Responses
 
   def around
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
+      authorise_pass!
       super
     end
   end
@@ -48,8 +50,87 @@ class RouteTester < Minitest::Test
     ProgramRepo.any_instance.stubs(:authorise?).returns(false)
   end
 
-  def around
-    authorise_pass!
-    super
+  def header_location
+    last_response.headers['Location']
+  end
+
+  def bland_page
+    Crossbeams::Layout::Page.build do |page, _|
+      page.add_text 'HTML_PAGE'
+    end
+  end
+
+  def ok_response(instance: nil)
+    success_response('OK', instance)
+  end
+
+  def bad_response
+    failed_response('FAILED')
+  end
+
+  def expect_json_response
+    last_response.headers['Content-Type'] == 'application/json'
+  end
+
+  def expect_ok_json_redirect(url: '/')
+    assert last_response.ok?
+    assert last_response.body.include?('redirect')
+    assert last_response.body.include?(url)
+    expect_json_response
+  end
+
+  def expect_json_replace_dialog(has_error: false, has_notice: false, content: 'HTML_PAGE')
+    assert last_response.ok?
+    assert last_response.body.include?('replaceDialog')
+    assert last_response.body.include?(content)
+    assert last_response.body.include?('error') if has_error
+    assert last_response.body.include?('notice') if has_notice
+    assert last_response.body.include?(bad_response.message)
+    expect_json_response
+  end
+
+  def expect_json_update_grid(has_error: false, has_notice: false)
+    assert last_response.ok?
+    assert last_response.body.include?('updateGridInPlace')
+    assert last_response.body.include?('error') if has_error
+    assert last_response.body.include?('notice') if has_notice
+    expect_json_response
+  end
+
+  def expect_json_delete_from_grid(has_notice: false)
+    assert last_response.ok?
+    assert last_response.body.include?('removeGridRowInPlace')
+    assert last_response.body.include?('notice') if has_notice
+    expect_json_response
+  end
+
+  def expect_ok_redirect(url: '/')
+    assert last_response.redirect?
+    assert_equal url, header_location
+    follow_redirect!
+    assert last_response.ok?
+    assert last_response.body.include?('OK')
+  end
+
+  def expect_bad_redirect(url: '/')
+    assert last_response.redirect?
+    assert_equal url, header_location
+    follow_redirect!
+    assert last_response.ok?
+    assert last_response.body.include?('FAIL')
+  end
+
+  def expect_bland_page
+    assert last_response.ok?
+    assert_match(/HTML_PAGE/, last_response.body)
+  end
+
+  def expect_permission_error
+    refute last_response.ok?
+    assert_match(/permission/i, last_response.body)
+  end
+
+  def post_as_fetch(url, params = {}, options = nil)
+    post url, params, options.merge('HTTP_X_CUSTOM_REQUEST_TYPE' => 'Y')
   end
 end

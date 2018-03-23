@@ -4,11 +4,11 @@ require 'minitest/autorun'
 require "mocha/mini_test"
 require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
-# require 'minitest/pride'
 require 'minitest/rg'
 
 require 'crossbeams/layout'
 require 'yaml'
+require 'dry/inflector'
 require 'dry-struct'
 require 'dry-validation'
 require 'sequel'

@@ -2,32 +2,23 @@ module UtilityFunctions
   module_function
 
   # Camelize a string (another_string => AnotherString)
-  def camelize(s)
-    s.sub(/^[a-z\d]*/) { $&.capitalize }.gsub(%r{(?:_|(\/))([a-z\d]*)}) do
-      "#{Regexp.last_match[1]}#{Regexp.last_match[2].capitalize}"
-    end.gsub('/', '::')
+  def camelize(str)
+    inflector = Dry::Inflector.new
+    inflector.camelize(str)
   end
 
   # Take a plural string and make a singular version.
-  # NB. This is NOT foolproof.
-  def simple_single(s)
-    return 'person' if s == 'people'
-
-    if s.end_with?('ies')
-      s.sub(/ies$/, 'y')
-    elsif s.end_with?('dresses')
-      s.sub(/es$/, '')
-    else
-      s.sub(/s$/, '')
-    end
+  def simple_single(str)
+    inflector = Dry::Inflector.new
+    inflector.singularize(str)
   end
 
-  def newline_and_spaces(no)
-    "\n#{' ' * no}"
+  def newline_and_spaces(count)
+    "\n#{' ' * count}"
   end
 
-  def comma_newline_and_spaces(no)
-    ",\n#{' ' * no}"
+  def comma_newline_and_spaces(count)
+    ",\n#{' ' * count}"
   end
 
   def spaces_from_string_lengths(initial_spaces, *strings)

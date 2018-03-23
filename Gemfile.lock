@@ -76,6 +76,7 @@ GEM
     dry-core (0.4.5)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.2.0)
+    dry-inflector (0.1.1)
     dry-logic (0.4.2)
       dry-container (~> 0.2, >= 0.2.6)
       dry-core (~> 0.2)
@@ -203,6 +204,7 @@ DEPENDENCIES
   crossbeams-layout!
   crossbeams-rack_middleware!
   dotenv
+  dry-inflector
   dry-struct
   dry-validation
   minitest (~> 5.10.3)

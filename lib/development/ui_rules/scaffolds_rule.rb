@@ -21,7 +21,8 @@ module UiRules
         other: { force_lowercase: true },
         program: { force_lowercase: true },
         label_field: {},
-        short_name: { caption: 'Short name based on table name' }
+        short_name: { caption: 'Short name based on table name' },
+        shared_repo_name: { hint: 'Name of an existing or new repo to use to store persistence methods for more than one table.<p>The code will refer to this repo instead of using a name derived from the table.<br> Use CamelCase - <em>"MostAwesome"</em> for <em>"MostAwesoneRepo"</em>.</p>' }
       }
     end
 
@@ -37,7 +38,8 @@ module UiRules
                                     other: nil,
                                     program: nil,
                                     label_field: nil,
-                                    short_name: nil)
+                                    short_name: nil,
+                                    short_repo_name: nil)
     end
 
     private

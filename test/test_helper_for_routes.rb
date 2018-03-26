@@ -54,9 +54,9 @@ class RouteTester < Minitest::Test
     last_response.headers['Location']
   end
 
-  def bland_page
+  def bland_page(content: 'HTML_PAGE')
     Crossbeams::Layout::Page.build do |page, _|
-      page.add_text 'HTML_PAGE'
+      page.add_text content
     end
   end
 
@@ -120,9 +120,9 @@ class RouteTester < Minitest::Test
     assert last_response.body.include?('FAIL')
   end
 
-  def expect_bland_page
+  def expect_bland_page(content: 'HTML_PAGE')
     assert last_response.ok?
-    assert_match(/HTML_PAGE/, last_response.body)
+    assert_match(/#{content}/, last_response.body)
   end
 
   def expect_permission_error

@@ -13,6 +13,7 @@ ScaffoldNewSchema = Dry::Validation.Form do
   required(:program).filled(:str?) # downcase...
   required(:label_field).maybe(:str?)
   required(:short_name).filled(:str?)
+  required(:shared_repo_name).maybe(:str?)
 
   # validate(applet_is_other: [:applet, :other]) do |applet, other|
   validate(filled?: %i[applet other]) do |applet, other|

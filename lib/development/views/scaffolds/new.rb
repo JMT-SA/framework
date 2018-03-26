@@ -22,6 +22,7 @@ module Development
               form.add_field :program
               form.add_field :label_field
               form.add_field :short_name
+              form.add_field :shared_repo_name
             end
           end
 

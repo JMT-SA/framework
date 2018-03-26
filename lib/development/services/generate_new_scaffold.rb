@@ -16,6 +16,17 @@ class GenerateNewScaffold < BaseService
     @opts.program   ||= 'progname'
     @opts.singlename  = simple_single(@opts.short_name)
     @opts.klassname   = camelize(@opts.singlename)
+    @opts.reponame    = if params[:shared_repo_name]
+                          camelize(params[:shared_repo_name].sub(/Repo$/, ''))
+                        else
+                          @opts.klassname
+                        end
+    @opts.repofile    = if params[:shared_repo_name]
+                          inflector = Dry::Inflector.new
+                          inflector.underscore(params[:shared_repo_name].sub(/Repo$/, ''))
+                        else
+                          @opts.singlename
+                        end
     @opts.query_name  = params[:query_name]  || @opts.table
     @opts.list_name   = params[:list_name]   || @opts.table
     @opts.search_name = params[:search_name] || @opts.table
@@ -29,7 +40,7 @@ class GenerateNewScaffold < BaseService
     sources[:paths][:dm_query] = "grid_definitions/dataminer_queries/#{opts.table}.yml"
     sources[:paths][:list] = "grid_definitions/lists/#{opts.table}.yml"
     sources[:paths][:search] = "grid_definitions/searches/#{opts.table}.yml"
-    sources[:paths][:repo] = "lib/#{opts.applet}/repositories/#{opts.singlename}_repo.rb"
+    sources[:paths][:repo] = "lib/#{opts.applet}/repositories/#{opts.repofile}_repo.rb"
     sources[:paths][:inter] = "lib/#{opts.applet}/interactors/#{opts.singlename}_interactor.rb"
     sources[:paths][:entity] = "lib/#{opts.applet}/entities/#{opts.singlename}.rb"
     sources[:paths][:validation] = "lib/#{opts.applet}/validations/#{opts.singlename}_schema.rb"
@@ -42,7 +53,7 @@ class GenerateNewScaffold < BaseService
     }
     sources[:paths][:test] = {
       interactor: "lib/#{opts.applet}/test/interactors/test_#{opts.singlename}_interactor.rb",
-      repo: "lib/#{opts.applet}/test/repositories/test_#{opts.singlename}_repo.rb",
+      repo: "lib/#{opts.applet}/test/repositories/test_#{opts.repofile}_repo.rb",
       route: "test/routes/test_#{opts.singlename}_routes.rb"
     }
     report               = QueryMaker.call(opts)
@@ -154,7 +165,7 @@ class GenerateNewScaffold < BaseService
         module #{opts.applet_module}
           class #{opts.klassname}Interactor < BaseInteractor
             def repo
-              @repo ||= #{opts.klassname}Repo.new
+              @repo ||= #{opts.reponame}Repo.new
             end
 
             def #{opts.singlename}(cached = true)
@@ -212,7 +223,7 @@ class GenerateNewScaffold < BaseService
           # frozen_string_literal: true
 
           module #{opts.applet_module}
-            class #{opts.klassname}Repo < RepoBase
+            class #{opts.reponame}Repo < RepoBase
               build_for_select :#{opts.table},
                                label: :#{opts.label_field},
                                value: :id,
@@ -231,7 +242,7 @@ class GenerateNewScaffold < BaseService
           # frozen_string_literal: true
 
           module #{opts.applet_module}
-            class #{opts.klassname}Repo < RepoBase
+            class #{opts.reponame}Repo < RepoBase
               build_for_select :#{opts.table},
                                label: :#{opts.label_field},
                                value: :id,
@@ -507,7 +518,7 @@ class GenerateNewScaffold < BaseService
         module UiRules
           class #{opts.klassname}Rule < Base
             def generate_rules
-              @repo = #{opts.applet_module}::#{opts.klassname}Repo.new
+              @repo = #{opts.applet_module}::#{opts.reponame}Repo.new
               make_form_object
               apply_form_values
 
@@ -556,7 +567,7 @@ class GenerateNewScaffold < BaseService
         tm = TableMeta.new(fk[:table])
         singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
         klassname   = UtilityFunctions.camelize(singlename)
-        fk_repo = "#{klassname}Repo"
+        fk_repo = "#{opts.applet_module}::#{klassname}Repo"
         code = tm.likely_label_field
         flds << "# #{f}_label = #{fk_repo}.new.find_#{singlename}(@form_object.#{f})&.#{code}"
         flds << "#{f}_label = @repo.find(:#{fk[:table]}, #{klassname}, @form_object.#{f})&.#{code}"
@@ -593,7 +604,7 @@ class GenerateNewScaffold < BaseService
       return "#{field}: {}" if fk.nil?
       singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
       klassname   = UtilityFunctions.camelize(singlename)
-      fk_repo = "#{klassname}Repo"
+      fk_repo = "#{opts.applet_module}::#{klassname}Repo"
       # get fk data & make select - or (if no fk....)
       tm = TableMeta.new(fk[:table])
       if tm.active_column_present?
@@ -646,7 +657,7 @@ class GenerateNewScaffold < BaseService
         # rubocop:disable Metrics/AbcSize
 
         module #{opts.applet_module}
-          class Test#{opts.klassname}Repo < MiniTestWithHooks
+          class Test#{opts.reponame}Repo < MiniTestWithHooks
 
             def test_for_selects
               assert_respond_to repo, :for_select_#{opts.table}
@@ -662,7 +673,7 @@ class GenerateNewScaffold < BaseService
             private
 
             def repo
-              #{opts.klassname}Repo.new
+              #{opts.reponame}Repo.new
             end
           end
         end
@@ -685,7 +696,7 @@ class GenerateNewScaffold < BaseService
             def test_repo
               repo = interactor.repo
               # repo = interactor.send(:repo)
-              assert repo.is_a?(#{opts.applet_module}::#{opts.klassname}Repo)
+              assert repo.is_a?(#{opts.applet_module}::#{opts.reponame}Repo)
             end
 
             private
@@ -1145,3 +1156,4 @@ class GenerateNewScaffold < BaseService
     end
   end
 end
+# rubocop:enable Metrics/AbcSize

@@ -74,49 +74,49 @@ module UiRules
         product_number: {},
         description: {},
         commodity_id: { renderer: :select, options: @commodity_repo.for_select_commodities, disabled_options: @commodity_repo.for_select_inactive_commodities, caption: 'commodity' },
-        variety_id: {},
+        variety_id: {}, #Lookup
         style: {},
         assembly_type: {},
         market_major: {},
-        ctn_size_basic_pack: {},
-        ctn_size_old_pack: {},
-        pls_pack_code: {},
-        fruit_mass_nett_kg: {},
+        ctn_size_basic_pack: {}, #Lookup
+        ctn_size_old_pack: {}, #Lookup
+        pls_pack_code: {}, #Lookup
+        fruit_mass_nett_kg: { renderer: :numeric },
         holes: {},
         perforation: {},
-        image: {},
-        length_mm: {},
-        width_mm: {},
-        height_mm: {},
-        diameter_mm: {},
-        thick_mm: {},
-        thick_mic: {},
+        image: {}, #Image Uploader
+        length_mm: { renderer: :numeric },
+        width_mm: { renderer: :numeric },
+        height_mm: { renderer: :numeric },
+        diameter_mm: { renderer: :numeric },
+        thick_mm: { renderer: :numeric },
+        thick_mic: { renderer: :numeric },
         colour: {},
         grade: {},
         mass: {},
         material_type: {},
         treatment: {},
-        specification_notes: {},
+        specification_notes: { renderer: :text },
         artwork_commodity: {},
         artwork_marketing_variety_group: {},
         artwork_variety: {},
         artwork_nett_mass: {},
         artwork_brand: {},
         artwork_class: {},
-        artwork_plu_number: {},
+        artwork_plu_number: { renderer: :numeric },
         artwork_other: {},
         artwork_image: {},
-        marketer: {},
-        retailer: {},
-        supplier: {},
-        supplier_stock_code: {},
-        product_alternative: {},
-        product_joint_use: {},
+        marketer: {}, #Lookup
+        retailer: {}, #Lookup
+        supplier: {}, #Lookup #AlwaysActive
+        supplier_stock_code: {}, #AlwaysActive
+        product_alternative: {}, #Validate if the product code given here is a valid entry
+        product_joint_use: {}, #Validate if the product code given here is a valid entry
         ownership: {},
         consignment_stock: { renderer: :checkbox },
-        start_date: {},
-        end_date: {},
-        remarks: {}
+        start_date: {}, #AlwaysActive
+        end_date: {}, #AlwaysActive
+        remarks: {} #AlwaysActive
       }
     end
 

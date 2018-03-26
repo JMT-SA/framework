@@ -63,6 +63,28 @@ module PackMaterialApp
               form.add_field :start_date
               form.add_field :end_date
               form.add_field :remarks
+
+              # product_column_options = ProductTypeRepo.new.product_column_options(id)
+              # product_column_options.keys.each do |key|
+              #   form.add_text "<b>#{ key.to_s.capitalize.gsub('_', ' ') }</b>"
+              #   product_column_options[key].keys.each do |sub|
+              #     form.add_field :"#{sub}"
+              #
+              #   end
+              # end
+              #
+              # Repo method:
+              #   def product_column_options(product_id)
+              #     options = {}
+              #     product_type_id = DB[:products].where(id: product_id).select(:product_type_id).single_value
+              #     product_column_ids = DB[:product_types_product_column_names].where(product_type_id: product_type_id).select_map(:product_column_name_id)
+              #     product_columns = DB[:product_column_names].where(id: product_column_ids).select_map{|x| [x.group_name, x.column_name] }
+              #     product_columns.each do |col|
+              #       options[:"#{col[0]}"] = {} unless options[:"#{col[0]}"]
+              #       options[:"#{col[0]}"][:"#{col[1]}"] = true
+              #     end
+              #     options
+              #   end
             end
           end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterialApp
+module PackMaterial
   module Config
     module MatresSubType
       class New

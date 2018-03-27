@@ -176,9 +176,10 @@ class Framework < Roda
         else
           flash[:error] = res.message
           show_page do
-            PackMaterial::Config::MatresSubType::New.call(form_values: params[:matres_sub_type],
-                                                             form_errors: res.errors,
-                                                             remote: false)
+            stash_page(PackMaterial::Config::MatresSubType::New.call(form_values: params[:matres_sub_type],
+                                                                     form_errors: res.errors,
+                                                                     remote: false))
+            r.redirect '/pack_material/config/material_resource_sub_types/new'
           end
         end
       end

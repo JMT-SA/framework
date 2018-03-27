@@ -11,7 +11,7 @@ module PackMaterial
           order_rule = UiRules::Compiler.new(:matres_sub_type_columns, :config_order, id: id, form_values: form_values)
           rules_for_cols = order_rule.compile
 
-          repo = ConfigRepo.new
+          repo = PackMaterialApp::ConfigRepo.new
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object

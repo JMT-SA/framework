@@ -8,6 +8,8 @@ Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
 require 'pstore'
 require './lib/types_for_dry'
+
+# require 'pry' # TODO: Put this in based on dev env.
 require './lib/crossbeams_responses'
 require './lib/base_repo'
 require './lib/base_interactor'

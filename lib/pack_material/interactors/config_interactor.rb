@@ -67,12 +67,8 @@ module PackMaterialApp
       success_response('got_items', code: code_items, var: var_items)
     end
 
-    def convert_string_params_to_arrays(params)
-      params.transform_values { |v| v.is_a?(String) ? v.split(',') : v }
-    end
-
     def update_product_code_configuration(id, params)
-      res = validate_material_resource_type_config_code_columns_params(convert_string_params_to_arrays(params))
+      res = validate_material_resource_type_config_code_columns_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       DB.transaction do

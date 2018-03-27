@@ -16,8 +16,12 @@ module PackMaterialApp
   end
 
   MatresSubTypeConfigColumnsSchema = Dry::Validation.Form do
-    required(:chosen_column_ids).filled { each(:int?) }
-    required(:columncodes_sorted_ids).filled { each(:int?) }
-    required(:variantcolumncodes_sorted_ids).maybe { each(:int?) }
+    configure do
+      config.type_specs = true
+    end
+
+    required(:chosen_column_ids, Types::ArrayFromString).filled { each(:int?) }
+    required(:columncodes_sorted_ids, Types::ArrayFromString).filled(:array?) { each(:int?) }
+    required(:variantcolumncodes_sorted_ids, Types::ArrayFromString).maybe(:array?) { each(:int?) }
   end
 end

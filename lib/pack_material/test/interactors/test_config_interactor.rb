@@ -218,6 +218,64 @@ module PackMaterialApp
       matres_sub_type_attrs.merge(sub_type_name: nil)
     end
 
+    def test_validate_material_resource_type_config_code_columns_params
+      # PLEASE NOTE: These validation tests are not like the rest. They test a custom DRY Type - ArrayFromString
+      # see MatresSubTypeConfigColumnsSchema
+      test_attrs = {
+        chosen_column_ids: '1,5,8,1,5',
+        columncodes_sorted_ids: '1,2,3,4',
+        variantcolumncodes_sorted_ids: '1,2,3,4'
+      }
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs)
+      assert_empty x.errors
+
+      # required(:chosen_column_ids, :array).filled { each(:int?) }
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :chosen_column_ids })
+      assert_equal(['is missing'], x.errors[:chosen_column_ids])
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(chosen_column_ids: nil))
+      assert_equal(['must be filled'], x.errors[:chosen_column_ids])
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(chosen_column_ids: ''))
+      assert_equal(['must be filled'], x.errors[:chosen_column_ids])
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(chosen_column_ids: '1,2,3,w,5'))
+      assert_equal(['must be an array'], x.errors[:chosen_column_ids])
+
+      # required(:columncodes_sorted_ids, Types::ArrayFromString).filled(:array?) { each(:int?) }
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :columncodes_sorted_ids })
+      assert_equal(['is missing'], x.errors[:columncodes_sorted_ids])
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(columncodes_sorted_ids: ''))
+      assert_equal(['must be filled'], x.errors[:columncodes_sorted_ids])
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(columncodes_sorted_ids: nil))
+      assert_equal(['must be filled'], x.errors[:columncodes_sorted_ids])
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(columncodes_sorted_ids: '1,2,3,w,5'))
+      assert_equal(['must be an array'], x.errors[:columncodes_sorted_ids])
+
+      # required(:variantcolumncodes_sorted_ids, Types::ArrayFromString).maybe(:array?) { each(:int?) }
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :variantcolumncodes_sorted_ids })
+      assert_equal(['is missing'], x.errors[:variantcolumncodes_sorted_ids])
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(variantcolumncodes_sorted_ids: ''))
+      refute x.errors[:variantcolumncodes_sorted_ids]
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(variantcolumncodes_sorted_ids: nil))
+      refute x.errors[:variantcolumncodes_sorted_ids]
+      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(variantcolumncodes_sorted_ids: '1,2,3,w,5'))
+      assert_equal(['must be an array'], x.errors[:variantcolumncodes_sorted_ids])
+    end
+
+    def invalid_matres_config_attrs
+      matres_sub_type_attrs.merge(product_code_separator: nil)
+    end
+
+    def test_update_matres_config
+      ConfigRepo.any_instance.stubs(:update_matres_sub_type).returns(fake_matres_sub_type)
+
+      x = interactor.update_matres_config(1, invalid_matres_config_attrs)
+      assert_equal 'Validation error', x.message
+      assert_equal false, x.success
+
+      x = interactor.update_matres_config(1, matres_sub_type_attrs)
+      assert x.success
+      assert_equal 'Updated the config', x.message
+    end
+
     def test_chosen_product_columns
       non_var = [['a', 1], ['a', 2], ['a', 3]]
       var = [['a', 4]]

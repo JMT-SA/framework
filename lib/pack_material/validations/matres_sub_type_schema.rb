@@ -20,8 +20,8 @@ module PackMaterialApp
       config.type_specs = true
     end
 
-    required(:chosen_column_ids, Types::ArrayFromString).filled { each(:int?) }
-    required(:columncodes_sorted_ids, Types::ArrayFromString).filled(:array?) { each(:int?) }
-    required(:variantcolumncodes_sorted_ids, Types::ArrayFromString).maybe(:array?) { each(:int?) }
+    required(:chosen_column_ids, Types::IntArrayFromString).filled { each(:int?) }
+    required(:columncodes_sorted_ids, Types::IntArrayFromString).filled(:array?) { each(:int?) }
+    required(:variantcolumncodes_sorted_ids, Types::IntArrayFromString).maybe(:array?) { each(:int?) }
   end
 end

@@ -11,7 +11,7 @@ require 'awesome_print'
 # require 'sequel'
 require 'crossbeams/layout'
 require 'crossbeams/dataminer'
-require 'crossbeams/dataminer_interface'
+# require 'crossbeams/dataminer_interface'
 require 'crossbeams/label_designer'
 require 'crossbeams/rack_middleware'
 require 'roda/data_grid'
@@ -39,26 +39,31 @@ require './lib/base_service'
 require './lib/local_store' # Will only work for processes running from one dir.
 require './lib/ui_rules'
 require './lib/library_versions'
+require './lib/dataminer_connections'
 Dir['./helpers/**/*.rb'].each { |f| require f }
 Dir['./lib/applets/*.rb'].each { |f| require f }
 
 ENV['ROOT'] = File.dirname(__FILE__)
 ENV['VERSION'] = File.read('VERSION')
+ENV['GRID_QUERIES_LOCATION'] ||= File.expand_path('grid_definitions/dataminer_queries', __dir__)
+
+DM_CONNECTIONS = DataminerConnections.new
 
 class Framework < Roda
   include CommonHelpers
   include MenuHelpers
+  include DataminerHelpers
 
   use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
   use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb' # , session: request.session
-  use Crossbeams::DataminerInterface::App,
-      url_prefix: 'dataminer/',
-      dm_reports_location: File.join(File.dirname(__FILE__), 'reports'),
-      dm_grid_queries_location: File.join(File.dirname(__FILE__), 'grid_definitions', 'dataminer_queries'),
-      dm_js_location: 'js',
-      dm_css_location: 'css',
-      db_connection: DB
+  # use Crossbeams::DataminerInterface::App,
+  #     url_prefix: 'dataminer/',
+  #     dm_reports_location: File.join(File.dirname(__FILE__), 'reports'),
+  #     dm_grid_queries_location: File.join(File.dirname(__FILE__), 'grid_definitions', 'dataminer_queries'),
+  #     dm_js_location: 'js',
+  #     dm_css_location: 'css',
+  #     db_connection: DB
 
   plugin :data_grid, path: File.dirname(__FILE__),
                      list_url: '/list/%s/grid',
@@ -284,24 +289,24 @@ class Framework < Roda
         end
 
         r.on 'xls' do
-          begin
-            caption, xls = render_excel_rows(id, params)
-            response.headers['content_type'] = 'application/vnd.ms-excel'
-            response.headers['Content-Disposition'] = "attachment; filename=\"#{caption.strip.gsub(%r{[/:*?"\\<>\|\r\n]}i, '-') + '.xls'}\""
-            response.write(xls) # NOTE: could this use streaming to start downloading quicker?
-          rescue Sequel::DatabaseError => e
-            view(inline: <<-HTML)
-            <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
-            <p>Report: <em>#{caption}</em></p>The error message is:
-            <pre>#{e.message}</pre>
-            <button class="pure-button" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
-              <i class="fa fa-info"></i> Toggle SQL
-            </button>
-            <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@rpt.runnable_sql) %></pre>
-            HTML
-          end
+          caption, xls = render_excel_rows(id, params)
+          response.headers['content_type'] = 'application/vnd.ms-excel'
+          response.headers['Content-Disposition'] = "attachment; filename=\"#{caption.strip.gsub(%r{[/:*?"\\<>\|\r\n]}i, '-') + '.xls'}\""
+          response.write(xls) # NOTE: could this use streaming to start downloading quicker?
+        rescue Sequel::DatabaseError => e
+          view(inline: <<-HTML)
+          <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
+          <p>Report: <em>#{caption}</em></p>The error message is:
+          <pre>#{e.message}</pre>
+          <button class="pure-button" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
+            <i class="fa fa-info"></i> Toggle SQL
+          </button>
+          <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@rpt.runnable_sql) %></pre>
+          HTML
         end
       end
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/BlockLength

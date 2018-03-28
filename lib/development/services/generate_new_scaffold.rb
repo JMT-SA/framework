@@ -1031,7 +1031,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      new_report = Crossbeams::DataminerInterface::DmCreator.new(DB, report).modify_column_datatypes
+      new_report = DmCreator.new(DB, report).modify_column_datatypes
       hide_cols = %w[id created_at updated_at]
       new_report.ordered_columns.each do |col|
         new_report.column(col.name).hide = true if hide_cols.include?(col.name) || col.name.end_with?('_id')

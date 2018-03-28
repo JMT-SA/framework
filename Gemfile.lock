@@ -6,18 +6,6 @@ GIT
       pg_query (= 1.0.1)
 
 GIT
-  remote: https://github.com/NoSoft-SA/crossbeams-dataminer_interface.git
-  revision: 783066b8efb996102fb7c43e53ff90725441c8ca
-  specs:
-    crossbeams-dataminer_interface (0.1.1)
-      axlsx
-      crossbeams-dataminer
-      crossbeams-layout
-      roda
-      rouge
-      tilt
-
-GIT
   remote: https://github.com/NoSoft-SA/crossbeams-label_designer.git
   revision: fe71225ffd8ad26842d8617d74394dbfd54b511b
   specs:
@@ -199,7 +187,6 @@ DEPENDENCIES
   awesome_print
   bcrypt
   crossbeams-dataminer!
-  crossbeams-dataminer_interface!
   crossbeams-label_designer!
   crossbeams-layout!
   crossbeams-rack_middleware!

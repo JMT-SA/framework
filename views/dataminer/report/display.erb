@@ -1,0 +1,129 @@
+<a href="<%= request.referer.gsub('?back=y', '') %>?back=y" class="near-white bg-dark-blue br2 dim pa2 mr4 ba b--near-white no-underline">Back</a>
+<button class="pure-button" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false"><i class="fa fa-info"></i> Toggle SQL</button>
+<pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre><hr>
+
+<div style="height:40em">
+  <%= Crossbeams::Layout::Renderer::Grid.header('grd1', @page.report.caption) %>
+  <div id="grd1" style="height: 100%;" class="ag-blue"></div>
+</div>
+
+ <% content_for :late_javascript do %>
+<script>
+
+(function() {
+  //var loadGrid;
+  var onBtExport;
+
+  translateColDefs = function(columnDefs) {
+    //console.log(columnDefs);
+    var newColDefs = [], col, newCol, fn;
+    for (_i = 0, _len = columnDefs.length; _i < _len; _i++) {
+      col = columnDefs[_i];
+      newCol = {};
+      for(attr in col) {
+        if(attr==='cellRenderer') {
+          //fn = window[col[attr]];
+          //newCol[attr] = fn;
+          //newCol[attr] = eval(col[attr]);
+          if(col[attr] ==='crossbeamsGridFormatters.testRender') {
+            newCol[attr] = crossbeamsGridFormatters.testRender;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas2') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas4') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.booleanFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.booleanFormatter;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.hrefInlineFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.hrefInlineFormatter;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.hrefSimpleFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.hrefSimpleFormatter;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.hrefPromptFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.hrefPromptFormatter;
+          }
+
+        }
+        else {
+          newCol[attr] = col[attr];
+        }
+      }
+      newColDefs.push(newCol);
+    }
+    return newColDefs;
+  };
+
+  // loadGrid = function(grid, gridOptions) {
+  //   var httpRequest, url;
+  //   url = grid.getAttribute('data-gridurl');
+  //   httpRequest = new XMLHttpRequest();
+  //   httpRequest.open('GET', url);
+  //   httpRequest.send();
+  //   return httpRequest.onreadystatechange = function() {
+  //     var httpResult, newColDefs;
+  //     if (httpRequest.readyState === 4 && httpRequest.status === 200) {
+  //       httpResult = JSON.parse(httpRequest.responseText);
+  //       newColDefs = translateColDefs(httpResult.columnDefs);
+  //       gridOptions.api.setColumnDefs(newColDefs);
+  //       gridOptions.api.setRowData(httpResult.rowDefs);
+  //     }
+  //   };
+  // };
+
+
+
+
+      var grid, gridOptions, grid_id, colDefs, rowDefs;
+  // colDefs = [{headerName:"",width:60,suppressMenu:true,suppresSorting:true,suppresMovable:true,suppresFilter:true,enableRowGroup:false,enablePivot:false,enableValue:false,suppressCsvExport:true,valueGetter:"'/books/' + data.id + '/edit|edit'",colId:"edit_link2",cellRenderer:crossbeamsGridFormatters.hrefSimpleFormatter},
+  //         {headerName:"",width:60,suppressMenu:true,suppresSorting:true,suppresMovable:true,suppresFilter:true,enableRowGroup:false,enablePivot:false,enableValue:false,suppressCsvExport:true,valueGetter:"'/books/' + data.id + '|delete|Are you sure?'",colId:"delete_link",cellRenderer:crossbeamsGridFormatters.hrefPromptFormatter},
+  //         {headerName:"Id",field:"id",hide:true,headerTooltip:"Id",enableValue:true,cellClass:"grid-number-column",width:100},
+  //         {headerName:"Title",field:"title",hide:false,headerTooltip:"Title",width:200,enableRowGroup:true},
+  //         {headerName:"Author",field:"author",hide:false,headerTooltip:"Author",width:150,enableRowGroup:true,cellClassRules:{"grid-row-red":"x === 'Fred'"}}];
+  colDefs = translateColDefs(<%= @page.col_defs.to_json %>),
+  rowDefs = <%= @page.row_defs.to_json %>,
+  // rowDefs = [{id:2,title:"Fred is Green, and Blue",author:"Fred"},
+  //                 {id:3,title:"A new book > Old book",author:"John"},
+  //                 {id:1,title:"TDD",author:"Kent Beck"},
+  //                 {id:5,title:"600980218299308328",author:"Pallet number"},
+  //                 {id:4,title:"Something",author:"Someones"}];
+      grid = document.querySelector('#grd1');
+      grid_id = grid.getAttribute('id');
+//console.log(grid_id);
+      //for_print = grid.dataset.gridPrint;
+      gridOptions = {
+        context: { domGridId: 'grd1' },
+        columnDefs: colDefs,
+        rowData: rowDefs,
+                enableColResize: true,
+                enableSorting: true,
+                enableFilter: true,
+                suppressScrollLag: true,
+            // groupSuppressAutoColumn: true,
+            // groupHideOpenParents: true,
+        // animateRows: true,
+                rowSelection: 'single',
+                enableRangeSelection: true,
+                enableStatusBar: true,
+                suppressAggFuncInHeader: true,
+                onFilterChanged: function () {
+                  let filterLength = 0;
+                  let rows = 0;
+                  this.api.forEachLeafNode((n) => { rows += 1; });
+                  this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
+                  crossbeamsGridEvents.displayRowCounts('grd1', filterLength, rows);
+                },
+              };
+
+      new agGrid.Grid(grid, gridOptions);
+      crossbeamsGridStore.addGrid(grid_id, gridOptions);
+      // crossbeamsGridEvents.displayRowCounts('grd1', filterLength, rows);
+      gridOptions.onFilterChanged();
+      crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId, colDefs);
+      //loadGrid(grid, gridOptions);
+  }).call(this);
+</script>
+<% end %>

@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
+
 # frozen_string_literal: true
 
+require 'bundler/setup'
 require_relative '../config/environment'
 
 case ENV['RACK_ENV']
@@ -8,10 +10,6 @@ when 'development', 'test'
   require 'pathname'
   ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile',
                                              Pathname.new(__FILE__).realpath)
-
-  require 'rubygems'
-  require 'bundler/setup'
-
   load Gem.bin_path('rack-console', 'rack-console')
 else
   warn "ERROR: repl can't be run in this environment (#{ENV['RACK_ENV']})"

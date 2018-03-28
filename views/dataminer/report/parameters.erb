@@ -1,0 +1,86 @@
+<h1>Fill in parameters</h1>
+
+<h2><%= @page.report.caption %></h2>
+
+<form action='<%= @page.report_action %>' id="rp_form" method=post class="crossbeams-form" onsubmit="crossbeamsDataMinerParams.storeCurrentParams('<%=@page.id%>'); crossbeamsUtils.addJSONVarToForm('rp_form', crossbeamsDataMinerParams.current_values);">
+  <%= csrf_tag %>
+  <div class="crossbeams-row">
+    <div class="crossbeams-col">
+      <div class="crossbeams-field">
+        <a href="#" id="reloadParams" style="display:none" onclick="crossbeamsDataMinerParams.loadCurrentParams()">get previous parameters</a>
+      </div>
+      <div class="crossbeams-field">
+        <label for="limit">Limit</label>
+        <input id="limit" class="cbl-input" type="number" name='limit' min="1" value="<%= @page.report.limit %>" />
+      </div>
+      <div class="crossbeams-field">
+        <label for="offset">Start from (offset)</label>
+        <input id="offset" class="cbl-input" type="number" name='offset' min="1" value="<%= @page.report.offset %>" />
+      </div>
+
+      <h3>Choose parameters</h3>
+      <select id="select_param">
+        <option value="">Select a parameter to apply</option>
+        <%= make_options(@page.report.query_parameter_definitions.map { |qp| [qp.caption, qp.column] }) %>
+      </select>
+      <div id="qp_form" style="display:inline-block"></div>
+      <div id="param_display"></div>
+    </div>
+  </div>
+
+  <% if @page.crosstab_config %>
+    <h3>Choose crosstab (pivot) settings</h3>
+    <div class="crossbeams-row">
+      <div class="crossbeams-col">
+        <p>Choose column(s) for the row:</p>
+        <% @page.crosstab_config[:row_columns].each_with_index do |row_column, index| %>
+          <div class="crossbeams-field">
+            <input id="row_columns_<%=index%>" type="checkbox" name='crosstab[row_columns][]' value="<%= row_column %>" checked=checked" />
+            <label for="row_columns_<%=index%>"><%= row_column %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="crossbeams-col">
+        <!-- - checkboxen ( choose order...?) -->
+        <p>Choose the column to pivot:</p>
+        <% @page.crosstab_config[:column_columns].each_with_index do |col, index| %>
+          <% column_column = col.keys.first %>
+          <div class="crossbeams-field">
+            <input id="column_column" type="radio" name='crosstab[column_column]' value="<%= column_column %>" <%= index == 0 ? 'checked="checked"' : '' %> />
+            <label for="column_column"><%= column_column %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="crossbeams-col">
+        <p>Choose the value to be used:</p>
+        <% @page.crosstab_config[:value_columns].each_with_index do |col, index| %>
+          <% value_column = col.keys.first %>
+          <div class="crossbeams-field">
+            <input id="value_column" type="radio" name='crosstab[value_column]' value="<%= value_column %>" <%= index == 0 ? 'checked="checked"' : '' %> />
+            <label for="value_column"><%= value_column %></label>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="crossbeams-row">
+    <div class="crossbeams-col">
+      <div class="crossbeams-actions">
+        <input type="submit" name="btnSubmit" value="Run report" data-disable-with="Running..." class="white bg-green br2 dim pa3 ba b--near-white">
+        <button type='submit' id="run_excel" name="btnSubmit" formaction="<%= @page.excel_action %>" data-disable-with="Create Excel report" class="near-white bg-green br2 dim pa3 ml4 ba b--near-white"><i class="fa fa-file-excel-o"></i> Download Excel report</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<% content_for :late_javascript do %>
+  <script>
+    crossbeamsDataMinerParams.init('rp_form', '<%=@page.id%>', <%= make_query_param_json(@page.report.query_parameter_definitions, @page.connection) %>);
+    <% if @page.load_params %>
+      crossbeamsDataMinerParams.loadCurrentParams();
+    <% else %>
+      crossbeamsDataMinerParams.buildReloadButton();
+    <% end %>
+  </script>
+<% end %>

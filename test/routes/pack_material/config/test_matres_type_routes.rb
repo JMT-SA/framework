@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.join(File.expand_path('./../../../', __FILE__), 'test_helper_for_routes')
+require File.join(File.expand_path('./../../../../', __FILE__), 'test_helper_for_routes')
 
 class TestMatresTypeRoutes < RouteTester
   def around
@@ -32,8 +32,6 @@ class TestMatresTypeRoutes < RouteTester
     authorise_fail!
     get 'pack_material/config/material_resource_types/1', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
-    # refute last_response.ok?
-    # assert_match(/permission/i, last_response.body)
   end
 
   def test_update
@@ -56,12 +54,6 @@ class TestMatresTypeRoutes < RouteTester
     delete 'pack_material/config/material_resource_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     expect_json_delete_from_grid
   end
-  #
-  # def test_delete_fail
-  #   PackMaterialApp::ConfigInteractor.any_instance.stubs(:delete_matres_type).returns(bad_response)
-  #   delete 'pack_material/config/material_resource_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-  #   expect_bad_redirect
-  # end
 
   def test_new
     PackMaterial::Config::MatresType::New.stub(:call, bland_page) do
@@ -74,8 +66,6 @@ class TestMatresTypeRoutes < RouteTester
     authorise_fail!
     get 'pack_material/config/material_resource_types/new', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
-    # refute last_response.ok?
-    # assert_match(/permission/i, last_response.body)
   end
 
   def test_create

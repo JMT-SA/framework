@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.join(File.expand_path('./../../../', __FILE__), 'test_helper_for_routes')
+require File.join(File.expand_path('./../../../../', __FILE__), 'test_helper_for_routes')
 
 class TestMatresSubTypeRoutes < RouteTester
   def around
@@ -31,8 +31,7 @@ class TestMatresSubTypeRoutes < RouteTester
   def test_show_fail
     authorise_fail!
     get 'pack_material/config/material_resource_sub_types/1', {}, 'rack.session' => { user_id: 1 }
-    refute last_response.ok?
-    assert_match(/permission/i, last_response.body)
+    expect_permission_error
   end
 
   def test_update
@@ -72,8 +71,7 @@ class TestMatresSubTypeRoutes < RouteTester
   def test_new_fail
     authorise_fail!
     get 'pack_material/config/material_resource_sub_types/new', {}, 'rack.session' => { user_id: 1 }
-    refute last_response.ok?
-    assert_match(/permission/i, last_response.body)
+    expect_permission_error
   end
 
   def test_create

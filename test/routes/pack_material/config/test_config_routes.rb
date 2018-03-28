@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.join(File.expand_path('./../../../', __FILE__), 'test_helper_for_routes')
+require File.join(File.expand_path('./../../../../', __FILE__), 'test_helper_for_routes')
 
 class TestConfigRoutes < RouteTester
   def around

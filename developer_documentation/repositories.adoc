@@ -113,7 +113,7 @@ create_user(attrs)
 
 === Built-in methods
 
-These methods are available to all repositories that inherit from `BaseRepo`.
+These methods are available to all repositories that inherit from `RepoBase`.
 For straightforward usage, use the generated CRUD calls, but the builtin methods can also be used within developer-generated repository methods.
 
-See link:/yarddocthis/lib=repo_base.rb[BaseRepo methods] for a list of methods in `BaseRepo`.
+See link:/yarddocthis/lib=repo_base.rb[RepoBase methods] for a list of methods in `RepoBase`.

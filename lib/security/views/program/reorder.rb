@@ -3,7 +3,7 @@ module Security
     module Program
       class Reorder
         def self.call(id)
-          this_repo = ProgramRepo.new
+          this_repo = SecurityApp::MenuRepo.new
           progfuncs = this_repo.program_functions_for_select(id)
 
           layout = Crossbeams::Layout::Page.build do |page|

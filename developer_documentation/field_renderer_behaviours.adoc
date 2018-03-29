@@ -72,7 +72,7 @@ r.on 'select_change_for_pf' do
   if params[:changed_value].empty?
     sel = []
   else
-    repo = FunctionalAreaRepo.new
+    repo = SecurityApp::MenuRepo.new
     sel = repo.for_select_program_functions(where: { program_id: params[:changed_value] })
   end
   json_replace_select_options('functional_area_program_function_id', sel)

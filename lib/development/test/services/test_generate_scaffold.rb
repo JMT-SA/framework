@@ -17,12 +17,12 @@ class GenerateNewScaffoldTest < MiniTestWithHooks
   end
 
   def test_db
-    repo = SecurityGroupRepo.new
+    repo = SecurityApp::SecurityGroupRepo.new
     assert_nil repo.find_security_group(1)
   end
 
   def test_add_db
-    repo = SecurityGroupRepo.new
+    repo = SecurityApp::SecurityGroupRepo.new
     assert 1, repo.create_security_group(security_group_name: 'a_test')
   end
 end

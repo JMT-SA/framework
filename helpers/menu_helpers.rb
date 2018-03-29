@@ -1,7 +1,7 @@
 module MenuHelpers
   def menu_items(webapp)
     return nil if current_user.nil?
-    repo      = ProgramFunctionRepo.new
+    repo      = SecurityApp::MenuRepo.new
     rows      = repo.menu_for_user(current_user, webapp)
     build_menu(rows).to_json
   end

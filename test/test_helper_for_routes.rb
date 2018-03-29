@@ -42,12 +42,12 @@ class RouteTester < Minitest::Test
 
   def authorise_pass!
     UserRepo.any_instance.stubs(:find).returns(base_user)
-    ProgramRepo.any_instance.stubs(:authorise?).returns(true)
+    SecurityApp::MenuRepo.any_instance.stubs(:authorise?).returns(true)
   end
 
   def authorise_fail!
     UserRepo.any_instance.stubs(:find).returns(base_user)
-    ProgramRepo.any_instance.stubs(:authorise?).returns(false)
+    SecurityApp::MenuRepo.any_instance.stubs(:authorise?).returns(false)
   end
 
   def header_location

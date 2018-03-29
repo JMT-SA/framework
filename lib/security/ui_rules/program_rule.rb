@@ -1,7 +1,7 @@
 module UiRules
   class ProgramRule < Base
     def generate_rules
-      @repo = ProgramRepo.new
+      @repo = SecurityApp::MenuRepo.new
       make_form_object
 
       common_values_for_fields common_fields
@@ -20,7 +20,7 @@ module UiRules
 
     def common_fields
       {
-        program_name: {},
+        program_name: { required: true },
         active: { renderer: :checkbox }
       }
     end
@@ -28,7 +28,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find(:programs, Program, @options[:id])
+      @form_object = @repo.find_program(@options[:id])
     end
 
     def make_new_form_object

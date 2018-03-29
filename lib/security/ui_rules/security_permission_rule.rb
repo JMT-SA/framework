@@ -3,7 +3,7 @@
 module UiRules
   class SecurityPermissionRule < Base
     def generate_rules
-      @this_repo = SecurityGroupRepo.new
+      @repo = SecurityApp::SecurityGroupRepo.new
       make_form_object
       apply_form_values
 
@@ -27,7 +27,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(:security_permissions, SecurityPermission, @options[:id])
+      @form_object = @repo.find(:security_permissions, SecurityPermission, @options[:id])
     end
 
     def make_new_form_object

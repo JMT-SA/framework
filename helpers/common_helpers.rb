@@ -81,7 +81,7 @@ module CommonHelpers
 
   def authorised?(programs, sought_permission)
     return false unless current_user
-    prog_repo = ProgramRepo.new
+    prog_repo = SecurityApp::MenuRepo.new
     prog_repo.authorise?(current_user, Array(programs), sought_permission)
   end
 

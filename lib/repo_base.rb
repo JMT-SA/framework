@@ -1,14 +1,29 @@
 class RepoBase
   include Crossbeams::Responses
 
+  # Return all rows from a table as instances of the given wrapper.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param wrapper [Class] the class of the object to return.
+  # @return [Array] the table rows.
   def all(table_name, wrapper)
     all_hash(table_name).map { |r| wrapper.new(r) }
   end
 
+  # Return all rows from a table as Hashes.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @return [Array] the table rows.
   def all_hash(table_name)
     DB[table_name].all
   end
 
+  # Find a row in a table. Raises an exception if it is not found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param wrapper [Class] the class of the object to return.
+  # @param id [Integer] the id of the row.
+  # @return [Object] the row wrapped in a new wrapper object.
   def find!(table_name, wrapper, id)
     hash = find_hash(table_name, id)
     # raise Crossbeams::FrameworkError, "#{table_name}: id #{id} not found." if hash.nil?
@@ -16,45 +31,102 @@ class RepoBase
     wrapper.new(hash)
   end
 
+  # Find a row in a table. Returns nil if it is not found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param wrapper [Class] the class of the object to return.
+  # @param id [Integer] the id of the row.
+  # @return [Object, nil] the row wrapped in a new wrapper object.
   def find(table_name, wrapper, id)
     hash = find_hash(table_name, id)
     return nil if hash.nil?
     wrapper.new(hash)
   end
 
+  # Find a row in a table. Returns nil if it is not found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param id [Integer] the id of the row.
+  # @return [Hash, nil] the row as a Hash.
   def find_hash(table_name, id)
     where_hash(table_name, id: id)
   end
 
+  # Find the first row in a table matching some condition.
+  # Returns nil if it is not found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param wrapper [Class] the class of the object to return.
+  # @param args [Hash] the where-clause conditions.
+  # @return [Object, nil] the row wrapped in a new wrapper object.
   def where(table_name, wrapper, args)
     hash = where_hash(table_name, args)
     return nil if hash.nil?
     wrapper.new(hash)
   end
 
+  # Find the first row in a table matching some condition.
+  # Returns nil if it is not found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param args [Hash] the where-clause conditions.
+  # @return [Hash, nil] the row as a Hash.
   def where_hash(table_name, args)
     DB[table_name].where(args).first
   end
 
+  # Checks to see if a row exists that meets the given requirements.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param args [Hash] the where-clause conditions.
+  # @return [Boolean] true if the row exists.
   def exists?(table_name, args)
     DB.select(1).where(DB[table_name].where(args).exists).one?
   end
 
+  # Create a record.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param attrs [Hash, OpenStruct] the fields and their values.
+  # @return [Integer] the id of the new record.
   def create(table_name, attrs)
     DB[table_name].insert(attrs.to_h)
   end
 
+  # Update a record.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param id [Integer] the id of the record.
+  # @param attrs [Hash, OpenStruct] the fields and their values.
   def update(table_name, id, attrs)
     DB[table_name].where(id: id).update(attrs.to_h)
   end
 
+  # Delete a record.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param id [Integer] the id of the record.
   def delete(table_name, id)
     DB[table_name].where(id: id).delete
   end
 
+  # Run a query returning an array of values from the first column.
+  #
+  # @param query [String] the SQL query to run.
+  # @return [Array] the values from the first column of each row.
   def select_values(query)
     DB[query].select_map
   end
+
+  # Helper to convert a Ruby Hash into a string that postgresql will understand.
+  #
+  # @param hash [Hash] the hash to convert.
+  # @return [String] JSON String version of the Hash.
+  def hash_to_jsonb_str(hash)
+    "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
+  end
+
+  private
 
   def make_order(dataset, sel_options)
     if sel_options[:desc]
@@ -76,11 +148,6 @@ class RepoBase
     end
   end
 
-  # Helper to convert a Ruby Hash into a string that postgresql will understand.
-  def hash_to_jsonb_str(hash)
-    "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
-  end
-
   def self.inherited(klass)
     klass.extend(MethodBuilder)
   end
@@ -89,6 +156,7 @@ end
 module MethodBuilder
   # Define a +for_select_table_name+ method in a repo.
   # The method returns an array of values for use in e.g. a select dropdown.
+  #
   # Options:
   # alias: String
   # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
@@ -117,6 +185,7 @@ module MethodBuilder
 
   # Define a +for_select_inactive_table_name+ method in a repo.
   # The method returns an array of values from inactive rows for use in e.g. a select dropdown's +disabled_options+.
+  #
   # Options:
   # alias: String
   # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
@@ -134,7 +203,9 @@ module MethodBuilder
   end
 
   # Define CRUD methods for a table in a repo.
+  #
   # Call like this: +crud_calls_for+ :table_name.
+  #
   # This creates find_name, create_name, update_name and delete_name methods for the repo.
   # There are 2 optional params.
   #
@@ -152,6 +223,8 @@ module MethodBuilder
   # - Change the name portion of the method. default: table_name.
   # wrapper: Class
   # - The wrapper class. If not provided, there will be no +find_+ method.
+  # exclude: Array
+  # - A list of symbols to exclude (:create, :update, :delete)
   def crud_calls_for(table_name, options = {})
     name    = options[:name] || table_name
     wrapper = options[:wrapper]

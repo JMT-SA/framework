@@ -22,6 +22,7 @@ require 'dry/inflector'
 require 'dry-struct'
 require 'dry-validation'
 require 'asciidoctor'
+require'yard'
 # require 'pry' # TODO: Put this in based on dev env.
 
 module Types
@@ -143,6 +144,47 @@ class Framework < Roda
         <% end %>
         <div id="asciidoc-content">
           #{Asciidoctor.convert(content, safe: :safe)}
+        </div>
+      HTML
+    end
+
+    r.on 'yarddocthis', String do |file|
+      # Reads Yard doc comments for a file and displays them.
+      # NB: The file param must have all '/' in the name replaced with '='.
+      filename = File.join(File.dirname(__FILE__), file.tr('=', '/'))
+      YARD::Registry.clear
+      YARD.parse_string(File.read(filename))
+      mds = YARD::Registry.all(:method)
+      toc = []
+      out = []
+      mds.each do |m|
+        next if m.visibility == :private
+        toc << m.name
+        parms = m.tags.select { |t| t.tag_name == 'param' }.map { |t| "#{t.name} (#{t.types.join(', ')}): #{t.text}" }
+        rets = m.tags.select { |t| t.tag_name == 'return' }.map(&:text)
+        out << <<~HTML
+          <a id="#{m.name}"></a><h2>#{m.name}</h2>
+          <table>
+          <tr><th>Method:</th><td>#{m.signature.sub('def ', '')}</td></tr>
+          <tr><th>       </th><td><pre>#{m.docstring}</pre></td></tr>
+          <tr><th>Params:</th><td>#{parms.empty? ? '' : "<ul><li>#{parms.join('</li><li>')}</ul>"}</td></tr>
+          <tr><th>Return:</th><td>#{rets.empty? ? '' : rets.join(', ')}</td></tr>
+          </table>
+        HTML
+      end
+
+      view(inline: <<~HTML)
+        <% content_for :late_head do %>
+          <link rel="stylesheet" href="/css/asciidoc.css">
+        <% end %>
+        <div id="asciidoc-content">
+          <h1>Yard documentation for methods in #{file.tr('=', '/')}</h1>
+          #{request.referer.nil? ? '' : "<p><a href='#{request.referer}'>Back</a></p>"}
+          <p>NB. This reads the source file to build the docs, so it is always up-to-date.
+          Note that this simple code might pick up some extra definitions and also note that
+          it uses Yard in a way it was not designed for, so this could all break with an update to Yard.</p>
+          <ul>#{toc.map { |t| "<li><a href='##{t}'>#{t}</a></li>" }.join("\n")}</ul>
+          #{out.join("\n")}
         </div>
       HTML
     end

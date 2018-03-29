@@ -587,19 +587,20 @@ class GenerateNewScaffold < BaseService
     def common_fields
       fields_to_use.map do |field|
         this_col = opts.table_meta.col_lookup[field]
+        required = this_col[:allow_null] ? '' : ' required: true '
         if this_col.nil?
           "#{field}: {}"
         elsif this_col[:type] == :boolean # int: number, _id: select.
           "#{field}: { renderer: :checkbox }"
         elsif field.to_s.end_with?('_id')
-          make_select(field)
+          make_select(field, this_col[:allow_null])
         else
-          "#{field}: {}"
+          "#{field}: {#{required}}"
         end
       end
     end
 
-    def make_select(field)
+    def make_select(field, can_be_null)
       fk = opts.table_meta.fk_lookup[field]
       return "#{field}: {}" if fk.nil?
       singlename  = UtilityFunctions.simple_single(fk[:table].to_s)
@@ -607,10 +608,11 @@ class GenerateNewScaffold < BaseService
       fk_repo = "#{opts.applet_module}::#{klassname}Repo"
       # get fk data & make select - or (if no fk....)
       tm = TableMeta.new(fk[:table])
+      required = can_be_null ? '' : ', required: true'
       if tm.active_column_present?
-        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_inactive_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}' }"
+        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_inactive_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
       else
-        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}' }"
+        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
       end
     end
 
@@ -1100,7 +1102,7 @@ class GenerateNewScaffold < BaseService
       <<~RUBY
         # frozen_string_literal: true
 
-        root_dir = File.expand_path('../..', __FILE__)
+        root_dir = File.expand_path('..', __dir__)
         Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }

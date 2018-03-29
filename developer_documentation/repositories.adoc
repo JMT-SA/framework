@@ -80,6 +80,7 @@ options
 
 * `:name` - use this as the name suffix instead of table_name. i.e. `find_name` instead of `find_table_name`.
 * `:wrapper` - The wrapper class to return from the `find`. If not provided, a `find` method is not generated.
+* `:exclude` - An optional Array containing one or more of `:create`, `:update`, `:delete`. These methods will not be generated.
 
 Examples:
 
@@ -100,6 +101,14 @@ find_people(id)
 create_people(attrs)
 update_people(id, attrs)
 delete_people(id)
+```
+
+```ruby
+crud_calls_for :users, name: 'user', wrapper: User, exclude: %i[delete update]
+
+# Generates the following methods for the repo:
+find_user(id)
+create_user(attrs)
 ```
 
 === Built-in methods

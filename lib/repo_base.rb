@@ -155,6 +155,7 @@ module MethodBuilder
   def crud_calls_for(table_name, options = {})
     name    = options[:name] || table_name
     wrapper = options[:wrapper]
+    skip    = options[:exclude] || []
 
     unless wrapper.nil?
       define_method(:"find_#{name}") do |id|
@@ -162,13 +163,19 @@ module MethodBuilder
       end
     end
 
-    define_method(:"create_#{name}") do |attrs|
-      create(table_name, attrs)
+    unless skip.include?(:create)
+      define_method(:"create_#{name}") do |attrs|
+        create(table_name, attrs)
+      end
     end
 
-    define_method(:"update_#{name}") do |id, attrs|
-      update(table_name, id, attrs)
+    unless skip.include?(:update)
+      define_method(:"update_#{name}") do |id, attrs|
+        update(table_name, id, attrs)
+      end
     end
+
+    return if skip.include?(:delete)
 
     define_method(:"delete_#{name}") do |id|
       delete(table_name, id)

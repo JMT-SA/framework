@@ -5,14 +5,21 @@ class Framework < Roda
     interactor = DataminerInteractor.new(current_user, {}, {}, {})
 
     r.on 'iframe' do
-      view(inline: %(<iframe src="#{flash[:iframe_url]}" title="test" width="100%" style="height:80vh"></iframe>))
+      if flash[:iframe_url].nil?
+        view(inline: '<h1>Not reloadable</h1><p>This page cannot be reloaded. Please navigate back to the report and re-run it.</p><p>Once the report has run, you may be able to reload by right-clicking in the body and choosing <em>Reload frame</em>.</p>')
+      else
+        view(inline: %(<iframe src="#{flash[:iframe_url]}" title="test" width="100%" style="height:80vh"></iframe>))
+      end
     end
 
+    # Just for testing inside an iframe...
     r.on 'runnable_sql' do
       "<h2>Iframe</h2><h3>Params</h3><p>#{params[:sql]}</p><h3>Base64 decoded:</h3><p>#{Base64.decode64(params[:sql])}</p>"
     end
 
     r.on 'report', String do |id|
+      id = id.gsub('%20', ' ')
+
       r.get true do
         @page = interactor.report_parameters(id, params)
         view('dataminer/report/parameters')
@@ -38,10 +45,13 @@ class Framework < Roda
 
       r.post 'run' do
         @page = interactor.run_report(id, params)
-        # flash[:iframe_url] = "#{@page.sql_run_url}?sql=#{@page.runnable}"
-        # r.redirect '/dataminer/reports/iframe'
-        # view(inline: "<p>Runnable</p><pre>#{Base64.decode64(@page.runnable)}</p>")
-        view('dataminer/report/display')
+        if @page.sql_run_url
+          flash[:iframe_url] = "#{@page.sql_run_url}?sql=#{@page.runnable}"
+          r.redirect '/dataminer/reports/iframe'
+          # view(inline: "<p>Runnable</p><pre>#{Base64.decode64(@page.runnable)}</p>")
+        else
+          view('dataminer/report/display')
+        end
       rescue Sequel::DatabaseError => e
         view(inline: <<-HTML)
         <p style='color:red;'>There is a problem with the SQL definition of this report:</p>

@@ -55,6 +55,9 @@ class Framework < Roda
   include MenuHelpers
   include DataminerHelpers
 
+  # Store the name of this class for use in scaffold generating.
+  ENV['RODA_KLASS'] = to_s
+
   use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
   use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb' # , session: request.session

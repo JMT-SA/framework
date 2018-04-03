@@ -2,18 +2,21 @@
   padding: 0 1em;
 }
 .grid-head {
-  background-color: #375c7f;
+  /* background-color: #375c7f; -- for ag-theme-blue */
+  background-color: #d8e6e6;
   padding: 0.2em;
 }
 .grid-caption {
   font-size: 1.2em;
   font-weight: bold;
   padding-left: 1em;
-  color: aliceblue;
+  /* color: aliceblue; -- for ag-theme-blue */
+  color: #727384;
   vertical-align: sub;
 }
 .crossbeams-rowcount {
-  color: white;
+  /* color: white; -- for ag-theme-blue */
+  color: #727384;
   margin-left: 1em;
   vertical-align: sub;
 }
@@ -186,6 +189,25 @@ header,
 
 /* Main content form layout */
 
+.rodauth {
+  padding: 2em;
+}
+
+.rodauth input[type="submit"] {
+  margin-top: 1em;
+  padding: 1rem;
+  background-color: #19a974;
+  color: #fff;
+  border-radius: .25rem;
+  border-color: #f4f4f4;
+  border-style: solid;
+  border-width: 1px;
+}
+
+form.rodauth div.form-group {
+  margin-top: 0.5em;
+}
+
 .crossbeams-field { padding: 0.5em; }
 .crossbeams-row {
     width: 100%;
@@ -201,7 +223,7 @@ header,
 }
 
 /* input, textarea, select { */
-.cbl-input {
+.cbl-input, .rodauth .form-control {
   font-size: 1em;
   padding: 2px 5px 4px;
 /*  border: 0 none; */
@@ -221,12 +243,12 @@ header,
 
 /* flexbox styles */
 /* fieldset div { */
-.crossbeams-field {
+.crossbeams-field, .rodauth .form-group {
   display: flex;
   /*align-items: center; */
 }
 
-.crossbeams-form label {
+.crossbeams-form label, .rodauth .control-label {
   order: 1;
   width: 10em;
   text-align: right;
@@ -237,7 +259,7 @@ header,
 }
 
 /* .crossbeams-form input, .crossbeams-form textarea, .crossbeams-form select { */
-.crossbeams-form .cbl-input, .crossbeams-form .multi-wrapper {
+.crossbeams-form .cbl-input, .crossbeams-form .multi-wrapper, .rodauth .col-sm-10 {
   order: 2;
   flex: 1 1 auto;
 }
@@ -279,7 +301,9 @@ header,
 
 /* label state styles - relies on label placed after input in form...*/
 /* .crossbeams-form input:focus ~ label, .crossbeams-form textarea:focus ~ label, .crossbeams-form select:focus ~ label { */
-.crossbeams-form .cbl-input:focus ~ label, .crossbeams-form .searchable-multi:focus ~ label {
+.crossbeams-form .cbl-input:focus ~ label,
+.crossbeams-form .searchable-multi:focus ~ label,
+.rodauth .form-control:focus ~ label {
   color: darkcyan;
 }
 

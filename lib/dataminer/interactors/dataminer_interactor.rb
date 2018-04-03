@@ -23,9 +23,12 @@ class DataminerInteractor < BaseInteractor
     page.report = repo.lookup_report(id)
     page.crosstab_config = repo.lookup_crosstab(id)
     setup_report_with_parameters(page.report, params, page.crosstab_config, db)
-    # page.runnable = Base64.encode64(page.report.runnable_sql)
-    # page.sql_run_url = '/dataminer/reports/runnable_sql'
-    # return page
+
+    if page.report.external_settings[:render_url]
+      page.runnable = Base64.encode64(page.report.runnable_sql)
+      page.sql_run_url = page.report.external_settings[:render_url]
+      return page
+    end
     # IF raw_sql_to_url, return page with base64 version of runnable_sql...
     # puts params.inspect
     # {"limit"=>"", "offset"=>"", "crosstab"=>{"row_columns"=>["organization_code", "commodity_code", "fg_code_old"], "column_columns"=>"grade_code", "value_columns"=>"no_pallets"}, "btnSubmit"=>"Run report", "json_var"=>"[]"}
@@ -301,6 +304,7 @@ class DataminerInteractor < BaseInteractor
     report.caption = params[:caption]
     report.limit = params[:limit].empty? ? nil : params[:limit].to_i
     report.offset = params[:offset].empty? ? nil : params[:offset].to_i
+    report.external_settings[:render_url] = params[:render_url].empty? ? nil : params[:render_url]
     yp = Crossbeams::Dataminer::YamlPersistor.new(filename)
     report.save(yp)
     success_response('Report saved', report)

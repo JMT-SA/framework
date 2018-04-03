@@ -11,7 +11,7 @@ module DM
         cols    = report.ordered_columns.map { |column| ["#{column.name} (#{column.caption})", column.name] }
         obj     = OpenStruct.new
         obj.id  = id
-        rules   = { fields: { id: { renderer: :hidden } } }
+        rules   = { fields: { id: { renderer: :hidden } }, name: 'report' }
 
         layout = Crossbeams::Layout::Page.build(rules) do |page|
           # page.form_object ui_rule.form_object

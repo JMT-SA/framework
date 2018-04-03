@@ -23,6 +23,10 @@
         <label for="offset">Offset</label>
         <input type='number' id="offset" name='offset' class='cbl-input' placeholder='Offset' value='<%= @page.report.offset %>' size="80"/>
       </div>
+      <div class="crossbeams-field">
+        <label for="render_url">Render URL</label>
+        <input type='url' id="render_url" name='render_url' class='cbl-input' placeholder='Render URL' value='<%= @page.report.external_settings[:render_url] %>'/>
+      </div>
       <div class="crossbeams-actions">
         <input type="submit" class="white bg-green br2 dim pa3 ba b--near-white" value="Update report header" />
       </div>
@@ -40,14 +44,14 @@
 
 <div style="height:20em">
   <%= Crossbeams::Layout::Renderer::Grid.header('grd1', 'Columns') %>
-  <div id="grd1" style="height: 100%;" class="ag-blue"></div>
+  <div id="grd1" style="height: 100%;" class="ag-theme-balham"></div>
 </div>
 
 <p style="margin-top:5em;"><a href='/dataminer/admin/<%= @page.id %>/parameter/new/' class="white bg-blue br2 dim pa3 ba b--near-white"><i class="fa fa-plus"></i> Add a parameter</a><p>
 
 <div style="height:20em">
   <%= Crossbeams::Layout::Renderer::Grid.header('grd2', 'Parameters') %>
-  <div id="grd2" style="height: 100%;" class="ag-blue"></div>
+  <div id="grd2" style="height: 100%;" class="ag-theme-balham"></div>
 </div>
 <p style="height:2em">
 </p>

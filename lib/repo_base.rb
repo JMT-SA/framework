@@ -126,6 +126,10 @@ class RepoBase
     "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
   end
 
+  def self.inherited(klass)
+    klass.extend(MethodBuilder)
+  end
+
   private
 
   def make_order(dataset, sel_options)
@@ -146,10 +150,6 @@ class RepoBase
     else
       dataset.select(label_name, value_name).map { |rec| [rec[label_name], rec[value_name]] }
     end
-  end
-
-  def self.inherited(klass)
-    klass.extend(MethodBuilder)
   end
 end
 

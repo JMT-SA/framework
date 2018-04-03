@@ -139,41 +139,6 @@ class TestRepoBase < MiniTestWithHooks
     assert_equal y, x
   end
 
-  def test_make_order
-    dataset = DB[:users]
-    sel_options = { order_by: :email, desc: false }
-    x = RepoBase.new.make_order(dataset, sel_options)
-    assert_equal 10, x.count
-    assert_kind_of Hash, x.first
-    assert_equal 'test_9@example.com', x.last[:email]
-
-    sel_options[:desc] = true
-    x = RepoBase.new.make_order(dataset, sel_options)
-    assert_equal 'test_9@example.com', x.first[:email]
-  end
-
-  def test_select_single
-    dataset = DB[:users]
-    value_name = :login_name
-    result = RepoBase.new.select_single(dataset, value_name)
-    expected = DB[:users].select(value_name).map{|r| r[value_name]}
-    assert_equal expected, result
-  end
-
-  def test_select_two
-    dataset = DB[:users]
-    value_name = :login_name
-    label_name = :user_name
-    result = RepoBase.new.select_two(dataset, label_name, value_name)
-    expected = dataset.select(label_name, value_name).map{|r| [r[label_name], r[value_name]]}
-    assert_equal expected, result
-
-    label_name = [:user_name, :active]
-    result = RepoBase.new.select_two(dataset, label_name, value_name)
-    expected = dataset.select(*label_name, value_name).map{|r| [label_name.map{ |nm| r[nm]}.join(' - '), r[value_name]]}
-    assert_equal expected, result
-  end
-
   def test_hash_to_jsonb_str
     hash = {test: 'Test', int: 123, array: [], bool: true, hash: {}}
     result = RepoBase.new.hash_to_jsonb_str(hash)
@@ -209,6 +174,33 @@ class TestRepoBase < MiniTestWithHooks
     klass.build_inactive_select(:tablename, value: :code, alias: 'tab')
     repo = klass.new
     assert_respond_to repo, :for_select_inactive_tab
+  end
+
+  def test_for_select_ordered
+    klass = Class.new(RepoBase)
+    klass.build_for_select(:users, value: :login_name, order_by: :login_name)
+    repo = klass.new
+    users = repo.for_select_users
+    assert_equal 'usr_0', users.first
+    assert_equal 'usr_9', users.last
+  end
+
+  def test_for_select_descending
+    klass = Class.new(RepoBase)
+    klass.build_for_select(:users, value: :login_name, order_by: :login_name, desc: true)
+    repo = klass.new
+    users = repo.for_select_users
+    assert_equal 'usr_9', users.first
+    assert_equal 'usr_0', users.last
+  end
+
+  def test_for_select_two
+    klass = Class.new(RepoBase)
+    klass.build_for_select(:users, value: :login_name, label: :user_name, order_by: :login_name)
+    repo = klass.new
+    users = repo.for_select_users
+    assert_equal ['User 0', 'usr_0'], users.first
+    assert_equal ['User 9', 'usr_9'], users.last
   end
 
   def test_crud_calls_without_wrapper

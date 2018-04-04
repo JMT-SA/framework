@@ -87,7 +87,11 @@ namespace :db do
       Sequel::Migrator.run(db, 'db/migrations', target: args[:version].to_i)
     else
       puts 'Migrating to latest'
-      Sequel::Migrator.run(db, 'db/migrations')
+      if ENV['MISS']
+        Sequel::Migrator.run(db, 'db/migrations', allow_missing_migration_files: true)
+      else
+        Sequel::Migrator.run(db, 'db/migrations')
+      end
     end
   end
 

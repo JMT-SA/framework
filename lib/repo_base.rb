@@ -110,6 +110,15 @@ class RepoBase
     DB[table_name].where(id: id).delete
   end
 
+  # Deactivate a record.
+  # Sets the +active+ column to false.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param id [Integer] the id of the record.
+  def deactivate(table_name, id)
+    DB[table_name].where(id: id).update(active: false)
+  end
+
   # Run a query returning an array of values from the first column.
   #
   # @param query [String] the SQL query to run.

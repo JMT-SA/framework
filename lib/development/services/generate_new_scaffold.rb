@@ -36,8 +36,8 @@ class GenerateNewScaffold < BaseService
         program: program_klass,
         text_name: @inflector.singularize(@table).split('_').map(&:capitalize).join(' '),
         schema: "#{classname}Schema",
-        repo: "#{@shared_repo_name ? @inflector.camelize(@shared_repo_name.sub(/Repo$/, '')) : classname}Repo",
-        namespaced_repo: "#{modulename}::#{@shared_repo_name ? @inflector.camelize(@shared_repo_name.sub(/Repo$/, '')) : classname}Repo",
+        repo: "#{@shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
+        namespaced_repo: "#{modulename}::#{@shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
         interactor: "#{classname}Interactor",
         namespaced_interactor: "#{modulename}::#{classname}Interactor",
         view_prefix: "#{applet_klass}::#{program_klass}::#{classname}"
@@ -160,7 +160,7 @@ class GenerateNewScaffold < BaseService
     }.freeze
 
     def initialize(table)
-      repo             = DevelopmentRepo.new
+      repo             = DevelopmentApp::DevelopmentRepo.new
       @columns         = repo.table_columns(table)
       @column_names    = repo.table_col_names(table)
       @indexed_columns = repo.indexed_columns(table)
@@ -1007,7 +1007,7 @@ class GenerateNewScaffold < BaseService
     attr_reader :opts
     def initialize(opts)
       @opts = opts
-      @repo = DevelopmentRepo.new
+      @repo = DevelopmentApp::DevelopmentRepo.new
     end
 
     def call

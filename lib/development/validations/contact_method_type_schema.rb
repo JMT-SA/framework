@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-ContactMethodTypeSchema = Dry::Validation.Form do
-  configure { config.type_specs = true }
+module DevelopmentApp
+  ContactMethodTypeSchema = Dry::Validation.Form do
+    configure { config.type_specs = true }
 
-  optional(:id, :int).filled(:int?)
-  required(:contact_method_type, Types::StrippedString).filled(:str?)
+    optional(:id, :int).filled(:int?)
+    required(:contact_method_type, Types::StrippedString).filled(:str?)
+  end
 end

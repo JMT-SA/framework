@@ -3,7 +3,7 @@
 module UiRules
   class RoleRule < Base
     def generate_rules
-      @this_repo = RoleRepo.new
+      @repo = DevelopmentApp::RoleRepo.new
       make_form_object
       apply_form_values
 
@@ -29,7 +29,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(:roles, Role, @options[:id])
+      @form_object = @repo.find_role(@options[:id])
     end
 
     def make_new_form_object

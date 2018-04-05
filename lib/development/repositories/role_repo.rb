@@ -1,18 +1,11 @@
-class RoleRepo < RepoBase
-  build_for_select :roles,
-                   label: :name,
-                   value: :id,
-                   order_by: :name
+# frozen_string_literal: true
 
-  def create_role(attrs)
-    create(:roles, attrs)
-  end
-
-  def update_role(id, attrs)
-    update(:roles, id, attrs)
-  end
-
-  def delete_role(id)
-    delete(:roles, id)
+module DevelopmentApp
+  class RoleRepo < RepoBase
+    build_for_select :roles,
+                     label: :name,
+                     value: :id,
+                     order_by: :name
+    crud_calls_for :roles, name: :role, wrapper: Role
   end
 end

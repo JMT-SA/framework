@@ -3,7 +3,7 @@
 module UiRules
   class ContactMethodTypeRule < Base
     def generate_rules
-      @this_repo = ContactMethodTypeRepo.new
+      @repo = DevelopmentApp::ContactMethodTypeRepo.new
       make_form_object
       apply_form_values
 
@@ -27,7 +27,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(:contact_method_types, ContactMethodType, @options[:id])
+      @form_object = @repo.find_contact_method_type(@options[:id])
     end
 
     def make_new_form_object

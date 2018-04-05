@@ -8,7 +8,7 @@ class Framework < Roda
     # ROLES
     # --------------------------------------------------------------------------
     r.on 'roles', Integer do |id|
-      interactor = RoleInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::RoleInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:roles, id) do
@@ -51,7 +51,7 @@ class Framework < Roda
       end
     end
     r.on 'roles' do
-      interactor = RoleInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::RoleInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('masterfiles', 'new')
           show_partial_or_page(fetch?(r)) { Development::Masterfiles::Role::New.call(remote: fetch?(r)) }
@@ -88,7 +88,7 @@ class Framework < Roda
     # ADDRESS TYPES
     # --------------------------------------------------------------------------
     r.on 'address_types', Integer do |id|
-      interactor = AddressTypeInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::AddressTypeInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:address_types, id) do
@@ -131,7 +131,7 @@ class Framework < Roda
       end
     end
     r.on 'address_types' do
-      interactor = AddressTypeInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::AddressTypeInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('masterfiles', 'new')
           show_partial_or_page(fetch?(r)) { Development::Masterfiles::AddressType::New.call(remote: fetch?(r)) }
@@ -168,7 +168,7 @@ class Framework < Roda
     # CONTACT METHOD TYPES
     # --------------------------------------------------------------------------
     r.on 'contact_method_types', Integer do |id|
-      interactor = ContactMethodTypeInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::ContactMethodTypeInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:contact_method_types, id) do
@@ -210,7 +210,7 @@ class Framework < Roda
       end
     end
     r.on 'contact_method_types' do
-      interactor = ContactMethodTypeInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::ContactMethodTypeInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('masterfiles', 'new')
           show_partial_or_page(fetch?(r)) { Development::Masterfiles::ContactMethodType::New.call(remote: fetch?(r)) }
@@ -247,7 +247,7 @@ class Framework < Roda
     # USERS
     # --------------------------------------------------------------------------
     r.on 'users', Integer do |id|
-      interactor = UserInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::UserInteractor.new(current_user, {}, {}, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:users, id) do
@@ -293,7 +293,7 @@ class Framework < Roda
       end
     end
     r.on 'users' do
-      interactor = UserInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::UserInteractor.new(current_user, {}, {}, {})
       r.on 'new' do    # NEW
         if authorised?('masterfiles', 'new')
           show_partial_or_page(fetch?(r)) { Development::Masterfiles::User::New.call(remote: fetch?(r)) }
@@ -329,3 +329,6 @@ class Framework < Roda
     end
   end
 end
+
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/BlockLength

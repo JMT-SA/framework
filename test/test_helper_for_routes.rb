@@ -30,7 +30,7 @@ class RouteTester < Minitest::Test
   end
 
   def base_user
-    User.new(
+    DevelopmentApp::User.new(
       id: 1,
       login_name: 'usr_login',
       user_name: 'User Name',
@@ -41,12 +41,12 @@ class RouteTester < Minitest::Test
   end
 
   def authorise_pass!
-    UserRepo.any_instance.stubs(:find).returns(base_user)
+    DevelopmentApp::UserRepo.any_instance.stubs(:find).returns(base_user)
     SecurityApp::MenuRepo.any_instance.stubs(:authorise?).returns(true)
   end
 
   def authorise_fail!
-    UserRepo.any_instance.stubs(:find).returns(base_user)
+    DevelopmentApp::UserRepo.any_instance.stubs(:find).returns(base_user)
     SecurityApp::MenuRepo.any_instance.stubs(:authorise?).returns(false)
   end
 

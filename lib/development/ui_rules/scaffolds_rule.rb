@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module UiRules
   class ScaffoldsRule < Base
     def generate_rules
-      @this_repo = DevelopmentRepo.new
+      @repo = DevelopmentApp::DevelopmentRepo.new
       make_form_object
       apply_form_values
 
@@ -11,12 +13,12 @@ module UiRules
 
       disable_other
 
-      form_name 'scaffold'.freeze
+      form_name 'scaffold'
     end
 
     def common_fields
       {
-        table: { renderer: :select, options: @this_repo.table_list, prompt: true },
+        table: { renderer: :select, options: @repo.table_list, prompt: true },
         applet: { renderer: :select, options: applets_list },
         other: { force_lowercase: true },
         program: { force_lowercase: true },
@@ -29,7 +31,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(@options[:id])
+      @form_object = @repo.find(@options[:id])
     end
 
     def make_new_form_object

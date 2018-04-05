@@ -48,7 +48,7 @@ class MiniTestWithHooks < Minitest::Test
 end
 
 def current_user
-  User.new(
+  DevelopmentApp::User.new(
     id: 1,
     login_name: 'usr_login',
     user_name: 'User Name',

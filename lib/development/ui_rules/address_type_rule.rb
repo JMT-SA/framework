@@ -3,7 +3,7 @@
 module UiRules
   class AddressTypeRule < Base
     def generate_rules
-      @this_repo = AddressTypeRepo.new
+      @repo = DevelopmentApp::AddressTypeRepo.new
       make_form_object
       apply_form_values
 
@@ -29,7 +29,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(:address_types, AddressType, @options[:id])
+      @form_object = @repo.find_address_type(@options[:id])
     end
 
     def make_new_form_object

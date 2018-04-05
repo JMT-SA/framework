@@ -23,12 +23,12 @@ class TestRepoBase < MiniTestWithHooks
   end
 
   def test_all
-    x = RepoBase.new.all(:users, User)
+    x = RepoBase.new.all(:users, DevelopmentApp::User)
     assert_equal 10, x.count
-    assert_instance_of(User, x.first)
+    assert_instance_of(DevelopmentApp::User, x.first)
 
     DB[:users].delete
-    x = RepoBase.new.all(:users, User)
+    x = RepoBase.new.all(:users, DevelopmentApp::User)
     assert_equal 0, x.count
     assert_empty x
   end
@@ -66,34 +66,34 @@ class TestRepoBase < MiniTestWithHooks
 
   def test_find
     id = RepoBase.new.where_hash(:users, email: 'test_5@example.com')[:id]
-    y = RepoBase.new.find(:users, User, id)
-    assert_instance_of(User, y)
+    y = RepoBase.new.find(:users, DevelopmentApp::User, id)
+    assert_instance_of(DevelopmentApp::User, y)
     assert y.id == id
 
     DB[:users].where(id: id).delete
-    y = RepoBase.new.find(:users, User, id)
+    y = RepoBase.new.find(:users, DevelopmentApp::User, id)
     assert_nil y
   end
 
   def test_find!
     id = RepoBase.new.where_hash(:users, email: 'test_5@example.com')[:id]
-    y = RepoBase.new.find!(:users, User, id)
-    assert_instance_of(User, y)
+    y = RepoBase.new.find!(:users, DevelopmentApp::User, id)
+    assert_instance_of(DevelopmentApp::User, y)
     assert y.id == id
 
     x = assert_raises(RuntimeError) {
-      RepoBase.new.find!(:users, User, 20)
+      RepoBase.new.find!(:users, DevelopmentApp::User, 20)
     }
     assert_equal 'users: id 20 not found.', x.message
   end
 
   def test_where
-    x = RepoBase.new.where(:users, User, email: 'test_5@example.com')
+    x = RepoBase.new.where(:users, DevelopmentApp::User, email: 'test_5@example.com')
     assert_equal 'usr_5', x.login_name
-    assert_instance_of User, x
+    assert_instance_of DevelopmentApp::User, x
 
     DB[:users].where(email: 'test_5@example.com').delete
-    x = RepoBase.new.where(:users, User, email: 'test_5@example.com')
+    x = RepoBase.new.where(:users, DevelopmentApp::User, email: 'test_5@example.com')
     assert_nil x
   end
 
@@ -111,25 +111,32 @@ class TestRepoBase < MiniTestWithHooks
              password_hash: "$a$10$wZQEHY77JEp93JgUUyVqgOkwhPb8bYZLswD5NVTWOKwU1ssQTYa.K",
              email: "test@example.com",
              active: true}
-    assert_nil RepoBase.new.where(:users, User, email: 'test@example.com')
+    assert_nil RepoBase.new.where(:users, DevelopmentApp::User, email: 'test@example.com')
     x = RepoBase.new.create(:users, attrs)
     assert_instance_of Integer, x
-    usr = RepoBase.new.find(:users, User, x)
+    usr = RepoBase.new.find(:users, DevelopmentApp::User, x)
     assert_equal 'usr', usr.login_name
     assert_equal 'User', usr.user_name
     assert_equal 'test@example.com', usr.email
   end
 
   def test_update
-    id = RepoBase.new.where(:users, User, email: 'test_1@example.com').id
+    id = RepoBase.new.where(:users, DevelopmentApp::User, email: 'test_1@example.com').id
     RepoBase.new.update(:users, id, email: 'updated@example.com')
     assert_equal 'updated@example.com', DB[:users].where(id: id).first[:email]
   end
 
   def test_delete
-    id = RepoBase.new.where(:users, User, email: 'test_8@example.com').id
+    id = RepoBase.new.where(:users, DevelopmentApp::User, email: 'test_8@example.com').id
     RepoBase.new.delete(:users, id)
     refute DB[:users].where(id: id).first
+  end
+
+  def test_deactivate
+    user = RepoBase.new.where(:users, DevelopmentApp::User, email: 'test_8@example.com')
+    RepoBase.new.deactivate(:users, user.id)
+    assert user.active
+    refute DB[:users].where(id: user.id).first[:active]
   end
 
   def test_select_values
@@ -215,7 +222,7 @@ class TestRepoBase < MiniTestWithHooks
 
   def test_crud_calls
     klass = Class.new(RepoBase)
-    klass.crud_calls_for(:tablename, wrapper: User)
+    klass.crud_calls_for(:tablename, wrapper: DevelopmentApp::User)
     repo = klass.new
     assert_respond_to repo, :create_tablename
     assert_respond_to repo, :update_tablename

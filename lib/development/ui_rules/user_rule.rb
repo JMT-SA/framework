@@ -3,7 +3,7 @@
 module UiRules
   class UserRule < Base
     def generate_rules
-      @this_repo = UserRepo.new
+      @repo = DevelopmentApp::UserRepo.new
       make_form_object
       apply_form_values
 
@@ -43,7 +43,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find(:users, User, @options[:id])
+      @form_object = @repo.find_user(@options[:id])
     end
 
     def make_new_form_object

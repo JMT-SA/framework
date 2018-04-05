@@ -119,11 +119,14 @@ class GenerateNewScaffold < BaseService
       boolean: 'Types::Bool',
       float: 'Types::Float',
       datetime: 'Types::DateTime',
+      date: 'Types::Date',
+      decimal: 'Types::Decimal',
       integer_array: 'Types::Array',
-      string_array: 'Types::Array'
+      string_array: 'Types::Array',
+      jsonb: 'Types::Hash'
     }.freeze
 
-    VALIDATION_TYPE_LOOKUP = {
+    VALIDATION_EXPECT_LOOKUP = {
       integer: '(:int?)',
       string: '(:str?)',
       boolean: '(:bool?)',
@@ -131,6 +134,27 @@ class GenerateNewScaffold < BaseService
       date: '(:date?)',
       time: '(:time?)',
       float: '(:float?)',
+      decimal: '(:decimal?)',
+      jsonb: '(:hash?)',
+      integer_array: nil, # ' { each(:int?) }',
+      string_array: nil # ' { each(:str?) }'
+    }.freeze
+
+    VALIDATION_TYPE_LOOKUP = {
+      integer: ':int',
+      string: 'Types::StrippedString',
+      boolean: ':bool',
+      datetime: ':date_time',
+      date: ':date',
+      time: ':time',
+      float: ':float',
+      decimal: ':decimal',
+      jsonb: ':hash',
+      integer_array: ':array',
+      string_array: ':array'
+    }.freeze
+
+    VALIDATION_ARRAY_LOOKUP = {
       integer_array: ' { each(:int?) }',
       string_array: ' { each(:str?) }'
     }.freeze
@@ -167,7 +191,15 @@ class GenerateNewScaffold < BaseService
     end
 
     def column_dry_validation_type(column)
-      VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "(Types::??? (#{@col_lookup[column][:type]}))"
+      VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+    end
+
+    def column_dry_validation_array_extra(column)
+      VALIDATION_ARRAY_LOOKUP[@col_lookup[column][:type]]
+    end
+
+    def column_dry_validation_expect_type(column)
+      VALIDATION_EXPECT_LOOKUP[@col_lookup[column][:type]] || "(Types::??? (#{@col_lookup[column][:type]}))"
     end
 
     def active_column_present?
@@ -323,6 +355,8 @@ class GenerateNewScaffold < BaseService
 
         module #{opts.classnames[:module]}
           #{opts.classnames[:schema]} = Dry::Validation.Form do
+            configure { config.type_specs = true }
+
             #{attr.join("\n    ")}
           end
         end
@@ -337,11 +371,11 @@ class GenerateNewScaffold < BaseService
         detail = opts.table_meta.col_lookup[col]
         fill_opt = detail[:allow_null] ? 'maybe' : 'filled'
         max = detail[:max_length] && detail[:max_length] < 200 ? "max_size?: #{detail[:max_length]}" : nil
-        rules = [opts.table_meta.column_dry_validation_type(col), max].compact.join(', ')
+        rules = [opts.table_meta.column_dry_validation_expect_type(col), max, opts.table_meta.column_dry_validation_array_extra(col)].compact.join(', ')
         attr << if col == :id
-                  "optional(:#{col}).#{fill_opt}#{rules}"
+                  "optional(:#{col}, #{opts.table_meta.column_dry_validation_type(col)}).#{fill_opt}#{rules}"
                 else
-                  "required(:#{col}).#{fill_opt}#{rules}"
+                  "required(:#{col}, #{opts.table_meta.column_dry_validation_type(col)}).#{fill_opt}#{rules}"
                 end
       end
       attr

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 TargetMarketSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:target_market_name).filled(:str?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:target_market_name, Types::StrippedString).filled(:str?)
 end

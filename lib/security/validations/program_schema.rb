@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module SecurityApp
-  ProgramSchema = Dry::Validation.Schema do
-    required(:program_name).filled(:str?)
+  ProgramSchema = Dry::Validation.Form do
+    configure { config.type_specs = true }
+
+    required(:program_name, Types::StrippedString).filled(:str?)
   end
 end

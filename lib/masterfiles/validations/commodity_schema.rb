@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 CommoditySchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:commodity_group_id).filled(:int?)
-  required(:code).filled(:str?)
-  required(:description).filled(:str?)
-  required(:hs_code).filled(:str?)
-  required(:active).maybe(:bool?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:commodity_group_id, :int).filled(:int?)
+  required(:code, Types::StrippedString).filled(:str?)
+  required(:description, Types::StrippedString).filled(:str?)
+  required(:hs_code, Types::StrippedString).filled(:str?)
+  required(:active, :bool).maybe(:bool?)
 end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 DestinationRegionSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:destination_region_name).filled(:str?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:destination_region_name, Types::StrippedString).filled(:str?)
 end

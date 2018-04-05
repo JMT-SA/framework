@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 PartyRoleSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:party_id).filled(:int?)
-  required(:role_id).filled(:int?)
-  required(:organization_id).maybe(:int?)
-  required(:person_id).maybe(:int?)
-  required(:active).maybe(:bool?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:party_id, :int).filled(:int?)
+  required(:role_id, :int).filled(:int?)
+  required(:organization_id, :int).maybe(:int?)
+  required(:person_id, :int).maybe(:int?)
+  required(:active, :bool).maybe(:bool?)
 end

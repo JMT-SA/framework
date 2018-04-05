@@ -2,7 +2,9 @@
 
 module SecurityApp
   EditProgramSchema = Dry::Validation.Form do
-    required(:program_name).filled(:str?)
-    required(:webapps).filled(:array?)
+    configure { config.type_specs = true }
+
+    required(:program_name, Types::StrippedString).filled(:str?)
+    required(:webapps, :array).filled(:array?)
   end
 end

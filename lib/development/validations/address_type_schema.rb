@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 AddressTypeSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:address_type).filled(:str?)
-  required(:active).maybe(:bool?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:address_type, Types::StrippedString).filled(:str?)
+  required(:active, :bool).maybe(:bool?)
 end

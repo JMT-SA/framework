@@ -27,10 +27,10 @@ require'yard'
 
 module Types
   include Dry::Types.module
-  # StrippedString = Types.Constructor(String) { |value| value.to_s.strip }
-  # module DataImport
-  #   StrippedString = Strict::String.constructor { |value| value.to_s.strip }
-  # end
+
+  StrippedString = Types::String.constructor do |str|
+    str&.is_a?(String) ? str.strip.chomp : str
+  end
 end
 
 require './lib/crossbeams_responses'

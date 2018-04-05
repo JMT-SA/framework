@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 PartySchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:party_type).filled(:str?, max_size?: 1)
-  required(:active).maybe(:bool?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:party_type, Types::StrippedString).filled(:str?, max_size?: 1)
+  required(:active, :bool).maybe(:bool?)
 end

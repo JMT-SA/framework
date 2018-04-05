@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 CultivarSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:commodity_id).filled(:int?)
-  required(:cultivar_group_id).maybe(:int?)
-  required(:cultivar_name).filled(:str?)
-  required(:description).maybe(:str?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:commodity_id, :int).filled(:int?)
+  required(:cultivar_group_id, :int).maybe(:int?)
+  required(:cultivar_name, Types::StrippedString).filled(:str?)
+  required(:description, Types::StrippedString).maybe(:str?)
 end

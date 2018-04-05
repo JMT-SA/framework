@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RoleSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:name).maybe(:str?)
-  required(:active).maybe(:bool?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:name, Types::StrippedString).maybe(:str?)
+  required(:active, :bool).maybe(:bool?)
 end

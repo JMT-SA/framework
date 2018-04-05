@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 BasicPackCodeSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:basic_pack_code).filled(:str?)
-  required(:description).maybe(:str?)
-  required(:length_mm).maybe(:int?)
-  required(:width_mm).maybe(:int?)
-  required(:height_mm).maybe(:int?)
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:basic_pack_code, Types::StrippedString).filled(:str?)
+  required(:description, Types::StrippedString).maybe(:str?)
+  required(:length_mm, :int).maybe(:int?)
+  required(:width_mm, :int).maybe(:int?)
+  required(:height_mm, :int).maybe(:int?)
 end

@@ -5,5 +5,6 @@ module SecurityApp
     configure { config.type_specs = true }
 
     required(:program_name, Types::StrippedString).filled(:str?)
+    optional(:functional_area_id, :int).maybe(:int?)
   end
 end

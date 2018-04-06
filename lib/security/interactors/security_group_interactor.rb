@@ -23,7 +23,10 @@ module SecurityApp
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       # res = validate_security_group
-      @id = repo.create_security_group(res)
+      DB.transaction do
+        @id = repo.create_security_group(res)
+        repo.log_action(:security_groups, @id, 'I', user_name: @user.user_name)
+      end
       success_response("Created security group #{security_group.security_group_name}",
                        security_group)
     rescue Sequel::UniqueConstraintViolation
@@ -35,7 +38,10 @@ module SecurityApp
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       # res = validate_security_group... etc.
-      repo.update_security_group(id, res)
+      DB.transaction do
+        repo.update_security_group(id, res)
+        repo.log_action(:security_groups, id, 'U', user_name: @user.user_name)
+      end
       success_response("Updated security group #{security_group.security_group_name}",
                        security_group(false))
     end
@@ -45,6 +51,7 @@ module SecurityApp
       name = security_group.security_group_name
       DB.transaction do
         repo.delete_with_permissions(id)
+        repo.log_action(:security_groups, id, 'D', user_name: @user.user_name)
       end
       success_response("Deleted security group #{name}")
     end
@@ -53,6 +60,7 @@ module SecurityApp
       if params[:security_permissions]
         DB.transaction do
           repo.assign_security_permissions(id, params[:security_permissions].map(&:to_i))
+          repo.log_action(:security_groups, id, 'U', user_name: @user.user_name)
         end
         security_group_ex = repo.find_with_permissions(id)
         success_response("Updated permissions on security group #{security_group_ex.security_group_name}",

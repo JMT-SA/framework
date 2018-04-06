@@ -135,6 +135,27 @@ class RepoBase
     "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
   end
 
+  # rubocop:disable Metrics/ParameterLists
+
+  # Log the context of an action change on a table row.
+  #
+  # @param table_name [Symbol] the table name.
+  # @param id [Integer] the id of the row.
+  # @param action [String] the action (I == insert, D == delete, U == update)
+  # @param user_name [String] the current user's name.
+  # @param context [String] more context about what led to the action.
+  # @param status [String] the status to be applied to the row.
+  def log_action(table_name, id, action, user_name: nil, context: nil, status: nil)
+    DB[:logged_action_details].insert(schema_name: 'public',
+                                      table_name: table_name.to_s,
+                                      row_data_id: id,
+                                      action: action,
+                                      user_name: user_name,
+                                      context: context,
+                                      status: status)
+  end
+  # rubocop:enable Metrics/ParameterLists
+
   def self.inherited(klass)
     klass.extend(MethodBuilder)
   end

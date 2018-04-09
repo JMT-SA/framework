@@ -112,7 +112,6 @@ class Framework < Roda
         end
       end
       r.is do
-        p 'IS'
         r.get do       # SHOW
           if authorised?('menu', 'read')
             show_partial { Security::FunctionalAreas::Program::Show.call(id) }

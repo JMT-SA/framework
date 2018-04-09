@@ -31,8 +31,12 @@ module Types
   # Returns nil if the new result is blank.
   # Non-string input (including nil) passes through to be handled by the dry-validation schema.
   StrippedString = Types::String.constructor do |str|
-    newstr = str&.class&.name == 'String' ? str.strip.chomp : str
-    newstr&.empty? ? nil : newstr
+    if str&.class&.name == 'String'
+      newstr = str.strip.chomp
+      newstr&.empty? ? nil : newstr
+    else
+      str
+    end
   end
 end
 

@@ -3,7 +3,7 @@ require File.join(File.expand_path('./../', __FILE__), 'test_helper')
 class TestBaseInteractor < Minitest::Test
 
   def interactor
-    BaseInteractor.new(current_user, {}, {}, {})
+    BaseInteractor.new(current_user, {}, { route_url: request.path }, {})
   end
 
   def test_exists?

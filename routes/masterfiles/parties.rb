@@ -6,7 +6,7 @@
 class Framework < Roda
   route 'parties', 'masterfiles' do |r|
     r.on 'organizations', Integer do |id|
-      interactor = OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:organizations, id) do
@@ -14,7 +14,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('menu', 'edit')
+        if authorised?('parties', 'edit')
           show_partial { Masterfiles::Parties::Organization::Edit.call(id) }
         else
           dialog_permission_error
@@ -54,46 +54,52 @@ class Framework < Roda
       end
       r.is do
         r.get do
-          if authorised?('menu', 'read')
+          if authorised?('parties', 'read')
             show_partial { Masterfiles::Parties::Organization::Show.call(id) }
           else
             dialog_permission_error
           end
         end
-        r.patch do
+        r.patch do     # UPDATE
           response['Content-Type'] = 'application/json'
           res = interactor.update_organization(id, params[:organization])
           if res.success
-            update_grid_row(id,
-                            changes: { short_description: res.instance[:short_description] },
-                            notice: res.message)
+            update_grid_row(id, changes: { party_id: res.instance[:party_id],
+                                           parent: res.instance[:parent_organization],
+                                           short_description: res.instance[:short_description],
+                                           medium_description: res.instance[:medium_description],
+                                           long_description: res.instance[:long_description],
+                                           vat_number: res.instance[:vat_number],
+                                           variants: res.instance[:variants],
+                                           active: res.instance[:active] },
+                                notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
             update_dialog_content(content: content, error: res.message)
           end
         end
-        r.delete do
+        r.delete do    # DELETE
           response['Content-Type'] = 'application/json'
           res = interactor.delete_organization(id)
-          if res.success
-            delete_grid_row(id, notice: res.message)
-          else
-            p 'do I get in here'
-            flash[:error] = res.errors
-          end
+          delete_grid_row(id, notice: res.message)
         end
       end
     end
     r.on 'organizations' do
-      interactor = OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('menu', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
+        if authorised?('parties', 'new')
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
       end
-      r.post do
+      r.post do        # CREATE
         res = interactor.create_organization(params[:organization])
         if res.success
           flash[:notice] = res.message
@@ -111,17 +117,16 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
-                                                         form_errors: res.errors,
-                                                         remote: false)
-          end
+          stash_page(Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
+                                                                  form_errors: res.errors,
+                                                                  remote: false))
+          r.redirect '/masterfiles/parties/organizations/new'
         end
       end
     end
 
     r.on 'people', Integer do |id|
-      interactor = PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:people, id) do
@@ -198,7 +203,7 @@ class Framework < Roda
       end
     end
     r.on 'people' do
-      interactor = PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         if authorised?('menu', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
@@ -234,7 +239,7 @@ class Framework < Roda
     end
 
     r.on 'addresses', Integer do |id|
-      interactor = AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:addresses, id) do
@@ -283,7 +288,7 @@ class Framework < Roda
       end
     end
     r.on 'addresses' do
-      interactor = AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         if authorised?('parties', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
@@ -319,7 +324,7 @@ class Framework < Roda
     end
 
     r.on 'contact_methods', Integer do |id|
-      interactor = ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:contact_methods, id) do
@@ -363,7 +368,7 @@ class Framework < Roda
       end
     end
     r.on 'contact_methods' do
-      interactor = ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         if authorised?('parties', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
@@ -400,7 +405,7 @@ class Framework < Roda
 
     r.on 'link_addresses', Integer do |id|
       r.post do
-        interactor = PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
 
         res = interactor.link_addresses(id, multiselect_grid_choices(params))
         if res.success
@@ -413,7 +418,7 @@ class Framework < Roda
     end
     r.on 'link_contact_methods', Integer do |id|
       r.post do
-        interactor = PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
 
         res = interactor.link_contact_methods(id, multiselect_grid_choices(params))
         if res.success

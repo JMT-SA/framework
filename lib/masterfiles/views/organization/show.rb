@@ -7,8 +7,8 @@ module Masterfiles
         def self.call(id)
           ui_rule = UiRules::Compiler.new(:organization, :show, id: id)
           rules   = ui_rule.compile
-          addresses = PartyRepo.new.addresses_for_party(organization_id: id)
-          contact_methods = PartyRepo.new.contact_methods_for_party(organization_id: id)
+          addresses = MasterfilesApp::PartyRepo.new.addresses_for_party(organization_id: id)
+          contact_methods = MasterfilesApp::PartyRepo.new.contact_methods_for_party(organization_id: id)
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object

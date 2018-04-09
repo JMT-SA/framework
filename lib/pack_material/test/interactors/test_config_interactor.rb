@@ -242,7 +242,7 @@ module PackMaterialApp
     private
 
     def interactor
-      @interactor ||= ConfigInteractor.new(current_user, {}, {}, {})
+      @interactor ||= ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
     end
   end
 end

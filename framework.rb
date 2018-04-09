@@ -23,13 +23,16 @@ require 'dry-struct'
 require 'dry-validation'
 require 'asciidoctor'
 require'yard'
-# require 'pry' # TODO: Put this in based on dev env.
 
 module Types
   include Dry::Types.module
 
+  # Strips leading and trailing spaces from the input string.
+  # Returns nil if the new result is blank.
+  # Non-string input (including nil) passes through to be handled by the dry-validation schema.
   StrippedString = Types::String.constructor do |str|
-    str&.is_a?(String) ? str.strip.chomp : str
+    newstr = str&.class&.name == 'String' ? str.strip.chomp : str
+    newstr&.empty? ? nil : newstr
   end
 end
 

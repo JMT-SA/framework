@@ -28,7 +28,7 @@ class Framework < Roda
       end
 
       r.post do        # CREATE
-        res = ScaffoldNewSchema.call(params[:scaffold] || {})
+        res = DevelopmentApp::ScaffoldNewSchema.call(params[:scaffold] || {})
         errors = res.messages
         if errors.empty?
           result = GenerateNewScaffold.call(res.to_h)

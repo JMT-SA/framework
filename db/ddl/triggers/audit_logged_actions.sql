@@ -94,7 +94,7 @@ CREATE TABLE audit.logged_actions (
     row_data hstore,
     changed_fields hstore,
     statement_only boolean not null,
-    row_data_id integer
+    row_data_id integer -- CUSTOM
 );
 
 REVOKE ALL ON audit.logged_actions FROM public;
@@ -122,7 +122,7 @@ COMMENT ON COLUMN audit.logged_actions.row_data_id IS 'CUSTOM: Stores the id of 
 CREATE INDEX logged_actions_relid_idx ON audit.logged_actions(relid);
 CREATE INDEX logged_actions_action_tstamp_tx_stm_idx ON audit.logged_actions(action_tstamp_stm);
 CREATE INDEX logged_actions_action_idx ON audit.logged_actions(action);
-CREATE INDEX logged_actions_row_data_id_idx ON audit.logged_actions(row_data_id);
+CREATE INDEX logged_actions_row_data_id_idx ON audit.logged_actions(row_data_id); -- CUSTOM
 
 CREATE OR REPLACE FUNCTION audit.if_modified_func() RETURNS TRIGGER AS $body$
 DECLARE
@@ -154,7 +154,7 @@ BEGIN
         substring(TG_OP,1,1),                         -- action
         NULL, NULL,                                   -- row_data, changed_fields
         'f',                                          -- statement_only
-        NULL                                          -- row_data_id
+        NULL                                          -- row_data_id -- CUSTOM
         );
 
     IF NOT TG_ARGV[0]::boolean IS DISTINCT FROM 'f'::boolean THEN
@@ -172,13 +172,13 @@ BEGIN
             -- All changed fields are ignored. Skip this update.
             RETURN NULL;
         END IF;
-        audit_row.row_data_id = OLD.id;
+        audit_row.row_data_id = OLD.id; -- CUSTOM
     ELSIF (TG_OP = 'DELETE' AND TG_LEVEL = 'ROW') THEN
         audit_row.row_data = hstore(OLD.*) - excluded_cols;
-        audit_row.row_data_id = OLD.id;
+        audit_row.row_data_id = OLD.id; -- CUSTOM
     ELSIF (TG_OP = 'INSERT' AND TG_LEVEL = 'ROW') THEN
         audit_row.row_data = hstore(NEW.*) - excluded_cols;
-        audit_row.row_data_id = NEW.id;
+        audit_row.row_data_id = NEW.id; -- CUSTOM
     ELSIF (TG_LEVEL = 'STATEMENT' AND TG_OP IN ('INSERT','UPDATE','DELETE','TRUNCATE')) THEN
         audit_row.statement_only = 't';
     ELSE

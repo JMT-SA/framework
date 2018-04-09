@@ -145,14 +145,15 @@ class RepoBase
   # @param user_name [String] the current user's name.
   # @param context [String] more context about what led to the action.
   # @param status [String] the status to be applied to the row.
-  def log_action(table_name, id, action, user_name: nil, context: nil, status: nil)
-    DB[:logged_action_details].insert(schema_name: 'public',
-                                      table_name: table_name.to_s,
-                                      row_data_id: id,
-                                      action: action,
-                                      user_name: user_name,
-                                      context: context,
-                                      status: status)
+  # @param schema [String] the schema that the table belongs to. Defaults to: 'public'.
+  def log_action(table_name, id, action, user_name: nil, context: nil, status: nil, schema: 'public')
+    DB[Sequel[:audit][:logged_action_details]].insert(schema_name: schema,
+                                                      table_name: table_name.to_s,
+                                                      row_data_id: id,
+                                                      action: action,
+                                                      user_name: user_name,
+                                                      context: context,
+                                                      status: status)
   end
   # rubocop:enable Metrics/ParameterLists
 

@@ -3,7 +3,7 @@
 module UiRules
   class DestinationRegionRule < Base
     def generate_rules
-      @repo = DestinationRepo.new
+      @repo = MasterfilesApp::DestinationRepo.new
       make_form_object
       apply_form_values
 

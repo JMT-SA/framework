@@ -3,7 +3,7 @@
 module UiRules
   class CommodityGroupRule < Base
     def generate_rules
-      @repo = CommodityRepo.new
+      @repo = MasterfilesApp::CommodityRepo.new
       make_form_object
       apply_form_values
 

@@ -3,7 +3,7 @@
 module UiRules
   class StdFruitSizeCountRule < Base
     def generate_rules
-      @this_repo = FruitSizeRepo.new
+      @this_repo = MasterfilesApp::FruitSizeRepo.new
       make_form_object
       apply_form_values
 
@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields
-      commodity_id_label = CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
+      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
       fields[:size_count_description] = { renderer: :label }
       fields[:marketing_size_range_mm] = { renderer: :label }
@@ -32,7 +32,7 @@ module UiRules
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: CommodityRepo.new.for_select_commodities },
+        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities },
         size_count_description: {},
         marketing_size_range_mm: {},
         marketing_weight_range: {},

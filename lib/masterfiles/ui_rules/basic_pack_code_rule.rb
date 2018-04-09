@@ -3,7 +3,7 @@
 module UiRules
   class BasicPackCodeRule < Base
     def generate_rules
-      @this_repo = FruitSizeRepo.new
+      @this_repo = MasterfilesApp::FruitSizeRepo.new
       make_form_object
       apply_form_values
 

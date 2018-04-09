@@ -3,7 +3,7 @@
 module UiRules
   class ContactMethodRule < Base
     def generate_rules
-      @repo = PartyRepo.new
+      @repo = MasterfilesApp::PartyRepo.new
       make_form_object
       apply_form_values
 

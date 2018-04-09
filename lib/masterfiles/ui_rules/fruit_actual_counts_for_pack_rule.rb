@@ -3,7 +3,7 @@
 module UiRules
   class FruitActualCountsForPackRule < Base
     def generate_rules
-      @this_repo = FruitSizeRepo.new
+      @this_repo = MasterfilesApp::FruitSizeRepo.new
       make_form_object
       apply_form_values
 
@@ -15,9 +15,9 @@ module UiRules
     end
 
     def set_show_fields
-      std_fruit_size_count_id_label = FruitSizeRepo.new.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_description
-      basic_pack_code_id_label = FruitSizeRepo.new.find_basic_pack_code(@form_object.basic_pack_code_id)&.basic_pack_code
-      standard_pack_code_id_label = FruitSizeRepo.new.find_standard_pack_code(@form_object.standard_pack_code_id)&.standard_pack_code
+      std_fruit_size_count_id_label = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_description
+      basic_pack_code_id_label = MasterfilesApp::FruitSizeRepo.new.find_basic_pack_code(@form_object.basic_pack_code_id)&.basic_pack_code
+      standard_pack_code_id_label = MasterfilesApp::FruitSizeRepo.new.find_standard_pack_code(@form_object.standard_pack_code_id)&.standard_pack_code
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label }
       fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label }
       fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label }
@@ -27,9 +27,9 @@ module UiRules
 
     def common_fields
       {
-        std_fruit_size_count_id: { renderer: :select, options: FruitSizeRepo.new.for_select_std_fruit_size_counts },
-        basic_pack_code_id: { renderer: :select, options: FruitSizeRepo.new.for_select_basic_pack_codes },
-        standard_pack_code_id: { renderer: :select, options: FruitSizeRepo.new.for_select_standard_pack_codes },
+        std_fruit_size_count_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts },
+        basic_pack_code_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes },
+        standard_pack_code_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes },
         actual_count_for_pack: {},
         size_count_variation: {}
       }

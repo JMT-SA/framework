@@ -3,7 +3,7 @@
 module UiRules
   class TargetMarketGroupRule < Base
     def generate_rules
-      @repo = TargetMarketRepo.new
+      @repo = MasterfilesApp::TargetMarketRepo.new
       make_form_object
       apply_form_values
 

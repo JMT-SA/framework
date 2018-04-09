@@ -3,7 +3,7 @@
 module UiRules
   class FruitSizeReferenceRule < Base
     def generate_rules
-      @this_repo = FruitSizeRepo.new
+      @this_repo = MasterfilesApp::FruitSizeRepo.new
       make_form_object
       apply_form_values
 
@@ -15,14 +15,14 @@ module UiRules
     end
 
     def set_show_fields
-      fruit_actual_counts_for_pack_id_label = FruitSizeRepo.new.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.size_count_variation
+      fruit_actual_counts_for_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.size_count_variation
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label }
       fields[:size_reference] = { renderer: :label }
     end
 
     def common_fields
       {
-        fruit_actual_counts_for_pack_id: { renderer: :select, options: FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs },
+        fruit_actual_counts_for_pack_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs },
         size_reference: {}
       }
     end

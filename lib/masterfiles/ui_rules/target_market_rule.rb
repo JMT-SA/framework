@@ -3,7 +3,7 @@
 module UiRules
   class TargetMarketRule < Base
     def generate_rules
-      @repo = TargetMarketRepo.new
+      @repo = MasterfilesApp::TargetMarketRepo.new
       make_form_object
       apply_form_values
 
@@ -24,7 +24,7 @@ module UiRules
       {
         target_market_name: {},
         tm_group_ids: { renderer: :multi, options: @repo.for_select_target_market_groups, selected: @form_object.tm_group_ids },
-        country_ids: { renderer: :multi, options: DestinationRepo.new.for_select_destination_countries, selected: @form_object.country_ids }
+        country_ids: { renderer: :multi, options: MasterfilesApp::DestinationRepo.new.for_select_destination_countries, selected: @form_object.country_ids }
       }
     end
 

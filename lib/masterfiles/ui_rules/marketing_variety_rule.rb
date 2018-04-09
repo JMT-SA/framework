@@ -3,7 +3,7 @@
 module UiRules
   class MarketingVarietyRule < Base
     def generate_rules
-      @repo = CultivarRepo.new
+      @repo = MasterfilesApp::CultivarRepo.new
       make_form_object
       apply_form_values
 

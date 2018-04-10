@@ -1008,11 +1008,10 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       gridOptions = {
         context: { domGridId: gridId },
         columnDefs: null,
-        rowDefs: null,
+        rowData: null,
         enableColResize: true,
         enableSorting: true,
         enableFilter: true,
-        suppressScrollLag: true, // TODO: remove with version 13...
         enableRangeSelection: true,
         enableStatusBar: true,
         suppressAggFuncInHeader: true,
@@ -1048,11 +1047,10 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       gridOptions = {
         context: { domGridId: gridId },
         // columnDefs: null,
-        rowDefs: null,
+        rowData: null,
         enableColResize: true,
         enableSorting: true,
         enableFilter: true,
-        suppressScrollLag: true,
         rowSelection: 'single',
         enableRangeSelection: true,
         enableStatusBar: true,

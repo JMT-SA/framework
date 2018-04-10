@@ -31,9 +31,9 @@ module Types
   # Returns nil if the new result is blank.
   # Non-string input (including nil) passes through to be handled by the dry-validation schema.
   StrippedString = Types::String.constructor do |str|
-    if str&.class&.name == 'String'
+    if str&.is_a?(::String)
       newstr = str.strip.chomp
-      newstr&.empty? ? nil : newstr
+      newstr.empty? ? nil : newstr
     else
       str
     end
@@ -68,13 +68,6 @@ class Framework < Roda
   use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
   use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb' # , session: request.session
-  # use Crossbeams::DataminerInterface::App,
-  #     url_prefix: 'dataminer/',
-  #     dm_reports_location: File.join(File.dirname(__FILE__), 'reports'),
-  #     dm_grid_queries_location: File.join(File.dirname(__FILE__), 'grid_definitions', 'dataminer_queries'),
-  #     dm_js_location: 'js',
-  #     dm_css_location: 'css',
-  #     db_connection: DB
 
   plugin :data_grid, path: File.dirname(__FILE__),
                      list_url: '/list/%s/grid',
@@ -92,29 +85,20 @@ class Framework < Roda
   plugin :view_options
   plugin :multi_route
   plugin :content_for, append: true
-  # plugin :indifferent_params # - allows access to params by string or symbol.
   plugin :symbolized_params    # - automatically converts all keys of params to symbols.
   plugin :flash
   plugin :csrf, raise: true, skip_if: ->(_) { ENV['RACK_ENV'] == 'test' }  # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
   plugin :rodauth do
-    db DB # .connection
+    db DB
     enable :login, :logout # , :change_password
     logout_route 'a_dummy_route' # Override 'logout' route so that we have control over it.
     # logout_notice_flash 'Logged out'
     session_key :user_id
-    login_param 'login_name' # 'user_name'
+    login_param 'login_name'
     login_label 'Login name'
-    login_column :login_name # :user_name
-    accounts_table :users
-    account_password_hash_column :password_hash # :hashed_password (This is old base64 version)
-    # require_bcrypt? false
-    # password_match? do |password| # Use legacy password hashing. Maybe change this to modern bcrypt using extra new pwd field?
-    #   account[:hashed_password] == Base64.encode64(password)
-    # end
-    # title_instance_variable :@title
-    # if DEMO_MODE
-    #   before_change_password{r.halt(404)}
-    # end
+    login_column :login_name
+    accounts_table :vw_active_users # Only active users can login.
+    account_password_hash_column :password_hash
   end
   # plugin :error_handler do |e|
   #   # TODO: how to handle AJAX/JSON etc...

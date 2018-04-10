@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: 5f51a185f91a97ddabb852658a28c9000cd7a175
+  revision: 80deab0475857b3dc76fdeb69f6d37bb47b56744
   specs:
     crossbeams-layout (0.1.4)
       rouge
@@ -38,11 +38,6 @@ GIT
       crossbeams-dataminer
       crossbeams-layout
       roda
-
-PATH
-  remote: /home/james/gitlocal/pg_query
-  specs:
-    pg_query (1.0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -122,6 +117,7 @@ GEM
     parser (2.5.0.4)
       ast (~> 2.4.0)
     pg (1.0.0)
+    pg_query (1.0.1)
     powerpack (0.1.1)
     pry (0.11.3)
       coderay (~> 1.1.0)
@@ -204,7 +200,6 @@ DEPENDENCIES
   minitest-stub_any_instance (~> 1.0.1)
   mocha (~> 1.3.0)
   pg
-  pg_query!
   pry
   pry-byebug
   pry-clipboard

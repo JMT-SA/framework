@@ -10,3 +10,4 @@ DB.logger = Logger.new($stdout) if ENV.fetch('RACK_ENV') == 'development' && !EN
 # DB.logger = Logger.new('log/sql.log') if ENV.fetch('RACK_ENV') == 'development' && !ENV['DONOTLOGSQL']
 DB.extension :pg_array
 DB.extension :pg_json
+DB.extension :pg_hstore

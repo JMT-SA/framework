@@ -1,11 +1,11 @@
 ---
 :caption: Logged Actions
-:sql: "SELECT a.event_id AS id, a.table_name, l.row_data_id, l.user_name, l.context,
+:sql: "SELECT a.event_id AS id, a.table_name, a.row_data_id, l.user_name, l.context,
   l.status,\r\nl.created_at, \r\nCASE a.action WHEN 'I' THEN 'INS' WHEN 'U' THEN 'UPD'
   WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,\r\na.client_query, a.row_data, a.changed_fields\r\nFROM
   audit.logged_actions a\r\nLEFT OUTER JOIN audit.logged_action_details l ON l.table_name
   = a.table_name AND l.row_data_id = a.row_data_id\r\nAND date_trunc('second', l.created_at)
-  = date_trunc('second', a.action_tstamp_tx)\r\n"
+  = date_trunc('second', a.action_tstamp_tx)\r\nORDER BY a.table_name, a.row_data_id DESC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -43,7 +43,7 @@
   row_data_id:
     :name: row_data_id
     :sequence_no: 3
-    :caption: Row data
+    :caption: Table row ID
     :namespaced_name: l.row_data_id
     :data_type: :integer
     :width: 

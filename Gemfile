@@ -28,7 +28,8 @@ gem 'crossbeams-rack_middleware', git: 'https://github.com/NoSoft-SA/crossbeams-
 gem 'roda-data_grid', git: 'https://github.com/NoSoft-SA/roda-data_grid.git'
 
 # Whilst awaiting pg_query gem update release...
-gem 'pg_query',           path: '/home/james/gitlocal/pg_query'
+gem 'pg_query', git: 'https://github.com/jcsjcs/pg_query.git'
+# gem 'pg_query',           path: '/home/james/gitlocal/pg_query'
 
 # gem 'crossbeams-dataminer',           path: File.expand_path('../../crossbeams-dataminer', __FILE__)
 # gem 'crossbeams-label_designer',      path: File.expand_path('../../crossbeams-label_designer', __FILE__)

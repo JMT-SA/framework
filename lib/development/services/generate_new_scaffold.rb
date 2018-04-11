@@ -36,8 +36,8 @@ class GenerateNewScaffold < BaseService
         program: program_klass,
         text_name: @inflector.singularize(@table).split('_').map(&:capitalize).join(' '),
         schema: "#{classname}Schema",
-        repo: "#{@shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
-        namespaced_repo: "#{modulename}::#{@shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
+        repo: "#{@shared_repo_name.nil? || @shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
+        namespaced_repo: "#{modulename}::#{@shared_repo_name.nil? || @shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
         interactor: "#{classname}Interactor",
         namespaced_interactor: "#{modulename}::#{classname}Interactor",
         view_prefix: "#{applet_klass}::#{program_klass}::#{classname}"
@@ -238,7 +238,10 @@ class GenerateNewScaffold < BaseService
             def create_#{opts.singlename}(params)
               res = validate_#{opts.singlename}_params(params)
               return validation_failed_response(res) unless res.messages.empty?
-              @id = repo.create_#{opts.singlename}(res)
+              DB.transaction do
+                @id = repo.create_#{opts.singlename}(res)
+                log_transaction
+              end
               success_response("Created #{opts.classnames[:text_name].downcase} \#{#{opts.singlename}.#{opts.label_field}}",
                                #{opts.singlename})
             rescue Sequel::UniqueConstraintViolation
@@ -249,7 +252,10 @@ class GenerateNewScaffold < BaseService
               @id = id
               res = validate_#{opts.singlename}_params(params)
               return validation_failed_response(res) unless res.messages.empty?
-              repo.update_#{opts.singlename}(id, res)
+              DB.transaction do
+                repo.update_#{opts.singlename}(id, res)
+                log_transaction
+              end
               success_response("Updated #{opts.classnames[:text_name].downcase} \#{#{opts.singlename}.#{opts.label_field}}",
                                #{opts.singlename}(false))
             end
@@ -257,7 +263,10 @@ class GenerateNewScaffold < BaseService
             def delete_#{opts.singlename}(id)
               @id = id
               name = #{opts.singlename}.#{opts.label_field}
-              repo.delete_#{opts.singlename}(id)
+              DB.transaction do
+                repo.delete_#{opts.singlename}(id)
+                log_transaction
+              end
               success_response("Deleted #{opts.classnames[:text_name].downcase} \#{name}")
             end
           end
@@ -457,7 +466,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      roda_klass    = ENV['RODA_KLASS']
+      roda_klass = ENV['RODA_KLASS']
       <<~RUBY
         # frozen_string_literal: true
 
@@ -469,7 +478,7 @@ class GenerateNewScaffold < BaseService
             # #{opts.table.upcase.tr('_', ' ')}
             # --------------------------------------------------------------------------
             r.on '#{opts.table}', Integer do |id|
-              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, {}, {})
+              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
 
               # Check for notfound:
               r.on !interactor.exists?(:#{opts.table}, id) do
@@ -510,7 +519,7 @@ class GenerateNewScaffold < BaseService
               end
             end
             r.on '#{opts.table}' do
-              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, {}, {})
+              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
               r.on 'new' do    # NEW
                 if authorised?('#{opts.program}', 'new')
                   page = stashed_page

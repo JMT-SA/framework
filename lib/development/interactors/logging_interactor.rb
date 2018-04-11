@@ -39,7 +39,7 @@ module DevelopmentApp
                   { headerName: 'Action', field: 'action' },
                   { headerName: 'User', field: 'user_name', width: 200 },
                   { headerName: 'Context', field: 'context' },
-                  { headerName: 'Status', field: 'status' }]
+                  { headerName: 'Route URL', field: 'route_url' }]
       col_defs += make_columns_for(col_names, logged_action.table_name)
       col_defs << { headerName: 'Stmt Only?', field: 'statement_only',
                     cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',

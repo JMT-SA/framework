@@ -1,11 +1,11 @@
 ---
 :caption: Logged Actions
-:sql: "SELECT a.event_id AS id, a.table_name, a.row_data_id, l.user_name, l.context,
-  l.status,\r\nl.created_at, \r\nCASE a.action WHEN 'I' THEN 'INS' WHEN 'U' THEN 'UPD'
-  WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,\r\na.client_query, a.row_data, a.changed_fields\r\nFROM
-  audit.logged_actions a\r\nLEFT OUTER JOIN audit.logged_action_details l ON l.table_name
-  = a.table_name AND l.row_data_id = a.row_data_id\r\nAND date_trunc('second', l.created_at)
-  = date_trunc('second', a.action_tstamp_tx)\r\nORDER BY a.table_name, a.row_data_id DESC"
+:sql: "SELECT a.event_id AS id, a.table_name, a.row_data_id, l.user_name, l.context,\r\n
+  \ l.route_url, a.transaction_id,\r\na.action_tstamp_tx, \r\nCASE a.action WHEN 'I'
+  THEN 'INS' WHEN 'U' THEN 'UPD'\r\n  WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,\r\na.client_query,
+  a.row_data, a.changed_fields\r\nFROM audit.logged_actions a\r\nLEFT OUTER JOIN audit.logged_action_details
+  l ON l.transaction_id = a.transaction_id AND l.action_tstamp_tx = a.action_tstamp_tx\r\nORDER
+  BY a.table_name, a.row_data_id DESC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -29,7 +29,7 @@
     :name: table_name
     :sequence_no: 2
     :caption: Table name
-    :namespaced_name: l.table_name
+    :namespaced_name: a.table_name
     :data_type: :string
     :width: 
     :format: 
@@ -44,7 +44,7 @@
     :name: row_data_id
     :sequence_no: 3
     :caption: Table row ID
-    :namespaced_name: l.row_data_id
+    :namespaced_name: a.row_data_id
     :data_type: :integer
     :width: 
     :format: 
@@ -85,26 +85,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  status:
-    :name: status
+  route_url:
+    :name: route_url
     :sequence_no: 6
-    :caption: Status
-    :namespaced_name: l.status
+    :caption: Route url
+    :namespaced_name: l.route_url
     :data_type: :string
     :width: 
     :format: 
     :hide: false
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  created_at:
-    :name: created_at
+  transaction_id:
+    :name: transaction_id
     :sequence_no: 7
-    :caption: Created at
-    :namespaced_name: l.created_at
+    :caption: Transaction
+    :namespaced_name: a.transaction_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  action_tstamp_tx:
+    :name: action_tstamp_tx
+    :sequence_no: 8
+    :caption: Transaction Time
+    :namespaced_name: a.action_tstamp_tx
     :data_type: :datetime
     :width: 
     :format: 
@@ -117,7 +132,7 @@
     :group_max: false
   action:
     :name: action
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Action
     :namespaced_name: 
     :data_type: :string
@@ -132,7 +147,7 @@
     :group_max: false
   client_query:
     :name: client_query
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Client query
     :namespaced_name: a.client_query
     :data_type: :string
@@ -147,7 +162,7 @@
     :group_max: false
   row_data:
     :name: row_data
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Row data
     :namespaced_name: a.row_data
     :data_type: :string
@@ -162,7 +177,7 @@
     :group_max: false
   changed_fields:
     :name: changed_fields
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Changed fields
     :namespaced_name: a.changed_fields
     :data_type: :string
@@ -176,15 +191,15 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: l.table_name
-  :caption: Table
+- :column: a.table_name
+  :caption: Table name
   :data_type: :string
   :control_type: :list
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT DISTINCT table_name FROM audit.logged_actions ORDER BY table_name
-- :column: l.row_data_id
+- :column: a.row_data_id
   :caption: ID
   :data_type: :integer
   :control_type: :text

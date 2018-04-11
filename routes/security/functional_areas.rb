@@ -289,7 +289,7 @@ class Framework < Roda
     # SECURITY GROUPS
     # --------------------------------------------------------------------------
     r.on 'security_groups', Integer do |id|
-      interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:security_groups, id) do
@@ -347,7 +347,7 @@ class Framework < Roda
       end
     end
     r.on 'security_groups' do
-      interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('menu', 'new')
           show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::SecurityGroup::New.call(remote: fetch?(r)) }

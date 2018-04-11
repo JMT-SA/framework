@@ -15,11 +15,10 @@ module DevelopmentApp
         SELECT a.action_tstamp_tx,
          CASE a.action WHEN 'I' THEN 'INS' WHEN 'U' THEN 'UPD'
           WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,
-         l.user_name, l.context, l.status,
+         l.user_name, l.context, l.route_url,
          a.statement_only, a.row_data, a.changed_fields
         FROM audit.logged_actions a
-        LEFT OUTER JOIN audit.logged_action_details l ON l.table_name = a.table_name AND l.row_data_id = a.row_data_id
-        AND date_trunc('second', l.created_at) = date_trunc('second', a.action_tstamp_tx)
+        LEFT OUTER JOIN audit.logged_action_details l ON l.transaction_id = a.transaction_id AND l.action_tstamp_tx = a.action_tstamp_tx
         WHERE a.table_name = '#{table_name}'
           AND a.row_data_id = #{id}
         ORDER BY a.action_tstamp_tx DESC

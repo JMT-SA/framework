@@ -3,12 +3,10 @@
 module DevelopmentApp
   class LoggedActionDetail < Dry::Struct
     attribute :id, Types::Int
-    attribute :schema_name, Types::String
-    attribute :table_name, Types::String
-    attribute :row_data_id, Types::Int
-    attribute :action, Types::String
+    attribute :transaction_id, Types::Int
+    attribute :action_tstamp_tx, Types::DateTime
     attribute :user_name, Types::String
     attribute :context, Types::String
-    attribute :status, Types::String
+    attribute :route_url, Types::String
   end
 end

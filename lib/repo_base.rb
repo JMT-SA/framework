@@ -135,27 +135,16 @@ class RepoBase
     "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
   end
 
-  # rubocop:disable Metrics/ParameterLists
-
-  # Log the context of an action change on a table row.
+  # Log the context of a transaction. Useful for joining to logged_actions table which has no context..
   #
-  # @param table_name [Symbol] the table name.
-  # @param id [Integer] the id of the row.
-  # @param action [String] the action (I == insert, D == delete, U == update)
   # @param user_name [String] the current user's name.
   # @param context [String] more context about what led to the action.
-  # @param status [String] the status to be applied to the row.
-  # @param schema [String] the schema that the table belongs to. Defaults to: 'public'.
-  def log_action(table_name, id, action, user_name: nil, context: nil, status: nil, schema: 'public')
-    DB[Sequel[:audit][:logged_action_details]].insert(schema_name: schema,
-                                                      table_name: table_name.to_s,
-                                                      row_data_id: id,
-                                                      action: action,
-                                                      user_name: user_name,
+  # @param route_url [String] the application route that led to the transaction.
+  def log_action(user_name: nil, context: nil, route_url: nil)
+    DB[Sequel[:audit][:logged_action_details]].insert(user_name: user_name,
                                                       context: context,
-                                                      status: status)
+                                                      route_url: route_url)
   end
-  # rubocop:enable Metrics/ParameterLists
 
   def self.inherited(klass)
     klass.extend(MethodBuilder)

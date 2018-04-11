@@ -179,9 +179,16 @@ namespace :db do
                            :updated_at,
                            function_name: :#{nm}_set_updated_at,
                            trigger_name: :set_updated_at)
+
+            # Log changes to this table.
+            run "SELECT audit.audit_table('#{nm}');"
           end
 
           down do
+            # Drop logging for this table.
+            drop_trigger(:#{nm}, :audit_trigger_row)
+            drop_trigger(:#{nm}, :audit_trigger_stm)
+
             drop_trigger(:#{nm}, :set_created_at)
             drop_function(:#{nm}_set_created_at)
             drop_trigger(:#{nm}, :set_updated_at)

@@ -16,9 +16,7 @@ require 'sequel'
 ENV['RACK_ENV'] = 'test'
 require './config/environment'
 
-module Types
-  include Dry::Types.module
-end
+require './lib/types_for_dry'
 require './lib/crossbeams_responses'
 require './lib/repo_base'
 

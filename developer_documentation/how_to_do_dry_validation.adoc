@@ -17,15 +17,22 @@ In most cases we want to inherit from `Dry::Validation.Form` rather than `Dry::V
 An example showing some simple variations:
 ```.ruby
 NewThingSchema = Dry::Validation.Form do
-  optional(:id).filled(:int?)
-  required(:join_id).filled(:int?)
-  required(:code).filled(:str?)
-  required(:name).maybe(:str?)
-  required(:active).filled(:bool?)
-  required(:multiselected_ids).filled { each(:int?) }
+  configure { config.type_specs = true }
+
+  optional(:id, :int).filled(:int?)
+  required(:join_id, :int).filled(:int?)
+  required(:code, Types::StrippedString).filled(:str?)
+  required(:name, Types::StrippedString).maybe(:str?)
+  required(:active, :bool).filled(:bool?)
+  required(:multiselected_ids, Types::IntArray).filled { each(:int?) }
 end
 
 ```
+
+=== Special types
+
+* `Types::StrippedString` will remove leading and trailing spaces from a string before validation. Non-strings pass through and blank strings become nil.
+* `Types::IntArray` will convert string elements in an array to integers. Blank strings become nil and non-strings or strings that cannot coerce to integers pass through so the dry-validation schema can fail their validation.
 
 == Calling a schema
 
@@ -43,10 +50,15 @@ Here is an example of a passing call followed by a failing call. Note how the in
 => #<Dry::Validation::Result output={:join_id=>"XXX", :code=>"AA", :name=>nil, :active=>true, :multiselected_ids=>[]} errors={:join_id=>["must be an integer"], :multiselected_ids=>["must be filled"]}>
 > res.errors                          # <3>
 => {:join_id=>["must be an integer"], :multiselected_ids=>["must be filled"]}
+> res = NewThingSchema.call(join_id: '2', code: 'AA', name: nil, active: 't', multiselected_ids: ['1', 'www'])
+=> #<Dry::Validation::Result output={:join_id=>2, :code=>"AA", :name=>nil, :active=>true, :multiselected_ids=>[1, "www"]} errors={:multiselected_ids=>{1=>["must be an integer"]}}>
+> res.errors                          # <4>
+=> {:multiselected_ids=>{1=>["must be an integer"]}}
 ```
 <1> Note the `'t'` has become a Boolean with `true` value.
 <2> The Array input has had all its items coerced to Integers.
 <3> Errors are returned as a Hash keyed by the column name and the value is an array of one or more validation failure messages.
+<4> Errors can be for the array as a whole, or in this case for one of the elements.
 
 == Rules
 
@@ -64,53 +76,53 @@ e.g. `{ col: 'some_value' }`
 |Y
 |Y
 |Integer
-|`required(:col).filled(:int?)`
+|`required(:col, :int).filled(:int?)`
 |`{col: '123'}`
 
 |Y
 |Y
 |String
-|`required(:col).filled(:str?)`
+|`required(:col, Types::StrippedString).filled(:str?)`
 |`{col: 'abc'}`
 
 |Y
 |Y
 |Boolean
-|`required(:col).filled(:bool?)`
+|`required(:col, :bool).filled(:bool?)`
 |`{col: 't'}`
 
 |Y
 |N
 |Integer
-|`required(:col).maybe(:int?)`
+|`required(:col, :int).maybe(:int?)`
 |`{col: nil}`
 
 |N
 |Y
 |Integer
-|`optional(:col).filled(:int?)`
+|`optional(:col, :int).filled(:int?)`
 |`{}`
 
 |N
 |N
 |Integer
-|`optional(:col).maybe(:int?)`
+|`optional(:col, :int).maybe(:int?)`
 |`{}`
 
 |Y
 |Y (length > 0)
 |Array of Integer
-|`required(:col).filled { each(:int?) }`
+|`required(:col, Types::IntArray).filled { each(:int?) }`
 |`{col: ['1','2']}`
 
 |Y
 |Y (can be empty)
 |Array of Integer
-|`required(:col).each(:int?)`
+|`required(:col, Types::IntArray).each(:int?)`
 |`{col: []}`
 
 |Y
 |N (length > 0)
 |Array of Integer
-|`required(:col).maybe { each(:int?) }`
+|`required(:col, Types::IntArray).maybe { each(:int?) }`
 |`{col: nil}`

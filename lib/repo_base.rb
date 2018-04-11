@@ -135,7 +135,7 @@ class RepoBase
     "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
   end
 
-  # Log the context of a transaction. Useful for joining to logged_actions table which has no context..
+  # Log the context of a transaction. Useful for joining to logged_actions table which has no context.
   #
   # @param user_name [String] the current user's name.
   # @param context [String] more context about what led to the action.

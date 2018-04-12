@@ -316,11 +316,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Parties::Address::New.call(form_values: params[:address],
-                                                    form_errors: res.errors,
-                                                    remote: false)
-          end
+          stash_page(Masterfiles::Parties::Address::New.call(form_values: params[:address],
+                                                             form_errors: res.errors,
+                                                             remote: false))
+          r.redirect '/masterfiles/parties/addresses/new'
         end
       end
     end

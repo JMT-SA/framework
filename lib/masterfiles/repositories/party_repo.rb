@@ -11,8 +11,6 @@ module MasterfilesApp
                           value: :id,
                           order_by: :short_description
 
-    crud_calls_for :organizations, name: :organization, wrapper: Organization
-
     build_for_select :people,
                      label: :surname,
                      value: :id,
@@ -22,7 +20,9 @@ module MasterfilesApp
                           value: :id,
                           order_by: :surname
 
+    crud_calls_for :organizations, name: :organization, wrapper: Organization
     crud_calls_for :people, name: :person, wrapper: Person
+    crud_calls_for :addresses, name: :address, wrapper: Address
 
     build_for_select :roles,
                      label: :name,
@@ -30,11 +30,11 @@ module MasterfilesApp
                      order_by: :name
 
     def for_select_contact_method_types
-      ContactMethodTypeRepo.new.for_select_contact_method_types
+      DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
     end
 
     def for_select_address_types
-      AddressTypeRepo.new.for_select_address_types
+      DevelopmentApp::AddressTypeRepo.new.for_select_address_types
     end
 
     def find_party(id)
@@ -129,10 +129,6 @@ module MasterfilesApp
       delete(:contact_methods, id)
     end
 
-    def create_address(attrs)
-      create(:addresses, attrs)
-    end
-
     def find_address(id)
       hash = find_hash(:addresses, id)
       return nil if hash.nil?
@@ -140,14 +136,6 @@ module MasterfilesApp
       address_type_hash = find_hash(:address_types, address_type_id)
       hash[:address_type] = address_type_hash[:address_type]
       Address.new(hash)
-    end
-
-    def update_address(id, attrs)
-      update(:addresses, id, attrs)
-    end
-
-    def delete_address(id)
-      delete(:addresses, id)
     end
 
     def link_addresses(party_id, address_ids)

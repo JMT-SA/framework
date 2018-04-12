@@ -7,6 +7,8 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
       @address_id = party_repo.create_address(res.to_h)
       success_response("Created address #{address.address_line_1}", address)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { address_line_1: ['This address already exists'] }))
     end
 
     def update_address(id, params)

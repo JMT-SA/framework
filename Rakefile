@@ -180,8 +180,8 @@ namespace :db do
                            function_name: :#{nm}_set_updated_at,
                            trigger_name: :set_updated_at)
 
-            # Log changes to this table.
-            run "SELECT audit.audit_table('#{nm}');"
+            # Log changes to this table. Exclude changes to the updated_at column.
+            run "SELECT audit.audit_table('#{nm}', true, true, '{updated_at}'::text[]);"
           end
 
           down do

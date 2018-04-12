@@ -31,8 +31,8 @@ end
 
 === Special types
 
-* `Types::StrippedString` will remove leading and trailing spaces from a string before validation. Non-strings pass through and blank strings become nil.
-* `Types::IntArray` will convert string elements in an array to integers. Blank strings become nil and non-strings or strings that cannot coerce to integers pass through so the dry-validation schema can fail their validation.
+* `Types::StrippedString` will remove leading and trailing spaces from a string before validation. Non-strings pass through and blank strings become `nil`.
+* `Types::IntArray` will convert string elements in an array to integers. Blank strings become `nil` and non-strings or strings that cannot coerce to integers pass through so the dry-validation schema can handle them as raw inputs.
 
 == Calling a schema
 
@@ -58,7 +58,7 @@ Here is an example of a passing call followed by a failing call. Note how the in
 <1> Note the `'t'` has become a Boolean with `true` value.
 <2> The Array input has had all its items coerced to Integers.
 <3> Errors are returned as a Hash keyed by the column name and the value is an array of one or more validation failure messages.
-<4> Errors can be for the array as a whole, or in this case for one of the elements.
+<4> Errors can be for the array as a whole, or in this case for one of the elements. The key is the array index.
 
 == Rules
 
@@ -118,11 +118,17 @@ e.g. `{ col: 'some_value' }`
 |Y
 |Y (can be empty)
 |Array of Integer
-|`required(:col, Types::IntArray).each(:int?)`
+|`required(:col, Types::IntArray) { each(:int?) }`
 |`{col: []}`
 
 |Y
 |N (length > 0)
+|Array of Integer
+|`required(:col, Types::IntArray).maybe(min_size?: 1) { each(:int?) }`
+|`{col: nil}`
+
+|Y
+|N (elements if present must be ints)
 |Array of Integer
 |`required(:col, Types::IntArray).maybe { each(:int?) }`
 |`{col: nil}`

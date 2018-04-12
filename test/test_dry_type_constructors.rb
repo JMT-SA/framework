@@ -7,6 +7,7 @@ class TestDryTypeConstructors < Minitest::Test
 
       required(:in, Types::StrippedString).filled(:str?)
     end
+
     res = schema.call(in: 'ABC')
     assert_equal 'ABC', res[:in]
     assert_empty res.errors
@@ -34,6 +35,7 @@ class TestDryTypeConstructors < Minitest::Test
 
       required(:in, Types::StrippedString).maybe(:str?)
     end
+
     res = schema.call(in: 'ABC')
     assert_equal 'ABC', res[:in]
     assert_empty res.errors
@@ -61,6 +63,7 @@ class TestDryTypeConstructors < Minitest::Test
 
       required(:in, Types::IntArray).filled { each(:int?) }
     end
+
     res = schema.call(in: ['1', '2'])
     assert_equal [1,2], res[:in]
     assert_empty res.errors
@@ -96,6 +99,7 @@ class TestDryTypeConstructors < Minitest::Test
 
       required(:in, Types::IntArray) { each(:int?) }
     end
+
     res = schema.call(in: ['1', '2'])
     assert_equal [1,2], res[:in]
     assert_empty res.errors
@@ -131,6 +135,7 @@ class TestDryTypeConstructors < Minitest::Test
 
       required(:in, Types::IntArray).filled
     end
+
     res = schema.call(in: ['1', '2'])
     assert_equal [1,2], res[:in]
     assert_empty res.errors
@@ -141,6 +146,10 @@ class TestDryTypeConstructors < Minitest::Test
 
     res = schema.call(in: [])
     assert_equal [], res[:in]
+    assert_equal 'must be filled', res.errors[:in].first
+
+    res = schema.call(in: nil)
+    assert_nil res[:in]
     assert_equal 'must be filled', res.errors[:in].first
 
     res = schema.call(in: ['1', 'w'])
@@ -154,5 +163,41 @@ class TestDryTypeConstructors < Minitest::Test
     res = schema.call(in: ['1', ''])
     assert_equal [1, nil], res[:in]
     assert_empty res.errors
+  end
+
+  def test_array_required_can_be_nil_or_ints
+    schema = Dry::Validation.Form do
+      configure { config.type_specs = true }
+
+      required(:in, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
+    end
+
+    res = schema.call(in: ['1', '2'])
+    assert_equal [1,2], res[:in]
+    assert_empty res.errors
+
+    res = schema.call(in: [1, '2'])
+    assert_equal [1,2], res[:in]
+    assert_empty res.errors
+
+    res = schema.call(in: [])
+    assert_equal [], res[:in]
+    assert_equal 'size cannot be less than 1', res.errors[:in].first
+
+    res = schema.call(in: nil)
+    assert_nil res[:in]
+    assert_empty res.errors
+
+    res = schema.call(in: ['1', 'w'])
+    assert_equal [1, 'w'], res[:in]
+    assert_equal 'must be an integer', res.errors[:in][1].first
+
+    res = schema.call(in: ['1', nil])
+    assert_equal [1, nil], res[:in]
+    assert_equal 'must be an integer', res.errors[:in][1].first
+
+    res = schema.call(in: ['1', ''])
+    assert_equal [1, nil], res[:in]
+    assert_equal 'must be an integer', res.errors[:in][1].first
   end
 end

@@ -13,14 +13,21 @@ module MasterfilesApp
 
     crud_calls_for :organizations, name: :organization, wrapper: Organization
 
-    build_for_select :roles,
-                     label: :name,
-                     value: :id,
-                     order_by: :name
     build_for_select :people,
                      label: :surname,
                      value: :id,
                      order_by: :surname
+    build_inactive_select :people,
+                          label: :surname,
+                          value: :id,
+                          order_by: :surname
+
+    crud_calls_for :people, name: :person, wrapper: Person
+
+    build_for_select :roles,
+                     label: :name,
+                     value: :id,
+                     order_by: :name
 
     def for_select_contact_method_types
       ContactMethodTypeRepo.new.for_select_contact_method_types
@@ -94,11 +101,6 @@ module MasterfilesApp
       hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
       Person.new(hash)
     end
-
-    def update_person(id, attrs)
-      update(:people, id, attrs)
-    end
-
 
     def delete_person(id)
       party_id = party_id_from_person(id)

@@ -14,7 +14,7 @@ module DevelopmentApp
     end
 
     def test_exists
-      skip 'todo: test that non-base exists methd works'
+      skip 'todo: test that non-base exists method works'
     end
 
     private

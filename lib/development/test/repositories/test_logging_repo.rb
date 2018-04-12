@@ -15,7 +15,7 @@ module DevelopmentApp
     end
 
     def test_find_logged_action
-      skip 'todo - test that find uses correct id field and schema'
+      skip 'todo: test that find uses correct id field and schema'
     end
 
     private

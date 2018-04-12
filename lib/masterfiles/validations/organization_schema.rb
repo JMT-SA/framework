@@ -11,7 +11,7 @@ module MasterfilesApp
     required(:medium_description, Types::StrippedString).maybe(:str?)
     required(:long_description, Types::StrippedString).maybe(:str?)
     required(:vat_number, Types::StrippedString).maybe(:str?)
-    required(:role_ids, :int).each(:int?)
+    required(:role_ids, Types::Array).filled { each(:int?) }
     # required(:variants, Types::StrippedString).maybe(:str?)
     # required(:active, :bool).maybe(:bool?)
   end

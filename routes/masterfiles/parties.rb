@@ -134,7 +134,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('menu', 'edit')
+        if authorised?('parties', 'edit')
           show_partial { Masterfiles::Parties::Person::Edit.call(id) }
         else
           dialog_permission_error
@@ -153,7 +153,6 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           end
         end
-
         show_partial { Masterfiles::Parties::Person::Addresses.call(id) }
       end
       r.on 'contact_methods' do
@@ -169,12 +168,11 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           end
         end
-
         show_partial { Masterfiles::Parties::Person::ContactMethods.call(id) }
       end
       r.is do
         r.get do
-          if authorised?('menu', 'read')
+          if authorised?('parties', 'read')
             show_partial { Masterfiles::Parties::Person::Show.call(id) }
           else
             dialog_permission_error
@@ -205,8 +203,13 @@ class Framework < Roda
     r.on 'people' do
       interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('menu', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
+        if authorised?('parties', 'new')
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -229,11 +232,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Parties::Person::New.call(form_values: params[:person],
-                                                   form_errors: res.errors,
-                                                   remote: false)
-          end
+          stash_page(Masterfiles::Parties::Person::New.call(form_values: params[:person],
+                                                            form_errors: res.errors,
+                                                            remote: false))
+          r.redirect '/masterfiles/parties/people/new'
         end
       end
     end

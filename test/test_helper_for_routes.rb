@@ -1,7 +1,7 @@
 ENV['RACK_ENV'] = 'test'
 require 'rack/test'
 require 'minitest/autorun'
-require "mocha/mini_test"
+require 'mocha/minitest'
 require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
 
@@ -14,7 +14,6 @@ class RouteTester < Minitest::Test
 
   def around
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
-      authorise_pass!
       super
     end
   end
@@ -48,6 +47,10 @@ class RouteTester < Minitest::Test
   def authorise_fail!
     DevelopmentApp::UserRepo.any_instance.stubs(:find).returns(base_user)
     SecurityApp::MenuRepo.any_instance.stubs(:authorise?).returns(false)
+  end
+
+  def ensure_exists!(klass)
+    klass.any_instance.stubs(:exists?).returns(true)
   end
 
   def header_location

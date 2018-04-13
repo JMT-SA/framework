@@ -785,15 +785,15 @@ class GenerateNewScaffold < BaseService
       <<~RUBY
         # frozen_string_literal: true
 
-        require File.join(File.expand_path('./../../', __FILE__), 'test_helper_for_routes')
+        require File.join(File.expand_path('./../', __dir__), 'test_helper_for_routes')
 
         class Test#{opts.classnames[:class]}Routes < RouteTester
-          def around
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:exists?).returns(true)
-            super
-          end
+
+          INTERACTOR = #{opts.classnames[:namespaced_interactor]}
 
           def test_edit
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:view_prefix]}::Edit.stub(:call, bland_page) do
               get '#{base_route}#{opts.table}/1/edit', {}, 'rack.session' => { user_id: 1 }
             end
@@ -802,11 +802,14 @@ class GenerateNewScaffold < BaseService
 
           def test_edit_fail
             authorise_fail!
+            ensure_exists!(INTERACTOR)
             get '#{base_route}#{opts.table}/1/edit', {}, 'rack.session' => { user_id: 1 }
             expect_permission_error
           end
 
           def test_show
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:view_prefix]}::Show.stub(:call, bland_page) do
               get '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1 }
             end
@@ -815,12 +818,15 @@ class GenerateNewScaffold < BaseService
 
           def test_show_fail
             authorise_fail!
+            ensure_exists!(INTERACTOR)
             get '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1 }
             refute last_response.ok?
             assert_match(/permission/i, last_response.body)
           end
 
           def test_update
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             row_vals = Hash.new(1)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(ok_response(instance: row_vals))
             patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
@@ -828,6 +834,8 @@ class GenerateNewScaffold < BaseService
           end
 
           def test_update_fail
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::Edit.stub(:call, bland_page) do
               patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
@@ -836,18 +844,24 @@ class GenerateNewScaffold < BaseService
           end
 
           def test_delete
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(ok_response)
             delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
             expect_json_delete_from_grid
           end
           #
           # def test_delete_fail
+          #   authorise_pass!
+          #   ensure_exists!(INTERACTOR)
           #   #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
           #   delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
           #   expect_bad_redirect
           # end
 
           def test_new
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
               get  '#{base_route}#{opts.table}/new', {}, 'rack.session' => { user_id: 1 }
             end
@@ -856,24 +870,31 @@ class GenerateNewScaffold < BaseService
 
           def test_new_fail
             authorise_fail!
+            ensure_exists!(INTERACTOR)
             get '#{base_route}#{opts.table}/new', {}, 'rack.session' => { user_id: 1 }
             refute last_response.ok?
             assert_match(/permission/i, last_response.body)
           end
 
           def test_create
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
             post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
             expect_ok_redirect
           end
 
           def test_create_remotely
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
             post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
             expect_ok_json_redirect
           end
 
           def test_create_fail
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
               post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
@@ -882,6 +903,8 @@ class GenerateNewScaffold < BaseService
           end
 
           def test_create_remotely_fail
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
               post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }

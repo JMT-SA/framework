@@ -1,8 +1,10 @@
-require File.join(File.expand_path('./../../', __FILE__), 'test_helper_for_routes')
+# frozen_string_literal: true
+
+require File.join(File.expand_path('./../', __dir__), 'test_helper_for_routes')
 
 class TestCoreRoutes < RouteTester
-
   def test_root_before_login
+    authorise_pass!
     get '/'
 
     assert last_response.redirect?
@@ -12,6 +14,7 @@ class TestCoreRoutes < RouteTester
   end
 
   def test_root_after_login
+    authorise_pass!
     get '/', {}, 'rack.session' => { user_id: 1 }
 
     assert last_response.ok?

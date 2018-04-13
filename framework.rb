@@ -3,15 +3,11 @@
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
 
-# TODO: Get rubocop in from the start....
-
 require 'roda'
 require 'rodauth'
 require 'awesome_print'
-# require 'sequel'
-require 'crossbeams/layout'
 require 'crossbeams/dataminer'
-# require 'crossbeams/dataminer_interface'
+require 'crossbeams/layout'
 require 'crossbeams/label_designer'
 require 'crossbeams/rack_middleware'
 require 'roda/data_grid'
@@ -73,7 +69,7 @@ class Framework < Roda
   plugin :content_for, append: true
   plugin :symbolized_params    # - automatically converts all keys of params to symbols.
   plugin :flash
-  plugin :csrf, raise: true, skip_if: ->(_) { ENV['RACK_ENV'] == 'test' }  # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
+  plugin :csrf, raise: true, skip_if: ->(_) { ENV['RACK_ENV'] == 'test' } # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
   plugin :rodauth do
     db DB
     enable :login, :logout # , :change_password

@@ -6,7 +6,7 @@ class Framework < Roda
     # LOGGED ACTION DETAILS
     # --------------------------------------------------------------------------
     r.on 'logged_actions', Integer do |id|
-      interactor = DevelopmentApp::LoggingInteractor.new(current_user, {}, {}, {})
+      interactor = DevelopmentApp::LoggingInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(Sequel[:audit][:logged_actions], id) do

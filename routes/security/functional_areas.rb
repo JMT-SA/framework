@@ -8,7 +8,7 @@ class Framework < Roda
     # FUNCTIONAL AREAS
     # --------------------------------------------------------------------------
     r.on 'functional_areas', Integer do |id|
-      interactor = SecurityApp::FunctionalAreaInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::FunctionalAreaInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:functional_areas, id) do
@@ -51,7 +51,7 @@ class Framework < Roda
     end
 
     r.on 'functional_areas' do
-      interactor = SecurityApp::FunctionalAreaInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::FunctionalAreaInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('menu', 'new')
           show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::FunctionalArea::New.call(remote: fetch?(r)) }
@@ -89,7 +89,7 @@ class Framework < Roda
     # PROGRAMS
     # --------------------------------------------------------------------------
     r.on 'programs', Integer do |id|
-      interactor = SecurityApp::ProgramInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::ProgramInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'new' do    # NEW
         if authorised?('menu', 'new')
@@ -150,7 +150,7 @@ class Framework < Roda
     end
 
     r.on 'programs' do
-      interactor = SecurityApp::ProgramInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::ProgramInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'link_users', Integer do |id|
         r.post do
@@ -196,7 +196,7 @@ class Framework < Roda
     # PROGRAM FUNCTIONS
     # --------------------------------------------------------------------------
     r.on 'program_functions', Integer do |id|
-      interactor = SecurityApp::ProgramFunctionInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::ProgramFunctionInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'new' do    # NEW
         if authorised?('menu', 'new')
@@ -247,7 +247,7 @@ class Framework < Roda
     end
 
     r.on 'program_functions' do
-      interactor = SecurityApp::ProgramFunctionInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::ProgramFunctionInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'link_users', Integer do |id|
         r.post do
@@ -385,7 +385,7 @@ class Framework < Roda
     # SECURITY PERMISSIONS
     # --------------------------------------------------------------------------
     r.on 'security_permissions', Integer do |id|
-      interactor = SecurityApp::SecurityPermissionInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:security_permissions, id) do
@@ -428,7 +428,7 @@ class Framework < Roda
     end
 
     r.on 'security_permissions' do
-      interactor = SecurityApp::SecurityPermissionInteractor.new(current_user, {}, {}, {})
+      interactor = SecurityApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('menu', 'new')
           show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::SecurityPermission::New.call(remote: fetch?(r)) }

@@ -4,7 +4,7 @@
 
 class Framework < Roda # rubocop:disable Metrics/ClassLength
   route 'admin', 'dataminer' do |r|
-    context = { for_grid_queries: session[:dm_admin_path] == :grids }
+    context = { for_grid_queries: session[:dm_admin_path] == :grids, route_url: request.path }
     interactor = DataminerInteractor.new(current_user, {}, context, {})
 
     r.is do

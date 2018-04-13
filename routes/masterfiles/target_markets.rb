@@ -8,7 +8,7 @@ class Framework < Roda
     # TARGET MARKET GROUP TYPES
     # --------------------------------------------------------------------------
     r.on 'target_market_group_types', Integer do |id|
-      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_market_group_types, id) do
@@ -50,7 +50,7 @@ class Framework < Roda
       end
     end
     r.on 'target_market_group_types' do
-      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::TargetMarketGroupType::New.call(remote: fetch?(r)) }
@@ -87,7 +87,7 @@ class Framework < Roda
     # TARGET MARKET GROUPS
     # --------------------------------------------------------------------------
     r.on 'target_market_groups', Integer do |id|
-      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_market_groups, id) do
@@ -130,7 +130,7 @@ class Framework < Roda
       end
     end
     r.on 'target_market_groups' do
-      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::TargetMarketGroup::New.call(remote: fetch?(r)) }
@@ -167,7 +167,7 @@ class Framework < Roda
     # TARGET MARKETS
     # --------------------------------------------------------------------------
     r.on 'target_markets', Integer do |id|
-      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_markets, id) do
@@ -233,7 +233,7 @@ class Framework < Roda
       end
     end
     r.on 'target_markets' do
-      interactor = TargetMarketInteractor.new(current_user, {}, {}, {})
+      interactor = TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::TargetMarket::New.call(remote: fetch?(r)) }
@@ -270,7 +270,7 @@ class Framework < Roda
     # DESTINATION CITIES
     # --------------------------------------------------------------------------
     r.on 'destination_cities', Integer do |id|
-      interactor = DestinationInteractor.new(current_user, {}, {}, {})
+      interactor = DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:destination_cities, id) do
@@ -313,7 +313,7 @@ class Framework < Roda
       end
     end
     r.on 'destination_cities' do
-      interactor = DestinationInteractor.new(current_user, {}, {}, {})
+      interactor = DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::DestinationCity::New.call(remote: fetch?(r)) }
@@ -350,7 +350,7 @@ class Framework < Roda
     # DESTINATION COUNTRIES
     # --------------------------------------------------------------------------
     r.on 'destination_countries', Integer do |id|
-      interactor = DestinationInteractor.new(current_user, {}, {}, {})
+      interactor = DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:destination_countries, id) do
@@ -393,7 +393,7 @@ class Framework < Roda
       end
     end
     r.on 'destination_countries' do
-      interactor = DestinationInteractor.new(current_user, {}, {}, {})
+      interactor = DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::DestinationCountry::New.call(remote: fetch?(r)) }
@@ -430,7 +430,7 @@ class Framework < Roda
     # DESTINATION REGIONS
     # --------------------------------------------------------------------------
     r.on 'destination_regions', Integer do |id|
-      interactor = DestinationInteractor.new(current_user, {}, {}, {})
+      interactor = DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:destination_regions, id) do
@@ -476,7 +476,7 @@ class Framework < Roda
       end
     end
     r.on 'destination_regions' do
-      interactor = DestinationInteractor.new(current_user, {}, {}, {})
+      interactor = DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::DestinationRegion::New.call(remote: fetch?(r)) }

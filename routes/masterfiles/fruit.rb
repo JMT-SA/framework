@@ -8,7 +8,7 @@ class Framework < Roda
     # COMMODITY GROUPS
     # --------------------------------------------------------------------------
     r.on 'commodity_groups', Integer do |id|
-      interactor = CommodityInteractor.new(current_user, {}, {}, {})
+      interactor = CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:commodity_groups, id) do
@@ -52,7 +52,7 @@ class Framework < Roda
       end
     end
     r.on 'commodity_groups' do
-      interactor = CommodityInteractor.new(current_user, {}, {}, {})
+      interactor = CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
@@ -89,7 +89,7 @@ class Framework < Roda
     # COMMODITIES
     # --------------------------------------------------------------------------
     r.on 'commodities', Integer do |id|
-      interactor = CommodityInteractor.new(current_user, {}, {}, {})
+      interactor = CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:commodities, id) do
@@ -135,7 +135,7 @@ class Framework < Roda
       end
     end
     r.on 'commodities' do
-      interactor = CommodityInteractor.new(current_user, {}, {}, {})
+      interactor = CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
@@ -172,7 +172,7 @@ class Framework < Roda
     # CULTIVAR GROUPS
     # --------------------------------------------------------------------------
     r.on 'cultivar_groups', Integer do |id|
-      interactor = CultivarInteractor.new(current_user, {}, {}, {})
+      interactor = CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cultivar_groups, id) do
@@ -215,7 +215,7 @@ class Framework < Roda
       end
     end
     r.on 'cultivar_groups' do
-      interactor = CultivarInteractor.new(current_user, {}, {}, {})
+      interactor = CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
@@ -252,7 +252,7 @@ class Framework < Roda
     # CULTIVARS
     # --------------------------------------------------------------------------
     r.on 'cultivars', Integer do |id|
-      interactor = CultivarInteractor.new(current_user, {}, {}, {})
+      interactor = CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cultivars, id) do
@@ -271,7 +271,7 @@ class Framework < Roda
       # --------------------------------------------------------------------------
       r.on 'link_marketing_varieties' do
         r.post do
-          interactor = CultivarInteractor.new(current_user, {}, {}, {})
+          interactor = CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
           res = interactor.link_marketing_varieties(id, multiselect_grid_choices(params))
 
           if res.success
@@ -283,7 +283,7 @@ class Framework < Roda
         end
       end
       r.on 'marketing_varieties' do
-        interactor = CultivarInteractor.new(current_user, {}, {}, {})
+        interactor = CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           if authorised?('fruit', 'new')
             show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
@@ -350,7 +350,7 @@ class Framework < Roda
       end
     end
     r.on 'cultivars' do
-      interactor = CultivarInteractor.new(current_user, {}, {}, {})
+      interactor = CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
@@ -385,7 +385,7 @@ class Framework < Roda
       end
     end
     r.on 'marketing_varieties', Integer do |id|
-      interactor = CultivarInteractor.new(current_user, {}, {}, {})
+      interactor = CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:marketing_varieties, id) do
@@ -425,7 +425,7 @@ class Framework < Roda
     # BASIC PACK CODES
     # --------------------------------------------------------------------------
     r.on 'basic_pack_codes', Integer do |id|
-      interactor = BasicPackCodeInteractor.new(current_user, {}, {}, {})
+      interactor = BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:basic_pack_codes, id) do
@@ -471,7 +471,7 @@ class Framework < Roda
       end
     end
     r.on 'basic_pack_codes' do
-      interactor = BasicPackCodeInteractor.new(current_user, {}, {}, {})
+      interactor = BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
@@ -508,7 +508,7 @@ class Framework < Roda
     # STANDARD PACK CODES
     # --------------------------------------------------------------------------
     r.on 'standard_pack_codes', Integer do |id|
-      interactor = StandardPackCodeInteractor.new(current_user, {}, {}, {})
+      interactor = StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:standard_pack_codes, id) do
@@ -550,7 +550,7 @@ class Framework < Roda
       end
     end
     r.on 'standard_pack_codes' do
-      interactor = StandardPackCodeInteractor.new(current_user, {}, {}, {})
+      interactor = StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
@@ -587,7 +587,7 @@ class Framework < Roda
     # STD FRUIT SIZE COUNTS
     # --------------------------------------------------------------------------
     r.on 'std_fruit_size_counts', Integer do |id|
-      interactor = StdFruitSizeCountInteractor.new(current_user, {}, {}, {})
+      interactor = StdFruitSizeCountInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:std_fruit_size_counts, id) do
@@ -602,7 +602,7 @@ class Framework < Roda
         end
       end
       r.on 'fruit_actual_counts_for_packs' do
-        interactor = FruitActualCountsForPackInteractor.new(current_user, {}, {}, {})
+        interactor = FruitActualCountsForPackInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           if authorised?('fruit', 'new')
             show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
@@ -677,7 +677,7 @@ class Framework < Roda
       end
     end
     r.on 'std_fruit_size_counts' do
-      interactor = StdFruitSizeCountInteractor.new(current_user, {}, {}, {})
+      interactor = StdFruitSizeCountInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
           show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
@@ -712,7 +712,7 @@ class Framework < Roda
       end
     end
     r.on 'fruit_actual_counts_for_packs', Integer do |id|
-      interactor = FruitActualCountsForPackInteractor.new(current_user, {}, {}, {})
+      interactor = FruitActualCountsForPackInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:fruit_actual_counts_for_packs, id) do
@@ -727,7 +727,7 @@ class Framework < Roda
         end
       end
       r.on 'fruit_size_references' do
-        interactor = FruitSizeReferenceInteractor.new(current_user, {}, {}, {})
+        interactor = FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           if authorised?('fruit', 'new')
             show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
@@ -797,7 +797,7 @@ class Framework < Roda
     # FRUIT SIZE REFERENCES
     # --------------------------------------------------------------------------
     r.on 'fruit_size_references', Integer do |id|
-      interactor = FruitSizeReferenceInteractor.new(current_user, {}, {}, {})
+      interactor = FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:fruit_size_references, id) do

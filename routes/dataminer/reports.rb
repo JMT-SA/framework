@@ -2,7 +2,7 @@
 
 class Framework < Roda
   route 'reports', 'dataminer' do |r|
-    interactor = DataminerInteractor.new(current_user, {}, {}, {})
+    interactor = DataminerInteractor.new(current_user, {}, { route_url: request.path }, {})
 
     r.on 'iframe' do
       if flash[:iframe_url].nil?

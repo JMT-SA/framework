@@ -68,7 +68,7 @@ class TestSecurityRoutes < RouteTester
     expect_bad_redirect
   end
 
-  def test_updat
+  def test_update
     authorise_pass!
     ensure_exists!(INTERACTOR)
     SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:update_functional_area).returns(ok_response)

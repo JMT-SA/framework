@@ -293,7 +293,12 @@ class Framework < Roda
       interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         if authorised?('parties', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -372,7 +377,12 @@ class Framework < Roda
       interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         if authorised?('parties', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -395,11 +405,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Parties::ContactMethod::New.call(form_values: params[:contact_method],
-                                                          form_errors: res.errors,
-                                                          remote: false)
-          end
+          stash_page(Masterfiles::Parties::ContactMethod::New.call(form_values: params[:contact_method],
+                                                                   form_errors: res.errors,
+                                                                   remote: false))
+          r.redirect '/masterfiles/parties/contact_methods/new'
         end
       end
     end

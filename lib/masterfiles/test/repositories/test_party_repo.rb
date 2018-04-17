@@ -10,6 +10,9 @@ module MasterfilesApp
     def test_for_selects
       assert_respond_to repo, :for_select_organizations
       assert_respond_to repo, :for_select_people
+      assert_respond_to repo, :for_select_roles
+      assert_respond_to repo, :for_select_contact_method_types
+      assert_respond_to repo, :for_select_address_types
     end
 
     def test_crud_calls
@@ -27,6 +30,11 @@ module MasterfilesApp
       assert_respond_to repo, :create_address
       assert_respond_to repo, :update_address
       assert_respond_to repo, :delete_address
+
+      assert_respond_to repo, :find_contact_method
+      assert_respond_to repo, :create_contact_method
+      assert_respond_to repo, :update_contact_method
+      assert_respond_to repo, :delete_contact_method
     end
 
     def test_the_following_methods

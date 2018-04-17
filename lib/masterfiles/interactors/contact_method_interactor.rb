@@ -8,6 +8,8 @@ module MasterfilesApp
       @contact_method_id = party_repo.create_contact_method(res.to_h)
       success_response("Created contact method #{contact_method.contact_method_code}",
                        contact_method)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { contact_method_code: ['This contact method already exists'] }))
     end
 
     def update_contact_method(id, params)

@@ -23,6 +23,7 @@ module MasterfilesApp
     crud_calls_for :organizations, name: :organization, wrapper: Organization
     crud_calls_for :people, name: :person, wrapper: Person
     crud_calls_for :addresses, name: :address, wrapper: Address
+    crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
 
     build_for_select :roles,
                      label: :name,
@@ -108,10 +109,6 @@ module MasterfilesApp
       delete_party_dependents(party_id)
     end
 
-    def create_contact_method(attrs)
-      create(:contact_methods, attrs)
-    end
-
     def find_contact_method(id)
       hash = DB[:contact_methods].where(id: id).first
       return nil if hash.nil?
@@ -119,14 +116,6 @@ module MasterfilesApp
       contact_method_type_hash = DB[:contact_method_types].where(id: contact_method_type_id).first
       hash[:contact_method_type] = contact_method_type_hash[:contact_method_type]
       ContactMethod.new(hash)
-    end
-
-    def update_contact_method(id, attrs)
-      update(:contact_methods, id, attrs)
-    end
-
-    def delete_contact_method(id)
-      delete(:contact_methods, id)
     end
 
     def find_address(id)

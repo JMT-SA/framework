@@ -18,36 +18,7 @@ module MasterfilesApp
                           label: :code,
                           value: :id
 
-    def create_commodity_group(attrs)
-      create(:commodity_groups, attrs)
-    end
-
-    def find_commodity_group(id)
-      find(:commodity_groups, CommodityGroup, id)
-    end
-
-    def update_commodity_group(id, attrs)
-      update(:commodity_groups, id, attrs)
-    end
-
-    def delete_commodity_group(id)
-      delete(:commodity_groups, id)
-    end
-
-    def create_commodity(attrs)
-      create(:commodities, attrs)
-    end
-
-    def find_commodity(id)
-      find(:commodities, Commodity, id)
-    end
-
-    def update_commodity(id, attrs)
-      update(:commodities, id, attrs)
-    end
-
-    def delete_commodity(id)
-      delete(:commodities, id)
-    end
+    crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup
+    crud_calls_for :commodities, name: :commodity, wrapper: Commodity
   end
 end

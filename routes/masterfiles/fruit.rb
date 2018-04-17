@@ -226,7 +226,12 @@ class Framework < Roda
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -249,11 +254,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
-                                                        form_errors: res.errors,
-                                                        remote: false)
-          end
+          stash_page(Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
+                                                                 form_errors: res.errors,
+                                                                 remote: false))
+          r.redirect '/masterfiles/fruit/cultivar_groups/new'
         end
       end
     end
@@ -294,7 +298,12 @@ class Framework < Roda
         interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           if authorised?('fruit', 'new')
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
+            page = stashed_page
+            if page
+              show_page { page }
+            else
+              show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
+            end
           else
             fetch?(r) ? dialog_permission_error : show_unauthorised
           end
@@ -310,7 +319,7 @@ class Framework < Roda
             end
           elsif fetch?(r)
             content = show_partial do
-              Masterfiles::Fruit::MarketingVariety::New.call(parent_id: id,
+              Masterfiles::Fruit::MarketingVariety::New.call(id,
                                                              form_values: params[:marketing_variety],
                                                              form_errors: res.errors,
                                                              remote: true)
@@ -318,12 +327,11 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           else
             flash[:error] = res.message
-            show_page do
-              Masterfiles::Fruit::MarketingVariety::New.call(parent_id: id,
-                                                             form_values: params[:marketing_variety],
-                                                             form_errors: res.errors,
-                                                             remote: false)
-            end
+            stash_page(Masterfiles::Fruit::MarketingVariety::New.call(id,
+                                                                      form_values: params[:marketing_variety],
+                                                                      form_errors: res.errors,
+                                                                      remote: false))
+            r.redirect "/masterfiles/fruit/cultivars/#{id}/marketing_varieties/new"
           end
         end
       end
@@ -342,6 +350,7 @@ class Framework < Roda
             update_grid_row(id,
                             changes: { commodity_id: res.instance[:commodity_id],
                                        cultivar_group_id: res.instance[:cultivar_group_id],
+                                       # TODO: cultivar_group_code: res.instance[:cultivar_group_code],
                                        cultivar_name: res.instance[:cultivar_name],
                                        description: res.instance[:description] },
                             notice: res.message)
@@ -361,7 +370,12 @@ class Framework < Roda
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -384,11 +398,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
-                                                   form_errors: res.errors,
-                                                   remote: false)
-          end
+          stash_page(Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
+                                                            form_errors: res.errors,
+                                                            remote: false))
+          r.redirect '/masterfiles/fruit/cultivars/new'
         end
       end
     end

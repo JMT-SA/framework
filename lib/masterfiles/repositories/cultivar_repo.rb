@@ -5,62 +5,32 @@ module MasterfilesApp
     build_for_select :cultivar_groups,
                      label: :cultivar_group_code,
                      value: :id,
+                     no_active_check: true,
                      order_by: :cultivar_group_code
 
     build_for_select :cultivars,
                      label: :cultivar_name,
                      value: :id,
+                     no_active_check: true,
                      order_by: :cultivar_name
 
     build_for_select :marketing_varieties,
                      label: :marketing_variety_code,
                      value: :id,
+                     no_active_check: true,
                      order_by: :marketing_variety_code
 
-    def create_cultivar_group(attrs)
-      create(:cultivar_groups, attrs)
-    end
+    crud_calls_for :cultivar_groups, name: :cultivar_group, wrapper: CultivarGroup
+    crud_calls_for :cultivars, name: :cultivar, wrapper: Cultivar
+    crud_calls_for :marketing_varieties, name: :marketing_variety, wrapper: MarketingVariety
 
-    def find_cultivar_group(id)
-      find(:cultivar_groups, CultivarGroup, id)
-    end
-
-    def update_cultivar_group(id, attrs)
-      update(:cultivar_groups, id, attrs)
-    end
-
-    def delete_cultivar_group(id)
-      delete(:cultivar_groups, id)
-    end
-
-    def create_cultivar(attrs)
-      create(:cultivars, attrs)
-    end
-
-    def find_cultivar(id)
-      find(:cultivars, Cultivar, id)
-    end
-
-    def update_cultivar(id, attrs)
-      update(:cultivars, id, attrs)
-    end
-
-    def delete_cultivar(id)
-      delete(:cultivars, id)
-    end
+    # TODO: return cultivar_group_code with cultivar
+    # def find_cultivar
 
     def create_marketing_variety(cultivar_id, attrs)
       id = DB[:marketing_varieties].insert(attrs.to_h)
       DB[:marketing_varieties_for_cultivars].insert(cultivar_id: cultivar_id, marketing_variety_id: id)
       id
-    end
-
-    def find_marketing_variety(id)
-      find(:marketing_varieties, MarketingVariety, id)
-    end
-
-    def update_marketing_variety(id, attrs)
-      update(:marketing_varieties, id, attrs)
     end
 
     def link_marketing_varieties(cultivar_id, marketing_variety_ids)

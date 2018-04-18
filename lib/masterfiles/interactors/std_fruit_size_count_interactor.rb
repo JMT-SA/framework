@@ -23,6 +23,8 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
       @id = fruit_size_repo.create_std_fruit_size_count(res.to_h)
       success_response("Created std fruit size count #{std_fruit_size_count.size_count_description}", std_fruit_size_count)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { size_count_description: ['This std fruit size count already exists'] }))
     end
 
     def update_std_fruit_size_count(id, params)

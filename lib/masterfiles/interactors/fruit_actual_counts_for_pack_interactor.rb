@@ -25,6 +25,8 @@ module MasterfilesApp
       @id = fruit_size_repo.create_fruit_actual_counts_for_pack(res.to_h)
       success_response("Created fruit actual counts for pack #{fruit_actual_counts_for_pack.size_count_variation}",
                        fruit_actual_counts_for_pack)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { size_count_variation: ['This fruit actual counts for pack already exists'] }))
     end
 
     def update_fruit_actual_counts_for_pack(id, params)

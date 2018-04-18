@@ -495,7 +495,12 @@ class Framework < Roda
       interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -518,11 +523,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
-                                                        form_errors: res.errors,
-                                                        remote: false)
-          end
+          stash_page(Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
+                                                                 form_errors: res.errors,
+                                                                 remote: false))
+          r.redirect '/masterfiles/fruit/basic_pack_codes/new'
         end
       end
     end
@@ -574,7 +578,12 @@ class Framework < Roda
       interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -597,11 +606,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
-                                                           form_errors: res.errors,
-                                                           remote: false)
-          end
+          stash_page(Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
+                                                                    form_errors: res.errors,
+                                                                    remote: false))
+          r.redirect '/masterfiles/fruit/standard_pack_codes/new'
         end
       end
     end
@@ -609,7 +617,6 @@ class Framework < Roda
     # --------------------------------------------------------------------------
     r.on 'std_fruit_size_counts', Integer do |id|
       interactor = MasterfilesApp::StdFruitSizeCountInteractor.new(current_user, {}, { route_url: request.path }, {})
-
       # Check for notfound:
       r.on !interactor.exists?(:std_fruit_size_counts, id) do
         handle_not_found(r)
@@ -626,7 +633,12 @@ class Framework < Roda
         interactor = MasterfilesApp::FruitActualCountsForPackInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           if authorised?('fruit', 'new')
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
+            page = stashed_page
+            if page
+              show_page { page }
+            else
+              show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
+            end
           else
             fetch?(r) ? dialog_permission_error : show_unauthorised
           end
@@ -650,12 +662,11 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           else
             flash[:error] = res.message
-            show_page do
-              Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
-                                                                     form_values: params[:fruit_actual_counts_for_pack],
-                                                                     form_errors: res.errors,
-                                                                     remote: false)
-            end
+            stash_page(Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
+                                                                              form_values: params[:fruit_actual_counts_for_pack],
+                                                                              form_errors: res.errors,
+                                                                              remote: false))
+            r.redirect "/masterfiles/fruit/std_fruit_size_counts/#{id}/fruit_actual_counts_for_packs/new"
           end
         end
       end
@@ -701,7 +712,12 @@ class Framework < Roda
       interactor = MasterfilesApp::StdFruitSizeCountInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         if authorised?('fruit', 'new')
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
+          page = stashed_page
+          if page
+            show_page { page }
+          else
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
+          end
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised
         end
@@ -724,11 +740,10 @@ class Framework < Roda
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          show_page do
-            Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
-                                                            form_errors: res.errors,
-                                                            remote: false)
-          end
+          stash_page(Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
+                                                                     form_errors: res.errors,
+                                                                     remote: false))
+          r.redirect '/masterfiles/fruit/std_fruit_size_counts/new'
         end
       end
     end
@@ -751,7 +766,12 @@ class Framework < Roda
         interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           if authorised?('fruit', 'new')
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
+            page = stashed_page
+            if page
+              show_page { page }
+            else
+              show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
+            end
           else
             fetch?(r) ? dialog_permission_error : show_unauthorised
           end
@@ -775,12 +795,11 @@ class Framework < Roda
             update_dialog_content(content: content, error: res.message)
           else
             flash[:error] = res.message
-            show_page do
-              Masterfiles::Fruit::FruitSizeReference::New.call(id,
-                                                               form_values: params[:fruit_size_reference],
-                                                               form_errors: res.errors,
-                                                               remote: false)
-            end
+            stash_page(Masterfiles::Fruit::FruitSizeReference::New.call(id,
+                                                                        form_values: params[:fruit_size_reference],
+                                                                        form_errors: res.errors,
+                                                                        remote: false))
+            r.redirect "/masterfiles/fruit/fruit_actual_counts_for_packs/#{id}/fruit_size_references/new"
           end
         end
       end

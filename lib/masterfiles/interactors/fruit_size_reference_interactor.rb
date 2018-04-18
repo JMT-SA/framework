@@ -25,6 +25,8 @@ module MasterfilesApp
       @id = fruit_size_repo.create_fruit_size_reference(res.to_h)
       success_response("Created fruit size reference #{fruit_size_reference.size_reference}",
                        fruit_size_reference)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { size_reference: ['This fruit size reference already exists'] }))
     end
 
     def update_fruit_size_reference(id, params)

@@ -24,6 +24,8 @@ module MasterfilesApp
       @id = fruit_size_repo.create_basic_pack_code(res.to_h)
       success_response("Created basic pack code #{basic_pack_code.basic_pack_code}",
                        basic_pack_code)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { basic_pack_code: ['This basic pack code already exists'] }))
     end
 
     def update_basic_pack_code(id, params)

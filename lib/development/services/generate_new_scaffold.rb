@@ -10,7 +10,8 @@ class GenerateNewScaffold < BaseService
     attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
                 :table_meta, :label_field, :short_name
 
-    def initialize(params)
+    def initialize(params, roda_class_name)
+      @roda_class_name  = roda_class_name
       @inflector        = Dry::Inflector.new
       @table            = params[:table]
       @singlename       = @inflector.singularize(params[:short_name])
@@ -29,7 +30,7 @@ class GenerateNewScaffold < BaseService
       applet_klass  = @inflector.camelize(@applet)
       program_klass = @inflector.camelize(@program)
       {
-        roda_class: ENV['RODA_KLASS'],
+        roda_class: @roda_class_name,
         module: modulename,
         class: classname,
         applet: applet_klass,
@@ -76,8 +77,8 @@ class GenerateNewScaffold < BaseService
   end
 
   # TODO: dry-validation: type to pre-strip strings...
-  def initialize(params)
-    @opts = ScaffoldConfig.new(params)
+  def initialize(params, roda_class_name)
+    @opts = ScaffoldConfig.new(params, roda_class_name)
   end
 
   def call
@@ -466,14 +467,13 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
-      roda_klass = ENV['RODA_KLASS']
       <<~RUBY
         # frozen_string_literal: true
 
         # rubocop:disable Metrics/ClassLength
         # rubocop:disable Metrics/BlockLength
 
-        class #{roda_klass} < Roda
+        class #{opts.classnames[:roda_class]} < Roda
           route '#{opts.program}', '#{opts.applet}' do |r|
             # #{opts.table.upcase.tr('_', ' ')}
             # --------------------------------------------------------------------------
@@ -486,22 +486,16 @@ class GenerateNewScaffold < BaseService
               end
 
               r.on 'edit' do   # EDIT
-                if authorised?('#{opts.program}', 'edit')
-                  show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id) }
-                else
-                  dialog_permission_error
-                end
+                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'edit')
+                show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id) }
               end
               r.is do
                 r.get do       # SHOW
-                  if authorised?('#{opts.program}', 'read')
-                    show_partial { #{opts.classnames[:view_prefix]}::Show.call(id) }
-                  else
-                    dialog_permission_error
-                  end
+                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'read')
+                  show_partial { #{opts.classnames[:view_prefix]}::Show.call(id) }
                 end
                 r.patch do     # UPDATE
-                  response['Content-Type'] = 'application/json'
+                  return_json_response
                   res = interactor.update_#{opts.singlename}(id, params[:#{opts.singlename}])
                   if res.success
                     update_grid_row(id, changes: { #{grid_refresh_fields} },
@@ -512,7 +506,8 @@ class GenerateNewScaffold < BaseService
                   end
                 end
                 r.delete do    # DELETE
-                  response['Content-Type'] = 'application/json'
+                  return_json_response
+                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'delete')
                   res = interactor.delete_#{opts.singlename}(id)
                   delete_grid_row(id, notice: res.message)
                 end
@@ -521,15 +516,12 @@ class GenerateNewScaffold < BaseService
             r.on '#{opts.table}' do
               interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
               r.on 'new' do    # NEW
-                if authorised?('#{opts.program}', 'new')
-                  page = stashed_page
-                  if page
-                    show_page { page }
-                  else
-                    show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
-                  end
+                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'new')
+                page = stashed_page
+                if page
+                  show_page { page }
                 else
-                  fetch?(r) ? dialog_permission_error : show_unauthorised
+                  show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
                 end
               end
               r.post do        # CREATE

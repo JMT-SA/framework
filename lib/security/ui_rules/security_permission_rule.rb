@@ -27,7 +27,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find(:security_permissions, SecurityPermission, @options[:id])
+      @form_object = @repo.find(:security_permissions, SecurityApp::SecurityPermission, @options[:id])
     end
 
     def make_new_form_object

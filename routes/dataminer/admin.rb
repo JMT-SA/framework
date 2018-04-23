@@ -12,12 +12,12 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'reports_grid' do
-      response['Content-Type'] = 'application/json'
+      return_json_response
       interactor.admin_report_list_grid
     end
 
     r.on 'grids_grid' do
-      response['Content-Type'] = 'application/json'
+      return_json_response
       interactor.admin_report_list_grid(for_grids: true)
     end
 
@@ -93,7 +93,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.delete do
-        response['Content-Type'] = 'application/json'
+        return_json_response
         res = interactor.delete_report(id)
         if res.success
           delete_grid_row(id, notice: res.message)

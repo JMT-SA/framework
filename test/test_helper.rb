@@ -1,19 +1,15 @@
 # frozen_string_literal: true
 
+ENV['RACK_ENV'] = 'test'
 require 'minitest/autorun'
 require 'mocha/minitest'
 require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
 require 'minitest/rg'
 
-require 'crossbeams/layout'
-require 'yaml'
-require 'dry/inflector'
-require 'dry-struct'
-require 'dry-validation'
-require 'sequel'
+require 'bundler'
+Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
-ENV['RACK_ENV'] = 'test'
 require './config/environment'
 
 require './lib/types_for_dry'

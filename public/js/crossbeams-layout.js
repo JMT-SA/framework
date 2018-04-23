@@ -216,6 +216,10 @@
               if (data.flash.error) {
                 if (data.exception) {
                   Jackbox.error(data.flash.error, { time: 20 });
+                  if (data.backtrace) {
+                    console.log('==Backend Backtrace==');
+                    console.info(data.backtrace.join('\n'));
+                  }
                 } else {
                   Jackbox.error(data.flash.error);
                 }

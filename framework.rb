@@ -3,23 +3,8 @@
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
 
-require 'roda'
-require 'rodauth'
-require 'awesome_print'
-require 'crossbeams/dataminer'
-require 'crossbeams/layout'
-require 'crossbeams/label_designer'
-require 'crossbeams/rack_middleware'
-require 'roda/data_grid'
-require 'yaml'
-require 'pstore'
-require 'base64'
-require 'dry/inflector'
-require 'dry-struct'
-require 'dry-validation'
-require 'asciidoctor'
-require'yard'
-
+require 'bundler'
+Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
 require './lib/types_for_dry'
 require './lib/crossbeams_responses'
@@ -39,13 +24,16 @@ ENV['GRID_QUERIES_LOCATION'] ||= File.expand_path('grid_definitions/dataminer_qu
 
 DM_CONNECTIONS = DataminerConnections.new
 
+module Crossbeams
+  class AuthorizationError < StandardError
+  end
+end
+
 class Framework < Roda
   include CommonHelpers
+  include ErrorHelpers
   include MenuHelpers
   include DataminerHelpers
-
-  # Store the name of this class for use in scaffold generating.
-  ENV['RODA_KLASS'] = to_s
 
   use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
@@ -82,14 +70,18 @@ class Framework < Roda
     accounts_table :vw_active_users # Only active users can login.
     account_password_hash_column :password_hash
   end
-  # plugin :error_handler do |e|
-  #   # TODO: how to handle AJAX/JSON etc...
-  #   view(inline: "An error occurred - #{e.message}") # TODO: refine this to handle certain classes of errors in certain ways.
-  #   # (could do something like - inline: render errorview(e) ...)
-  # end
+  unless ENV['NO_ERR_HANDLE'] == 'true'
+    plugin :error_handler do |e|
+      show_error(e, request.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE'), @cbr_json_response)
+      # = if prod and unexpected exception type, just display "something whent wrong" and log
+      # = use an exception library & email...
+    end
+  end
   Dir['./routes/*.rb'].each { |f| require f }
 
   route do |r|
+    initialize_route_instance_vars
+
     r.assets unless ENV['RACK_ENV'] == 'production'
     r.public
 
@@ -98,6 +90,7 @@ class Framework < Roda
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do
+      # TODO: perhaps root should ALWAYS redirect to a config'd URL. which is customised.
       # flash.now[:error] = 'A TEST' # <=== Add this...
       s = <<-HTML
       <h2>Kromco packhouse</h2>

@@ -12,7 +12,7 @@ class Framework < Roda
       grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'grid' do
-        response['Content-Type'] = 'application/json'
+        return_json_response
         grid_interactor.list_grids.to_json
       end
 
@@ -24,22 +24,22 @@ class Framework < Roda
       end
 
       r.on 'grid_actions', String do |list_file|
-        response['Content-Type'] = 'application/json'
+        return_json_response
         grid_interactor.grid_actions(list_file).to_json
       end
 
       r.on 'grid_page_controls', String do |list_file|
-        response['Content-Type'] = 'application/json'
+        return_json_response
         grid_interactor.grid_page_controls(list_file).to_json
       end
 
       r.on 'grid_multiselects', String do |list_file|
-        response['Content-Type'] = 'application/json'
+        return_json_response
         grid_interactor.grid_multiselects(list_file).to_json
       end
 
       r.on 'grid_conditions', String do |list_file|
-        response['Content-Type'] = 'application/json'
+        return_json_response
         grid_interactor.grid_conditions(list_file).to_json
       end
     end

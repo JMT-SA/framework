@@ -71,7 +71,7 @@ class Framework < Roda
     end
 
     r.on 'grid' do
-      response['Content-Type'] = 'application/json'
+      return_json_response
       interactor.report_list_grid
     end
   end

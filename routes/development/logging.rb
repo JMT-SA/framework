@@ -15,17 +15,14 @@ class Framework < Roda
 
       r.is do
         r.get do       # SHOW
-          if authorised?('logging', 'read')
-            # using id of logged_action, build a grid of changes.
-            show_page { Development::Logging::LoggedAction::Show.call(id) }
-          else
-            show_unauthorised
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('logging', 'read')
+          # using id of logged_action, build a grid of changes.
+          show_page { Development::Logging::LoggedAction::Show.call(id) }
         end
       end
 
       r.on 'grid' do
-        response['Content-Type'] = 'application/json'
+        return_json_response
         interactor.logged_actions_grid(id)
       end
     end

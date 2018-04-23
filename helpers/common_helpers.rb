@@ -89,11 +89,6 @@ module CommonHelpers
     !authorised?(programs, sought_permission)
   end
 
-  def show_unauthorised
-    response.status = 404
-    view(inline: "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>")
-  end
-
   def can_do_dataminer_admin?
     # TODO: what decides that user can do admin? security role on dm program?
     # program + user -> program_users -> security_group -> security_permissions
@@ -115,14 +110,6 @@ module CommonHelpers
 
   def load_via_json(url)
     { loadNewUrl: url }.to_json
-  end
-
-  def show_json_notice(message)
-    { flash: { notice: message } }.to_json
-  end
-
-  def show_json_error(message)
-    { flash: { error: message } }.to_json
   end
 
   def update_grid_row(id, changes:, notice: nil)
@@ -150,11 +137,6 @@ module CommonHelpers
   end
 
   def show_json_exception(err)
-    { exception: err.class.name, flash: { error: "An error occurred: #{err.message}" } }.to_json
-  end
-
-  def handle_json_error(err)
-    response.status = 500
     { exception: err.class.name, flash: { error: "An error occurred: #{err.message}" } }.to_json
   end
 
@@ -195,31 +177,12 @@ module CommonHelpers
     res.to_json
   end
 
-  def handle_error(err)
-    response.status = 500
-    view(inline: "<div class='crossbeams-error-note'><strong>Error</strong><br>#{err}</div>")
-  end
-
   def handle_not_found(route)
     if request.xhr?
       "<div class='crossbeams-error-note'><strong>Error</strong><br>The requested resource was not found.</div>"
     else
       route.redirect '/not_found'
     end
-  end
-
-  def dialog_warning(message)
-    "<div class='crossbeams-warning-note'><strong>Warning</strong><br>#{message}</div>"
-  end
-
-  def dialog_permission_error
-    response.status = 404
-    "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>"
-  end
-
-  def dialog_error(err, state = nil)
-    response.status = 500
-    "<div class='crossbeams-error-note'><strong>#{state || 'ERROR'}</strong><br>#{err}</div>"
   end
 
   def stash_page(value)

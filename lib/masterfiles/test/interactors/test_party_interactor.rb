@@ -19,7 +19,7 @@ module MasterfilesApp
     private
 
     def interactor
-      @interactor ||= PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
+      @interactor ||= PartyInteractor.new(current_user, {}, {}, {})
     end
   end
 end

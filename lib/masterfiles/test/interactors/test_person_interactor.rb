@@ -150,7 +150,7 @@ module MasterfilesApp
     private
 
     def interactor
-      @interactor ||= PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      @interactor ||= PersonInteractor.new(current_user, {}, {}, {})
     end
 
     def person_attrs

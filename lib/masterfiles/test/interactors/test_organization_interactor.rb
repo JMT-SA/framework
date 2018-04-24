@@ -190,7 +190,7 @@ module MasterfilesApp
     private
 
     def interactor
-      @interactor ||= OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      @interactor ||= OrganizationInteractor.new(current_user, {}, {}, {})
     end
 
     def organization_attrs

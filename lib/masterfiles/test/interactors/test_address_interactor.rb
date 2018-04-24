@@ -169,7 +169,7 @@ module MasterfilesApp
     private
 
     def interactor
-      @interactor ||= AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
+      @interactor ||= AddressInteractor.new(current_user, {}, {}, {})
     end
 
     def address_attrs

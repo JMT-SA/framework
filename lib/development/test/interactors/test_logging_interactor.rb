@@ -20,7 +20,7 @@ module DevelopmentApp
     private
 
     def interactor
-      @interactor ||= LoggingInteractor.new(current_user, {}, { route_url: request.path }, {})
+      @interactor ||= LoggingInteractor.new(current_user, {}, {}, {})
     end
   end
 end

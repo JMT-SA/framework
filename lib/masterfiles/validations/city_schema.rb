@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  DestinationCitySchema = Dry::Validation.Form do
+  CitySchema = Dry::Validation.Form do
     configure { config.type_specs = true }
 
     optional(:id, :int).filled(:int?)

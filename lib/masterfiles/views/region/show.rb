@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Masterfiles
-  module Fruit
-    module DestinationRegion
+  module TargetMarkets
+    module Region
       class Show
         def self.call(id)
-          ui_rule = UiRules::Compiler.new(:destination_region, :show, id: id)
+          ui_rule = UiRules::Compiler.new(:region, :show, id: id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

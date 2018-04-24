@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class DestinationRegionRule < Base
+  class RegionRule < Base
     def generate_rules
       @repo = MasterfilesApp::DestinationRepo.new
       make_form_object
@@ -11,7 +11,7 @@ module UiRules
 
       set_show_fields if @mode == :show
 
-      form_name 'destination_region'
+      form_name 'region'
     end
 
     def set_show_fields
@@ -20,7 +20,7 @@ module UiRules
 
     def common_fields
       {
-        destination_region_name: {}
+        destination_region_name: { required: true }
       }
     end
 
@@ -28,7 +28,6 @@ module UiRules
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_region(@options[:id])
-      # TODO: move -> DestinationInteractor.find_region(id) ?
     end
 
     def make_new_form_object

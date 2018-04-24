@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class DestinationCity < Dry::Struct
+  class Country < Dry::Struct
     attribute :id, Types::Int
-    attribute :destination_country_id, Types::Int
-    attribute :city_name, Types::String
+    attribute :destination_region_id, Types::Int
     attribute :country_name, Types::String
     attribute :region_name, Types::String
   end

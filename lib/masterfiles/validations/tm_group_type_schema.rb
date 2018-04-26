@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  TargetMarketGroupTypeSchema = Dry::Validation.Form do
+  TmGroupTypeSchema = Dry::Validation.Form do
     configure { config.type_specs = true }
 
     optional(:id, :int).filled(:int?)

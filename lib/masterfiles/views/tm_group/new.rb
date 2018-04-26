@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Masterfiles
-  module Fruit
-    module TargetMarketGroup
+  module TargetMarkets
+    module TmGroup
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
-          ui_rule = UiRules::Compiler.new(:target_market_group, :new, form_values: form_values)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:tm_group, :new, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

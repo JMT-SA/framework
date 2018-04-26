@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Masterfiles
-  module Fruit
+  module TargetMarkets
     module TargetMarket
       class Show
         def self.call(id)

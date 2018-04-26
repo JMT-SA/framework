@@ -4,6 +4,7 @@ module UiRules
   class TargetMarketRule < Base
     def generate_rules
       @repo = MasterfilesApp::TargetMarketRepo.new
+      @destination_repo = MasterfilesApp::DestinationRepo.new
       make_form_object
       apply_form_values
 
@@ -22,9 +23,9 @@ module UiRules
 
     def common_fields
       {
-        target_market_name: {},
-        tm_group_ids: { renderer: :multi, options: @repo.for_select_target_market_groups, selected: @form_object.tm_group_ids },
-        country_ids: { renderer: :multi, options: MasterfilesApp::DestinationRepo.new.for_select_destination_countries, selected: @form_object.country_ids }
+        target_market_name: { required: true, caption: 'Name'},
+        tm_group_ids: { renderer: :multi, options: @repo.for_select_tm_groups, selected: @form_object.tm_group_ids, caption: 'Groups' },
+        country_ids: { renderer: :multi, options: @destination_repo.for_select_destination_countries, selected: @form_object.country_ids, caption: 'Countries' }
       }
     end
 

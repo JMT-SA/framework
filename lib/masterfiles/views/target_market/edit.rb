@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Masterfiles
-  module Fruit
+  module TargetMarkets
     module TargetMarket
       class Edit
         def self.call(id, form_values = nil, form_errors = nil)

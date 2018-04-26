@@ -5,16 +5,21 @@ module MasterfilesApp
     def create_tm_group_type(params)
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @tm_group_type_id = target_market_repo.create_tm_group_type(res.to_h)
-      success_response("Created target market group type #{tm_group_type.target_market_group_type_code}",
-                       tm_group_type)
+      DB.transaction do
+        @tm_group_type_id = target_market_repo.create_tm_group_type(res.to_h)
+      end
+      success_response("Created target market group type #{tm_group_type.target_market_group_type_code}", tm_group_type)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { target_market_group_type_code: ['This target market group type already exists'] }))
     end
 
     def update_tm_group_type(id, params)
       @tm_group_type_id = id
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      target_market_repo.update_tm_group_type(id, res.to_h)
+      DB.transaction do
+        target_market_repo.update_tm_group_type(id, res.to_h)
+      end
       success_response("Updated target market group type #{tm_group_type.target_market_group_type_code}",
                        tm_group_type(false))
     end
@@ -22,29 +27,40 @@ module MasterfilesApp
     def delete_tm_group_type(id)
       @tm_group_type_id = id
       name = tm_group_type.target_market_group_type_code
-      target_market_repo.delete_tm_group_type(id)
+      DB.transaction do
+        target_market_repo.delete_tm_group_type(id)
+      end
       success_response("Deleted target market group type #{name}")
     end
 
     def create_tm_group(params)
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @tm_group_id = target_market_repo.create_tm_group(res.to_h)
-      success_response("Created target market group #{tm_group.target_market_group_name}", tm_group)
+      DB.transaction do
+        @tm_group_id = target_market_repo.create_tm_group(res)
+      end
+      success_response("Created target market group #{tm_group.target_market_group_name}",
+                       tm_group)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { target_market_group_name: ['This target market group already exists'] }))
     end
 
     def update_tm_group(id, params)
       @tm_group_id = id
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      target_market_repo.update_tm_group(id, res.to_h)
+      DB.transaction do
+        target_market_repo.update_tm_group(id, res)
+      end
       success_response("Updated target market group #{tm_group.target_market_group_name}", tm_group(false))
     end
 
     def delete_tm_group(id)
       @tm_group_id = id
       name = tm_group.target_market_group_name
-      target_market_repo.delete_tm_group(id)
+      DB.transaction do
+        target_market_repo.delete_tm_group(id)
+      end
       success_response("Deleted target market group #{name}")
     end
 
@@ -53,10 +69,14 @@ module MasterfilesApp
       tm_group_ids = params.delete(:tm_group_ids)
       res = validate_target_market_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @target_market_id = target_market_repo.create_target_market(res.to_h)
+      DB.transaction do
+        @target_market_id = target_market_repo.create_target_market(res.to_h)
+      end
       country_response = link_countries(@target_market_id, country_ids)
       tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
       success_response("Created target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { target_market_name: ['This target market already exists'] }))
     end
 
     def update_target_market(id, params)
@@ -119,7 +139,7 @@ module MasterfilesApp
     end
 
     def validate_tm_group_type_params(params)
-      TargetMarketGroupTypeSchema.call(params)
+      TmGroupTypeSchema.call(params)
     end
 
     def tm_group(cached = true)
@@ -131,7 +151,7 @@ module MasterfilesApp
     end
 
     def validate_tm_group_params(params)
-      TargetMarketGroupSchema.call(params)
+      TmGroupSchema.call(params)
     end
 
     def target_market(cached = true)

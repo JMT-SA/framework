@@ -6,6 +6,7 @@
 require 'bundler'
 Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
+require 'pstore'
 require './lib/types_for_dry'
 require './lib/crossbeams_responses'
 require './lib/repo_base'

@@ -70,7 +70,7 @@ class Framework < Roda
     accounts_table :vw_active_users # Only active users can login.
     account_password_hash_column :password_hash
   end
-  unless ENV['NO_ERR_HANDLE'] == 'true'
+  unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
     plugin :error_handler do |e|
       show_error(e, request.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE'), @cbr_json_response)
       # = if prod and unexpected exception type, just display "something whent wrong" and log

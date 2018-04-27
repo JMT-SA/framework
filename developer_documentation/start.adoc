@@ -4,6 +4,13 @@
 
 == Crossbeams framework
 
+=== Running the app
+
+The following special environment variables are available when running the app:
+
+* `NO_ERR_HANDLE` - Only applies in development mode. If set, the error_handler will not handle errors for you.
+* `DONOTLOGSQL` - If set, SQL statements are not included in the application logs. Note that statements are only logged in development mode.
+
 === Reference
 
 * link:/developer_documentation/grids.adoc[Grids]

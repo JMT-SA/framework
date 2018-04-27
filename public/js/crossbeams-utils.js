@@ -24,6 +24,17 @@ const crossbeamsUtils = {
     return 0;
   },
 
+  nextDialogError: function nextDialogError() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return 'dialog-error-level2';
+      case 1:
+        return 'dialog-error-level2';
+      default:
+        return 'dialog-error-level1';
+    }
+  },
+
   nextDialogContent: function nextDialogContent() {
     switch (this.currentDialogLevel()) {
       case 2:
@@ -54,6 +65,17 @@ const crossbeamsUtils = {
         return crossbeamsDialogLevel2;
       default:
         return crossbeamsDialogLevel1;
+    }
+  },
+
+  activeDialogError: function activeDialogError() {
+    switch (this.currentDialogLevel()) {
+      case 2:
+        return 'dialog-error-level2';
+      case 1:
+        return 'dialog-error-level1';
+      default:
+        return 'dialog-error-level1';
     }
   },
 
@@ -145,27 +167,40 @@ const crossbeamsUtils = {
   popupDialog: function popupDialog(title, href) {
     document.getElementById(this.nextDialogTitle()).innerHTML = title;
     document.getElementById(this.nextDialogContent()).innerHTML = '';
+    document.getElementById(this.nextDialogError()).style.display = 'none';
     fetch(href, {
       method: 'GET',
       headers: new Headers({
         'X-Custom-Request-Type': 'Fetch',
       }),
       credentials: 'same-origin',
-    }).then(response => response.text())
+    }).then((response) => {
+      const contentType = response.headers.get('Content-Type'); // -> "text/html; charset=utf-8"
+      if (/text\/html/i.test(contentType)) {
+        return response.text();
+      }
+      return response.json();
+    })
       .then((data) => {
-        const dlg = document.getElementById(this.activeDialogContent());
-        dlg.innerHTML = data;
-        crossbeamsUtils.makeMultiSelects();
-        crossbeamsUtils.makeSearchableSelects();
-        const grids = dlg.querySelectorAll('[data-grid]');
-        grids.forEach((grid) => {
-          const gridId = grid.getAttribute('id');
-          const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
-          document.dispatchEvent(gridEvent);
-        });
-        const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
-        if (sortable.length > 0) {
-          crossbeamsUtils.makeListSortable(sortable[0].dataset.sortablePrefix);
+        if (data.flash) {
+          const err = document.getElementById(this.activeDialogError());
+          err.innerHTML = `<strong>An error occurred:</strong><br>${data.flash.error}`;
+          err.style.display = 'block';
+        } else {
+          const dlg = document.getElementById(this.activeDialogContent());
+          dlg.innerHTML = data;
+          crossbeamsUtils.makeMultiSelects();
+          crossbeamsUtils.makeSearchableSelects();
+          const grids = dlg.querySelectorAll('[data-grid]');
+          grids.forEach((grid) => {
+            const gridId = grid.getAttribute('id');
+            const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+            document.dispatchEvent(gridEvent);
+          });
+          const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
+          if (sortable.length > 0) {
+            crossbeamsUtils.makeListSortable(sortable[0].dataset.sortablePrefix);
+          }
         }
       }).catch((data) => {
         Jackbox.error('The action was unsuccessful...');

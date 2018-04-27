@@ -55,8 +55,11 @@ module ErrorHelpers
 
   def dialog_error(err, state = nil)
     response.status = 500
+    msg = err.respond_to?(:message) ? err.message : err.to_s
+    msg = "#{state} - #{msg}" unless state.nil?
     puts err.full_message if err.respond_to?(:full_message)
-    "<div class='crossbeams-error-note'><strong>#{state || 'ERROR'}</strong><br>#{err}</div>"
+    return_json_response
+    { flash: { error: msg } }.to_json
   end
 
   def show_unauthorised

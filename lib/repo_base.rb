@@ -5,17 +5,19 @@ class RepoBase
   #
   # @param table_name [Symbol] the db table name.
   # @param wrapper [Class] the class of the object to return.
+  # @param args [Hash] the optional where-clause conditions.
   # @return [Array] the table rows.
-  def all(table_name, wrapper)
-    all_hash(table_name).map { |r| wrapper.new(r) }
+  def all(table_name, wrapper, args = nil)
+    all_hash(table_name, args).map { |r| wrapper.new(r) }
   end
 
   # Return all rows from a table as Hashes.
   #
   # @param table_name [Symbol] the db table name.
+  # @param args [Hash] the optional where-clause conditions.
   # @return [Array] the table rows.
-  def all_hash(table_name)
-    DB[table_name].all
+  def all_hash(table_name, args = nil)
+    args.nil? ? DB[table_name].all : DB[table_name].where(args).all
   end
 
   # Find a row in a table. Raises an exception if it is not found.

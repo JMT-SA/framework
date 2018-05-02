@@ -6,5 +6,7 @@ module MasterfilesApp
 
     optional(:id, :int).filled(:int?)
     required(:target_market_name, Types::StrippedString).filled(:str?)
+    required(:country_ids, Types::IntArray).filled { each(:int?) }
+    required(:tm_group_ids, Types::IntArray).filled { each(:int?) }
   end
 end

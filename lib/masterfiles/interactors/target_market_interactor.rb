@@ -65,12 +65,15 @@ module MasterfilesApp
     end
 
     def create_target_market(params)
-      country_ids = params.delete(:country_ids)
-      tm_group_ids = params.delete(:tm_group_ids)
       res = validate_target_market_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
+      res = res.to_h
+      country_ids = res.delete(:country_ids)
+      tm_group_ids = res.delete(:tm_group_ids)
+
       DB.transaction do
-        @target_market_id = target_market_repo.create_target_market(res.to_h)
+        @target_market_id = target_market_repo.create_target_market(res)
       end
       country_response = link_countries(@target_market_id, country_ids)
       tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
@@ -80,14 +83,17 @@ module MasterfilesApp
     end
 
     def update_target_market(id, params)
-      country_ids = params.delete(:country_ids)
-      tm_group_ids = params.delete(:tm_group_ids)
       @target_market_id = id
       res = validate_target_market_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
+      res = res.to_h
+      country_ids = res.delete(:country_ids)
+      tm_group_ids = res.delete(:tm_group_ids)
+
       country_response = link_countries(@target_market_id, country_ids)
       tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
-      target_market_repo.update_target_market(id, res.to_h)
+      target_market_repo.update_target_market(id, res)
       success_response("Updated target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market(false))
     end
 
@@ -99,6 +105,7 @@ module MasterfilesApp
     end
 
     def link_countries(target_market_id, country_ids)
+      return failed_response('You have not selected any countries') unless country_ids
       DB.transaction do
         target_market_repo.link_countries(target_market_id, country_ids)
       end
@@ -112,6 +119,7 @@ module MasterfilesApp
     end
 
     def link_tm_groups(target_market_id, tm_group_ids)
+      return failed_response('You have not selected any target market groups') unless tm_group_ids
       DB.transaction do
         target_market_repo.link_tm_groups(target_market_id, tm_group_ids)
       end

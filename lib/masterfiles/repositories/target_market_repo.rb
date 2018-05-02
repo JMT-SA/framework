@@ -44,6 +44,7 @@ module MasterfilesApp
     end
 
     def link_countries(target_market_id, country_ids)
+      return nil unless country_ids
       existing_ids      = target_market_country_ids(target_market_id)
       old_ids           = existing_ids - country_ids
       new_ids           = country_ids - existing_ids
@@ -59,6 +60,7 @@ module MasterfilesApp
     end
 
     def link_tm_groups(target_market_id, tm_group_ids)
+      return nil unless tm_group_ids
       existing_ids      = target_market_tm_group_ids(target_market_id)
       old_ids           = existing_ids - tm_group_ids
       new_ids           = tm_group_ids - existing_ids

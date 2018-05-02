@@ -8,13 +8,14 @@ class GenerateNewScaffold < BaseService
 
   class ScaffoldConfig
     attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
-                :table_meta, :label_field, :short_name
+                :table_meta, :label_field, :short_name, :has_short_name
 
     def initialize(params, roda_class_name)
       @roda_class_name  = roda_class_name
       @inflector        = Dry::Inflector.new
       @table            = params[:table]
       @singlename       = @inflector.singularize(params[:short_name])
+      @has_short_name   = params[:short_name] != params[:table]
       @applet           = params[:applet]
       @new_applet       = @applet == 'other'
       @applet           = params[:other] if @applet == 'other'
@@ -283,17 +284,19 @@ class GenerateNewScaffold < BaseService
     end
 
     def call
+      alias_active   = opts.has_short_name ? "#{UtilityFunctions.newline_and_spaces(21)}alias: :#{opts.singlename}," : ''
+      alias_inactive = opts.has_short_name ? "#{UtilityFunctions.newline_and_spaces(26)}alias: :#{opts.singlename}," : ''
       if @opts.table_meta.active_column_present?
         <<~RUBY
           # frozen_string_literal: true
 
           module #{opts.classnames[:module]}
             class #{opts.classnames[:repo]} < RepoBase
-              build_for_select :#{opts.table},
+              build_for_select :#{opts.table},#{alias_active}
                                label: :#{opts.label_field},
                                value: :id,
                                order_by: :#{opts.label_field}
-              build_inactive_select :#{opts.table},
+              build_inactive_select :#{opts.table},#{alias_inactive}
                                     label: :#{opts.label_field},
                                     value: :id,
                                     order_by: :#{opts.label_field}
@@ -308,7 +311,7 @@ class GenerateNewScaffold < BaseService
 
           module #{opts.classnames[:module]}
             class #{opts.classnames[:repo]} < RepoBase
-              build_for_select :#{opts.table},
+              build_for_select :#{opts.table},#{alias_active}
                                label: :#{opts.label_field},
                                value: :id,
                                no_active_check: true,
@@ -721,7 +724,7 @@ class GenerateNewScaffold < BaseService
           class Test#{opts.classnames[:repo]} < MiniTestWithHooks
 
             def test_for_selects
-              assert_respond_to repo, :for_select_#{opts.table}
+              assert_respond_to repo, :for_select_#{opts.has_short_name ? opts.singlename : opts.table}
             end
 
             def test_crud_calls

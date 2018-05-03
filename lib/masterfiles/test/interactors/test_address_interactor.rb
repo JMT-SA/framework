@@ -145,7 +145,7 @@ module MasterfilesApp
       x = interactor.update_address(1, invalid_address)
       assert_equal(false, x.success)
       # Gives validation failed response on fail
-      expected = interactor.validation_failed_response(OpenStruct.new(messages: { address_line_1: ['must be a string'] }))
+      expected = interactor.validation_failed_response(OpenStruct.new(messages: { address_line_1: ['must be a string'] }, **invalid_address))
       assert_equal(expected, x)
 
       # Updates successfully

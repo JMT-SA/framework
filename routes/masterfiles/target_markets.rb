@@ -238,14 +238,14 @@ class Framework < Roda
           end
         elsif fetch?(r)
           content = show_partial do
-            Masterfiles::TargetMarkets::TargetMarket::New.call(form_values: params[:target_market],
+            Masterfiles::TargetMarkets::TargetMarket::New.call(form_values: res.instance,
                                                                form_errors: res.errors,
                                                                remote: true)
           end
           update_dialog_content(content: content, error: res.message)
         else
           flash[:error] = res.message
-          stash_page(Masterfiles::TargetMarkets::TargetMarket::New.call(form_values: params[:target_market],
+          stash_page(Masterfiles::TargetMarkets::TargetMarket::New.call(form_values: res.instance,
                                                                         form_errors: res.errors,
                                                                         remote: false))
           r.redirect '/masterfiles/target_markets/target_markets/new'

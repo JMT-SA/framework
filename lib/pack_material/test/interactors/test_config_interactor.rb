@@ -86,7 +86,7 @@ module PackMaterialApp
 
       # Gives validation failed response on fail
       x = interactor.update_matres_type(1, invalid_matres_type_attrs)
-      expected = interactor.validation_failed_response(OpenStruct.new(messages: { type_name: ['must be filled'] }))
+      expected = interactor.validation_failed_response(OpenStruct.new(messages: { type_name: ['must be filled'] }, **invalid_matres_type_attrs))
       assert_equal(expected, x)
     end
 

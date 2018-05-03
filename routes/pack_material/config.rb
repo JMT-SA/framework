@@ -43,7 +43,8 @@ class Framework < Roda
           end
         end
         r.delete do
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'delete')
           res = interactor.delete_matres_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -163,7 +164,8 @@ class Framework < Roda
           end
         end
         r.delete do
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'delete')
           res = interactor.delete_matres_sub_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -228,7 +230,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorized?('Pack Material Products', 'edit')
+        if authorized?('Pack material products', 'edit')
           show_partial { PackMaterialApp::Config::PmProduct::Edit.call(id) }
         else
           dialog_permission_error
@@ -301,7 +303,8 @@ class Framework < Roda
           end
         end
         r.delete do
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'delete')
           res = interactor.delete_pm_product(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -310,7 +313,7 @@ class Framework < Roda
     r.on 'pack_material_products' do
       interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('Pack Material Products', 'new')
+        if authorised?('Pack material products', 'new')
           show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::PmProduct::New.call(remote: fetch?(r)) }
         else
           fetch?(r) ? dialog_permission_error : show_unauthorised

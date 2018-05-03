@@ -39,6 +39,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
           res = interactor.delete_role(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -110,6 +111,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
           res = interactor.delete_address_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -180,6 +182,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
           res = interactor.delete_contact_method_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -254,6 +257,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
           res = interactor.delete_user(id)
           delete_grid_row(id, notice: res.message)
         end

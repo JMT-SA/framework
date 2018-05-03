@@ -45,7 +45,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_commodity_group(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -132,7 +133,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_commodity(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -216,7 +218,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_cultivar_group(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -360,7 +363,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_cultivar(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -485,7 +489,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_basic_pack_code(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -568,7 +573,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_standard_pack_code(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -702,7 +708,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_std_fruit_size_count(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -828,7 +835,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_fruit_actual_counts_for_pack(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -873,7 +881,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_fruit_size_reference(id)
           delete_grid_row(id, notice: res.message)
         end

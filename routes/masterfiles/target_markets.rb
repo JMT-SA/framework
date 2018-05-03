@@ -294,7 +294,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
           res = interactor.delete_region(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -378,7 +379,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
           res = interactor.delete_country(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -462,7 +464,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
           res = interactor.delete_city(id)
           delete_grid_row(id, notice: res.message)
         end

@@ -37,6 +37,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('menu', 'delete')
           res = interactor.delete_functional_area(id)
           flash[:notice] = res.message
           redirect_to_last_grid(r)

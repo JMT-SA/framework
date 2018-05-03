@@ -79,7 +79,8 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'delete')
           res = interactor.delete_organization(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -194,7 +195,8 @@ class Framework < Roda
           end
         end
         r.delete do
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'delete')
           res = interactor.delete_person(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -283,7 +285,8 @@ class Framework < Roda
           end
         end
         r.delete do
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'delete')
           res = interactor.delete_address(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -367,7 +370,8 @@ class Framework < Roda
           end
         end
         r.delete do
-          response['Content-Type'] = 'application/json'
+          return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'delete')
           res = interactor.delete_contact_method(id)
           delete_grid_row(id, notice: res.message)
         end

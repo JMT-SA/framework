@@ -17,7 +17,6 @@ module SecurityApp
         JOIN security_groups ON security_groups.id = security_groups_security_permissions.security_group_id
         JOIN security_permissions ON security_permissions.id = security_groups_security_permissions.security_permission_id
         JOIN programs_users ON programs_users.security_group_id = security_groups.id
-        -- JOIN programs ON programs.id = programs_users.program_id
         WHERE programs_users.user_id = #{user.id}
         AND security_permissions.security_permission = '#{sought_permission}'
         AND programs_users.program_id IN (#{prog_ids.join(',')})

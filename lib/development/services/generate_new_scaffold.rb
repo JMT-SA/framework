@@ -8,7 +8,7 @@ class GenerateNewScaffold < BaseService
 
   class ScaffoldConfig
     attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
-                :table_meta, :label_field, :short_name, :has_short_name
+                :table_meta, :label_field, :short_name, :has_short_name, :program_text
 
     def initialize(params, roda_class_name)
       @roda_class_name  = roda_class_name
@@ -19,7 +19,8 @@ class GenerateNewScaffold < BaseService
       @applet           = params[:applet]
       @new_applet       = @applet == 'other'
       @applet           = params[:other] if @applet == 'other'
-      @program          = params[:program]
+      @program_text     = params[:program].strip
+      @program          = @program_text.tr(' ', '_')
       @table_meta       = TableMeta.new(@table)
       @label_field      = params[:label_field] || @table_meta.likely_label_field
       @shared_repo_name = params[:shared_repo_name]
@@ -489,12 +490,12 @@ class GenerateNewScaffold < BaseService
               end
 
               r.on 'edit' do   # EDIT
-                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'edit')
+                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'edit')
                 show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id) }
               end
               r.is do
                 r.get do       # SHOW
-                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'read')
+                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'read')
                   show_partial { #{opts.classnames[:view_prefix]}::Show.call(id) }
                 end
                 r.patch do     # UPDATE
@@ -510,7 +511,7 @@ class GenerateNewScaffold < BaseService
                 end
                 r.delete do    # DELETE
                   return_json_response
-                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'delete')
+                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'delete')
                   res = interactor.delete_#{opts.singlename}(id)
                   delete_grid_row(id, notice: res.message)
                 end
@@ -519,7 +520,7 @@ class GenerateNewScaffold < BaseService
             r.on '#{opts.table}' do
               interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
               r.on 'new' do    # NEW
-                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program}', 'new')
+                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
                 page = stashed_page
                 if page
                   show_page { page }
@@ -1200,35 +1201,40 @@ class GenerateNewScaffold < BaseService
       @opts = opts
     end
 
+    def titleize(str)
+      str.split(' ').map(&:capitalize).join(' ')
+    end
+
     def call
       <<~SQL
-        INSERT INTO functional_areas (functional_area_name) VALUES ('#{opts.applet}');
+        INSERT INTO functional_areas (functional_area_name) VALUES ('#{titleize(opts.applet)}');
 
         INSERT INTO programs (program_name, program_sequence, functional_area_id)
-        VALUES ('#{opts.program}', 1, (SELECT id FROM functional_areas WHERE functional_area_name = '#{opts.applet}'));
+        VALUES ('#{titleize(opts.program_text)}', 1, (SELECT id FROM functional_areas
+                                                      WHERE functional_area_name = '#{titleize(opts.applet)}'));
 
         -- NEW menu item
         /*
         INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-        VALUES ((SELECT id FROM programs WHERE program_name = '#{opts.program}'
+        VALUES ((SELECT id FROM programs WHERE program_name = '#{titleize(opts.program_text)}'
                  AND functional_area_id = (SELECT id FROM functional_areas
-                                           WHERE functional_area_name = '#{opts.applet}')),
+                                           WHERE functional_area_name = '#{titleize(opts.applet)}')),
                  'New #{opts.classnames[:class]}', '/#{opts.applet}/#{opts.program}/#{opts.table}/new', 1);
         */
 
         -- LIST menu item
         INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-        VALUES ((SELECT id FROM programs WHERE program_name = '#{opts.program}'
+        VALUES ((SELECT id FROM programs WHERE program_name = '#{titleize(opts.program_text)}'
                  AND functional_area_id = (SELECT id FROM functional_areas
-                                           WHERE functional_area_name = '#{opts.applet}')),
+                                           WHERE functional_area_name = '#{titleize(opts.applet)}')),
                  '#{opts.table.capitalize}', '/list/#{opts.table}', 2);
 
         -- SEARCH menu item
         /*
         INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-        VALUES ((SELECT id FROM programs WHERE program_name = '#{opts.program}'
+        VALUES ((SELECT id FROM programs WHERE program_name = '#{titleize(opts.program_text)}'
                  AND functional_area_id = (SELECT id FROM functional_areas
-                                           WHERE functional_area_name = '#{opts.applet}')),
+                                           WHERE functional_area_name = '#{titleize(opts.applet)}')),
                  'Search #{opts.table.capitalize}', '/search/#{opts.table}', 2);
         */
       SQL

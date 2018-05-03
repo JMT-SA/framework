@@ -71,7 +71,7 @@ class GenerateNewScaffold < BaseService
         test: {
           interactor: "lib/#{@applet}/test/interactors/test_#{@singlename}_interactor.rb",
           repo: "lib/#{@applet}/test/repositories/test_#{repofile}_repo.rb",
-          route: "test/routes/test_#{@singlename}_routes.rb"
+          route: "test/routes/#{@applet}/test_#{@program}_routes.rb"
         }
       }
     end
@@ -561,7 +561,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def grid_refresh_fields
-      opts.table_meta.columns_without(%i[id created_at updated_at]).map do |col|
+      opts.table_meta.columns_without(%i[id created_at updated_at active]).map do |col|
         "#{col}: res.instance[:#{col}]"
       end.join(', ')
     end

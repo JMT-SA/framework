@@ -8,7 +8,8 @@ class GenerateNewScaffold < BaseService
 
   class ScaffoldConfig
     attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
-                :table_meta, :label_field, :short_name, :has_short_name, :program_text
+                :table_meta, :label_field, :short_name, :has_short_name, :program_text,
+                :nested_route
 
     def initialize(params, roda_class_name)
       @roda_class_name  = roda_class_name
@@ -24,6 +25,7 @@ class GenerateNewScaffold < BaseService
       @table_meta       = TableMeta.new(@table)
       @label_field      = params[:label_field] || @table_meta.likely_label_field
       @shared_repo_name = params[:shared_repo_name]
+      @nested_route     = params[:nested_route_parent].empty? ? nil : params[:nested_route_parent]
     end
 
     def classnames
@@ -238,7 +240,7 @@ class GenerateNewScaffold < BaseService
               #{opts.classnames[:schema]}.call(params)
             end
 
-            def create_#{opts.singlename}(params)
+            def create_#{opts.singlename}(#{needs_id}params)#{add_parent_to_params}
               res = validate_#{opts.singlename}_params(params)
               return validation_failed_response(res) unless res.messages.empty?
               DB.transaction do
@@ -275,6 +277,17 @@ class GenerateNewScaffold < BaseService
           end
         end
       RUBY
+    end
+
+    private
+
+    def needs_id
+      opts.nested_route ? 'parent_id, ' : ''
+    end
+
+    def add_parent_to_params
+      parent_id_name = opts.inflector.foreign_key(opts.inflector.singularize(opts.nested_route)) if opts.nested_route
+      opts.nested_route ? "\n      params[:#{parent_id_name}] = parent_id" : ''
     end
   end
 
@@ -517,43 +530,99 @@ class GenerateNewScaffold < BaseService
                 end
               end
             end
-            r.on '#{opts.table}' do
-              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
-              r.on 'new' do    # NEW
-                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
-                page = stashed_page
-                if page
-                  show_page { page }
-                else
-                  show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
-                end
-              end
-              r.post do        # CREATE
-                res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
-                if res.success
-                  flash[:notice] = res.message
-                  redirect_to_last_grid(r)
-                elsif fetch?(r)
-                  content = show_partial do
-                    #{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],
-                    #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
-                    #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: true)
-                  end
-                  update_dialog_content(content: content, error: res.message)
-                else
-                  flash[:error] = res.message
-                  stash_page(#{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],
-                             #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
-                             #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: false))
-                  r.redirect '/#{opts.applet}/#{opts.program}/#{opts.table}/new'
-                end
-              end
-            end
+
+            #{new_create_routes.gsub("\n", "\n    ").sub(/    \Z/, '')}
           end
         end
 
         # rubocop:enable Metrics/ClassLength
         # rubocop:enable Metrics/BlockLength
+      RUBY
+    end
+
+    def new_create_routes
+      if opts.nested_route
+        nested_new_routes
+      else
+        plain_new_routes
+      end
+    end
+
+    def plain_new_routes
+      <<~RUBY
+        r.on '#{opts.table}' do
+          interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+          r.on 'new' do    # NEW
+            raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
+            page = stashed_page
+            if page
+              show_page { page }
+            else
+              show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
+            end
+          end
+          r.post do        # CREATE
+            res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
+            if res.success
+              flash[:notice] = res.message
+              redirect_to_last_grid(r)
+            elsif fetch?(r)
+              content = show_partial do
+                #{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],
+                #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
+                #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: true)
+              end
+              update_dialog_content(content: content, error: res.message)
+            else
+              flash[:error] = res.message
+              stash_page(#{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],
+                         #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
+                         #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: false))
+              r.redirect '/#{opts.applet}/#{opts.program}/#{opts.table}/new'
+            end
+          end
+        end
+      RUBY
+    end
+
+    def nested_new_routes
+      <<~RUBY
+        r.on '#{opts.nested_route}', Integer do |id|
+          r.on '#{opts.table}' do
+            interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+            r.on 'new' do    # NEW
+              raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
+              page = stashed_page
+              if page
+                show_page { page }
+              else
+                show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
+              end
+            end
+            r.post do        # CREATE
+              res = interactor.create_#{opts.singlename}(id, params[:#{opts.singlename}])
+              if res.success
+                flash[:notice] = res.message
+                redirect_to_last_grid(r)
+              elsif fetch?(r)
+                content = show_partial do
+                  #{opts.classnames[:view_prefix]}::New.call(id,
+                  #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_values: params[:#{opts.singlename}],
+                  #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
+                  #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: true)
+                end
+                update_dialog_content(content: content, error: res.message)
+              else
+                flash[:error] = res.message
+                stash_page(#{opts.classnames[:view_prefix]}::New.call(id,
+                           #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_values: params[:#{opts.singlename}],
+                           #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
+                           #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: false))
+                r.redirect "/#{opts.applet}/#{opts.program}/#{opts.nested_route}/\#{id}/#{opts.table}/new"
+              end
+            end
+          end
+        end
       RUBY
     end
 
@@ -932,6 +1001,18 @@ class GenerateNewScaffold < BaseService
       fields_to_use.map { |f| "form.add_field :#{f}" }.join(UtilityFunctions.newline_and_spaces(14))
     end
 
+    def needs_id
+      opts.nested_route ? 'parent_id, ' : ''
+    end
+
+    def new_form_url
+      if opts.nested_route
+        "\"/#{opts.applet}/#{opts.program}/#{opts.nested_route}/\#{parent_id}/#{opts.table}\""
+      else
+        "'/#{opts.applet}/#{opts.program}/#{opts.table}'"
+      end
+    end
+
     def new_view
       <<~RUBY
         # frozen_string_literal: true
@@ -940,7 +1021,7 @@ class GenerateNewScaffold < BaseService
           module #{opts.classnames[:program]}
             module #{opts.classnames[:class]}
               class New
-                def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+                def self.call(#{needs_id}form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
                   ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new, form_values: form_values)
                   rules   = ui_rule.compile
 
@@ -949,7 +1030,7 @@ class GenerateNewScaffold < BaseService
                     page.form_values form_values
                     page.form_errors form_errors
                     page.form do |form|
-                      form.action '/#{opts.applet}/#{opts.program}/#{opts.table}'
+                      form.action #{new_form_url}
                       form.remote! if remote
                       #{form_fields}
                     end
@@ -1208,6 +1289,13 @@ class GenerateNewScaffold < BaseService
         INSERT INTO programs (program_name, program_sequence, functional_area_id)
         VALUES ('#{titleize(opts.program_text)}', 1, (SELECT id FROM functional_areas
                                                       WHERE functional_area_name = '#{titleize(opts.applet)}'));
+
+        INSERT INTO programs_webapps(program_id, webapp) VALUES (
+              (SELECT id FROM programs
+               WHERE program_name = '#{titleize(opts.program_text)}'
+                 AND functional_area_id = (SELECT id FROM functional_areas
+                                           WHERE functional_area_name = '#{titleize(opts.applet)}')),
+               '#{opts.classnames[:roda_class]}');
 
         -- NEW menu item
         /*

@@ -23,6 +23,7 @@ module Development
               form.add_field :label_field
               form.add_field :short_name
               form.add_field :shared_repo_name
+              form.add_field :nested_route_parent
             end
           end
 

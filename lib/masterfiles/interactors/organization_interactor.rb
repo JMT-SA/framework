@@ -7,7 +7,7 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
       response = nil
       DB.transaction do
-        response = party_repo.create_organization(res.to_h)
+        response = party_repo.create_organization(res)
       end
       if response[:id]
         @organization_id = response[:id]

@@ -5,7 +5,7 @@ module MasterfilesApp
     def create_contact_method(params)
       res = validate_contact_method_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @contact_method_id = party_repo.create_contact_method(res.to_h)
+      @contact_method_id = party_repo.create_contact_method(res)
       success_response("Created contact method #{contact_method.contact_method_code}",
                        contact_method)
     rescue Sequel::UniqueConstraintViolation
@@ -16,7 +16,7 @@ module MasterfilesApp
       @contact_method_id = id
       res = validate_contact_method_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      party_repo.update_contact_method(id, res.to_h)
+      party_repo.update_contact_method(id, res)
       success_response("Updated contact method #{contact_method.contact_method_code}",
                        contact_method(false))
     end

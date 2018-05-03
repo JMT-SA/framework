@@ -16,22 +16,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('Pack material products', 'edit')
-          show_partial { PackMaterialApp::Config::MatresType::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'edit')
+        show_partial { PackMaterialApp::Config::MatresType::Edit.call(id) }
       end
       r.is do
         r.get do
-          if authorised?('Pack material products', 'read')
-            show_partial { PackMaterialApp::Config::MatresType::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'read')
+          show_partial { PackMaterialApp::Config::MatresType::Show.call(id) }
         end
         r.patch do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_matres_type(id, params[:matres_type])
           if res.success
             update_grid_row(id, changes: { material_resource_domain_id: res.instance[:material_resource_domain_id],
@@ -54,21 +48,14 @@ class Framework < Roda
     r.on 'material_resource_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('Pack material products', 'new')
-          show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::MatresType::New.call(remote: fetch?(r)) }
-        else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'new')
+        show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::MatresType::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_matres_type(params[:matres_type])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             PackMaterialApp::Config::MatresType::New.call(form_values: params[:matres_type],
@@ -98,28 +85,22 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('Pack material products', 'edit')
-          show_partial { PackMaterialApp::Config::MatresSubType::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'edit')
+        show_partial { PackMaterialApp::Config::MatresSubType::Edit.call(id) }
       end
 
       r.on 'config' do
         r.is 'edit' do
-          if authorised?('Pack material products', 'edit')
-            page = stashed_page
-            if page
-              show_page { page }
-            else
-              show_page { PackMaterialApp::Config::MatresSubType::Config.call(id) }
-            end
+          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'edit')
+          page = stashed_page
+          if page
+            show_page { page }
           else
-            dialog_permission_error
+            show_page { PackMaterialApp::Config::MatresSubType::Config.call(id) }
           end
         end
         r.patch do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_matres_config(id, params[:matres_sub_type])
           if res.success
             show_json_notice(res.message)
@@ -146,14 +127,11 @@ class Framework < Roda
 
       r.is do
         r.get do
-          if authorised?('Pack material products', 'read')
-            show_partial { PackMaterialApp::Config::MatresSubType::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'read')
+          show_partial { PackMaterialApp::Config::MatresSubType::Show.call(id) }
         end
         r.patch do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_matres_sub_type(id, params[:matres_sub_type])
           if res.success
             update_grid_row(id, changes: { material_resource_type_id: res.instance[:material_resource_type_id], sub_type_name: res.instance[:sub_type_name] },
@@ -175,21 +153,14 @@ class Framework < Roda
     r.on 'material_resource_sub_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('Pack material products', 'new')
-          show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::MatresSubType::New.call(remote: fetch?(r)) }
-        else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'new')
+        show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::MatresSubType::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_matres_sub_type(params[:matres_sub_type])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             PackMaterialApp::Config::MatresSubType::New.call(form_values: params[:matres_sub_type],
@@ -230,22 +201,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorized?('Pack material products', 'edit')
-          show_partial { PackMaterialApp::Config::PmProduct::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorized?('Pack material products', 'edit')
+        show_partial { PackMaterialApp::Config::PmProduct::Edit.call(id) }
       end
       r.is do
         r.get do
-          if authorised?('Pack material products', 'read')
-            show_partial { PackMaterialApp::Config::PmProduct::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'read')
+          show_partial { PackMaterialApp::Config::PmProduct::Show.call(id) }
         end
         r.patch do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_pm_product(id, params[:pm_product])
           if res.success
             update_grid_row(id, changes: { material_resource_sub_type_id: res.instance[:material_resource_sub_type_id],
@@ -313,21 +278,14 @@ class Framework < Roda
     r.on 'pack_material_products' do
       interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('Pack material products', 'new')
-          show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::PmProduct::New.call(remote: fetch?(r)) }
-        else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'new')
+        show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::PmProduct::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_pm_product(params[:pm_product])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             PackMaterialApp::Config::PmProduct::New.call(form_values: params[:pm_product],

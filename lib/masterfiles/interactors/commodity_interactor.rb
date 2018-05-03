@@ -5,7 +5,7 @@ module MasterfilesApp
     def create_commodity_group(params)
       res = validate_commodity_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @commodity_group_id = commodity_repo.create_commodity_group(res.to_h)
+      @commodity_group_id = commodity_repo.create_commodity_group(res)
       success_response("Created commodity group #{commodity_group.code}", commodity_group)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { code: ['This commodity group already exists'] }))
@@ -15,7 +15,7 @@ module MasterfilesApp
       @commodity_group_id = id
       res = validate_commodity_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      commodity_repo.update_commodity_group(id, res.to_h)
+      commodity_repo.update_commodity_group(id, res)
       success_response("Updated commodity group #{commodity_group.code}", commodity_group(false))
     end
 
@@ -29,7 +29,7 @@ module MasterfilesApp
     def create_commodity(params)
       res = validate_commodity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @commodity_id = commodity_repo.create_commodity(res.to_h)
+      @commodity_id = commodity_repo.create_commodity(res)
       success_response("Created commodity #{commodity.code}", commodity)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { code: ['This commodity already exists'] }))
@@ -39,7 +39,7 @@ module MasterfilesApp
       @commodity_id = id
       res = validate_commodity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      commodity_repo.update_commodity(id, res.to_h)
+      commodity_repo.update_commodity(id, res)
       success_response("Updated commodity #{commodity.code}", commodity(false))
     end
 

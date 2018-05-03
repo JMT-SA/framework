@@ -14,15 +14,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('parties', 'edit')
-          show_partial { Masterfiles::Parties::Organization::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'edit')
+        show_partial { Masterfiles::Parties::Organization::Edit.call(id) }
       end
       r.on 'addresses' do
         r.post do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.assign_addresses(id, params[:organization])
           if res.success
             update_grid_row(id,
@@ -38,7 +35,7 @@ class Framework < Roda
       end
       r.on 'contact_methods' do
         r.post do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.assign_contact_methods(id, params[:organization])
           if res.success
             update_grid_row(id,
@@ -54,14 +51,11 @@ class Framework < Roda
       end
       r.is do
         r.get do
-          if authorised?('parties', 'read')
-            show_partial { Masterfiles::Parties::Organization::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'read')
+          show_partial { Masterfiles::Parties::Organization::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_organization(id, params[:organization])
           if res.success
             update_grid_row(id, changes: { party_id: res.instance[:party_id],
@@ -89,26 +83,19 @@ class Framework < Roda
     r.on 'organizations' do
       interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('parties', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_organization(params[:organization])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
@@ -135,15 +122,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('parties', 'edit')
-          show_partial { Masterfiles::Parties::Person::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'edit')
+        show_partial { Masterfiles::Parties::Person::Edit.call(id) }
       end
       r.on 'addresses' do
         r.post do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.assign_addresses(id, params[:person])
           if res.success
             update_grid_row(id,
@@ -158,7 +142,7 @@ class Framework < Roda
       end
       r.on 'contact_methods' do
         r.post do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.assign_contact_methods(id, params[:person])
           if res.success
             update_grid_row(id,
@@ -173,14 +157,11 @@ class Framework < Roda
       end
       r.is do
         r.get do
-          if authorised?('parties', 'read')
-            show_partial { Masterfiles::Parties::Person::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'read')
+          show_partial { Masterfiles::Parties::Person::Show.call(id) }
         end
         r.patch do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_person(id, params[:person])
           if res.success
             update_grid_row(id,
@@ -205,26 +186,19 @@ class Framework < Roda
     r.on 'people' do
       interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('parties', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
         end
       end
       r.post do
         res = interactor.create_person(params[:person])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Parties::Person::New.call(form_values: params[:person],
@@ -251,22 +225,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('parties', 'edit')
-          show_partial { Masterfiles::Parties::Address::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'edit')
+        show_partial { Masterfiles::Parties::Address::Edit.call(id) }
       end
       r.is do
         r.get do
-          if authorised?('parties', 'read')
-            show_partial { Masterfiles::Parties::Address::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'read')
+          show_partial { Masterfiles::Parties::Address::Show.call(id) }
         end
         r.patch do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_address(id, params[:address])
           if res.success
             update_grid_row(id,
@@ -295,26 +263,19 @@ class Framework < Roda
     r.on 'addresses' do
       interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('parties', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
         end
       end
       r.post do
         res = interactor.create_address(params[:address])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Parties::Address::New.call(form_values: params[:address],
@@ -341,22 +302,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        if authorised?('parties', 'edit')
-          show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'edit')
+        show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id) }
       end
       r.is do
         r.get do
-          if authorised?('parties', 'read')
-            show_partial { Masterfiles::Parties::ContactMethod::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('parties', 'read')
+          show_partial { Masterfiles::Parties::ContactMethod::Show.call(id) }
         end
         r.patch do
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_contact_method(id, params[:contact_method])
           if res.success
             update_grid_row(id,
@@ -380,26 +335,19 @@ class Framework < Roda
     r.on 'contact_methods' do
       interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        if authorised?('parties', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
         end
       end
       r.post do
         res = interactor.create_contact_method(params[:contact_method])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Parties::ContactMethod::New.call(form_values: params[:contact_method],
@@ -422,11 +370,6 @@ class Framework < Roda
         interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
 
         res = interactor.link_addresses(id, multiselect_grid_choices(params))
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
         redirect_to_last_grid(r)
       end
     end

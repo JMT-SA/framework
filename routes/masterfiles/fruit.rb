@@ -16,22 +16,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::CommodityGroup::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::CommodityGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_commodity_group(id, params[:commodity_group])
           if res.success
             update_grid_row(id,
@@ -55,26 +49,19 @@ class Framework < Roda
     r.on 'commodity_groups' do
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        if authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_commodity_group(params[:commodity_group])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Fruit::CommodityGroup::New.call(form_values: params[:commodity_group],
@@ -102,22 +89,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::Commodity::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::Commodity::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::Commodity::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::Commodity::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_commodity(id, params[:commodity])
           if res.success
             update_grid_row(id,
@@ -143,26 +124,19 @@ class Framework < Roda
     r.on 'commodities' do
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        if authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_commodity(params[:commodity])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Fruit::Commodity::New.call(form_values: params[:commodity],
@@ -190,22 +164,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::CultivarGroup::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::CultivarGroup::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::CultivarGroup::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::CultivarGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_cultivar_group(id, params[:cultivar_group])
           if res.success
             update_grid_row(id,
@@ -228,26 +196,19 @@ class Framework < Roda
     r.on 'cultivar_groups' do
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        if authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_cultivar_group(params[:cultivar_group])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
@@ -275,11 +236,8 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::Cultivar::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::Cultivar::Edit.call(id) }
       end
 
       # MARKETING VARIETIES
@@ -300,26 +258,19 @@ class Framework < Roda
       r.on 'marketing_varieties' do
         interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          if authorised?('fruit', 'new')
-            page = stashed_page
-            if page
-              show_page { page }
-            else
-              show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
-            end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+          page = stashed_page
+          if page
+            show_page { page }
           else
-            fetch?(r) ? dialog_permission_error : show_unauthorised
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
           end
         end
         r.post do        # CREATE
           res = interactor.create_marketing_variety(id, params[:marketing_variety])
           if res.success
             flash[:notice] = res.message
-            if fetch?(r)
-              redirect_via_json_to_last_grid
-            else
-              redirect_to_last_grid(r)
-            end
+            redirect_to_last_grid(r)
           elsif fetch?(r)
             content = show_partial do
               Masterfiles::Fruit::MarketingVariety::New.call(id,
@@ -340,14 +291,11 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::Cultivar::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::Cultivar::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_cultivar(id, params[:cultivar])
           if res.success
             update_grid_row(id,
@@ -373,26 +321,19 @@ class Framework < Roda
     r.on 'cultivars' do
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        if authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_cultivar(params[:cultivar])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
@@ -418,22 +359,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::MarketingVariety::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::MarketingVariety::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::MarketingVariety::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::MarketingVariety::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_marketing_variety(id, params[:marketing_variety])
           if res.success
             update_grid_row(id,
@@ -458,22 +393,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::BasicPackCode::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::BasicPackCode::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::BasicPackCode::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::BasicPackCode::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_basic_pack_code(id, params[:basic_pack_code])
           if res.success
             update_grid_row(id,
@@ -499,26 +428,19 @@ class Framework < Roda
     r.on 'basic_pack_codes' do
       interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        if authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_basic_pack_code(params[:basic_pack_code])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
@@ -546,22 +468,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::StandardPackCode::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::StandardPackCode::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::StandardPackCode::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::StandardPackCode::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_standard_pack_code(id, params[:standard_pack_code])
           if res.success
             update_grid_row(id,
@@ -583,26 +499,19 @@ class Framework < Roda
     r.on 'standard_pack_codes' do
       interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        if authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_standard_pack_code(params[:standard_pack_code])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
@@ -629,35 +538,25 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id) }
       end
       r.on 'fruit_actual_counts_for_packs' do
         interactor = MasterfilesApp::FruitActualCountsForPackInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          if authorised?('fruit', 'new')
-            page = stashed_page
-            if page
-              show_page { page }
-            else
-              show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
-            end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+          page = stashed_page
+          if page
+            show_page { page }
           else
-            fetch?(r) ? dialog_permission_error : show_unauthorised
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
           end
         end
         r.post do        # CREATE
           res = interactor.create_fruit_actual_counts_for_pack(id, params[:fruit_actual_counts_for_pack])
           if res.success
             flash[:notice] = res.message
-            if fetch?(r)
-              redirect_via_json_to_last_grid
-            else
-              redirect_to_last_grid(r)
-            end
+            redirect_to_last_grid(r)
           elsif fetch?(r)
             content = show_partial do
               Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
@@ -678,14 +577,11 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::StdFruitSizeCount::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::StdFruitSizeCount::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_std_fruit_size_count(id, params[:std_fruit_size_count])
           if res.success
             update_grid_row(id,
@@ -718,26 +614,19 @@ class Framework < Roda
     r.on 'std_fruit_size_counts' do
       interactor = MasterfilesApp::StdFruitSizeCountInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        if authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
-          end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+        page = stashed_page
+        if page
+          show_page { page }
         else
-          fetch?(r) ? dialog_permission_error : show_unauthorised
+          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
         res = interactor.create_std_fruit_size_count(params[:std_fruit_size_count])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
@@ -763,35 +652,25 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id) }
       end
       r.on 'fruit_size_references' do
         interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          if authorised?('fruit', 'new')
-            page = stashed_page
-            if page
-              show_page { page }
-            else
-              show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
-            end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
+          page = stashed_page
+          if page
+            show_page { page }
           else
-            fetch?(r) ? dialog_permission_error : show_unauthorised
+            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
           end
         end
         r.post do        # CREATE
           res = interactor.create_fruit_size_reference(id, params[:fruit_size_reference])
           if res.success
             flash[:notice] = res.message
-            if fetch?(r)
-              redirect_via_json_to_last_grid
-            else
-              redirect_to_last_grid(r)
-            end
+            redirect_to_last_grid(r)
           elsif fetch?(r)
             content = show_partial do
               Masterfiles::Fruit::FruitSizeReference::New.call(id,
@@ -812,14 +691,11 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_fruit_actual_counts_for_pack(id, params[:fruit_actual_counts_for_pack])
           if res.success
             update_grid_row(id,
@@ -853,22 +729,16 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        if authorised?('fruit', 'edit')
-          show_partial { Masterfiles::Fruit::FruitSizeReference::Edit.call(id) }
-        else
-          dialog_permission_error
-        end
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        show_partial { Masterfiles::Fruit::FruitSizeReference::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          if authorised?('fruit', 'read')
-            show_partial { Masterfiles::Fruit::FruitSizeReference::Show.call(id) }
-          else
-            dialog_permission_error
-          end
+          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          show_partial { Masterfiles::Fruit::FruitSizeReference::Show.call(id) }
         end
         r.patch do     # UPDATE
-          response['Content-Type'] = 'application/json'
+          return_json_response
           res = interactor.update_fruit_size_reference(id, params[:fruit_size_reference])
           if res.success
             update_grid_row(id,

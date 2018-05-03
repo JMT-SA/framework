@@ -21,7 +21,7 @@ module MasterfilesApp
     def create_basic_pack_code(params)
       res = validate_basic_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @id = fruit_size_repo.create_basic_pack_code(res.to_h)
+      @id = fruit_size_repo.create_basic_pack_code(res)
       success_response("Created basic pack code #{basic_pack_code.basic_pack_code}",
                        basic_pack_code)
     rescue Sequel::UniqueConstraintViolation
@@ -32,7 +32,7 @@ module MasterfilesApp
       @id = id
       res = validate_basic_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      fruit_size_repo.update_basic_pack_code(id, res.to_h)
+      fruit_size_repo.update_basic_pack_code(id, res)
       success_response("Updated basic pack code #{basic_pack_code.basic_pack_code}",
                        basic_pack_code(false))
     end

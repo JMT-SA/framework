@@ -5,7 +5,7 @@ module MasterfilesApp
     def create_cultivar_group(params)
       res = validate_cultivar_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @cultivar_group_id = cultivar_repo.create_cultivar_group(res.to_h)
+      @cultivar_group_id = cultivar_repo.create_cultivar_group(res)
       success_response("Created cultivar group #{cultivar_group.cultivar_group_code}", cultivar_group)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { cultivar_group_code: ['This cultivar group already exists'] }))
@@ -15,7 +15,7 @@ module MasterfilesApp
       @cultivar_group_id = id
       res = validate_cultivar_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      cultivar_repo.update_cultivar_group(id, res.to_h)
+      cultivar_repo.update_cultivar_group(id, res)
       success_response("Updated cultivar group #{cultivar_group.cultivar_group_code}", cultivar_group(false))
     end
 
@@ -29,7 +29,7 @@ module MasterfilesApp
     def create_cultivar(params)
       res = validate_cultivar_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @cultivar_id = cultivar_repo.create_cultivar(res.to_h)
+      @cultivar_id = cultivar_repo.create_cultivar(res)
       success_response("Created cultivar #{cultivar.cultivar_name}", cultivar)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { cultivar_name: ['This cultivar already exists'] }))
@@ -39,7 +39,7 @@ module MasterfilesApp
       @cultivar_id = id
       res = validate_cultivar_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      cultivar_repo.update_cultivar(id, res.to_h)
+      cultivar_repo.update_cultivar(id, res)
       success_response("Updated cultivar #{cultivar.cultivar_name}", cultivar(false))
     end
 
@@ -53,7 +53,7 @@ module MasterfilesApp
     def create_marketing_variety(cultivar_id, params)
       res = validate_marketing_variety_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @marketing_variety_id = cultivar_repo.create_marketing_variety(cultivar_id, res.to_h)
+      @marketing_variety_id = cultivar_repo.create_marketing_variety(cultivar_id, res)
       success_response("Created marketing variety #{marketing_variety.marketing_variety_code}", marketing_variety)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { marketing_variety_code: ['This marketing variety already exists'] }))
@@ -63,7 +63,7 @@ module MasterfilesApp
       @marketing_variety_id = id
       res = validate_marketing_variety_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      cultivar_repo.update_marketing_variety(id, res.to_h)
+      cultivar_repo.update_marketing_variety(id, res)
       success_response("Updated marketing variety #{marketing_variety.marketing_variety_code}", marketing_variety(false))
     end
 

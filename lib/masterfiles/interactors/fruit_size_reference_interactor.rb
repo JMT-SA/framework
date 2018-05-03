@@ -22,7 +22,7 @@ module MasterfilesApp
       params[:fruit_actual_counts_for_pack_id] = parent_id
       res = validate_fruit_size_reference_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @id = fruit_size_repo.create_fruit_size_reference(res.to_h)
+      @id = fruit_size_repo.create_fruit_size_reference(res)
       success_response("Created fruit size reference #{fruit_size_reference.size_reference}",
                        fruit_size_reference)
     rescue Sequel::UniqueConstraintViolation
@@ -33,7 +33,7 @@ module MasterfilesApp
       @id = id
       res = validate_fruit_size_reference_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      fruit_size_repo.update_fruit_size_reference(id, res.to_h)
+      fruit_size_repo.update_fruit_size_reference(id, res)
       success_response("Updated fruit size reference #{fruit_size_reference.size_reference}",
                        fruit_size_reference(false))
     end

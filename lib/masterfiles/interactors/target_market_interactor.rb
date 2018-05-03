@@ -6,7 +6,7 @@ module MasterfilesApp
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       DB.transaction do
-        @tm_group_type_id = target_market_repo.create_tm_group_type(res.to_h)
+        @tm_group_type_id = target_market_repo.create_tm_group_type(res)
       end
       success_response("Created target market group type #{tm_group_type.target_market_group_type_code}", tm_group_type)
     rescue Sequel::UniqueConstraintViolation
@@ -18,7 +18,7 @@ module MasterfilesApp
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       DB.transaction do
-        target_market_repo.update_tm_group_type(id, res.to_h)
+        target_market_repo.update_tm_group_type(id, res)
       end
       success_response("Updated target market group type #{tm_group_type.target_market_group_type_code}",
                        tm_group_type(false))

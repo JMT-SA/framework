@@ -21,7 +21,7 @@ module MasterfilesApp
     def create_standard_pack_code(params)
       res = validate_standard_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @id = fruit_size_repo.create_standard_pack_code(res.to_h)
+      @id = fruit_size_repo.create_standard_pack_code(res)
       success_response("Created standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { standard_pack_code: ['This standard pack code already exists'] }))
@@ -31,7 +31,7 @@ module MasterfilesApp
       @id = id
       res = validate_standard_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      fruit_size_repo.update_standard_pack_code(id, res.to_h)
+      fruit_size_repo.update_standard_pack_code(id, res)
       success_response("Updated standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code(false))
     end
 

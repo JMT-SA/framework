@@ -30,7 +30,7 @@ module SecurityApp
       @id = id
       res = validate_functional_area_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      repo.update_functional_area(id, res.to_h)
+      repo.update_functional_area(id, res)
       success_response("Updated functional area #{functional_area.functional_area_name}",
                        functional_area(false))
     end

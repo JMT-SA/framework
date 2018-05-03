@@ -94,7 +94,8 @@ module CommonHelpers
     prog_repo.authorise?(current_user, Array(programs), sought_permission, functional_area_id)
   end
 
-  def auth_blocked?(programs, sought_permission)
+  def auth_blocked?(functional_area_name, programs, sought_permission)
+    store_current_functional_area(functional_area_name)
     !authorised?(programs, sought_permission)
   end
 

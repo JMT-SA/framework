@@ -32,9 +32,9 @@ class Framework < Roda
         return_json_response
         begin
           if params && !params.empty?
-            render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, params)
+            render_data_grid_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, params)
           else
-            render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) })
+            render_data_grid_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) })
           end
         rescue StandardError => e
           show_json_exception(e)
@@ -44,7 +44,7 @@ class Framework < Roda
       r.on 'grid_multi', String do |key|
         return_json_response
         begin
-          render_data_grid_multiselect_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, key, params)
+          render_data_grid_multiselect_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, key, params)
         rescue StandardError => e
           show_json_exception(e)
         end
@@ -82,7 +82,7 @@ class Framework < Roda
 
       r.on 'grid' do
         return_json_response
-        render_search_grid_rows(id, params, ->(program, permission) { auth_blocked?(program, permission) })
+        render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program, permission) })
       end
 
       r.on 'xls' do

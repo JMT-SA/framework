@@ -31,9 +31,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: c69bca2dbaa6c9d8bde7bc105be5f67e8ed8cfe2
+  revision: f15f427608310f631faeee6d390423f0e0b4cfae
   specs:
-    roda-data_grid (0.1.2)
+    roda-data_grid (0.1.3)
       axlsx
       crossbeams-dataminer
       crossbeams-layout
@@ -131,7 +131,7 @@ GEM
     pry-doc (0.13.4)
       pry (~> 0.11)
       yard (~> 0.9.11)
-    rack (2.0.4)
+    rack (2.0.5)
     rack-console (1.3.1)
       rack (>= 1.1)
       rack-test

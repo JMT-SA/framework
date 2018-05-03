@@ -10,6 +10,7 @@
         :title: Properties
         :popup: true
         :auth:
+          :function: security
           :program: menu
           :permission: edit
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$

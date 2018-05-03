@@ -29,7 +29,7 @@ class Framework < Roda
       end
 
       r.on 'grid' do
-        response['Content-Type'] = 'application/json'
+        return_json_response
         begin
           if params && !params.empty?
             render_data_grid_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, params)
@@ -42,7 +42,7 @@ class Framework < Roda
       end
 
       r.on 'grid_multi', String do |key|
-        response['Content-Type'] = 'application/json'
+        return_json_response
         begin
           render_data_grid_multiselect_rows(id, ->(program, permission) { auth_blocked?(program, permission) }, key, params)
         rescue StandardError => e
@@ -51,7 +51,7 @@ class Framework < Roda
       end
 
       r.on 'nested_grid' do
-        response['Content-Type'] = 'application/json'
+        return_json_response
         begin
           render_data_grid_nested_rows(id)
         rescue StandardError => e
@@ -81,7 +81,7 @@ class Framework < Roda
       end
 
       r.on 'grid' do
-        response['Content-Type'] = 'application/json'
+        return_json_response
         render_search_grid_rows(id, params, ->(program, permission) { auth_blocked?(program, permission) })
       end
 

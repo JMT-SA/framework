@@ -79,10 +79,19 @@ module CommonHelpers
     @current_user ||= DevelopmentApp::UserRepo.new.find(:users, DevelopmentApp::User, session[:user_id])
   end
 
-  def authorised?(programs, sought_permission)
+  def store_current_functional_area(functional_area_name)
+    @functional_area_id = SecurityApp::MenuRepo.new.functional_area_id_for_name(functional_area_name)
+  end
+
+  def current_functional_area
+    @functional_area_id
+  end
+
+  def authorised?(programs, sought_permission, functional_area_id = nil)
     return false unless current_user
+    functional_area_id ||= current_functional_area
     prog_repo = SecurityApp::MenuRepo.new
-    prog_repo.authorise?(current_user, Array(programs), sought_permission)
+    prog_repo.authorise?(current_user, Array(programs), sought_permission, functional_area_id)
   end
 
   def auth_blocked?(programs, sought_permission)

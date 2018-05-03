@@ -6,19 +6,33 @@ module SecurityApp
     crud_calls_for :programs, name: :program, wrapper: Program, exclude: %i[create update delete]
     crud_calls_for :program_functions, name: :program_function, wrapper: ProgramFunction
 
-    def authorise?(user, programs, sought_permission)
+    def authorise?(user, programs, sought_permission, functional_area_id)
+      raise 'Invalid Functional Area' if functional_area_id.nil?
+      prog_ids = program_ids_for(functional_area_id, programs)
+      raise 'Invalid Functional Area/Program combination' if prog_ids.empty?
+
       query = <<~SQL
         SELECT security_permissions.id
         FROM security_groups_security_permissions
         JOIN security_groups ON security_groups.id = security_groups_security_permissions.security_group_id
         JOIN security_permissions ON security_permissions.id = security_groups_security_permissions.security_permission_id
         JOIN programs_users ON programs_users.security_group_id = security_groups.id
-        JOIN programs ON programs.id = programs_users.program_id
+        -- JOIN programs ON programs.id = programs_users.program_id
         WHERE programs_users.user_id = #{user.id}
         AND security_permissions.security_permission = '#{sought_permission}'
-        AND LOWER(programs.program_name) IN ( '#{programs.map(&:to_s).map(&:downcase).join("','")}')
+        AND programs_users.program_id IN (#{prog_ids.join(',')})
       SQL
       !DB[query].first.nil?
+    end
+
+    def program_ids_for(functional_area_id, programs)
+      query = <<~SQL
+        SELECT id
+        FROM programs
+        WHERE programs.functional_area_id = #{functional_area_id}
+        AND programs.program_name IN ( '#{programs.map(&:to_s).join("','")}')
+      SQL
+      DB[query].select_map
     end
 
     def program_functions_for_select(id)
@@ -29,6 +43,10 @@ module SecurityApp
         ORDER BY program_function_sequence
       SQL
       DB[query].map { |rec| [rec[:program_function_name], rec[:id]] }
+    end
+
+    def functional_area_id_for_name(functional_area_name)
+      DB[:functional_areas].where(functional_area_name: functional_area_name).first[:id]
     end
 
     def create_program(res, webapp)

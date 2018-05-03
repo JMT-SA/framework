@@ -532,11 +532,7 @@ class GenerateNewScaffold < BaseService
                 res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
                 if res.success
                   flash[:notice] = res.message
-                  if fetch?(r)
-                    redirect_via_json_to_last_grid
-                  else
-                    redirect_to_last_grid(r)
-                  end
+                  redirect_to_last_grid(r)
                 elsif fetch?(r)
                   content = show_partial do
                     #{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],

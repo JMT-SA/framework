@@ -55,11 +55,7 @@ class Framework < Roda
         res = interactor.create_functional_area(params[:functional_area])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Security::FunctionalAreas::FunctionalArea::New.call(form_values: params[:functional_area],
@@ -151,11 +147,7 @@ class Framework < Roda
         res = interactor.create_program(params[:program], self.class.name)
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do # params[:program][:functional_area_id]
             Security::FunctionalAreas::Program::New.call(res.functional_area_id,
@@ -235,11 +227,7 @@ class Framework < Roda
         res = interactor.create_program_function(params[:program_function])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Security::FunctionalAreas::ProgramFunction::New.call(params[:program_function][:program_id],
@@ -324,11 +312,7 @@ class Framework < Roda
         res = interactor.create_security_group(params[:security_group])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Security::FunctionalAreas::SecurityGroup::New.call(form_values: params[:security_group],
@@ -397,11 +381,7 @@ class Framework < Roda
         res = interactor.create_security_permission(params[:security_permission])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Security::FunctionalAreas::SecurityPermission::New.call(form_values: params[:security_permission],

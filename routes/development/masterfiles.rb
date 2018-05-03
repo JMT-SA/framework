@@ -55,11 +55,7 @@ class Framework < Roda
         res = interactor.create_role(params[:role])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Development::Masterfiles::Role::New.call(form_values: params[:role],
@@ -127,11 +123,7 @@ class Framework < Roda
         res = interactor.create_address_type(params[:address_type])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Development::Masterfiles::AddressType::New.call(form_values: params[:address_type],
@@ -198,11 +190,7 @@ class Framework < Roda
         res = interactor.create_contact_method_type(params[:contact_method_type])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Development::Masterfiles::ContactMethodType::New.call(form_values: params[:contact_method_type],
@@ -273,11 +261,7 @@ class Framework < Roda
         res = interactor.create_user(params[:user])
         if res.success
           flash[:notice] = res.message
-          if fetch?(r)
-            redirect_via_json_to_last_grid
-          else
-            redirect_to_last_grid(r)
-          end
+          redirect_to_last_grid(r)
         elsif fetch?(r)
           content = show_partial do
             Development::Masterfiles::User::New.call(form_values: params[:user],

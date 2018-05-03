@@ -106,7 +106,11 @@ module CommonHelpers
   end
 
   def redirect_to_last_grid(route)
-    route.redirect session[:last_grid_url]
+    if fetch?(route)
+      redirect_via_json(session[:last_grid_url])
+    else
+      route.redirect session[:last_grid_url]
+    end
   end
 
   def redirect_via_json_to_last_grid

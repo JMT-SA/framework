@@ -24,7 +24,7 @@ module UiRules
 
     def common_fields
       {
-        material_resource_domain_id: { renderer: :select, options: @this_repo.for_select_matres_domains, caption: 'Domain' },
+        material_resource_domain_id: { renderer: :select, options: @this_repo.for_select_domains, caption: 'Domain' },
         type_name: {}
       }
     end

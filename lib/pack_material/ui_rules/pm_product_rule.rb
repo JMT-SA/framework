@@ -5,7 +5,7 @@ module UiRules
     def generate_rules
       @repo = PackMaterialApp::PmProductRepo.new
       @config_repo = PackMaterialApp::ConfigRepo.new
-      @commodity_repo = CommodityRepo.new
+      @commodity_repo = MasterfilesApp::CommodityRepo.new
       make_form_object
       apply_form_values
 

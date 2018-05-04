@@ -109,7 +109,8 @@ class TestSecurityRoutes < RouteTester
     Security::FunctionalAreas::FunctionalArea::New.stub(:call, bland_page) do
       post 'security/functional_areas/functional_areas', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
-    expect_bland_page
+    assert last_response.redirect?
+    assert header_location, 'security/functional_areas/functional_areas/new'
   end
 
   def test_create_remotely_fail

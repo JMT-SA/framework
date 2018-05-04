@@ -14,12 +14,25 @@ module CommonHelpers
   end
 
   def show_partial_or_page(partial, &block)
-    @layout = block.yield
-    @layout.add_csrf_tag(csrf_tag)
-    if partial
-      @layout.render
+    page = stashed_page
+    if page
+      show_page { page }
+    elsif partial
+      show_partial(&block)
     else
-      view('crossbeams_layout_page')
+      show_page(&block)
+    end
+  end
+
+  def re_show_form(route, res, url: nil, &block)
+    form = block.yield
+    if fetch?(route)
+      content = show_partial { form }
+      update_dialog_content(content: content, error: res.message)
+    else
+      flash[:error] = res.message
+      stash_page(form)
+      route.redirect url || '/'
     end
   end
 

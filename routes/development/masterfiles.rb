@@ -56,19 +56,11 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Development::Masterfiles::Role::New.call(form_values: params[:role],
-                                                     form_errors: res.errors,
-                                                     remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: '/development/masterfiles/roles/new') do
             Development::Masterfiles::Role::New.call(form_values: params[:role],
                                                      form_errors: res.errors,
-                                                     remote: false)
+                                                     remote: fetch?(r))
           end
         end
       end
@@ -124,19 +116,11 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Development::Masterfiles::AddressType::New.call(form_values: params[:address_type],
-                                                            form_errors: res.errors,
-                                                            remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: '/development/masterfiles/address_types/new') do
             Development::Masterfiles::AddressType::New.call(form_values: params[:address_type],
                                                             form_errors: res.errors,
-                                                            remote: false)
+                                                            remote: fetch?(r))
           end
         end
       end
@@ -191,19 +175,11 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Development::Masterfiles::ContactMethodType::New.call(form_values: params[:contact_method_type],
-                                                                  form_errors: res.errors,
-                                                                  remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: '/development/masterfiles/contact_method_types/new') do
             Development::Masterfiles::ContactMethodType::New.call(form_values: params[:contact_method_type],
                                                                   form_errors: res.errors,
-                                                                  remote: false)
+                                                                  remote: fetch?(r))
           end
         end
       end
@@ -262,19 +238,11 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/development/masterfiles/users/new') do
             Development::Masterfiles::User::New.call(form_values: params[:user],
                                                      form_errors: res.errors,
-                                                     remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          show_page do
-            Development::Masterfiles::User::New.call(form_values: params[:security_group],
-                                                     form_errors: res.errors,
-                                                     remote: false)
+                                                     remote: fetch?(r))
           end
         end
       end

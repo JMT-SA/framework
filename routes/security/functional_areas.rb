@@ -56,19 +56,11 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Security::FunctionalAreas::FunctionalArea::New.call(form_values: params[:functional_area],
-                                                                form_errors: res.errors,
-                                                                remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: '/security/functional_areas/functional_areas/new') do
             Security::FunctionalAreas::FunctionalArea::New.call(form_values: params[:functional_area],
                                                                 form_errors: res.errors,
-                                                                remote: false)
+                                                                remote: fetch?(r))
           end
         end
       end
@@ -148,21 +140,12 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do # params[:program][:functional_area_id]
-            Security::FunctionalAreas::Program::New.call(res.functional_area_id,
-                                                         form_values: params[:program],
-                                                         form_errors: res.errors,
-                                                         remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: "/security/functional_areas/programs/#{res.functional_area_id}/new") do
             Security::FunctionalAreas::Program::New.call(res.functional_area_id,
                                                          form_values: params[:program],
                                                          form_errors: res.errors,
-                                                         remote: false)
+                                                         remote: fetch?(r))
           end
         end
       end
@@ -228,21 +211,12 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Security::FunctionalAreas::ProgramFunction::New.call(params[:program_function][:program_id],
-                                                                 form_values: params[:program_function],
-                                                                 form_errors: res.errors,
-                                                                 remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: "/security/functional_areas/program_functions/#{params[:program_function][:program_id]}/new") do
             Security::FunctionalAreas::ProgramFunction::New.call(params[:program_function][:program_id],
                                                                  form_values: params[:program_function],
                                                                  form_errors: res.errors,
-                                                                 remote: false)
+                                                                 remote: fetch?(r))
           end
         end
       end
@@ -297,6 +271,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
+          raise Crossbeams::AuthorizationError unless authorised?('menu', 'delete')
           res = interactor.delete_security_group(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -313,19 +288,11 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Security::FunctionalAreas::SecurityGroup::New.call(form_values: params[:security_group],
-                                                               form_errors: res.errors,
-                                                               remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: '/security/functional_areas/security_groups/new') do
             Security::FunctionalAreas::SecurityGroup::New.call(form_values: params[:security_group],
                                                                form_errors: res.errors,
-                                                               remote: false)
+                                                               remote: fetch?(r))
           end
         end
       end
@@ -382,19 +349,11 @@ class Framework < Roda
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Security::FunctionalAreas::SecurityPermission::New.call(form_values: params[:security_permission],
-                                                                    form_errors: res.errors,
-                                                                    remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: '/security/functional_areas/security_permissions/new') do
             Security::FunctionalAreas::SecurityPermission::New.call(form_values: params[:security_permission],
                                                                     form_errors: res.errors,
-                                                                    remote: false)
+                                                                    remote: fetch?(r))
           end
         end
       end

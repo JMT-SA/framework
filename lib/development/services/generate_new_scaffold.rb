@@ -554,31 +554,19 @@ class GenerateNewScaffold < BaseService
           interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
           r.on 'new' do    # NEW
             raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
-            page = stashed_page
-            if page
-              show_page { page }
-            else
-              show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
-            end
+            show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
           end
           r.post do        # CREATE
             res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
             if res.success
               flash[:notice] = res.message
               redirect_to_last_grid(r)
-            elsif fetch?(r)
-              content = show_partial do
+            else
+              re_show_form(r, res, url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new') do
                 #{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],
                 #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
-                #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: true)
+                #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: fetch?(r))
               end
-              update_dialog_content(content: content, error: res.message)
-            else
-              flash[:error] = res.message
-              stash_page(#{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],
-                         #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
-                         #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: false))
-              r.redirect '/#{opts.applet}/#{opts.program}/#{opts.table}/new'
             end
           end
         end
@@ -592,33 +580,20 @@ class GenerateNewScaffold < BaseService
             interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
             r.on 'new' do    # NEW
               raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
-              page = stashed_page
-              if page
-                show_page { page }
-              else
-                show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
-              end
+              show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
             end
             r.post do        # CREATE
               res = interactor.create_#{opts.singlename}(id, params[:#{opts.singlename}])
               if res.success
                 flash[:notice] = res.message
                 redirect_to_last_grid(r)
-              elsif fetch?(r)
-                content = show_partial do
+              else
+                re_show_form(r, res, url: "/#{opts.applet}/#{opts.program}/#{opts.nested_route}/\#{id}/#{opts.table}/new") do
                   #{opts.classnames[:view_prefix]}::New.call(id,
                   #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_values: params[:#{opts.singlename}],
                   #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
-                  #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: true)
+                  #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: fetch?(r))
                 end
-                update_dialog_content(content: content, error: res.message)
-              else
-                flash[:error] = res.message
-                stash_page(#{opts.classnames[:view_prefix]}::New.call(id,
-                           #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_values: params[:#{opts.singlename}],
-                           #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}form_errors: res.errors,
-                           #{UtilityFunctions.spaces_from_string_lengths(11, opts.classnames[:view_prefix])}remote: false))
-                r.redirect "/#{opts.applet}/#{opts.program}/#{opts.nested_route}/\#{id}/#{opts.table}/new"
               end
             end
           end

@@ -933,6 +933,11 @@ class GenerateNewScaffold < BaseService
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
+              post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            end
+            expect_bad_page
+
+            #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
               post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
             end
             expect_bad_redirect(url: '/#{base_route}#{opts.table}/new')

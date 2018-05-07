@@ -125,6 +125,11 @@ class RouteTester < Minitest::Test
     assert last_response.body.include?('FAIL')
   end
 
+  def expect_bad_page(content: 'FAIL')
+    assert last_response.ok?
+    assert_match(/#{content}/, last_response.body)
+  end
+
   def expect_bland_page(content: 'HTML_PAGE')
     assert last_response.ok?
     assert_match(/#{content}/, last_response.body)

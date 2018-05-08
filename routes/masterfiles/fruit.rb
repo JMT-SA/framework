@@ -54,7 +54,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -129,7 +129,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -201,7 +201,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -263,7 +263,7 @@ class Framework < Roda
           if page
             show_page { page }
           else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
+            show_partial_or_page(r) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
           end
         end
         r.post do        # CREATE
@@ -326,7 +326,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -433,7 +433,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -504,7 +504,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -549,7 +549,7 @@ class Framework < Roda
           if page
             show_page { page }
           else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
+            show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
           end
         end
         r.post do        # CREATE
@@ -619,7 +619,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -663,7 +663,7 @@ class Framework < Roda
           if page
             show_page { page }
           else
-            show_partial_or_page(fetch?(r)) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
+            show_partial_or_page(r) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
           end
         end
         r.post do        # CREATE

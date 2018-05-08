@@ -554,7 +554,7 @@ class GenerateNewScaffold < BaseService
           interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
           r.on 'new' do    # NEW
             raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
-            show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
+            show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
           end
           r.post do        # CREATE
             res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
@@ -580,7 +580,7 @@ class GenerateNewScaffold < BaseService
             interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
             r.on 'new' do    # NEW
               raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
-              show_partial_or_page(fetch?(r)) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
+              show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
             end
             r.post do        # CREATE
               res = interactor.create_#{opts.singlename}(id, params[:#{opts.singlename}])

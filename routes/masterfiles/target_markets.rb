@@ -51,7 +51,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::TargetMarkets::TmGroupType::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::TmGroupType::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -122,7 +122,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::TargetMarkets::TmGroup::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::TmGroup::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -216,7 +216,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::TargetMarkets::TargetMarket::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::TargetMarket::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -291,7 +291,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::TargetMarkets::Region::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::Region::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -363,7 +363,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::TargetMarkets::Country::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::Country::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -435,7 +435,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::TargetMarkets::City::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::City::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE

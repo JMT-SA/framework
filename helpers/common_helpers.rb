@@ -13,11 +13,11 @@ module CommonHelpers
     @layout.render
   end
 
-  def show_partial_or_page(partial, &block)
+  def show_partial_or_page(route, &block)
     page = stashed_page
     if page
       show_page { page }
-    elsif partial
+    elsif fetch?(route)
       show_partial(&block)
     else
       show_page(&block)

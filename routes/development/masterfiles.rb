@@ -49,7 +49,7 @@ class Framework < Roda
       interactor = DevelopmentApp::RoleInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
-        show_partial_or_page(fetch?(r)) { Development::Masterfiles::Role::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Development::Masterfiles::Role::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_role(params[:role])
@@ -109,7 +109,7 @@ class Framework < Roda
       interactor = DevelopmentApp::AddressTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
-        show_partial_or_page(fetch?(r)) { Development::Masterfiles::AddressType::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Development::Masterfiles::AddressType::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_address_type(params[:address_type])
@@ -168,7 +168,7 @@ class Framework < Roda
       interactor = DevelopmentApp::ContactMethodTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
-        show_partial_or_page(fetch?(r)) { Development::Masterfiles::ContactMethodType::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Development::Masterfiles::ContactMethodType::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_contact_method_type(params[:contact_method_type])
@@ -231,7 +231,7 @@ class Framework < Roda
       interactor = DevelopmentApp::UserInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
-        show_partial_or_page(fetch?(r)) { Development::Masterfiles::User::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Development::Masterfiles::User::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_user(params[:user])

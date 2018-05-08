@@ -49,7 +49,7 @@ class Framework < Roda
       interactor = SecurityApp::FunctionalAreaInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
-        show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::FunctionalArea::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Security::FunctionalAreas::FunctionalArea::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_functional_area(params[:functional_area])
@@ -73,7 +73,7 @@ class Framework < Roda
 
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
-        show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::Program::New.call(id, remote: fetch?(r)) }
+        show_partial_or_page(r) { Security::FunctionalAreas::Program::New.call(id, remote: fetch?(r)) }
       end
 
       # Check for notfound:
@@ -158,7 +158,7 @@ class Framework < Roda
 
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
-        show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::ProgramFunction::New.call(id, remote: fetch?(r)) }
+        show_partial_or_page(r) { Security::FunctionalAreas::ProgramFunction::New.call(id, remote: fetch?(r)) }
       end
 
       # Check for notfound:
@@ -281,7 +281,7 @@ class Framework < Roda
       interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
-        show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::SecurityGroup::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Security::FunctionalAreas::SecurityGroup::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_security_group(params[:security_group])
@@ -342,7 +342,7 @@ class Framework < Roda
       interactor = SecurityApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
-        show_partial_or_page(fetch?(r)) { Security::FunctionalAreas::SecurityPermission::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Security::FunctionalAreas::SecurityPermission::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_security_permission(params[:security_permission])

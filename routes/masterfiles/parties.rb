@@ -88,7 +88,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
         end
       end
       r.post do        # CREATE
@@ -191,7 +191,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
         end
       end
       r.post do
@@ -268,7 +268,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
         end
       end
       r.post do
@@ -340,7 +340,7 @@ class Framework < Roda
         if page
           show_page { page }
         else
-          show_partial_or_page(fetch?(r)) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
         end
       end
       r.post do

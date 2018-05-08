@@ -24,6 +24,15 @@ class TestLoggingRoutes < RouteTester
   end
 
   def test_show_grid
-    skip 'todo: ensure grid url is called from show...'
+    expected =
+      {
+        columnDefs: {},
+        rowDefs:    []
+      }.to_json
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    DevelopmentApp::LoggingInteractor.any_instance.stubs(:logged_actions_grid).returns(expected)
+    get_as_fetch 'development/logging/logged_actions/1/grid', {}, 'rack.session' => { user_id: 1 }
+    assert_equal expected, last_response.body
   end
 end

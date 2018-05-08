@@ -143,4 +143,8 @@ class RouteTester < Minitest::Test
   def post_as_fetch(url, params = {}, options = nil)
     post url, params, options.merge('HTTP_X_CUSTOM_REQUEST_TYPE' => 'Y')
   end
+
+  def get_as_fetch(url, params = {}, options = nil)
+    get url, params, options.merge('HTTP_X_CUSTOM_REQUEST_TYPE' => 'Y')
+  end
 end

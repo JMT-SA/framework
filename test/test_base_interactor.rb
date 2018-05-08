@@ -21,6 +21,16 @@ class TestBaseInteractor < Minitest::Test
     assert_equal expected, x
   end
 
+  def test_validation_failed_response_with_instance
+    results = OpenStruct.new(messages: { roles: ['You did not choose a role'] }, id: 1, name: 'fred')
+    x = interactor.validation_failed_response(results)
+    expected = OpenStruct.new( success: false,
+                               instance: {id: 1, name: 'fred'},
+                               errors: results.messages,
+                               message: 'Validation error')
+    assert_equal expected, x
+  end
+
   def test_failed_response
     mes = 'Failed'
     x = interactor.failed_response(mes, current_user)

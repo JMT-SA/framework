@@ -305,7 +305,7 @@ class GenerateNewScaffold < BaseService
           # frozen_string_literal: true
 
           module #{opts.classnames[:module]}
-            class #{opts.classnames[:repo]} < RepoBase
+            class #{opts.classnames[:repo]} < BaseRepo
               build_for_select :#{opts.table},#{alias_active}
                                label: :#{opts.label_field},
                                value: :id,
@@ -324,7 +324,7 @@ class GenerateNewScaffold < BaseService
           # frozen_string_literal: true
 
           module #{opts.classnames[:module]}
-            class #{opts.classnames[:repo]} < RepoBase
+            class #{opts.classnames[:repo]} < BaseRepo
               build_for_select :#{opts.table},#{alias_active}
                                label: :#{opts.label_field},
                                value: :id,

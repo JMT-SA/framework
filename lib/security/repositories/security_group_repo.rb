@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SecurityApp
-  class SecurityGroupRepo < RepoBase
+  class SecurityGroupRepo < BaseRepo
     build_for_select :security_permissions, label: :security_permission,
                                             value: :id,
                                             no_active_check: true,

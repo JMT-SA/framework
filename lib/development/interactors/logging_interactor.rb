@@ -7,7 +7,7 @@ module DevelopmentApp
     end
 
     def exists?(entity, id)
-      # repo = RepoBase.new
+      # repo = BaseRepo.new
       repo.exists?(entity, event_id: id)
     end
 

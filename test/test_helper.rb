@@ -14,7 +14,7 @@ require './config/environment'
 
 require './lib/types_for_dry'
 require './lib/crossbeams_responses'
-require './lib/repo_base'
+require './lib/base_repo'
 
 root_dir = File.expand_path('../..', __FILE__)
 

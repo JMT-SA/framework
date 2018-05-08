@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class CultivarRepo < RepoBase
+  class CultivarRepo < BaseRepo
     build_for_select :cultivar_groups,
                      label: :cultivar_group_code,
                      value: :id,

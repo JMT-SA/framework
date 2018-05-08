@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class AddressTypeRepo < RepoBase
+  class AddressTypeRepo < BaseRepo
     build_for_select :address_types,
                      label: :address_type,
                      value: :id,

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class LoggingRepo < RepoBase
+  class LoggingRepo < BaseRepo
     crud_calls_for :logged_action_details, name: :logged_action_detail, wrapper: LoggedActionDetail
 
     def find_logged_action(id)

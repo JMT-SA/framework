@@ -15,7 +15,7 @@ class BaseInteractor
   # @param entity [Symbol] the table name.
   # @param id [Integer] the id to check.
   def exists?(entity, id)
-    repo = RepoBase.new
+    repo = BaseRepo.new
     repo.exists?(entity, id: id)
   end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class DevelopmentRepo < RepoBase
+  class DevelopmentRepo < BaseRepo
     IGNORE_TABLES = %i[schema_migrations users].freeze
 
     def table_list

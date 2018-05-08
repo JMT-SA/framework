@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class TargetMarketRepo < RepoBase
+  class TargetMarketRepo < BaseRepo
     build_for_select :target_market_group_types,
                      alias: 'tm_group_types',
                      label: :target_market_group_type_code,

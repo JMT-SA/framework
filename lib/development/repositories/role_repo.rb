@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class RoleRepo < RepoBase
+  class RoleRepo < BaseRepo
     build_for_select :roles,
                      label: :name,
                      value: :id,

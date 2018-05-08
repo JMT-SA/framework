@@ -7,7 +7,7 @@ class TestBaseInteractor < Minitest::Test
   end
 
   def test_exists?
-    RepoBase.any_instance.expects(:exists?).returns(true)
+    BaseRepo.any_instance.expects(:exists?).returns(true)
     interactor.exists?(:users, 1)
   end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SecurityApp
-  class MenuRepo < RepoBase
+  class MenuRepo < BaseRepo
     crud_calls_for :functional_areas, name: :functional_area, wrapper: FunctionalArea
     crud_calls_for :programs, name: :program, wrapper: Program, exclude: %i[create update delete]
     crud_calls_for :program_functions, name: :program_function, wrapper: ProgramFunction

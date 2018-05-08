@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class UserRepo < RepoBase
+  class UserRepo < BaseRepo
     build_for_select :users,
                      label: :user_name,
                      value: :id,

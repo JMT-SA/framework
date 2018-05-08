@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class DestinationRepo < RepoBase
+  class DestinationRepo < BaseRepo
     build_for_select :destination_regions,
                      label: :destination_region_name,
                      value: :id,

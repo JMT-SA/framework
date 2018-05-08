@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class ContactMethodTypeRepo < RepoBase
+  class ContactMethodTypeRepo < BaseRepo
     build_for_select :contact_method_types,
                      label: :contact_method_type,
                      value: :id,

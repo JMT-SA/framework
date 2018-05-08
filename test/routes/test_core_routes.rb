@@ -32,10 +32,10 @@ class TestCoreRoutes < RouteTester
 
   def test_developer_yardocs
     authorise_pass!
-    get '/yarddocthis/lib=repo_base.rb', {}, 'rack.session' => { user_id: 1 }
+    get '/yarddocthis/lib=base_repo.rb', {}, 'rack.session' => { user_id: 1 }
 
     assert last_response.ok?
-    assert last_response.body.include?('Yard documentation for methods in lib/repo_base.rb')
+    assert last_response.body.include?('Yard documentation for methods in lib/base_repo.rb')
   end
 
   def test_iframe_content

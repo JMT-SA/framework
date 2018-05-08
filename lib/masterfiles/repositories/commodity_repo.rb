@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class CommodityRepo < RepoBase
+  class CommodityRepo < BaseRepo
     build_for_select :commodity_groups,
                      label: :code,
                      value: :id,

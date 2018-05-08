@@ -1,4 +1,4 @@
-class RepoBase
+class BaseRepo
   include Crossbeams::Responses
 
   # Return all rows from a table as instances of the given wrapper.

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class PartyRepo < RepoBase
+  class PartyRepo < BaseRepo
     build_for_select :organizations,
                      label: :short_description,
                      value: :id,

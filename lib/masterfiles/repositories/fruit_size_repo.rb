@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class FruitSizeRepo < RepoBase
+  class FruitSizeRepo < BaseRepo
     build_for_select :basic_pack_codes,
                      label: :basic_pack_code,
                      value: :id,

@@ -6,7 +6,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 # rubocop:disable Metrics/AbcSize
 
 module MasterfilesApp
-  class TestStdFruitSizeCountInteractor < Minitest::Test
+  class TestFruitSizeInteractor < Minitest::Test
     def test_repo
       fruit_size_repo = interactor.send(:fruit_size_repo)
       assert fruit_size_repo.is_a?(MasterfilesApp::FruitSizeRepo)
@@ -15,7 +15,7 @@ module MasterfilesApp
     private
 
     def interactor
-      @interactor ||= StdFruitSizeCountInteractor.new(current_user, {}, {}, {})
+      @interactor ||= FruitSizeInteractor.new(current_user, {}, {}, {})
     end
   end
 end

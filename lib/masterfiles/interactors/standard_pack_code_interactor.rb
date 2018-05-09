@@ -38,8 +38,15 @@ module MasterfilesApp
     def delete_standard_pack_code(id)
       @id = id
       name = standard_pack_code.standard_pack_code
-      fruit_size_repo.delete_standard_pack_code(id)
-      success_response("Deleted standard pack code #{name}")
+      res = {}
+      DB.transaction do
+        res = fruit_size_repo.delete_standard_pack_code(id)
+      end
+      if res[:error]
+        failed_response(res[:error])
+      else
+        success_response("Deleted standard pack code #{name}")
+      end
     end
   end
 end

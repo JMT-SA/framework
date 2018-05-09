@@ -33,5 +33,33 @@ module MasterfilesApp
     crud_calls_for :std_fruit_size_counts, name: :std_fruit_size_count, wrapper: StdFruitSizeCount
     crud_calls_for :fruit_actual_counts_for_packs, name: :fruit_actual_counts_for_pack, wrapper: FruitActualCountsForPack
     crud_calls_for :fruit_size_references, name: :fruit_size_reference, wrapper: FruitSizeReference
+
+    def delete_basic_pack_code(id)
+      dependents = DB[:fruit_actual_counts_for_packs].where(basic_pack_code_id: id).select_map(:id)
+      return { error: 'This pack code is in use.' } unless dependents.empty?
+      DB[:basic_pack_codes].where(id: id).delete
+      { success: true }
+    end
+
+    def delete_standard_pack_code(id)
+      dependents = DB[:fruit_actual_counts_for_packs].where(standard_pack_code_id: id).select_map(:id)
+      return { error: 'This pack code is in use.' } unless dependents.empty?
+      DB[:standard_pack_codes].where(id: id).delete
+      { success: true }
+    end
+
+    def delete_std_fruit_size_count(id)
+      actual_counts_collection = DB[:fruit_actual_counts_for_packs].where(std_fruit_size_count_id: id)
+      actual_counts_collection.select_map(:id).each do |act_count_id|
+        DB[:fruit_size_references].where(fruit_actual_counts_for_pack_id: act_count_id).delete
+      end
+      actual_counts_collection.delete
+      DB[:std_fruit_size_counts].where(id: id).delete
+    end
+
+    def delete_fruit_actual_counts_for_pack(id)
+      DB[:fruit_size_references].where(fruit_actual_counts_for_pack_id: id).delete
+      DB[:fruit_actual_counts_for_packs].where(id: id).delete
+    end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MaterialResourceRepo < RepoBase
+  class MaterialResourceRepo < BaseRepo
     def link_mr_product_columns(mr_type_config_id, mr_product_column_ids)
       existing_ids      = mr_type_mr_product_column_ids(mr_type_config_id)
       old_ids           = existing_ids - mr_product_column_ids
@@ -161,7 +161,7 @@ end
 
 # # frozen_string_literal: true
 #
-# class ProductTypeRepo < RepoBase
+# class ProductTypeRepo < BaseRepo
 #   # build_for_select :product_types,
 #   #                  label: :packing_material_product_type_id,
 #   #                  value: :id,

@@ -22,8 +22,15 @@ module MasterfilesApp
     def delete_commodity_group(id)
       @commodity_group_id = id
       name = commodity_group.code
-      commodity_repo.delete_commodity_group(id)
-      success_response("Deleted commodity group #{name}")
+      res = {}
+      DB.transaction do
+        res = commodity_repo.delete_commodity_group(id)
+      end
+      if res[:error]
+        failed_response(res[:error])
+      else
+        success_response("Deleted commodity group #{name}")
+      end
     end
 
     def create_commodity(params)
@@ -46,8 +53,15 @@ module MasterfilesApp
     def delete_commodity(id)
       @commodity_id = id
       name = commodity.code
-      commodity_repo.delete_commodity(id)
-      success_response("Deleted commodity #{name}")
+      res = {}
+      DB.transaction do
+        res = commodity_repo.delete_commodity(id)
+      end
+      if res[:error]
+        failed_response(res[:error])
+      else
+        success_response("Deleted commodity #{name}")
+      end
     end
 
     private

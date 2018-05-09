@@ -28,17 +28,22 @@ module MasterfilesApp
     def delete_region(id)
       @region_id = id
       name = region.destination_region_name
+      res = {}
       DB.transaction do
-        destination_repo.delete_region(id)
+        res = destination_repo.delete_region(id)
       end
-      success_response("Deleted destination region #{name}")
+      if res[:error]
+        failed_response(res[:error])
+      else
+        success_response("Deleted destination region #{name}")
+      end
     end
 
-    def create_country(params)
+    def create_country(id, params)
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       DB.transaction do
-        @country_id = destination_repo.create_country(res)
+        @country_id = destination_repo.create_country(id, res)
       end
       success_response("Created destination country #{country.country_name}", country)
     rescue Sequel::UniqueConstraintViolation
@@ -58,17 +63,22 @@ module MasterfilesApp
     def delete_country(id)
       @country_id = id
       name = country.country_name
+      res = {}
       DB.transaction do
-        destination_repo.delete_country(id)
+        res = destination_repo.delete_country(id)
       end
-      success_response("Deleted destination country #{name}")
+      if res[:error]
+        failed_response(res[:error])
+      else
+        success_response("Deleted destination country #{name}")
+      end
     end
 
-    def create_city(params)
+    def create_city(id, params)
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       DB.transaction do
-        @city_id = destination_repo.create_city(res)
+        @city_id = destination_repo.create_city(id, res)
       end
       success_response("Created destination city #{city.city_name}", city)
     rescue Sequel::UniqueConstraintViolation

@@ -24,8 +24,31 @@ module MasterfilesApp
     crud_calls_for :cultivars, name: :cultivar, wrapper: Cultivar
     crud_calls_for :marketing_varieties, name: :marketing_variety, wrapper: MarketingVariety
 
-    # TODO: return cultivar_group_code with cultivar
-    # def find_cultivar
+    def find_cultivar_group(id)
+      hash = find_hash(:cultivar_groups, id)
+      return nil if hash.nil?
+      cultivar_ids = DB[:cultivars].where(cultivar_group_id: id).select_map(:id)
+      hash[:cultivar_ids] = cultivar_ids
+      CultivarGroup.new(hash)
+    end
+
+    def find_cultivar(id)
+      hash = find_hash(:cultivars, id)
+      return nil if hash.nil?
+      cg_hash = find_hash(:cultivar_groups, hash[:cultivar_group_id])
+      hash[:cultivar_group_code] = cg_hash[:cultivar_group_code]
+      Cultivar.new(hash)
+    end
+
+    def delete_cultivar_group(id)
+      DB[:cultivar_groups].where(id: id).delete
+    end
+
+    def delete_cultivar(id)
+      DB[:marketing_varieties_for_cultivars].where(cultivar_id: id).delete
+      delete_orphaned_marketing_varieties
+      DB[:cultivars].where(id: id).delete
+    end
 
     def create_marketing_variety(cultivar_id, attrs)
       id = DB[:marketing_varieties].insert(attrs.to_h)
@@ -39,8 +62,7 @@ module MasterfilesApp
       new_ids           = marketing_variety_ids - existing_ids
 
       DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).where(marketing_variety_id: old_ids).delete
-      orphan_ids = orphaned_marketing_varieties(old_ids)
-      DB[:marketing_varieties].where(id: orphan_ids).delete
+      delete_orphaned_marketing_varieties
 
       new_ids.each do |prog_id|
         DB[:marketing_varieties_for_cultivars].insert(cultivar_id: cultivar_id, marketing_variety_id: prog_id)
@@ -48,9 +70,11 @@ module MasterfilesApp
       { success: true }
     end
 
-    def orphaned_marketing_varieties(id_set)
-      active_ids = DB[:marketing_varieties_for_cultivars].where(marketing_variety_id: id_set).select_map(:marketing_variety_id)
-      id_set - active_ids
+    def delete_orphaned_marketing_varieties
+      link_ids = DB[:marketing_varieties_for_cultivars].select_map(:marketing_variety_id)
+      marketing_variety_ids = DB[:marketing_varieties].select_map(:id)
+      orphan_ids = marketing_variety_ids - link_ids
+      DB[:marketing_varieties].where(id: orphan_ids).delete
     end
 
     def cultivar_marketing_variety_ids(cultivar_id)

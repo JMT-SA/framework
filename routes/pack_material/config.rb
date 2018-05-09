@@ -16,12 +16,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'edit')
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
         show_partial { PackMaterialApp::Config::MatresType::Edit.call(id) }
       end
       r.is do
         r.get do
-          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'read')
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
           show_partial { PackMaterialApp::Config::MatresType::Show.call(id) }
         end
         r.patch do
@@ -38,7 +38,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'delete')
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'delete')
           res = interactor.delete_matres_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -48,7 +48,7 @@ class Framework < Roda
     r.on 'material_resource_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'new')
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
         show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::MatresType::New.call(remote: fetch?(r)) }
       end
       r.post do
@@ -85,13 +85,13 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'edit')
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
         show_partial { PackMaterialApp::Config::MatresSubType::Edit.call(id) }
       end
 
       r.on 'config' do
         r.is 'edit' do
-          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'edit')
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
           page = stashed_page
           if page
             show_page { page }
@@ -127,7 +127,7 @@ class Framework < Roda
 
       r.is do
         r.get do
-          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'read')
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
           show_partial { PackMaterialApp::Config::MatresSubType::Show.call(id) }
         end
         r.patch do
@@ -143,7 +143,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'delete')
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'delete')
           res = interactor.delete_matres_sub_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -153,7 +153,7 @@ class Framework < Roda
     r.on 'material_resource_sub_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'new')
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
         show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::MatresSubType::New.call(remote: fetch?(r)) }
       end
       r.post do
@@ -206,7 +206,7 @@ class Framework < Roda
       end
       r.is do
         r.get do
-          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'read')
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
           show_partial { PackMaterialApp::Config::PmProduct::Show.call(id) }
         end
         r.patch do
@@ -269,7 +269,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'delete')
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'delete')
           res = interactor.delete_pm_product(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -278,7 +278,7 @@ class Framework < Roda
     r.on 'pack_material_products' do
       interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        raise Crossbeams::AuthorizationError unless authorised?('Pack material products', 'new')
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
         show_partial_or_page(fetch?(r)) { PackMaterialApp::Config::PmProduct::New.call(remote: fetch?(r)) }
       end
       r.post do

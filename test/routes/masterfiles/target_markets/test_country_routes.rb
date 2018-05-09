@@ -78,7 +78,7 @@ class TestCountryRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     Masterfiles::TargetMarkets::Country::New.stub(:call, bland_page) do
-      get  'masterfiles/target_markets/destination_countries/new', {}, 'rack.session' => { user_id: 1 }
+      get  'masterfiles/target_markets/destination_regions/1/destination_countries/new', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -86,7 +86,7 @@ class TestCountryRoutes < RouteTester
   def test_new_fail
     authorise_fail!
     ensure_exists!(INTERACTOR)
-    get 'masterfiles/target_markets/destination_countries/new', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/target_markets/destination_regions/1/destination_countries/new', {}, 'rack.session' => { user_id: 1 }
     refute last_response.ok?
     assert_match(/permission/i, last_response.body)
   end
@@ -95,7 +95,7 @@ class TestCountryRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::DestinationInteractor.any_instance.stubs(:create_country).returns(ok_response)
-    post 'masterfiles/target_markets/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'masterfiles/target_markets/destination_regions/1/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     expect_ok_redirect
   end
 
@@ -103,7 +103,7 @@ class TestCountryRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::DestinationInteractor.any_instance.stubs(:create_country).returns(ok_response)
-    post_as_fetch 'masterfiles/target_markets/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post_as_fetch 'masterfiles/target_markets/destination_regions/1/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     expect_ok_json_redirect
   end
 
@@ -112,9 +112,9 @@ class TestCountryRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::DestinationInteractor.any_instance.stubs(:create_country).returns(bad_response)
     Masterfiles::TargetMarkets::Country::New.stub(:call, bland_page) do
-      post 'masterfiles/target_markets/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post 'masterfiles/target_markets/destination_regions/1/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
-    expect_bad_redirect(url: '/masterfiles/target_markets/destination_countries/new')
+    expect_bad_redirect(url: '/masterfiles/target_markets/destination_regions/1/destination_countries/new')
   end
 
   def test_create_remotely_fail
@@ -122,7 +122,7 @@ class TestCountryRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::DestinationInteractor.any_instance.stubs(:create_country).returns(bad_response)
     Masterfiles::TargetMarkets::Country::New.stub(:call, bland_page) do
-      post_as_fetch 'masterfiles/target_markets/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'masterfiles/target_markets/destination_regions/1/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
     expect_json_replace_dialog
   end

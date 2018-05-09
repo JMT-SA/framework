@@ -15,6 +15,12 @@
   :text: delete
   :icon: fa-remove
   :is_delete: true
+  :prompt: 'The associated Countries and its Cities will be deleted as well, are you sure you want to delete this Region?'
+  :popup: true
+- :url: "/masterfiles/target_markets/destination_regions/$:id$/destination_countries/new"
+  :text: add country
+  :icon: fa-plus
+  :title: New Country
   :popup: true
 - :url: "/list/destination_countries/with_params?key=standard&destination_countries.destination_region_id=$:id$"
   :text: countries

@@ -5,5 +5,6 @@ module MasterfilesApp
     attribute :id, Types::Int
     attribute :cultivar_group_code, Types::String
     attribute :description, Types::String
+    attribute :cultivar_ids, Types::IntArray
   end
 end

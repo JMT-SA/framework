@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class ConfigRepo < RepoBase
+  class ConfigRepo < BaseRepo
     build_for_select :material_resource_domains,
                      alias: 'domains',
                      label: :domain_name,

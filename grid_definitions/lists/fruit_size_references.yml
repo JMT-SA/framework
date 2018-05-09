@@ -16,9 +16,13 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/fruit/back/$:fruit_size_references.fruit_actual_counts_for_pack_id$/fruit_actual_counts_for_packs"
+  :text: Back
+  :style: :button
 :conditions:
   :standard:
     - :col: fruit_size_references.fruit_actual_counts_for_pack_id
       :op: =
       :val: $:fruit_size_references.fruit_actual_counts_for_pack_id$
-

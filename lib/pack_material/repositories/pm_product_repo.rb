@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class PmProductRepo < RepoBase
+  class PmProductRepo < BaseRepo
     build_for_select :pack_material_products,
                      label: :description,
                      value: :id,

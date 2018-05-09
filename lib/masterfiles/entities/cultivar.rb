@@ -5,7 +5,7 @@ module MasterfilesApp
     attribute :id, Types::Int
     attribute :commodity_id, Types::Int
     attribute :cultivar_group_id, Types::Int
-    # TODO: attribute :cultivar_group_code, Types::String
+    attribute :cultivar_group_code, Types::String
     attribute :cultivar_name, Types::String
     attribute :description, Types::String
   end

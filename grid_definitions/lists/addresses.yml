@@ -15,6 +15,7 @@
   :text: delete
   :icon: fa-remove
   :is_delete: true
+  :prompt: 'By deleting this address you will also be removing it from linked parties. Are you sure you want to delete this address?'
   :popup: true
 :page_controls:
 - :control_type: :link

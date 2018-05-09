@@ -75,6 +75,7 @@ module MasterfilesApp
       children = DB[:organizations].where(parent_id: id)
       return { error: 'This organization is set as a parent' } if children.any?
       party_id = party_id_from_organization(id)
+      DB[:party_roles].where(party_id: party_id).delete
       DB[:organizations].where(id: id).delete
       delete_party_dependents(party_id)
       { success: true }
@@ -105,6 +106,7 @@ module MasterfilesApp
 
     def delete_person(id)
       party_id = party_id_from_person(id)
+      DB[:party_roles].where(party_id: party_id).delete
       DB[:people].where(id: id).delete
       delete_party_dependents(party_id)
     end
@@ -127,6 +129,11 @@ module MasterfilesApp
       Address.new(hash)
     end
 
+    def delete_address(id)
+      DB[:party_addresses].where(address_id: id).delete
+      DB[:addresses].where(id: id).delete
+    end
+
     def link_addresses(party_id, address_ids)
       existing_ids      = party_address_ids(party_id)
       old_ids           = existing_ids - address_ids
@@ -136,6 +143,11 @@ module MasterfilesApp
       new_ids.each do |prog_id|
         DB[:party_addresses].insert(party_id: party_id, address_id: prog_id)
       end
+    end
+
+    def delete_contact_method(id)
+      DB[:party_contact_methods].where(contact_method_id: id).delete
+      DB[:contact_methods].where(id: id).delete
     end
 
     def link_contact_methods(party_id, contact_method_ids)
@@ -237,7 +249,6 @@ module MasterfilesApp
 
     def delete_party_dependents(party_id)
       DB[:party_addresses].where(party_id: party_id).delete
-      DB[:party_roles].where(party_id: party_id).delete
       DB[:party_contact_methods].where(party_id: party_id).delete
       DB[:parties].where(id: party_id).delete
     end

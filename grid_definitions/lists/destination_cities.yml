@@ -16,12 +16,6 @@
   :icon: fa-remove
   :is_delete: true
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/masterfiles/target_markets/destination_cities/new"
-  :text: New Destination City
-  :style: :button
-  :behaviour: :popup
 :conditions:
   :standard:
     - :col: destination_cities.destination_country_id

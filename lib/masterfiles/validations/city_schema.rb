@@ -5,7 +5,7 @@ module MasterfilesApp
     configure { config.type_specs = true }
 
     optional(:id, :int).filled(:int?)
-    required(:destination_country_id, :int).filled(:int?)
+    optional(:destination_country_id, :int).filled(:int?)
     required(:city_name, Types::StrippedString).filled(:str?)
   end
 end

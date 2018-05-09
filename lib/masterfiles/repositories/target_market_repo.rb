@@ -43,6 +43,12 @@ module MasterfilesApp
       TargetMarket.new(hash)
     end
 
+    def delete_target_market(id)
+      DB[:target_markets_for_countries].where(target_market_id: id).delete
+      DB[:target_markets_for_groups].where(target_market_id: id).delete
+      DB[:target_markets].where(id: id).delete
+    end
+
     def link_countries(target_market_id, country_ids)
       return nil unless country_ids
       existing_ids      = target_market_country_ids(target_market_id)

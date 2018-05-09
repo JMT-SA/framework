@@ -22,6 +22,11 @@ module MasterfilesApp
     def delete_cultivar_group(id)
       @cultivar_group_id = id
       name = cultivar_group.cultivar_group_code
+
+      cultivar_group = cultivar_repo.find_cultivar_group(id)
+      cultivar_group.cultivar_ids.each do |cultivar_id|
+        cultivar_repo.delete_cultivar(cultivar_id)
+      end
       cultivar_repo.delete_cultivar_group(id)
       success_response("Deleted cultivar group #{name}")
     end

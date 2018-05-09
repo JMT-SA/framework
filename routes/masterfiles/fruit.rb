@@ -42,7 +42,11 @@ class Framework < Roda
           return_json_response
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_commodity_group(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message)
+          end
         end
       end
     end
@@ -117,7 +121,11 @@ class Framework < Roda
           return_json_response
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_commodity(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message)
+          end
         end
       end
     end
@@ -421,7 +429,11 @@ class Framework < Roda
           return_json_response
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_basic_pack_code(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message)
+          end
         end
       end
     end
@@ -492,7 +504,11 @@ class Framework < Roda
           return_json_response
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
           res = interactor.delete_standard_pack_code(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message)
+          end
         end
       end
     end
@@ -531,7 +547,7 @@ class Framework < Roda
     # STD FRUIT SIZE COUNTS
     # --------------------------------------------------------------------------
     r.on 'std_fruit_size_counts', Integer do |id|
-      interactor = MasterfilesApp::StdFruitSizeCountInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
       # Check for notfound:
       r.on !interactor.exists?(:std_fruit_size_counts, id) do
         handle_not_found(r)
@@ -542,7 +558,7 @@ class Framework < Roda
         show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id) }
       end
       r.on 'fruit_actual_counts_for_packs' do
-        interactor = MasterfilesApp::FruitActualCountsForPackInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
           page = stashed_page
@@ -612,7 +628,7 @@ class Framework < Roda
       end
     end
     r.on 'std_fruit_size_counts' do
-      interactor = MasterfilesApp::StdFruitSizeCountInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
         page = stashed_page
@@ -644,7 +660,7 @@ class Framework < Roda
       end
     end
     r.on 'fruit_actual_counts_for_packs', Integer do |id|
-      interactor = MasterfilesApp::FruitActualCountsForPackInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:fruit_actual_counts_for_packs, id) do
@@ -656,7 +672,7 @@ class Framework < Roda
         show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id) }
       end
       r.on 'fruit_size_references' do
-        interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
           page = stashed_page
@@ -721,7 +737,7 @@ class Framework < Roda
     # FRUIT SIZE REFERENCES
     # --------------------------------------------------------------------------
     r.on 'fruit_size_references', Integer do |id|
-      interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:fruit_size_references, id) do
@@ -756,6 +772,19 @@ class Framework < Roda
           res = interactor.delete_fruit_size_reference(id)
           delete_grid_row(id, notice: res.message)
         end
+      end
+    end
+
+    r.on 'back', Integer do |id|
+      r.on 'fruit_actual_counts_for_packs' do
+        # NOTE: Working on the principle that your views are allowed access to your repositories
+        repo = MasterfilesApp::FruitSizeRepo.new()
+        actual_count = repo.find_fruit_actual_counts_for_pack(id)
+        handle_not_found(r) unless actual_count
+        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+        parent_id = actual_count.std_fruit_size_count_id
+        return_json_response
+        r.redirect "/list/fruit_actual_counts_for_packs/with_params?key=standard&fruit_actual_counts_for_packs.std_fruit_size_count_id=#{parent_id}"
       end
     end
   end

@@ -249,15 +249,38 @@ class Framework < Roda
       r.on !interactor.exists?(:destination_regions, id) do
         handle_not_found(r)
       end
-
-      # r.on 'destination_countries' do
-      #   # TODO: Show countries grid here (redirect, Not multiselect)
-      #   show_partial { Masterfiles::Fruit::DestinationCountry::Edit.call(1) }
-      # end
-
       r.on 'edit' do   # EDIT
         raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::Region::Edit.call(id) }
+      end
+      r.on 'destination_countries' do
+        country_interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+        r.on 'new' do    # NEW
+          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::Country::New.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = country_interactor.create_country(id, params[:country])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          elsif fetch?(r)
+            content = show_partial do
+              Masterfiles::TargetMarkets::Country::New.call(id,
+                                                            form_values: params[:country],
+                                                            form_errors: res.errors,
+                                                            remote: true)
+            end
+            update_dialog_content(content: content, error: res.message)
+          else
+            flash[:error] = res.message
+            stash_page(Masterfiles::TargetMarkets::Country::New.call(id,
+                                                                     form_values: params[:country],
+                                                                     form_errors: res.errors,
+                                                                     remote: false))
+            r.redirect "/masterfiles/target_markets/destination_regions/#{id}/destination_countries/new"
+          end
+        end
       end
       r.is do
         r.get do       # SHOW
@@ -279,7 +302,12 @@ class Framework < Roda
           return_json_response
           raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
           res = interactor.delete_region(id)
-          delete_grid_row(id, notice: res.message)
+
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message)
+          end
         end
       end
     end
@@ -329,6 +357,34 @@ class Framework < Roda
         raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::Country::Edit.call(id) }
       end
+      r.on 'destination_cities' do
+        r.on 'new' do    # NEW
+          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+          show_partial_or_page(r) { Masterfiles::TargetMarkets::City::New.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = interactor.create_city(id, params[:city])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          elsif fetch?(r)
+            content = show_partial do
+              Masterfiles::TargetMarkets::City::New.call(id,
+                                                         form_values: params[:city],
+                                                         form_errors: res.errors,
+                                                         remote: true)
+            end
+            update_dialog_content(content: content, error: res.message)
+          else
+            flash[:error] = res.message
+            stash_page(Masterfiles::TargetMarkets::City::New.call(id,
+                                                                  form_values: params[:city],
+                                                                  form_errors: res.errors,
+                                                                  remote: false))
+            r.redirect "/masterfiles/target_markets/destination_countries/#{id}/destination_cities/new"
+          end
+        end
+      end
       r.is do
         r.get do       # SHOW
           raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'read')
@@ -351,39 +407,11 @@ class Framework < Roda
           return_json_response
           raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
           res = interactor.delete_country(id)
-          delete_grid_row(id, notice: res.message)
-        end
-      end
-    end
-    r.on 'destination_countries' do
-      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
-      r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::TargetMarkets::Country::New.call(remote: fetch?(r)) }
-        end
-      end
-      r.post do        # CREATE
-        res = interactor.create_country(params[:country])
-        if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Masterfiles::TargetMarkets::Country::New.call(form_values: params[:country],
-                                                          form_errors: res.errors,
-                                                          remote: true)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message)
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::TargetMarkets::Country::New.call(form_values: params[:country],
-                                                                   form_errors: res.errors,
-                                                                   remote: false))
-          r.redirect '/masterfiles/target_markets/destination_countries/new'
         end
       end
     end
@@ -424,38 +452,6 @@ class Framework < Roda
           raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
           res = interactor.delete_city(id)
           delete_grid_row(id, notice: res.message)
-        end
-      end
-    end
-    r.on 'destination_cities' do
-      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
-      r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::TargetMarkets::City::New.call(remote: fetch?(r)) }
-        end
-      end
-      r.post do        # CREATE
-        res = interactor.create_city(params[:city])
-        if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Masterfiles::TargetMarkets::City::New.call(form_values: params[:city],
-                                                       form_errors: res.errors,
-                                                       remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::TargetMarkets::City::New.call(form_values: params[:city],
-                                                                form_errors: res.errors,
-                                                                remote: false))
-          r.redirect '/masterfiles/target_markets/destination_cities/new'
         end
       end
     end

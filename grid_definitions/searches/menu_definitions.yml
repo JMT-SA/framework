@@ -8,6 +8,7 @@
     :text: delete functional area
     :icon: fa-remove
     :is_delete: true
+    :popup: true
     :hide_if_present: :program_id
   - :separator: true
   - :url: /security/functional_areas/programs/$:functional_area_id$/new
@@ -21,6 +22,7 @@
     :text: delete program
     :icon: fa-remove
     :is_delete: true
+    :popup: true
     :hide_if_null: :program_id
     :hide_if_present: :id
   - :separator: true
@@ -36,4 +38,5 @@
     :text: delete program function
     :icon: fa-remove
     :is_delete: true
+    :popup: true
     :hide_if_null: :id

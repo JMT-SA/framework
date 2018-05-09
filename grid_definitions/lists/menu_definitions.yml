@@ -17,6 +17,7 @@
         :text: delete functional area
         :icon: fa-remove
         :is_delete: true
+        :popup: true
         :hide_if_present: :program_id
   - :separator: true
   - :submenu:
@@ -35,6 +36,7 @@
         :text: delete program
         :icon: fa-remove
         :is_delete: true
+        :popup: true
         :hide_if_null: :program_id
         :hide_if_present: :id
       - :url: /security/functional_areas/programs/$:program_id$/reorder
@@ -61,6 +63,7 @@
         :text: delete program function
         :icon: fa-remove
         :is_delete: true
+        :popup: true
         :hide_if_null: :id
       - :url: "/list/users/multi?key=progfunc_users&id=$:id$"
         :text: restrict program function to specific users

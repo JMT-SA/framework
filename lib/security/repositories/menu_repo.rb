@@ -69,6 +69,7 @@ module SecurityApp
     def delete_program(id)
       DB.transaction do
         DB[:programs_webapps].where(program_id: id).delete
+        DB[:programs_users].where(program_id: id).delete
         delete(:programs, id)
       end
     end

@@ -72,7 +72,6 @@ module PackMaterialApp
     end
 
     def update_product_code_configuration(id, params)
-      # TODO: see if we can manage the String => Array conversion in dry-validation...
       res = validate_material_resource_type_config_code_columns_params(convert_string_params_to_arrays(params))
       return validation_failed_response(res) unless res.messages.empty?
 

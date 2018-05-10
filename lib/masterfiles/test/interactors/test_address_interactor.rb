@@ -132,7 +132,6 @@ module MasterfilesApp
       x = interactor.create_address(invalid_address)
       assert_equal(false, x.success)
       assert_equal('Validation error', x.message)
-      # assert_equal(['must be a string'], x.errors[:vat_number]) # TODO: This is rather a test for validate_address_params
 
       x = interactor.create_address(address_for_create)
       assert x.success

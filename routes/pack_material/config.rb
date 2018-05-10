@@ -179,7 +179,7 @@ class Framework < Roda
       end
     end
 
-    r.on 'link_product_columns' do # , Integer do |id| # TODO: This does not have to be per id....
+    r.on 'link_product_columns' do
       r.post do
         interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
         ids = multiselect_grid_choices(params)

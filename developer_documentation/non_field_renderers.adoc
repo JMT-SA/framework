@@ -122,6 +122,7 @@ sorted_id_list = params[:deals_sorted_ids] #=> '1,2,3'
 This page control renders one or more addresses. Provide a single address entity or an array of address entities.
 
 e.g.
+
 [source,ruby]
 ----
 form.add_address(address)

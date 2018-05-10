@@ -15,7 +15,9 @@ Create one or more schemas in a file (typically in `lib/applet_name/validations`
 In most cases we want to inherit from `Dry::Validation.Form` rather than `Dry::Validation.Schema` because it is more flexible about its inputs.
 
 An example showing some simple variations:
-```.ruby
+
+[source,ruby]
+----
 NewThingSchema = Dry::Validation.Form do
   configure { config.type_specs = true }
 
@@ -27,7 +29,7 @@ NewThingSchema = Dry::Validation.Form do
   required(:multiselected_ids, Types::IntArray).filled { each(:int?) }
 end
 
-```
+----
 
 === Special types
 
@@ -37,7 +39,9 @@ end
 == Calling a schema
 
 Here is an example of a passing call followed by a failing call. Note how the inputs are coerced into their desired output types.
-```.ruby
+
+[source,ruby]
+----
 > res = NewThingSchema.call(join_id: '1', code: 'AA', name: nil, active: 't', multiselected_ids: ['1', '2'])
 => #<Dry::Validation::Result output={:join_id=>1, :code=>"AA", :name=>nil, :active=>true, :multiselected_ids=>[1, 2]} errors={}>
 > res[:active]
@@ -54,7 +58,7 @@ Here is an example of a passing call followed by a failing call. Note how the in
 => #<Dry::Validation::Result output={:join_id=>2, :code=>"AA", :name=>nil, :active=>true, :multiselected_ids=>[1, "www"]} errors={:multiselected_ids=>{1=>["must be an integer"]}}>
 > res.errors                          # <4>
 => {:multiselected_ids=>{1=>["must be an integer"]}}
-```
+----
 <1> Note the `'t'` has become a Boolean with `true` value.
 <2> The Array input has had all its items coerced to Integers.
 <3> Errors are returned as a Hash keyed by the column name and the value is an array of one or more validation failure messages.

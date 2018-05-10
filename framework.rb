@@ -113,7 +113,7 @@ class Framework < Roda
           <link rel="stylesheet" href="/css/asciidoc.css">
         <% end %>
         <div id="asciidoc-content">
-          #{Asciidoctor.convert(content, safe: :safe)}
+          #{Asciidoctor.convert(content, safe: :safe, attributes: { 'source-highlighter' => 'coderay', 'coderay-css' => 'style' })}
         </div>
       HTML
     end

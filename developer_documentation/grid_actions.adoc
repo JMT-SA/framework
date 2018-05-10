@@ -21,6 +21,7 @@ The actions are rendered as a context menu that can include submenu groupings.
     :title: The dialog title with $:id$ in it
     :popup: true
     :auth:
+      :function: function_name
       :program: program_name
       :permission: required_permission
     :hide_if_null: another_field_id
@@ -29,6 +30,7 @@ The actions are rendered as a context menu that can include submenu groupings.
      :text: Submenu caption
      :items:
        - :url: /path/to/this/resource
+         :text: A submenu item
 ----
 
 === Top-level items
@@ -49,7 +51,9 @@ An action is a Hash of attributes which is an item in the actions array.
 
 |:url
 |A URL.
-|Framework paths start with a `/`. Any value from the grid row can be included in the path by specifying it surrounded by dollar signes and prefixed with a colon. e.g. to include the customer_id in the URL when the link is clicked: `/customers/$:customer_id$`.
+a|Framework paths start with a `/`. Any value from the grid row can be included in the path by specifying it surrounded by dollar signs and prefixed with a colon.
+
+e.g. to include the `customer_id` in the URL when the link is clicked: `/customers/$:customer_id$`.
 
 |:text
 |Link text.
@@ -73,7 +77,11 @@ a|Currently the system uses FontAwesome icons - e.g.:
 
 |:title
 |Dialog title.
-|Text to show as the caption of a popup dialog. Only makes sense if `:popup` is true. If the text includes a column name within `$:...$` delimiters, that part of the title will be repaced with the column value of the selected row. e.g. `A dialog for grade $:grade$ fruit` would render as `A dialog for grade 1X fruit` if the grade coumn of the current row's value was `1X`.
+a|Text to show as the caption of a popup dialog. Only makes sense if `:popup` is true.
+
+If the text includes a column name within `$:...$` delimiters, that part of the title will be repaced with the column value of the selected row.
+
+e.g. `A dialog for grade $:grade$ fruit` would render as `A dialog for grade 1X fruit` if the grade coumn of the current row's value was `1X`.
 
 |:title_field
 |Name of a field in the grid.
@@ -97,15 +105,21 @@ a|Currently the system uses FontAwesome icons - e.g.:
 
 |:is_delete
 |`true` or `false`
-|If `true`, a prompt dialog will force the user to choose OK to continue or Cancel. The link will be POSTed to the server with `_method` = `'DELETE'` if the user chooses OK.
+a|If `true`, a prompt dialog will force the user to choose OK to continue or Cancel.
+
+The link will be POSTed to the server with `_method` = `'DELETE'` if the user chooses OK.
+
+**NB** for this to be a `fetch` call, the `:popup` value must also be `true`.
 
 |:prompt
 |Text - a question to ask the user.
 |If present, a prompt dialog will show this text, asking the user to choose OK to continue or Cancel.
 
 |:auth
-|A Hash with `:program` and `:permission` keys.
-|If the user does not have the required permission, the link will not appear.
+|A Hash with `:function`, `:program` and `:permission` keys.
+a|If the user does not have the required permission, the link will not appear.
+
+This is usually used when an action requires a special level of authorisation -- not so much for basic CRUD authorisations (which are almost implied by the fact that the user can call the list action and thus has permission to at least view the applicable program).
 
 |===
 

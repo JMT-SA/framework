@@ -28,6 +28,9 @@ The following renderers are available to a page:
 |:label
 |<<Renderer::Label>>
 
+|:list
+|<<Renderer::List>>
+
 |:multi
 |<<Renderer::Multi>>
 
@@ -208,6 +211,31 @@ and all words start with initial capital letter.
 |Text to appear in the input.
 |any text
 |The value of the column in the record for this field.
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
+
+|===
+
+=== Renderer::List
+
+An ordered list of items.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:items
+|The list of items to display. If a two-dimensional array is provided, just the first element is displayed.
+|a one-dimensional or two-diemnsional array
+|None. Required.
 
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.

@@ -84,6 +84,31 @@ a|* :p
 
 |===
 
+=== List
+
+An ordered list of items.
+
+e.g.
+[source,ruby]
+----
+column.add_list([['FP', 1], ['MGP', 2], ['CONS', 3]])
+----
+
+|===
+|attribute |description |possible values |default
+
+|items
+|The list of items to display. If a two-dimensional array is provided, just the first element is displayed.
+|a one-dimensional or two-diemnsional array.
+|None. Required.
+
+|:caption
+|The label text
+|any text
+|None.
+
+|===
+
 === SortableList
 
 Render a list of items that can be dragged and dropped to change the sort-order.

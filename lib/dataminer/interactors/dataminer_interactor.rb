@@ -22,6 +22,7 @@ class DataminerInteractor < BaseInteractor
     page = OpenStruct.new(id: id, col_defs: [])
     page.report = repo.lookup_report(id)
     page.crosstab_config = repo.lookup_crosstab(id)
+    page.json_var = params[:json_var]
     setup_report_with_parameters(page.report, params, page.crosstab_config, db)
 
     # If just passing parameterised query to url, return page with base64 version of runnable_sql.
@@ -501,5 +502,15 @@ class DataminerInteractor < BaseInteractor
       # rescue StandardError => e
       #   return "ERROR: #{e.message}"
     end
+  end
+
+  def create_prepared_report(params)
+    # NB. Validate the report description - must be unique. (unless we are replaceing an existing prep rpt.)
+    # Create a copy of the report yml in prepared_reports dir (as per dm config)
+    # Name the prepared report yml as "#{user_id}_#{report_filename (id)}_#{a sequence_no}"
+    # include the report description, created_by user_id, list of users who can run it.
+    # Unpack the json_var and store as default values on the params.
+    # Return the saved_report id so the route can construct a webquery url.
+    success_response("No work done yet: #{params.keys}")
   end
 end

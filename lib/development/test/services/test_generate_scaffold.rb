@@ -1,4 +1,4 @@
-require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 class GenerateNewScaffoldTest < MiniTestWithHooks
   def before_all

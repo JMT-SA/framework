@@ -516,7 +516,7 @@ class GenerateNewScaffold < BaseService
                   res = interactor.update_#{opts.singlename}(id, params[:#{opts.singlename}])
                   if res.success
                     update_grid_row(id, changes: { #{grid_refresh_fields} },
-                                    notice: res.message)
+                                        notice: res.message)
                   else
                     content = show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id, params[:#{opts.singlename}], res.errors) }
                     update_dialog_content(content: content, error: res.message)

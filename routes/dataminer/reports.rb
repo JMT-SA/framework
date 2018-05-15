@@ -76,6 +76,71 @@ class Framework < Roda
       return_json_response
       interactor.report_list_grid
     end
+
+    # PREPARED REPORTS
+    # --------------------------------------------------------------------------
+    # r.on 'prepared_reports', String do |id|
+    #   # interactor = DataminerApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
+    #
+    #   # Check for notfound:
+    #   r.on !interactor.exists?(:security_permissions, id) do
+    #     handle_not_found(r)
+    #   end
+    #
+    #   r.on 'edit' do   # EDIT
+    #     raise Crossbeams::AuthorizationError unless authorised?('reports', 'edit')
+    #     show_partial { Dataminer::PreparedReport::SecurityPermission::Edit.call(id) }
+    #   end
+    #   r.is do
+    #     r.get do       # SHOW
+    #       raise Crossbeams::AuthorizationError unless authorised?('reports', 'read')
+    #       show_partial { Dataminer::PreparedReport::SecurityPermission::Show.call(id) }
+    #     end
+    #     r.patch do     # UPDATE
+    #       return_json_response
+    #       res = interactor.update_security_permission(id, params[:security_permission])
+    #       if res.success
+    #         update_grid_row(id, changes: { security_permission: res.instance[:security_permission] },
+    #                             notice: res.message)
+    #       else
+    #         content = show_partial { Dataminer::PreparedReport::SecurityPermission::Edit.call(id, params[:security_permission], res.errors) }
+    #         update_dialog_content(content: content, error: res.message)
+    #       end
+    #     end
+    #     r.delete do    # DELETE
+    #       return_json_response
+    #       raise Crossbeams::AuthorizationError unless authorised?('reports', 'delete')
+    #       # TODO: Only user who created or admin can delete...
+    #       res = interactor.delete_security_permission(id)
+    #       delete_grid_row(id, notice: res.message)
+    #     end
+    #   end
+    # end
+
+    # r.on 'prepared_reports', Integer do |id|
+    r.on 'prepared_reports' do
+      r.on 'new', String do |id|    # NEW
+        raise Crossbeams::AuthorizationError unless authorised?('reports', 'new')
+        show_partial_or_page(r) { Dataminer::Report::PreparedReport::New.call(id, params[:json_var], remote: fetch?(r)) }
+      end
+
+      r.post do       # CREATE
+        res = interactor.create_prepared_report(params[:prepared_report])
+        if res.success
+          update_dialog_content(content: 'Webquery URL for this report is abcd... Click to copy to clipboard...', notice: res.message)
+          # Show webquery URL
+          # flash[:notice] = res.message
+          # redirect_to_last_grid(r)
+        else
+          re_show_form(r, res, url: "/dataminer/reports/prepared_reports/new/#{id}") do
+            Dataminer::Report::PreparedReport::New.call(id,
+                                                        form_values: params[:security_permission],
+                                                        form_errors: res.errors,
+                                                        remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 

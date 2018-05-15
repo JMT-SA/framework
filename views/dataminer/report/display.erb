@@ -1,6 +1,8 @@
 <a href="<%= request.referer.gsub('?back=y', '') %>?back=y" class="near-white bg-dark-blue br2 dim pa2 mr4 ba b--near-white no-underline">Back</a>
-<button class="pure-button" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false"><i class="fa fa-info"></i> Toggle SQL</button>
-<pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre><hr>
+<a href="#" class="f6 link dim br2 ph3 pv2 mb2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false"><i class="fa fa-info"></i> Toggle SQL</a>
+<a href="/dataminer/reports/prepared_reports/new/<%= @page.id %>?json_var=<%= Base64.encode64(@page.json_var) %>" class="f6 link dim br2 ph3 pv2 mb2 dib white bg-silver" data-popup-dialog="true"><i class="fa fa-save"></i> Save prepared report</a>
+<pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
+<hr>
 
 <div style="height:40em">
   <%= Crossbeams::Layout::Renderer::Grid.header('grd1', @page.report.caption) %>

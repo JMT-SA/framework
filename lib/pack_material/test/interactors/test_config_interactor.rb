@@ -219,7 +219,7 @@ module PackMaterialApp
     end
 
     def test_validate_material_resource_type_config_code_columns_params
-      # PLEASE NOTE: These validation tests are not like the rest. They test a custom DRY Type - IntArrayFromString
+      # PLEASE NOTE: These validation tests are not like the rest. They test a custom DRY Type - ArrayFromString
       # see MatresSubTypeConfigColumnsSchema
       test_attrs = {
         chosen_column_ids: '1,5,8,1,5',
@@ -239,7 +239,7 @@ module PackMaterialApp
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(chosen_column_ids: '1,2,3,w,5'))
       assert_equal(['must be an array'], x.errors[:chosen_column_ids])
 
-      # required(:columncodes_sorted_ids, Types::IntArrayFromString).filled(:array?) { each(:int?) }
+      # required(:columncodes_sorted_ids, Types::ArrayFromString).filled(:array?) { each(:int?) }
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :columncodes_sorted_ids })
       assert_equal(['is missing'], x.errors[:columncodes_sorted_ids])
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(columncodes_sorted_ids: ''))
@@ -249,7 +249,7 @@ module PackMaterialApp
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(columncodes_sorted_ids: '1,2,3,w,5'))
       assert_equal(['must be an array'], x.errors[:columncodes_sorted_ids])
 
-      # required(:variantcolumncodes_sorted_ids, Types::IntArrayFromString).maybe(:array?) { each(:int?) }
+      # required(:variantcolumncodes_sorted_ids, Types::ArrayFromString).maybe(:array?) { each(:int?) }
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :variantcolumncodes_sorted_ids })
       assert_equal(['is missing'], x.errors[:variantcolumncodes_sorted_ids])
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(variantcolumncodes_sorted_ids: ''))

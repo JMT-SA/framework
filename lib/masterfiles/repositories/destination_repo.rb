@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-<<<<<<< 8b1383f8420557602d2d247333fbbcca19fdfc99
 module MasterfilesApp
   class DestinationRepo < BaseRepo
     build_for_select :destination_regions,

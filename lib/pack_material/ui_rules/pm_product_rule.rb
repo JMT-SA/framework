@@ -17,7 +17,7 @@ module UiRules
     end
 
     def set_show_fields
-      material_resource_sub_type_id_label = @config_repo.find_material_resource_sub_type(@form_object.material_resource_sub_type_id)&.sub_type_name
+      material_resource_sub_type_id_label = @config_repo.find_matres_sub_type(@form_object.material_resource_sub_type_id)&.sub_type_name
       commodity_id_label = @commodity_repo.find_commodity(@form_object.commodity_id)&.code
       fields[:material_resource_sub_type_id] = { renderer: :label, with_value: material_resource_sub_type_id_label, caption: 'material_resource_sub_type' }
       fields[:product_number] = { renderer: :label }

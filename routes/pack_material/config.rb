@@ -8,7 +8,7 @@ class Framework < Roda
     # MATERIAL RESOURCE TYPES
     # --------------------------------------------------------------------------
     r.on 'material_resource_types', Integer do |id|
-      interactor = PackMaterial::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:material_resource_types, id) do
@@ -46,29 +46,22 @@ class Framework < Roda
     end
 
     r.on 'material_resource_types' do
-      interactor = PackMaterial::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
-        show_partial_or_page(fetch?(r)) { PackMaterial::Config::MatresType::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Config::MatresType::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_matres_type(params[:matres_type])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            PackMaterial::Config::MatresType::New.call(form_values: params[:matres_type],
-                                                          form_errors: res.errors,
-                                                          remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          stash_page(PackMaterial::Config::MatresType::New.call(form_values: params[:matres_type],
-                                                                form_errors: res.errors,
-                                                                remote: false))
-          r.redirect '/pack_material/config/material_resource_types/new'
+          re_show_form(r, res, url: '/pack_material/config/material_resource_types/new') do
+            PackMaterial::Config::MatresType::New.call(form_values: params[:matres_type],
+                                                       form_errors: res.errors,
+                                                       remote: fetch?(r))
+          end
         end
       end
     end
@@ -76,7 +69,7 @@ class Framework < Roda
     # MATERIAL RESOURCE SUB TYPES
     # --------------------------------------------------------------------------
     r.on 'material_resource_sub_types', Integer do |id|
-      interactor = PackMaterial::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:material_resource_sub_types, id) do
@@ -117,7 +110,7 @@ class Framework < Roda
           else
             flash[:error] = res.message
             stash_page(PackMaterial::Config::MatresSubType::Config.call(id, form_values: params[:product_code_columns],
-                                                                               form_errors: res.errors))
+                                                                            form_errors: res.errors))
             r.redirect "/pack_material/config/material_resource_sub_types/#{id}/config/edit"
           end
         end
@@ -156,30 +149,21 @@ class Framework < Roda
     end
 
     r.on 'material_resource_sub_types' do
-      interactor = PackMaterial::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
-        show_partial_or_page(fetch?(r)) { PackMaterial::Config::MatresSubType::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Config::MatresSubType::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_matres_sub_type(params[:matres_sub_type])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            PackMaterial::Config::MatresSubType::New.call(form_values: params[:matres_sub_type],
-                                                             form_errors: res.errors,
-                                                             remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
-            stash_page(PackMaterial::Config::MatresSubType::New.call(form_values: params[:matres_sub_type],
-                                                                     form_errors: res.errors,
-                                                                     remote: false))
-            r.redirect '/pack_material/config/material_resource_sub_types/new'
+          re_show_form(r, res, url: '/pack_material/config/material_resource_sub_types/new') do
+            PackMaterial::Config::MatresSubType::New.call(form_values: params[:matres_sub_type],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
           end
         end
       end
@@ -187,7 +171,7 @@ class Framework < Roda
 
     r.on 'link_product_columns' do
       r.post do
-        interactor = PackMaterial::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
         ids = multiselect_grid_choices(params)
         res = interactor.chosen_product_columns(ids)
         json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_non_variant_product_code_column_ids', options_array: res.instance[:code]),
@@ -207,7 +191,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        raise Crossbeams::AuthorizationError unless authorized?('Pack material products', 'edit')
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
         show_partial { PackMaterial::Config::PmProduct::Edit.call(id) }
       end
       r.is do
@@ -285,26 +269,18 @@ class Framework < Roda
       interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
-        show_partial_or_page(fetch?(r)) { PackMaterial::Config::PmProduct::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Config::PmProduct::New.call(remote: fetch?(r)) }
       end
-      r.post do
+      r.post do        # CREATE
         res = interactor.create_pm_product(params[:pm_product])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            PackMaterial::Config::PmProduct::New.call(form_values: params[:pm_product],
-                                                         form_errors: res.errors,
-                                                         remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          show_page do
+          re_show_form(r, res, url: '/pack_material/config/pack_material_products/new') do
             PackMaterial::Config::PmProduct::New.call(form_values: params[:pm_product],
-                                                         form_errors: res.errors,
-                                                         remote: false)
+                                                      form_errors: res.errors,
+                                                      remote: fetch?(r))
           end
         end
       end

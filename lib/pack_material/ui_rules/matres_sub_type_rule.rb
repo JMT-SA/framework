@@ -16,7 +16,7 @@ module UiRules
     end
 
     def set_show_fields
-      material_resource_type_id_label = @repo.find(:material_resource_types, MatresType, @form_object.material_resource_type_id)&.type_name
+      material_resource_type_id_label = @repo.find_matres_type(@form_object.material_resource_type_id)&.type_name
       fields[:material_resource_type_id] = { renderer: :label, with_value: material_resource_type_id_label, caption: 'Type' }
       fields[:sub_type_name] = { renderer: :label }
     end

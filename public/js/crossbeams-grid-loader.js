@@ -538,6 +538,9 @@ const crossbeamsGridFormatters = {
     // If items are hidden, the last item(s) could be separators.
     // Remove them here.
     items = _.dropRightWhile(items, ['value', '---']);
+    if (items.length === 0) {
+      return '';
+    }
     return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'>&nbsp;<i class="fa fa-chevron-right blue"></i>&nbsp;</button>`;
   },
 

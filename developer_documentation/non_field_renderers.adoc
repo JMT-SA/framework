@@ -15,6 +15,7 @@ The following renderers that do not bind to fields in a form are available:
 * <<Grid>>
 * <<Form>>
 * <<Table>>
+* <<Diff>>
 
 === Link
 
@@ -244,6 +245,84 @@ section.add_table [{ keys: 'a', values: 1, amounts: 22 },
 |options
 |A Hash of options
 |`alignment: { col: :right }`. The hash should only contain columns that should not be left-aligned. The value for the column can be `:right` or `:center`.
+|None.
+
+|===
+
+=== Diff
+
+Display the difference between two texts, two Hashes or two files.
+
+One of the option sets `:left_record` and `:right_record`, `:left` and `:right` or `:left_file` and `:right_file` *must* be provided.
+
+e.g.
+[source,ruby]
+----
+# In the Layout:
+
+section.add_diff :invoice
+
+# In UI Rules:
+
+def common_fields
+  {
+    invoice: {
+      left_caption: 'Before',
+      right_caption: 'After',
+      left_record: { id: 1, customer: 'AJAX', amount: 100.00 },
+      right_record: { id: 1, customer: 'AJAX LTD.', amount: 120.00 }
+    }
+  }
+end
+
+----
+
+|===
+|attribute |description |possible values |default
+
+|key
+|The key (or field name) matches a key in the `fields` attribute of the UI Rules.
+|`Symbol`.
+|None. This is required.
+
+|left_caption
+|A caption for the left side of the display.
+|`String`.
+|"Left".
+
+|right_caption
+|A caption for the right side of the display.
+|`String`.
+|"Right".
+
+|left_record
+|A `Hash` of atrributes representing one version of a record. Each `key : value` will be compared.
+|`Hash`.
+|None.
+
+|right_record
+|A `Hash` of atrributes representing one version of a record. Each `key : value` will be compared.
+|`Hash`.
+|None.
+
+|left
+|A `String` of text. Each line will be compared.
+|`String`.
+|None.
+
+|right
+|A `String` of text. Each line will be compared.
+|`String`.
+|None.
+
+|left_file
+|A file name.
+|`String`.
+|None.
+
+|right_file
+|A file name.
+|`String`.
 |None.
 
 |===

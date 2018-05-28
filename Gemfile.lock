@@ -16,9 +16,10 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: f2897d335ed69b96cd6bc5309b3363e6bd2da9a6
+  revision: 67acde7ac67d284e13fb887bc12ec5b9c0dacf37
   specs:
-    crossbeams-layout (0.1.5)
+    crossbeams-layout (0.1.6)
+      diffy
       rouge
 
 GIT
@@ -55,6 +56,7 @@ GEM
     coderay (1.1.2)
     concurrent-ruby (1.0.5)
     daemons (1.2.6)
+    diffy (3.2.1)
     dotenv (2.2.2)
     dry-configurable (0.7.0)
       concurrent-ruby (~> 1.0)

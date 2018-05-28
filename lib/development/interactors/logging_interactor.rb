@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  class LoggingInteractor < BaseInteractor
+  class LoggingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def repo
       @repo ||= LoggingRepo.new
     end
 
     def exists?(entity, id)
-      # repo = BaseRepo.new
       repo.exists?(entity, event_id: id)
     end
 
@@ -31,11 +30,45 @@ module DevelopmentApp
       }.to_json
     end
 
+    def diff_action(id)
+      logged_action = repo.find_logged_action_hash(id)
+      left = Sequel.hstore(logged_action[:row_data]).to_hash
+      right = changed_fields_for_right(logged_action)
+      [left, right]
+    end
+
     private
+
+    def changed_fields_for_right(logged_action)
+      if logged_action[:changed_fields].nil?
+        Sequel.hstore(logged_action[:row_data]).to_hash
+      else
+        Sequel.hstore(logged_action[:row_data]).to_hash.merge(Sequel.hstore(logged_action[:changed_fields]).to_hash)
+      end
+    end
 
     def col_defs_for_logged_actions(logged_action)
       col_names = DevelopmentRepo.new.table_col_names(logged_action.table_name)
-      col_defs = [{ headerName: 'Action Time', field: 'action_tstamp_tx' },
+      this_col = [
+        {
+          text: 'Detail diff',
+          url: '/development/logging/logged_actions/$col1$/diff',
+          col1: 'event_id',
+          icon: 'fa-list',
+          title: 'View differences',
+          hide_if_null: :event_id,
+          popup: true
+        }
+      ]
+      col_defs = [{ headerName: '', pinned: 'left',
+                    width: 60,
+                    suppressMenu: true,   suppressSorting: true,   suppressMovable: true,
+                    suppressFilter: true, enableRowGroup: false,   enablePivot: false,
+                    enableValue: false,   suppressCsvExport: true, suppressToolPanel: true,
+                    valueGetter: this_col.to_json.to_s,
+                    colId: 'action_links',
+                    cellRenderer: 'crossbeamsGridFormatters.menuActionsRenderer' },
+                  { headerName: 'Action Time', field: 'action_tstamp_tx' },
                   { headerName: 'Action', field: 'action' },
                   { headerName: 'User', field: 'user_name', width: 200 },
                   { headerName: 'Context', field: 'context' },
@@ -45,6 +78,8 @@ module DevelopmentApp
                     cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
                     cellClass:    'grid-boolean-column',
                     width:        100 }
+      col_defs << { headerName: 'Event ID', field: 'event_id' }
+      col_defs << { headerName: 'ID', field: 'id', hide: true }
       col_defs
     end
 
@@ -53,6 +88,8 @@ module DevelopmentApp
       data_record[:context] = data_record.empty? ? 'DELETED' : 'CURRENT'
       data_record[:action_tstamp_tx] = Time.now
       data_record[:action] = 'N/A'
+      data_record[:event_id] = nil
+      data_record[:id] = 1
       data_record
     end
 
@@ -62,7 +99,7 @@ module DevelopmentApp
 
       col_names.each do |name|
         coldef = col_lookup[name]
-        cols << col_with_attrs(coldef, name)
+        cols << col_with_attrs(coldef, name == :id ? :rowid : name)
       end
       cols
     end
@@ -92,6 +129,7 @@ module DevelopmentApp
       rows = []
       repo.logged_actions_for_id(table_name, id).each do |row|
         row_data = row.delete(:row_data)
+        row_data[:rowid] = row_data.delete(:id) # Rename id column to prevent uniqueness problems in the grid.
         changed_fields = row.delete(:changed_fields)
         rows << if changed_fields.nil?
                   row.merge(Sequel.hstore(row_data).to_hash)

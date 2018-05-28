@@ -25,6 +25,11 @@ class Framework < Roda
         return_json_response
         interactor.logged_actions_grid(id)
       end
+
+      r.on 'diff' do
+        left, right = interactor.diff_action(id)
+        show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
+      end
     end
   end
 end

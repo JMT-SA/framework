@@ -7,7 +7,11 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      if @mode == :diff
+        common_values_for_fields diff_fields
+      else
+        common_values_for_fields common_fields
+      end
 
       set_show_fields if @mode == :show
 
@@ -25,6 +29,21 @@ module UiRules
         schema_name: { required: true },
         table_name: { required: true },
         row_data_id: {}
+      }
+    end
+
+    def diff_fields
+      {
+        logged_action: {
+          # left_caption: 'diff.rb',
+          # right_caption: 'show.rb',
+          # left_file: '/home/james/ra/crossbeams/framework/lib/development/views/logged_action/diff.rb',
+          # right_file: '/home/james/ra/crossbeams/framework/lib/development/views/logged_action/show.rb'
+          left_caption: 'Before',
+          right_caption: 'After',
+          left_record: @options[:left],
+          right_record: @options[:right]
+        }
       }
     end
 

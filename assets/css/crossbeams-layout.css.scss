@@ -100,7 +100,7 @@ section.crossbeams_layout {
         width: 150px;
     }
     .full-width-grid {
-         margin-left: 100px; 
+        margin-left: 100px;
         padding-top: 35px;
         box-sizing: border-box;
         display: block;
@@ -517,6 +517,76 @@ tr.roweven {
     right: 1em;
   }
 }
+
+/* -------------------------------------------------------------------------- *\
+ * Styles for DIFF display
+ * -------------------------------------------------------------------------- */
+.diff {
+  overflow: auto;
+}
+.diff ul {
+  background: #fff;
+  overflow: auto;
+  /* font-size: 13px; */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: table;
+  width: 100%;
+}
+.diff del, .diff ins {
+  display: block;
+  text-decoration: none;
+}
+.diff li {
+  padding: 0;
+  display: table-row;
+  margin:  0;
+  height: 1em;
+}
+.diff li.ins {
+  /* background: #dfd; */
+  background: #deeeff;
+  /* color: #080; */
+}
+.diff li.del {
+  /* background: #fee; */
+  background: #deeeff;
+  /* color: #b00; */
+}
+.diff li:hover {
+  background: #ffc;
+}
+.diff del, .diff ins, .diff span {
+  white-space: pre;
+  font-family: courier;
+}
+.diff del, .diff ins {
+  border: 1px solid #74b0f0;
+}
+.diff del strong {
+  font-weight: normal;
+  /* background: #fcc; */
+  background: #8ac2ff;
+}
+.diff ins strong {
+  font-weight: normal;
+  /* background: #9f9; */
+  background: #8ac2ff;
+}
+.diff li.diff-comment  {
+  display: none;
+}
+.diff li.diff-block-info  {
+  background: none repeat scroll 0 0 gray;
+}
+.cbl-diff-container {
+  padding: 0.25em;
+}
+.cbl-diff-caption {
+  font-weight: bold;
+}
+
 /* RESPONSIVE */
 @media (max-width: 48em) {
   .crossbeams-row {

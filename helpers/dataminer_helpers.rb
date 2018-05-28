@@ -4,15 +4,46 @@ module DataminerHelpers
   # @param sql [String] the sql.
   # @return [String] HTML styled for syntax highlighting.
   def sql_to_highlight(sql)
-    # wrap sql @ 120
-    width = 120
-    ar = sql.gsub(/from /i, "\nFROM ").gsub(/where /i, "\nWHERE ").gsub(/(left outer join |left join |inner join |join )/i, "\n\\1").split("\n")
-    wrapped_sql = ar.map { |a| a.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n") }.join("\n")
+    ar = sql_add_newlines(sql_format_from_and_where(sql)).split("\n")
+    wrapped_sql = ar.map { |a| wrap_line(a, 120) }
+                    .reject(&:empty?)
+                    .join("\n")
 
     theme     = Rouge::Themes::Github.new
     formatter = Rouge::Formatters::HTMLInline.new(theme)
     lexer     = Rouge::Lexers::SQL.new
     formatter.format(lexer.lex(wrapped_sql))
+  end
+
+  # Word-wrap a line of text.
+  #
+  # @param str [String] the line.
+  # @param width [Integer] the position at which to wrap words.
+  # @return [String] The line with newline characters inserted where appropriate.
+  def wrap_line(str, width)
+    str.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n")
+  end
+
+  # Add newlines to SQL before certain keywords.
+  #
+  # @param sql [String] the sql.
+  # @return [String] SQL with newlines injected where appropriate.
+  def sql_add_newlines(sql)
+    key_phrases = ['left outer join',
+                   'left join ',
+                   'inner join ',
+                   'join ',
+                   'order by ',
+                   'group by '].join('|')
+    sql.gsub(/(#{key_phrases})/i, "\n\\1")
+  end
+
+  # Add newlines to SQL before from and where. Make uppercase.
+  #
+  # @param sql [String] the sql.
+  # @return [String] SQL with newlines injected where appropriate.
+  def sql_format_from_and_where(sql)
+    sql.gsub(/from /i, "\nFROM ").gsub(/where /i, "\nWHERE ")
   end
 
   # Syntax highlighting for YAML using Rouge.

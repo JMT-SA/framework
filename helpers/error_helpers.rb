@@ -46,11 +46,11 @@ module ErrorHelpers
 
   def dialog_permission_error
     response.status = 403
-    "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>"
+    "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>You do not have permission for this task</p></div>"
   end
 
   def dialog_warning(message)
-    "<div class='crossbeams-warning-note'><strong>Warning</strong><br>#{message}</div>"
+    "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>#{message}</p></div>"
   end
 
   def dialog_error(err, state = nil)
@@ -67,10 +67,22 @@ module ErrorHelpers
     view(inline: "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>")
   end
 
+  def show_page_info(message)
+    view(inline: "<div class='crossbeams-info-note'><p><strong>Note:</strong></p><p>#{message}</p></div>")
+  end
+
+  def show_page_warning(message)
+    view(inline: "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>#{message}</p></div>")
+  end
+
+  def show_page_success(message)
+    view(inline: "<div class='crossbeams-success-note'><p><strong>Success:</strong></p><p>#{message}</p></div>")
+  end
+
   def show_page_error(err)
-    msg = err.respond_to?(:message) ? err.message : err.to_s
+    message = err.respond_to?(:message) ? err.message : err.to_s
     puts err.full_message if err.respond_to?(:full_message)
-    view(inline: "<div class='crossbeams-error-note'><strong>Error</strong><br>#{msg}</div>")
+    view(inline: "<div class='crossbeams-error-note'><p><strong>Error</strong></p><p>#{message}</p></div>")
   end
 
   def show_json_notice(message)

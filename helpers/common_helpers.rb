@@ -112,13 +112,6 @@ module CommonHelpers
     !authorised?(programs, sought_permission)
   end
 
-  def can_do_dataminer_admin?
-    # TODO: what decides that user can do admin? security role on dm program?
-    # program + user -> program_users -> security_group -> security_permissions
-    current_user && authorised?(:data_miner, :admin)
-    # current_user # && current_user[:department_name] == 'IT'
-  end
-
   def redirect_to_last_grid(route)
     if fetch?(route)
       redirect_via_json(session[:last_grid_url])

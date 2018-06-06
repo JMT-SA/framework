@@ -157,6 +157,16 @@
           crossbeamsUtils.showHtmlInDialog('Hint', el.innerHTML);
         }
       }
+      if (event.target.dataset && event.target.dataset.clipboard && event.target.dataset.clipboard === 'copy') {
+        const input = document.getElementById(event.target.id.replace('_clip_i', '').replace('_clip', ''));
+        input.select();
+        try {
+          document.execCommand('copy');
+          Jackbox.information('Copied to clipboard');
+        } catch (e) {
+          Jackbox.warning('Cannot copy, hit Ctrl+C to copy the selected text');
+        }
+      }
       if (event.target.classList.contains('close-dialog')) {
         crossbeamsUtils.closePopupDialog();
         event.stopPropagation();

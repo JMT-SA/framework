@@ -157,6 +157,11 @@ a|
 |HTML text
 |None
 
+|:copy_to_clipboard
+|If true, a button will render next to the input which allow the user to copy the contents to the clipboard.
+|true or false
+|false
+
 |===
 
 === Renderer::Hidden

@@ -4,7 +4,7 @@
 
 class Framework < Roda
   route 'reports', 'dataminer' do |r|
-    interactor = DataminerInteractor.new(current_user, {}, { route_url: request.path }, {})
+    interactor = DataminerApp::DataminerInteractor.new(current_user, {}, { route_url: request.path }, {})
 
     r.on 'iframe' do
       if flash[:iframe_url].nil?
@@ -74,13 +74,17 @@ class Framework < Roda
 
     r.on 'grid' do
       return_json_response
-      interactor.report_list_grid
+      begin
+        interactor.report_list_grid
+      rescue StandardError => e
+        show_json_exception(e)
+      end
     end
 
     # PREPARED REPORTS
     # --------------------------------------------------------------------------
     # r.on 'prepared_reports', String do |id|
-    #   # interactor = DataminerApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
+    #   # interactor = DataminerApp::DataminerApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
     #
     #   # Check for notfound:
     #   r.on !interactor.exists?(:security_permissions, id) do
@@ -117,24 +121,71 @@ class Framework < Roda
     #   end
     # end
 
-    # r.on 'prepared_reports', Integer do |id|
+    # ****************************************************************************************************************************************
+    #
+    # TODO: think through system + framework db with same connection, diff reports path, but same prep dir. (do not list same dir twice......)
+    #
+    # ****************************************************************************************************************************************
     r.on 'prepared_reports' do
       r.on 'new', String do |id|    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('reports', 'new')
+        # Show already-saved-reports-for-same_user
         show_partial_or_page(r) { Dataminer::Report::PreparedReport::New.call(id, params[:json_var], remote: fetch?(r)) }
+      end
+
+      r.on 'list' do
+        renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', '/dataminer/reports/prepared_reports/grid/', 'Prepared report listing')
+        view(inline: renderer.render)
+      end
+
+      r.on 'grid' do
+        return_json_response
+        begin
+          interactor.prepared_report_list_grid(true)
+        rescue StandardError => e
+          show_json_exception(e)
+        end
+      end
+
+      r.on :id do |id|
+        # Make an instance
+        instance = interactor.prepared_report_meta(id)
+        r.on 'webquery_url' do
+          show_partial_or_page(r) { Dataminer::Report::PreparedReport::WebQuery.call(instance, webquery_url_for(id)) }
+        end
+
+        r.on 'run' do
+          renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', "/dataminer/reports/prepared_reports/#{id}/grid/", instance[:report_description])
+          view(inline: renderer.render)
+        end
+
+        r.on 'xls' do
+          page = interactor.create_prepared_report_spreadsheet(id)
+          response.headers['content_type'] = 'application/vnd.ms-excel'
+          response.headers['Content-Disposition'] = "attachment; filename=\"#{page.report.caption.strip.gsub(%r{[/:*?"\\<>\|\r\n]}i, '-') + '.xls'}\""
+          # NOTE: could this use streaming to start downloading quicker?
+          response.write(page.excel_file.to_stream.read)
+        end
+
+        r.on 'grid' do
+          return_json_response
+          begin
+            interactor.prepared_report_grid(id)
+          rescue StandardError => e
+            show_json_exception(e)
+          end
+        end
       end
 
       r.post do       # CREATE
         res = interactor.create_prepared_report(params[:prepared_report])
         if res.success
-          update_dialog_content(content: 'Webquery URL for this report is abcd... Click to copy to clipboard...', notice: res.message)
-          # Show webquery URL
-          # flash[:notice] = res.message
-          # redirect_to_last_grid(r)
+          content = show_partial { Dataminer::Report::PreparedReport::WebQuery.call(res.instance, webquery_url_for(res.instance[:id])) }
+          update_dialog_content(content: content, notice: res.message)
         else
           re_show_form(r, res, url: "/dataminer/reports/prepared_reports/new/#{id}") do
             Dataminer::Report::PreparedReport::New.call(id,
-                                                        form_values: params[:security_permission],
+                                                        form_values: params[:prepared_report],
                                                         form_errors: res.errors,
                                                         remote: fetch?(r))
           end

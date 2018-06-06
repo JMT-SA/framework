@@ -6,7 +6,7 @@ module DM
       def self.call(id, form_values = nil, form_errors = nil)
         # ui_rule = UiRules::Compiler.new(:user, :edit, id: id, form_values: form_values)
         # rules   = ui_rule.compile
-        repo    = ReportRepo.new
+        repo    = DataminerApp::ReportRepo.new
         report  = repo.lookup_admin_report(id)
         cols    = report.ordered_columns.map { |column| ["#{column.name} (#{column.caption})", column.name] }
         obj     = OpenStruct.new

@@ -3,7 +3,7 @@
 module UiRules
   class ParameterRule < Base
     def generate_rules
-      @this_repo = ReportRepo.new
+      @this_repo = DataminerApp::ReportRepo.new
       @report    = @this_repo.lookup_admin_report(@options[:id])
       make_form_object
       apply_form_values

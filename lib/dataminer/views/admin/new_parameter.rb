@@ -7,7 +7,7 @@ module DM
         ui_rule = UiRules::Compiler.new(:parameter, :new, id: id, form_values: form_values)
         rules   = ui_rule.compile
         # # report = lookup_admin_report(id) # TODO: create a repo for this...
-        # repo    = ReportRepo.new
+        # repo    = DataminerApp::ReportRepo.new
         # report  = repo.lookup_admin_report(id)
         # cols    = report.ordered_columns.map(&:namespaced_name).compact
         # tables  = report.tables

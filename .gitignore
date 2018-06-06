@@ -53,3 +53,4 @@ prestyle.css
 
 # Client-specific config.
 config/dataminer_connections.yml
+prepared_reports/*.yml

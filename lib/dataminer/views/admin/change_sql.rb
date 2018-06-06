@@ -7,7 +7,7 @@ module DM
         # ui_rule = UiRules::Compiler.new(:user, :edit, id: id, form_values: form_values)
         # rules   = ui_rule.compile
         # report = lookup_admin_report(id) # TODO: create a repo for this...
-        repo    = ReportRepo.new
+        repo    = DataminerApp::ReportRepo.new
         report  = repo.lookup_admin_report(id)
         obj     = OpenStruct.new
         obj.id  = id

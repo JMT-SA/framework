@@ -14,11 +14,7 @@ module DM
                   else
                     'Report listing'
                   end
-        new_url = if context[:for_grid_queries] # MAYBE not required...
-                    '/dataminer/admin/new/'
-                  else
-                    '/dataminer/admin/new/'
-                  end
+        new_url = '/dataminer/admin/new/'
 
         layout = Crossbeams::Layout::Page.build({}) do |page|
           page.section do |section|

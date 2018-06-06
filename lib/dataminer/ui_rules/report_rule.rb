@@ -24,7 +24,7 @@ module UiRules
 
     def make_form_object
       @form_object = OpenStruct.new(database: nil, filename: nil, caption: nil, sql: nil)
-      @form_object.database = ReportRepo::GRID_DEFS if @options[:for_grids]
+      @form_object.database = DataminerApp::ReportRepo::GRID_DEFS if @options[:for_grids]
     end
   end
 end

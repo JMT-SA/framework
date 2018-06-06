@@ -5,7 +5,7 @@
 class Framework < Roda # rubocop:disable Metrics/ClassLength
   route 'admin', 'dataminer' do |r|
     context = { for_grid_queries: session[:dm_admin_path] == :grids, route_url: request.path }
-    interactor = DataminerInteractor.new(current_user, {}, context, {})
+    interactor = DataminerApp::DataminerInteractor.new(current_user, {}, context, {})
 
     r.is do
       show_page { DM::Admin::Index.call(context) }
@@ -13,12 +13,20 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'reports_grid' do
       return_json_response
-      interactor.admin_report_list_grid
+      begin
+        interactor.admin_report_list_grid
+      rescue StandardError => e
+        show_json_exception(e)
+      end
     end
 
     r.on 'grids_grid' do
       return_json_response
-      interactor.admin_report_list_grid(for_grids: true)
+      begin
+        interactor.admin_report_list_grid(for_grids: true)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
     end
 
     r.on 'reports' do
@@ -71,15 +79,12 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.convert_report(params[:report])
         if res.success
           view(inline: <<-HTML)
-          <h1>Converted</h1>
+          <div class="crossbeams-success-note"><p><strong>Converted</strong></p></div>
           <p>New YAML code:</p>
           <pre>#{yml_to_highlight(res.instance.to_hash.to_yaml)}</pre>
           HTML
         else
-          view(inline: <<-HTML)
-          <h1>Conversion failed</h1>
-          <p>#{res.message}</p>
-          HTML
+          show_page_error "Conversion failed: #{res.message}"
         end
       end
     end

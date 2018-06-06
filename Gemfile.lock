@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: 96de4471feeb9e75119204c1e42f420900349c4a
+  revision: b56e52d80b2596d9a5c00ff0adc43ff5874a8494
   specs:
     crossbeams-layout (0.1.6)
       diffy

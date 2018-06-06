@@ -214,4 +214,9 @@ module CommonHelpers
     store = LocalStore.new(current_user.id)
     store.read_once(:stashed_page)
   end
+
+  def webquery_url_for(report_id)
+    port = request.port == '80' || request.port.nil? ? '' : ":#{request.port}"
+    "http://#{request.host}#{port}/webquery/#{report_id}"
+  end
 end

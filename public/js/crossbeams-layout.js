@@ -163,6 +163,8 @@
         try {
           document.execCommand('copy');
           Jackbox.information('Copied to clipboard');
+          window.getSelection().removeAllRanges();
+          input.blur();
         } catch (e) {
           Jackbox.warning('Cannot copy, hit Ctrl+C to copy the selected text');
         }

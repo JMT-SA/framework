@@ -262,9 +262,15 @@ form.rodauth div.form-group {
 }
 
 /* .crossbeams-form input, .crossbeams-form textarea, .crossbeams-form select { */
-.crossbeams-form .cbl-input, .cbl-copy-wrapper, .crossbeams-form .multi-wrapper, .rodauth .col-sm-10 {
+.crossbeams-form .cbl-input, .crossbeams-form .cbl-copy-wrapper, .crossbeams-form .multi-wrapper, .rodauth .col-sm-10 {
   order: 2;
   flex: 1 1 auto;
+}
+.crossbeams-form .cbl-copy-wrapper {
+  display: flex;
+}
+.crossbeams-form .cbl-clipcopy {
+  order: 3;
 }
 
 .crossbeams-form input[type="checkbox"], .crossbeams-form input[type="radio"] {
@@ -617,6 +623,7 @@ tr.roweven {
 }
 @media (max-width: 600px) {
   .cbl-input,
+  .cbl-copy-wrapper,
   .multi-wrapper,
   /* input, */
   select{width: 100%;}

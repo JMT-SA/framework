@@ -303,7 +303,7 @@ and all words start with initial capital letter.
 |`true`.
 
 |:prompt
-|Pre-selected items.
+|Prompt to show when nothing is selected.
 |any text, or `true` - in which case the prompt will be `'Select a value'`.
 |n/a
 

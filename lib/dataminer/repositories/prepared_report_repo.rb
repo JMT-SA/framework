@@ -116,13 +116,25 @@ module DataminerApp
       lkp
     end
 
-    def create_prepared_report(user, db_id, report_description, chosen_params)
+    def existing_prepared_reports_for(db_id, user)
+      repo = ReportRepo.new
+      db, report_id = repo.split_db_and_id(db_id)
+      path = DM_CONNECTIONS.prepared_report_path(db)
+      ymlfiles = File.join(path, '**', '*.yml')
+      yml_list = Dir.glob(ymlfiles)
+      yml_list.grep(%r{#{path}/#{user.id}_#{report_id}_\d\d\d.yml}).map { |p| p.sub("#{path}/", '').sub('.yml', '') }.sort.map do |rpt|
+        report = lookup_report("#{db}_#{rpt}")
+        ["#{rpt} : #{report.caption}", rpt]
+      end
+    end
+
+    def create_prepared_report(user, db_id, report_description, chosen_params, existing_report)
       rep_loc = ReportLocation.new(db_id)
       rpt = ReportRepo.new.lookup_report(db_id)
       rpt.caption = report_description
       apply_prepared_report_params(rpt, user, report_description, chosen_params)
       # rpt.apply_params_as_defaults(chosen_params) ???
-      basename = save_new_report(rpt, rep_loc, user)
+      basename = save_new_report(rpt, rep_loc, user, existing_report)
       "#{rep_loc.db}_#{basename}"
     end
 
@@ -131,6 +143,7 @@ module DataminerApp
       rpt = lookup_report(id)
       rpt.caption = params[:report_description]
       rpt.external_settings[:prepared_report][:report_description] = params[:report_description]
+      rpt.external_settings[:prepared_report][:linked_users] = (params[:linked_users] || []).map(&:to_i)
 
       filename = File.join(rep_loc.prepared_path, "#{rep_loc.id}.yml")
       persistor = Crossbeams::Dataminer::YamlPersistor.new(filename)
@@ -145,8 +158,8 @@ module DataminerApp
       rpt.external_settings[:prepared_report][:json_var] = chosen_params
     end
 
-    def save_new_report(rpt, rep_loc, user)
-      new_basename = new_prepared_report_file(user, rep_loc.id, rep_loc.prepared_path)
+    def save_new_report(rpt, rep_loc, user, existing_report)
+      new_basename = new_prepared_report_file(user, rep_loc.id, rep_loc.prepared_path, existing_report)
       new_filename = File.join(rep_loc.prepared_path, "#{new_basename}.yml")
       persistor = Crossbeams::Dataminer::YamlPersistor.new(new_filename)
       rpt.save(persistor)
@@ -154,7 +167,8 @@ module DataminerApp
       new_basename
     end
 
-    def new_prepared_report_file(user, id, prepared_path)
+    def new_prepared_report_file(user, id, prepared_path, existing_report)
+      return existing_report if existing_report
       prefix = "#{user.id}_#{id}"
       "#{prefix}_#{next_seq_no(prepared_path, prefix).to_s.rjust(3, '0')}"
     end

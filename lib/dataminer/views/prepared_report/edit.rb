@@ -18,7 +18,7 @@ module Dataminer
               form.remote!
               form.add_field :id
               form.add_field :report_description
-              # linked_users
+              form.add_field :linked_users
             end
           end
 

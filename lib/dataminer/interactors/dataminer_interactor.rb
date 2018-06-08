@@ -720,7 +720,7 @@ module DataminerApp
                  else
                    Base64.decode64(params[:json_var])
                  end
-      prep_rep_id = PreparedReportRepo.new.create_prepared_report(@user, params[:id], params[:report_description], json_var)
+      prep_rep_id = PreparedReportRepo.new.create_prepared_report(@user, params[:id], params[:report_description], json_var, params[:existing_report])
       param_texts = json_var_as_text(::JSON.parse(json_var))
       success_response('Prepared report was successfully created', id: prep_rep_id, report_description: params[:report_description], param_texts: param_texts)
     end

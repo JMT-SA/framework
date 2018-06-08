@@ -4,8 +4,8 @@ module Dataminer
   module Report
     module PreparedReport
       class New
-        def self.call(id, json_var, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:prepared_report, :new, id: id, form_values: form_values, json_var: json_var)
+        def self.call(id, json_var, user, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:prepared_report, :new, id: id, user: user, form_values: form_values, json_var: json_var)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -20,10 +20,8 @@ module Dataminer
               form.add_field :database
               form.add_field :report_template
               form.add_field :report_description
-              # change param
-              # webq only
-              # users
-              # replace existing
+              # form.add_field :linked_users -- Only show when editing
+              form.add_field :existing_report
             end
           end
 

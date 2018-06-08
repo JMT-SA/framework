@@ -90,7 +90,7 @@ class Framework < Roda
       r.on 'new', String do |id|    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('reports', 'new')
         # Show already-saved-reports-for-same_user
-        show_partial_or_page(r) { Dataminer::Report::PreparedReport::New.call(id, params[:json_var], remote: fetch?(r)) }
+        show_partial_or_page(r) { Dataminer::Report::PreparedReport::New.call(id, params[:json_var], current_user, remote: fetch?(r)) }
       end
 
       r.on 'list' do
@@ -183,8 +183,9 @@ class Framework < Roda
         if res.success
           show_page_or_update_dialog(r, res) { Dataminer::Report::PreparedReport::WebQuery.call(res.instance, webquery_url_for(res.instance[:id]), fetch?(r)) }
         else
+          id = params[:prepared_report][:id]
           re_show_form(r, res, url: "/dataminer/reports/prepared_reports/new/#{id}") do
-            Dataminer::Report::PreparedReport::New.call(id,
+            Dataminer::Report::PreparedReport::New.call(id, params[:prepared_report][:json_var], current_user,
                                                         form_values: params[:prepared_report],
                                                         form_errors: res.errors,
                                                         remote: fetch?(r))

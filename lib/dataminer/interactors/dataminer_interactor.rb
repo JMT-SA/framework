@@ -11,7 +11,8 @@ module DataminerApp
       page = OpenStruct.new(id: id,
                             load_params: params[:back] && params[:back] == 'y',
                             report_action: "/dataminer/reports/report/#{id}/run",
-                            excel_action: "/dataminer/reports/report/#{id}/xls")
+                            excel_action: "/dataminer/reports/report/#{id}/xls",
+                            prepared_action: "/dataminer/reports/prepared_reports/new/#{id}")
       page.report = repo.lookup_report(id)
       page.connection = repo.db_connection_for(db)
       page.crosstab_config = repo.lookup_crosstab(id)
@@ -710,14 +711,61 @@ module DataminerApp
     end
 
     def create_prepared_report(params)
+      res = validate_prepared_report_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
       # NB. Validate the report description - must be unique. (unless we are replacing an existing prep rpt.)
-      prep_rep_id = PreparedReportRepo.new.create_prepared_report(@user, params[:id], params[:report_description], Base64.decode64(params[:json_var]))
-      success_response('Prepared report was successfully created', id: prep_rep_id, report_description: params[:report_description])
+
+      json_var = if params[:json_var].start_with?('[')
+                   params[:json_var]
+                 else
+                   Base64.decode64(params[:json_var])
+                 end
+      prep_rep_id = PreparedReportRepo.new.create_prepared_report(@user, params[:id], params[:report_description], json_var)
+      param_texts = json_var_as_text(::JSON.parse(json_var))
+      success_response('Prepared report was successfully created', id: prep_rep_id, report_description: params[:report_description], param_texts: param_texts)
+    end
+
+    def validate_prepared_report_params(params)
+      PreparedReportSchema.call(params)
+    end
+
+    # def base64?(value)
+    #   value.is_a?(String) && Base64.encode64(Base64.decode64(value)) == value
+    # end
+
+    def update_prepared_report(id, params)
+      res = validate_prepared_report_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      PreparedReportRepo.new.save_prepared_report(id, params)
+      success_response('Report has been updated', report_description: params[:report_description])
+    end
+
+    def delete_prepared_report(id)
+      # Should ideally validate user is owner or has all reports permission...
+      filename = PreparedReportRepo.new.lookup_file_name(id)
+      File.delete(filename)
+      success_response('Report has been deleted')
     end
 
     def prepared_report_meta(id)
       rpt = PreparedReportRepo.new.lookup_report(id)
-      { id: id, report_description: rpt.caption }
+      json_var = ::JSON.parse(rpt.external_settings[:prepared_report][:json_var])
+      param_texts = json_var_as_text(json_var)
+
+      { id: id, report_description: rpt.caption, param_texts: param_texts }
+    end
+
+    def json_var_as_text(json_var)
+      json_var.map do |param|
+        if param['op'] == 'between'
+          "#{param['caption']} #{param['opText']} #{param['text']} AND #{param['textTo']}"
+        elsif param['op'] == 'is_null' || param['op'] == 'notnull'
+          "#{param['caption']} #{param['opText']}"
+        else
+          "#{param['caption']} #{param['opText']} #{param['text']}"
+        end
+      end
     end
 
     def prepared_report_as_html(id)

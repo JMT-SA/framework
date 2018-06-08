@@ -82,7 +82,7 @@ module DataminerApp
         report_lookup.merge!(get_reports_for(key, DM_CONNECTIONS.prepared_report_path(key), user))
       end
       # report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab] } }
-      report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab] } }
+      report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab], owner: lkp[:owner] } }
     end
 
     def list_all_reports_for_user(user)
@@ -95,7 +95,7 @@ module DataminerApp
     end
 
     def get_reports_for(key, path, user = nil, for_user_only = false)
-      user_id = user.nil? ? nil : user.id
+      user_id = user&.id
       lkp = {}
       ymlfiles = File.join(path, '**', '*.yml')
       yml_list = Dir.glob(ymlfiles)
@@ -103,14 +103,10 @@ module DataminerApp
       yml_list.each do |yml_file|
         index = "#{key}_#{File.basename(yml_file).sub(File.extname(yml_file), '')}"
         yp    = Crossbeams::Dataminer::YamlPersistor.new(yml_file).to_hash
-        owned_by_user = user_id.nil? ? false :File.basename(yml_file).start_with?(user_id.to_s)
+        owned_by_user = user_id.nil? ? false : File.basename(yml_file).start_with?(user_id.to_s)
         if for_user_only && !owned_by_user
           next unless yp[:external_settings][:prepared_report].key?(:linked_users) && yp[:external_settings][:prepared_report][:linked_users].include?(user_id)
         end
-        # lkp[index] = { file: yml_file, db: key, caption: Crossbeams::Dataminer::Report.load(yp).caption, crosstab: !yp.to_hash[:crosstab].nil? }
-        # :description: BlahBlah
-        # :user: 1
-        # :created_on: 2
         lkp[index] = { file: yml_file,
                        db: key,
                        caption: yp[:external_settings][:prepared_report][:description],
@@ -130,8 +126,18 @@ module DataminerApp
       "#{rep_loc.db}_#{basename}"
     end
 
+    def save_prepared_report(id, params)
+      rep_loc = ReportLocation.new(id)
+      rpt = lookup_report(id)
+      rpt.caption = params[:report_description]
+      rpt.external_settings[:prepared_report][:report_description] = params[:report_description]
+
+      filename = File.join(rep_loc.prepared_path, "#{rep_loc.id}.yml")
+      persistor = Crossbeams::Dataminer::YamlPersistor.new(filename)
+      rpt.save(persistor)
+    end
+
     def apply_prepared_report_params(rpt, user, report_description, chosen_params)
-      # Add a textual description of chosen parameters
       rpt.external_settings[:prepared_report] = {}
       rpt.external_settings[:prepared_report][:description] = report_description
       rpt.external_settings[:prepared_report][:user] = user.id

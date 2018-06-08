@@ -81,46 +81,6 @@ class Framework < Roda
       end
     end
 
-    # PREPARED REPORTS
-    # --------------------------------------------------------------------------
-    # r.on 'prepared_reports', String do |id|
-    #   # interactor = DataminerApp::DataminerApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
-    #
-    #   # Check for notfound:
-    #   r.on !interactor.exists?(:security_permissions, id) do
-    #     handle_not_found(r)
-    #   end
-    #
-    #   r.on 'edit' do   # EDIT
-    #     raise Crossbeams::AuthorizationError unless authorised?('reports', 'edit')
-    #     show_partial { Dataminer::PreparedReport::SecurityPermission::Edit.call(id) }
-    #   end
-    #   r.is do
-    #     r.get do       # SHOW
-    #       raise Crossbeams::AuthorizationError unless authorised?('reports', 'read')
-    #       show_partial { Dataminer::PreparedReport::SecurityPermission::Show.call(id) }
-    #     end
-    #     r.patch do     # UPDATE
-    #       return_json_response
-    #       res = interactor.update_security_permission(id, params[:security_permission])
-    #       if res.success
-    #         update_grid_row(id, changes: { security_permission: res.instance[:security_permission] },
-    #                             notice: res.message)
-    #       else
-    #         content = show_partial { Dataminer::PreparedReport::SecurityPermission::Edit.call(id, params[:security_permission], res.errors) }
-    #         update_dialog_content(content: content, error: res.message)
-    #       end
-    #     end
-    #     r.delete do    # DELETE
-    #       return_json_response
-    #       raise Crossbeams::AuthorizationError unless authorised?('reports', 'delete')
-    #       # TODO: Only user who created or admin can delete...
-    #       res = interactor.delete_security_permission(id)
-    #       delete_grid_row(id, notice: res.message)
-    #     end
-    #   end
-    # end
-
     # ****************************************************************************************************************************************
     #
     # TODO: think through system + framework db with same connection, diff reports path, but same prep dir. (do not list same dir twice......)
@@ -147,6 +107,20 @@ class Framework < Roda
         end
       end
 
+      r.on 'list_all' do
+        renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', '/dataminer/reports/prepared_reports/grid_all/', 'Prepared report listing - all reports')
+        view(inline: renderer.render)
+      end
+
+      r.on 'grid_all' do
+        return_json_response
+        begin
+          interactor.prepared_report_list_grid
+        rescue StandardError => e
+          show_json_exception(e)
+        end
+      end
+
       r.on :id do |id|
         # Make an instance
         instance = interactor.prepared_report_meta(id)
@@ -155,7 +129,7 @@ class Framework < Roda
         end
 
         r.on 'run' do
-          renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', "/dataminer/reports/prepared_reports/#{id}/grid/", instance[:report_description])
+          renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', "/dataminer/reports/prepared_reports/#{id}/grid/", instance[:report_description], height: 35)
           view(inline: renderer.render)
         end
 
@@ -175,13 +149,39 @@ class Framework < Roda
             show_json_exception(e)
           end
         end
+
+        r.on 'edit' do
+          raise Crossbeams::AuthorizationError unless authorised?('reports', 'edit') # Need to check user == creator, or has all_preps permission...
+          show_partial { Dataminer::Report::PreparedReport::Edit.call(id) }
+        end
+
+        r.patch do     # UPDATE
+          return_json_response
+          res = interactor.update_prepared_report(id, params[:prepared_report])
+          if res.success
+            update_grid_row(id, changes: { caption: res.instance[:report_description] },
+                                notice: res.message)
+          else
+            content = show_partial { Dataminer::Report::PreparedReport::Edit.call(id, form_values: params[:prepared_report], form_errors: res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+
+        r.delete do
+          return_json_response
+          res = interactor.delete_prepared_report(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message)
+          end
+        end
       end
 
       r.post do       # CREATE
         res = interactor.create_prepared_report(params[:prepared_report])
         if res.success
-          content = show_partial { Dataminer::Report::PreparedReport::WebQuery.call(res.instance, webquery_url_for(res.instance[:id])) }
-          update_dialog_content(content: content, notice: res.message)
+          show_page_or_update_dialog(r, res) { Dataminer::Report::PreparedReport::WebQuery.call(res.instance, webquery_url_for(res.instance[:id]), fetch?(r)) }
         else
           re_show_form(r, res, url: "/dataminer/reports/prepared_reports/new/#{id}") do
             Dataminer::Report::PreparedReport::New.call(id,

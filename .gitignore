@@ -12,7 +12,7 @@
 /tmp/
 *.backup
 *.old
-/.sass-cache/
+.sass-cache/
 lib/applets/.sass-cache/
 public/assets/*.*
 public/js/ag-enterprise-activation.js

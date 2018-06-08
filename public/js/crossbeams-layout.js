@@ -242,7 +242,7 @@
               crossbeamsUtils.closePopupDialog();
             }
           }).catch((data) => {
-            if (data.response.status === 500) {
+            if (data.response && data.response.status === 500) {
               data.response.text().then((body) => {
                 document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
               });

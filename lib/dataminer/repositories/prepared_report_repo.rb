@@ -133,7 +133,6 @@ module DataminerApp
       rpt = ReportRepo.new.lookup_report(db_id)
       rpt.caption = report_description
       apply_prepared_report_params(rpt, user, report_description, chosen_params)
-      # rpt.apply_params_as_defaults(chosen_params) ???
       basename = save_new_report(rpt, rep_loc, user, existing_report)
       "#{rep_loc.db}_#{basename}"
     end
@@ -168,7 +167,7 @@ module DataminerApp
     end
 
     def new_prepared_report_file(user, id, prepared_path, existing_report)
-      return existing_report if existing_report
+      return existing_report unless existing_report.nil? || existing_report&.blank?
       prefix = "#{user.id}_#{id}"
       "#{prefix}_#{next_seq_no(prepared_path, prefix).to_s.rjust(3, '0')}"
     end

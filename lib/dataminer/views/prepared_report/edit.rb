@@ -13,7 +13,7 @@ module Dataminer
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/dataminer/reports/prepared_reports/#{id}"
+              form.action "/dataminer/prepared_reports/#{id}"
               form.method :update
               form.remote!
               form.add_field :id

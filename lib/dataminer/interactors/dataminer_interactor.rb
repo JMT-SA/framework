@@ -12,7 +12,7 @@ module DataminerApp
                             load_params: params[:back] && params[:back] == 'y',
                             report_action: "/dataminer/reports/report/#{id}/run",
                             excel_action: "/dataminer/reports/report/#{id}/xls",
-                            prepared_action: "/dataminer/reports/prepared_reports/new/#{id}")
+                            prepared_action: "/dataminer/prepared_reports/new/#{id}")
       page.report = repo.lookup_report(id)
       page.connection = repo.db_connection_for(db)
       page.crosstab_config = repo.lookup_crosstab(id)
@@ -531,27 +531,27 @@ module DataminerApp
       this_col = [
         {
           text: 'webquery link',
-          url: '/dataminer/reports/prepared_reports/$col1$/webquery_url',
+          url: '/dataminer/prepared_reports/$col1$/webquery_url',
           col1: 'id',
           icon: 'fa-link',
           popup: true
         },
         {
           text: 'run',
-          url: '/dataminer/reports/prepared_reports/$col1$/run',
+          url: '/dataminer/prepared_reports/$col1$/run',
           col1: 'id',
           icon: 'fa-play'
         },
         {
           text: 'Excel download',
-          url: '/dataminer/reports/prepared_reports/$col1$/xls',
+          url: '/dataminer/prepared_reports/$col1$/xls',
           col1: 'id',
           icon: 'fa-file-excel-o'
         },
         { is_separator: true },
         {
           text: 'edit',
-          url: '/dataminer/reports/prepared_reports/$col1$/edit',
+          url: '/dataminer/prepared_reports/$col1$/edit',
           col1: 'id',
           icon: 'fa-edit',
           hide_if_false: 'owner',
@@ -559,7 +559,7 @@ module DataminerApp
         },
         {
           text: 'delete',
-          url: '/dataminer/reports/prepared_reports/$col1$',
+          url: '/dataminer/prepared_reports/$col1$',
           col1: 'id',
           prompt: 'Are you sure?',
           method: 'delete',

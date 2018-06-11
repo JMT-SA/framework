@@ -10,7 +10,7 @@
 
 class Framework < Roda
   route 'prepared_reports', 'dataminer' do |r|
-    interactor = DataminerApp::DataminerInteractor.new(current_user, {}, { route_url: request.path }, {})
+    interactor = DataminerApp::PreparedReportInteractor.new(current_user, {}, { route_url: request.path }, {})
 
     r.on 'new', String do |id|    # NEW
       raise Crossbeams::AuthorizationError unless authorised?('reports', 'new')

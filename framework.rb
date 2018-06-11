@@ -92,7 +92,7 @@ class Framework < Roda
     r.on 'webquery', String do |id|
       # A dummy user
       user = DevelopmentApp::User.new(id: 0, login_name: 'webquery', user_name: 'webquery', password_hash: 'dummy', email: nil, active: true)
-      interactor = DataminerApp::DataminerInteractor.new(user, {}, { route_url: request.path }, {})
+      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path }, {})
       interactor.prepared_report_as_html(id)
     end
 
@@ -100,7 +100,7 @@ class Framework < Roda
     r.on 'xmlreport', String do |id|
       # A dummy user
       user = DevelopmentApp::User.new(id: 0, login_name: 'webquery', user_name: 'webquery', password_hash: 'dummy', email: nil, active: true)
-      interactor = DataminerApp::DataminerInteractor.new(user, {}, { route_url: request.path }, {})
+      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path }, {})
       interactor.prepared_report_as_xml(id)
     end
     # Do the same as XML?

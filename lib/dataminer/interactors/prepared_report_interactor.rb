@@ -121,6 +121,10 @@ module DataminerApp
           popup: true
         }
       ]
+      # Make prepared reports maintainable when listing all reports.
+      unless for_user
+        this_col.select { |act| %w[edit delete].include?(act[:text]) }.each { |a| a.delete(:hide_if_false) }
+      end
       col_defs = [{ headerName: '', pinned: 'left',
                     width: 60,
                     suppressMenu: true,   suppressSorting: true,   suppressMovable: true,
@@ -131,6 +135,7 @@ module DataminerApp
                     cellRenderer: 'crossbeamsGridFormatters.menuActionsRenderer' },
                   { headerName: 'Database', field: 'db' },
                   { headerName: 'Report caption', field: 'caption', width: 300 },
+                  { headerName: 'Report name', field: 'report_name' },
                   { headerName: 'File name', field: 'file', width: 600 },
                   { headerName: 'Crosstab?', field: 'crosstab',
                     cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',

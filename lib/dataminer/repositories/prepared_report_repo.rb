@@ -82,7 +82,7 @@ module DataminerApp
         report_lookup.merge!(get_reports_for(key, DM_CONNECTIONS.prepared_report_path(key), user))
       end
       # report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab] } }
-      report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab], owner: lkp[:owner] } }
+      report_lookup.map { |id, lkp| { id: id, db: lkp[:db], report_name: lkp[:report_name], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab], owner: lkp[:owner] } }
     end
 
     def list_all_reports_for_user(user)
@@ -91,7 +91,7 @@ module DataminerApp
         report_lookup.merge!(get_reports_for(key, DM_CONNECTIONS.prepared_report_path(key), user, true))
       end
       # report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab] } }
-      report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab], owner: lkp[:owner] } }
+      report_lookup.map { |id, lkp| { id: id, db: lkp[:db], report_name: lkp[:report_name], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab], owner: lkp[:owner] } }
     end
 
     def get_reports_for(key, path, user = nil, for_user_only = false)
@@ -109,6 +109,7 @@ module DataminerApp
         end
         lkp[index] = { file: yml_file,
                        db: key,
+                       report_name: File.basename(yml_file).sub(/^\d+_/, '').sub(/_\d\d\d.yml/, ''),
                        caption: yp[:external_settings][:prepared_report][:description],
                        crosstab: !yp[:crosstab].nil?,
                        owner: owned_by_user }

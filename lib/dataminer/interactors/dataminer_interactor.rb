@@ -29,7 +29,8 @@ module DataminerApp
 
       # If just passing parameterised query to url, return page with base64 version of runnable_sql.
       if page.report.external_settings[:render_url]
-        page.runnable = Base64.encode64(sql_to_run(repo.db_connection_for(db), page.report))
+        db_type = repo.db_connection_for(db).database_type
+        page.runnable = Base64.encode64(page.report.runnable_sql_delimited(db_type))
         page.sql_run_url = page.report.external_settings[:render_url]
         return page
       end
@@ -68,18 +69,12 @@ module DataminerApp
       end
       # p page.report.runnable_sql
       # Use module for BigDecimal change? - register_extension...?
-      page.row_defs = repo.db_connection_for(db)[sql_to_run(repo.db_connection_for(db), page.report)].to_a.map do |m|
+      db_type = repo.db_connection_for(db).database_type
+      page.row_defs = repo.db_connection_for(db)[page.report.runnable_sql_delimited(db_type)].to_a.map do |m|
         m.each_key { |k| m[k] = m[k].to_f if m[k].is_a?(BigDecimal) }
         m
       end
       page
-    end
-
-    # The TinyTDS gem breaks on SQL with double-quoted column names.
-    # Here we remove the "s and hope there is no legitimate requirement
-    # for "s elsewhere in the query...
-    def sql_to_run(database, report)
-      database.database_type == :mssql ? report.runnable_sql.tr('"', '') : report.runnable_sql
     end
 
     def create_spreadsheet(id, params)
@@ -112,7 +107,8 @@ module DataminerApp
           puts x_styles.inspect
           wb.add_worksheet do |sheet|
             sheet.add_row heads, style: tbl_header
-            repo.db_connection_for(db)[sql_to_run(repo.db_connection_for(db), page.report)].each do |row|
+            db_type = repo.db_connection_for(db).database_type
+            repo.db_connection_for(db)[page.report.runnable_sql_delimited(db_type)].each do |row|
               values = fields.map do |f|
                 v = row[f.to_sym]
                 v.is_a?(BigDecimal) ? v.to_f : v

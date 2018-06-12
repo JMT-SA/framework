@@ -121,6 +121,14 @@ module DataminerApp
           popup: true
         },
         {
+          text: 'change columns',
+          url: '/dataminer/prepared_reports/$col1$/change_columns',
+          col1: 'id',
+          icon: 'fa-columns',
+          hide_if_false: 'owner',
+          popup: true
+        },
+        {
           text: 'delete',
           url: '/dataminer/prepared_reports/$col1$',
           col1: 'id',
@@ -276,16 +284,16 @@ module DataminerApp
       PreparedReportSchema.call(params)
     end
 
-    # def base64?(value)
-    #   value.is_a?(String) && Base64.encode64(Base64.decode64(value)) == value
-    # end
-
     def update_prepared_report(id, params)
       res = validate_prepared_report_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       PreparedReportRepo.new.save_prepared_report(id, params)
       success_response('Report has been updated', report_description: params[:report_description])
+    end
+
+    def change_columns(id, params)
+      PreparedReportRepo.new.change_columns(id, params[:co_sorted_ids].split(','), params[:hc_sorted_ids].split(','))
     end
 
     def delete_prepared_report(id)
@@ -295,8 +303,12 @@ module DataminerApp
       success_response('Report has been deleted')
     end
 
+    def prepared_report(id)
+      PreparedReportRepo.new.lookup_report(id)
+    end
+
     def prepared_report_meta(id)
-      rpt = PreparedReportRepo.new.lookup_report(id)
+      rpt = prepared_report(id)
       json_var = ::JSON.parse(rpt.external_settings[:prepared_report][:json_var])
       param_texts = json_var_as_text(json_var)
 

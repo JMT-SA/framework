@@ -17,6 +17,8 @@ module UiRules
                                  new_fields
                                when :properties
                                  properties_fields
+                               when :change_columns
+                                 column_fields
                                end
 
       form_name 'prepared_report'
@@ -63,9 +65,19 @@ module UiRules
       }
     end
 
+    def column_fields
+      {
+        report_description: { renderer: :label },
+        column_sequence: { renderer: :sortable_list, caption: 'Column order', prefix: 'co' },
+        hidden_columns: { renderer: :sortable_list, caption: 'Hidden columns', prefix: 'hc' }
+      }
+    end
+
     def make_form_object
       @form_object = if @mode == :edit
                        read_form_object
+                     elsif @mode == :change_columns
+                       columns_form_object
                      else
                        @options[:instance] ? form_instance_object : form_new_object
                      end
@@ -83,7 +95,7 @@ module UiRules
                      database: @options[:id].split('_').first,
                      report_template: @options[:id].split('_').last,
                      json_var: @options[:json_var],
-                     report_description: nil) # could start with current rpt desc?
+                     report_description: nil)
     end
 
     def form_instance_object
@@ -91,6 +103,10 @@ module UiRules
                      report_description: @options[:instance][:report_description],
                      webquery_url: @options[:url],
                      param_description: @options[:instance][:param_texts])
+    end
+
+    def columns_form_object
+      OpenStruct.new(report_description: @options[:instance][:report_description])
     end
   end
 end

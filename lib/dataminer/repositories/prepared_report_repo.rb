@@ -2,6 +2,8 @@
 
 module DataminerApp
   class PreparedReportRepo # rubocop:disable Metrics/ClassLength
+    include Crossbeams::Responses
+
     # Get the database connection from DM_CONNECTIONS for a specific key.
     #
     # @param key [String] the database key.
@@ -97,8 +99,7 @@ module DataminerApp
     def get_reports_for(key, path, user = nil, for_user_only = false)
       user_id = user&.id
       lkp = {}
-      ymlfiles = File.join(path, '**', '*.yml')
-      yml_list = Dir.glob(ymlfiles)
+      yml_list = yml_files_in_path(path)
 
       yml_list.each do |yml_file|
         index = "#{key}_#{File.basename(yml_file).sub(File.extname(yml_file), '')}"
@@ -117,14 +118,22 @@ module DataminerApp
       lkp
     end
 
+    def yml_files_in_path(path)
+      ymlfiles = File.join(path, '**', '*.yml')
+      Dir.glob(ymlfiles)
+    end
+
     def existing_prepared_reports_for(db_id, user)
       repo = ReportRepo.new
-      db, report_id = repo.split_db_and_id(db_id)
-      path = DM_CONNECTIONS.prepared_report_path(db)
-      ymlfiles = File.join(path, '**', '*.yml')
-      yml_list = Dir.glob(ymlfiles)
+      dbname, report_id = repo.split_db_and_id(db_id)
+      path = DM_CONNECTIONS.prepared_report_path(dbname)
+      list_users_prepared_reports(dbname, report_id, user, path)
+    end
+
+    def list_users_prepared_reports(dbname, report_id, user, path)
+      yml_list = yml_files_in_path(path)
       yml_list.grep(%r{#{path}/#{user.id}_#{report_id}_\d\d\d.yml}).map { |p| p.sub("#{path}/", '').sub('.yml', '') }.sort.map do |rpt|
-        report = lookup_report("#{db}_#{rpt}")
+        report = lookup_report("#{dbname}_#{rpt}")
         ["#{rpt} : #{report.caption}", rpt]
       end
     end
@@ -138,6 +147,30 @@ module DataminerApp
       "#{rep_loc.db}_#{basename}"
     end
 
+    def change_columns(id, sorted_columns, hidden_columns)
+      rep_loc = ReportLocation.new(id)
+      report = lookup_report(id)
+      sorted_columns.each_with_index do |col_name, index|
+        col = report.column(col_name)
+        col.hide = false
+        col.sequence_no = index + 1
+      end
+      offset = sorted_columns.length
+      hidden_columns.each_with_index do |col_name, index|
+        col = report.column(col_name)
+        col.hide = true
+        col.sequence_no = offset + index + 1
+      end
+      save_file(rep_loc, report)
+      success_response('Column changes have been saved')
+    end
+
+    def save_file(rep_loc, report)
+      filename = File.join(rep_loc.prepared_path, "#{rep_loc.id}.yml")
+      persistor = Crossbeams::Dataminer::YamlPersistor.new(filename)
+      report.save(persistor)
+    end
+
     def save_prepared_report(id, params)
       rep_loc = ReportLocation.new(id)
       rpt = lookup_report(id)
@@ -145,9 +178,7 @@ module DataminerApp
       rpt.external_settings[:prepared_report][:report_description] = params[:report_description]
       rpt.external_settings[:prepared_report][:linked_users] = (params[:linked_users] || []).map(&:to_i)
 
-      filename = File.join(rep_loc.prepared_path, "#{rep_loc.id}.yml")
-      persistor = Crossbeams::Dataminer::YamlPersistor.new(filename)
-      rpt.save(persistor)
+      save_file(rep_loc, rpt)
     end
 
     def apply_prepared_report_params(rpt, user, report_description, chosen_params)

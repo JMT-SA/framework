@@ -59,6 +59,17 @@ class Framework < Roda
         show_partial_or_page(r) { Dataminer::Report::PreparedReport::Properties.call(instance, webquery_url_for(id)) }
       end
 
+      r.on 'change_columns' do
+        show_partial_or_page(r) { Dataminer::Report::PreparedReport::ChangeColumns.call(id, instance, interactor.prepared_report(id)) }
+      end
+
+      r.on 'save_columns' do
+        r.patch do
+          res = interactor.change_columns(id, params[:prepared_report])
+          show_json_notice(res.message)
+        end
+      end
+
       r.on 'run' do
         renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', "/dataminer/prepared_reports/#{id}/grid/",
                                                           instance[:report_description],

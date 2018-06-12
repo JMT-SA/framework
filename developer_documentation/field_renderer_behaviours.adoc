@@ -10,8 +10,9 @@ e.g. To limit the options of one dropdown based on the current selection of anot
 
 The following behaviours can be specified for a field renderer:
 
-* <<DropdownChange>>
+* <<Dropdown Change>>
 * <<Enable>>
+* <<Populate From Selected>>
 
 === Add a behaviour
 
@@ -109,5 +110,39 @@ Example:
 ----
 behaviours do |behaviour|
   behaviour.enable :more_info, when: :refferred_by, changes_to: ['unknown', 'other']
+end
+----
+
+=== Populate From Selected
+
+Description:
+
+This behaviour attaches to a select element (typically a multi) and adds selected items to a sortable element.
+This allows a user to select items in one place and sequence them in another place.
+
+Format:
+
+`populate_from_selected(field_name, conditions = {})`
+
+`field_name` is the name of the select field to observe.
+
+Conditions:
+
+* `populate_from_selected:` Symbol
++
+An Array of Hashes. Each hash contains:
+* `sortable:` Symbol
++
+The DOM `id` of the sortable element in the page.
+
+Example:
+
+[source,ruby]
+----
+behaviours do |behaviour|
+  behaviour.populate_from_selected :variant_product_code_column_ids,
+                                   populate_from_selected: [
+                                     { sortable: 'variantcolumncodes-sortable-items' }
+                                   ]
 end
 ----

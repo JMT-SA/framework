@@ -20,12 +20,16 @@ module UiRules
       # fields[:material_resource_domain_id] = { renderer: :label, with_value: material_resource_domain_id_label, caption: 'Domain' }
       fields[:domain_name] = { renderer: :label }
       fields[:type_name] = { renderer: :label }
+      fields[:short_code] = { renderer: :label }
+      fields[:description] = { renderer: :label }
     end
 
     def common_fields
       {
         material_resource_domain_id: { renderer: :select, options: @this_repo.for_select_domains, caption: 'Domain' },
-        type_name: {}
+        type_name: {},
+        short_code: {},
+        description: {}
       }
     end
 

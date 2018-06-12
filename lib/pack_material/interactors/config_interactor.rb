@@ -62,9 +62,8 @@ module PackMaterialApp
     end
 
     def chosen_product_columns(ids)
-      code_items = repo.non_variant_columns_subset(ids)
-      var_items = repo.variant_columns_subset(ids)
-      success_response('got_items', code: code_items, var: var_items)
+      code_items = repo.product_code_column_subset(ids)
+      success_response('got_items', code: code_items)
     end
 
     def update_product_code_configuration(id, params)

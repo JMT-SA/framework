@@ -16,34 +16,27 @@ module UiRules
 
     def common_fields
       unless @form_object.chosen_column_ids.nil?
-        options     = @repo.non_variant_columns_subset(@form_object.chosen_column_ids.split(',').map(&:to_i))
-        var_options = @repo.variant_columns_subset(@form_object.chosen_column_ids.split(',').map(&:to_i))
+        options     = @repo.product_code_column_subset(@form_object.chosen_column_ids.split(',').map(&:to_i))
       end
       {
         chosen_column_ids: { renderer: :hidden },
-        non_variant_product_code_column_ids: {
+        product_code_column_ids: {
           renderer: :multi, options: options, caption: 'Non-variants'
-        },
-        variant_product_code_column_ids: {
-          renderer: :multi, options: var_options, caption: 'Variants'
         }
       }
     end
 
     def make_form_object
       sub_type    = @repo.find_matres_sub_type(@options[:id])
-      options     = @repo.non_variant_columns(@options[:id]).map { |_, id| id }
-      var_options = @repo.variant_columns(@options[:id]).map { |_, id| id }
+      options     = @repo.product_code_columns(@options[:id]).map { |_, id| id }
 
-      @form_object = OpenStruct.new(non_variant_product_code_column_ids: options,
-                                    variant_product_code_column_ids: var_options,
+      @form_object = OpenStruct.new(product_code_column_ids: options,
                                     chosen_column_ids: (sub_type.product_column_ids || []).join(','))
     end
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.populate_from_selected :non_variant_product_code_column_ids, populate_from_selected: [{ sortable: 'columncodes-sortable-items' }]
-        behaviour.populate_from_selected :variant_product_code_column_ids, populate_from_selected: [{ sortable: 'variantcolumncodes-sortable-items' }]
+        behaviour.populate_from_selected :product_code_column_ids, populate_from_selected: [{ sortable: 'columncodes-sortable-items' }]
       end
     end
   end

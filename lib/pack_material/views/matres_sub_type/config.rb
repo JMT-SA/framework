@@ -27,7 +27,7 @@ module PackMaterial
                 form.add_field :product_code_separator
                 form.add_field :has_suppliers
                 form.add_field :has_marketers
-                form.add_field :has_retailer
+                form.add_field :has_retailers
                 # form.add_field :active
 
                 form.submit_captions 'Update config'
@@ -45,7 +45,7 @@ module PackMaterial
                                is_multiselect: true,
                                multiselect_url: "/pack_material/config/link_product_columns/#{id}",
                                multiselect_key: 'material_resource_type_config',
-                               multiselect_params: { id: id }, # variant_bool: false},
+                               multiselect_params: { id: id },
                                can_be_cleared: true,
                                multiselect_save_remote: true)
                 end
@@ -55,28 +55,18 @@ module PackMaterial
             page.section do |section|
               section.form do |form|
                 form.form_config      = rules_for_cols
-                non_variant_name_list = repo.non_variant_columns(id)
-                variant_name_list     = repo.variant_columns(id)
+                product_code_column_name_list = repo.product_code_columns(id)
                 form.form_object order_rule.form_object
-                form.form_errors(form_errors&.transform_keys { |k| k == :columncodes_sorted_ids ? :non_variant_product_code_column_ids : k })
+                form.form_errors(form_errors&.transform_keys { |k| k == :columncodes_sorted_ids ? :product_code_column_ids : k })
                 form.action "/pack_material/config/material_resource_sub_types/#{id}/update_product_code_configuration"
 
                 form.row do |row|
                   row.column do |col|
                     col.add_field :chosen_column_ids
-                    col.add_field :non_variant_product_code_column_ids
+                    col.add_field :product_code_column_ids
                   end
                   row.column do |col|
-                    col.add_sortable_list('columncodes', non_variant_name_list, caption: 'Drag columns to set order for first part of code')
-                  end
-                end
-
-                form.row do |row|
-                  row.column do |col|
-                    col.add_field :variant_product_code_column_ids
-                  end
-                  row.column do |col|
-                    col.add_sortable_list('variantcolumncodes', variant_name_list, caption: 'Drag variant columns to set order for end part of the code')
+                    col.add_sortable_list('columncodes', product_code_column_name_list, caption: 'Drag columns to set order for first part of code')
                   end
                 end
               end

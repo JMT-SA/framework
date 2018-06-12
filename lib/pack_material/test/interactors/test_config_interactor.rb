@@ -104,7 +104,9 @@ module PackMaterialApp
         id: 1,
         material_resource_domain_id: 1,
         type_name: 'Retail',
-        domain_name: 'Pack Material'
+        domain_name: 'Pack Material',
+        short_code: 'RT',
+        description: 'Stock for Retail'
       }
     end
 
@@ -157,6 +159,16 @@ module PackMaterialApp
 
       x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(sub_type_name: 1))
       assert_equal(['must be a string'], x.errors[:sub_type_name])
+
+      # required(:short_code).filled(:str?)
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.reject { |k| k == :short_code })
+      assert_equal(['is missing'], x.errors[:short_code])
+
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(short_code: nil))
+      assert_equal(['must be filled'], x.errors[:short_code])
+
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(short_code: 1))
+      assert_equal(['must be a string'], x.errors[:short_code])
     end
 
     def test_create_matres_sub_type
@@ -201,10 +213,11 @@ module PackMaterialApp
         id: 1,
         material_resource_type_id: 1,
         sub_type_name: 'Bag Fruit',
+        short_code: 'BF',
         product_code_separator: '_',
         has_suppliers: false,
         has_marketers: false,
-        has_retailer: false,
+        has_retailers: false,
         product_column_ids: [],
         product_code_ids: []
       }
@@ -224,7 +237,6 @@ module PackMaterialApp
       test_attrs = {
         chosen_column_ids: '1,5,8,1,5',
         columncodes_sorted_ids: '1,2,3,4',
-        variantcolumncodes_sorted_ids: '1,2,3,4'
       }
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs)
       assert_empty x.errors
@@ -248,16 +260,6 @@ module PackMaterialApp
       assert_equal(['must be filled'], x.errors[:columncodes_sorted_ids])
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(columncodes_sorted_ids: '1,2,3,w,5'))
       assert_equal(['must be an array'], x.errors[:columncodes_sorted_ids])
-
-      # required(:variantcolumncodes_sorted_ids, Types::ArrayFromString).maybe(:array?) { each(:int?) }
-      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :variantcolumncodes_sorted_ids })
-      assert_equal(['is missing'], x.errors[:variantcolumncodes_sorted_ids])
-      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(variantcolumncodes_sorted_ids: ''))
-      refute x.errors[:variantcolumncodes_sorted_ids]
-      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(variantcolumncodes_sorted_ids: nil))
-      refute x.errors[:variantcolumncodes_sorted_ids]
-      x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(variantcolumncodes_sorted_ids: '1,2,3,w,5'))
-      assert_equal(['must be an array'], x.errors[:variantcolumncodes_sorted_ids])
     end
 
     def invalid_matres_config_attrs
@@ -278,22 +280,19 @@ module PackMaterialApp
 
     def test_chosen_product_columns
       non_var = [['a', 1], ['a', 2], ['a', 3]]
-      var = [['a', 4]]
-      ConfigRepo.any_instance.stubs(:non_variant_columns_subset).returns(non_var)
-      ConfigRepo.any_instance.stubs(:variant_columns_subset).returns(var)
+      ConfigRepo.any_instance.stubs(:product_code_column_subset).returns(non_var)
       res = interactor.chosen_product_columns([1, 2, 3, 4])
       assert_equal [['a', 1], ['a', 2], ['a', 3]], res.instance[:code]
-      assert_equal [['a', 4]], res.instance[:var]
     end
 
     def test_update_product_code_config
       ConfigRepo.any_instance.stubs(:update_product_code_configuration)
-      res = interactor.update_product_code_configuration(1, chosen_column_ids: '1,2,3', columncodes_sorted_ids: '1,2', variantcolumncodes_sorted_ids: '')
+      res = interactor.update_product_code_configuration(1, chosen_column_ids: '1,2,3', columncodes_sorted_ids: '1,2')
       assert res.success
-      res = interactor.update_product_code_configuration(1, chosen_column_ids: '', columncodes_sorted_ids: '', variantcolumncodes_sorted_ids: '')
+      res = interactor.update_product_code_configuration(1, chosen_column_ids: '', columncodes_sorted_ids: '')
       refute res.success
       assert_match(/Validation/, res.message)
-      res = interactor.update_product_code_configuration(1, chosen_column_ids: '1,2,3', columncodes_sorted_ids: '', variantcolumncodes_sorted_ids: '')
+      res = interactor.update_product_code_configuration(1, chosen_column_ids: '1,2,3', columncodes_sorted_ids: '')
       refute res.success
       assert_match(/Validation/, res.message)
     end

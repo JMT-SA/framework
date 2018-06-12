@@ -130,7 +130,7 @@ class Framework < Roda
                                             product_code_separator: res.instance[:product_code_separator],
                                             has_suppliers: res.instance[:has_suppliers],
                                             has_marketers: res.instance[:has_marketers],
-                                            has_retailer: res.instance[:has_retailer],
+                                            has_retailers: res.instance[:has_retailers],
                                             product_column_ids: res.instance[:product_column_ids],
                                             product_code_ids: res.instance[:product_code_ids] },
                                 notice: res.message)
@@ -174,8 +174,7 @@ class Framework < Roda
         interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
         ids = multiselect_grid_choices(params)
         res = interactor.chosen_product_columns(ids)
-        json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_non_variant_product_code_column_ids', options_array: res.instance[:code]),
-                      OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_variant_product_code_column_ids', options_array: res.instance[:var]),
+        json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_product_code_column_ids', options_array: res.instance[:code]),
                       OpenStruct.new(type: :replace_input_value, dom_id: 'product_code_columns_chosen_column_ids', value: ids.join(','))],
                      'Re-assigned product columns')
       end
@@ -199,59 +198,43 @@ class Framework < Roda
           raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
           show_partial { PackMaterial::Config::PmProduct::Show.call(id) }
         end
-        r.patch do
+        r.patch do     # UPDATE
           return_json_response
           res = interactor.update_pm_product(id, params[:pm_product])
           if res.success
             update_grid_row(id, changes: { material_resource_sub_type_id: res.instance[:material_resource_sub_type_id],
-                                           product_number: res.instance[:product_number],
-                                           description: res.instance[:description],
                                            commodity_id: res.instance[:commodity_id],
                                            variety_id: res.instance[:variety_id],
+                                           product_number: res.instance[:product_number],
+                                           product_code: res.instance[:product_code],
+                                           unit: res.instance[:unit],
                                            style: res.instance[:style],
-                                           assembly_type: res.instance[:assembly_type],
-                                           market_major: res.instance[:market_major],
-                                           ctn_size_basic_pack: res.instance[:ctn_size_basic_pack],
-                                           ctn_size_old_pack: res.instance[:ctn_size_old_pack],
-                                           pls_pack_code: res.instance[:pls_pack_code],
-                                           fruit_mass_nett_kg: res.instance[:fruit_mass_nett_kg],
-                                           holes: res.instance[:holes],
-                                           perforation: res.instance[:perforation],
-                                           image: res.instance[:image],
+                                           alternate: res.instance[:alternate],
+                                           shape: res.instance[:shape],
+                                           reference_size: res.instance[:reference_size],
+                                           reference_quantity: res.instance[:reference_quantity],
                                            length_mm: res.instance[:length_mm],
                                            width_mm: res.instance[:width_mm],
                                            height_mm: res.instance[:height_mm],
                                            diameter_mm: res.instance[:diameter_mm],
                                            thick_mm: res.instance[:thick_mm],
                                            thick_mic: res.instance[:thick_mic],
+                                           brand_1: res.instance[:brand_1],
+                                           brand_2: res.instance[:brand_2],
                                            colour: res.instance[:colour],
+                                           material: res.instance[:material],
+                                           assembly: res.instance[:assembly],
+                                           reference_mass: res.instance[:reference_mass],
+                                           reference_number: res.instance[:reference_number],
+                                           market: res.instance[:market],
+                                           marking: res.instance[:marking],
+                                           model: res.instance[:model],
+                                           pm_class: res.instance[:pm_class],
                                            grade: res.instance[:grade],
-                                           mass: res.instance[:mass],
-                                           material_type: res.instance[:material_type],
-                                           treatment: res.instance[:treatment],
-                                           specification_notes: res.instance[:specification_notes],
-                                           artwork_commodity: res.instance[:artwork_commodity],
-                                           artwork_marketing_variety_group: res.instance[:artwork_marketing_variety_group],
-                                           artwork_variety: res.instance[:artwork_variety],
-                                           artwork_nett_mass: res.instance[:artwork_nett_mass],
-                                           artwork_brand: res.instance[:artwork_brand],
-                                           artwork_class: res.instance[:artwork_class],
-                                           artwork_plu_number: res.instance[:artwork_plu_number],
-                                           artwork_other: res.instance[:artwork_other],
-                                           artwork_image: res.instance[:artwork_image],
-                                           marketer: res.instance[:marketer],
-                                           retailer: res.instance[:retailer],
-                                           supplier: res.instance[:supplier],
-                                           supplier_stock_code: res.instance[:supplier_stock_code],
-                                           product_alternative: res.instance[:product_alternative],
-                                           product_joint_use: res.instance[:product_joint_use],
-                                           ownership: res.instance[:ownership],
-                                           consignment_stock: res.instance[:consignment_stock],
-                                           start_date: res.instance[:start_date],
-                                           end_date: res.instance[:end_date],
-                                           active: res.instance[:active],
-                                           remarks: res.instance[:remarks] },
-                                notice: res.message)
+                                           language: res.instance[:language],
+                                           other: res.instance[:other],
+                                           specification_notes: res.instance[:specification_notes] },
+                            notice: res.message)
           else
             content = show_partial { PackMaterial::Config::PmProduct::Edit.call(id, params[:pm_product], res.errors) }
             update_dialog_content(content: content, error: res.message)

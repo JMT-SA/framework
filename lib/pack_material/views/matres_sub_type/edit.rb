@@ -18,6 +18,7 @@ module PackMaterial
               form.method :update
               form.add_field :material_resource_type_id
               form.add_field :sub_type_name
+              form.add_field :short_code
             end
           end
 

@@ -34,9 +34,9 @@ module PackMaterialApp
     # TYPES
     def find_matres_type(id)
       hash = find_hash(:material_resource_types, id)
-      domain = find_hash(:material_resource_domains, hash[:material_resource_domain_id])
-      hash[:domain_name] = domain[:domain_name]
       return nil if hash.nil?
+      domain = find_hash(:material_resource_domains, hash[:material_resource_domain_id])
+      hash[:domain_name] = domain ? domain[:domain_name] : 'unknown domain name'
       MatresType.new(hash)
     end
 
@@ -50,9 +50,8 @@ module PackMaterialApp
         WHERE st.id = #{id}
       SQL
       table_name = DB[query].single_value
-      products = where_hash(:"#{table_name}", material_resource_sub_type_id: id)
-
-      if products.nil?
+      products = all_hash(:"#{table_name}", material_resource_sub_type_id: id)
+      if products.empty?
         delete(:material_resource_sub_types, id)
         success_response('ok')
       else
@@ -61,58 +60,24 @@ module PackMaterialApp
       end
     end
 
-    def sub_type_chosen_columns(id, variants: false)
-      neg = variants ? '' : 'NOT'
-      query = <<~SQL
-        SELECT pc.column_name, pc.id
-        FROM unnest((SELECT st.product_column_ids FROM material_resource_sub_types st WHERE st.id = #{id})) product_code_id
-        LEFT JOIN material_resource_product_columns pc on pc.id = product_code_id
-        WHERE #{neg} pc.is_variant_column
-      SQL
-      DB[query].map { |rec| [rec[:column_name], rec[:id]] }
-    end
-
-    def chosen_non_variant_columns(id)
-      sub_type_chosen_columns(id)
-    end
-
-    def chosen_variant_columns(id)
-      sub_type_chosen_columns(id, variants: true)
-    end
-
-    def sub_type_code_columns(id, variants: false)
-      neg = variants ? '' : 'NOT'
+    def product_code_columns(id)
       query = <<~SQL
         SELECT pc.column_name, pc.id
         FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{id})) product_code_id
         LEFT JOIN material_resource_product_columns pc on pc.id = product_code_id
-        WHERE #{neg} pc.is_variant_column
       SQL
       DB[query].map { |rec| [rec[:column_name], rec[:id]] }
     end
 
-    def non_variant_columns(id)
-      sub_type_code_columns(id)
-    end
-
-    def variant_columns(id)
-      sub_type_code_columns(id, variants: true)
-    end
-
-    def non_variant_columns_subset(ids)
-      for_select_material_resource_product_columns(where: { is_variant_column: false }).select { |i| ids.include?(i[1]) }
-    end
-
-    def variant_columns_subset(ids)
-      for_select_material_resource_product_columns(where: { is_variant_column: true }).select { |i| ids.include?(i[1]) }
+    def product_code_column_subset(ids)
+      for_select_material_resource_product_columns.select { |i| ids.include?(i[1]) }
     end
 
     def update_product_code_configuration(config_id, res)
-      codes_in_order = res[:columncodes_sorted_ids] + res[:variantcolumncodes_sorted_ids]
       changes = <<~SQL
         UPDATE material_resource_sub_types
            SET product_column_ids = '{#{res[:chosen_column_ids].join(',')}}',
-               product_code_ids = '{#{codes_in_order.join(',')}}'
+               product_code_ids = '{#{res[:columncodes_sorted_ids].join(',')}}'
         WHERE id = #{config_id};
       SQL
 

@@ -19,20 +19,22 @@ module UiRules
       material_resource_type_id_label = @repo.find_matres_type(@form_object.material_resource_type_id)&.type_name
       fields[:material_resource_type_id] = { renderer: :label, with_value: material_resource_type_id_label, caption: 'Type' }
       fields[:sub_type_name] = { renderer: :label }
+      fields[:short_code] = { renderer: :label }
     end
 
     def set_config_fields
       fields[:product_code_separator] = { renderer: :label }
       fields[:has_suppliers] = { renderer: :checkbox }
       fields[:has_marketers] = { renderer: :checkbox }
-      fields[:has_retailer] = { renderer: :checkbox }
+      fields[:has_retailers] = { renderer: :checkbox }
       fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
         material_resource_type_id: { renderer: :select, options: @repo.for_select_matres_types, caption: 'Type' },
-        sub_type_name: {}
+        sub_type_name: {},
+        short_code: {}
       }
     end
 

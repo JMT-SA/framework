@@ -14,6 +14,8 @@ module PackMaterial
               form.view_only!
               form.add_field :domain_name
               form.add_field :type_name
+              form.add_field :short_code
+              form.add_field :description
             end
           end
 

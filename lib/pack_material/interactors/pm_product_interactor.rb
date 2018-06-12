@@ -20,13 +20,12 @@ module PackMaterialApp
 
     def create_pm_product(params)
       res = validate_pm_product_params(params)
-      p res
       return validation_failed_response(res) unless res.messages.empty?
       @id = repo.create_pm_product(res)
-      success_response("Created pm product #{pm_product.description}",
+      success_response("Created pm product #{pm_product.product_number}",
                        pm_product)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This pm product already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { product_number: ['This pm product already exists'] }))
     end
 
     def update_pm_product(id, params)
@@ -34,13 +33,13 @@ module PackMaterialApp
       res = validate_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_pm_product(id, res)
-      success_response("Updated pm product #{pm_product.description}",
+      success_response("Updated pm product #{pm_product.product_number}",
                        pm_product(false))
     end
 
     def delete_pm_product(id)
       @id = id
-      name = pm_product.description
+      name = pm_product.product_number
       repo.delete_pm_product(id)
       success_response("Deleted pm product #{name}")
     end

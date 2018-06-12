@@ -11,10 +11,10 @@ Sequel.migration do
 
   down do
     alter_table(:functional_areas) do
-      set_column_type :functional_area_name, :string
+      set_column_type :functional_area_name, :text
     end
     alter_table(:programs) do
-      set_column_type :program_name, :string
+      set_column_type :program_name, :text
     end
   end
 end

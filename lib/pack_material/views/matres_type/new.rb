@@ -17,6 +17,8 @@ module PackMaterial
               form.remote! if remote
               form.add_field :material_resource_domain_id
               form.add_field :type_name
+              form.add_field :short_code
+              form.add_field :description
             end
           end
 

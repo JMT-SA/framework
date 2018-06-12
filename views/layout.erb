@@ -131,11 +131,7 @@
         crossbeamsDialogLevel2 = new window.A11yDialog(dialogEl2);
 
         const sortable = Array.from(document.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
-        if (sortable.length > 0) {
-          sortable.forEach((control) => {
-            crossbeamsUtils.makeListSortable(control.dataset.sortablePrefix);
-          });
-        }
+        sortable.forEach((elem) => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix, elem.dataset.sortableGroup))
 
       });
 

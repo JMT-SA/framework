@@ -141,6 +141,11 @@ sorted_id_list = params[:deals_sorted_ids] #=> '1,2,3'
 |Any string
 |None.
 
+|:drag_between_lists_name
+|A name to group to lists together so the user can drag from one to the other.
+|Any string
+|None.
+
 |===
 
 === Address

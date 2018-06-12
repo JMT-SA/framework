@@ -177,9 +177,7 @@ const crossbeamsGridEvents = {
                 document.dispatchEvent(gridEvent);
               });
               const sortable = Array.from(dlgContent.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
-              if (sortable.length > 0) {
-                crossbeamsUtils.makeListSortable(sortable[0].dataset.sortablePrefix);
-              }
+              sortable.forEach((elem) => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix, elem.dataset.sortableGroup))
             } else {
               console.log('Not sure what to do with this:', data);
             }

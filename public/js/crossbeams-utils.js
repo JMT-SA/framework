@@ -198,9 +198,7 @@ const crossbeamsUtils = {
             document.dispatchEvent(gridEvent);
           });
           const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
-          if (sortable.length > 0) {
-            crossbeamsUtils.makeListSortable(sortable[0].dataset.sortablePrefix);
-          }
+          sortable.forEach((elem) => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix, elem.dataset.sortableGroup))
         }
       }).catch((data) => {
         Jackbox.error('The action was unsuccessful...');
@@ -658,15 +656,16 @@ const crossbeamsUtils = {
    * @param {string} prefix - the prefix part of the id of the ol or ul tag.
    * @returns {void}
    */
-  makeListSortable: function makeListSortable(prefix) {
+  makeListSortable: function makeListSortable(prefix, groupName) {
     const el = document.getElementById(`${prefix}-sortable-items`);
     const sortedIds = document.getElementById(`${prefix}-sorted_ids`);
     Sortable.create(el, {
+      group: groupName ? groupName : null,
       animation: 150,
       handle: '.crossbeams-drag-handle',
       ghostClass: 'crossbeams-sortable-ghost',  // Class name for the drop placeholder
       dragClass: 'crossbeams-sortable-drag',  // Class name for the dragging item
-      onEnd: () => {
+      onSort: () => {
         const idList = [];
         Array.from(el.children).forEach((child) => { idList.push(child.id.replace('si_', '')); });// strip si_ part...
         sortedIds.value = idList.join(',');

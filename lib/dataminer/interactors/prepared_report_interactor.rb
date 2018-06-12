@@ -83,10 +83,20 @@ module DataminerApp
 
       this_col = [
         {
+          text: 'properties',
+          url: '/dataminer/prepared_reports/$col1$/properties',
+          col1: 'id',
+          icon: 'fa-book',
+          title: 'Prepared report properties',
+          popup: true
+        },
+        { is_separator: true },
+        {
           text: 'webquery link',
           url: '/dataminer/prepared_reports/$col1$/webquery_url',
           col1: 'id',
           icon: 'fa-link',
+          title_field: 'caption',
           popup: true
         },
         {

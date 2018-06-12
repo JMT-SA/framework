@@ -8,42 +8,59 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
-      webquery_fields if @mode == :webquery
-      edit_fields if @mode == :edit
-      new_fields if @mode == :new
+      common_values_for_fields case @mode
+                               when :webquery
+                                 webquery_fields
+                               when :edit
+                                 edit_fields
+                               when :new
+                                 new_fields
+                               when :properties
+                                 properties_fields
+                               end
 
       form_name 'prepared_report'
     end
 
-    def common_fields
+    def new_fields
       {
         database: { readonly: true },
         report_template: { readonly: true },
         report_description: { required: true },
         id: { renderer: :hidden },
         json_var: { renderer: :hidden },
-        linked_users: { renderer: :multi, options: @user_repo.for_select_users, selected: [] }
+        existing_report: { renderer: :select,
+                           caption: 'Overwrite an existing report',
+                           options: @prep_repo.existing_prepared_reports_for(@options[:id], @options[:user]),
+                           prompt: 'Leave blank to save a new report or choose one to replace...' }
       }
     end
 
-    def new_fields
-      fields[:existing_report] = { renderer: :select,
-                                   caption: 'Overwrite an existing report',
-                                   options: @prep_repo.existing_prepared_reports_for(@options[:id], @options[:user]),
-                                   prompt: 'Leave blank to save a new report or choose one to replace...' }
+    def edit_fields
+      {
+        database: { readonly: true },
+        report_template: { readonly: true },
+        report_description: { required: true },
+        id: { renderer: :label, caption: 'Report id' },
+        linked_users: { renderer: :multi, options: @user_repo.for_select_users, selected: @form_object.selected_users || [] }
+      }
     end
 
     def webquery_fields
-      fields[:id] = { renderer: :label, caption: 'Report id' }
-      fields[:report_description] = { renderer: :label }
-      fields[:webquery_url] = { readonly: true, copy_to_clipboard: true }
-      fields[:param_description] = { renderer: :list, items: @options[:instance][:param_texts], caption: 'Parameters applied' }
+      {
+        webquery_url: { readonly: true, copy_to_clipboard: true }
+      }
     end
 
-    def edit_fields
-      fields[:id] = { renderer: :label, caption: 'Report id' }
-      fields[:linked_users][:selected] = @form_object.selected_users || []
+    def properties_fields
+      {
+        database: { readonly: true },
+        report_template: { readonly: true },
+        report_description: { renderer: :label },
+        id: { renderer: :label, caption: 'Report id' },
+        webquery_url: { readonly: true, copy_to_clipboard: true },
+        param_description: { renderer: :list, items: @options[:instance][:param_texts], caption: 'Parameters applied' }
+      }
     end
 
     def make_form_object

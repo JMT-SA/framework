@@ -55,8 +55,14 @@ class Framework < Roda
         show_partial_or_page(r) { Dataminer::Report::PreparedReport::WebQuery.call(instance, webquery_url_for(id)) }
       end
 
+      r.on 'properties' do
+        show_partial_or_page(r) { Dataminer::Report::PreparedReport::Properties.call(instance, webquery_url_for(id)) }
+      end
+
       r.on 'run' do
-        renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', "/dataminer/prepared_reports/#{id}/grid/", instance[:report_description], height: 35)
+        renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', "/dataminer/prepared_reports/#{id}/grid/",
+                                                          instance[:report_description],
+                                                          height: 35)
         view(inline: renderer.render)
       end
 

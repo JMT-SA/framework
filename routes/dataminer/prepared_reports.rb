@@ -15,7 +15,7 @@ class Framework < Roda
     r.on 'new', String do |id|    # NEW
       raise Crossbeams::AuthorizationError unless authorised?('reports', 'new')
       # Show already-saved-reports-for-same_user
-      show_partial_or_page(r) { Dataminer::Report::PreparedReport::New.call(id, params[:json_var], current_user, remote: fetch?(r)) }
+      show_partial_or_page(r) { DM::Report::PreparedReport::New.call(id, params[:json_var], current_user, remote: fetch?(r)) }
     end
 
     r.on 'list' do
@@ -52,15 +52,15 @@ class Framework < Roda
       # Make an instance
       instance = interactor.prepared_report_meta(id)
       r.on 'webquery_url' do
-        show_partial_or_page(r) { Dataminer::Report::PreparedReport::WebQuery.call(instance, webquery_url_for(id)) }
+        show_partial_or_page(r) { DM::Report::PreparedReport::WebQuery.call(instance, webquery_url_for(id)) }
       end
 
       r.on 'properties' do
-        show_partial_or_page(r) { Dataminer::Report::PreparedReport::Properties.call(instance, webquery_url_for(id)) }
+        show_partial_or_page(r) { DM::Report::PreparedReport::Properties.call(instance, webquery_url_for(id)) }
       end
 
       r.on 'change_columns' do
-        show_partial_or_page(r) { Dataminer::Report::PreparedReport::ChangeColumns.call(id, instance, interactor.prepared_report(id)) }
+        show_partial_or_page(r) { DM::Report::PreparedReport::ChangeColumns.call(id, instance, interactor.prepared_report(id)) }
       end
 
       r.on 'save_columns' do
@@ -102,7 +102,7 @@ class Framework < Roda
 
       r.on 'edit' do
         raise Crossbeams::AuthorizationError unless authorised?('reports', 'edit') # Need to check user == creator, or has all_preps permission...
-        show_partial { Dataminer::Report::PreparedReport::Edit.call(id) }
+        show_partial { DM::Report::PreparedReport::Edit.call(id) }
       end
 
       r.patch do     # UPDATE
@@ -112,7 +112,7 @@ class Framework < Roda
           update_grid_row(id, changes: { caption: res.instance[:report_description] },
                               notice: res.message)
         else
-          content = show_partial { Dataminer::Report::PreparedReport::Edit.call(id, form_values: params[:prepared_report], form_errors: res.errors) }
+          content = show_partial { DM::Report::PreparedReport::Edit.call(id, form_values: params[:prepared_report], form_errors: res.errors) }
           update_dialog_content(content: content, error: res.message)
         end
       end
@@ -131,14 +131,14 @@ class Framework < Roda
     r.post do       # CREATE
       res = interactor.create_prepared_report(params[:prepared_report])
       if res.success
-        show_page_or_update_dialog(r, res) { Dataminer::Report::PreparedReport::WebQuery.call(res.instance, webquery_url_for(res.instance[:id]), fetch?(r)) }
+        show_page_or_update_dialog(r, res) { DM::Report::PreparedReport::WebQuery.call(res.instance, webquery_url_for(res.instance[:id]), fetch?(r)) }
       else
         id = params[:prepared_report][:id]
         re_show_form(r, res, url: "/dataminer/prepared_reports/new/#{id}") do
-          Dataminer::Report::PreparedReport::New.call(id, params[:prepared_report][:json_var], current_user,
-                                                      form_values: params[:prepared_report],
-                                                      form_errors: res.errors,
-                                                      remote: fetch?(r))
+          DM::Report::PreparedReport::New.call(id, params[:prepared_report][:json_var], current_user,
+                                                   form_values: params[:prepared_report],
+                                                   form_errors: res.errors,
+                                                   remote: fetch?(r))
         end
       end
     end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Dataminer
+module DM
   module Report
     module PreparedReport
       class Edit

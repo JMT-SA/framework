@@ -515,8 +515,7 @@ class GenerateNewScaffold < BaseService
                   return_json_response
                   res = interactor.update_#{opts.singlename}(id, params[:#{opts.singlename}])
                   if res.success
-                    update_grid_row(id, changes: { #{grid_refresh_fields} },
-                                        notice: res.message)
+                    #{update_grid_row.gsub("\n", "\n            ").sub(/            \Z/, '').sub(/\n\Z/, '')}
                   else
                     content = show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id, params[:#{opts.singlename}], res.errors) }
                     update_dialog_content(content: content, error: res.message)
@@ -598,6 +597,31 @@ class GenerateNewScaffold < BaseService
             end
           end
         end
+      RUBY
+    end
+
+    def update_grid_row
+      if opts.table_meta.columns_without(%i[id created_at updated_at active]).length > 3
+        update_grid_row_many
+      else
+        update_grid_row_few
+      end
+    end
+
+    def update_grid_row_many
+      row_keys = opts.table_meta.columns_without(%i[id created_at updated_at active]).map(&:to_s).join("\n  ")
+      <<~RUBY
+        row_keys = %i[
+          #{row_keys}
+        ]
+        update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+      RUBY
+    end
+
+    def update_grid_row_few
+      <<~RUBY
+        update_grid_row(id, changes: { #{grid_refresh_fields} },
+                            notice: res.message)
       RUBY
     end
 

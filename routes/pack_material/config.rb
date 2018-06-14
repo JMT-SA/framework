@@ -202,39 +202,41 @@ class Framework < Roda
           return_json_response
           res = interactor.update_pm_product(id, params[:pm_product])
           if res.success
-            update_grid_row(id, changes: { material_resource_sub_type_id: res.instance[:material_resource_sub_type_id],
-                                           commodity_id: res.instance[:commodity_id],
-                                           variety_id: res.instance[:variety_id],
-                                           product_number: res.instance[:product_number],
-                                           product_code: res.instance[:product_code],
-                                           unit: res.instance[:unit],
-                                           style: res.instance[:style],
-                                           alternate: res.instance[:alternate],
-                                           shape: res.instance[:shape],
-                                           reference_size: res.instance[:reference_size],
-                                           reference_quantity: res.instance[:reference_quantity],
-                                           length_mm: res.instance[:length_mm],
-                                           width_mm: res.instance[:width_mm],
-                                           height_mm: res.instance[:height_mm],
-                                           diameter_mm: res.instance[:diameter_mm],
-                                           thick_mm: res.instance[:thick_mm],
-                                           thick_mic: res.instance[:thick_mic],
-                                           brand_1: res.instance[:brand_1],
-                                           brand_2: res.instance[:brand_2],
-                                           colour: res.instance[:colour],
-                                           material: res.instance[:material],
-                                           assembly: res.instance[:assembly],
-                                           reference_mass: res.instance[:reference_mass],
-                                           reference_number: res.instance[:reference_number],
-                                           market: res.instance[:market],
-                                           marking: res.instance[:marking],
-                                           model: res.instance[:model],
-                                           pm_class: res.instance[:pm_class],
-                                           grade: res.instance[:grade],
-                                           language: res.instance[:language],
-                                           other: res.instance[:other],
-                                           specification_notes: res.instance[:specification_notes] },
-                            notice: res.message)
+            row_keys = %i[
+              alternate
+              assembly
+              brand_1
+              brand_2
+              colour
+              commodity_id
+              diameter_mm
+              grade
+              height_mm
+              language
+              length_mm
+              market
+              marking
+              material
+              material_resource_sub_type_id
+              model
+              other
+              pm_class
+              product_code
+              product_number
+              reference_mass
+              reference_number
+              reference_quantity
+              reference_size
+              shape
+              specification_notes
+              style
+              thick_mic
+              thick_mm
+              unit
+              variety_id
+              width_mm
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys, other: 'SOME override CHANGE'), notice: res.message)
           else
             content = show_partial { PackMaterial::Config::PmProduct::Edit.call(id, params[:pm_product], res.errors) }
             update_dialog_content(content: content, error: res.message)

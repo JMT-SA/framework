@@ -156,6 +156,16 @@ module CommonHelpers
     res.to_json
   end
 
+  # Create a list of attributes for passing to the +update_grid_row+ method.
+  #
+  # @param instance [Hash/Dry-type] the instance.
+  # @param row_keys [Array] the keys to attributes of the instance.
+  # @param extras [Hash] extra key/value combinations to add/replace attributes.
+  # @return [Hash] the chosen attributes.
+  def select_attributes(instance, row_keys, extras = {})
+    Hash[row_keys.map { |k| [k, instance[k]] }].merge(extras)
+  end
+
   def delete_grid_row(id, notice: nil)
     res = { removeGridRowInPlace: { id: make_id_correct_type(id) } }
     res[:flash] = { notice: notice } if notice

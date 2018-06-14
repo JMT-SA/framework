@@ -6,12 +6,8 @@ module SecurityApp
       @repo ||= SecurityGroupRepo.new
     end
 
-    def security_group(cached = true)
-      if cached
-        @security_group ||= repo.find_security_group(@id)
-      else
-        @security_group = repo.find_security_group(@id)
-      end
+    def security_group(id)
+      repo.find_security_group(id)
     end
 
     def validate_security_group_params(params)
@@ -23,18 +19,19 @@ module SecurityApp
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       # res = validate_security_group
+      id = nil
       DB.transaction do
-        @id = repo.create_security_group(res)
+        id = repo.create_security_group(res)
         log_transaction
       end
-      success_response("Created security group #{security_group.security_group_name}",
-                       security_group)
+      instance = security_group(id)
+      success_response("Created security group #{instance.security_group_name}",
+                       instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { security_group_name: ['This security group already exists'] }))
     end
 
     def update_security_group(id, params)
-      @id = id
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       # res = validate_security_group... etc.
@@ -42,13 +39,13 @@ module SecurityApp
         repo.update_security_group(id, res)
         log_transaction
       end
-      success_response("Updated security group #{security_group.security_group_name}",
-                       security_group(false))
+      instance = security_group(id)
+      success_response("Updated security group #{instance.security_group_name}",
+                       instance)
     end
 
     def delete_security_group(id)
-      @id = id
-      name = security_group.security_group_name
+      name = security_group(id).security_group_name
       DB.transaction do
         repo.delete_with_permissions(id)
         log_transaction

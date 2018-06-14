@@ -228,12 +228,8 @@ class GenerateNewScaffold < BaseService
               @repo ||= #{opts.classnames[:repo]}.new
             end
 
-            def #{opts.singlename}(cached = true)
-              if cached
-                @#{opts.singlename} ||= repo.find_#{opts.singlename}(@id)
-              else
-                @#{opts.singlename} = repo.find_#{opts.singlename}(@id)
-              end
+            def #{opts.singlename}(id)
+              repo.find_#{opts.singlename}(id)
             end
 
             def validate_#{opts.singlename}_params(params)
@@ -243,31 +239,32 @@ class GenerateNewScaffold < BaseService
             def create_#{opts.singlename}(#{needs_id}params)#{add_parent_to_params}
               res = validate_#{opts.singlename}_params(params)
               return validation_failed_response(res) unless res.messages.empty?
+              id = nil
               DB.transaction do
-                @id = repo.create_#{opts.singlename}(res)
+                id = repo.create_#{opts.singlename}(res)
                 log_transaction
               end
-              success_response("Created #{opts.classnames[:text_name].downcase} \#{#{opts.singlename}.#{opts.label_field}}",
-                               #{opts.singlename})
+              instance = #{opts.singlename}(id)
+              success_response("Created #{opts.classnames[:text_name].downcase} \#{instance.#{opts.label_field}}",
+                               instance)
             rescue Sequel::UniqueConstraintViolation
               validation_failed_response(OpenStruct.new(messages: { #{opts.label_field}: ['This #{opts.classnames[:text_name].downcase} already exists'] }))
             end
 
             def update_#{opts.singlename}(id, params)
-              @id = id
               res = validate_#{opts.singlename}_params(params)
               return validation_failed_response(res) unless res.messages.empty?
               DB.transaction do
                 repo.update_#{opts.singlename}(id, res)
                 log_transaction
               end
-              success_response("Updated #{opts.classnames[:text_name].downcase} \#{#{opts.singlename}.#{opts.label_field}}",
-                               #{opts.singlename}(false))
+              instance = #{opts.singlename}(id)
+              success_response("Updated #{opts.classnames[:text_name].downcase} \#{instance.#{opts.label_field}}",
+                               instance)
             end
 
             def delete_#{opts.singlename}(id)
-              @id = id
-              name = #{opts.singlename}.#{opts.label_field}
+              name = #{opts.singlename}(id).#{opts.label_field}
               DB.transaction do
                 repo.delete_#{opts.singlename}(id)
                 log_transaction

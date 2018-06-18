@@ -15,6 +15,31 @@ class Framework < Roda
         handle_not_found(r)
       end
 
+      r.on 'unit' do
+        r.on 'new' do    # NEW
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
+          show_partial_or_page(r) { PackMaterial::Config::MatresType::Unit.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          if params[:matres_type] && params[:matres_type][:unit_of_measure] == 'other'
+            res = interactor.create_matres_unit(id, params[:matres_type])
+          else
+            res = interactor.add_matres_unit(id, params[:matres_type])
+          end
+
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/pack_material/config/material_resource_types/#{id}/unit/new") do
+              PackMaterial::Config::MatresType::Unit.call(id,
+                                                          form_values: params[:matres_type],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+            end
+          end
+        end
+      end
       r.on 'edit' do
         raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
         show_partial { PackMaterial::Config::MatresType::Edit.call(id) }
@@ -29,7 +54,9 @@ class Framework < Roda
           res = interactor.update_matres_type(id, params[:matres_type])
           if res.success
             update_grid_row(id, changes: { material_resource_domain_id: res.instance[:material_resource_domain_id],
-                                           type_name: res.instance[:type_name] },
+                                           type_name: res.instance[:type_name],
+                                           short_code: res.instance[:short_code],
+                                           description: res.instance[:description] },
                                 notice: res.message)
           else
             content = show_partial { PackMaterial::Config::MatresType::Edit.call(id, params[:matres_type], res.errors) }
@@ -127,6 +154,7 @@ class Framework < Roda
           if res.success
             update_grid_row(id, changes: {  material_resource_type_id: res.instance[:material_resource_type_id],
                                             sub_type_name: res.instance[:sub_type_name],
+                                            short_code: res.instance[:short_code],
                                             product_code_separator: res.instance[:product_code_separator],
                                             has_suppliers: res.instance[:has_suppliers],
                                             has_marketers: res.instance[:has_marketers],

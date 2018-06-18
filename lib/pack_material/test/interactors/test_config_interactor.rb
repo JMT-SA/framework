@@ -110,6 +110,57 @@ module PackMaterialApp
       }
     end
 
+    def test_validate_matres_unit_params
+      test_attrs = { unit_of_measure: 'each', other: 'new unit' }
+      # required(:unit_of_measure).filled(:str?)
+      x = interactor.send(:validate_matres_unit_params, test_attrs.reject { |k| k == :unit_of_measure })
+      assert_equal(['is missing'], x.errors[:unit_of_measure])
+
+      x = interactor.send(:validate_matres_unit_params, test_attrs.merge(unit_of_measure: nil))
+      assert_equal(['must be filled'], x.errors[:unit_of_measure])
+
+      x = interactor.send(:validate_matres_unit_params, test_attrs.merge(unit_of_measure: 1))
+      assert_equal(['must be a string'], x.errors[:unit_of_measure])
+
+    end
+
+    def test_create_matres_unit
+      ConfigRepo.any_instance.stubs(:create_matres_type_unit).returns(true)
+      params = { other: 'new unit' }
+
+      x = interactor.create_matres_unit(1, params)
+      expected = interactor.success_response('Created unit new unit')
+      assert_equal(expected, x)
+      assert x.success
+
+      ConfigRepo.any_instance.stubs(:create_matres_type_unit).raises(Sequel::UniqueConstraintViolation)
+      params = { other: 'new unit' }
+
+      x = interactor.create_matres_unit(1, params)
+      expected = interactor.validation_failed_response(OpenStruct.new(messages: { other: ['This unit already exists'] }))
+      assert_equal(expected, x)
+      refute x.success
+    end
+
+    def test_add_matres_unit
+      ConfigRepo.any_instance.stubs(:add_matres_type_unit).returns(true)
+      ConfigInteractor.any_instance.stubs(:matres_type).returns(fake_matres_type)
+      params = { unit_of_measure: 'new unit' }
+
+      x = interactor.add_matres_unit(1, params)
+      expected = interactor.success_response("Unit was added to #{fake_matres_type.type_name}", fake_matres_type)
+      assert_equal expected, x
+      assert x.success
+
+      ConfigRepo.any_instance.stubs(:add_matres_type_unit).raises(Sequel::UniqueConstraintViolation)
+      params = { unit_of_measure: 'new unit' }
+
+      x = interactor.add_matres_unit(1, params)
+      expected = interactor.validation_failed_response(OpenStruct.new(messages: { unit_of_measure: ['This unit is already assigned'] }))
+      assert_equal expected, x
+      refute x.success
+    end
+
     def fake_matres_type
       MatresType.new(matres_type_attrs)
     end
@@ -169,6 +220,60 @@ module PackMaterialApp
 
       x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(short_code: 1))
       assert_equal(['must be a string'], x.errors[:short_code])
+    end
+
+    def test_validate_matres_sub_type_config_params
+      test_attrs = {
+        id: 1,
+        product_code_separator: '_',
+        has_suppliers: true,
+        has_marketers: true,
+        has_retailers: true
+      }
+      # optional(:id).filled(:int?)
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :id })
+      assert_empty x. errors
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(id: 'name'))
+      assert_equal(['must be an integer'], x.errors[:id])
+
+      # required(:product_code_separator).filled(:str?)
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :product_code_separator })
+      assert_equal(['is missing'], x.errors[:product_code_separator])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(product_code_separator: nil))
+      assert_equal(['must be filled'], x.errors[:product_code_separator])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(product_code_separator: 1))
+      assert_equal(['must be a string'], x.errors[:product_code_separator])
+
+      # required(:has_suppliers).filled(:bool?)
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :has_suppliers })
+      assert_equal(['is missing'], x.errors[:has_suppliers])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_suppliers: nil))
+      assert_equal(['must be filled'], x.errors[:has_suppliers])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_suppliers: 'something'))
+      assert_equal(['must be boolean'], x.errors[:has_suppliers])
+      # required(:has_marketers).filled(:bool?)
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :has_marketers })
+      assert_equal(['is missing'], x.errors[:has_marketers])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_marketers: nil))
+      assert_equal(['must be filled'], x.errors[:has_marketers])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_marketers: 'something'))
+      assert_equal(['must be boolean'], x.errors[:has_marketers])
+      # required(:has_retailers).filled(:bool?)
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :has_retailers })
+      assert_equal(['is missing'], x.errors[:has_retailers])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_retailers: nil))
+      assert_equal(['must be filled'], x.errors[:has_retailers])
+
+      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_retailers: 'something'))
+      assert_equal(['must be boolean'], x.errors[:has_retailers])
     end
 
     def test_create_matres_sub_type
@@ -236,7 +341,7 @@ module PackMaterialApp
       # see MatresSubTypeConfigColumnsSchema
       test_attrs = {
         chosen_column_ids: '1,5,8,1,5',
-        columncodes_sorted_ids: '1,2,3,4',
+        columncodes_sorted_ids: '1,2,3,4'
       }
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs)
       assert_empty x.errors

@@ -56,6 +56,137 @@ module PackMaterialApp
       DB[:material_resource_domains].where(id: dom_id).delete
     end
 
+    def update_matres_type
+      dom_id = DB[:material_resource_domains].insert(
+        domain_name: 'domain name',
+        product_table_name: 'product table name',
+        variant_table_name: 'variant table name'
+      )
+      type_id = DB[:material_resource_types].insert(
+        material_resource_domain_id: dom_id,
+        type_name: 'type name',
+        short_code: 'SC',
+        description: 'This is the description field'
+      )
+
+      attrs = { description: 'This is the updated description', measurement_units: [] }
+      ConfigRepo.new.update_matres_type(type_id, attrs)
+      assert_equal('This is the updated description', DB[:material_resource_types].where(id: type_id).select(:description))
+
+      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
+      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
+      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
+      attrs = { measurement_units: [each_id, pallets_id, bags_id] }
+      ConfigRepo.new.update_matres_type(type_id, attrs)
+      x = DB[:measurement_units_for_matres_types]
+        .where(material_resource_type_id: type_id)
+        .select_map(:measurement_unit_id)
+
+      assert_equal [each_id, pallets_id, bags_id], x
+    end
+
+    def test_measurement_units
+      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
+      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
+      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
+
+      y = ConfigRepo.new.measurement_units
+      assert_equal y, ["each", "pallets", "bags"]
+
+      DB[:measurement_units].delete
+      y = ConfigRepo.new.measurement_units
+      assert_equal y, []
+    end
+
+    def test_matres_type_measurement_units_and_ids
+      dom_id = DB[:material_resource_domains].insert(
+        domain_name: 'domain name',
+        product_table_name: 'product table name',
+        variant_table_name: 'variant table name'
+      )
+      type_id = DB[:material_resource_types].insert(
+        material_resource_domain_id: dom_id,
+        type_name: 'type name',
+        short_code: 'SC',
+        description: 'This is the description field'
+      )
+      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
+      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
+      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
+      DB[:measurement_units_for_matres_types].insert(
+        material_resource_type_id: type_id,
+        measurement_unit_id: each_id
+      )
+      DB[:measurement_units_for_matres_types].insert(
+        material_resource_type_id: type_id,
+        measurement_unit_id: pallets_id
+      )
+      DB[:measurement_units_for_matres_types].insert(
+        material_resource_type_id: type_id,
+        measurement_unit_id: bags_id
+      )
+      y = ConfigRepo.new.matres_type_measurement_units(type_id)
+      assert_equal y, ["each", "pallets", "bags"]
+
+      y = ConfigRepo.new.matres_type_measurement_unit_ids(type_id)
+      assert_equal y, [each_id, pallets_id, bags_id]
+
+      DB[:measurement_units_for_matres_types].where(material_resource_type_id: type_id).delete
+      y = ConfigRepo.new.matres_type_measurement_units(type_id)
+      assert_equal y, []
+      y = ConfigRepo.new.matres_type_measurement_unit_ids(type_id)
+      assert_equal y, []
+    end
+
+    def test_create_matres_type_unit
+      dom_id = DB[:material_resource_domains].insert(
+        domain_name: 'domain name',
+        product_table_name: 'product table name',
+        variant_table_name: 'variant table name'
+      )
+      type_id = DB[:material_resource_types].insert(
+        material_resource_domain_id: dom_id,
+        type_name: 'type name',
+        short_code: 'SC',
+        description: 'This is the description field'
+      )
+
+      ConfigRepo.new.create_matres_type_unit(type_id, 'test unit')
+      unit_id = DB[:measurement_units].where(unit_of_measure: 'test unit').select_map(:id)
+      refute_nil unit_id
+      link_id = DB[:measurement_units_for_matres_types].where(material_resource_type_id: type_id).select_map(:measurement_unit_id)
+      assert_equal link_id, unit_id
+    end
+
+    def test_add_matres_type_unit
+      dom_id = DB[:material_resource_domains].insert(
+        domain_name: 'domain name',
+        product_table_name: 'product table name',
+        variant_table_name: 'variant table name'
+      )
+      type_id = DB[:material_resource_types].insert(
+        material_resource_domain_id: dom_id,
+        type_name: 'type name',
+        short_code: 'SC',
+        description: 'This is the description field'
+      )
+      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
+      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
+      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
+
+      ConfigRepo.new.add_matres_type_unit(type_id, 'each')
+      link_id = DB[:measurement_units_for_matres_types].where(
+        material_resource_type_id: type_id,
+        measurement_unit_id: each_id
+      )
+      refute_nil link_id
+
+      assert_raises() {
+        PackMaterialApp::ConfigRepo.new.add_matres_type_unit(type_id, 'does not exist')
+      }
+    end
+
+
     def test_delete_matres_sub_type
       dom_id = DB[:material_resource_domains].insert(
         domain_name: 'domain name',

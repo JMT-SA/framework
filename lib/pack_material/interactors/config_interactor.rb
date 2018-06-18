@@ -6,14 +6,14 @@ module PackMaterialApp
     def create_matres_type(params)
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @id = repo.create_matres_type(res)
+      @matres_type_id = repo.create_matres_type(res)
       success_response("Created type #{matres_type.type_name}", matres_type)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { type_name: ['This type already exists'] }))
     end
 
     def update_matres_type(id, params)
-      @id = id
+      @matres_type_id = id
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_matres_type(id, res)
@@ -21,23 +21,41 @@ module PackMaterialApp
     end
 
     def delete_matres_type(id)
-      @id = id
+      @matres_type_id = id
       name = matres_type.type_name
       repo.delete_matres_type(id)
       success_response("Deleted type #{name}")
     end
 
+    def create_matres_unit(matres_type_id, params)
+      params[:unit_of_measure] = params[:other]
+      res = validate_matres_unit_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+      repo.create_matres_type_unit(matres_type_id, res[:unit_of_measure])
+      success_response("Created unit #{res[:unit_of_measure]}")
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { other: ['This unit already exists'] }))
+    end
+
+    def add_matres_unit(matres_type_id, params)
+      repo.add_matres_type_unit(matres_type_id, params[:unit_of_measure])
+      @matres_type_id = matres_type_id
+      success_response("Unit was added to #{matres_type.type_name}", matres_type(false))
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { unit_of_measure: ['This unit is already assigned'] }))
+    end
+
     def create_matres_sub_type(params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @id = repo.create_matres_sub_type(res)
+      @matres_sub_type_id = repo.create_matres_sub_type(res)
       success_response("Created sub type #{matres_sub_type.sub_type_name}", matres_sub_type)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { sub_type_name: ['This sub type already exists'] }))
     end
 
     def update_matres_sub_type(id, params)
-      @id = id
+      @matres_sub_type_id = id
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_matres_sub_type(id, res)
@@ -45,7 +63,7 @@ module PackMaterialApp
     end
 
     def delete_matres_sub_type(id)
-      @id = id
+      @matres_sub_type_id = id
       name = matres_sub_type.sub_type_name
       DB.transaction do
         repo.delete_matres_sub_type(id)
@@ -54,7 +72,7 @@ module PackMaterialApp
     end
 
     def update_matres_config(id, params)
-      @id = id
+      @matres_sub_type_id = id
       res = validate_matres_sub_type_config_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_matres_sub_type(id, res)
@@ -84,9 +102,9 @@ module PackMaterialApp
 
     def matres_type(cached = true)
       if cached
-        @matres_type ||= repo.find_matres_type(@id)
+        @matres_type ||= repo.find_matres_type(@matres_type_id)
       else
-        @matres_type = repo.find_matres_type(@id)
+        @matres_type = repo.find_matres_type(@matres_type_id)
       end
     end
 
@@ -94,11 +112,15 @@ module PackMaterialApp
       MatresTypeSchema.call(params)
     end
 
+    def validate_matres_unit_params(params)
+      MatresTypeUnitSchema.call(params)
+    end
+
     def matres_sub_type(cached = true)
       if cached
-        @matres_sub_type ||= repo.find_matres_sub_type(@id)
+        @matres_sub_type ||= repo.find_matres_sub_type(@matres_sub_type_id)
       else
-        @matres_sub_type = repo.find_matres_sub_type(@id)
+        @matres_sub_type = repo.find_matres_sub_type(@matres_sub_type_id)
       end
     end
 

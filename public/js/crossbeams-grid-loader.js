@@ -959,6 +959,11 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         httpResult = JSON.parse(httpRequest.responseText);
         if (httpResult.exception) {
           crossbeamsUtils.alert({ prompt: httpResult.flash.error, type: 'error' });
+          if (httpResult.backtrace) {
+            console.log('==Backend Backtrace==');
+            console.info(httpResult.backtrace.join('\n'));
+          }
+          return null;
         }
         // var midLevelColumnDefs, detailColumnDefs;
         if (httpResult.nestedColumnDefs) {
@@ -984,6 +989,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId, newColDefs);
         }
       }
+      return null;
     };
     httpRequest.send();
   };

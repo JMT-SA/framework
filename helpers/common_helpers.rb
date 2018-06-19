@@ -179,10 +179,6 @@ module CommonHelpers
     res.to_json
   end
 
-  def show_json_exception(err)
-    { exception: err.class.name, flash: { error: "An error occurred: #{err.message}" } }.to_json
-  end
-
   def json_replace_select_options(dom_id, options_array, message = nil)
     json_actions(OpenStruct.new(type: :replace_select_options, dom_id: dom_id, options_array: options_array), message)
   end

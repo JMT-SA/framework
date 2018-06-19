@@ -23,7 +23,11 @@ class Framework < Roda
 
       r.on 'grid' do
         return_json_response
-        interactor.logged_actions_grid(id)
+        begin
+          interactor.logged_actions_grid(id)
+        rescue StandardError => e
+          show_json_exception(e)
+        end
       end
 
       r.on 'diff' do

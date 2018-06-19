@@ -94,15 +94,18 @@ module ErrorHelpers
     { flash: { error: 'You do not have permission for this task' } }.to_json
   end
 
-  # TODO: add stacktrace for rendering in console
-  def show_json_error(err)
+  def show_json_error(err, status: 500)
     msg = err.respond_to?(:message) ? err.message : err.to_s
-    response.status = 500
+    response.status = status
     if err.respond_to?(:backtrace)
       { exception: err.class.name, flash: { error: "An error occurred: #{msg}" }, backtrace: err.backtrace }.to_json
     else
       { exception: err.class.name, flash: { error: "An error occurred: #{msg}" } }.to_json
     end
+  end
+
+  def show_json_exception(err)
+    show_json_error(err, status: 200)
   end
 
   def pg_foreign_key_violation_msg(err)

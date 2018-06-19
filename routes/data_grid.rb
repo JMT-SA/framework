@@ -82,7 +82,11 @@ class Framework < Roda
 
       r.on 'grid' do
         return_json_response
-        render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program, permission) })
+        begin
+          render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program, permission) })
+        rescue StandardError => e
+          show_json_exception(e)
+        end
       end
 
       r.on 'xls' do

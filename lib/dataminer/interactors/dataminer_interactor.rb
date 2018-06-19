@@ -127,43 +127,16 @@ module DataminerApp
                  else
                    repo.list_all_reports
                  end
-      this_col = [
-        {
-          text: 'edit',
-          url: '/dataminer/admin/$col1$/edit',
-          col1: 'id',
-          icon: 'fa-edit'
-        },
-        {
-          text: 'delete',
-          url: '/dataminer/admin/$col1$',
-          col1: 'id',
-          prompt: 'Are you sure?',
-          method: 'delete',
-          icon: 'fa-remove',
-          popup: true
-        }
-      ]
-      col_defs = [{ headerName: '', pinned: 'left',
-                    width: 60,
-                    suppressMenu: true,   suppressSorting: true,   suppressMovable: true,
-                    suppressFilter: true, enableRowGroup: false,   enablePivot: false,
-                    enableValue: false,   suppressCsvExport: true, suppressToolPanel: true,
-                    valueGetter: this_col.to_json.to_s,
-                    colId: 'action_links',
-                    cellRenderer: 'crossbeamsGridFormatters.menuActionsRenderer' },
-                  { headerName: 'Database', field: 'db' },
-                  { headerName: 'Report caption', field: 'caption', width: 300 },
-                  { headerName: 'File name', field: 'file', width: 600 },
-                  { headerName: 'Crosstab?', field: 'crosstab',
-                    cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-                    cellClass:    'grid-boolean-column',
-                    width:        100 }]
-      unless for_grids
-        col_defs << { headerName: 'External Render?', field: 'external',
-                      cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-                      cellClass:    'grid-boolean-column',
-                      width:        150 }
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
+          act.edit_link '/dataminer/admin/$col1$/edit', col1: 'id'
+          act.popup_delete_link '/dataminer/admin/$col1$', col1: 'id'
+        end
+        mk.col 'db', 'Database'
+        mk.col 'caption', 'Report caption', width: 300
+        mk.col 'file', 'File name', width: 600
+        mk.boolean 'crosstab', 'Crosstab?'
+        mk.boolean('external', 'External render?', width: 150) unless for_grids
       end
       {
         columnDefs: col_defs,
@@ -175,25 +148,14 @@ module DataminerApp
       rpt_list = repo.list_all_reports
       link     = "'/dataminer/reports/report/'+data.id+'|run'"
 
-      col_defs = [{ headerName: '',
-                    width: 60,
-                    suppressMenu: true,   suppressSorting: true,   suppressMovable: true,
-                    suppressFilter: true, enableRowGroup: false,   enablePivot: false,
-                    enableValue: false,   suppressCsvExport: true, suppressToolPanel: true,
-                    valueGetter: link,
-                    colId: 'edit_link',
-                    cellRenderer: 'crossbeamsGridFormatters.hrefSimpleFormatter' },
-                  { headerName: 'Database', field: 'db' },
-                  { headerName: 'Report caption', field: 'caption', width: 300 },
-                  { headerName: 'File name', field: 'file', width: 600 },
-                  { headerName: 'Crosstab?', field: 'crosstab',
-                    cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-                    cellClass:    'grid-boolean-column',
-                    width:        100 },
-                  { headerName: 'External Render?', field: 'external',
-                    cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-                    cellClass:    'grid-boolean-column',
-                    width:        150 }]
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.href link, 'edit_link'
+        mk.col 'db', 'Database'
+        mk.col 'caption', 'Report caption', width: 300
+        mk.col 'file', 'File name', width: 600
+        mk.boolean 'crosstab', 'Crosstab?'
+        mk.boolean 'external', 'External render?', width: 150
+      end
       {
         columnDefs: col_defs,
         rowDefs:    rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
@@ -252,56 +214,54 @@ module DataminerApp
     end
 
     def edit_report(id)
-      page = OpenStruct.new({ id: id, report: repo.lookup_report(id, true) })
+      page = OpenStruct.new(id: id, report: repo.lookup_report(id, true))
 
       page.filename = File.basename(repo.lookup_file_name(id, true))
 
-      page.col_defs = [{ headerName: 'Column Name', field: 'name', pinned: 'left' },
-                       { headerName: 'Seq', field: 'sequence_no', cellClass: 'grid-number-column', pinned: 'left', width: 80 }, # to be changed in group...
-                       { headerName: 'Caption', field: 'caption', editable: true, pinned: 'left' },
-                       { headerName: 'Namespaced Name', field: 'namespaced_name' },
-                       { headerName: 'Data type', field: 'data_type', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: %w[string boolean integer number date datetime]
-                       } },
-                       { headerName: 'Width', field: 'width', cellClass: 'grid-number-column', editable: true, cellEditor: 'NumericCellEditor' }, # editable NUM ONLY...
-                       { headerName: 'Format', field: 'format', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: ['', 'delimited_1000', 'delimited_1000_4']
-                       } },
-                       { headerName: 'Hide?', field: 'hide', cellRenderer: 'crossbeamsGridFormatters.booleanFormatter', cellClass: 'grid-boolean-column', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: [true, false]
-                       } },
-                       { headerName: 'Can group by?', field: 'groupable', cellRenderer: 'crossbeamsGridFormatters.booleanFormatter', cellClass: 'grid-boolean-column', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: [true, false]
-                       } },
-                       { headerName: 'Group Seq', field: 'group_by_seq', cellClass: 'grid-number-column', headerTooltip: 'If the grid opens grouped, this is the grouping level', editable: true, cellEditor: 'NumericCellEditor' },
-                       { headerName: 'Sum?', field: 'group_sum', cellRenderer: 'crossbeamsGridFormatters.booleanFormatter', cellClass: 'grid-boolean-column', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: [true, false]
-                       } },
-                       { headerName: 'Avg?', field: 'group_avg', cellRenderer: 'crossbeamsGridFormatters.booleanFormatter', cellClass: 'grid-boolean-column', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: [true, false]
-                       } },
-                       { headerName: 'Min?', field: 'group_min', cellRenderer: 'crossbeamsGridFormatters.booleanFormatter', cellClass: 'grid-boolean-column', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: [true, false]
-                       } },
-                       { headerName: 'Max?', field: 'group_max', cellRenderer: 'crossbeamsGridFormatters.booleanFormatter', cellClass: 'grid-boolean-column', editable: true, cellEditor: 'select', cellEditorParams: {
-                         values: [true, false]
-                       } }]
+      page.col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
+        mk.col 'name', 'Column name', pinned: 'left'
+        mk.col 'sequence_no', 'Seq', cellClass: 'grid-number-column', pinned: 'left', width: 80
+        mk.col 'caption', nil, editable: true, pinned: 'left'
+        mk.col 'namespaced_name'
+        mk.col 'data_type', nil, editable: true, cellEditor: 'select', cellEditorParams: {
+          values: %w[string boolean integer number date datetime]
+        }
+        mk.integer 'width', nil, editable: true, cellEditor: 'NumericCellEditor'
+        mk.col 'format', nil, editable: true, cellEditor: 'select', cellEditorParams: {
+          values: ['', 'delimited_1000', 'delimited_1000_4']
+        }
+        mk.boolean 'hide', 'Hide?', editable: true, cellEditor: 'select', cellEditorParams: {
+          values: [true, false]
+        }
+        mk.boolean 'groupable', 'Can group by?', editable: true, cellEditor: 'select', cellEditorParams: {
+          values: [true, false]
+        }
+        mk.integer 'group_by_seq', 'Group Seq', tooltip: 'If the grid opens grouped, this is the grouping level', editable: true, cellEditor: 'NumericCellEditor'
+        mk.boolean 'group_sum', 'Sum?', editable: true, cellEditor: 'select', cellEditorParams: {
+          values: [true, false]
+        }
+        mk.boolean 'group_avg', 'Avg?', editable: true, cellEditor: 'select', cellEditorParams: {
+          values: [true, false]
+        }
+        mk.boolean 'group_min', 'Min?', editable: true, cellEditor: 'select', cellEditorParams: {
+          values: [true, false]
+        }
+        mk.boolean 'group_max', 'Max?', editable: true, cellEditor: 'select', cellEditorParams: {
+          values: [true, false]
+        }
+      end
       page.row_defs = page.report.ordered_columns.map(&:to_hash)
 
-      page.col_defs_params = [
-        { headerName: '', width: 60, suppressMenu: true, suppressSorting: true, suppressMovable: true, suppressFilter: true,
-          enableRowGroup: false, enablePivot: false, enableValue: false, suppressCsvExport: true,
-          valueGetter: "'/dataminer/admin/#{id}/parameter/delete/' + data.column + '|delete|Are you sure?|delete'", colId: 'delete_link', cellRenderer: 'crossbeamsGridFormatters.hrefPromptFormatter' },
-
-      { headerName: 'Column', field: 'column' },
-      { headerName: 'Caption', field: 'caption' },
-      { headerName: 'Data type', field: 'data_type' },
-      { headerName: 'Control type', field: 'control_type' },
-      { headerName: 'List definition', field: 'list_def' },
-      { headerName: 'UI priority', field: 'ui_priority' },
-      { headerName: 'Default value', field: 'default_value' } # ,
-      # { headerName: 'List values', field: 'list_values' }
-      ]
+      page.col_defs_params = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.href_prompt "'/dataminer/admin/#{id}/parameter/delete/' + data.column + '|delete|Are you sure?|delete'", 'delete_link'
+        mk.col 'column'
+        mk.col 'caption'
+        mk.col 'data_type'
+        mk.col 'control_type'
+        mk.col 'list_def', 'List definition'
+        mk.col 'ui_priority'
+        mk.col 'default_value'
+      end
 
       page.row_defs_params = []
       page.report.query_parameter_definitions.each do |query_def|
@@ -312,15 +272,9 @@ module DataminerApp
     end
 
     def save_report(id, params)
-      # if new name <> old name, make sure new name has .yml, no spaces and lowercase....
       report = repo.lookup_report(id, true)
 
       filename = repo.lookup_file_name(id, true)
-      # if File.basename(filename) != params[:filename]
-      #   puts "new name: #{params[:filename]} for #{File.basename(filename)}"
-      # else
-      #   puts 'No change to file name'
-      # end
       report.caption = params[:caption]
       report.limit = params[:limit].empty? ? nil : params[:limit].to_i
       report.offset = params[:offset].empty? ? nil : params[:offset].to_i

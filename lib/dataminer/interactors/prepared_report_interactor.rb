@@ -14,7 +14,7 @@ module DataminerApp
     # @param params [Hash] the request parameters.
     # @param crosstab_hash [Hash] the crosstab config (if applicable).
     # @return [Crossbeams::Dataminer::Report] the modified report.
-    def setup_report_with_parameters(rpt, params, crosstab_hash = {}, db)
+    def setup_report_with_parameters(rpt, params, db_name, crosstab_hash = {})
       # puts params[:json_var].inspect
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
@@ -52,7 +52,7 @@ module DataminerApp
       begin
         rpt.apply_params(parms)
 
-        CrosstabApplier.new(repo.db_connection_for(db), rpt, params, crosstab_hash).convert_report if params[:crosstab]
+        CrosstabApplier.new(repo.db_connection_for(db_name), rpt, params, crosstab_hash).convert_report if params[:crosstab]
         rpt
         # rescue StandardError => e
         #   return "ERROR: #{e.message}"
@@ -73,96 +73,59 @@ module DataminerApp
       page
     end
 
-    def prepared_report_list_grid(for_user = false)
+    def prepared_report_list_grid(for_user = false) # rubocop:disable Metrics/AbcSize
       rpt_list = if for_user
                    PreparedReportRepo.new.list_all_reports_for_user(@user)
                  else
                    PreparedReportRepo.new.list_all_reports(@user)
                  end
-      # link     = "'/dataminer/reports/report/'+data.id+'|run'"
 
-      this_col = [
-        {
-          text: 'properties',
-          url: '/dataminer/prepared_reports/$col1$/properties',
-          col1: 'id',
-          icon: 'fa-book',
-          title: 'Prepared report properties',
-          popup: true
-        },
-        { is_separator: true },
-        {
-          text: 'webquery link',
-          url: '/dataminer/prepared_reports/$col1$/webquery_url',
-          col1: 'id',
-          icon: 'fa-link',
-          title_field: 'caption',
-          popup: true
-        },
-        {
-          text: 'run',
-          url: '/dataminer/prepared_reports/$col1$/run',
-          col1: 'id',
-          icon: 'fa-play'
-        },
-        {
-          text: 'Excel download',
-          url: '/dataminer/prepared_reports/$col1$/xls',
-          col1: 'id',
-          icon: 'fa-file-excel-o'
-        },
-        { is_separator: true },
-        {
-          text: 'edit',
-          url: '/dataminer/prepared_reports/$col1$/edit',
-          col1: 'id',
-          icon: 'fa-edit',
-          hide_if_false: 'owner',
-          popup: true
-        },
-        {
-          text: 'change columns',
-          url: '/dataminer/prepared_reports/$col1$/change_columns',
-          col1: 'id',
-          icon: 'fa-columns',
-          hide_if_false: 'owner',
-          popup: true
-        },
-        {
-          text: 'delete',
-          url: '/dataminer/prepared_reports/$col1$',
-          col1: 'id',
-          prompt: 'Are you sure?',
-          method: 'delete',
-          icon: 'fa-remove',
-          hide_if_false: 'owner',
-          popup: true
-        }
-      ]
-      # Make prepared reports maintainable when listing all reports.
-      unless for_user
-        this_col.select { |act| %w[edit delete].include?(act[:text]) }.each { |a| a.delete(:hide_if_false) }
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk| # rubocop:disable Metrics/BlockLength
+        mk.action_column do |act| # rubocop:disable Metrics/BlockLength
+          act.popup_link 'properties', '/dataminer/prepared_reports/$col1$/properties',
+                         col1: 'id',
+                         icon: 'fa-book',
+                         title: 'Prepared report properties'
+          act.separator
+          act.popup_link 'webquery link', '/dataminer/prepared_reports/$col1$/webquery_url',
+                         col1: 'id',
+                         icon: 'fa-link',
+                         title_field: 'caption'
+          act.link 'run', '/dataminer/prepared_reports/$col1$/run',
+                   col1: 'id',
+                   icon: 'fa-play'
+          act.link 'Excel download', '/dataminer/prepared_reports/$col1$/xls',
+                   col1: 'id',
+                   icon: 'fa-file-excel-o'
+          act.separator
+          act.popup_edit_link '/dataminer/prepared_reports/$col1$/edit',
+                              col1: 'id',
+                              hide_if_false: for_user ? 'owner' : nil
+          act.popup_link 'change columns', '/dataminer/prepared_reports/$col1$/change_columns',
+                         col1: 'id',
+                         icon: 'fa-columns',
+                         hide_if_false: for_user ? 'owner' : nil
+          act.popup_delete_link '/dataminer/prepared_reports/$col1$',
+                                col1: 'id',
+                                hide_if_false: for_user ? 'owner' : nil
+          act.separator
+          act.submenu('Test') do |sub|
+            sub.link 'Excel download', '/dataminer/prepared_reports/$col1$/xls',
+                     col1: 'id',
+                     icon: 'fa-file-excel-o'
+            sub.separator
+            sub.popup_edit_link '/dataminer/prepared_reports/$col1$/edit',
+                                col1: 'id',
+                                hide_if_false: for_user ? 'owner' : nil
+          end
+        end
+        mk.col 'db', 'Database'
+        mk.col 'caption', 'Report caption', width: 300
+        mk.col 'report_name'
+        mk.col 'file', 'File name', width: 600
+        mk.boolean 'crosstab', 'Crosstab?'
+        mk.boolean 'owner', 'Owner?'
       end
-      col_defs = [{ headerName: '', pinned: 'left',
-                    width: 60,
-                    suppressMenu: true,   suppressSorting: true,   suppressMovable: true,
-                    suppressFilter: true, enableRowGroup: false,   enablePivot: false,
-                    enableValue: false,   suppressCsvExport: true, suppressToolPanel: true,
-                    valueGetter: this_col.to_json.to_s,
-                    colId: 'action_links',
-                    cellRenderer: 'crossbeamsGridFormatters.menuActionsRenderer' },
-                  { headerName: 'Database', field: 'db' },
-                  { headerName: 'Report caption', field: 'caption', width: 300 },
-                  { headerName: 'Report name', field: 'report_name' },
-                  { headerName: 'File name', field: 'file', width: 600 },
-                  { headerName: 'Crosstab?', field: 'crosstab',
-                    cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-                    cellClass:    'grid-boolean-column',
-                    width:        100 },
-                  { headerName: 'Owner?', field: 'owner',
-                    cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-                    cellClass:    'grid-boolean-column',
-                    width:        100 }]
       {
         columnDefs: col_defs,
         rowDefs:    rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
@@ -173,39 +136,12 @@ module DataminerApp
       db, = repo.split_db_and_id(id)
       report = PreparedReportRepo.new.lookup_report(id)
       params = { json_var: report.external_settings[:prepared_report][:json_var] }
-      setup_report_with_parameters(report, params, {}, db) # Need to include crosstab_hash if required...
+      setup_report_with_parameters(report, params, db) # Need to include crosstab_hash if required...
 
-      col_defs = []
-      report.ordered_columns.each do |col|
-        hs                  = { headerName: col.caption, field: col.name, hide: col.hide, headerTooltip: col.caption }
-        hs[:width]          = col.width unless col.width.nil?
-        hs[:enableValue]    = true if %i[integer number].include?(col.data_type)
-        hs[:enableRowGroup] = true unless hs[:enableValue] && !col.groupable
-        hs[:enablePivot]    = true unless hs[:enableValue] && !col.groupable
-        hs[:rowGroupIndex]  = col.group_by_seq if col.group_by_seq
-        hs[:cellRenderer]   = 'group' if col.group_by_seq
-        hs[:cellRendererParams] = { restrictToOneGroup: true } if col.group_by_seq
-        hs[:aggFunc]            = 'sum' if col.group_sum
-        if %i[integer number].include?(col.data_type)
-          hs[:cellClass] = 'grid-number-column'
-          hs[:width]     = 100 if col.width.nil? && col.data_type == :integer
-          hs[:width]     = 120 if col.width.nil? && col.data_type == :number
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        report.ordered_columns.each do |col|
+          mk.column_from_dataminer col
         end
-        if col.format == :delimited_1000
-          hs[:cellRenderer] = 'crossbeamsGridFormatters.numberWithCommas2'
-        end
-        if col.format == :delimited_1000_4
-          hs[:cellRenderer] = 'crossbeamsGridFormatters.numberWithCommas4'
-        end
-        if col.data_type == :boolean
-          hs[:cellRenderer] = 'crossbeamsGridFormatters.booleanFormatter'
-          hs[:cellClass]    = 'grid-boolean-column'
-          hs[:width]        = 100 if col.width.nil?
-        end
-
-        # hs[:cellClassRules] = {"grid-row-red": "x === 'Fred'"} if col.name == 'author'
-
-        col_defs << hs
       end
       # Use module for BigDecimal change? - register_extension...?
       db_type = repo.db_connection_for(db).database_type
@@ -226,7 +162,7 @@ module DataminerApp
       # ....
       page.report = PreparedReportRepo.new.lookup_report(id)
       params = { json_var: page.report.external_settings[:prepared_report][:json_var] }
-      setup_report_with_parameters(page.report, params, {}, db) # Need to include crosstab_hash if required...
+      setup_report_with_parameters(page.report, params, db) # Need to include crosstab_hash if required...
       xls_possible_types = { string: :string, integer: :integer, date: :string,
                              datetime: :time, time: :time, boolean: :boolean, number: :float }
       heads = []
@@ -331,7 +267,7 @@ module DataminerApp
       db, = repo.split_db_and_id(id)
       rpt = PreparedReportRepo.new.lookup_report(id)
       params = { json_var: rpt.external_settings[:prepared_report][:json_var] }
-      setup_report_with_parameters(rpt, params, {}, db) # Need to include crosstab_hash if required...
+      setup_report_with_parameters(rpt, params, db) # Need to include crosstab_hash if required...
 
       db_type = repo.db_connection_for(db).database_type
       row_defs = repo.db_connection_for(db)[rpt.runnable_sql_delimited(db_type)].to_a.map do |m|
@@ -354,7 +290,7 @@ module DataminerApp
       db, = repo.split_db_and_id(id)
       rpt = PreparedReportRepo.new.lookup_report(id)
       params = { json_var: rpt.external_settings[:prepared_report][:json_var] }
-      setup_report_with_parameters(rpt, params, {}, db) # Need to include crosstab_hash if required...
+      setup_report_with_parameters(rpt, params, db) # Need to include crosstab_hash if required...
 
       db_type = repo.db_connection_for(db).database_type
       row_defs = repo.db_connection_for(db)[rpt.runnable_sql_delimited(db_type)].to_a.map do |m|

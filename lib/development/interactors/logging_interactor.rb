@@ -47,40 +47,28 @@ module DevelopmentApp
       end
     end
 
-    def col_defs_for_logged_actions(logged_action)
+    def col_defs_for_logged_actions(logged_action) # rubocop:disable Metrics/AbcSize
       col_names = DevelopmentRepo.new.table_col_names(logged_action.table_name)
-      this_col = [
-        {
-          text: 'Detail diff',
-          url: '/development/logging/logged_actions/$col1$/diff',
-          col1: 'event_id',
-          icon: 'fa-list',
-          title: 'View differences',
-          hide_if_null: :event_id,
-          popup: true
-        }
-      ]
-      col_defs = [{ headerName: '', pinned: 'left',
-                    width: 60,
-                    suppressMenu: true,   suppressSorting: true,   suppressMovable: true,
-                    suppressFilter: true, enableRowGroup: false,   enablePivot: false,
-                    enableValue: false,   suppressCsvExport: true, suppressToolPanel: true,
-                    valueGetter: this_col.to_json.to_s,
-                    colId: 'action_links',
-                    cellRenderer: 'crossbeamsGridFormatters.menuActionsRenderer' },
-                  { headerName: 'Action Time', field: 'action_tstamp_tx' },
-                  { headerName: 'Action', field: 'action' },
-                  { headerName: 'User', field: 'user_name', width: 200 },
-                  { headerName: 'Context', field: 'context' },
-                  { headerName: 'Route URL', field: 'route_url' }]
-      col_defs += make_columns_for(col_names, logged_action.table_name)
-      col_defs << { headerName: 'Stmt Only?', field: 'statement_only',
-                    cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-                    cellClass:    'grid-boolean-column',
-                    width:        100 }
-      col_defs << { headerName: 'Event ID', field: 'event_id' }
-      col_defs << { headerName: 'ID', field: 'id', hide: true }
-      col_defs
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
+          act.popup_link 'Detail diff', '/development/logging/logged_actions/$col1$/diff',
+                         col1: 'event_id',
+                         icon: 'fa-list',
+                         title: 'View differences',
+                         hide_if_null: :event_id
+        end
+        mk.col 'action_tstamp_tx', 'Action time'
+        mk.col 'action'
+        mk.col 'user_name', 'User', width: 200
+        mk.col 'context'
+        mk.col 'route_url'
+        make_columns_for(col_names, logged_action.table_name).each do |col|
+          mk.col col[:field], nil, col[:options]
+        end
+        mk.boolean 'statement_only', 'Stmt only?'
+        mk.integer 'event_id'
+        mk.integer 'id', nil, hide: true
+      end
     end
 
     def current_action_data_record(table_name, row_data_id)
@@ -99,30 +87,20 @@ module DevelopmentApp
 
       col_names.each do |name|
         coldef = col_lookup[name]
-        cols << col_with_attrs(coldef, name == :id ? :rowid : name)
+        cols << col_with_attrs(coldef, name == :id ? 'rowid' : name)
       end
       cols
     end
 
     def col_with_attrs(coldef, name)
-      inflector = Dry::Inflector.new
-      col = { headerName: inflector.humanize(name), field: name }
-      numeric_col_attrs(col, coldef) if %i[integer decimal float].include?(coldef[:type])
-      col[:cellRenderer] = 'crossbeamsGridFormatters.numberWithCommas4' if %i[decimal float].include?(coldef[:type])
-      boolean_col_attrs(col) if coldef[:type] == :boolean
-      col
-    end
-
-    def numeric_col_attrs(col, coldef)
-      col[:cellClass] = 'grid-number-column'
-      col[:width]     = 100 if coldef[:type] == :integer
-      col[:width]     = 120 if coldef[:type] == :number
-    end
-
-    def boolean_col_attrs(col)
-      col[:cellRenderer] = 'crossbeamsGridFormatters.booleanFormatter'
-      col[:cellClass]    = 'grid-boolean-column'
-      col[:width]        = 100
+      col = { field: name }
+      opts = {}
+      opts[:data_type] = :string
+      opts[:data_type] = :integer if coldef[:type] == :integer
+      opts[:data_type] = :number if %i[decimal float].include?(coldef[:type])
+      opts[:format]    = :delimited_1000 if %i[decimal float].include?(coldef[:type])
+      opts[:data_type] = :boolean if coldef[:type] == :boolean
+      col.merge(options: opts)
     end
 
     def logged_action_changes(table_name, id)

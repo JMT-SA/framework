@@ -3,7 +3,7 @@
 :sql: "SELECT a.event_id AS id, a.table_name, a.row_data_id, l.user_name, l.context,\r\n
   \ l.route_url, a.transaction_id,\r\na.action_tstamp_tx, \r\nCASE a.action WHEN 'I'
   THEN 'INS' WHEN 'U' THEN 'UPD'\r\n  WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,\r\na.client_query,
-  a.row_data, a.changed_fields\r\nFROM audit.logged_actions a\r\nLEFT OUTER JOIN audit.logged_action_details
+  a.row_data::text AS row_data, a.changed_fields::text AS changed_fields\r\nFROM audit.logged_actions a\r\nLEFT OUTER JOIN audit.logged_action_details
   l ON l.transaction_id = a.transaction_id AND l.action_tstamp_tx = a.action_tstamp_tx\r\nORDER
   BY a.table_name, a.row_data_id DESC"
 :limit: 

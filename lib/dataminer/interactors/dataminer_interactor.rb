@@ -52,10 +52,10 @@ module DataminerApp
           hs[:width]     = 120 if col.width.nil? && col.data_type == :number
         end
         if col.format == :delimited_1000
-          hs[:cellRenderer] = 'crossbeamsGridFormatters.numberWithCommas2'
+          hs[:valueFormatter] = 'crossbeamsGridFormatters.numberWithCommas2'
         end
         if col.format == :delimited_1000_4
-          hs[:cellRenderer] = 'crossbeamsGridFormatters.numberWithCommas4'
+          hs[:valueFormatter] = 'crossbeamsGridFormatters.numberWithCommas4'
         end
         if col.data_type == :boolean
           hs[:cellRenderer] = 'crossbeamsGridFormatters.booleanFormatter'

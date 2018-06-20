@@ -108,16 +108,6 @@ module DataminerApp
           act.popup_delete_link '/dataminer/prepared_reports/$col1$',
                                 col1: 'id',
                                 hide_if_false: for_user ? 'owner' : nil
-          act.separator
-          act.submenu('Test') do |sub|
-            sub.link 'Excel download', '/dataminer/prepared_reports/$col1$/xls',
-                     col1: 'id',
-                     icon: 'fa-file-excel-o'
-            sub.separator
-            sub.popup_edit_link '/dataminer/prepared_reports/$col1$/edit',
-                                col1: 'id',
-                                hide_if_false: for_user ? 'owner' : nil
-          end
         end
         mk.col 'db', 'Database'
         mk.col 'caption', 'Report caption', width: 300

@@ -50,6 +50,14 @@
           }
 
         }
+        else if(attr==='valueFormatter') {
+          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas2') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas4') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
+          }
+        }
         else {
           newCol[attr] = col[attr];
         }
@@ -59,42 +67,12 @@
     return newColDefs;
   };
 
-  // loadGrid = function(grid, gridOptions) {
-  //   var httpRequest, url;
-  //   url = grid.getAttribute('data-gridurl');
-  //   httpRequest = new XMLHttpRequest();
-  //   httpRequest.open('GET', url);
-  //   httpRequest.send();
-  //   return httpRequest.onreadystatechange = function() {
-  //     var httpResult, newColDefs;
-  //     if (httpRequest.readyState === 4 && httpRequest.status === 200) {
-  //       httpResult = JSON.parse(httpRequest.responseText);
-  //       newColDefs = translateColDefs(httpResult.columnDefs);
-  //       gridOptions.api.setColumnDefs(newColDefs);
-  //       gridOptions.api.setRowData(httpResult.rowDefs);
-  //     }
-  //   };
-  // };
-
-
-
 
       var grid, gridOptions, grid_id, colDefs, rowDefs;
-  // colDefs = [{headerName:"",width:60,suppressMenu:true,suppresSorting:true,suppresMovable:true,suppresFilter:true,enableRowGroup:false,enablePivot:false,enableValue:false,suppressCsvExport:true,valueGetter:"'/books/' + data.id + '/edit|edit'",colId:"edit_link2",cellRenderer:crossbeamsGridFormatters.hrefSimpleFormatter},
-  //         {headerName:"",width:60,suppressMenu:true,suppresSorting:true,suppresMovable:true,suppresFilter:true,enableRowGroup:false,enablePivot:false,enableValue:false,suppressCsvExport:true,valueGetter:"'/books/' + data.id + '|delete|Are you sure?'",colId:"delete_link",cellRenderer:crossbeamsGridFormatters.hrefPromptFormatter},
-  //         {headerName:"Id",field:"id",hide:true,headerTooltip:"Id",enableValue:true,cellClass:"grid-number-column",width:100},
-  //         {headerName:"Title",field:"title",hide:false,headerTooltip:"Title",width:200,enableRowGroup:true},
-  //         {headerName:"Author",field:"author",hide:false,headerTooltip:"Author",width:150,enableRowGroup:true,cellClassRules:{"grid-row-red":"x === 'Fred'"}}];
   colDefs = translateColDefs(<%= @page.col_defs.to_json %>),
   rowDefs = <%= @page.row_defs.to_json %>,
-  // rowDefs = [{id:2,title:"Fred is Green, and Blue",author:"Fred"},
-  //                 {id:3,title:"A new book > Old book",author:"John"},
-  //                 {id:1,title:"TDD",author:"Kent Beck"},
-  //                 {id:5,title:"600980218299308328",author:"Pallet number"},
-  //                 {id:4,title:"Something",author:"Someones"}];
       grid = document.querySelector('#grd1');
       grid_id = grid.getAttribute('id');
-//console.log(grid_id);
       //for_print = grid.dataset.gridPrint;
       gridOptions = {
         context: { domGridId: 'grd1' },
@@ -103,10 +81,6 @@
                 enableColResize: true,
                 enableSorting: true,
                 enableFilter: true,
-                suppressScrollLag: true,
-            // groupSuppressAutoColumn: true,
-            // groupHideOpenParents: true,
-        // animateRows: true,
                 rowSelection: 'single',
                 enableRangeSelection: true,
                 enableStatusBar: true,

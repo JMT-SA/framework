@@ -97,18 +97,24 @@
           }
 
         }
-        else {
-          if(attr==='cellEditor') {
-            if(col[attr] ==='NumericCellEditor') {
-              newCol[attr] = NumericCellEditor;
-            }
-            else {
-              newCol[attr] = col[attr];
-            }
+        else if(attr==='valueFormatter') {
+          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas2') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
+          }
+          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas4') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
+          }
+        }
+        else if(attr==='cellEditor') {
+          if(col[attr] ==='NumericCellEditor') {
+            newCol[attr] = NumericCellEditor;
           }
           else {
             newCol[attr] = col[attr];
           }
+        }
+        else {
+          newCol[attr] = col[attr];
         }
       }
       newColDefs.push(newCol);
@@ -128,12 +134,12 @@
         rowData: rowDefs,
         context: {
           saveUrl: '<%= @page.save_url %>',
-          keyColumn: 'name'
+          keyColumn: 'name',
+          domGridId: 'grd1'
               },
                 enableColResize: true,
                 enableSorting: true,
                 enableFilter: true,
-                suppressScrollLag: true,
                 enableRangeSelection: true,
                 enableStatusBar: true,
                 suppressAggFuncInHeader: true,
@@ -212,7 +218,6 @@
                 enableColResize: true,
                 enableSorting: true,
                 enableFilter: true,
-                suppressScrollLag: true,
                 enableRangeSelection: true,
                 enableStatusBar: true,
         suppressAggFuncInHeader: true,

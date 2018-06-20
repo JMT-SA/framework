@@ -917,6 +917,13 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           if (col[attr] === 'crossbeamsGridFormatters.hrefPromptFormatter') {
             newCol[attr] = crossbeamsGridFormatters.hrefPromptFormatter;
           }
+        } else if (attr === 'valueFormatter') {
+          if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas2') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
+          }
+          if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas4') {
+            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
+          }
         } else if (attr === 'cellEditor') {
           if (col[attr] === 'NumericCellEditor') {
             newCol[attr] = NumericCellEditor;

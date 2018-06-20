@@ -43,7 +43,7 @@ module PackMaterial
                 row.column do |col|
                   col.add_text 'Assign Product Columns'
                   col.add_grid('productColumnsGrid',
-                               '/list/material_resource_product_columns/grid_multi/material_resource_type_configs',
+                               '/list/multi_matres_product_columns/grid_multi/material_resource_type_configs',
                                caption: 'Assign Product Columns',
                                is_multiselect: true,
                                multiselect_url: "/pack_material/config/link_product_columns/#{id}",

@@ -161,4 +161,12 @@
   :default_value: 
   :ordered_list: 
   :ui_priority: 1
-  :list_def: 
+  :list_def:
+- :column: material_resource_product_columns.id
+  :caption: Id
+  :data_type: :integer
+  :control_type: :list
+  :default_value:
+  :ordered_list:
+  :ui_priority: 1
+  :list_def:

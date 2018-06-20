@@ -1,0 +1,28 @@
+---
+:dataminer_definition: material_resource_product_columns
+:actions:
+- :url: "/pack_material/config/material_resource_product_columns/$:id$"
+  :text: view options
+  :icon: fa-list
+  :title: View Options
+  :popup: true
+- :url: "/pack_material/config/material_resource_product_columns/$:id$/edit"
+  :text: edit options
+  :icon: fa-edit
+  :title: Edit Options
+  :popup: true
+- :url: "/pack_material/config/material_resource_product_columns/$:id$/option/new"
+  :text: add options
+  :icon: fa-plus
+  :title: New Option
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/list/material_resource_sub_types"
+  :text: Back
+  :style: :button
+:conditions:
+  :standard:
+    - :col: material_resource_product_columns.id
+      :op: in
+      :val: $:product_column_ids$

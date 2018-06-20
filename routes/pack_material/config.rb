@@ -107,6 +107,17 @@ class Framework < Roda
         raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
         show_partial { PackMaterial::Config::MatresSubType::Edit.call(id) }
       end
+      r.on 'product_columns' do
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
+        repo = PackMaterialApp::ConfigRepo.new()
+        product_column_ids = repo.find_matres_sub_type(id).product_column_ids || []
+        if product_column_ids.any?
+          r.redirect "/list/material_resource_product_columns/with_params?key=standard&product_column_ids=#{product_column_ids}"
+        else
+          flash[:error] = "No product columns selected, please see config."
+          r.redirect "/list/material_resource_sub_types"
+        end
+      end
       r.on 'config' do
         r.is 'edit' do
           raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')

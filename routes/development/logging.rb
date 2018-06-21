@@ -15,7 +15,7 @@ class Framework < Roda
 
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('logging', 'read')
+          check_auth!('logging', 'read')
           # using id of logged_action, build a grid of changes.
           show_page { Development::Logging::LoggedAction::Show.call(id) }
         end

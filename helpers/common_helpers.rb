@@ -122,6 +122,10 @@ module CommonHelpers
     !authorised?(programs, sought_permission)
   end
 
+  def check_auth!(programs, sought_permission, functional_area_id = nil)
+    raise Crossbeams::AuthorizationError unless authorised?(programs, sought_permission, functional_area_id)
+  end
+
   def redirect_to_last_grid(route)
     if fetch?(route)
       redirect_via_json(session[:last_grid_url])

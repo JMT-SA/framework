@@ -16,12 +16,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'edit')
+        check_auth!('masterfiles', 'edit')
         show_partial { Development::Masterfiles::Role::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'read')
+          check_auth!('masterfiles', 'read')
           show_partial { Development::Masterfiles::Role::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -39,7 +39,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
+          check_auth!('masterfiles', 'delete')
           res = interactor.delete_role(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -48,7 +48,7 @@ class Framework < Roda
     r.on 'roles' do
       interactor = DevelopmentApp::RoleInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
+        check_auth!('masterfiles', 'new')
         show_partial_or_page(r) { Development::Masterfiles::Role::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -76,12 +76,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'edit')
+        check_auth!('masterfiles', 'edit')
         show_partial { Development::Masterfiles::AddressType::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'read')
+          check_auth!('masterfiles', 'read')
           show_partial { Development::Masterfiles::AddressType::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -99,7 +99,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
+          check_auth!('masterfiles', 'delete')
           res = interactor.delete_address_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -108,7 +108,7 @@ class Framework < Roda
     r.on 'address_types' do
       interactor = DevelopmentApp::AddressTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
+        check_auth!('masterfiles', 'new')
         show_partial_or_page(r) { Development::Masterfiles::AddressType::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -136,12 +136,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'edit')
+        check_auth!('masterfiles', 'edit')
         show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'read')
+          check_auth!('masterfiles', 'read')
           show_partial { Development::Masterfiles::ContactMethodType::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -158,7 +158,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
+          check_auth!('masterfiles', 'delete')
           res = interactor.delete_contact_method_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -167,7 +167,7 @@ class Framework < Roda
     r.on 'contact_method_types' do
       interactor = DevelopmentApp::ContactMethodTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
+        check_auth!('masterfiles', 'new')
         show_partial_or_page(r) { Development::Masterfiles::ContactMethodType::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -195,12 +195,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'edit')
+        check_auth!('masterfiles', 'edit')
         show_partial { Development::Masterfiles::User::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'read')
+          check_auth!('masterfiles', 'read')
           show_partial { Development::Masterfiles::User::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -221,7 +221,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'delete')
+          check_auth!('masterfiles', 'delete')
           res = interactor.delete_user(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -230,7 +230,7 @@ class Framework < Roda
     r.on 'users' do
       interactor = DevelopmentApp::UserInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('masterfiles', 'new')
+        check_auth!('masterfiles', 'new')
         show_partial_or_page(r) { Development::Masterfiles::User::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE

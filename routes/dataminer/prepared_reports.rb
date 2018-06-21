@@ -13,7 +13,7 @@ class Framework < Roda
     interactor = DataminerApp::PreparedReportInteractor.new(current_user, {}, { route_url: request.path }, {})
 
     r.on 'new', String do |id|    # NEW
-      raise Crossbeams::AuthorizationError unless authorised?('reports', 'new')
+      check_auth!('reports', 'new')
       # Show already-saved-reports-for-same_user
       show_partial_or_page(r) { DM::Report::PreparedReport::New.call(id, params[:json_var], current_user, remote: fetch?(r)) }
     end
@@ -101,7 +101,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do
-        raise Crossbeams::AuthorizationError unless authorised?('reports', 'edit') # Need to check user == creator, or has all_preps permission...
+        check_auth!('reports', 'edit') # Need to check user == creator, or has all_preps permission...
         show_partial { DM::Report::PreparedReport::Edit.call(id) }
       end
 

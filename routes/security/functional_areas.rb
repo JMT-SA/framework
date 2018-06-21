@@ -16,12 +16,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'edit')
+        check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::FunctionalArea::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'read')
+          check_auth!('menu', 'read')
           show_partial { Security::FunctionalAreas::FunctionalArea::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -37,7 +37,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'delete')
+          check_auth!('menu', 'delete')
           res = interactor.delete_functional_area(id)
           flash[:notice] = res.message
           redirect_to_last_grid(r)
@@ -48,7 +48,7 @@ class Framework < Roda
     r.on 'functional_areas' do
       interactor = SecurityApp::FunctionalAreaInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
+        check_auth!('menu', 'new')
         show_partial_or_page(r) { Security::FunctionalAreas::FunctionalArea::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -72,7 +72,7 @@ class Framework < Roda
       interactor = SecurityApp::ProgramInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
+        check_auth!('menu', 'new')
         show_partial_or_page(r) { Security::FunctionalAreas::Program::New.call(id, remote: fetch?(r)) }
       end
 
@@ -82,12 +82,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'edit')
+        check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::Program::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'read')
+          check_auth!('menu', 'read')
           show_partial { Security::FunctionalAreas::Program::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -103,7 +103,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'delete')
+          check_auth!('menu', 'delete')
           res = interactor.delete_program(id)
           flash[:notice] = res.message
           redirect_to_last_grid(r)
@@ -158,7 +158,7 @@ class Framework < Roda
       interactor = SecurityApp::ProgramFunctionInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
+        check_auth!('menu', 'new')
         show_partial_or_page(r) { Security::FunctionalAreas::ProgramFunction::New.call(id, remote: fetch?(r)) }
       end
 
@@ -168,12 +168,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'edit')
+        check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::ProgramFunction::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'read')
+          check_auth!('menu', 'read')
           show_partial { Security::FunctionalAreas::ProgramFunction::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -189,7 +189,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'delete')
+          check_auth!('menu', 'delete')
           res = interactor.delete_program_function(id)
           flash[:notice] = res.message
           redirect_to_last_grid(r)
@@ -235,7 +235,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'edit')
+        check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::SecurityGroup::Edit.call(id) }
       end
       r.on 'permissions' do
@@ -256,7 +256,7 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'read')
+          check_auth!('menu', 'read')
           show_partial { Security::FunctionalAreas::SecurityGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -273,7 +273,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'delete')
+          check_auth!('menu', 'delete')
           res = interactor.delete_security_group(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -282,7 +282,7 @@ class Framework < Roda
     r.on 'security_groups' do
       interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
+        check_auth!('menu', 'new')
         show_partial_or_page(r) { Security::FunctionalAreas::SecurityGroup::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -311,12 +311,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'edit')
+        check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'read')
+          check_auth!('menu', 'read')
           show_partial { Security::FunctionalAreas::SecurityPermission::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -333,7 +333,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('menu', 'delete')
+          check_auth!('menu', 'delete')
           res = interactor.delete_security_permission(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -343,7 +343,7 @@ class Framework < Roda
     r.on 'security_permissions' do
       interactor = SecurityApp::SecurityPermissionInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('menu', 'new')
+        check_auth!('menu', 'new')
         show_partial_or_page(r) { Security::FunctionalAreas::SecurityPermission::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE

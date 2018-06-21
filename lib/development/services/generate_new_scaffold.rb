@@ -500,12 +500,12 @@ class GenerateNewScaffold < BaseService
               end
 
               r.on 'edit' do   # EDIT
-                raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'edit')
+                check_auth!('#{opts.program_text}', 'edit')
                 show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id) }
               end
               r.is do
                 r.get do       # SHOW
-                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'read')
+                  check_auth!('#{opts.program_text}', 'read')
                   show_partial { #{opts.classnames[:view_prefix]}::Show.call(id) }
                 end
                 r.patch do     # UPDATE
@@ -520,7 +520,7 @@ class GenerateNewScaffold < BaseService
                 end
                 r.delete do    # DELETE
                   return_json_response
-                  raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'delete')
+                  check_auth!('#{opts.program_text}', 'delete')
                   res = interactor.delete_#{opts.singlename}(id)
                   delete_grid_row(id, notice: res.message)
                 end
@@ -549,7 +549,7 @@ class GenerateNewScaffold < BaseService
         r.on '#{opts.table}' do
           interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
           r.on 'new' do    # NEW
-            raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
+            check_auth!('#{opts.program_text}', 'new')
             show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
           end
           r.post do        # CREATE
@@ -575,7 +575,7 @@ class GenerateNewScaffold < BaseService
           r.on '#{opts.table}' do
             interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
             r.on 'new' do    # NEW
-              raise Crossbeams::AuthorizationError unless authorised?('#{opts.program_text}', 'new')
+              check_auth!('#{opts.program_text}', 'new')
               show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
             end
             r.post do        # CREATE

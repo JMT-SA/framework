@@ -50,5 +50,9 @@ module SecurityApp
       end
       success_response('Linked users to program function')
     end
+
+    def show_sql(id, webapp)
+      DataToSql.new(webapp).sql_for(:program_functions, id)
+    end
   end
 end

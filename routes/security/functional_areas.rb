@@ -19,6 +19,10 @@ class Framework < Roda
         check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::FunctionalArea::Edit.call(id) }
       end
+      r.on 'sql' do
+        sql = interactor.show_sql(id, self.class.name)
+        show_partial { Security::FunctionalAreas::FunctionalArea::Sql.call(sql) }
+      end
       r.is do
         r.get do       # SHOW
           check_auth!('menu', 'read')
@@ -84,6 +88,10 @@ class Framework < Roda
       r.on 'edit' do   # EDIT
         check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::Program::Edit.call(id) }
+      end
+      r.on 'sql' do
+        sql = interactor.show_sql(id, self.class.name)
+        show_partial { Security::FunctionalAreas::FunctionalArea::Sql.call(sql) }
       end
       r.is do
         r.get do       # SHOW
@@ -170,6 +178,10 @@ class Framework < Roda
       r.on 'edit' do   # EDIT
         check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::ProgramFunction::Edit.call(id) }
+      end
+      r.on 'sql' do
+        sql = interactor.show_sql(id, self.class.name)
+        show_partial { Security::FunctionalAreas::FunctionalArea::Sql.call(sql) }
       end
       r.is do
         r.get do       # SHOW

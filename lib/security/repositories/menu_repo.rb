@@ -55,7 +55,8 @@ module SecurityApp
       end
     end
 
-    def update_program(id, res)
+    def update_program(id, in_res)
+      res = in_res.to_h
       webapps = res.delete(:webapps)
       DB.transaction do
         update(:programs, id, res)

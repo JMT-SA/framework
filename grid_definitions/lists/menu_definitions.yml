@@ -19,6 +19,12 @@
         :is_delete: true
         :popup: true
         :hide_if_present: :program_id
+      - :separator: true
+      - :url: /security/functional_areas/functional_areas/$:functional_area_id$/sql
+        :text: SQL for Functional area
+        :icon: fa-code
+        :title: SQL for Functional area - $:functional_area_name$
+        :popup: true
   - :separator: true
   - :submenu:
       :text: Program
@@ -45,6 +51,12 @@
         :title: Re-order
         :hide_if_null: :id
         :popup: true
+      - :separator: true
+      - :url: /security/functional_areas/programs/$:program_id$/sql
+        :text: SQL for Program
+        :icon: fa-code
+        :title: SQL for Program - $:program_name$
+        :popup: true
   - :separator: true
   - :submenu:
       :text: Program Function
@@ -70,6 +82,12 @@
         :icon: fa-lock
         :hide_if_null: :id
         :hide_if_false: :restricted_user_access
+      - :separator: true
+      - :url: /security/functional_areas/program_functions/$:id$/sql
+        :text: SQL for Program function
+        :icon: fa-code
+        :title: SQL for Program function - $:program_function_name$
+        :popup: true
 :page_controls:
   - :control_type: :link
     :url: /security/functional_areas/functional_areas/new

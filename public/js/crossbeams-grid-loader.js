@@ -1125,7 +1125,11 @@ $(() => {
     const itemSet = {};
     if (subs) {
       subs.forEach((sub) => {
-        itemSet[sub.key] = sub;
+        if (sub.value && sub.value === '---') {
+          itemSet[sub.key] = '---';
+        } else {
+          itemSet[sub.key] = sub;
+        }
         itemSet[sub.key].domGridId = gridId;
       });
     }

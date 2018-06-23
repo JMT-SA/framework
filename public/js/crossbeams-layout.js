@@ -229,6 +229,7 @@
                 if (data.exception) {
                   Jackbox.error(data.flash.error, { time: 20 });
                   if (data.backtrace) {
+                    console.log('EXCEPTION:', data.exception, data.flash.error);
                     console.log('==Backend Backtrace==');
                     console.info(data.backtrace.join('\n'));
                   }
@@ -243,8 +244,20 @@
             }
           }).catch((data) => {
             if (data.response && data.response.status === 500) {
-              data.response.text().then((body) => {
-                document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
+              data.response.json().then((body) => {
+                if (body.flash.error) {
+                  if (body.exception) {
+                    if (body.backtrace) {
+                      console.log('EXCEPTION:', body.exception, body.flash.error);
+                      console.log('==Backend Backtrace==');
+                      console.info(body.backtrace.join('\n'));
+                    }
+                  } else {
+                    Jackbox.error(body.flash.error);
+                  }
+                } else {
+                  document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
+                }
               });
             }
             Jackbox.error(`An error occurred ${data}`, { time: 20 });

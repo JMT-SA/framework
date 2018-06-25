@@ -176,6 +176,11 @@ const crossbeamsUtils = {
       credentials: 'same-origin',
     }).then((response) => {
       const contentType = response.headers.get('Content-Type'); // -> "text/html; charset=utf-8"
+      if (response.status === 404) {
+        const err = document.getElementById(this.activeDialogError());
+        err.innerHTML = '<strong>404</strong><br>The requested URL could not be found.';
+        err.style.display = 'block';
+      }
       if (/text\/html/i.test(contentType)) {
         return response.text();
       }

@@ -21,5 +21,11 @@ module DevelopmentApp
     def deactivate_user(id)
       deactivate(:users, id)
     end
+
+    def save_new_password(id, password)
+      password_hash = BCrypt::Password.create(password)
+      upd = "UPDATE users SET password_hash = '#{password_hash}' WHERE id = #{id};"
+      DB[upd].update
+    end
   end
 end

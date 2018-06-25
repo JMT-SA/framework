@@ -198,6 +198,42 @@ class Framework < Roda
         check_auth!('masterfiles', 'edit')
         show_partial { Development::Masterfiles::User::Edit.call(id) }
       end
+      r.on 'details' do
+        r.get do
+          show_partial { Development::Masterfiles::User::Details.call(id) }
+        end
+        r.patch do
+          # User updates own password
+          res = interactor.change_user_password(id, params[:user])
+          if res.success
+            show_json_notice res.message
+          else
+            re_show_form(r, res, url: "/development/masterfiles/users/#{id}/details") do
+              Development::Masterfiles::User::Details.call(id,
+                                                           form_values: {}, # Do not re-show password values...
+                                                           form_errors: res.errors)
+            end
+          end
+        end
+      end
+      r.on 'change_password' do
+        r.get do
+          check_auth!('masterfiles', 'edit')
+          show_partial { Development::Masterfiles::User::ChangePassword.call(id) }
+        end
+        r.patch do
+          res = interactor.set_user_password(id, params[:user])
+          if res.success
+            show_json_notice res.message
+          else
+            re_show_form(r, res, url: "/development/masterfiles/users/#{id}/change_password") do
+              Development::Masterfiles::User::ChangePassword.call(id,
+                                                                  form_values: {}, # Do not re-show password values...
+                                                                  form_errors: res.errors)
+            end
+          end
+        end
+      end
       r.is do
         r.get do       # SHOW
           check_auth!('masterfiles', 'read')

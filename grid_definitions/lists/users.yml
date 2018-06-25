@@ -20,6 +20,12 @@
   :text: select programs
   :icon: fa-list
   :popup: true
+- :separator: true
+- :url: "/development/masterfiles/users/$:id$/change_password"
+  :text: Change password
+  :icon: fa-lock
+  :title: Change password
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/development/masterfiles/users/new"

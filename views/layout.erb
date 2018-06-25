@@ -48,7 +48,7 @@
           <ul id="menuSearchResults">
           </ul>
           <!-- [current resource] -->
-          <span class="ml2 mr2"><%= current_user.user_name %> <%#= current_user.department_name %></span>
+          <a href="/development/masterfiles/users/<%= current_user.id %>/details" class="ml2 mr2 f6 link dim mb2 br2 ph3 pv2 dib white bg-silver" data-popup-dialog= "true"><%= current_user.user_name %></a>
           <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
         <% end %>
       </div>

@@ -12,13 +12,26 @@ module UiRules
       set_show_fields if @mode == :show
       set_new_fields if @mode == :new
       set_edit_fields if @mode == :edit
+      set_detail_fields if @mode == :details
+      set_password_fields if @mode == :change_password
 
       form_name 'user'
     end
 
     def set_new_fields
       fields[:password] = { subtype: :password }
-      fields[:password_confirmation] = { subtype: :password, caption: 'Confirm Password' }
+      fields[:password_confirmation] = { subtype: :password, caption: 'Confirm new password' }
+    end
+
+    def set_detail_fields
+      fields[:old_password] = { subtype: :password }
+      set_show_fields
+      set_new_fields
+    end
+
+    def set_password_fields
+      set_show_fields
+      set_new_fields
     end
 
     def set_edit_fields
@@ -43,7 +56,16 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find_user(@options[:id])
+      @form_object = if @mode == :details
+                       OpenStruct.new(@repo.find_user(@options[:id]).to_h.merge(password: nil,
+                                                                                old_password: nil,
+                                                                                password_confirmation: nil))
+                     elsif @mode == :change_password
+                       OpenStruct.new(@repo.find_user(@options[:id]).to_h.merge(password: nil,
+                                                                                password_confirmation: nil))
+                     else
+                       @repo.find_user(@options[:id])
+                     end
     end
 
     def make_new_form_object

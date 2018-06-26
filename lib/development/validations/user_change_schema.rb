@@ -12,8 +12,8 @@ module DevelopmentApp
       value(:password_confirmation).eql?(password)
     end
 
-    rule(old_password: [:password]) do |password|
-      value(:old_password).not_eql?(password)
+    rule(password: [:old_password]) do |old_password|
+      value(:password).not_eql?(old_password)
     end
   end
 end

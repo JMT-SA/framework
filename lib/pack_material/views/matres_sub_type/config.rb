@@ -19,7 +19,9 @@ module PackMaterial
             page.form_errors form_errors
 
             page.section do |section|
-              section.add_text "Config for #{ui_rule.form_object.sub_type_name}", wrapper: :h2
+              # section.add_text "Config for #{ui_rule.form_object.sub_type_name}", wrapper: :h2
+              section.add_caption "Config for #{ui_rule.form_object.sub_type_name}"
+              section.show_border!
               section.form do |form|
                 form.action "/pack_material/config/material_resource_sub_types/#{id}/config"
                 form.remote!
@@ -36,6 +38,7 @@ module PackMaterial
 
             # Product Columns
             page.section do |section|
+              section.show_border!
               section.row do |row|
                 row.column do |col|
                   col.add_text 'Assign Product Columns'
@@ -53,6 +56,7 @@ module PackMaterial
             end
 
             page.section do |section|
+              section.show_border!
               section.form do |form|
                 form.form_config      = rules_for_cols
                 product_code_column_name_list = repo.product_code_columns(id)

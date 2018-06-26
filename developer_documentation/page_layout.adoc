@@ -117,6 +117,10 @@ These are the methods used in building a page layout.
 |grid_id (String), url (String), options (Hash)
 |Add a Grid to the section.
 
+|add_caption
+|text (String)
+|Add a caption (rendered as header1) to the top of the section.
+
 |add_text
 |text (String), options (Hash)
 |Add a block of Text to the section.
@@ -124,6 +128,10 @@ These are the methods used in building a page layout.
 |add_control
 |page_control_definition (Hash)
 |Add a control (link / button) to the section.
+
+|show_border!
+|None
+|Show a border around the Section. No border is shown if this method is not called.
 
 |render
 |

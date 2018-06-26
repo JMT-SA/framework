@@ -465,47 +465,51 @@ const crossbeamsUtils = {
     const sels = document.querySelectorAll('.searchable-select');
     let holdSel;
     sels.forEach((sel) => {
-      holdSel = new Selectr(sel, {
-        customClass: 'cbl-input',
-        defaultSelected: true, // should configure via data...
-        // multiple: true,     // should configure via data...
-        allowDeselect: false,
-        clearable: true,       // should configure via data...
-      }); // select that can be searched.
-      // Store a reference on the DOM node.
-      sel.selectr = holdSel;
+      if (sel.selectr) {
+        // Selectr has already been applied...
+      } else {
+        holdSel = new Selectr(sel, {
+          customClass: 'cbl-input',
+          defaultSelected: true, // should configure via data...
+          // multiple: true,     // should configure via data...
+          allowDeselect: false,
+          clearable: true,       // should configure via data...
+        }); // select that can be searched.
+        // Store a reference on the DOM node.
+        sel.selectr = holdSel;
 
-      // changeValues behaviour - check if another element should be
-      // enabled/disabled based on the current selected value.
-      if (sel.dataset && sel.dataset.changeValues) {
-        holdSel.on('selectr.change', (option) => {
-          sel.dataset.changeValues.split(',').forEach((el) => {
-            const target = document.getElementById(el);
-            if (target && (target.dataset && target.dataset.enableOnValues)) {
-              const vals = target.dataset.enableOnValues;
-              if (_.includes(vals, option.value)) {
-                target.disabled = false;
-              } else {
-                target.disabled = true;
+        // changeValues behaviour - check if another element should be
+        // enabled/disabled based on the current selected value.
+        if (sel.dataset && sel.dataset.changeValues) {
+          holdSel.on('selectr.change', (option) => {
+            sel.dataset.changeValues.split(',').forEach((el) => {
+              const target = document.getElementById(el);
+              if (target && (target.dataset && target.dataset.enableOnValues)) {
+                const vals = target.dataset.enableOnValues;
+                if (_.includes(vals, option.value)) {
+                  target.disabled = false;
+                } else {
+                  target.disabled = true;
+                }
+                if (target.selectr) {
+                  target.selectr.disable(target.disabled === true);
+                }
               }
-              if (target.selectr) {
-                target.selectr.disable(target.disabled === true);
-              }
-            }
+            });
           });
-        });
-      }
+        }
 
-      // observeChange behaviour - get rules from select element and
-      // call the supplied url(s).
-      if (sel.dataset && sel.dataset.observeChange) {
-        holdSel.on('selectr.change', (option) => {
-          const s = sel.dataset.observeChange;
-          const j = JSON.parse(s);
-          const urls = j.map(el => this.buildObserveChangeUrl(el, option));
+        // observeChange behaviour - get rules from select element and
+        // call the supplied url(s).
+        if (sel.dataset && sel.dataset.observeChange) {
+          holdSel.on('selectr.change', (option) => {
+            const s = sel.dataset.observeChange;
+            const j = JSON.parse(s);
+            const urls = j.map(el => this.buildObserveChangeUrl(el, option));
 
-          urls.forEach(url => this.fetchDropdownChanges(url));
-        });
+            urls.forEach(url => this.fetchDropdownChanges(url));
+          });
+        }
       }
     });
   },

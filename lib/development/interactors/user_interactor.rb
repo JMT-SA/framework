@@ -35,7 +35,7 @@ module DevelopmentApp
 
     def create_user(params)
       res = validate_new_user_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
       id = repo.create_user(prepare_password(res))
       instance = user(id)
       success_response("Created user #{instance.user_name}",
@@ -97,7 +97,7 @@ module DevelopmentApp
           if t.start_with?('must not be equal')
             'cannot be the same as the old password'
           elsif t.start_with?('must be equal')
-            'must match the new password'
+            'must match the password'
           else
             t
           end

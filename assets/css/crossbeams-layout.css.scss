@@ -41,7 +41,12 @@
   background: transparent url(/images/loading_bars.gif) 0 0 no-repeat;
 }
 section.crossbeams_layout {
-  border-bottom: gray thin solid;
+  padding: 0.5em;
+}
+section.crossbeams_layout-border {
+  margin: 1em 0;
+  border: solid thin lightgray;
+  border-radius: 1em;
 }
 .grid-number-column {
   text-align: right;
@@ -230,7 +235,11 @@ form.rodauth div.form-group {
   font-size: 1em;
   padding: 2px 5px 4px;
 /*  border: 0 none; */
-  border-radius: 2px;
+}
+input.cbl-input {
+  line-height: 1.4em;
+  border-radius: 0.25em;
+  border: 1px solid #999;
 }
 .cbl-to-upper {
   text-transform: uppercase;

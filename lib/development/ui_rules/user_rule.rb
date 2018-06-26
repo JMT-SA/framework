@@ -20,7 +20,7 @@ module UiRules
 
     def set_new_fields
       fields[:password] = { subtype: :password }
-      fields[:password_confirmation] = { subtype: :password, caption: 'Confirm new password' }
+      fields[:password_confirmation] = { subtype: :password, caption: 'Confirm password' }
     end
 
     def set_detail_fields

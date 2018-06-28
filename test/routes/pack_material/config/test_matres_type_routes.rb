@@ -131,4 +131,63 @@ class TestMatresTypeRoutes < RouteTester
     end
     expect_json_replace_dialog
   end
+
+  def test_new_unit
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterial::Config::MatresType::Unit.stub(:call, bland_page) do
+      get  'pack_material/config/material_resource_types/1/unit/new', {}, 'rack.session' => { user_id: 1 }
+    end
+    expect_bland_page
+  end
+
+  def test_new_unit_fail
+    authorise_fail!
+    ensure_exists!(INTERACTOR)
+    get 'pack_material/config/material_resource_types/1/unit/new', {}, 'rack.session' => { user_id: 1 }
+    refute last_response.ok?
+    assert_match(/permission/i, last_response.body)
+  end
+
+  def test_create_unit
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
+    post 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_ok_redirect
+  end
+
+  def test_create_unit_remotely
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
+    post_as_fetch 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_ok_json_redirect
+  end
+
+  def test_create_unit_fail
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(bad_response)
+    PackMaterial::Config::MatresType::Unit.stub(:call, bland_page) do
+      post_as_fetch 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    end
+    expect_bad_page
+
+    PackMaterial::Config::MatresType::Unit.stub(:call, bland_page) do
+      post 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    end
+    expect_bad_redirect(url: '/pack_material/config/material_resource_types/1/unit/new')
+  end
+
+  def test_create_unit_remotely_fail
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(bad_response)
+    PackMaterial::Config::MatresType::Unit.stub(:call, bland_page) do
+      post_as_fetch 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    end
+    expect_json_replace_dialog
+  end
+
 end

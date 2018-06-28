@@ -124,6 +124,19 @@ module PackMaterialApp
 
     end
 
+    def test_add_a_matres_unit
+      ConfigInteractor.any_instance.stubs(:create_matres_unit).returns(true)
+      ConfigInteractor.any_instance.stubs(:add_matres_unit).returns(false)
+
+      params = { other: 'new unit', unit_of_measure: 'other' }
+      x = interactor.add_a_matres_unit(1, params)
+      assert_equal true, x
+
+      params = { unit_of_measure: 'thing' }
+      x = interactor.add_a_matres_unit(1, params)
+      assert_equal false, x
+    end
+
     def test_create_matres_unit
       ConfigRepo.any_instance.stubs(:create_matres_type_unit).returns(true)
       params = { other: 'new unit' }

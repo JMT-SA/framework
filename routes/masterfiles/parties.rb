@@ -17,38 +17,6 @@ class Framework < Roda
         raise Crossbeams::AuthorizationError unless authorised?('parties', 'edit')
         show_partial { Masterfiles::Parties::Organization::Edit.call(id) }
       end
-      r.on 'addresses' do
-        r.post do
-          return_json_response
-          res = interactor.assign_addresses(id, params[:organization])
-          if res.success
-            update_grid_row(id,
-                            changes: { addresses: res.instance.address_list },
-                            notice: res.message)
-          else
-            content = show_partial { Masterfiles::Parties::Organization::Addresses.call(id, params[:organization], res.errors) }
-            update_dialog_content(content: content, error: res.message)
-          end
-        end
-
-        show_partial { Masterfiles::Parties::Organization::Addresses.call(id) }
-      end
-      r.on 'contact_methods' do
-        r.post do
-          return_json_response
-          res = interactor.assign_contact_methods(id, params[:organization])
-          if res.success
-            update_grid_row(id,
-                            changes: { contact_methods: res.instance.contact_method_list },
-                            notice: res.message)
-          else
-            content = show_partial { Masterfiles::Parties::Organization::ContactMethods.call(id, params[:organization], res.errors) }
-            update_dialog_content(content: content, error: res.message)
-          end
-        end
-
-        show_partial { Masterfiles::Parties::Organization::ContactMethods.call(id) }
-      end
       r.is do
         r.get do
           raise Crossbeams::AuthorizationError unless authorised?('parties', 'read')
@@ -124,36 +92,6 @@ class Framework < Roda
       r.on 'edit' do
         raise Crossbeams::AuthorizationError unless authorised?('parties', 'edit')
         show_partial { Masterfiles::Parties::Person::Edit.call(id) }
-      end
-      r.on 'addresses' do
-        r.post do
-          return_json_response
-          res = interactor.assign_addresses(id, params[:person])
-          if res.success
-            update_grid_row(id,
-                            changes: { addresses: res.instance.address_list },
-                            notice: res.message)
-          else
-            content = show_partial { Masterfiles::Parties::Person::Addresses.call(id, params[:person], res.errors) }
-            update_dialog_content(content: content, error: res.message)
-          end
-        end
-        show_partial { Masterfiles::Parties::Person::Addresses.call(id) }
-      end
-      r.on 'contact_methods' do
-        r.post do
-          return_json_response
-          res = interactor.assign_contact_methods(id, params[:person])
-          if res.success
-            update_grid_row(id,
-                            changes: { contact_methods: res.instance.contact_method_list },
-                            notice: res.message)
-          else
-            content = show_partial { Masterfiles::Parties::Person::ContactMethods.call(id, params[:person], res.errors) }
-            update_dialog_content(content: content, error: res.message)
-          end
-        end
-        show_partial { Masterfiles::Parties::Person::ContactMethods.call(id) }
       end
       r.is do
         r.get do
@@ -370,6 +308,11 @@ class Framework < Roda
         interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
 
         res = interactor.link_addresses(id, multiselect_grid_choices(params))
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
         redirect_to_last_grid(r)
       end
     end

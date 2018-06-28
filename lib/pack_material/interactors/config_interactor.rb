@@ -27,6 +27,14 @@ module PackMaterialApp
       success_response("Deleted type #{name}")
     end
 
+    def add_a_matres_unit(id, params)
+      if params && params[:unit_of_measure] == 'other'
+        create_matres_unit(id, params)
+      else
+        add_matres_unit(id, params)
+      end
+    end
+
     def create_matres_unit(matres_type_id, params)
       params[:unit_of_measure] = params[:other]
       res = validate_matres_unit_params(params)

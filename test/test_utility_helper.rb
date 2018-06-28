@@ -10,7 +10,7 @@ class TestUtilityFunctions < Minitest::Test
     assert_equal ",\n    ", UtilityFunctions.comma_newline_and_spaces(4)
   end
 
-  def test_spaces_from_string_lengths
-    skip 'not currently in use'
-  end
+  # def test_spaces_from_string_lengths
+  #   skip 'not currently in use'
+  # end
 end

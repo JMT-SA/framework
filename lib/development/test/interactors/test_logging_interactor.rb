@@ -9,7 +9,6 @@ module DevelopmentApp
   class TestLoggingInteractor < Minitest::Test
     def test_repo
       repo = interactor.repo
-      # repo = interactor.send(:repo)
       assert repo.is_a?(DevelopmentApp::LoggingRepo)
     end
 

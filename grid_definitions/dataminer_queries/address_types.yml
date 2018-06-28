@@ -1,9 +1,10 @@
 ---
 :caption: Address Types
 :sql: SELECT "address_types"."id", "address_types"."address_type", "address_types"."active",
-        "address_types"."created_at", "address_types"."updated_at" FROM "address_types"
-:limit:
-:offset:
+  "address_types"."created_at", "address_types"."updated_at" FROM "address_types"
+:limit: 
+:offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -11,11 +12,11 @@
     :caption: Id
     :namespaced_name: address_types.id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -26,11 +27,11 @@
     :caption: Address type
     :namespaced_name: address_types.address_type
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -41,11 +42,11 @@
     :caption: Active
     :namespaced_name: address_types.active
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -56,11 +57,11 @@
     :caption: Created at
     :namespaced_name: address_types.created_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -71,11 +72,11 @@
     :caption: Updated at
     :namespaced_name: address_types.updated_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

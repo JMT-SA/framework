@@ -21,12 +21,7 @@ class Framework < Roda
           show_partial_or_page(r) { PackMaterial::Config::MatresType::Unit.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          if params[:matres_type] && params[:matres_type][:unit_of_measure] == 'other'
-            res = interactor.create_matres_unit(id, params[:matres_type])
-          else
-            res = interactor.add_matres_unit(id, params[:matres_type])
-          end
-
+          res = interactor.add_a_matres_unit(id, params[:matres_type])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
@@ -121,12 +116,7 @@ class Framework < Roda
       r.on 'config' do
         r.is 'edit' do
           raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_page { PackMaterial::Config::MatresSubType::Config.call(id) }
-          end
+          show_partial_or_page(r) { PackMaterial::Config::MatresSubType::Config.call(id) }
         end
         r.patch do
           return_json_response

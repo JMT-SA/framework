@@ -58,24 +58,27 @@ class TestMarketingVarietyRoutes < RouteTester
     expect_json_replace_dialog(has_error: true)
   end
 
-  # def test_delete
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   MasterfilesApp::CultivarInteractor.any_instance.stubs(:delete_marketing_variety).returns(ok_response)
-  #   delete 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-  #   expect_json_delete_from_grid
-  # end
-  #
-  # def test_delete_fail
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   MasterfilesApp::CultivarInteractor.any_instance.stubs(:delete_marketing_variety).returns(bad_response)
-  #   delete 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-  #   expect_bad_redirect
-  # end
+  def test_link_marketing_varieties
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(ok_response)
+    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    url = '/list/cultivar_marketing_varieties/multi?key=cultivars&id=1'
+    assert last_response.redirect?
+    assert_equal url, header_location
+    # In order to follow the redirect we have to stub some methods because this is a dataminer url. I just want to test the route method here
+    # follow_redirect!
+    # assert last_response.ok?
+    # assert last_response.body.include?('OK')
 
-  def test_linking
-    skip 'link_marketing_varieties'
+    # TODO: how do I test for error message & notice message
+    # MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(ok_response(instance: OpenStruct.new({message: 'notice message' })))
+    # post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    # # expect_notice_flash('notice message')
+    # MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(bad_response(instance: OpenStruct.new({message: 'error message' })))
+    # post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    # # At the moment bad_response doesn't accept an instance
+    # # expect_error_flash('error message')
   end
 
   def test_new

@@ -72,6 +72,5 @@ module UiRules
     def measurement_units_list
       @this_repo.measurement_units + ['other']
     end
-
   end
 end

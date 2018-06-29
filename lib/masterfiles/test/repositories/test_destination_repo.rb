@@ -7,7 +7,6 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestDestinationRepo < MiniTestWithHooks
-
     def test_for_selects
       assert_respond_to repo, :for_select_destination_regions
       assert_respond_to repo, :for_select_destination_countries

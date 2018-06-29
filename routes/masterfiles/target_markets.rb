@@ -28,7 +28,8 @@ class Framework < Roda
           return_json_response
           res = interactor.update_tm_group_type(id, params[:tm_group_type])
           if res.success
-            update_grid_row(id, changes: { target_market_group_type_code: res.instance[:target_market_group_type_code] },
+            update_grid_row(id,
+                            changes: { target_market_group_type_code: res.instance[:target_market_group_type_code] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::TargetMarkets::TmGroupType::Edit.call(id, params[:tm_group_type], res.errors) }
@@ -86,8 +87,9 @@ class Framework < Roda
           return_json_response
           res = interactor.update_tm_group(id, params[:tm_group])
           if res.success
-            update_grid_row(id, changes: { target_market_group_type_id: res.instance[:target_market_group_type_id],
-                                           target_market_group_name: res.instance[:target_market_group_name] },
+            update_grid_row(id,
+                            changes: { target_market_group_type_id: res.instance[:target_market_group_type_id],
+                                       target_market_group_name: res.instance[:target_market_group_name] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::TargetMarkets::TmGroup::Edit.call(id, params[:tm_group], res.errors) }
@@ -169,7 +171,8 @@ class Framework < Roda
           return_json_response
           res = interactor.update_target_market(id, params[:target_market])
           if res.success
-            update_grid_row(id, changes: { target_market_name: res.instance[:target_market_name] },
+            update_grid_row(id,
+                            changes: { target_market_name: res.instance[:target_market_name] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::TargetMarkets::TargetMarket::Edit.call(id, params[:target_market], res.errors) }
@@ -247,7 +250,8 @@ class Framework < Roda
           return_json_response
           res = interactor.update_region(id, params[:region])
           if res.success
-            update_grid_row(id, changes: { destination_region_name: res.instance[:destination_region_name] },
+            update_grid_row(id,
+                            changes: { destination_region_name: res.instance[:destination_region_name] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::TargetMarkets::Region::Edit.call(id, params[:region], res.errors) }
@@ -314,9 +318,9 @@ class Framework < Roda
           else
             re_show_form(r, res, url: "/masterfiles/target_markets/destination_countries/#{id}/destination_cities/new") do
               Masterfiles::TargetMarkets::City::New.call(id,
-                                                            form_values: params[:city],
-                                                            form_errors: res.errors,
-                                                            remote: fetch?(r))
+                                                         form_values: params[:city],
+                                                         form_errors: res.errors,
+                                                         remote: fetch?(r))
             end
           end
         end

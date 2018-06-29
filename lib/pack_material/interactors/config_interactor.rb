@@ -2,7 +2,6 @@
 
 module PackMaterialApp
   class ConfigInteractor < BaseInteractor
-
     def create_matres_type(params)
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?

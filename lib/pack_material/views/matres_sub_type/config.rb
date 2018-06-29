@@ -58,7 +58,7 @@ module PackMaterial
             page.section do |section|
               section.show_border!
               section.form do |form|
-                form.form_config      = rules_for_cols
+                form.form_config = rules_for_cols
                 product_code_column_name_list = repo.product_code_columns(id)
                 form.form_object order_rule.form_object
                 form.form_errors(form_errors&.transform_keys { |k| k == :columncodes_sorted_ids ? :product_code_column_ids : k })

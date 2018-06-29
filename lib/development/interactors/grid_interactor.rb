@@ -298,6 +298,5 @@ module DevelopmentApp
       end
       { file: index, dm_file: list_hash[:dataminer_definition], caption: caption }
     end
-
   end
 end

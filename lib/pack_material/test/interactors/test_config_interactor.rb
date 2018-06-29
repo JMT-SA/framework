@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class TestConfigInteractor < Minitest::Test
     def test_repo
@@ -121,7 +118,6 @@ module PackMaterialApp
 
       x = interactor.send(:validate_matres_unit_params, test_attrs.merge(unit_of_measure: 1))
       assert_equal(['must be a string'], x.errors[:unit_of_measure])
-
     end
 
     def test_add_a_matres_unit
@@ -529,5 +525,3 @@ module PackMaterialApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

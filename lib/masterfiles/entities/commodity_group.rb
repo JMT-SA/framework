@@ -8,4 +8,3 @@ module MasterfilesApp
     attribute :active, Types::Bool
   end
 end
-

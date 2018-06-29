@@ -191,8 +191,8 @@ class Framework < Roda
         else
           re_show_form(r, res, url: '/masterfiles/fruit/cultivar_groups/new') do
             Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
-                                                    form_errors: res.errors,
-                                                    remote: fetch?(r))
+                                                        form_errors: res.errors,
+                                                        remote: fetch?(r))
           end
         end
       end
@@ -655,7 +655,7 @@ class Framework < Roda
     r.on 'back', Integer do |id|
       r.on 'fruit_actual_counts_for_packs' do
         # NOTE: Working on the principle that your views are allowed access to your repositories
-        repo = MasterfilesApp::FruitSizeRepo.new()
+        repo = MasterfilesApp::FruitSizeRepo.new
         actual_count = repo.find_fruit_actual_counts_for_pack(id)
         handle_not_found(r) unless actual_count
         check_auth!('fruit', 'read')

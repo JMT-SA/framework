@@ -1,8 +1,7 @@
-require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module PackMaterialApp
   class TestConfigRepo < MiniTestWithHooks
-
     def test_for_selects
       assert_respond_to repo, :for_select_domains
       assert_respond_to repo, :for_select_matres_types
@@ -89,19 +88,19 @@ module PackMaterialApp
       attrs = { measurement_units: [each_id, pallets_id, bags_id] }
       ConfigRepo.new.update_matres_type(type_id, attrs)
       x = DB[:measurement_units_for_matres_types]
-        .where(material_resource_type_id: type_id)
-        .select_map(:measurement_unit_id)
+          .where(material_resource_type_id: type_id)
+          .select_map(:measurement_unit_id)
 
       assert_equal [each_id, pallets_id, bags_id], x
     end
 
     def test_measurement_units
-      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
-      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
-      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
+      DB[:measurement_units].insert(unit_of_measure: 'each') # each_id
+      DB[:measurement_units].insert(unit_of_measure: 'pallets') # pallets_id
+      DB[:measurement_units].insert(unit_of_measure: 'bags') # bags_id
 
       y = ConfigRepo.new.measurement_units
-      assert_equal y, ["each", "pallets", "bags"]
+      assert_equal y, %w[each pallets bags]
 
       DB[:measurement_units].delete
       y = ConfigRepo.new.measurement_units
@@ -136,7 +135,7 @@ module PackMaterialApp
         measurement_unit_id: bags_id
       )
       y = ConfigRepo.new.matres_type_measurement_units(type_id)
-      assert_equal y, ["each", "pallets", "bags"]
+      assert_equal y, %w[each pallets bags]
 
       y = ConfigRepo.new.matres_type_measurement_unit_ids(type_id)
       assert_equal y, [each_id, pallets_id, bags_id]
@@ -181,8 +180,8 @@ module PackMaterialApp
         description: 'This is the description field'
       )
       each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
-      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
-      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
+      DB[:measurement_units].insert(unit_of_measure: 'pallets') # pallets_id
+      DB[:measurement_units].insert(unit_of_measure: 'bags') # bags_id
 
       ConfigRepo.new.add_matres_type_unit(type_id, 'each')
       link_id = DB[:measurement_units_for_matres_types].where(
@@ -191,11 +190,10 @@ module PackMaterialApp
       )
       refute_nil link_id
 
-      assert_raises() {
+      assert_raises do
         PackMaterialApp::ConfigRepo.new.add_matres_type_unit(type_id, 'does not exist')
-      }
+      end
     end
-
 
     def test_delete_matres_sub_type
       dom_id = DB[:material_resource_domains].insert(
@@ -203,17 +201,17 @@ module PackMaterialApp
         product_table_name: 'pack_material_products',
         variant_table_name: 'variant table name'
       )
-      id_1 = DB[:material_resource_product_columns].insert(
+      id1 = DB[:material_resource_product_columns].insert(
         material_resource_domain_id: dom_id,
         column_name: 'column name one',
         short_code: 'CN1'
       )
-      id_2 = DB[:material_resource_product_columns].insert(
+      id2 = DB[:material_resource_product_columns].insert(
         material_resource_domain_id: dom_id,
         column_name: 'column name two',
         short_code: 'CN2'
       )
-      id_3 = DB[:material_resource_product_columns].insert(
+      id3 = DB[:material_resource_product_columns].insert(
         material_resource_domain_id: dom_id,
         column_name: 'column name three',
         short_code: 'CN3'
@@ -228,7 +226,7 @@ module PackMaterialApp
         material_resource_type_id: type_id,
         sub_type_name: 'sub type name',
         short_code: 'SC',
-        product_code_ids: "{#{id_1},#{id_2},#{id_3}}"
+        product_code_ids: "{#{id1},#{id2},#{id3}}"
       )
       comm_group_id = DB[:commodity_groups].insert(
         code: 'group',
@@ -243,23 +241,23 @@ module PackMaterialApp
       var_id = DB[:marketing_varieties].insert(
         marketing_variety_code: 'variety'
       )
-      prod_1_id = DB[:pack_material_products].insert(
+      prod_id1 = DB[:pack_material_products].insert(
         material_resource_sub_type_id: sub_id,
         commodity_id: comm_id,
         variety_id: var_id,
-        product_number: 789456
+        product_number: 789_456
       )
-      prod_2_id = DB[:pack_material_products].insert(
+      prod_id2 = DB[:pack_material_products].insert(
         material_resource_sub_type_id: sub_id,
         commodity_id: comm_id,
         variety_id: var_id,
-        product_number: 789457
+        product_number: 789_457
       )
 
       x = ConfigRepo.new.delete_matres_sub_type(sub_id)
       refute x.success
 
-      DB[:pack_material_products].where(id: [prod_1_id, prod_2_id]).delete
+      DB[:pack_material_products].where(id: [prod_id1, prod_id2]).delete
       x = ConfigRepo.new.delete_matres_sub_type(sub_id)
       assert x.success
       assert_nil ConfigRepo.new.find_matres_sub_type(sub_id)
@@ -271,17 +269,17 @@ module PackMaterialApp
         product_table_name: 'product table name',
         variant_table_name: 'variant table name'
       )
-      id_1 = DB[:material_resource_product_columns].insert(
+      id1 = DB[:material_resource_product_columns].insert(
         material_resource_domain_id: dom_id,
         column_name: 'column name one',
         short_code: 'CN1'
       )
-      id_2 = DB[:material_resource_product_columns].insert(
+      id2 = DB[:material_resource_product_columns].insert(
         material_resource_domain_id: dom_id,
         column_name: 'column name two',
         short_code: 'CN2'
       )
-      id_3 = DB[:material_resource_product_columns].insert(
+      id3 = DB[:material_resource_product_columns].insert(
         material_resource_domain_id: dom_id,
         column_name: 'column name three',
         short_code: 'CN3'
@@ -296,11 +294,11 @@ module PackMaterialApp
         material_resource_type_id: type_id,
         sub_type_name: 'sub type name',
         short_code: 'SC',
-        product_code_ids: "{#{id_1},#{id_2},#{id_3}}"
+        product_code_ids: "{#{id1},#{id2},#{id3}}"
       )
 
       y = ConfigRepo.new.product_code_columns(sub_id)
-      assert_equal(y, [["column name one", id_1], ["column name two", id_2], ["column name three", id_3]])
+      assert_equal(y, [['column name one', id1], ['column name two', id2], ['column name three', id3]])
     end
 
     def test_update_product_code_configuration

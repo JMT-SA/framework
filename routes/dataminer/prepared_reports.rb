@@ -130,10 +130,11 @@ class Framework < Roda
       else
         id = params[:prepared_report][:id]
         re_show_form(r, res, url: "/dataminer/prepared_reports/new/#{id}") do
-          DM::Report::PreparedReport::New.call(id, params[:prepared_report][:json_var], current_user,
-                                                   form_values: params[:prepared_report],
-                                                   form_errors: res.errors,
-                                                   remote: fetch?(r))
+          DM::Report::PreparedReport::New.call(id,
+                                               params[:prepared_report][:json_var], current_user,
+                                               form_values: params[:prepared_report],
+                                               form_errors: res.errors,
+                                               remote: fetch?(r))
         end
       end
     end

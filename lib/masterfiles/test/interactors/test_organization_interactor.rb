@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/AbcSize
@@ -47,7 +47,7 @@ module MasterfilesApp
       org_attrs_without_short_description[:short_description] = 1
       x = interactor.send(:validate_organization_params, org_attrs_without_short_description)
       refute_empty x.errors
-      expected = {short_description: ['must be a string']}
+      expected = { short_description: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:medium_description).maybe(:str?)
@@ -60,7 +60,7 @@ module MasterfilesApp
       assert_empty x.errors
       org_attrs_without_medium_description[:medium_description] = 1
       x = interactor.send(:validate_organization_params, org_attrs_without_medium_description)
-      expected = {medium_description: ['must be a string']}
+      expected = { medium_description: ['must be a string'] }
       assert_equal(x.errors, expected)
 
       # required(:long_description).maybe(:str?)
@@ -73,7 +73,7 @@ module MasterfilesApp
       assert_empty x.errors
       org_attrs_without_long_description[:long_description] = 1
       x = interactor.send(:validate_organization_params, org_attrs_without_long_description)
-      expected = {long_description: ['must be a string']}
+      expected = { long_description: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:vat_number).maybe(:str?)
@@ -86,7 +86,7 @@ module MasterfilesApp
       assert_empty x.errors
       org_attrs_without_vat_number[:vat_number] = 1
       x = interactor.send(:validate_organization_params, org_attrs_without_vat_number)
-      expected = {vat_number: ['must be a string']}
+      expected = { vat_number: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:role_ids).each(:int?)
@@ -164,7 +164,7 @@ module MasterfilesApp
     end
 
     def test_delete_organization
-      PartyRepo.any_instance.stubs(:delete_organization).returns({success: true})
+      PartyRepo.any_instance.stubs(:delete_organization).returns(success: true)
       OrganizationInteractor.any_instance.stubs(:organization).returns(fake_organization)
       x = interactor.delete_organization(1)
       expected = interactor.success_response('Deleted organization Test Organization Party')
@@ -206,7 +206,7 @@ module MasterfilesApp
         variants: [],
         active: true,
         role_ids: [1, 2, 3],
-        role_names: ['One', 'Two', 'Three'],
+        role_names: %w[One Two Three],
         parent_organization: 'Test Parent Organization'
       }
     end
@@ -219,7 +219,7 @@ module MasterfilesApp
     def invalid_organization
       keys = %i[short_description medium_description long_description vat_number active role_ids]
       org_attrs = organization_attrs.select { |key, _| keys.include?(key) }
-      org_attrs[:vat_number] = 789456
+      org_attrs[:vat_number] = 789_456
       org_attrs
     end
 

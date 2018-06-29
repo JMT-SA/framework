@@ -1,4 +1,4 @@
-require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestPersonInteractor < Minitest::Test
@@ -31,7 +31,7 @@ module MasterfilesApp
       prsn_attrs_without_surname[:surname] = 1
       x = interactor.send(:validate_person_params, prsn_attrs_without_surname)
       refute_empty x.errors
-      expected = {surname: ['must be a string']}
+      expected = { surname: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:first_name).filled(:str?)
@@ -43,7 +43,7 @@ module MasterfilesApp
       prsn_attrs_without_first_name[:first_name] = 1
       x = interactor.send(:validate_person_params, prsn_attrs_without_first_name)
       refute_empty x.errors
-      expected = {first_name: ['must be a string']}
+      expected = { first_name: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:title).filled(:str?)
@@ -55,7 +55,7 @@ module MasterfilesApp
       prsn_attrs_without_title[:title] = 1
       x = interactor.send(:validate_person_params, prsn_attrs_without_title)
       refute_empty x.errors
-      expected = {title: ['must be a string']}
+      expected = { title: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:vat_number).maybe(:str?)
@@ -68,7 +68,7 @@ module MasterfilesApp
       assert_empty x.errors
       prsn_attrs_without_vat_number[:vat_number] = 1
       x = interactor.send(:validate_person_params, prsn_attrs_without_vat_number)
-      expected = {vat_number: ['must be a string']}
+      expected = { vat_number: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:role_ids).each(:int?)
@@ -128,7 +128,7 @@ module MasterfilesApp
     end
 
     def test_delete_person
-      PartyRepo.any_instance.stubs(:delete_person).returns({success: true})
+      PartyRepo.any_instance.stubs(:delete_person).returns(success: true)
       PersonInteractor.any_instance.stubs(:person).returns(fake_person)
       x = interactor.delete_person(1)
       expected = interactor.success_response('Deleted person Title First Name Surname')
@@ -164,7 +164,7 @@ module MasterfilesApp
         vat_number: '789456',
         active: true,
         role_ids: [1, 2, 3],
-        role_names: ['One', 'Two', 'Three'],
+        role_names: %w[One Two Three],
         address_ids: [1, 2, 3],
         contact_method_ids: [1, 2, 3]
       }
@@ -178,7 +178,7 @@ module MasterfilesApp
     def invalid_person
       keys = %i[title first_name surname vat_number active role_ids]
       prsn_attrs = person_attrs.select { |key, _| keys.include?(key) }
-      prsn_attrs[:vat_number] = 789456
+      prsn_attrs[:vat_number] = 789_456
       prsn_attrs
     end
 

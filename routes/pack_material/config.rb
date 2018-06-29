@@ -104,13 +104,13 @@ class Framework < Roda
       end
       r.on 'product_columns' do
         check_auth!('config', 'edit')
-        repo = PackMaterialApp::ConfigRepo.new()
+        repo = PackMaterialApp::ConfigRepo.new
         product_column_ids = repo.find_matres_sub_type(id).product_column_ids || []
         if product_column_ids.any?
           r.redirect "/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=#{id}&product_column_ids=#{product_column_ids}"
         else
-          flash[:error] = "No product columns selected, please see config."
-          r.redirect "/list/material_resource_sub_types"
+          flash[:error] = 'No product columns selected, please see config.'
+          r.redirect '/list/material_resource_sub_types'
         end
       end
 

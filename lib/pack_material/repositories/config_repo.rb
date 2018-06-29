@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module PackMaterialApp
   class ConfigRepo < BaseRepo
     build_for_select :material_resource_domains,
@@ -54,12 +56,12 @@ module PackMaterialApp
 
       # TODO: A helper method for the backend use of multi select ids for the simplest case?
       DB[:measurement_units_for_matres_types].where(material_resource_type_id: id).delete
-      measurement_unit_ids.each do |unit_id|
+      measurement_unit_ids&.each do |unit_id|
         DB[:measurement_units_for_matres_types].insert(
           material_resource_type_id: id,
           measurement_unit_id: unit_id
         )
-      end if measurement_unit_ids
+      end
 
       DB[:material_resource_types].where(id: id).update(params)
     end
@@ -72,14 +74,14 @@ module PackMaterialApp
       DB[:measurement_units].where(id: DB[:measurement_units_for_matres_types]
                                          .where(material_resource_type_id: matres_type_id)
                                          .select_map(:measurement_unit_id))
-        .select_map(:unit_of_measure)
+                            .select_map(:unit_of_measure)
     end
 
     def matres_type_measurement_unit_ids(matres_type_id)
       DB[:measurement_units].where(id: DB[:measurement_units_for_matres_types]
                                          .where(material_resource_type_id: matres_type_id)
                                          .select_map(:measurement_unit_id))
-        .select_map(:id)
+                            .select_map(:id)
     end
 
     def create_matres_type_unit(matres_type_id, unit_of_measure_string)
@@ -146,3 +148,4 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

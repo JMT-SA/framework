@@ -4,7 +4,7 @@ module PackMaterial
   module Config
     module MatresType
       class Unit
-        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:matres_type, :add_unit, form_values: form_values)
           rules   = ui_rule.compile
 

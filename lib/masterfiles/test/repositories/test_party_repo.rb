@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/AbcSize

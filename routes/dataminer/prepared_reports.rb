@@ -19,8 +19,7 @@ class Framework < Roda
     end
 
     r.on 'list' do
-      renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', '/dataminer/prepared_reports/grid/', 'Prepared report listing')
-      view(inline: renderer.render)
+      show_page { DM::Report::Report::GridPage.call('/dataminer/prepared_reports/grid/', 'Prepared report listing') }
     end
 
     r.on 'grid' do
@@ -33,8 +32,7 @@ class Framework < Roda
     end
 
     r.on 'list_all' do
-      renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', '/dataminer/prepared_reports/grid_all/', 'Prepared report listing - all reports')
-      view(inline: renderer.render)
+      show_page { DM::Report::Report::GridPage.call('/dataminer/prepared_reports/grid_all/', 'Prepared report listing - all reports') }
     end
 
     r.on 'grid_all' do
@@ -71,10 +69,7 @@ class Framework < Roda
       end
 
       r.on 'run' do
-        renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', "/dataminer/prepared_reports/#{id}/grid/",
-                                                          instance[:report_description],
-                                                          height: 35)
-        view(inline: renderer.render)
+        show_page { DM::Report::Report::GridPage.call("/dataminer/prepared_reports/#{id}/grid/", instance[:report_description]) }
       end
 
       r.on 'run_with_parameters' do

@@ -216,6 +216,11 @@ section.add_grid 'tickets', '/list/tickets', caption: 'Movie tickets', height: 8
 |An integer greater than or equal to 6.
 |20. If a value less than 6 is given, it will be fixed to 6.
 
+|fit_height
+|Make the grid fit the available height of its parent element. Note that if the grid is in a section, you can call `fit_height!` on the section and the grid will adjust. If the grid is not in a section, the parent element must have the css property `display:flex`.
+|`true` or `false`
+|`nil` - effectively `false`.
+
 |===
 
 === Form

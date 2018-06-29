@@ -42,6 +42,7 @@ module DM
           end
 
           page.section do |section|
+            section.fit_height!
             section.add_grid('rpt_grid', grid_url, caption: caption)
           end
         end

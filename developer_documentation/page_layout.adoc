@@ -133,6 +133,10 @@ These are the methods used in building a page layout.
 |None
 |Show a border around the Section. No border is shown if this method is not called.
 
+|fit_height!
+|None
+|Makes the section fit in available space. Required to make a grid within the section expand to use available space.
+
 |render
 |
 |Renders the section and all nodes within it.

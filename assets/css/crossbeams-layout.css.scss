@@ -40,13 +40,14 @@
 .content-loading{
   background: transparent url(/images/loading_bars.gif) 0 0 no-repeat;
 }
-section.crossbeams_layout {
-  padding: 0.5em;
-}
 section.crossbeams_layout-border {
   margin: 1em 0;
   border: solid thin lightgray;
   border-radius: 1em;
+}
+section.crossbeams_layout-fit-height {
+  flex-grow: 1;
+  display:flex;
 }
 .grid-number-column {
   text-align: right;
@@ -180,6 +181,8 @@ option[value=""] {
   flex: 1;
   margin: 0 1em;
   margin-top: 90px;
+  display:flex;
+  flex-direction: column;
 }
 
 header,

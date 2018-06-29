@@ -68,8 +68,7 @@ class Framework < Roda
     end
 
     r.is do
-      renderer = Crossbeams::Layout::Renderer::Grid.new('rpt_grid', '/dataminer/reports/grid/', 'Report listing')
-      view(inline: renderer.render)
+      show_page { DM::Report::Report::GridPage.call('/dataminer/reports/grid/', 'Report listing') }
     end
 
     r.on 'grid' do

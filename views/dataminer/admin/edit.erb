@@ -1,8 +1,6 @@
-<h1>Edit report</h1>
+<h1 class="mv1">Report: <%= @page.report.caption %></h2>
 
-<h2>Report: <%= @page.report.caption %></h2>
-<fieldset>
-<legend>Header</legend>
+<section class="crossbeams_layout-border pa2">
 <form action='/dataminer/admin/<%= @page.id%>/save/' method=post class="crossbeams-form">
   <%= csrf_tag %>
   <div class="crossbeams-row">
@@ -28,27 +26,28 @@
         <input type='url' id="render_url" name='render_url' class='cbl-input' placeholder='Render URL' value='<%= @page.report.external_settings[:render_url] %>'/>
       </div>
       <div class="crossbeams-actions">
-        <input type="submit" class="white bg-green br2 dim pa3 ba b--near-white" value="Update report header" />
+        <input type="submit" class="dim br2 pa3 bn white bg-green" value="Update report header" />
       </div>
     </div>
   </div>
 
 </form>
-</fieldset>
-<hr>
-<button onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false" class="pure-button"><i class="fa fa-info"></i> Toggle SQL view</button>
-<a href='/dataminer/admin/<%= @page.id %>/change_sql/' class="crossbeams-button">Change SQL</a>
-<a href='/dataminer/admin/<%= @page.id %>/reorder_columns/' class="crossbeams-button">Re-order columns</a>
-<pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
-<hr>
+</section>
+<section class="crossbeams_layout-border pa2">
+  <a href="#" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false" class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><i class="fa fa-info"></i> Toggle SQL view</a>
+  <a href='/dataminer/admin/<%= @page.id %>/change_sql/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver">Change SQL</a>
+  <a href='/dataminer/admin/<%= @page.id %>/reorder_columns/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver">Re-order columns</a>
+  <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
+</section>
 
 <div style="height:20em">
   <%= Crossbeams::Layout::Renderer::Grid.header('grd1', 'Columns') %>
   <div id="grd1" style="height: 100%;" class="ag-theme-balham"></div>
 </div>
 
-<p style="margin-top:5em;"><a href='/dataminer/admin/<%= @page.id %>/parameter/new/' class="white bg-blue br2 dim pa3 ba b--near-white"><i class="fa fa-plus"></i> Add a parameter</a><p>
-
+<p style="margin-top:5em;">
+  <a href='/dataminer/admin/<%= @page.id %>/parameter/new/' class="crossbeams-button link dim br2 pa3 white bg-blue"><i class="fa fa-plus"></i> Add a parameter</a>
+</p>
 <div style="height:20em">
   <%= Crossbeams::Layout::Renderer::Grid.header('grd2', 'Parameters') %>
   <div id="grd2" style="height: 100%;" class="ag-theme-balham"></div>

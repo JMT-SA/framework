@@ -30,9 +30,9 @@ gem 'roda-data_grid', git: 'https://github.com/NoSoft-SA/roda-data_grid.git'
 
 # gem 'crossbeams-dataminer',           path: File.expand_path('../../crossbeams-dataminer', __FILE__)
 # gem 'crossbeams-label_designer',      path: File.expand_path('../../crossbeams-label_designer', __FILE__)
-# gem 'crossbeams-layout',              path: File.expand_path('../../crossbeams-layout', __FILE__)
+# gem 'crossbeams-layout',              path: File.expand_path('../crossbeams-layout', __dir__)
 # gem 'crossbeams-rack_middleware',     path: File.expand_path('../../crossbeams-rack_middleware', __FILE__)
-# gem 'roda-data_grid',                 path: File.expand_path('../../roda-data_grid', __FILE__)
+# gem 'roda-data_grid',                 path: File.expand_path('../roda-data_grid', __dir__)
 
 group :test do
   gem 'minitest', '~>5.11'

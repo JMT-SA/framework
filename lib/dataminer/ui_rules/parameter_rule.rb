@@ -20,7 +20,7 @@ module UiRules
     def common_fields
       {
         column: { renderer: :select, options: @report.ordered_columns.map(&:namespaced_name).compact, prompt: true }, # cols...
-        table: { renderer: :select, options: @report.tables, prompt: true }, # ...
+        table: { renderer: :select, options: @report.tables_or_aliases, prompt: true },
         field: { force_lowercase: true },
         caption: { required: true },
         data_type: { renderer: :select, options: data_types, required: true },

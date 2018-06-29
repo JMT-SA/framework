@@ -88,6 +88,7 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_sub_type).returns(ok_response)
     post 'pack_material/config/material_resource_sub_types', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
   end
 
@@ -96,6 +97,7 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_sub_type).returns(ok_response)
     post_as_fetch 'pack_material/config/material_resource_sub_types', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_json_redirect
   end
 
@@ -130,7 +132,7 @@ class TestMatresSubTypeRoutes < RouteTester
 
     PackMaterialApp::ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns( OpenStruct.new({ product_column_ids: [1,2,3] }) )
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }
-    url = '/list/material_resource_product_columns/with_params?key=standard&product_column_ids=[1, 2, 3]'
+    url = '/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=1&product_column_ids=[1, 2, 3]'
     assert last_response.redirect?
     assert_equal url, header_location
     follow_redirect!
@@ -139,11 +141,90 @@ class TestMatresSubTypeRoutes < RouteTester
     PackMaterialApp::ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns(OpenStruct.new({ product_column_ids: nil }))
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }
     url = '/list/material_resource_sub_types'
-    # TODO: How do I assert that the flash error message was shown and updated?
+    expect_flash_error('No product columns selected, please see config.')
+
     assert last_response.redirect?
     assert_equal url, header_location
     follow_redirect!
     assert last_response.ok?
+  end
+
+  def test_master_list_items_edit
+    # edit
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterial::Config::MatresMasterListItem::Edit.stub(:call, bland_page) do
+      get 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1/edit', {}, 'rack.session' => { user_id: 1 }
+    end
+    expect_bland_page
+
+    # edit_fail
+    authorise_fail!
+    ensure_exists!(INTERACTOR)
+    get 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1/edit', {}, 'rack.session' => { user_id: 1 }
+    expect_permission_error
+  end
+
+  def test_master_list_items_update
+    # update
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    row_vals = Hash.new(1)
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:update_matres_master_list_item).returns(ok_response(instance: row_vals))
+    patch 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_json_update_grid
+
+    # update fail
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:update_matres_master_list_item).returns(bad_response)
+    PackMaterial::Config::MatresMasterListItem::Edit.stub(:call, bland_page) do
+      patch 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    end
+    expect_json_replace_dialog(has_error: true)
+  end
+
+  def test_master_list_items_new
+    ensure_exists!(INTERACTOR)
+    # new
+    authorise_pass!
+    PackMaterial::Config::MatresMasterListItem::New.stub(:call, bland_page) do
+      get  'pack_material/config/material_resource_sub_types/1/material_resource_master_lists/1/new', {}, 'rack.session' => { user_id: 1 }
+    end
+    expect_bland_page
+
+    # new fail
+    authorise_fail!
+    get  'pack_material/config/material_resource_sub_types/1/material_resource_master_lists/1/new', {}, 'rack.session' => { user_id: 1 }
+    refute last_response.ok?
+    assert_match(/permission/i, last_response.body)
+  end
+
+  def test_master_list_items_create
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_master_list_item).returns(ok_response)
+    post 'pack_material/config/material_resource_sub_types/1/material_resource_master_lists/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_ok_redirect
+
+    # remotely
+    post_as_fetch 'pack_material/config/material_resource_sub_types/1/material_resource_master_lists/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_ok_json_redirect
+  end
+
+  def test_master_list_items_create_fail
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_master_list_item).returns(bad_response)
+    PackMaterial::Config::MatresMasterListItem::New.stub(:call, bland_page) do
+      post 'pack_material/config/material_resource_sub_types/1/material_resource_master_lists/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    end
+    expect_bad_redirect(url: '/pack_material/config/material_resource_sub_types/1/material_resource_master_lists/1/new')
+
+    # remotely
+    PackMaterial::Config::MatresMasterListItem::New.stub(:call, bland_page) do
+      post_as_fetch 'pack_material/config/material_resource_sub_types/1/material_resource_master_lists/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    end
+    expect_bad_page
+    expect_json_replace_dialog
   end
 
   def test_config_edit

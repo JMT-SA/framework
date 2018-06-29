@@ -1,0 +1,167 @@
+---
+:caption: Master List Items for Product Columns
+:sql: "SELECT \"pc\".\"id\" AS product_column_id, \"pc\".\"column_name\", \"li\".\"id\",
+  \"li\".\"short_code\", \"li\".\"description\",\r\n\"li\".\"active\", \"li\".\"long_name\",
+  \"li\".\"material_resource_master_list_id\" AS master_list_id,\r\n\"ml\".\"material_resource_sub_type_id\"
+  AS sub_type_id\r\nFROM \"material_resource_product_columns\" pc\r\nLEFT JOIN \"material_resource_master_lists\"
+  ml ON \"ml\".\"material_resource_product_column_id\" = \"pc\".\"id\"\r\nLEFT JOIN
+  \"material_resource_master_list_items\" li ON \"li\".\"material_resource_master_list_id\"
+  = \"ml\".\"id\"\r\nWHERE \"pc\".\"id\" IN (SELECT unnest(\"product_column_ids\")\r\nFROM
+  \"material_resource_sub_types\"\r\nWHERE \"id\" = \"ml\".\"material_resource_sub_type_id\")"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  product_column_id:
+    :name: product_column_id
+    :sequence_no: 1
+    :caption: Product column
+    :namespaced_name: pc.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  column_name:
+    :name: column_name
+    :sequence_no: 2
+    :caption: Column name
+    :namespaced_name: pc.column_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 1
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 3
+    :caption: Id
+    :namespaced_name: li.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  short_code:
+    :name: short_code
+    :sequence_no: 4
+    :caption: Short code
+    :namespaced_name: li.short_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 5
+    :caption: Description
+    :namespaced_name: li.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 6
+    :caption: Active
+    :namespaced_name: li.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  long_name:
+    :name: long_name
+    :sequence_no: 7
+    :caption: Long name
+    :namespaced_name: li.long_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  master_list_id:
+    :name: master_list_id
+    :sequence_no: 8
+    :caption: Master list
+    :namespaced_name: li.material_resource_master_list_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sub_type_id:
+    :name: sub_type_id
+    :sequence_no: 9
+    :caption: Sub type
+    :namespaced_name: ml.material_resource_sub_type_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: pc.id
+  :caption: product_column_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 
+- :column: ml.material_resource_sub_type_id
+  :caption: sub_type_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

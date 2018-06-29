@@ -103,14 +103,58 @@ class Framework < Roda
         show_partial { PackMaterial::Config::MatresSubType::Edit.call(id) }
       end
       r.on 'product_columns' do
-        raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
+        raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
         repo = PackMaterialApp::ConfigRepo.new()
         product_column_ids = repo.find_matres_sub_type(id).product_column_ids || []
         if product_column_ids.any?
-          r.redirect "/list/material_resource_product_columns/with_params?key=standard&product_column_ids=#{product_column_ids}"
+          r.redirect "/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=#{id}&product_column_ids=#{product_column_ids}"
         else
           flash[:error] = "No product columns selected, please see config."
           r.redirect "/list/material_resource_sub_types"
+        end
+      end
+
+      r.on 'material_resource_master_list_items', Integer do |item_id|
+        r.on 'edit' do
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
+          show_partial { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id) }
+        end
+        r.patch do     # UPDATE
+          return_json_response
+          res = interactor.update_matres_master_list_item(item_id, params[:matres_master_list_item])
+          if res.success
+            row_keys = %i[
+              material_resource_master_list_id
+              short_code
+              long_name
+              description
+              active
+            ]
+            update_grid_row(item_id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            content = show_partial { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id, params[:matres_master_list_item], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+      end
+      r.on 'material_resource_master_lists', Integer do |list_id|
+        r.on 'new' do
+          raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
+          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(list_id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = interactor.create_matres_master_list_item(list_id, params[:matres_master_list_item])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/#{list_id}/new") do
+              PackMaterial::Config::MatresMasterListItem::New.call(list_id,
+                                                                   form_values: params[:matres_master_list_item],
+                                                                   form_errors: res.errors,
+                                                                   remote: fetch?(r))
+            end
+          end
         end
       end
       r.on 'config' do

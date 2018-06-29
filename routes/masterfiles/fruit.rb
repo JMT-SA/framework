@@ -54,31 +54,19 @@ class Framework < Roda
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_commodity_group(params[:commodity_group])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/commodity_groups/new') do
             Masterfiles::Fruit::CommodityGroup::New.call(form_values: params[:commodity_group],
                                                          form_errors: res.errors,
-                                                         remote: true)
+                                                         remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::CommodityGroup::New.call(form_values: params[:commodity_group],
-                                                                  form_errors: res.errors,
-                                                                  remote: false))
-          r.redirect '/masterfiles/fruit/commodity_groups/new'
         end
       end
     end
@@ -133,31 +121,19 @@ class Framework < Roda
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_commodity(params[:commodity])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/commodities/new') do
             Masterfiles::Fruit::Commodity::New.call(form_values: params[:commodity],
                                                     form_errors: res.errors,
-                                                    remote: true)
+                                                    remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::Commodity::New.call(form_values: params[:commodity],
-                                                             form_errors: res.errors,
-                                                             remote: false))
-          r.redirect '/masterfiles/fruit/commodities/new'
         end
       end
     end
@@ -205,31 +181,19 @@ class Framework < Roda
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_cultivar_group(params[:cultivar_group])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
-                                                        form_errors: res.errors,
-                                                        remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
-                                                                 form_errors: res.errors,
-                                                                 remote: false))
-          r.redirect '/masterfiles/fruit/cultivar_groups/new'
+          re_show_form(r, res, url: '/masterfiles/fruit/cultivar_groups/new') do
+            Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
+                                                    form_errors: res.errors,
+                                                    remote: fetch?(r))
+          end
         end
       end
     end
@@ -267,33 +231,20 @@ class Framework < Roda
         interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(r) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
-          end
+          show_partial_or_page(r) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_marketing_variety(id, params[:marketing_variety])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
-          elsif fetch?(r)
-            content = show_partial do
+          else
+            re_show_form(r, res, url: "/masterfiles/fruit/cultivars/#{id}/marketing_varieties/new") do
               Masterfiles::Fruit::MarketingVariety::New.call(id,
                                                              form_values: params[:marketing_variety],
                                                              form_errors: res.errors,
-                                                             remote: true)
+                                                             remote: fetch?(r))
             end
-            update_dialog_content(content: content, error: res.message)
-          else
-            flash[:error] = res.message
-            stash_page(Masterfiles::Fruit::MarketingVariety::New.call(id,
-                                                                      form_values: params[:marketing_variety],
-                                                                      form_errors: res.errors,
-                                                                      remote: false))
-            r.redirect "/masterfiles/fruit/cultivars/#{id}/marketing_varieties/new"
           end
         end
       end
@@ -330,31 +281,19 @@ class Framework < Roda
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_cultivar(params[:cultivar])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/cultivars/new') do
             Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
                                                    form_errors: res.errors,
-                                                   remote: true)
+                                                   remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
-                                                            form_errors: res.errors,
-                                                            remote: false))
-          r.redirect '/masterfiles/fruit/cultivars/new'
         end
       end
     end
@@ -441,31 +380,19 @@ class Framework < Roda
       interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_basic_pack_code(params[:basic_pack_code])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/basic_pack_codes/new') do
             Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
                                                         form_errors: res.errors,
-                                                        remote: true)
+                                                        remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
-                                                                 form_errors: res.errors,
-                                                                 remote: false))
-          r.redirect '/masterfiles/fruit/basic_pack_codes/new'
         end
       end
     end
@@ -516,31 +443,19 @@ class Framework < Roda
       interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_standard_pack_code(params[:standard_pack_code])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/standard_pack_codes/new') do
             Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
                                                            form_errors: res.errors,
-                                                           remote: true)
+                                                           remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
-                                                                    form_errors: res.errors,
-                                                                    remote: false))
-          r.redirect '/masterfiles/fruit/standard_pack_codes/new'
         end
       end
     end
@@ -561,33 +476,20 @@ class Framework < Roda
         interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
-          end
+          show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_fruit_actual_counts_for_pack(id, params[:fruit_actual_counts_for_pack])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
-          elsif fetch?(r)
-            content = show_partial do
+          else
+            re_show_form(r, res, url: "/masterfiles/fruit/std_fruit_size_counts/#{id}/fruit_actual_counts_for_packs/new") do
               Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
                                                                      form_values: params[:fruit_actual_counts_for_pack],
                                                                      form_errors: res.errors,
-                                                                     remote: true)
+                                                                     remote: fetch?(r))
             end
-            update_dialog_content(content: content, error: res.message)
-          else
-            flash[:error] = res.message
-            stash_page(Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
-                                                                              form_values: params[:fruit_actual_counts_for_pack],
-                                                                              form_errors: res.errors,
-                                                                              remote: false))
-            r.redirect "/masterfiles/fruit/std_fruit_size_counts/#{id}/fruit_actual_counts_for_packs/new"
           end
         end
       end
@@ -631,31 +533,19 @@ class Framework < Roda
       interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_std_fruit_size_count(params[:std_fruit_size_count])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/std_fruit_size_counts/new') do
             Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
                                                             form_errors: res.errors,
-                                                            remote: true)
+                                                            remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
-                                                                     form_errors: res.errors,
-                                                                     remote: false))
-          r.redirect '/masterfiles/fruit/std_fruit_size_counts/new'
         end
       end
     end
@@ -675,33 +565,20 @@ class Framework < Roda
         interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(r) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
-          end
+          show_partial_or_page(r) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_fruit_size_reference(id, params[:fruit_size_reference])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
-          elsif fetch?(r)
-            content = show_partial do
+          else
+            re_show_form(r, res, url: "/masterfiles/fruit/fruit_actual_counts_for_packs/#{id}/fruit_size_references/new") do
               Masterfiles::Fruit::FruitSizeReference::New.call(id,
                                                                form_values: params[:fruit_size_reference],
                                                                form_errors: res.errors,
-                                                               remote: true)
+                                                               remote: fetch?(r))
             end
-            update_dialog_content(content: content, error: res.message)
-          else
-            flash[:error] = res.message
-            stash_page(Masterfiles::Fruit::FruitSizeReference::New.call(id,
-                                                                        form_values: params[:fruit_size_reference],
-                                                                        form_errors: res.errors,
-                                                                        remote: false))
-            r.redirect "/masterfiles/fruit/fruit_actual_counts_for_packs/#{id}/fruit_size_references/new"
           end
         end
       end

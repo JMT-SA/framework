@@ -415,6 +415,113 @@ module PackMaterialApp
       assert_match(/Validation/, res.message)
     end
 
+    def test_create_matres_master_list_item
+      ConfigRepo.any_instance.stubs(:create_matres_master_list_item).returns(id: 1)
+      ConfigInteractor.any_instance.stubs(:matres_master_list_item).returns(fake_matres_master_list_item)
+
+      x = interactor.create_matres_master_list_item(1, invalid_matres_master_list_item_attrs)
+      assert_equal false, x.success
+      assert_equal 'Validation error', x.message
+
+      x = interactor.create_matres_master_list_item(1, matres_master_list_item_attrs)
+      assert x.success
+      assert_equal 'Created list item BF', x.message
+      assert_instance_of MatresMasterListItem, x.instance
+
+      ConfigRepo.any_instance.stubs(:create_matres_master_list_item).raises(Sequel::UniqueConstraintViolation)
+      x = interactor.create_matres_master_list_item(1, matres_master_list_item_attrs)
+      expected = interactor.validation_failed_response(OpenStruct.new(messages: { short_code: ['This list item already exists'] }))
+      assert_equal expected, x
+      refute x.success
+    end
+
+    def test_update_matres_master_list_item
+      ConfigRepo.any_instance.stubs(:update_matres_master_list_item).returns(fake_matres_master_list_item)
+      ConfigInteractor.any_instance.stubs(:matres_master_list_item).returns(fake_matres_master_list_item)
+
+      x = interactor.update_matres_master_list_item(1, invalid_matres_master_list_item_attrs)
+      assert_equal 'Validation error', x.message
+      assert_equal false, x.success
+
+      x = interactor.update_matres_master_list_item(1, matres_master_list_item_attrs.merge(sub_type_name: 'Updated value'))
+      assert x.success
+      assert_equal 'Updated list item BF', x.message
+      assert_instance_of MatresMasterListItem, x.instance
+    end
+
+    def matres_master_list_item_attrs
+      {
+        id: 1,
+        material_resource_master_list_id: 1,
+        short_code: 'BF',
+        long_name: 'Bag Fruit',
+        description: 'description',
+        active: true
+      }
+    end
+
+    def fake_matres_master_list_item
+      MatresMasterListItem.new(matres_master_list_item_attrs)
+    end
+
+    def invalid_matres_master_list_item_attrs
+      matres_master_list_item_attrs.merge(short_code: nil)
+    end
+
+    def test_matres_master_list_item
+      ConfigRepo.any_instance.stubs(:find_matres_master_list_item).returns(fake_matres_master_list_item)
+      x = interactor.send(:matres_master_list_item, 1)
+      assert_equal 'BF', x.short_code
+    end
+
+    def test_validate_matres_master_list_item_params
+      test_attrs = matres_master_list_item_attrs
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs)
+      assert_empty x.errors
+
+      # optional(:id).filled(:int?)
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :id })
+      assert_empty x. errors
+
+      # optional(:material_resource_master_list_id, :int).filled(:int?)
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(material_resource_master_list_id: 'string'))
+      assert_equal(['must be an integer'], x.errors[:material_resource_master_list_id])
+
+      # optional(:short_code, Types::StrippedString).filled(:str?)
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :short_code })
+      assert_nil x.errors[:short_code]
+
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(short_code: nil))
+      assert_equal(['must be filled'], x.errors[:short_code])
+
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(short_code: 1))
+      assert_equal(['must be a string'], x.errors[:short_code])
+
+      # required(:long_name, Types::StrippedString).maybe(:str?)
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :long_name })
+      assert_equal(['is missing'], x.errors[:long_name])
+
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(long_name: 1))
+      assert_equal(['must be a string'], x.errors[:long_name])
+
+      # required(:description, Types::StrippedString).maybe(:str?)
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :description })
+      assert_equal(['is missing'], x.errors[:description])
+
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(description: 1))
+      assert_equal(['must be a string'], x.errors[:description])
+
+      # optional(:active, :bool).filled(:bool?)
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :active })
+      assert_nil x.errors[:active]
+
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(active: nil))
+      assert_equal(['must be filled'], x.errors[:active])
+
+      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(active: 'string'))
+      assert_equal(['must be boolean'], x.errors[:active])
+    end
+
     private
 
     def interactor

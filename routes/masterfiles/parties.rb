@@ -52,31 +52,19 @@ class Framework < Roda
       interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_organization(params[:organization])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
-                                                         form_errors: res.errors,
-                                                         remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
-                                                                  form_errors: res.errors,
-                                                                  remote: false))
-          r.redirect '/masterfiles/parties/organizations/new'
+          re_show_form(r, res, url: '/masterfiles/parties/organizations/new') do
+            Masterfiles::Parties::Organization::New.call(form_values: params[:organization],
+                                                   form_errors: res.errors,
+                                                   remote: fetch?(r))
+          end
         end
       end
     end
@@ -125,31 +113,19 @@ class Framework < Roda
       interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_person(params[:person])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Masterfiles::Parties::Person::New.call(form_values: params[:person],
-                                                   form_errors: res.errors,
-                                                   remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Parties::Person::New.call(form_values: params[:person],
-                                                            form_errors: res.errors,
-                                                            remote: false))
-          r.redirect '/masterfiles/parties/people/new'
+          re_show_form(r, res, url: '/masterfiles/parties/people/new') do
+            Masterfiles::Parties::Person::New.call(form_values: params[:person],
+                                                    form_errors: res.errors,
+                                                    remote: fetch?(r))
+          end
         end
       end
     end
@@ -202,31 +178,19 @@ class Framework < Roda
       interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_address(params[:address])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
-            Masterfiles::Parties::Address::New.call(form_values: params[:address],
-                                                    form_errors: res.errors,
-                                                    remote: true)
-          end
-          update_dialog_content(content: content, error: res.message)
         else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Parties::Address::New.call(form_values: params[:address],
-                                                             form_errors: res.errors,
-                                                             remote: false))
-          r.redirect '/masterfiles/parties/addresses/new'
+          re_show_form(r, res, url: '/masterfiles/parties/addresses/new') do
+            Masterfiles::Parties::Address::New.call(form_values: params[:address],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
         end
       end
     end
@@ -274,31 +238,19 @@ class Framework < Roda
       interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
         raise Crossbeams::AuthorizationError unless authorised?('parties', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
-        end
+        show_partial_or_page(r) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
       end
       r.post do
         res = interactor.create_contact_method(params[:contact_method])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/parties/contact_methods/new') do
             Masterfiles::Parties::ContactMethod::New.call(form_values: params[:contact_method],
                                                           form_errors: res.errors,
-                                                          remote: true)
+                                                          remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Parties::ContactMethod::New.call(form_values: params[:contact_method],
-                                                                   form_errors: res.errors,
-                                                                   remote: false))
-          r.redirect '/masterfiles/parties/contact_methods/new'
         end
       end
     end

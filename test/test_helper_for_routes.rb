@@ -65,12 +65,12 @@ class RouteTester < Minitest::Test
     end
   end
 
-  def ok_response(instance: nil)
-    success_response('OK', instance)
+  def ok_response(message: nil, instance: nil)
+    success_response((message || 'OK'), instance)
   end
 
-  def bad_response
-    failed_response('FAILED')
+  def bad_response(message: nil, instance: nil)
+    failed_response((message || 'FAILED'), instance)
   end
 
   def expect_json_response
@@ -146,5 +146,23 @@ class RouteTester < Minitest::Test
 
   def get_as_fetch(url, params = {}, options = nil)
     get url, params, options.merge('HTTP_X_CUSTOM_REQUEST_TYPE' => 'Y')
+  end
+
+  def expect_flash_notice(message = nil)
+    assert last_request.session['_flash']
+    if message
+      assert_equal message, last_request.session['_flash'][:notice]
+    else
+      assert_equal 'OK', last_request.session['_flash'][:notice]
+    end
+  end
+
+  def expect_flash_error(message = nil)
+    assert last_request.session['_flash']
+    if message
+      assert_equal message, last_request.session['_flash'][:error]
+    else
+      assert_equal 'FAILED', last_request.session['_flash'][:error]
+    end
   end
 end

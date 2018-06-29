@@ -19,11 +19,9 @@
 - :url: "/pack_material/config/material_resource_sub_types/$:id$/config/edit"
   :text: config
   :icon: fa-list
-  :title: Configuration
 - :url: "/pack_material/config/material_resource_sub_types/$:id$/product_columns"
   :text: product columns
   :icon: fa-list
-  :title: Product Columns
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/config/material_resource_sub_types/new"

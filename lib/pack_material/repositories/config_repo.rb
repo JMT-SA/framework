@@ -36,6 +36,8 @@ module PackMaterialApp
     crud_calls_for :material_resource_types, name: :matres_type, wrapper: MatresType
     crud_calls_for :material_resource_sub_types, name: :matres_sub_type, wrapper: MatresSubType
     crud_calls_for :pack_material_products, name: :pm_product, wrapper: PmProduct
+    crud_calls_for :material_resource_master_list_items, name: :matres_master_list_item, wrapper: MatresMasterListItem
+    crud_calls_for :material_resource_master_lists, name: :matres_master_list, wrapper: MatresMasterList
 
     # TYPES
     def find_matres_type(id)

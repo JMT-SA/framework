@@ -24,6 +24,16 @@ module PackMaterialApp
       assert_respond_to repo, :create_pm_product
       assert_respond_to repo, :update_pm_product
       assert_respond_to repo, :delete_pm_product
+
+      assert_respond_to repo, :find_matres_master_list_item
+      assert_respond_to repo, :create_matres_master_list_item
+      assert_respond_to repo, :update_matres_master_list_item
+      assert_respond_to repo, :delete_matres_master_list_item
+
+      assert_respond_to repo, :find_matres_master_list
+      assert_respond_to repo, :create_matres_master_list
+      assert_respond_to repo, :update_matres_master_list
+      assert_respond_to repo, :delete_matres_master_list
     end
 
     def test_product_code_column_subset

@@ -96,6 +96,7 @@ class TestOrganizationRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::OrganizationInteractor.any_instance.stubs(:create_organization).returns(ok_response)
     post 'masterfiles/parties/organizations', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
   end
 
@@ -114,6 +115,7 @@ class TestOrganizationRoutes < RouteTester
     Masterfiles::Parties::Organization::New.stub(:call, bland_page) do
       post 'masterfiles/parties/organizations', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
+    expect_flash_error
     expect_bad_redirect(url: '/masterfiles/parties/organizations/new')
   end
 

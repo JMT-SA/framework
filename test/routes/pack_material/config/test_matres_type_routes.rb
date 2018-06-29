@@ -96,6 +96,7 @@ class TestMatresTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_type).returns(ok_response)
     post 'pack_material/config/material_resource_types', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
   end
 
@@ -104,6 +105,7 @@ class TestMatresTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_type).returns(ok_response)
     post_as_fetch 'pack_material/config/material_resource_types', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_json_redirect
   end
 
@@ -154,6 +156,7 @@ class TestMatresTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
     post 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
   end
 
@@ -162,6 +165,7 @@ class TestMatresTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
     post_as_fetch 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_json_redirect
   end
 

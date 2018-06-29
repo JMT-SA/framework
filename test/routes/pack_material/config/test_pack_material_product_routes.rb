@@ -96,6 +96,7 @@ class TestPmProductRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:create_pm_product).returns(ok_response)
     post 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
   end
 
@@ -104,6 +105,7 @@ class TestPmProductRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:create_pm_product).returns(ok_response)
     post_as_fetch 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_json_redirect
   end
 

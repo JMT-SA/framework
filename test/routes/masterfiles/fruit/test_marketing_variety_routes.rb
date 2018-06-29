@@ -71,14 +71,12 @@ class TestMarketingVarietyRoutes < RouteTester
     # assert last_response.ok?
     # assert last_response.body.include?('OK')
 
-    # TODO: how do I test for error message & notice message
-    # MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(ok_response(instance: OpenStruct.new({message: 'notice message' })))
-    # post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-    # # expect_notice_flash('notice message')
-    # MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(bad_response(instance: OpenStruct.new({message: 'error message' })))
-    # post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-    # # At the moment bad_response doesn't accept an instance
-    # # expect_error_flash('error message')
+    MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(ok_response(message: 'notice message'))
+    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice('notice message')
+    MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(bad_response(message: 'error message'))
+    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_error('error message')
   end
 
   def test_new

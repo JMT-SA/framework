@@ -114,6 +114,7 @@ class TestContactMethodRoutes < RouteTester
     Masterfiles::Parties::ContactMethod::New.stub(:call, bland_page) do
       post 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
+    expect_flash_error
     expect_bad_redirect(url: '/masterfiles/parties/contact_methods/new')
   end
 

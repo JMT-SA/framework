@@ -13,12 +13,12 @@ class TestPartyRoutes < RouteTester
     ensure_exists!(MasterfilesApp::PartyInteractor)
     MasterfilesApp::PartyInteractor.any_instance.stubs(:link_addresses).returns(ok_response)
     post 'masterfiles/parties/link_addresses/1', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
 
     MasterfilesApp::PartyInteractor.any_instance.stubs(:link_addresses).returns(bad_response)
     post 'masterfiles/parties/link_addresses/1', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-    # expect_ok_redirect
-    # TODO: test flash messages
+    expect_flash_error
   end
 
   def test_link_contact_methods
@@ -26,11 +26,11 @@ class TestPartyRoutes < RouteTester
     ensure_exists!(MasterfilesApp::PartyInteractor)
     MasterfilesApp::PartyInteractor.any_instance.stubs(:link_contact_methods).returns(ok_response)
     post 'masterfiles/parties/link_contact_methods/1', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
 
     MasterfilesApp::PartyInteractor.any_instance.stubs(:link_contact_methods).returns(bad_response)
     post 'masterfiles/parties/link_contact_methods/1', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-    # expect_ok_redirect
-    # TODO: test flash messages
+    expect_flash_error
   end
 end

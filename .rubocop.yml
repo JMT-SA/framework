@@ -24,6 +24,15 @@ Metrics/BlockLength:
     - 'Rakefile'
     - '**/*.rake'
     - 'spec/**/*.rb'
+    - '**/test_*.rb'
+
+Metrics/ClassLength:
+  Exclude:
+    - '**/test_*.rb'
+
+Metrics/AbcSize:
+  Exclude:
+    - '**/test_*.rb'
 
 Layout/SpaceAroundOperators:
   AllowForAlignment: true

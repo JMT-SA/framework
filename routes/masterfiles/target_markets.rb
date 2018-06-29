@@ -16,12 +16,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
+        check_auth!('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::TmGroupType::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'read')
+          check_auth!('Target Markets', 'read')
           show_partial { Masterfiles::TargetMarkets::TmGroupType::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -37,7 +37,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
+          check_auth!('Target Markets', 'delete')
           res = interactor.delete_tm_group_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -46,7 +46,7 @@ class Framework < Roda
     r.on 'target_market_group_types' do
       interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+        check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::TmGroupType::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -74,12 +74,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
+        check_auth!('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::TmGroup::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'read')
+          check_auth!('Target Markets', 'read')
           show_partial { Masterfiles::TargetMarkets::TmGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -96,7 +96,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
+          check_auth!('Target Markets', 'delete')
           res = interactor.delete_tm_group(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -105,7 +105,7 @@ class Framework < Roda
     r.on 'target_market_groups' do
       interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+        check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::TmGroup::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -133,7 +133,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
+        check_auth!('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::TargetMarket::Edit.call(id) }
       end
       r.on 'link_countries' do
@@ -162,7 +162,7 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'read')
+          check_auth!('Target Markets', 'read')
           show_partial { Masterfiles::TargetMarkets::TargetMarket::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -178,7 +178,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
+          check_auth!('Target Markets', 'delete')
           res = interactor.delete_target_market(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -187,7 +187,7 @@ class Framework < Roda
     r.on 'target_markets' do
       interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+        check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::TargetMarket::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -214,13 +214,13 @@ class Framework < Roda
         handle_not_found(r)
       end
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
+        check_auth!('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::Region::Edit.call(id) }
       end
       r.on 'destination_countries' do
         country_interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+          check_auth!('Target Markets', 'new')
           show_partial_or_page(r) { Masterfiles::TargetMarkets::Country::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
@@ -240,7 +240,7 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'read')
+          check_auth!('Target Markets', 'read')
           show_partial { Masterfiles::TargetMarkets::Region::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -256,7 +256,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
+          check_auth!('Target Markets', 'delete')
           res = interactor.delete_region(id)
 
           if res.success
@@ -270,7 +270,7 @@ class Framework < Roda
     r.on 'destination_regions' do
       interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+        check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::Region::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
@@ -298,12 +298,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
+        check_auth!('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::Country::Edit.call(id) }
       end
       r.on 'destination_cities' do
         r.on 'new' do    # NEW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'new')
+          check_auth!('Target Markets', 'new')
           show_partial_or_page(r) { Masterfiles::TargetMarkets::City::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
@@ -323,7 +323,7 @@ class Framework < Roda
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'read')
+          check_auth!('Target Markets', 'read')
           show_partial { Masterfiles::TargetMarkets::Country::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -341,7 +341,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
+          check_auth!('Target Markets', 'delete')
           res = interactor.delete_country(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -362,12 +362,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'edit')
+        check_auth!('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::City::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'read')
+          check_auth!('Target Markets', 'read')
           show_partial { Masterfiles::TargetMarkets::City::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -385,7 +385,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('Target Markets', 'delete')
+          check_auth!('Target Markets', 'delete')
           res = interactor.delete_city(id)
           delete_grid_row(id, notice: res.message)
         end

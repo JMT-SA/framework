@@ -14,11 +14,16 @@ module DM
                   else
                     'Report listing'
                   end
+        button_caption = if context[:for_grid_queries]
+                           'Create a new grid query'
+                         else
+                           'Create a new report'
+                         end
         new_url = '/dataminer/admin/new/'
 
         layout = Crossbeams::Layout::Page.build({}) do |page|
           page.section do |section|
-            section.add_control(control_type: :link, text: 'Create a new report', url: new_url, style: :button)
+            section.add_control(control_type: :link, text: button_caption, url: new_url, style: :button)
           end
 
           unless context[:for_grid_queries]

@@ -8,7 +8,7 @@ class Framework < Roda
     r.on :id do |id|
       r.is do
         session[:last_grid_url] = "/list/#{id}"
-        show_page { render_data_grid_page(id) }
+        show_page { render_data_grid_page(id, fit_height: true) }
       end
 
       r.on 'with_params' do
@@ -16,7 +16,7 @@ class Framework < Roda
           show_partial { render_data_grid_page(id, query_string: request.query_string) }
         else
           session[:last_grid_url] = "/list/#{id}/with_params?#{request.query_string}"
-          show_page { render_data_grid_page(id, query_string: request.query_string) }
+          show_page { render_data_grid_page(id, query_string: request.query_string, fit_height: true) }
         end
       end
 
@@ -24,7 +24,7 @@ class Framework < Roda
         if fetch?(r)
           show_partial { render_data_grid_page_multiselect(id, params) }
         else
-          show_page { render_data_grid_page_multiselect(id, params) }
+          show_page { render_data_grid_page_multiselect(id, params.merge(fit_height: true)) }
         end
       end
 
@@ -77,7 +77,7 @@ class Framework < Roda
 
       r.on 'run' do
         session[:last_grid_url] = "/search/#{id}?rerun=y"
-        show_page { render_search_grid_page(id, params) }
+        show_page { render_search_grid_page(id, params.merge(fit_height: true)) }
       end
 
       r.on 'grid' do

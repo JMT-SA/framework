@@ -1,0 +1,16 @@
+---
+:dataminer_definition: user_program_permissions
+:conditions:
+  :standard:
+    - :col: pu.user_id
+      :op: =
+      :val: $:id$
+:multiselect:
+  :set_group:
+    :url: "/development/masterfiles/users/set_permissions/$:id$"
+    :section_caption: "Set permissions for programs"
+    :multiselect_save_method: dialog
+    :conditions:
+      - :col: pu.user_id
+        :op: =
+        :val: $:id$

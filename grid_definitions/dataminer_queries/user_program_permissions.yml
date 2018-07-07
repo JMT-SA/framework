@@ -1,0 +1,144 @@
+---
+:caption: User program permissions
+:sql: "SELECT f.functional_area_name, p.program_name, s.security_group_name,\r\n(SELECT
+  string_agg(security_permission, '; ')\r\n  FROM (SELECT sp.security_permission\r\n
+  \ FROM security_groups_security_permissions sgsp\r\n  JOIN security_permissions
+  sp ON sp.id = sgsp.security_permission_id\r\n  WHERE sgsp.security_group_id = s.id)
+  sub) AS permissions,\r\npu.id, pu.user_id, pu.program_id, pu.security_group_id\r\n
+  \ FROM public.programs_users pu\r\n  JOIN programs p ON p.id = pu.program_id\r\n
+  \ JOIN security_groups s ON s.id = pu.security_group_id\r\n  JOIN functional_areas
+  f ON f.id = p.functional_area_id\r\nORDER BY f.functional_area_name,
+  p.program_name"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  functional_area_name:
+    :name: functional_area_name
+    :sequence_no: 1
+    :caption: Functional area name
+    :namespaced_name: f.functional_area_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_name:
+    :name: program_name
+    :sequence_no: 2
+    :caption: Program name
+    :namespaced_name: p.program_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  security_group_name:
+    :name: security_group_name
+    :sequence_no: 3
+    :caption: Security group name
+    :namespaced_name: s.security_group_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  permissions:
+    :name: permissions
+    :sequence_no: 4
+    :caption: Permissions
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 5
+    :caption: Id
+    :namespaced_name: pu.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  user_id:
+    :name: user_id
+    :sequence_no: 6
+    :caption: User
+    :namespaced_name: pu.user_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_id:
+    :name: program_id
+    :sequence_no: 7
+    :caption: Program
+    :namespaced_name: pu.program_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  security_group_id:
+    :name: security_group_id
+    :sequence_no: 8
+    :caption: Security group
+    :namespaced_name: pu.security_group_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: pu.user_id
+  :caption: User id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

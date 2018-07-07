@@ -83,7 +83,19 @@ module DevelopmentApp
       success_response("Password for #{instance.user_name} has been changed", instance)
     end
 
+    def set_user_permissions(id, ids, params)
+      res = validate_user_permission(params)
+      return validation_failed_response(res) unless res.messages.empty?
+      res = repo.update_user_permission(ids, res.to_h[:security_group_id])
+      success_response("Updated permissions for #{user(id).user_name}",
+                       res.instance)
+    end
+
     private
+
+    def validate_user_permission(params)
+      UserPermissionSchema.call(params)
+    end
 
     def invalid_password
       validation_failed_response(OpenStruct.new(messages: { old_password: ['Incorrect password'] }))

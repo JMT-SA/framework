@@ -269,6 +269,31 @@ class Framework < Roda
         check_auth!('masterfiles', 'new')
         show_partial_or_page(r) { Development::Masterfiles::User::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'set_permissions', Integer do |id|
+        r.get do
+          check_auth!('masterfiles', 'edit')
+          ids = multiselect_grid_choices(params)
+          show_partial { Development::Masterfiles::User::ApplySecurityGroupToProgram.call(id, ids) }
+        end
+        r.patch do
+          ids = multiselect_grid_choices(params[:permission])
+          res = interactor.set_user_permissions(id, ids, params[:permission])
+          if res.success
+            update_grid_row(ids,
+                            changes: { security_group_name: res.instance[:security_group_name],
+                                       permissions: res.instance[:permissions] },
+                            notice: res.message)
+          else
+            re_show_form(r, res, url: "/development/masterfiles/users/set_permissions/#{id}") do
+              Development::Masterfiles::User::ApplySecurityGroupToProgram.call(id,
+                                                                               ids,
+                                                                               form_values: params[:permission],
+                                                                               form_errors: res.errors)
+            end
+          end
+        end
+      end
       r.post do        # CREATE
         res = interactor.create_user(params[:user])
         if res.success

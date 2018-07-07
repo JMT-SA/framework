@@ -146,13 +146,7 @@ module DevelopmentApp
          cellClass: 'grid-boolean-column',
          width: 100
        },
-       {
-         headerName: 'Remote?',
-         field: 'multiselect_save_remote',
-         cellRenderer: 'crossbeamsGridFormatters.booleanFormatter',
-         cellClass: 'grid-boolean-column',
-         width: 100
-       }]
+       { headerName: 'Save method', field: 'multiselect_save_method' }]
     end
 
     def multiselect_row_defs(file)
@@ -165,7 +159,7 @@ module DevelopmentApp
           preselect: control.preselect,
           section_caption: control.section_caption,
           can_be_cleared: control.can_be_cleared,
-          multiselect_save_remote: control.multiselect_save_remote
+          multiselect_save_method: control.multiselect_save_method
         }
       end
       rows

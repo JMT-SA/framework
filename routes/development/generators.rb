@@ -25,7 +25,6 @@ class Framework < Roda
           result = GenerateNewScaffold.call(res.to_h, request.roda_class)
           show_page { Development::Generators::Scaffolds::Show.call(result) }
         else
-          puts errors.inspect
           show_page { Development::Generators::Scaffolds::New.call(params[:scaffold], errors) }
         end
       end

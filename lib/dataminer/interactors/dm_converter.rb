@@ -41,7 +41,6 @@ class DmConverter
     end
 
     fields.each_value do |field_def|
-      # puts ">>> FIELD DEF: #{field_def}"
       list_def = field_def['list']
       control_type = case field_def['field_type']
                      when 'lookup'
@@ -58,7 +57,6 @@ class DmConverter
       rpt.ordered_columns.each do |column|
         data_type = column.data_type if column.namespaced_name == param_name
       end
-      # puts ">>> PARAM: #{param_name}"
       rpt.add_parameter_definition(Crossbeams::Dataminer::QueryParameterDefinition.new(param_name,
                                                                                        caption:       caption,
                                                                                        data_type:     data_type,

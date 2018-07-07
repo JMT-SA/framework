@@ -57,7 +57,7 @@ module ErrorHelpers
     response.status = 500
     msg = err.respond_to?(:message) ? err.message : err.to_s
     msg = "#{state} - #{msg}" unless state.nil?
-    puts err.full_message if err.respond_to?(:full_message)
+    puts err.full_message if err.respond_to?(:full_message) # Log the error too
     return_json_response
     { flash: { error: msg } }.to_json
   end
@@ -81,7 +81,7 @@ module ErrorHelpers
 
   def show_page_error(err)
     message = err.respond_to?(:message) ? err.message : err.to_s
-    puts err.full_message if err.respond_to?(:full_message)
+    puts err.full_message if err.respond_to?(:full_message) # Log the error too
     view(inline: "<div class='crossbeams-error-note'><p><strong>Error</strong></p><p>#{message}</p></div>")
   end
 

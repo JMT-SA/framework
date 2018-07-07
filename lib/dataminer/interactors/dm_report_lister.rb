@@ -7,10 +7,8 @@ class DmReportLister
   end
 
   def get_report_by_id(id)
-    # puts ">>> ID: #{id}"
     config_file       = File.join(path, '.dm_report_list.yml')
     report_dictionary = YAML.load_file(config_file)
-    # puts ">>> Dict: #{report_dictionary.inspect}"
     this_report       = report_dictionary[id]
     persistor         = Crossbeams::Dataminer::YamlPersistor.new(this_report[:file])
     Crossbeams::Dataminer::Report.load(persistor)

@@ -34,7 +34,6 @@ module DataminerApp
         page.sql_run_url = page.report.external_settings[:render_url]
         return page
       end
-      # puts params.inspect
       # {"limit"=>"", "offset"=>"", "crosstab"=>{"row_columns"=>["organization_code", "commodity_code", "fg_code_old"], "column_columns"=>"grade_code", "value_columns"=>"no_pallets"}, "btnSubmit"=>"Run report", "json_var"=>"[]"}
       page.report.ordered_columns.each do |col|
         hs                  = { headerName: col.caption, field: col.name, hide: col.hide, headerTooltip: col.caption }
@@ -67,7 +66,6 @@ module DataminerApp
 
         page.col_defs << hs
       end
-      # p page.report.runnable_sql
       # Use module for BigDecimal change? - register_extension...?
       db_type = repo.db_connection_for(db).database_type
       page.row_defs = repo.db_connection_for(db)[page.report.runnable_sql_delimited(db_type)].to_a.map do |m|
@@ -104,7 +102,7 @@ module DataminerApp
             # x_styles << (col.format == :delimited_1000_4 ? delim4 : :delimited_1000 ? delim2 : nil) # :num_fmt => Axlsx::NUM_FMT_YYYYMMDDHHMMSS / Axlsx::NUM_FMT_PERCENT
             x_styles << and_styles[col.format]
           end
-          puts x_styles.inspect
+
           wb.add_worksheet do |sheet|
             sheet.add_row heads, style: tbl_header
             db_type = repo.db_connection_for(db).database_type
@@ -337,9 +335,8 @@ module DataminerApp
         value = false if value && value == 'false'
         col.send("#{attrib}=", value)
       end
-      # puts ">>> ATTR: #{attrib} - #{value} #{value.class}"
+
       if attrib == 'group_sum' && value == 'true' # NOTE string value of bool...
-        puts 'CHANGING...'
         col.group_avg = false
         col.group_min = false
         col.group_max = false
@@ -426,10 +423,8 @@ module DataminerApp
     # @param crosstab_hash [Hash] the crosstab config (if applicable).
     # @return [Crossbeams::Dataminer::Report] the modified report.
     def setup_report_with_parameters(rpt, params, crosstab_hash = {}, db)
-      # puts params[:json_var].inspect
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
-      # logger.info input_parameters.inspect
       parms   = []
       # Check if this should become an IN parmeter (list of equal checks for a column.
       eq_sel  = input_parameters.select { |p| p['op'] == '=' }.group_by { |p| p['col'] }

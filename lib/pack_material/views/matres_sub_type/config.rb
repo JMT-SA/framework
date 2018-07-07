@@ -50,7 +50,7 @@ module PackMaterial
                                multiselect_key: 'material_resource_type_config',
                                multiselect_params: { id: id },
                                can_be_cleared: true,
-                               multiselect_save_remote: true)
+                               multiselect_save_method: 'remote')
                 end
               end
             end

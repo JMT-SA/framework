@@ -22,8 +22,7 @@ module UiRules
 
     def make_form_object
       yml  = @options[:tempfile].read # Store tmpfile so it's available for save? ... currently hiding yml in the form...
-      hash = YAML.load(yml)
-      p hash
+      hash = YAML.load(yml) # rubocop:disable Security/YAMLLoad
       @form_object = OpenStruct.new(database: nil, filename: @options[:filename], yml: yml, temp_path: @options[:tempfile].path, sql: clean_where(hash['query']))
     end
 

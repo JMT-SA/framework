@@ -103,7 +103,7 @@ const crossbeamsGridEvents = {
    * @param {string} url - the URL to receive the fetch request.
    * @returns {void}
    */
-  saveSelectedRows: function saveSelectedRows(gridId, url, canBeCleared, remoteSave) {
+  saveSelectedRows: function saveSelectedRows(gridId, url, canBeCleared, saveMethod) {
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
     const ids = _.map(gridOptions.api.getSelectedRows(), m => m.id);
     let msg;
@@ -133,6 +133,12 @@ const crossbeamsGridEvents = {
         form.submit();
       };
 
+      // Save via a remote fetch call that renders in a dialog.
+      const saveToPopup = () => {
+        crossbeamsUtils.recordGridIdForPopup(gridId);
+        crossbeamsUtils.popupDialog('JS Test', `${url}?selection[list]=${ids.join(',')}`);
+      };
+
       // Save via a remote fetch call.
       const saveRemote = () => {
         const form = new FormData();
@@ -151,7 +157,9 @@ const crossbeamsGridEvents = {
             if (data.redirect) {
               window.location = data.redirect;
             } else if (data.updateGridInPlace) {
-              this.updateGridInPlace(data.updateGridInPlace.id, data.updateGridInPlace.changes);
+              data.updateGridInPlace.forEach((gridRow) => {
+                this.updateGridInPlace(gridRow.id, gridRow.changes);
+              });
             } else if (data.actions) {
               data.actions.forEach((action) => {
                 if (action.replace_options) {
@@ -177,7 +185,8 @@ const crossbeamsGridEvents = {
                 document.dispatchEvent(gridEvent);
               });
               const sortable = Array.from(dlgContent.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
-              sortable.forEach((elem) => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix, elem.dataset.sortableGroup))
+              sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
+                                                       elem.dataset.sortableGroup));
             } else {
               console.log('Not sure what to do with this:', data);
             }
@@ -206,7 +215,14 @@ const crossbeamsGridEvents = {
           });
       };
 
-      const saveFunc = remoteSave ? saveRemote : saveStd;
+      let saveFunc;
+      if (saveMethod === 'http') {
+        saveFunc = saveStd;
+      } else if (saveMethod === 'remote') {
+        saveFunc = saveRemote;
+      } else if (saveMethod === 'dialog') {
+        saveFunc = saveToPopup;
+      }
 
       crossbeamsUtils.confirm({
         prompt: msg,
@@ -1224,8 +1240,9 @@ $(() => {
                   } else if (data.removeGridRowInPlace) {
                     crossbeamsGridEvents.removeGridRowInPlace(data.removeGridRowInPlace.id);
                   } else if (data.updateGridInPlace) {
-                    crossbeamsGridEvents.updateGridInPlace(data.updateGridInPlace.id,
-                                           data.updateGridInPlace.changes);
+                    data.updateGridInPlace.forEach((gridRow) => {
+                      crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
+                    });
                   } else {
                     console.log('Not sure what to do with this:', data);
                   }

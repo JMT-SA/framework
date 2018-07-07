@@ -15,7 +15,6 @@ module DataminerApp
     # @param crosstab_hash [Hash] the crosstab config (if applicable).
     # @return [Crossbeams::Dataminer::Report] the modified report.
     def setup_report_with_parameters(rpt, params, db_name, crosstab_hash = {})
-      # puts params[:json_var].inspect
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
       # logger.info input_parameters.inspect
@@ -174,7 +173,7 @@ module DataminerApp
             # x_styles << (col.format == :delimited_1000_4 ? delim4 : :delimited_1000 ? delim2 : nil) # :num_fmt => Axlsx::NUM_FMT_YYYYMMDDHHMMSS / Axlsx::NUM_FMT_PERCENT
             x_styles << and_styles[col.format]
           end
-          # puts x_styles.inspect
+
           wb.add_worksheet do |sheet|
             sheet.add_row heads, style: tbl_header
             db_type = repo.db_connection_for(db).database_type

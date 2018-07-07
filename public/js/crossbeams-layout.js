@@ -203,8 +203,9 @@
               closeDialog = false;
               loadDialogContent(data.loadNewUrl); // promise...
             } else if (data.updateGridInPlace) {
-              crossbeamsGridEvents.updateGridInPlace(data.updateGridInPlace.id,
-                                     data.updateGridInPlace.changes);
+              data.updateGridInPlace.forEach((gridRow) => {
+                crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
+              });
             } else if (data.replaceDialog) {
               closeDialog = false;
               const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());

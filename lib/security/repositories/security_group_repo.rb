@@ -2,6 +2,10 @@
 
 module SecurityApp
   class SecurityGroupRepo < BaseRepo
+    build_for_select :security_groups, label: :security_group_name,
+                                       value: :id,
+                                       no_active_check: true,
+                                       order_by: :security_group_name
     build_for_select :security_permissions, label: :security_permission,
                                             value: :id,
                                             no_active_check: true,

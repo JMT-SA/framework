@@ -6,4 +6,4 @@
     :preselect: "SELECT unnest(product_column_ids) FROM material_resource_sub_types WHERE id = $:id$"
     :section_caption: "SELECT 'Select product columns'"
     :can_be_cleared: false
-    :multiselect_save_remote: true
+    :multiselect_save_method: remote

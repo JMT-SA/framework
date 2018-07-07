@@ -49,10 +49,15 @@ module CommonHelpers
   # Selection from a multiselect grid.
   # Returns an array of values.
   def multiselect_grid_choices(params, treat_as_integers: true)
+    list = if params.key?(:selection)
+             params[:selection][:list]
+           else
+             params[:list]
+           end
     if treat_as_integers
-      params[:selection][:list].split(',').map(&:to_i)
+      list.split(',').map(&:to_i)
     else
-      params[:selection][:list].split(',')
+      list.split(',')
     end
   end
 
@@ -154,8 +159,16 @@ module CommonHelpers
     end
   end
 
-  def update_grid_row(id, changes:, notice: nil)
-    res = { updateGridInPlace: { id: make_id_correct_type(id), changes: changes } }
+  # Update columns in a particular row (or rows) in the grid.
+  # If more than one id is provided, all matching rows will
+  # receive the same changed values.
+  #
+  # @param ids [Integer/Array] the id or ids of the row(s) to update.
+  # @param changes [Hash] the changed columns and their values.
+  # @param notice [String/Nil] the flash message to show.
+  # @return [JSON] the changes to be applied.
+  def update_grid_row(ids, changes:, notice: nil)
+    res = { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes } } }
     res[:flash] = { notice: notice } if notice
     res.to_json
   end

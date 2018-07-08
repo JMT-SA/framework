@@ -60,5 +60,7 @@ class DataminerConnection
           else
             Sequel.connect(validation[:connection_string])
           end
+    # Ensure connections are not lost over time.
+    @db.extension(:connection_validator) unless validation[:connection_string].nil?
   end
 end

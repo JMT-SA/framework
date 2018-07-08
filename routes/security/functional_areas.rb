@@ -23,6 +23,16 @@ class Framework < Roda
         sql = interactor.show_sql(id, self.class.name)
         show_partial { Security::FunctionalAreas::FunctionalArea::Sql.call(sql) }
       end
+
+      r.on 'reorder' do
+        show_partial { Security::FunctionalAreas::FunctionalArea::Reorder.call(id) }
+      end
+
+      r.on 'save_reorder' do
+        res = interactor.reorder_programs(params[:p_sorted_ids])
+        flash[:notice] = res.message
+        redirect_via_json_to_last_grid
+      end
       r.is do
         r.get do       # SHOW
           check_auth!('menu', 'read')

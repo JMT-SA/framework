@@ -19,6 +19,12 @@
         :is_delete: true
         :popup: true
         :hide_if_present: :program_id
+      - :url: /security/functional_areas/functional_areas/$:functional_area_id$/reorder
+        :text: re-order programs
+        :icon: fa-sort
+        :title: Re-order
+        :hide_if_null: :program_id
+        :popup: true
       - :separator: true
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$/sql
         :text: SQL for Functional area

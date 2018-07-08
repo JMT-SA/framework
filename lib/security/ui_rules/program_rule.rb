@@ -21,6 +21,7 @@ module UiRules
     def common_fields
       {
         program_name: { required: true },
+        program_sequence: { renderer: :number, required: true },
         active: { renderer: :checkbox }
       }
     end

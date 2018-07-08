@@ -3,7 +3,7 @@
 :sql: "  SELECT \r\nf.id AS functional_area_id, p.id AS program_id, pf.id, f.functional_area_name,
   f.active AS f_active, f.created_at AS f_created_at, f.updated_at AS f_updated_at,\r\np.program_name,
   p.active AS p_active, p.created_at AS p_created_at, p.updated_at AS p_updated_at,
-  -- p.functional_area_id\r\npf.group_name, pf.program_function_name, pf.url, pf.program_function_sequence,
+  -- p.functional_area_id\r\npf.group_name, pf.program_function_name, pf.url, p.program_sequence, pf.program_function_sequence,
   \r\n       pf.restricted_user_access, pf.active AS pf_active, pf.created_at AS pf_created_at,
   pf.updated_at AS pf_updated_at,\r\n  (SELECT string_agg(webapp, '; ') FROM (SELECT
   webapp FROM programs_webapps WHERE program_id = p.id) sub) AS webapps\r\n  FROM
@@ -215,6 +215,21 @@
     :caption: Url
     :namespaced_name: pf.url
     :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  program_sequence:
+    :name: program_sequence
+    :sequence_no: 7
+    :caption: Prog. Seq.
+    :namespaced_name: pf.program_sequence
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false

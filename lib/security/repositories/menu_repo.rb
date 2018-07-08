@@ -34,6 +34,16 @@ module SecurityApp
       DB[query].select_map
     end
 
+    def programs_for_select(id)
+      query = <<~SQL
+        SELECT id, program_name
+        FROM programs
+        WHERE functional_area_id = #{id}
+        ORDER BY program_sequence
+      SQL
+      DB[query].map { |rec| [rec[:program_name], rec[:id]] }
+    end
+
     def program_functions_for_select(id)
       query = <<~SQL
         SELECT id, program_function_name
@@ -73,6 +83,14 @@ module SecurityApp
         DB[:programs_users].where(program_id: id).delete
         delete(:programs, id)
       end
+    end
+
+    def re_order_programs(sorted_ids)
+      upd = []
+      sorted_ids.split(',').each_with_index do |id, index|
+        upd << "UPDATE programs SET program_sequence = #{index + 1} WHERE id = #{id};"
+      end
+      DB[upd.join].update
     end
 
     def re_order_program_functions(sorted_ids)

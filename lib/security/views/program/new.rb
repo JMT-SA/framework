@@ -17,6 +17,7 @@ module Security
               form.remote! if remote
               form.add_field :functional_area_id
               form.add_field :program_name
+              form.add_field :program_sequence
               form.add_field :active
             end
           end

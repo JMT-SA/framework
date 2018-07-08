@@ -17,6 +17,7 @@ module Security
               form.remote!
               form.method :update
               form.add_field :program_name
+              form.add_field :program_sequence
               form.add_field :webapps
               form.add_field :active
             end

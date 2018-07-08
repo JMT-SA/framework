@@ -38,6 +38,11 @@ module SecurityApp
       success_response("Deleted functional area #{name}")
     end
 
+    def reorder_programs(params)
+      repo.re_order_programs(params)
+      success_response('Re-ordered programs')
+    end
+
     def show_sql(id, webapp)
       DataToSql.new(webapp).sql_for(:functional_areas, id)
     end

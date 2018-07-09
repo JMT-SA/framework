@@ -55,6 +55,8 @@ a|Framework paths start with a `/`. Any value from the grid row can be included 
 
 e.g. to include the `customer_id` in the URL when the link is clicked: `/customers/$:customer_id$`.
 
+See <<URLs>> below for more information.
+
 |:text
 |Link text.
 |The text to display for the link. Defaults to `'link'`.
@@ -139,3 +141,107 @@ Submenus are sub-groupings of actions. Submenus have an items array that can con
 ----
 <1> This text appears in the context menu with a right-pointing arrowhead.
 <2> Items is an array of items just like under <<Actions>>. These appear to the right of the arrowhead.
+
+=== URLs
+
+URL strings are relative to the root and start with a `/`.
+
+Tokens (`$:xxx$`) in the URL are replaced by their matching column values in the selected row. Here `$:xxx$` will be replaced by the value in the `xxx` column of the selected row.
+
+*List* URLS start with `/list/` and are followed by the filename without extension of the list to render. e.g. `/list/users` will render the grid defined in `grid_definitions/lists/users.yml`.
+
+*Search* URLS start with `/search/` and are followed by the filename without extension of the search to render. e.g. `/search/users` will render the grid defined in `grid_definitions/searches/users.yml`.
+
+There are a few _special_ URLs that link to other grids to render a *filtered* list or a *multiselect* list.
+
+==== Link to a filtered list
+
+Create a link like this to link to a grid that is filtered in some way by values in the current row.
+
+Add `with_params?key=KEYNAME&id=$:id$` at the end of the URL to render a list that has a `:conditions` section named `KEYNAME` and has a `col` entry for `id`.
+[source,yaml]
+----
+- :url: "/list/user_program_permissions/with_params?key=standard&id=$:id$"
+----
+
+Then in the `user_program_permissions.yml` file in the `list` directory:
+[source,yaml]
+----
+:dataminer_definition: user_program_permissions # <1>
+:conditions:
+  :standard:                                    # <2>
+    - :col: pu.user_id                          # <3>
+      :op: =                                    # <4>
+      :val: $:id$                               # <5>
+----
+<1> The dataminer query definition in `grid_definitions/dataminer_queries/`.
+<2> This matches the value of `key` in the URL.
+<3> The name of a parameter in the query definition specified in (1).
+<4> The operator to apply (=, <, > etc.)
+<5> The value to apply. Matches `$:id$` in the calling URL which will be set to the `id` column of the selected row in the grid.
+
+==== Link to a multiselect grid
+
+Create a link like this to link to a grid that presents multiselect choices. The grid can be filtered by parameter(s) in the link, and/or it can have pre-selections made based on parameter(s) in the link.
+
+add `multi?key=KEYNAME&id=$:id$` to render a list that has a `:multiselect` section named `KEYNAME`.
+
+[source,yaml]
+----
+- :url: "/list/users/multi?key=progfunc_users&id=$:id$"
+----
+
+Then in the `users.yml` file in the `list` directory:
+[source,yaml]
+----
+:multiselect:
+  :progfunc_users:
+    :url: "/security/functional_areas/program_functions/link_users/$:id$"
+    :preselect: "SELECT user_id AS id FROM program_functions_users WHERE program_function_id = $:id$"
+    :section_caption: "SELECT 'Assign users to ' || program_function_name FROM program_functions WHERE id = $:id$"
+    :can_be_cleared: true
+----
+OR
+[source,yaml]
+----
+- :url: "/list/user_program_permissions/multi?key=set_group&id=$:id$"
+----
+Then in the `user_program_permissions.yml` file in the `list` directory:
+[source,yaml]
+----
+:multiselect:
+  :set_group:
+    :url: "/development/masterfiles/users/set_permissions/$:id$"
+    :section_caption: "Set permissions for programs"
+    :multiselect_save_method: dialog
+    :conditions:
+      - :col: pu.user_id
+        :op: =
+        :val: $:id$
+----
+
+Possible options in the `:multiselect` section:
+[source,yaml]
+----
+:multiselect:
+  :keyname:                                              # <1>
+    :url: "/path/to/call/on/save"                        # <2>
+    :section_caption: "SELECT statement or fixed string" # <3>
+    :preselect: "SELECT statement"                       # <4>
+    :multiselect_save_method: dialog/remote/http         # <5>
+    :can_be_cleared: true                                # <6>
+    :conditions:                                         # <7>
+      - :col: param.column
+        :op: =
+        :val: $:id$
+----
+<1> Keyname to match `?key=` part of calling URL.
+<2> The path to be called when the user saves a selection.
+<3> Caption can be a `SELECT` query that returns the caption (using tokens from the URL) or a fixed string.
+<4> A `SELECT` statement that returns an `id` column. Matching ids in the grid will be pre-selected.
+<5> Optional. How to save -- defaults to `http` which sends a POST request.
+    `remote` will send a `POST fetch` request.
+    `dialog` will send a `GET fetch` request that will render in a modal dialog.
+<6> Optional. Can the user select no rows at all (to clear a previous selection). Default is `false`.
+<7> Conditions to apply to filter the grid. Same as per filtered lists (above).
+

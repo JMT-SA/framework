@@ -13,33 +13,40 @@ The following renderers that do not bind to fields in a form are available:
 * <<Address>>
 * <<ContactMethod>>
 * <<Grid>>
-* <<Form>>
 * <<Table>>
 * <<Diff>>
+* <<ProgressStep>>
+* <<RepeatingRequest>>
 
 === Link
 
 This page control displays a link in a page.
 
+e.g.
+[source,ruby]
+----
+section.add_link(text: 'Do something', url: '/path/to/something', style: :button)
+----
+
 |===
 |attribute |description |possible values |default
 
-|:text
+|options - :text
 |The link text
 |any text
 |None. must be provided.
 
-|:url
+|options - :url
 |The url to be called.
 |a valid endpoint.
 |None. must be provided.
 
-|:style
+|options - :style
 |How the link is styled - as a normal link, or to look like a button.
 |`:link` or `:button`.
 |`:link`
 
-|:behaviour
+|options - :behaviour
 |How the link behaves when clicked. Can open the url in a new page, or can open the url in a popup dialog.
 |`:popup`.
 |n/a
@@ -60,19 +67,24 @@ section.add_text('def a_ruby_method(text)', syntax: :ruby)
 |===
 |attribute |description |possible values |default
 
-|:preformatted
+|text
+|The text to be displayed.
+|`String`. Can contain HTML.
+|None. Required.
+
+|options - :preformatted
 |Display the text within <pre> tags.
 |`true` or `false`.
 |`false`
 
-|:syntax
+|options - :syntax
 |Syntax highlighter to apply to the text.
 a|* :ruby
 * :sql
 * :yaml or :yml
 |n/a
 
-|:wrapper
+|options - :wrapper
 |Tag(s) to wrap the text in. Can be a Symbol or Array of Symbols.
 a|* :p
 * :h1
@@ -103,7 +115,7 @@ column.add_list([['FP', 1], ['MGP', 2], ['CONS', 3]])
 |a one-dimensional or two-diemnsional array.
 |None. Required.
 
-|:caption
+|options - :caption
 |The label text
 |any text
 |None.
@@ -128,7 +140,7 @@ sorted_id_list = params[:deals_sorted_ids] #=> '1,2,3'
 
 |prefix
 |The prefix to be used in identifying this group of items.
-|any text starting with a letter, without spaces.
+|`String` starting with a letter, without spaces.
 |None. This is required.
 
 |items
@@ -136,12 +148,12 @@ sorted_id_list = params[:deals_sorted_ids] #=> '1,2,3'
 |An Array of `[text, id]` elements.
 |None. This is required.
 
-|:caption
+|options - :caption
 |A caption to display above the list.
 |Any string
 |None.
 
-|:drag_between_lists_name
+|options - :drag_between_lists_name
 |A name to group two lists together so the user can drag from one to the other.
 |Any string
 |None.
@@ -163,7 +175,12 @@ form.add_address(address_array, include_address_type: false)
 |===
 |attribute |description |possible values |default
 
-|:include_address_type
+|address
+|The address or addresses.
+|An object that responds to `address_line_1`, `address_line_2`, `address_line_3`, `city`, `postal_code` and `address_type`. Or an `Array` of such objects.
+|None. Required.
+
+|options - :include_address_type
 |Show the type of address in the heading.
 |`true` or `false`.
 |`true`
@@ -185,7 +202,12 @@ form.add_contact_method(contact_method_array, icon_lookup: { 'telephone' => 'tel
 |===
 |attribute |description |possible values |default
 
-|:icon_lookup
+|contact_method
+|The contact method or methods.
+|An object that responds to `contact_method_type` and `contact_method_code`. Or an `Array` of such objects.
+|None. Required.
+
+|options - :icon_lookup
 |Add method_type to icon shortcut for the icons to display next to the method type.
 |Each key in the Hash should correspond to a method type and the value should be one of `tel`, `cell`, `fax`, `email`, `social`.
 |`{'tel' => 'tel', 'cell' => 'cell', 'fax' => 'fax', 'email' => 'email', 'social' => 'social'}`
@@ -206,25 +228,32 @@ section.add_grid 'tickets', '/list/tickets', caption: 'Movie tickets', height: 8
 |===
 |attribute |description |possible values |default
 
-|caption
+|id
+|The DOM id for the grid.
+|`String`.
+|None. Required.
+
+|url
+|The URL to call that will return the grid columns and rows in JSON
+|`String`.
+|None. Required.
+
+|options - :caption
 |The caption to be shown in the grid header
 |any text.
 |None (no caption will be shown in the header).
 
-|height
+|options - :height
 |The height in css ems of the grid body (excludes the grid header).
 |An integer greater than or equal to 6.
 |20. If a value less than 6 is given, it will be fixed to 6.
 
-|fit_height
+|options - :fit_height
 |Make the grid fit the available height of its parent element. Note that if the grid is in a section, you can call `fit_height!` on the section and the grid will adjust. If the grid is not in a section, the parent element must have the css property `display:flex`.
 |`true` or `false`
 |`nil` - effectively `false`.
 
 |===
-
-=== Form
-
 
 === Table
 
@@ -233,10 +262,13 @@ Render a table. The table renders with thin borders and highlights each row on h
 e.g.
 [source,ruby]
 ----
+neg_check = ->(a) { a && a.negative? ? 'red' : '' }
+
 section.add_table [{ keys: 'a', values: 1, amounts: 22 },
                    { keys: 'b', values: 2, amounts: 33 }],
                    %i[keys values amounts],
-                   alignments: { amounts: :right }
+                   alignments: { amounts: :right },
+                   cell_classes: { amounts: neg_check }
 ----
 
 |===
@@ -252,9 +284,14 @@ section.add_table [{ keys: 'a', values: 1, amounts: 22 },
 |`Symbol` or `String`.
 |None (no column headers will be shown).
 
-|options
+|options - :alignment
 |A Hash of options
 |`alignment: { col: :right }`. The hash should only contain columns that should not be left-aligned. The value for the column can be `:right` or `:center`.
+|None.
+
+|options - :cell_classes
+|A Hash of options
+|`cell_classes: { col: [callable] }`. The hash should only contain columns where you wish to apply logic to determine the css class. The value for each column must be something that responds to `call` - see example above using a lambda. NB. it is crucial to guard agains `nil` values for the column.
 |None.
 
 |===
@@ -336,3 +373,110 @@ end
 |None.
 
 |===
+
+=== ProgressStep
+
+Show the state of progress with a variable number of steps to be taken.
+
+e.g.
+[source,ruby]
+----
+steps = ['Add coffee', 'Add sugar', 'Add water', 'Add milk', 'Stir']
+descs = ['1 tsp coffee', '3 sugars']
+section.add_progress_step steps, position: 2, state_description: descs
+----
+
+|===
+|attribute |description |possible values |default
+
+|steps
+|A list of the steps to display.
+|`Array`.
+|None. This is required.
+
+|options - :position
+|The position in the steps array that is active. Zero-based index.
+|`Integer`.
+|`0`.
+
+|options - :state_description
+|An optional array of information relevant to the current position to display. e.g. a summary of choices made during previous steps.
+|A single `String` or an `Array` of `String`.
+|None.
+
+|options - :show_finished
+|Display the last step as "finished" rather than "busy".
+|`true` or `false`.
+|`false`. Only applies when the position is at the last step.
+
+|options - :current_step_id
+|An optional id to assign to the DOM element for the current step.
+|`String`.
+|`'cbl-current-step'`.
+
+|===
+
+NOTE: The value of `current_step_id` can be passed to the js function `finaliseProgressStep` to change the current step state from `busy` to `finished`. See usage in a route in <<RepeatingRequest response>> below.
+e.g.
+[source,javascript]
+----
+crossbeamsUtils.finaliseProgressStep('cbl-current-step');
+----
+
+=== RepeatingRequest
+
+Render a div and attach a url to it to be called periodically.
+
+* On load, the browser will wait for the interval to pass and then call the url.
+* On response to the url, if the response does not include a stop command, the timer will start again.
+* If the response includes a stop command, no more calls will be made.
+* If the response is an exception, no more calls will be made.
+
+e.g.
+[source,ruby]
+----
+section.add_repeatable_request('/path/to/action', 1000, '<p>Some content</p>')
+----
+
+|===
+|attribute |description |possible values |default
+
+|url
+|The url to call after `interval` milliseconds have elapsed.
+|`String`.
+|None. This is required.
+
+|interval
+|The time in milliseconds between calls to the `url`.
+|`Integer`. Milliseconds. e.g. `1000` for a 1 second wait.
+|None. This is required.
+
+|content
+|HTML code to be rendered before the first call to the url.
+|`String`.
+|None. This is required, but can be blank.
+
+|===
+
+==== RepeatingRequest response
+
+The responding url must return a JSON response.
+
+To redirect to a new page:
+[source,ruby]
+----
+{ redirect: '/new/path' }.to_json
+----
+
+To update the div contents and contine calling the url periodically:
+[source,ruby]
+----
+{ updateMessage: { content: 'New content', continuePolling: true } }.to_json
+----
+
+Optional: to change the state of a step in a ProgressStep control to finalised, supply the id of the step:
+[source,ruby]
+----
+{ updateMessage: { content: 'New content', finaliseProgressStep: 'cbl-current-step' } }.to_json
+----
+NOTE: `continuePolling` can be set to false or can be omitted to stop the repeats.

@@ -23,13 +23,8 @@ module PackMaterial
               form.add_field :alternate
               form.add_field :shape
               form.add_field :reference_size
+              form.add_field :reference_dimension
               form.add_field :reference_quantity
-              form.add_field :length_mm
-              form.add_field :width_mm
-              form.add_field :height_mm
-              form.add_field :diameter_mm
-              form.add_field :thick_mm
-              form.add_field :thick_mic
               form.add_field :brand_1
               form.add_field :brand_2
               form.add_field :colour

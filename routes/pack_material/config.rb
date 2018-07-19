@@ -313,11 +313,8 @@ class Framework < Roda
               brand_2
               colour
               commodity_id
-              diameter_mm
               grade
-              height_mm
               language
-              length_mm
               market
               marking
               material
@@ -327,6 +324,7 @@ class Framework < Roda
               pm_class
               product_code
               product_number
+              reference_dimension
               reference_mass
               reference_number
               reference_quantity
@@ -334,11 +332,8 @@ class Framework < Roda
               shape
               specification_notes
               style
-              thick_mic
-              thick_mm
               unit
               variety_id
-              width_mm
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -424,13 +419,8 @@ class Framework < Roda
               alternate
               shape
               reference_size
+              reference_dimension
               reference_quantity
-              length_mm
-              width_mm
-              height_mm
-              diameter_mm
-              thick_mm
-              thick_mic
               brand_1
               brand_2
               colour

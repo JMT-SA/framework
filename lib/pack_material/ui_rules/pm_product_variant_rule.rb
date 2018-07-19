@@ -25,13 +25,8 @@ module UiRules
       fields[:alternate] = { renderer: :label }
       fields[:shape] = { renderer: :label }
       fields[:reference_size] = { renderer: :label }
+      fields[:reference_dimension] = { renderer: :label }
       fields[:reference_quantity] = { renderer: :label }
-      fields[:length_mm] = { renderer: :label }
-      fields[:width_mm] = { renderer: :label }
-      fields[:height_mm] = { renderer: :label }
-      fields[:diameter_mm] = { renderer: :label }
-      fields[:thick_mm] = { renderer: :label }
-      fields[:thick_mic] = { renderer: :label }
       fields[:brand_1] = { renderer: :label }
       fields[:brand_2] = { renderer: :label }
       fields[:colour] = { renderer: :label }
@@ -57,21 +52,8 @@ module UiRules
       }
 
       product_column_set.each do |col_name, required|
-        if col_name == :reference_dimension
-          ref_dim = {
-            # Separate setup for reference Dimension?
-            length_mm: { renderer: :numeric }, # reference dimension -> H(100)xW(100)xL(100) OR H(100)xD(30)
-            width_mm: { renderer: :numeric },
-            height_mm: { renderer: :numeric },
-            diameter_mm: { renderer: :numeric },
-            thick_mm: { renderer: :numeric }, # Tmm(15)
-            thick_mic: { renderer: :numeric }, # Tmic(165)
-          }
-          x.merge(ref_dim)
-        else
-          list = master_list_items(col_name)
-          x[col_name] = list.any? ? { renderer: :select, options: list, caption: col_name.to_s.gsub('pm_', '').gsub('_', ' ').capitalize, required: required } : { required: required }
-        end
+        list = master_list_items(col_name)
+        x[col_name] = list.any? ? { renderer: :select, options: list, caption: col_name.to_s.gsub('pm_', '').gsub('_', ' ').capitalize, required: required } : { required: required }
       end
       x
     end
@@ -107,13 +89,8 @@ module UiRules
                                     alternate: nil,
                                     shape: nil,
                                     reference_size: nil,
+                                    reference_dimension: nil,
                                     reference_quantity: nil,
-                                    length_mm: nil,
-                                    width_mm: nil,
-                                    height_mm: nil,
-                                    diameter_mm: nil,
-                                    thick_mm: nil,
-                                    thick_mic: nil,
                                     brand_1: nil,
                                     brand_2: nil,
                                     colour: nil,

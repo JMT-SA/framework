@@ -9,10 +9,16 @@ module PackMaterialApp
   class TestPmProductRepo < MiniTestWithHooks
 
     def test_for_selects
+      assert_respond_to repo, :for_select_pm_product
       assert_respond_to repo, :for_select_pm_product_variant
     end
 
     def test_crud_calls
+      assert_respond_to repo, :find_pm_product
+      assert_respond_to repo, :create_pm_product
+      assert_respond_to repo, :update_pm_product
+      assert_respond_to repo, :delete_pm_product
+
       assert_respond_to repo, :find_pm_product_variant
       assert_respond_to repo, :create_pm_product_variant
       assert_respond_to repo, :update_pm_product_variant

@@ -5,21 +5,19 @@
   pack_material_product_variants.\"pack_material_product_id\" as product_id,\r\n  pack_material_product_variants.\"product_variant_number\",
   pack_material_product_variants.\"unit\",\r\n  pack_material_product_variants.\"style\",
   pack_material_product_variants.\"alternate\",\r\n  pack_material_product_variants.\"shape\",
-  pack_material_product_variants.\"reference_size\",\r\n  pack_material_product_variants.\"reference_quantity\",
-  pack_material_product_variants.\"length_mm\",\r\n  pack_material_product_variants.\"width_mm\",
-  pack_material_product_variants.\"height_mm\",\r\n  pack_material_product_variants.\"diameter_mm\",
-  pack_material_product_variants.\"thick_mm\",\r\n  pack_material_product_variants.\"thick_mic\",
-  pack_material_product_variants.\"brand_1\",\r\n  pack_material_product_variants.\"brand_2\",
-  pack_material_product_variants.\"colour\",\r\n  pack_material_product_variants.\"material\",
-  pack_material_product_variants.\"assembly\",\r\n  pack_material_product_variants.\"reference_mass\",
-  pack_material_product_variants.\"reference_number\",\r\n  pack_material_product_variants.\"market\",
-  pack_material_product_variants.\"marking\",\r\n  pack_material_product_variants.\"model\",
-  pack_material_product_variants.\"pm_class\",\r\n  pack_material_product_variants.\"grade\",
-  pack_material_product_variants.\"language\",\r\n  pack_material_product_variants.\"other\",
-  pack_material_product_variants.\"created_at\",\r\n  pack_material_product_variants.\"updated_at\"\r\nFROM
-  pack_material_product_variants\r\n  LEFT JOIN \"pack_material_products\" ON pack_material_products.\"id\"
-  = pack_material_product_variants.\"pack_material_product_id\"\r\n  LEFT JOIN material_resource_sub_types
-  on pack_material_products.material_resource_sub_type_id = material_resource_sub_types.id;"
+  pack_material_product_variants.\"reference_size\",\r\n  pack_material_product_variants.\"reference_dimension\",
+  pack_material_product_variants.\"reference_quantity\",\r\n  pack_material_product_variants.\"brand_1\",\r\n
+  \ pack_material_product_variants.\"brand_2\", pack_material_product_variants.\"colour\",\r\n
+  \ pack_material_product_variants.\"material\", pack_material_product_variants.\"assembly\",\r\n
+  \ pack_material_product_variants.\"reference_mass\", pack_material_product_variants.\"reference_number\",\r\n
+  \ pack_material_product_variants.\"market\", pack_material_product_variants.\"marking\",\r\n
+  \ pack_material_product_variants.\"model\", pack_material_product_variants.\"pm_class\",\r\n
+  \ pack_material_product_variants.\"grade\", pack_material_product_variants.\"language\",\r\n
+  \ pack_material_product_variants.\"other\", pack_material_product_variants.\"created_at\",\r\n
+  \ pack_material_product_variants.\"updated_at\"\r\nFROM pack_material_product_variants\r\n
+  \ LEFT JOIN \"pack_material_products\" ON pack_material_products.\"id\" = pack_material_product_variants.\"pack_material_product_id\"\r\n
+  \ LEFT JOIN material_resource_sub_types on pack_material_products.material_resource_sub_type_id
+  = material_resource_sub_types.id;"
 :limit: 
 :offset: 
 :external_settings:
@@ -190,9 +188,24 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  reference_dimension:
+    :name: reference_dimension
+    :sequence_no: 12
+    :caption: Reference dimension
+    :namespaced_name: pack_material_product_variants.reference_dimension
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   reference_quantity:
     :name: reference_quantity
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Reference quantity
     :namespaced_name: pack_material_product_variants.reference_quantity
     :data_type: :string
@@ -205,99 +218,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  length_mm:
-    :name: length_mm
-    :sequence_no: 13
-    :caption: Length mm
-    :namespaced_name: pack_material_product_variants.length_mm
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  width_mm:
-    :name: width_mm
-    :sequence_no: 14
-    :caption: Width mm
-    :namespaced_name: pack_material_product_variants.width_mm
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  height_mm:
-    :name: height_mm
-    :sequence_no: 15
-    :caption: Height mm
-    :namespaced_name: pack_material_product_variants.height_mm
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  diameter_mm:
-    :name: diameter_mm
-    :sequence_no: 16
-    :caption: Diameter mm
-    :namespaced_name: pack_material_product_variants.diameter_mm
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  thick_mm:
-    :name: thick_mm
-    :sequence_no: 17
-    :caption: Thick mm
-    :namespaced_name: pack_material_product_variants.thick_mm
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  thick_mic:
-    :name: thick_mic
-    :sequence_no: 18
-    :caption: Thick mic
-    :namespaced_name: pack_material_product_variants.thick_mic
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   brand_1:
     :name: brand_1
-    :sequence_no: 19
+    :sequence_no: 14
     :caption: Brand 1
     :namespaced_name: pack_material_product_variants.brand_1
     :data_type: :string
@@ -312,7 +235,7 @@
     :group_max: false
   brand_2:
     :name: brand_2
-    :sequence_no: 20
+    :sequence_no: 15
     :caption: Brand 2
     :namespaced_name: pack_material_product_variants.brand_2
     :data_type: :string
@@ -327,7 +250,7 @@
     :group_max: false
   colour:
     :name: colour
-    :sequence_no: 21
+    :sequence_no: 16
     :caption: Colour
     :namespaced_name: pack_material_product_variants.colour
     :data_type: :string
@@ -342,7 +265,7 @@
     :group_max: false
   material:
     :name: material
-    :sequence_no: 22
+    :sequence_no: 17
     :caption: Material
     :namespaced_name: pack_material_product_variants.material
     :data_type: :string
@@ -357,7 +280,7 @@
     :group_max: false
   assembly:
     :name: assembly
-    :sequence_no: 23
+    :sequence_no: 18
     :caption: Assembly
     :namespaced_name: pack_material_product_variants.assembly
     :data_type: :string
@@ -372,7 +295,7 @@
     :group_max: false
   reference_mass:
     :name: reference_mass
-    :sequence_no: 24
+    :sequence_no: 19
     :caption: Reference mass
     :namespaced_name: pack_material_product_variants.reference_mass
     :data_type: :string
@@ -387,7 +310,7 @@
     :group_max: false
   reference_number:
     :name: reference_number
-    :sequence_no: 25
+    :sequence_no: 20
     :caption: Reference number
     :namespaced_name: pack_material_product_variants.reference_number
     :data_type: :string
@@ -402,7 +325,7 @@
     :group_max: false
   market:
     :name: market
-    :sequence_no: 26
+    :sequence_no: 21
     :caption: Market
     :namespaced_name: pack_material_product_variants.market
     :data_type: :string
@@ -417,7 +340,7 @@
     :group_max: false
   marking:
     :name: marking
-    :sequence_no: 27
+    :sequence_no: 22
     :caption: Marking
     :namespaced_name: pack_material_product_variants.marking
     :data_type: :string
@@ -432,7 +355,7 @@
     :group_max: false
   model:
     :name: model
-    :sequence_no: 28
+    :sequence_no: 23
     :caption: Model
     :namespaced_name: pack_material_product_variants.model
     :data_type: :string
@@ -447,7 +370,7 @@
     :group_max: false
   pm_class:
     :name: pm_class
-    :sequence_no: 29
+    :sequence_no: 24
     :caption: Pm class
     :namespaced_name: pack_material_product_variants.pm_class
     :data_type: :string
@@ -462,7 +385,7 @@
     :group_max: false
   grade:
     :name: grade
-    :sequence_no: 30
+    :sequence_no: 25
     :caption: Grade
     :namespaced_name: pack_material_product_variants.grade
     :data_type: :string
@@ -477,7 +400,7 @@
     :group_max: false
   language:
     :name: language
-    :sequence_no: 31
+    :sequence_no: 26
     :caption: Language
     :namespaced_name: pack_material_product_variants.language
     :data_type: :string
@@ -492,7 +415,7 @@
     :group_max: false
   other:
     :name: other
-    :sequence_no: 32
+    :sequence_no: 27
     :caption: Other
     :namespaced_name: pack_material_product_variants.other
     :data_type: :string
@@ -507,7 +430,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 33
+    :sequence_no: 28
     :caption: Created at
     :namespaced_name: pack_material_product_variants.created_at
     :data_type: :datetime
@@ -522,7 +445,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 34
+    :sequence_no: 29
     :caption: Updated at
     :namespaced_name: pack_material_product_variants.updated_at
     :data_type: :datetime

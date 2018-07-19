@@ -327,6 +327,13 @@ module PackMaterialApp
       assert_equal(matres_sub_type.product_code_ids.join(','), '78,79,77')
     end
 
+    def test_sub_type_master_list_items
+      skip 'still todo'
+      sub_id = 1
+      y = ConfigRepo.new.sub_type_master_list_items(sub_id)
+      p y
+    end
+
     def repo
       ConfigRepo.new
     end

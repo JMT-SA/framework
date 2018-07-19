@@ -122,10 +122,25 @@ module PackMaterialApp
       end
     end
 
-    def product_code_columns(id)
+    def product_variant_columns(sub_type_id)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
+      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
+      DB[:material_resource_product_columns].where(id: product_variant_column_ids)
+                                            .map { |rec| [rec[:column_name], rec[:id]] }
+    end
+
+    def product_variant_columns_optional(sub_type_id)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
+      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
+      DB[:material_resource_product_columns].where(material_resource_domain_id: sub_type[:material_resource_domain_id])
+                                            .exclude(id: product_variant_column_ids)
+                                            .map { |rec| [rec[:column_name], rec[:id]] }
+    end
+
+    def product_code_columns(sub_type_id)
       query = <<~SQL
         SELECT pc.column_name, pc.id
-        FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{id})) product_code_id
+        FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{sub_type_id})) product_code_id
         LEFT JOIN material_resource_product_columns pc on pc.id = product_code_id
       SQL
       DB[query].map { |rec| [rec[:column_name], rec[:id]] }
@@ -145,6 +160,22 @@ module PackMaterialApp
 
       DB[changes].update
       success_response('ok')
+    end
+
+    def sub_type_master_list_items(sub_type_id)
+      DB[get_dataminer_report('matres_prodcol_sub_type_list_items.yml').sql].where(sub_type_id: sub_type_id)
+
+    end
+
+    def for_select_sub_type_master_list_items(sub_type_id, product_column)
+      sub_type_master_list_items(sub_type_id).map { |r| [(r[:short_code] + (r[:long_name] ? ' - ' + r[:long_name] : '')).to_s, r[:id]] if r[:column_name] == product_column.to_s && r[:active] }
+        .compact
+    end
+
+    def get_dataminer_report(file_name)
+      path = File.join(ENV['ROOT'], 'grid_definitions', 'dataminer_queries', file_name.sub('.yml', '') << '.yml')
+      rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
+      Crossbeams::Dataminer::Report.load(rpt_hash)
     end
   end
 end

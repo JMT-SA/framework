@@ -97,7 +97,6 @@ class Framework < Roda
       r.on !interactor.exists?(:material_resource_sub_types, id) do
         handle_not_found(r)
       end
-
       r.on 'edit' do
         check_auth!('config', 'edit')
         show_partial { PackMaterial::Config::MatresSubType::Edit.call(id) }
@@ -113,7 +112,6 @@ class Framework < Roda
           r.redirect '/list/material_resource_sub_types'
         end
       end
-
       r.on 'material_resource_master_list_items', Integer do |item_id|
         r.on 'edit' do
           check_auth!('config', 'edit')
@@ -172,7 +170,6 @@ class Framework < Roda
           end
         end
       end
-
       r.on 'update_product_code_configuration' do
         r.post do
           res = interactor.update_product_code_configuration(id, params[:product_code_columns])
@@ -187,7 +184,6 @@ class Framework < Roda
           end
         end
       end
-
       r.is do
         r.get do
           check_auth!('config', 'read')
@@ -220,7 +216,6 @@ class Framework < Roda
         end
       end
     end
-
     r.on 'material_resource_sub_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
@@ -241,7 +236,6 @@ class Framework < Roda
         end
       end
     end
-
     r.on 'link_product_columns' do
       r.post do
         interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
@@ -252,6 +246,7 @@ class Framework < Roda
                      'Re-assigned product columns')
       end
     end
+
     # PACK MATERIAL PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_products', Integer do |id|
@@ -261,10 +256,46 @@ class Framework < Roda
       r.on !interactor.exists?(:pack_material_products, id) do
         handle_not_found(r)
       end
-
+      r.on 'pack_material_product_variants' do
+        r.on 'new' do    # NEW
+          check_auth!('config', 'new')
+          show_partial_or_page(r) { PackMaterial::Config::PmProductVariant::New.call(id, remote: fetch?(r)) }
+        end
+        r.on 'clone', Integer do |variant_id|
+          r.post do
+            res = interactor.clone_pm_product_variant(id, params[:pm_product_variant])
+            if res.success
+              flash[:notice] = res.message
+              redirect_to_last_grid(r)
+            else
+              re_show_form(r, res, url: "/pack_material/config/pack_material_product_variants/clone/#{variant_id}") do
+                PackMaterial::Config::PmProductVariant::Clone.call(variant_id, params[:pm_product_variant], res.errors)
+              end
+            end
+          end
+        end
+        r.post do        # CREATE
+          res = interactor.create_pm_product_variant(id, params[:pm_product_variant])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/pack_material_product_variants/new") do
+              PackMaterial::Config::PmProductVariant::New.call(id,
+                                                               form_values: params[:pm_product_variant],
+                                                               form_errors: res.errors,
+                                                               remote: fetch?(r))
+            end
+          end
+        end
+      end
       r.on 'edit' do
         check_auth!('config', 'edit')
         show_partial { PackMaterial::Config::PmProduct::Edit.call(id) }
+      end
+      r.on 'clone' do
+        check_auth!('config', 'new')
+        show_partial_or_page(r) { PackMaterial::Config::PmProduct::Clone.call(id) }
       end
       r.is do
         r.get do
@@ -309,7 +340,7 @@ class Framework < Roda
               variety_id
               width_mm
             ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys, other: 'SOME override CHANGE'), notice: res.message)
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             content = show_partial { PackMaterial::Config::PmProduct::Edit.call(id, params[:pm_product], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -329,6 +360,22 @@ class Framework < Roda
         check_auth!('config', 'new')
         show_partial_or_page(r) { PackMaterial::Config::PmProduct::New.call(remote: fetch?(r)) }
       end
+      r.on 'clone', Integer do |id|
+        r.post do        # CLONE
+          res = interactor.clone_pm_product(params[:pm_product])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            # content = show_partial { PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors) }
+            # update_dialog_content(content: content, error: res.message)
+
+            re_show_form(r, res, url: "/pack_material/config/pack_material_products/clone/#{id}") do
+              PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors)
+            end
+          end
+        end
+      end
       r.post do        # CREATE
         res = interactor.create_pm_product(params[:pm_product])
         if res.success
@@ -340,6 +387,76 @@ class Framework < Roda
                                                       form_errors: res.errors,
                                                       remote: fetch?(r))
           end
+        end
+      end
+    end
+    # PACK MATERIAL PRODUCT VARIANTS
+    # --------------------------------------------------------------------------
+    r.on 'pack_material_product_variants', Integer do |id|
+      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:pack_material_product_variants, id) do
+        handle_not_found(r)
+      end
+      r.on 'edit' do   # EDIT
+        check_auth!('config', 'edit')
+        show_partial { PackMaterial::Config::PmProductVariant::Edit.call(id) }
+      end
+      r.on 'clone' do    # CLONE
+        check_auth!('config', 'new')
+        show_partial_or_page(r) { PackMaterial::Config::PmProductVariant::Clone.call(id) }
+      end
+      r.is do
+        r.get do       # SHOW
+          check_auth!('config', 'read')
+          show_partial { PackMaterial::Config::PmProductVariant::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          return_json_response
+          res = interactor.update_pm_product_variant(id, params[:pm_product_variant])
+          if res.success
+            row_keys = %i[
+              pack_material_product_id
+              product_variant_number
+              unit
+              style
+              alternate
+              shape
+              reference_size
+              reference_quantity
+              length_mm
+              width_mm
+              height_mm
+              diameter_mm
+              thick_mm
+              thick_mic
+              brand_1
+              brand_2
+              colour
+              material
+              assembly
+              reference_mass
+              reference_number
+              market
+              marking
+              model
+              pm_class
+              grade
+              language
+              other
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            content = show_partial { PackMaterial::Config::PmProductVariant::Edit.call(id, params[:pm_product_variant], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          return_json_response
+          check_auth!('config', 'delete')
+          res = interactor.delete_pm_product_variant(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end

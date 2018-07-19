@@ -11,6 +11,11 @@
   :icon: fa-edit
   :title: Edit
   :popup: true
+- :url: "/pack_material/config/pack_material_products/$:id$/clone"
+  :text: clone
+  :icon: fa-copy
+  :title: Clone
+  :popup: true
 - :url: "/pack_material/config/pack_material_products/$:id$"
   :text: delete
   :icon: fa-remove

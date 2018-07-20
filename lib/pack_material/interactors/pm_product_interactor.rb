@@ -31,7 +31,8 @@ module PackMaterialApp
       res = validate_edit_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_pm_product(id, res)
-      success_response("Updated product #{pm_product.product_code}", pm_product(id))
+      instance = pm_product(id)
+      success_response("Updated product #{instance.product_code}", instance)
     end
 
     def delete_pm_product(id)

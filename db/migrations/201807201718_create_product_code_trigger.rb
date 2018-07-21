@@ -24,9 +24,9 @@ Sequel.migration do
             EXIT WHEN NOT FOUND;
 
             IF p_col = 'commodity_id' THEN
-              EXECUTE 'SELECT code FROM commodities WHERE id = (SELECT commodity_id FROM pack_material_products WHERE id = $1)' INTO p_sql USING NEW.commodity_id;
+              EXECUTE 'SELECT code FROM commodities WHERE id = $1' INTO p_sql USING NEW.commodity_id;
             ELSIF p_col = 'variety_id' THEN
-              EXECUTE 'SELECT marketing_variety_code FROM marketing_varieties WHERE id = (SELECT variety_id FROM pack_material_products WHERE id = $1)' INTO p_sql USING NEW.variety_id;
+              EXECUTE 'SELECT marketing_variety_code FROM marketing_varieties WHERE id = $1' INTO p_sql USING NEW.variety_id;
             ELSE
               EXECUTE format('SELECT ($1).%s::text', p_col)
                USING NEW

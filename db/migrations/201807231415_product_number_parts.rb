@@ -15,6 +15,7 @@ Sequel.migration do
       set_column_not_null :internal_seq
       add_unique_constraint :internal_seq
       add_constraint(:int_seq_min) { internal_seq > 9 }
+      add_constraint(:int_seq_max) { internal_seq < 100 }
     end
     alter_table(:material_resource_types) do
       set_column_not_null :short_code
@@ -31,6 +32,7 @@ Sequel.migration do
     alter_table(:material_resource_types) do
       set_column_not_null :internal_seq
       add_unique_constraint :internal_seq
+      add_constraint(:int_seq_max) { internal_seq < 100 }
     end
     alter_table(:material_resource_sub_types) do
       set_column_not_null :short_code
@@ -47,11 +49,12 @@ Sequel.migration do
     alter_table(:material_resource_sub_types) do
       set_column_not_null :short_code
       add_unique_constraint :internal_seq
+      add_constraint(:int_seq_max) { internal_seq < 100 }
     end
     alter_table(:pack_material_products) do
       set_column_default :active, false
       set_column_not_null :product_code
-      add_unique_constraint :product_code
+      add_unique_constraint :product_code, name: :pack_material_products_product_code_uniq
       rename_column :variety_id, :marketing_variety_id
     end
   end
@@ -71,7 +74,7 @@ Sequel.migration do
     alter_table(:pack_material_products) do
       set_column_default :active, nil
       set_column_allow_null :product_code
-      drop_unique_constraint :product_code
+      drop_constraint :pack_material_products_product_code_uniq
       rename_column :marketing_variety_id, :variety_id
     end
   end

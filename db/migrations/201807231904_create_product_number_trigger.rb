@@ -24,7 +24,7 @@ Sequel.migration do
         OWNER TO postgres;
 
       CREATE TRIGGER pack_material_product_update_number
-      BEFORE INSERT OR UPDATE
+      BEFORE INSERT
       ON public.pack_material_products
       FOR EACH ROW
       EXECUTE PROCEDURE public.pack_material_product_update_number();

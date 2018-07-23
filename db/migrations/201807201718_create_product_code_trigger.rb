@@ -7,12 +7,15 @@ Sequel.migration do
         DECLARE
           o_code TEXT DEFAULT '';
           p_sep TEXT;
+          p_type TEXT;
+          p_sub TEXT;
           p_col TEXT;
           p_sql TEXT;
-          cur_cols CURSOR (sub_type_id integer) FOR SELECT sub.product_code_separator, m.column_name
+          cur_cols CURSOR (sub_type_id integer) FOR SELECT sub.product_code_separator, sub.type_code, sub.sub_code, m.column_name
             FROM 
-            (SELECT s.product_code_separator, unnest(s.product_code_ids) AS pcid
+            (SELECT s.product_code_separator, t.short_code AS type_code, s.short_code AS sub_code, unnest(s.product_code_ids) AS pcid
              FROM material_resource_sub_types s
+             JOIN material_resource_types t ON t.id = s.material_resource_type_id
              WHERE s.id = sub_type_id) AS sub
             LEFT JOIN material_resource_product_columns m ON m.id = sub.pcid;
       BEGIN
@@ -20,7 +23,7 @@ Sequel.migration do
           OPEN cur_cols(sub_type_id:=NEW.material_resource_sub_type_id);
 
           LOOP
-            FETCH cur_cols INTO p_sep, p_col;
+            FETCH cur_cols INTO p_sep, p_type, p_sub, p_col;
             EXIT WHEN NOT FOUND;
 
             IF p_col = 'commodity_id' THEN
@@ -34,14 +37,14 @@ Sequel.migration do
             END IF;
 
             IF o_code = '' THEN
-              o_code := o_code || p_sql;
+              o_code := o_code || p_type || p_sep || p_sub || p_sep || p_sql;
             ELSE
               o_code := o_code || p_sep || p_sql;
             END IF;
           END LOOP;
 
           CLOSE cur_cols;
-          NEW.product_code = o_code;
+          NEW.product_code = COALESCE(o_code, 'PLEASE SELECT COLUMNS');
         RETURN NEW;
 
       END

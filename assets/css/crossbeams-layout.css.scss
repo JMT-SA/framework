@@ -630,6 +630,10 @@ tr.roweven {
   font-weight: bold;
 }
 
+input:required {
+  border-right: thick solid orange;
+}
+
 /* RESPONSIVE */
 @media (max-width: 48em) {
   .crossbeams-row {

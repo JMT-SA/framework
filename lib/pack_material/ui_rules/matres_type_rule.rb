@@ -33,8 +33,8 @@ module UiRules
     def common_fields
       {
         material_resource_domain_id: { renderer: :select, options: @this_repo.for_select_domains, caption: 'Domain' },
-        type_name: {},
-        short_code: {},
+        type_name: { required: true },
+        short_code: { required: true },
         description: {},
         measurement_units: { renderer: :multi, options: @this_repo.for_select_units, selected: @this_repo.matres_type_measurement_unit_ids(@options[:id]), caption: 'Measurement Units' }
       }

@@ -42,9 +42,9 @@ module PackMaterialApp
     crud_calls_for :material_resource_master_lists, name: :matres_master_list, wrapper: MatresMasterList
 
     def for_select_configured_sub_types
-      DB['SELECT mrst.sub_type_name, mrst.id, mrt.short_code as type_name from material_resource_sub_types mrst
+      optgroup_array(DB['SELECT mrst.sub_type_name, mrst.id, mrt.short_code as type_name from material_resource_sub_types mrst
       LEFT JOIN material_resource_types mrt on mrst.material_resource_type_id = mrt.id
-      WHERE mrst.active IS true AND mrst.product_code_ids is not null;'].all.map { |r| [(r[:type_name] ? r[:type_name] + '-' : '').to_s + r[:sub_type_name], r[:id]] }
+      WHERE mrst.active IS true AND mrst.product_code_ids is not null;'].all, :type_name, :sub_type_name, :id)
     end
 
     # TYPES

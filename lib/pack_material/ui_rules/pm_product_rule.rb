@@ -60,7 +60,7 @@ module UiRules
       x = {
         material_resource_sub_type_name: { renderer: :label, with_value: material_resource_sub_type_id_label, caption: 'Sub Type', readonly: true },
         material_resource_sub_type_id: { renderer: :hidden, with_value: @form_object.material_resource_sub_type_id },
-        specification_notes: { renderer: :text }
+        specification_notes: { renderer: :text, required: true }
       }
 
       product_column_set.each do |col_name|

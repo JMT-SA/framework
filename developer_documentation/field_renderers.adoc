@@ -267,6 +267,11 @@ and all words start with initial capital letter.
 |any text, or `true` - in which case the prompt will be `'Select a value'`.
 |n/a
 
+|:required
+|HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain unless the user chooses at least one option.
+|true or false
+|false
+
 |:options
 |Options for selecting.
 |an array of values.
@@ -309,8 +314,13 @@ and all words start with initial capital letter.
 
 |:options
 |Options for selecting.
-|an array of values. Can be 2D array in which case the text comes before the value. (e.g. `['Choose me', 1]`).
+
+Option groups will display if this is a Hash.
+|an array or hash of values. Can be 2D array in which case the text comes before the value. (e.g. `['Choose me', 1]`).
+
 For a 1D array, the option value and text will be the same.
+
+To display `optgroup` elements, use a Hash and the format must be: `{ group => [ [label, val], [label, val] ], group => [ [label, val] ] }` etc.
 |`[]` - an empty array.
 
 |:disabled_options

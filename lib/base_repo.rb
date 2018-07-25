@@ -137,6 +137,23 @@ class BaseRepo
     "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
   end
 
+  # Helper to convert rows of records to a Hash that can be used for optgroups in a select.
+  # Pass the records, and field names for the group, label and value elements.
+  #
+  # @param recs [Array] the records to process - an array of Hashes.
+  # @param group_name [Symbol/String] the column with values to group by.
+  # @param label [Symbol/String] the column to display as a label in a select.
+  # @param value [Symbol/String] the column to act as the value in a select. Defaults to the same as the label.
+  #
+  # Example
+  #    recs = [{type: 'A', sub: 'B', id: 1}, {type: 'A', sub: 'C', id: 2}, {type: 'B', sub: 'D', id: 4}, {type: 'A', sub: 'E', id: 7}]
+  #    optgroup_array(recs, :type, :sub, :id)
+  #    # => { 'A' => [['B', 1], ['C', 2], ['E', 7]], 'B' => [['D', 4]] }
+  def optgroup_array(recs, group_name, label, value = label)
+    Hash[recs.map { |r| [r[group_name], r[label], r[value]] }.group_by(&:first).map {|k, v| [k, v.map { |i| [i[1], i[2]] }] }]
+  end
+
+
   # Log the context of a transaction. Useful for joining to logged_actions table which has no context.
   #
   # @param user_name [String] the current user's name.

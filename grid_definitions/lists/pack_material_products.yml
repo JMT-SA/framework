@@ -23,7 +23,7 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/pack_material/config/pack_material_products/new"
+  :url: "/pack_material/config/pack_material_products/preselect"
   :text: New Product Code
   :style: :button
   :behaviour: :popup

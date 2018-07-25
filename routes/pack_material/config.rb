@@ -333,7 +333,7 @@ class Framework < Roda
               specification_notes
               style
               unit
-              variety_id
+              marketing_variety_id
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -351,9 +351,24 @@ class Framework < Roda
     end
     r.on 'pack_material_products' do
       interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
-      r.on 'new' do
+      r.on 'preselect' do
         check_auth!('config', 'new')
-        show_partial_or_page(r) { PackMaterial::Config::PmProduct::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Config::PmProduct::Preselect.call(remote: fetch?(r)) }
+      end
+      r.on 'new', Integer do |sub_type_id|
+        check_auth!('config', 'new')
+        show_partial_or_page(r) { PackMaterial::Config::PmProduct::New.call(sub_type_id: sub_type_id, remote: fetch?(r)) }
+      end
+      r.on 'new' do
+        r.post do
+          return_json_response
+          check_auth!('config', 'new')
+          sub_type_id = params[:pm_product][:material_resource_sub_type_id].to_i
+
+          re_show_form(r, OpenStruct.new(message: nil), url: "/pack_material/config/pack_material_products/new/#{sub_type_id}") do
+            PackMaterial::Config::PmProduct::New.call(sub_type_id)
+          end
+        end
       end
       r.on 'clone', Integer do |id|
         r.post do        # CLONE
@@ -365,7 +380,7 @@ class Framework < Roda
             # content = show_partial { PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors) }
             # update_dialog_content(content: content, error: res.message)
 
-            re_show_form(r, res, url: "/pack_material/config/pack_material_products/clone/#{id}") do
+            re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/clone") do
               PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors)
             end
           end
@@ -377,10 +392,9 @@ class Framework < Roda
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         else
-          re_show_form(r, res, url: '/pack_material/config/pack_material_products/new') do
-            PackMaterial::Config::PmProduct::New.call(form_values: params[:pm_product],
-                                                      form_errors: res.errors,
-                                                      remote: fetch?(r))
+          sub_type_id = params[:pm_product][:material_resource_sub_type_id].to_i
+          re_show_form(r, res, url: "/pack_material/config/pack_material_products/new/#{sub_type_id}") do
+            PackMaterial::Config::PmProduct::New.call(sub_type_id, params[:pm_product], res.errors)
           end
         end
       end

@@ -16,8 +16,6 @@ module PackMaterial
             page.form do |form|
               form.view_only!
               form.add_field :material_resource_sub_type_id
-              form.add_field :commodity_id
-              form.add_field :variety_id
               form.add_field :product_number
               form.add_field :product_code
 

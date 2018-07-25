@@ -5,14 +5,14 @@ module PackMaterialApp
     configure { config.type_specs = true }
 
     required(:material_resource_sub_type_id, :int).filled(:int?)
-    required(:commodity_id, :int).filled(:int?)
-    required(:variety_id, :int).filled(:int?)
-    required(:specification_notes, Types::StrippedString).filled(:str?)
   end
 
-  EditPmProductSchema = Dry::Validation.Form do
+  PmProductSchema = Dry::Validation.Form do
     configure { config.type_specs = true }
 
+    optional(:material_resource_sub_type_id, :int).filled(:int?)
+    optional(:commodity_id, :int).filled(:int?)
+    optional(:marketing_variety_id, :int).filled(:int?)
     optional(:unit, Types::StrippedString).filled(:str?)
     optional(:style, Types::StrippedString).filled(:str?)
     optional(:alternate, Types::StrippedString).filled(:str?)
@@ -35,8 +35,6 @@ module PackMaterialApp
     optional(:language, Types::StrippedString).filled(:str?)
     optional(:other, Types::StrippedString).filled(:str?)
 
-    required(:commodity_id, :int).filled(:int?)
-    required(:variety_id, :int).filled(:int?)
     required(:specification_notes, Types::StrippedString).filled(:str?)
   end
 
@@ -44,9 +42,9 @@ module PackMaterialApp
     configure { config.type_specs = true }
 
     required(:material_resource_sub_type_id, :int).filled(:int?)
-    required(:commodity_id, :int).filled(:int?)
-    required(:variety_id, :int).filled(:int?)
-    required(:specification_notes, Types::StrippedString).filled(:str?)
+
+    optional(:commodity_id, :int).filled(:int?)
+    optional(:marketing_variety_id, :int).filled(:int?)
 
     optional(:unit, Types::StrippedString).filled(:str?)
     optional(:style, Types::StrippedString).filled(:str?)
@@ -69,6 +67,8 @@ module PackMaterialApp
     optional(:grade, Types::StrippedString).filled(:str?)
     optional(:language, Types::StrippedString).filled(:str?)
     optional(:other, Types::StrippedString).filled(:str?)
+
+    required(:specification_notes, Types::StrippedString).filled(:str?)
   end
 
   CompletedPmProductSchema = Dry::Validation.Form do

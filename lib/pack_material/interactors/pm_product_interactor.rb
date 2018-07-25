@@ -3,7 +3,7 @@
 module PackMaterialApp
   class PmProductInteractor < BaseInteractor
     def create_pm_product(params)
-      res = validate_new_pm_product_params(params)
+      res = validate_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       pm_product_create(res)
     end
@@ -26,9 +26,7 @@ module PackMaterialApp
     end
 
     def update_pm_product(id, params)
-      # Update should test for product code uniqueness
-      # and generate the product code & product number
-      res = validate_edit_pm_product_params(params)
+      res = validate_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_pm_product(id, res)
       instance = pm_product(id)
@@ -98,12 +96,8 @@ module PackMaterialApp
       repo.find_pm_product_variant(id)
     end
 
-    def validate_new_pm_product_params(params)
-      NewPmProductSchema.call(params)
-    end
-
-    def validate_edit_pm_product_params(params)
-      EditPmProductSchema.call(params)
+    def validate_pm_product_params(params)
+      PmProductSchema.call(params)
     end
 
     def validate_clone_pm_product_params(params)

@@ -20,8 +20,6 @@ module PackMaterial
               form.remote!
               form.add_field :material_resource_sub_type_name
               form.add_field :material_resource_sub_type_id
-              form.add_field :commodity_id
-              form.add_field :variety_id
 
               set.each do |item|
                 form.add_field item

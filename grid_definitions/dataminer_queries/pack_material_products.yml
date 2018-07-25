@@ -1,7 +1,7 @@
 ---
 :caption: Pack Material Products
 :sql: SELECT "pack_material_products"."id", "pack_material_products"."material_resource_sub_type_id",
-  "pack_material_products"."commodity_id", "pack_material_products"."variety_id",
+  "pack_material_products"."commodity_id", "pack_material_products"."marketing_variety_id",
   "pack_material_products"."product_number", "pack_material_products"."product_code",
   "pack_material_products"."unit", "pack_material_products"."style", "pack_material_products"."alternate",
   "pack_material_products"."shape", "pack_material_products"."reference_size", "pack_material_products"."reference_dimension",
@@ -16,7 +16,7 @@
   "marketing_varieties"."marketing_variety_code" FROM "pack_material_products" LEFT
   JOIN "commodities" ON "commodities"."id" = "pack_material_products"."commodity_id"
   JOIN "material_resource_sub_types" ON "material_resource_sub_types"."id" = "pack_material_products"."material_resource_sub_type_id"
-  LEFT JOIN "marketing_varieties" ON "marketing_varieties"."id" = "pack_material_products"."variety_id"
+  LEFT JOIN "marketing_varieties" ON "marketing_varieties"."id" = "pack_material_products"."marketing_variety_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -66,11 +66,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  variety_id:
-    :name: variety_id
+  marketing_variety_id:
+    :name: marketing_variety_id
     :sequence_no: 4
     :caption: Variety
-    :namespaced_name: pack_material_products.variety_id
+    :namespaced_name: pack_material_products.marketing_variety_id
     :data_type: :integer
     :width: 
     :format: 
@@ -533,7 +533,7 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT code, id FROM commodities ORDER BY code
-- :column: pack_material_products.variety_id
+- :column: pack_material_products.marketing_variety_id
   :caption: Variety
   :data_type: :integer
   :control_type: :list

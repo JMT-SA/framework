@@ -52,7 +52,7 @@ Sequel.migration do
       add_constraint(:int_seq_max) { internal_seq < 100 }
     end
     alter_table(:pack_material_products) do
-      set_column_default :active, false
+      set_column_default :active, true
       set_column_not_null :product_code
       add_unique_constraint :product_code, name: :pack_material_products_product_code_uniq
       rename_column :variety_id, :marketing_variety_id

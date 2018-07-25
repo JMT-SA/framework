@@ -244,13 +244,13 @@ module PackMaterialApp
       prod_id1 = DB[:pack_material_products].insert(
         material_resource_sub_type_id: sub_id,
         commodity_id: comm_id,
-        variety_id: var_id,
+        marketing_variety_id: var_id,
         product_number: 789_456
       )
       prod_id2 = DB[:pack_material_products].insert(
         material_resource_sub_type_id: sub_id,
         commodity_id: comm_id,
-        variety_id: var_id,
+        marketing_variety_id: var_id,
         product_number: 789_457
       )
 

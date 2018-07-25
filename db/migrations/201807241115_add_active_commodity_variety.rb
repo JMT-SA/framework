@@ -1,7 +1,7 @@
 Sequel.migration do
   up do
     alter_table(:material_resource_sub_types) do
-      add_column(:active, TrueClass, Default: true)
+      add_column(:active, TrueClass, default: true)
     end
 
     alter_table(:pack_material_product_variants) do
@@ -23,9 +23,6 @@ Sequel.migration do
       set_column_default :active, false
       drop_column :commodity_id
       drop_column :marketing_variety_id
-
-      drop_index :commodity_id
-      drop_index :marketing_variety_id
     end
   end
 end

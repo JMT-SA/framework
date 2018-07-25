@@ -6,6 +6,7 @@ Sequel.migration do
 
     alter_table(:pack_material_product_variants) do
       set_column_default :active, true
+      set_column_type :product_variant_number, :Bignum
       add_foreign_key :commodity_id, :commodities, null: true, key: [:id]
       add_foreign_key :marketing_variety_id, :marketing_varieties, null: true, key: [:id]
 
@@ -21,6 +22,7 @@ Sequel.migration do
 
     alter_table(:pack_material_product_variants) do
       set_column_default :active, false
+      set_column_type :product_variant_number, :integer
       drop_column :commodity_id
       drop_column :marketing_variety_id
     end

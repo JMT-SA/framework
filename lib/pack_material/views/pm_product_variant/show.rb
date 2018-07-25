@@ -15,6 +15,8 @@ module PackMaterial
               form.add_field :pack_material_product
               form.add_field :product_variant_number
 
+              form.add_field :commodity_id
+              form.add_field :marketing_variety_id
               form.add_field :unit
               form.add_field :style
               form.add_field :alternate

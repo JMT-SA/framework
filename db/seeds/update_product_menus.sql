@@ -24,6 +24,8 @@ JOIN (SELECT * FROM (VALUES ('unit', 'UNIT', 'Unit', 1),
   ('pm_class', 'CLAS', 'Class', 1),
   ('grade', 'GRAD', 'Grade', 1),
   ('language', 'LANG', 'Language', 1),
-  ('other', 'OTHR', 'Other', 1))
+  ('other', 'OTHR', 'Other', 1),
+  ('commodity_id', 'COMM', 'Commodity', 1),
+  ('marketing_variety_id', 'VARY', 'Variety', 1))
   AS t(column_name, short_code, description, n)) sub ON sub.n = 1
 WHERE dom.domain_name = 'Packing Materials';

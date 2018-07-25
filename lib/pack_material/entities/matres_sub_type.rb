@@ -13,5 +13,6 @@ module PackMaterialApp
     # attribute :active, Types::Bool
     attribute :product_column_ids, Types::Array
     attribute :product_code_ids, Types::Array
+    attribute :internal_seq, Types::Int
   end
 end

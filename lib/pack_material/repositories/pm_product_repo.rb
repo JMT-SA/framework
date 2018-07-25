@@ -4,10 +4,12 @@ module PackMaterialApp
   class PmProductRepo < BaseRepo
     build_for_select :pack_material_products,
                      label: :product_code,
+                     alias: 'pm_products',
                      value: :id,
                      order_by: :product_code
     build_inactive_select :pack_material_products,
                           label: :product_code,
+                          alias: 'pm_products',
                           value: :id,
                           order_by: :product_code
 

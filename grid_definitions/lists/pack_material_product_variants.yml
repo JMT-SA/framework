@@ -11,24 +11,22 @@
   :icon: fa-eye
   :title: View
   :popup: true
+  :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$/edit"
   :text: edit
   :icon: fa-edit
   :title: Edit
   :popup: true
+  :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$/clone"
   :text: clone
   :icon: fa-copy
   :title: Clone
   :popup: true
+  :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$"
   :text: delete
   :icon: fa-remove
   :is_delete: true
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/pack_material/config/pack_material_product_variants/new"
-  :text: New Pack Material Product Variant
-  :style: :button
-  :behaviour: :popup
+  :hide_if_null: id

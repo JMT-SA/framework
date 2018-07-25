@@ -20,6 +20,7 @@ module UiRules
       fields[:material_resource_type_id] = { renderer: :label, with_value: material_resource_type_id_label, caption: 'Type' }
       fields[:sub_type_name] = { renderer: :label }
       fields[:short_code] = { renderer: :label }
+      fields[:internal_seq] = { renderer: :label }
     end
 
     def set_config_fields

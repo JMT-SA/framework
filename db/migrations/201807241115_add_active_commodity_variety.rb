@@ -20,7 +20,7 @@ Sequel.migration do
     end
 
     alter_table(:pack_material_product_variants) do
-      set_column_default :active, null
+      set_column_default :active, false
       drop_column :commodity_id
       drop_column :marketing_variety_id
 

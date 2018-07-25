@@ -20,6 +20,7 @@ module UiRules
       fields[:type_name] = { renderer: :label }
       fields[:short_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:internal_seq] = { renderer: :label }
       fields[:measurement_units] = { renderer: :list, items: @this_repo.matres_type_measurement_units(@options[:id]), caption: 'Measurement Units' }
     end
 

@@ -57,8 +57,8 @@ Sequel.migration do
   end
 
   down do
-    run <<~SQL
-      DROP FUNCTION public.pack_material_product_update_code();
-    SQL
+    # run <<~SQL
+    #   DROP FUNCTION public.pack_material_product_update_code();
+    # SQL
   end
 end

@@ -321,6 +321,8 @@ Option groups will display if this is a Hash.
 For a 1D array, the option value and text will be the same.
 
 To display `optgroup` elements, use a Hash and the format must be: `{ group => [ [label, val], [label, val] ], group => [ [label, val] ] }` etc.
+
+(see the `optgroup_array` method in link:/yarddocthis/lib=base_repo.rb[BaseRepo methods])
 |`[]` - an empty array.
 
 |:disabled_options

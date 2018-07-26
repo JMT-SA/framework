@@ -24,14 +24,14 @@ Sequel.migration do
     run <<~SQL
       UPDATE material_resource_types m
       SET internal_seq = m2.seqnum
-      FROM (SELECT m2.*, ROW_NUMBER() OVER () AS seqnum
+      FROM (SELECT m2.*, ROW_NUMBER() OVER (PARTITION BY m2.material_resource_domain_id) AS seqnum
             FROM material_resource_types m2
            ) m2
       WHERE m2.id = m.id;
     SQL
     alter_table(:material_resource_types) do
       set_column_not_null :internal_seq
-      add_unique_constraint :internal_seq
+      add_unique_constraint [:material_resource_domain_id, :internal_seq]
       add_constraint(:int_seq_max) { internal_seq < 100 }
     end
     alter_table(:material_resource_sub_types) do
@@ -41,14 +41,14 @@ Sequel.migration do
     run <<~SQL
       UPDATE material_resource_sub_types m
       SET internal_seq = m2.seqnum
-      FROM (SELECT m2.*, ROW_NUMBER() OVER () AS seqnum
+      FROM (SELECT m2.*, ROW_NUMBER() OVER (PARTITION BY m2.material_resource_type_id) AS seqnum
             FROM material_resource_sub_types m2
            ) m2
       WHERE m2.id = m.id;
     SQL
     alter_table(:material_resource_sub_types) do
       set_column_not_null :short_code
-      add_unique_constraint :internal_seq
+      add_unique_constraint [:material_resource_type_id, :internal_seq]
       add_constraint(:int_seq_max) { internal_seq < 100 }
     end
     alter_table(:pack_material_products) do

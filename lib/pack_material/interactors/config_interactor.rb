@@ -81,7 +81,7 @@ module PackMaterialApp
 
     def update_matres_config(id, params)
       @matres_sub_type_id = id
-      res = validate_matres_sub_type_config_params(params)
+      res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_matres_sub_type(id, res)
       success_response('Updated the config')
@@ -158,10 +158,6 @@ module PackMaterialApp
 
     def validate_matres_sub_type_params(params)
       MatresSubTypeSchema.call(params)
-    end
-
-    def validate_matres_sub_type_config_params(params)
-      MatresSubTypeConfigSchema.call(params)
     end
 
     def validate_material_resource_type_config_code_columns_params(params)

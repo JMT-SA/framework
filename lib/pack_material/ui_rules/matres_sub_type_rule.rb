@@ -10,7 +10,6 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
-      set_config_fields if @mode == :config
 
       form_name 'matres_sub_type'
     end
@@ -21,21 +20,23 @@ module UiRules
       fields[:sub_type_name] = { renderer: :label }
       fields[:short_code] = { renderer: :label }
       fields[:internal_seq] = { renderer: :label }
-    end
-
-    def set_config_fields
       fields[:product_code_separator] = { renderer: :label }
       fields[:has_suppliers] = { renderer: :checkbox }
       fields[:has_marketers] = { renderer: :checkbox }
       fields[:has_retailers] = { renderer: :checkbox }
-      fields[:active] = { renderer: :checkbox }
+      # fields[:active] = { renderer: :label }
     end
 
     def common_fields
       {
         material_resource_type_id: { renderer: :select, options: @repo.for_select_matres_types, caption: 'Type' },
         sub_type_name: {},
-        short_code: { required: true, force_uppercase: true }
+        short_code: { required: true, force_uppercase: true },
+        product_code_separator: { renderer: :label },
+        has_suppliers: { renderer: :checkbox },
+        has_marketers: { renderer: :checkbox },
+        has_retailers: { renderer: :checkbox }
+        # active: { renderer: :checkbox }
       }
     end
 

@@ -233,57 +233,57 @@ module PackMaterialApp
     end
 
     def test_validate_matres_sub_type_config_params
-      test_attrs = {
+      test_attrs = matres_sub_type_attrs.merge(
         id: 1,
         product_code_separator: '_',
         has_suppliers: true,
         has_marketers: true,
         has_retailers: true,
         internal_seq: 1
-      }
+      )
       # optional(:id).filled(:int?)
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :id })
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.reject { |k| k == :id })
       assert_empty x. errors
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(id: 'name'))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(id: 'name'))
       assert_equal(['must be an integer'], x.errors[:id])
 
       # required(:product_code_separator).filled(:str?)
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :product_code_separator })
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.reject { |k| k == :product_code_separator })
       assert_equal(['is missing'], x.errors[:product_code_separator])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(product_code_separator: nil))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(product_code_separator: nil))
       assert_equal(['must be filled'], x.errors[:product_code_separator])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(product_code_separator: 1))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(product_code_separator: 1))
       assert_equal(['must be a string'], x.errors[:product_code_separator])
 
       # required(:has_suppliers).filled(:bool?)
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :has_suppliers })
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.reject { |k| k == :has_suppliers })
       assert_equal(['is missing'], x.errors[:has_suppliers])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_suppliers: nil))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(has_suppliers: nil))
       assert_equal(['must be filled'], x.errors[:has_suppliers])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_suppliers: 'something'))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(has_suppliers: 'something'))
       assert_equal(['must be boolean'], x.errors[:has_suppliers])
       # required(:has_marketers).filled(:bool?)
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :has_marketers })
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.reject { |k| k == :has_marketers })
       assert_equal(['is missing'], x.errors[:has_marketers])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_marketers: nil))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(has_marketers: nil))
       assert_equal(['must be filled'], x.errors[:has_marketers])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_marketers: 'something'))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(has_marketers: 'something'))
       assert_equal(['must be boolean'], x.errors[:has_marketers])
       # required(:has_retailers).filled(:bool?)
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.reject { |k| k == :has_retailers })
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.reject { |k| k == :has_retailers })
       assert_equal(['is missing'], x.errors[:has_retailers])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_retailers: nil))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(has_retailers: nil))
       assert_equal(['must be filled'], x.errors[:has_retailers])
 
-      x = interactor.send(:validate_matres_sub_type_config_params, test_attrs.merge(has_retailers: 'something'))
+      x = interactor.send(:validate_matres_sub_type_params, test_attrs.merge(has_retailers: 'something'))
       assert_equal(['must be boolean'], x.errors[:has_retailers])
     end
 

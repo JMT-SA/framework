@@ -46,7 +46,6 @@ module UiRules
       fields[:grade] = { renderer: :label }
       fields[:language] = { renderer: :label }
       fields[:other] = { renderer: :label }
-      fields[:specification_notes] = { renderer: :label }
     end
 
     def preselect_fields
@@ -60,7 +59,6 @@ module UiRules
       x = {
         material_resource_sub_type_name: { renderer: :label, with_value: material_resource_sub_type_id_label, caption: 'Sub Type', readonly: true },
         material_resource_sub_type_id: { renderer: :hidden, with_value: @form_object.material_resource_sub_type_id },
-        specification_notes: { renderer: :text, required: true }
       }
 
       product_column_set.each do |col_name|
@@ -113,7 +111,6 @@ module UiRules
                                     grade: nil,
                                     language: nil,
                                     other: nil,
-                                    specification_notes: nil,
                                     reference_dimension: nil)
     end
 

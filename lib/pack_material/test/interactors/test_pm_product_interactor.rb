@@ -217,16 +217,6 @@ module PackMaterialApp
       x = interactor.send(:validate_pm_product_params, test_attrs.merge(marketing_variety_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:marketing_variety_id])
 
-      # required(:specification_notes, Types::StrippedString).filled(:str?)
-      x = interactor.send(:validate_pm_product_params, test_attrs.reject { |k| k == :specification_notes })
-      assert_equal(['is missing'], x.errors[:specification_notes])
-
-      x = interactor.send(:validate_pm_product_params, test_attrs.merge(specification_notes: nil))
-      assert_equal(['must be filled'], x.errors[:specification_notes])
-
-      x = interactor.send(:validate_pm_product_params, test_attrs.merge(specification_notes: 1))
-      assert_equal(['must be a string'], x.errors[:specification_notes])
-
       %i[
         unit
         style
@@ -287,16 +277,6 @@ module PackMaterialApp
 
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.merge(marketing_variety_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:marketing_variety_id])
-
-      # required(:specification_notes, Types::StrippedString).filled(:str?)
-      x = interactor.send(:validate_clone_pm_product_params, test_attrs.reject { |k| k == :specification_notes })
-      assert_equal(['is missing'], x.errors[:specification_notes])
-
-      x = interactor.send(:validate_clone_pm_product_params, test_attrs.merge(specification_notes: nil))
-      assert_equal(['must be filled'], x.errors[:specification_notes])
-
-      x = interactor.send(:validate_clone_pm_product_params, test_attrs.merge(specification_notes: 1))
-      assert_equal(['must be a string'], x.errors[:specification_notes])
 
       %i[
         unit
@@ -505,7 +485,6 @@ module PackMaterialApp
         reference_quantity: 'reference_quantity',
         reference_size: 'reference_size',
         shape: 'shape',
-        specification_notes: 'specification_notes',
         style: 'style',
         unit: 'unit',
         marketing_variety_id: 1
@@ -547,7 +526,6 @@ module PackMaterialApp
         reference_quantity: 'reference_quantity',
         reference_size: 'reference_size',
         shape: 'shape',
-        specification_notes: 'specification_notes',
         style: 'style',
         unit: 'unit',
         marketing_variety_id: 1

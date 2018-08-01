@@ -30,8 +30,6 @@ module PackMaterialApp
     optional(:grade, Types::StrippedString).filled(:str?)
     optional(:language, Types::StrippedString).filled(:str?)
     optional(:other, Types::StrippedString).filled(:str?)
-
-    required(:specification_notes, Types::StrippedString).filled(:str?)
   end
 
   ClonePmProductSchema = Dry::Validation.Form do
@@ -63,8 +61,6 @@ module PackMaterialApp
     optional(:grade, Types::StrippedString).filled(:str?)
     optional(:language, Types::StrippedString).filled(:str?)
     optional(:other, Types::StrippedString).filled(:str?)
-
-    required(:specification_notes, Types::StrippedString).filled(:str?)
   end
 
   CompletedPmProductSchema = Dry::Validation.Form do

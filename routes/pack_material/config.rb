@@ -335,7 +335,6 @@ class Framework < Roda
               reference_quantity
               reference_size
               shape
-              specification_notes
               style
               unit
               marketing_variety_id

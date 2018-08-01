@@ -72,10 +72,11 @@ module PackMaterialApp
     def delete_matres_sub_type(id)
       @matres_sub_type_id = id
       name = matres_sub_type.sub_type_name
+      res = nil
       DB.transaction do
-        repo.delete_matres_sub_type(id)
+        res = repo.delete_matres_sub_type(id)
       end
-      success_response("Deleted sub type #{name}")
+      res.success ? success_response("Deleted sub type #{name}") : res
     end
 
     def update_matres_config(id, params)

@@ -56,15 +56,15 @@ module UiRules
         product_variant_number: {}
       }
 
-      product_column_set.each do |col_name, required|
+      product_column_set.each do |col_name|
         list = master_list_items(col_name)
         list = @commodity_repo.for_select_commodities if col_name == :commodity_id
         list = @variety_repo.for_select_marketing_varieties if col_name == :marketing_variety_id
 
-        caption = col_name.to_s.gsub('_id', '').gsub('pm_', '').gsub('_', ' ').capitalize
+        caption = col_name.to_s.gsub('_id', '').gsub('pm_', '').tr('_', ' ').capitalize
         caption = 'Variety' if col_name == :marketing_variety_id
 
-        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: required } : { required: required }
+        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: true } : { required: true }
       end
       x
     end
@@ -75,10 +75,7 @@ module UiRules
 
     def product_column_set
       product = @repo.find_pm_product(product_id)
-      applicable_columns = @config_repo.product_variant_columns(product.material_resource_sub_type_id).map { |r| r.push(true) }
-      applicable_columns_optional = @config_repo.product_variant_columns_optional(product.material_resource_sub_type_id).map { |r| r.push(false) }
-      combined_set = applicable_columns + applicable_columns_optional
-      combined_set.map { |r| [r[0].to_sym, r[2]] }
+      @config_repo.product_variant_columns(product.material_resource_sub_type_id).map { |r| r[0].to_sym }
     end
 
     def master_list_items(product_column)

@@ -6,7 +6,7 @@ module PackMaterialApp
 
     optional(:id, :int).filled(:int?)
     optional(:pack_material_product_id, :int).filled(:int?)
-    optional(:product_variant_number, Types::StrippedString).maybe(:str?)
+    optional(:product_variant_number, :int).maybe(:int?)
 
     optional(:unit, Types::StrippedString).maybe(:str?)
     optional(:style, Types::StrippedString).maybe(:str?)
@@ -60,6 +60,6 @@ module PackMaterialApp
   end
 
   CompletedPmProductVariantSchema = Dry::Validation.Form do
-    required(:product_variant_number, Types::StrippedString).filled(:str?)
+    required(:product_variant_number, :int).filled(:int?)
   end
 end

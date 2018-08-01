@@ -51,7 +51,7 @@ module UiRules
 
     def preselect_fields
       {
-        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_configured_sub_types, caption: 'Please select Sub Type', required: true },
+        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_configured_sub_types(PackMaterialApp::DOMAIN_NAME), caption: 'Please select Sub Type', required: true },
       }
     end
 

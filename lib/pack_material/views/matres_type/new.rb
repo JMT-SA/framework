@@ -15,6 +15,7 @@ module PackMaterial
             page.form do |form|
               form.action '/pack_material/config/material_resource_types'
               form.remote! if remote
+              form.add_field :material_resource_domain_name
               form.add_field :material_resource_domain_id
               form.add_field :type_name
               form.add_field :short_code

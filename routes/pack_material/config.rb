@@ -212,7 +212,12 @@ class Framework < Roda
           return_json_response
           check_auth!('config', 'delete')
           res = interactor.delete_matres_sub_type(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
+          end
         end
       end
     end
@@ -345,7 +350,12 @@ class Framework < Roda
           return_json_response
           check_auth!('config', 'delete')
           res = interactor.delete_pm_product(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
+          end
         end
       end
     end
@@ -377,9 +387,6 @@ class Framework < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            # content = show_partial { PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors) }
-            # update_dialog_content(content: content, error: res.message)
-
             re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/clone") do
               PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors)
             end

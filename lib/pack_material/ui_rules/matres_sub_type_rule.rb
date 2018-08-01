@@ -35,7 +35,7 @@ module UiRules
       {
         material_resource_type_id: { renderer: :select, options: @repo.for_select_matres_types, caption: 'Type' },
         sub_type_name: {},
-        short_code: {}
+        short_code: { required: true, force_uppercase: true }
       }
     end
 

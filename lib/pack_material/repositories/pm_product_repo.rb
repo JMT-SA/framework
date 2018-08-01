@@ -24,5 +24,27 @@ module PackMaterialApp
       SQL
       DB[query].all
     end
+
+    def delete_pm_product(id)
+      if (pm_variant_ids = pm_variant_ids(id).empty?)
+        delete(:pack_material_products, id)
+        success_response('ok')
+      else
+        failed_response('There are variants linked to this product', associated_variant_ids: pm_variant_ids)
+      end
+    end
+
+    def update_pm_product(id, attrs)
+      if (pm_variant_ids = pm_variant_ids(id).empty?)
+        update(:pack_material_products, id, attrs)
+        success_response('ok')
+      else
+        failed_response('There are variants linked to this product', associated_variant_ids: pm_variant_ids)
+      end
+    end
+
+    def pm_variant_ids(id)
+      DB[:pack_material_product_variants].where(pack_material_product_id: id).all.map { |r| r[:id] }
+    end
   end
 end

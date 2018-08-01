@@ -8,10 +8,10 @@
   \"material_resource_master_list_items\" li ON \"li\".\"material_resource_master_list_id\"
   = \"ml\".\"id\"\r\nWHERE \"pc\".\"id\" IN (SELECT unnest(\"product_column_ids\")\r\nFROM
   \"material_resource_sub_types\"\r\nWHERE \"id\" = \"ml\".\"material_resource_sub_type_id\")"
-:limit: 
-:offset: 
+:limit:
+:offset:
 :external_settings:
-  :render_url: 
+  :render_url:
 :columns:
   product_column_id:
     :name: product_column_id
@@ -19,11 +19,11 @@
     :caption: Product column
     :namespaced_name: pc.id
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -34,8 +34,8 @@
     :caption: Column name
     :namespaced_name: pc.column_name
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
     :groupable: true
     :group_by_seq: 1
@@ -49,11 +49,11 @@
     :caption: Id
     :namespaced_name: li.id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -64,11 +64,11 @@
     :caption: Short code
     :namespaced_name: li.short_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -79,11 +79,11 @@
     :caption: Description
     :namespaced_name: li.description
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -94,11 +94,11 @@
     :caption: Active
     :namespaced_name: li.active
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -109,11 +109,11 @@
     :caption: Long name
     :namespaced_name: li.long_name
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -124,11 +124,11 @@
     :caption: Master list
     :namespaced_name: li.material_resource_master_list_id
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -139,11 +139,11 @@
     :caption: Sub type
     :namespaced_name: ml.material_resource_sub_type_id
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -153,15 +153,15 @@
   :caption: product_column_id
   :data_type: :integer
   :control_type: :text
-  :default_value: 
-  :ordered_list: 
+  :default_value:
+  :ordered_list:
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: ml.material_resource_sub_type_id
   :caption: sub_type_id
   :data_type: :integer
   :control_type: :text
-  :default_value: 
-  :ordered_list: 
+  :default_value:
+  :ordered_list:
   :ui_priority: 1
-  :list_def: 
+  :list_def:

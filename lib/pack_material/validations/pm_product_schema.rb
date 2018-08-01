@@ -1,18 +1,14 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  NewPmProductSchema = Dry::Validation.Form do
-    configure { config.type_specs = true }
-
-    required(:material_resource_sub_type_id, :int).filled(:int?)
-  end
-
   PmProductSchema = Dry::Validation.Form do
     configure { config.type_specs = true }
 
     optional(:material_resource_sub_type_id, :int).filled(:int?)
+
     optional(:commodity_id, :int).filled(:int?)
     optional(:marketing_variety_id, :int).filled(:int?)
+
     optional(:unit, Types::StrippedString).filled(:str?)
     optional(:style, Types::StrippedString).filled(:str?)
     optional(:alternate, Types::StrippedString).filled(:str?)

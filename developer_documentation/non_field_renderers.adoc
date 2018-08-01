@@ -42,8 +42,8 @@ section.add_link(text: 'Do something', url: '/path/to/something', style: :button
 |None. must be provided.
 
 |options - :style
-|How the link is styled - as a normal link, or to look like a button.
-|`:link` or `:button`.
+|How the link is styled - as a normal link, or to look like a button. A back button renders in blue with a left-pointing arrow glyph.
+|`:link`, `:button` or `:back_button`.
 |`:link`
 
 |options - :behaviour
@@ -287,6 +287,8 @@ section.add_table [{ keys: 'a', values: 1, amounts: 22 },
 |rows
 |Rows containing the data to be shown
 |An Array of Hashes of the format `{ column1_name: value, column2_name: value }`.
+
+Or a 2-dimensionial array (in which case there will be no columns or table head).
 |None. This is required.
 
 |columns

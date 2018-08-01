@@ -277,7 +277,7 @@ neg_check = ->(a) { a && a.negative? ? 'red' : '' }
 section.add_table [{ keys: 'a', values: 1, amounts: 22 },
                    { keys: 'b', values: 2, amounts: 33 }],
                    %i[keys values amounts],
-                   alignments: { amounts: :right },
+                   alignment: { amounts: :right },
                    cell_classes: { amounts: neg_check }
 ----
 

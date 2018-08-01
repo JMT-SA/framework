@@ -95,6 +95,16 @@ a|* :p
 * :b or :strong
 |None
 
+|options - :toggle_button
+|Display the text hidden with a button that shows/hides it.
+|`true` or `false`.
+|`false`
+
+|options - :toggle_caption
+|The caption to display on the toggle button.
+|`String`.
+|`Show/Hide Text`
+
 |===
 
 === List

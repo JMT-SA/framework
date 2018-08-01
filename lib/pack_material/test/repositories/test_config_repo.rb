@@ -264,6 +264,11 @@ module PackMaterialApp
     end
 
     def test_product_code_columns
+      # dom = create_dom
+      # id1 = create_pc(dom, seq=1)
+      # id2 = create_pc(dom, seq=2)
+      # typ = create_type(dom)
+      # sub = create_subtype(typ, prod_ids = [id1,id2])
       dom_id = DB[:material_resource_domains].insert(
         domain_name: 'domain name',
         product_table_name: 'product table name',
@@ -302,6 +307,7 @@ module PackMaterialApp
     end
 
     def test_update_product_code_configuration
+      # create_sub => {dom: {id: 1, type: {id: 2, sub: {id: 3}}}}
       dom_id = DB[:material_resource_domains].insert(
         domain_name: 'domain name',
         product_table_name: 'product table name',

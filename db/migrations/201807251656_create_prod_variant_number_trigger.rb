@@ -6,6 +6,7 @@ Sequel.migration do
       $BODY$
         DECLARE
           p_sql BIGINT;
+          p_code TEXT;
       BEGIN
 
           EXECUTE 'SELECT MAX(p.product_variant_number) AS latest_no FROM pack_material_product_variants p WHERE p.pack_material_product_id = $1' INTO p_sql USING NEW.pack_material_product_id;
@@ -14,6 +15,9 @@ Sequel.migration do
           END IF;
 
           NEW.product_variant_number = p_sql + 1;
+
+          EXECUTE 'SELECT p.product_code FROM pack_material_products p WHERE p.id = $1' INTO p_code USING NEW.pack_material_product_id;
+          NEW.product_variant_code = p_code || '-' || substring((p_sql + 1)::text from '...$');
         RETURN NEW;
 
       END

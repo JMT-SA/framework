@@ -15,6 +15,7 @@ Sequel.migration do
       DateTime :updated_at, null: false
 
       index [:program_id], name: :fki_program_functions_program
+      index [:program_id, :program_function_name], name: :program_functions_program_id_program_function_name_key, unique: true
     end
 
     pgt_created_at(:program_functions,

@@ -102,13 +102,12 @@ module PackMaterialApp
       success_response('Saved configuration')
     end
 
-    def create_matres_master_list_item(parent_id, params)
-      params[:material_resource_master_list_id] = parent_id
+    def create_matres_master_list_item(sub_type_id, params)
       res = validate_matres_master_list_item_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       id = nil
       DB.transaction do
-        id = repo.create_matres_master_list_item(res)
+        id = repo.create_matres_sub_type_master_list_item(sub_type_id, res)
       end
       instance = matres_master_list_item(id)
       success_response("Created list item #{instance.short_code}", instance)

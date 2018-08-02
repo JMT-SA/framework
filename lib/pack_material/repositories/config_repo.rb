@@ -45,10 +45,6 @@ module PackMaterialApp
       DB[:material_resource_domains].where(domain_name: DOMAIN_NAME).first[:id]
     end
 
-    def product_code_column_subset(ids)
-      for_select_material_resource_product_columns.select { |i| ids.include?(i[1]) }
-    end
-
     def for_select_configured_sub_types(domain_name)
       optgroup_array(DB["SELECT mrst.sub_type_name, mrst.id, mrt.short_code as type_name from material_resource_sub_types mrst
       LEFT JOIN material_resource_types mrt on mrst.material_resource_type_id = mrt.id
@@ -156,6 +152,16 @@ module PackMaterialApp
       DB[query].map { |rec| [rec[:column_name], rec[:id]] }
     end
 
+    def product_code_column_subset(ids)
+      for_select_material_resource_product_columns.select { |i| ids.include?(i[1]) }
+    end
+
+    def product_columns(sub_type_id)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
+      product_column_ids = (sub_type[:product_column_ids] || [])
+      for_select_material_resource_product_columns.select { |i| product_column_ids.include?(i[1]) }
+    end
+
     def update_product_code_configuration(config_id, res)
       changes = <<~SQL
         UPDATE material_resource_sub_types
@@ -182,6 +188,23 @@ module PackMaterialApp
       rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
       Crossbeams::Dataminer::Report.load(rpt_hash)
     end
+
+    def create_matres_sub_type_master_list_item(sub_type_id, attrs)
+      new_attrs = attrs.to_h
+      prod_col_id = new_attrs.delete(:material_resource_product_column_id)
+      existing_list = DB[:material_resource_master_lists].where(
+        material_resource_sub_type_id: sub_type_id,
+        material_resource_product_column_id: prod_col_id
+      ).first
+      list_id = existing_list ? existing_list[:id] : nil
+      list_id ||= DB[:material_resource_master_lists].insert(
+        material_resource_sub_type_id: sub_type_id,
+        material_resource_product_column_id: prod_col_id
+      )
+      new_attrs[:material_resource_master_list_id] = list_id
+      DB[:material_resource_master_list_items].insert(new_attrs)
+    end
+
   end
 end
 # rubocop:enable Metrics/ClassLength

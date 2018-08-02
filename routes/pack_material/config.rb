@@ -135,20 +135,19 @@ class Framework < Roda
           end
         end
       end
-      r.on 'material_resource_master_lists', Integer do |list_id|
+      r.on 'material_resource_master_list_items' do
         r.on 'new' do
           check_auth!('config', 'new')
-          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(list_id, remote: fetch?(r)) }
+          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = interactor.create_matres_master_list_item(list_id, params[:matres_master_list_item])
+          res = interactor.create_matres_master_list_item(id, params[:matres_master_list_item])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/#{list_id}/new") do
-              PackMaterial::Config::MatresMasterListItem::New.call(list_id,
-                                                                   form_values: params[:matres_master_list_item],
+            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/new") do
+              PackMaterial::Config::MatresMasterListItem::New.call(id, form_values: params[:matres_master_list_item],
                                                                    form_errors: res.errors,
                                                                    remote: fetch?(r))
             end

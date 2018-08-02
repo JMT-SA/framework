@@ -7,6 +7,7 @@
   :icon: fa-edit
   :title: Edit Item Details
   :popup: true
+  :hide_if_null: id
 - :url: "/pack_material/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_lists/$:master_list_id$/new"
   :text: add list item
   :icon: fa-plus
@@ -26,11 +27,13 @@
   :url: "/list/material_resource_sub_types"
   :text: Back
   :style: :button
+- :control_type: :link
+  :url: "/pack_material/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_list_items/new"
+  :text: New list item
+  :style: :button
+  :behaviour: :popup
 :conditions:
   :standard:
-    - :col: pc.id
+    - :col: material_resource_product_columns.id
       :op: in
       :val: $:product_column_ids$
-    - :col: ml.material_resource_sub_type_id
-      :op: =
-      :val: $:sub_type_id$

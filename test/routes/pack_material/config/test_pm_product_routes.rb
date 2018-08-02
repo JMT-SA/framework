@@ -69,7 +69,7 @@ class TestPmProductRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:delete_pm_product).returns(bad_response)
-    delete 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    delete 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_bad_redirect
   end
 

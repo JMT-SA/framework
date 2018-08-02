@@ -19,6 +19,11 @@ module PackMaterial
               form.add_field :material_resource_type_id
               form.add_field :sub_type_name
               form.add_field :short_code
+              form.add_field :product_code_separator
+              form.add_field :has_suppliers
+              form.add_field :has_marketers
+              form.add_field :has_retailers
+              # form.add_field :active
             end
           end
 

@@ -8,6 +8,7 @@ Sequel.migration do
       add_column(:product_variant_number, Integer)
       add_column(:active, TrueClass)
       add_column(:reference_dimension, String)
+      add_column(:product_variant_code, String, null: false)
       drop_column(:length_mm)
       drop_column(:width_mm)
       drop_column(:height_mm)
@@ -25,6 +26,7 @@ Sequel.migration do
       drop_column(:diameter_mm)
       drop_column(:thick_mm)
       drop_column(:thick_mic)
+      drop_column(:specification_notes)
     end
   end
 
@@ -34,6 +36,7 @@ Sequel.migration do
       drop_column(:product_variant_number)
       drop_column(:active)
       drop_column(:reference_dimension)
+      drop_column(:product_variant_code)
       add_column(:length_mm, Numeric)
       add_column(:width_mm, Numeric)
       add_column(:height_mm, Numeric)
@@ -51,6 +54,7 @@ Sequel.migration do
       add_column(:diameter_mm, Numeric)
       add_column(:thick_mm, Numeric)
       add_column(:thick_mic, Numeric)
+      add_column(:specification_notes, String)
     end
   end
 end

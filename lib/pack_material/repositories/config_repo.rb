@@ -41,10 +41,15 @@ module PackMaterialApp
     crud_calls_for :material_resource_master_list_items, name: :matres_master_list_item, wrapper: MatresMasterListItem
     crud_calls_for :material_resource_master_lists, name: :matres_master_list, wrapper: MatresMasterList
 
-    def for_select_configured_sub_types
-      optgroup_array(DB['SELECT mrst.sub_type_name, mrst.id, mrt.short_code as type_name from material_resource_sub_types mrst
+    def domain_id
+      DB[:material_resource_domains].where(domain_name: DOMAIN_NAME).first[:id]
+    end
+
+    def for_select_configured_sub_types(domain_name)
+      optgroup_array(DB["SELECT mrst.sub_type_name, mrst.id, mrt.short_code as type_name from material_resource_sub_types mrst
       LEFT JOIN material_resource_types mrt on mrst.material_resource_type_id = mrt.id
-      WHERE mrst.active IS true AND mrst.product_code_ids is not null;'].all, :type_name, :sub_type_name, :id)
+      LEFT JOIN material_resource_domains dom on mrt.material_resource_domain_id = dom.id
+      WHERE dom.domain_name = '#{domain_name}' AND mrst.active IS true AND mrst.product_code_ids IS NOT null;"].all, :type_name, :sub_type_name, :id)
     end
 
     # TYPES
@@ -118,28 +123,23 @@ module PackMaterialApp
         WHERE st.id = #{id}
       SQL
       table_name = DB[query].single_value
-      products = all_hash(:"#{table_name}", material_resource_sub_type_id: id)
-      if products.empty?
+      product_ids = matres_sub_type_product_ids(id, table_name)
+      if product_ids.any?
+        failed_response('There are products linked to this sub-type', associated_product_ids: product_ids)
+      else
         delete(:material_resource_sub_types, id)
         success_response('ok')
-      else
-        associated_product_ids = products.map { |r| r[:id] }
-        failed_response('There are products linked to this sub-type', associated_product_ids: associated_product_ids)
       end
+    end
+
+    def matres_sub_type_product_ids(id, table_name)
+      all_hash(:"#{table_name}", material_resource_sub_type_id: id).map { |r| r[:id] }
     end
 
     def product_variant_columns(sub_type_id)
       sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
-      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
+      product_variant_column_ids = sub_type ? (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || []) : nil
       DB[:material_resource_product_columns].where(id: product_variant_column_ids)
-                                            .map { |rec| [rec[:column_name], rec[:id]] }
-    end
-
-    def product_variant_columns_optional(sub_type_id)
-      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
-      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
-      DB[:material_resource_product_columns].where(material_resource_domain_id: sub_type[:material_resource_domain_id])
-                                            .exclude(id: product_variant_column_ids)
                                             .map { |rec| [rec[:column_name], rec[:id]] }
     end
 
@@ -156,6 +156,12 @@ module PackMaterialApp
       for_select_material_resource_product_columns.select { |i| ids.include?(i[1]) }
     end
 
+    def product_columns(sub_type_id)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
+      product_column_ids = (sub_type[:product_column_ids] || [])
+      for_select_material_resource_product_columns.select { |i| product_column_ids.include?(i[1]) }
+    end
+
     def update_product_code_configuration(config_id, res)
       changes = <<~SQL
         UPDATE material_resource_sub_types
@@ -170,7 +176,6 @@ module PackMaterialApp
 
     def sub_type_master_list_items(sub_type_id)
       DB[get_dataminer_report('matres_prodcol_sub_type_list_items.yml').sql].where(sub_type_id: sub_type_id)
-
     end
 
     def for_select_sub_type_master_list_items(sub_type_id, product_column)
@@ -183,6 +188,23 @@ module PackMaterialApp
       rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
       Crossbeams::Dataminer::Report.load(rpt_hash)
     end
+
+    def create_matres_sub_type_master_list_item(sub_type_id, attrs)
+      new_attrs = attrs.to_h
+      prod_col_id = new_attrs.delete(:material_resource_product_column_id)
+      existing_list = DB[:material_resource_master_lists].where(
+        material_resource_sub_type_id: sub_type_id,
+        material_resource_product_column_id: prod_col_id
+      ).first
+      list_id = existing_list ? existing_list[:id] : nil
+      list_id ||= DB[:material_resource_master_lists].insert(
+        material_resource_sub_type_id: sub_type_id,
+        material_resource_product_column_id: prod_col_id
+      )
+      new_attrs[:material_resource_master_list_id] = list_id
+      DB[:material_resource_master_list_items].insert(new_attrs)
+    end
+
   end
 end
 # rubocop:enable Metrics/ClassLength

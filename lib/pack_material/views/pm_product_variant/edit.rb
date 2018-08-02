@@ -7,6 +7,11 @@ module PackMaterial
         def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:pm_product_variant, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
+          pm_product_id = ui_rule.form_object.pack_material_product_id
+
+          # Consider view helper per App
+          product = PackMaterialApp::PmProductRepo.new.find_pm_product(pm_product_id)
+          set = PackMaterialApp::ConfigRepo.new.product_variant_columns(product.material_resource_sub_type_id).map { |r| r[0].to_sym }
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
@@ -19,27 +24,9 @@ module PackMaterial
               form.add_field :pack_material_product
               form.add_field :pack_material_product_id
 
-              form.add_field :unit
-              form.add_field :style
-              form.add_field :alternate
-              form.add_field :shape
-              form.add_field :reference_size
-              form.add_field :reference_dimension
-              form.add_field :reference_quantity
-              form.add_field :brand_1
-              form.add_field :brand_2
-              form.add_field :colour
-              form.add_field :material
-              form.add_field :assembly
-              form.add_field :reference_mass
-              form.add_field :reference_number
-              form.add_field :market
-              form.add_field :marking
-              form.add_field :model
-              form.add_field :pm_class
-              form.add_field :grade
-              form.add_field :language
-              form.add_field :other
+              set.each do |item|
+                form.add_field item
+              end
             end
           end
 

@@ -14,33 +14,33 @@ module PackMaterialApp
       pm_product_create(res)
     end
 
-    def pm_product_create(res)
-      id = nil
-      DB.transaction do
-        id = repo.create_pm_product(res)
-      end
-      instance = pm_product(id)
-      success_response('Created product', instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { product_number: ['This product already exists'] }))
-    end
-
     def update_pm_product(id, params)
       res = validate_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      repo.update_pm_product(id, res)
-      instance = pm_product(id)
-      success_response("Updated product #{instance.product_code}", instance)
+      resp = nil
+      DB.transaction do
+        resp = repo.update_pm_product(id, res)
+      end
+      if resp.success
+        instance = pm_product(id)
+        success_response("Updated product #{instance.product_code}", instance)
+      else
+        resp
+      end
     end
 
     def delete_pm_product(id)
       name = pm_product(id).product_code
-      repo.delete_pm_product(id)
-      success_response("Deleted product #{name}")
+      res = nil
+      DB.transaction do
+        res = repo.delete_pm_product(id)
+      end
+      res.success ? success_response("Deleted product #{name}") : res
     end
 
     def create_pm_product_variant(parent_id, params)
       params[:pack_material_product_id] = parent_id
+      return parent_id_missing unless parent_id
       res = validate_pm_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       pm_product_variant_create(res)
@@ -48,6 +48,7 @@ module PackMaterialApp
 
     def clone_pm_product_variant(parent_id, params)
       params[:pack_material_product_id] = parent_id
+      return parent_id_missing unless parent_id
       res = validate_clone_pm_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       pm_product_variant_create(res)
@@ -75,7 +76,7 @@ module PackMaterialApp
     end
 
     def delete_pm_product_variant(id)
-      name = pm_product_variant(id).unit
+      name = pm_product_variant(id).product_variant_number
       DB.transaction do
         repo.delete_pm_product_variant(id)
       end
@@ -94,6 +95,17 @@ module PackMaterialApp
 
     def pm_product_variant(id)
       repo.find_pm_product_variant(id)
+    end
+
+    def pm_product_create(res)
+      id = nil
+      DB.transaction do
+        id = repo.create_pm_product(res)
+      end
+      instance = pm_product(id)
+      success_response('Created product', instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { product_number: ['This product already exists'] }))
     end
 
     def validate_pm_product_params(params)
@@ -118,6 +130,10 @@ module PackMaterialApp
 
     def validate_completed_pm_product_variant_params(params)
       CompletedPmProductVariantSchema.call(params)
+    end
+
+    def parent_id_missing
+      validation_failed_response(OpenStruct.new(messages: { pack_material_product_id: ["is missing"] }))
     end
   end
 end

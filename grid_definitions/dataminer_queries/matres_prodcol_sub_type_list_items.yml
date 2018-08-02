@@ -1,13 +1,18 @@
 ---
 :caption: Master List Items for Product Columns
-:sql: "SELECT \"pc\".\"id\" AS product_column_id, \"pc\".\"column_name\", \"li\".\"id\",
-  \"li\".\"short_code\", \"li\".\"description\",\r\n\"li\".\"active\", \"li\".\"long_name\",
-  \"li\".\"material_resource_master_list_id\" AS master_list_id,\r\n\"ml\".\"material_resource_sub_type_id\"
-  AS sub_type_id\r\nFROM \"material_resource_product_columns\" pc\r\nLEFT JOIN \"material_resource_master_lists\"
-  ml ON \"ml\".\"material_resource_product_column_id\" = \"pc\".\"id\"\r\nLEFT JOIN
-  \"material_resource_master_list_items\" li ON \"li\".\"material_resource_master_list_id\"
-  = \"ml\".\"id\"\r\nWHERE \"pc\".\"id\" IN (SELECT unnest(\"product_column_ids\")\r\nFROM
-  \"material_resource_sub_types\"\r\nWHERE \"id\" = \"ml\".\"material_resource_sub_type_id\")"
+:sql: "SELECT \"material_resource_product_columns\".\"id\" AS product_column_id,\r\n
+  \ \"material_resource_product_columns\".\"column_name\",\r\n  \"material_resource_master_list_items\".\"id\",\r\n
+  \ \"material_resource_master_list_items\".\"short_code\",\r\n  \"material_resource_master_list_items\".\"description\",\r\n
+  \ \"material_resource_master_list_items\".\"active\",\r\n  \"material_resource_master_list_items\".\"long_name\",\r\n
+  \ \"material_resource_master_list_items\".\"material_resource_master_list_id\" AS
+  master_list_id,\r\n  \"material_resource_master_lists\".\"material_resource_sub_type_id\"
+  AS sub_type_id\r\nFROM \"material_resource_product_columns\"\r\n  LEFT JOIN \"material_resource_master_lists\"
+  ON \"material_resource_master_lists\".\"material_resource_product_column_id\" =
+  \"material_resource_product_columns\".\"id\"\r\n  LEFT JOIN \"material_resource_master_list_items\"
+  ON \"material_resource_master_list_items\".\"material_resource_master_list_id\"
+  = \"material_resource_master_lists\".\"id\"\r\nWHERE \"material_resource_product_columns\".\"id\"
+  IN (SELECT unnest(\"product_column_ids\")\r\n                    FROM \"material_resource_sub_types\"\r\n
+  \                   WHERE \"id\" = \"material_resource_master_lists\".\"material_resource_sub_type_id\")"
 :limit: 
 :offset: 
 :external_settings:
@@ -17,7 +22,7 @@
     :name: product_column_id
     :sequence_no: 1
     :caption: Product column
-    :namespaced_name: pc.id
+    :namespaced_name: material_resource_product_columns.id
     :data_type: :string
     :width: 
     :format: 
@@ -32,7 +37,7 @@
     :name: column_name
     :sequence_no: 2
     :caption: Column name
-    :namespaced_name: pc.column_name
+    :namespaced_name: material_resource_product_columns.column_name
     :data_type: :string
     :width: 
     :format: 
@@ -47,7 +52,7 @@
     :name: id
     :sequence_no: 3
     :caption: Id
-    :namespaced_name: li.id
+    :namespaced_name: material_resource_master_list_items.id
     :data_type: :integer
     :width: 
     :format: 
@@ -62,7 +67,7 @@
     :name: short_code
     :sequence_no: 4
     :caption: Short code
-    :namespaced_name: li.short_code
+    :namespaced_name: material_resource_master_list_items.short_code
     :data_type: :string
     :width: 
     :format: 
@@ -77,7 +82,7 @@
     :name: description
     :sequence_no: 5
     :caption: Description
-    :namespaced_name: li.description
+    :namespaced_name: material_resource_master_list_items.description
     :data_type: :string
     :width: 
     :format: 
@@ -92,7 +97,7 @@
     :name: active
     :sequence_no: 6
     :caption: Active
-    :namespaced_name: li.active
+    :namespaced_name: material_resource_master_list_items.active
     :data_type: :boolean
     :width: 
     :format: 
@@ -107,7 +112,7 @@
     :name: long_name
     :sequence_no: 7
     :caption: Long name
-    :namespaced_name: li.long_name
+    :namespaced_name: material_resource_master_list_items.long_name
     :data_type: :string
     :width: 
     :format: 
@@ -122,7 +127,7 @@
     :name: master_list_id
     :sequence_no: 8
     :caption: Master list
-    :namespaced_name: li.material_resource_master_list_id
+    :namespaced_name: material_resource_master_list_items.material_resource_master_list_id
     :data_type: :string
     :width: 
     :format: 
@@ -137,7 +142,7 @@
     :name: sub_type_id
     :sequence_no: 9
     :caption: Sub type
-    :namespaced_name: ml.material_resource_sub_type_id
+    :namespaced_name: material_resource_master_lists.material_resource_sub_type_id
     :data_type: :string
     :width: 
     :format: 
@@ -149,17 +154,17 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: pc.id
-  :caption: product_column_id
-  :data_type: :integer
+- :column: material_resource_product_columns.id
+  :caption: Product Column Id
+  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: 
   :ui_priority: 1
   :list_def: 
-- :column: ml.material_resource_sub_type_id
-  :caption: sub_type_id
-  :data_type: :integer
+- :column: material_resource_master_lists.material_resource_sub_type_id
+  :caption: Sub Type Id
+  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: 

@@ -135,20 +135,19 @@ class Framework < Roda
           end
         end
       end
-      r.on 'material_resource_master_lists', Integer do |list_id|
+      r.on 'material_resource_master_list_items' do
         r.on 'new' do
           check_auth!('config', 'new')
-          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(list_id, remote: fetch?(r)) }
+          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = interactor.create_matres_master_list_item(list_id, params[:matres_master_list_item])
+          res = interactor.create_matres_master_list_item(id, params[:matres_master_list_item])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/#{list_id}/new") do
-              PackMaterial::Config::MatresMasterListItem::New.call(list_id,
-                                                                   form_values: params[:matres_master_list_item],
+            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/new") do
+              PackMaterial::Config::MatresMasterListItem::New.call(id, form_values: params[:matres_master_list_item],
                                                                    form_errors: res.errors,
                                                                    remote: fetch?(r))
             end
@@ -212,7 +211,12 @@ class Framework < Roda
           return_json_response
           check_auth!('config', 'delete')
           res = interactor.delete_matres_sub_type(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
+          end
         end
       end
     end
@@ -275,10 +279,11 @@ class Framework < Roda
           end
         end
         r.post do        # CREATE
+          return_json_response
           res = interactor.create_pm_product_variant(id, params[:pm_product_variant])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json('/list/pack_material_product_variants')
           else
             re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/pack_material_product_variants/new") do
               PackMaterial::Config::PmProductVariant::New.call(id,
@@ -330,7 +335,6 @@ class Framework < Roda
               reference_quantity
               reference_size
               shape
-              specification_notes
               style
               unit
               marketing_variety_id
@@ -345,7 +349,12 @@ class Framework < Roda
           return_json_response
           check_auth!('config', 'delete')
           res = interactor.delete_pm_product(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
+          end
         end
       end
     end
@@ -377,9 +386,6 @@ class Framework < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            # content = show_partial { PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors) }
-            # update_dialog_content(content: content, error: res.message)
-
             re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/clone") do
               PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors)
             end

@@ -25,8 +25,6 @@ module PackMaterial
               set.each do |item|
                 form.add_field item
               end
-
-              form.add_field :specification_notes
             end
           end
           layout

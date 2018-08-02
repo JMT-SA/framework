@@ -18,24 +18,6 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
 
-            page.section do |section|
-              # section.add_text "Config for #{ui_rule.form_object.sub_type_name}", wrapper: :h2
-              section.add_caption "Config for #{ui_rule.form_object.sub_type_name}"
-              section.show_border!
-              section.form do |form|
-                form.action "/pack_material/config/material_resource_sub_types/#{id}/config"
-                form.remote!
-                form.method :update
-                form.add_field :product_code_separator
-                form.add_field :has_suppliers
-                form.add_field :has_marketers
-                form.add_field :has_retailers
-                # form.add_field :active
-
-                form.submit_captions 'Update config'
-              end
-            end
-
             # Product Columns
             page.section do |section|
               section.show_border!

@@ -29,6 +29,5 @@ module PackMaterialApp
     attribute :grade, Types::String
     attribute :language, Types::String
     attribute :other, Types::String
-    attribute :specification_notes, Types::String
   end
 end

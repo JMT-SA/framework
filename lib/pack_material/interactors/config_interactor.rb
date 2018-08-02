@@ -72,15 +72,16 @@ module PackMaterialApp
     def delete_matres_sub_type(id)
       @matres_sub_type_id = id
       name = matres_sub_type.sub_type_name
+      res = nil
       DB.transaction do
-        repo.delete_matres_sub_type(id)
+        res = repo.delete_matres_sub_type(id)
       end
-      success_response("Deleted sub type #{name}")
+      res.success ? success_response("Deleted sub type #{name}") : res
     end
 
     def update_matres_config(id, params)
       @matres_sub_type_id = id
-      res = validate_matres_sub_type_config_params(params)
+      res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_matres_sub_type(id, res)
       success_response('Updated the config')
@@ -101,13 +102,12 @@ module PackMaterialApp
       success_response('Saved configuration')
     end
 
-    def create_matres_master_list_item(parent_id, params)
-      params[:material_resource_master_list_id] = parent_id
+    def create_matres_master_list_item(sub_type_id, params)
       res = validate_matres_master_list_item_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       id = nil
       DB.transaction do
-        id = repo.create_matres_master_list_item(res)
+        id = repo.create_matres_sub_type_master_list_item(sub_type_id, res)
       end
       instance = matres_master_list_item(id)
       success_response("Created list item #{instance.short_code}", instance)
@@ -157,10 +157,6 @@ module PackMaterialApp
 
     def validate_matres_sub_type_params(params)
       MatresSubTypeSchema.call(params)
-    end
-
-    def validate_matres_sub_type_config_params(params)
-      MatresSubTypeConfigSchema.call(params)
     end
 
     def validate_material_resource_type_config_code_columns_params(params)

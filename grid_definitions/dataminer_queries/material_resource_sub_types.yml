@@ -1,14 +1,15 @@
 ---
 :caption: Sub Types
-:sql: SELECT "material_resource_sub_types"."id", "material_resource_sub_types"."internal_seq",
-  "material_resource_sub_types"."material_resource_type_id", "material_resource_sub_types"."sub_type_name",
-  "material_resource_sub_types"."created_at", "material_resource_sub_types"."updated_at",
-  "material_resource_sub_types"."product_code_separator", "material_resource_sub_types"."has_suppliers",
-  "material_resource_sub_types"."has_marketers", "material_resource_sub_types"."has_retailers",
-  "material_resource_sub_types"."product_column_ids", "material_resource_sub_types"."product_code_ids",
-  "material_resource_sub_types"."short_code", "material_resource_types"."type_name"
-  FROM "material_resource_sub_types" JOIN "material_resource_types" ON "material_resource_types"."id"
-  = "material_resource_sub_types"."material_resource_type_id"
+:sql: "SELECT \"material_resource_sub_types\".\"id\", \"material_resource_types\".\"type_name\",\r\n
+  \ \"material_resource_sub_types\".\"internal_seq\",\"material_resource_sub_types\".\"short_code\",\r\n
+  \ \"material_resource_sub_types\".\"sub_type_name\",\r\n  \"material_resource_sub_types\".\"created_at\",
+  \"material_resource_sub_types\".\"updated_at\",\r\n\"material_resource_sub_types\".\"product_code_separator\",
+  \"material_resource_sub_types\".\"has_suppliers\",\r\n  \"material_resource_sub_types\".\"has_marketers\",
+  \"material_resource_sub_types\".\"has_retailers\",\r\n  \"material_resource_sub_types\".\"product_column_ids\",
+  \"material_resource_sub_types\".\"product_code_ids\",\r\n  \"material_resource_sub_types\".\"material_resource_type_id\",\r\n
+  \ exists(select id from pack_material_products\r\n  where material_resource_sub_type_id
+  = material_resource_types.id) as has_products\r\nFROM \"material_resource_sub_types\"\r\nJOIN
+  \"material_resource_types\" ON \"material_resource_types\".\"id\" =\r\n\"material_resource_sub_types\".\"material_resource_type_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -28,9 +29,24 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  type_name:
+    :name: type_name
+    :sequence_no: 2
+    :caption: Type name
+    :namespaced_name: material_resource_types.type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   internal_seq:
     :name: internal_seq
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Internal seq
     :namespaced_name: material_resource_sub_types.internal_seq
     :data_type: :string
@@ -43,16 +59,16 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  material_resource_type_id:
-    :name: material_resource_type_id
-    :sequence_no: 3
-    :caption: Material resource type
-    :namespaced_name: material_resource_sub_types.material_resource_type_id
-    :data_type: :integer
+  short_code:
+    :name: short_code
+    :sequence_no: 4
+    :caption: Short code
+    :namespaced_name: material_resource_sub_types.short_code
+    :data_type: :string
     :width: 
     :format: 
-    :hide: true
-    :groupable: false
+    :hide: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -60,7 +76,7 @@
     :group_max: false
   sub_type_name:
     :name: sub_type_name
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Sub type name
     :namespaced_name: material_resource_sub_types.sub_type_name
     :data_type: :string
@@ -75,7 +91,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: material_resource_sub_types.created_at
     :data_type: :datetime
@@ -90,7 +106,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: material_resource_sub_types.updated_at
     :data_type: :datetime
@@ -105,13 +121,13 @@
     :group_max: false
   product_code_separator:
     :name: product_code_separator
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Product code separator
     :namespaced_name: material_resource_sub_types.product_code_separator
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -120,7 +136,7 @@
     :group_max: false
   has_suppliers:
     :name: has_suppliers
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Has suppliers
     :namespaced_name: material_resource_sub_types.has_suppliers
     :data_type: :boolean
@@ -135,7 +151,7 @@
     :group_max: false
   has_marketers:
     :name: has_marketers
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Has marketers
     :namespaced_name: material_resource_sub_types.has_marketers
     :data_type: :boolean
@@ -150,7 +166,7 @@
     :group_max: false
   has_retailers:
     :name: has_retailers
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Has retailers
     :namespaced_name: material_resource_sub_types.has_retailers
     :data_type: :boolean
@@ -165,13 +181,13 @@
     :group_max: false
   product_column_ids:
     :name: product_column_ids
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Product column ids
     :namespaced_name: material_resource_sub_types.product_column_ids
     :data_type: :integer_array
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -180,44 +196,44 @@
     :group_max: false
   product_code_ids:
     :name: product_code_ids
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Product code ids
     :namespaced_name: material_resource_sub_types.product_code_ids
     :data_type: :integer_array
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  short_code:
-    :name: short_code
-    :sequence_no: 13
-    :caption: Short code
-    :namespaced_name: material_resource_sub_types.short_code
-    :data_type: :string
+  material_resource_type_id:
+    :name: material_resource_type_id
+    :sequence_no: 14
+    :caption: Material resource type
+    :namespaced_name: material_resource_sub_types.material_resource_type_id
+    :data_type: :integer
     :width: 
     :format: 
-    :hide: false
-    :groupable: true
+    :hide: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  type_name:
-    :name: type_name
-    :sequence_no: 14
-    :caption: Type name
-    :namespaced_name: material_resource_types.type_name
+  has_products:
+    :name: has_products
+    :sequence_no: 15
+    :caption: Has products
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
-    :groupable: true
+    :hide: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

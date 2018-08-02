@@ -97,6 +97,7 @@ namespace :devops do
     on roles(:app) do |_|
       upload! 'public/js/ag-enterprise-activation.js', "#{shared_path}/public/js/ag-enterprise-activation.js"
       upload! 'config/dataminer_connections.yml.example', "#{shared_path}/config/dataminer_connections.yml"
+      execute :touch, "#{shared_path}/.env.local"
     end
   end
 end

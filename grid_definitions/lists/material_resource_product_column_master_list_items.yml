@@ -26,7 +26,7 @@
 - :control_type: :link
   :url: "/list/material_resource_sub_types"
   :text: Back
-  :style: :button
+  :style: :back_button
 - :control_type: :link
   :url: "/pack_material/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_list_items/new"
   :text: New list item

@@ -44,7 +44,7 @@ class TestContactMethodRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:update_contact_method).returns(ok_response(instance: row_vals))
-    patch 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    patch 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestContactMethodRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:update_contact_method).returns(bad_response)
     Masterfiles::Parties::ContactMethod::Edit.stub(:call, bland_page) do
-      patch 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      patch 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestContactMethodRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:delete_contact_method).returns(ok_response)
-    delete 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    delete 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
   #
@@ -70,7 +70,7 @@ class TestContactMethodRoutes < RouteTester
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
   #   MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:delete_contact_method).returns(bad_response)
-  #   delete 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+  #   delete 'masterfiles/parties/contact_methods/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_bad_redirect
   # end
 
@@ -95,7 +95,7 @@ class TestContactMethodRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:create_contact_method).returns(ok_response)
-    post 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
 
@@ -103,7 +103,7 @@ class TestContactMethodRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:create_contact_method).returns(ok_response)
-    post_as_fetch 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post_as_fetch 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 
@@ -112,7 +112,7 @@ class TestContactMethodRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:create_contact_method).returns(bad_response)
     Masterfiles::Parties::ContactMethod::New.stub(:call, bland_page) do
-      post 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_flash_error
     expect_bad_redirect(url: '/masterfiles/parties/contact_methods/new')
@@ -123,7 +123,7 @@ class TestContactMethodRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::ContactMethodInteractor.any_instance.stubs(:create_contact_method).returns(bad_response)
     Masterfiles::Parties::ContactMethod::New.stub(:call, bland_page) do
-      post_as_fetch 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'masterfiles/parties/contact_methods', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

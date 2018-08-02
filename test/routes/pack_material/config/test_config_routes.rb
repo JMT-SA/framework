@@ -61,14 +61,14 @@
 #
 #   def test_update_product_code_configuration
 #     PackMaterialApp::ConfigInteractor.any_instance.stubs(:update_product_code_configuration).returns(ok_response)
-#     post 'pack_material/config/material_resource_sub_types/1/update_product_code_configuration', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+#     post 'pack_material/config/material_resource_sub_types/1/update_product_code_configuration', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
 #     expect_ok_redirect
 #   end
 #
 #   def test_update_product_code_configuration_fail
 #     PackMaterialApp::ConfigInteractor.any_instance.stubs(:update_product_code_configuration).returns(bad_response)
 #     PackMaterial::Config::MatresSubType::Config.stub(:call, bland_page) do
-#       post 'pack_material/config/material_resource_sub_types/1/update_product_code_configuration', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+#       post 'pack_material/config/material_resource_sub_types/1/update_product_code_configuration', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
 #     end
 #     expect_bad_redirect(url: '/pack_material/config/material_resource_sub_types/1/config/edit')
 #   end
@@ -76,7 +76,7 @@
 #   def test_link_product_columns
 #     resp = success_response('got_items', code: [['a', 1], ['a', 2], ['a', 3]], var: [['a', 4]])
 #     PackMaterialApp::ConfigInteractor.any_instance.stubs(:chosen_product_columns).returns(resp)
-#     post 'pack_material/config/link_product_columns', { selection: { list: '1,2,3,4' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+#     post 'pack_material/config/link_product_columns', { selection: { list: '1,2,3,4' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
 #     expect_json_response
 #     assert last_response.body.include?('notice')
 #     assert last_response.body.include?('Re-assigned product columns')

@@ -44,7 +44,7 @@ class TestAddressRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:update_address).returns(ok_response(instance: row_vals))
-    patch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    patch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestAddressRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:update_address).returns(bad_response)
     Masterfiles::Parties::Address::Edit.stub(:call, bland_page) do
-      patch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      patch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestAddressRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:delete_address).returns(ok_response)
-    delete 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    delete 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
   #
@@ -70,7 +70,7 @@ class TestAddressRoutes < RouteTester
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
   #   MasterfilesApp::AddressInteractor.any_instance.stubs(:delete_address).returns(bad_response)
-  #   delete 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+  #   delete 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_bad_redirect
   # end
 
@@ -95,7 +95,7 @@ class TestAddressRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:create_address).returns(ok_response)
-    post 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
 
@@ -103,7 +103,7 @@ class TestAddressRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:create_address).returns(ok_response)
-    post_as_fetch 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post_as_fetch 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 
@@ -112,7 +112,7 @@ class TestAddressRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:create_address).returns(bad_response)
     Masterfiles::Parties::Address::New.stub(:call, bland_page) do
-      post 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_flash_error
     expect_bad_redirect(url: '/masterfiles/parties/addresses/new')
@@ -123,7 +123,7 @@ class TestAddressRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:create_address).returns(bad_response)
     Masterfiles::Parties::Address::New.stub(:call, bland_page) do
-      post_as_fetch 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

@@ -12,6 +12,8 @@ class RouteTester < Minitest::Test
   include Minitest::Hooks
   include Crossbeams::Responses
 
+  DEFAULT_LAST_GRID_URL = '/list/users'
+
   def around
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
       super
@@ -109,7 +111,7 @@ class RouteTester < Minitest::Test
     expect_json_response
   end
 
-  def expect_ok_redirect(url: '/')
+  def expect_ok_redirect(url: DEFAULT_LAST_GRID_URL)
     assert last_response.redirect?
     assert_equal url, header_location
     follow_redirect!
@@ -117,7 +119,7 @@ class RouteTester < Minitest::Test
     assert last_response.body.include?('OK')
   end
 
-  def expect_bad_redirect(url: '/')
+  def expect_bad_redirect(url: DEFAULT_LAST_GRID_URL)
     assert last_response.redirect?
     assert_equal url, header_location
     follow_redirect!

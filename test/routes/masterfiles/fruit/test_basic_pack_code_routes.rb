@@ -44,7 +44,7 @@ class TestBasicPackCodeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:update_basic_pack_code).returns(ok_response(instance: row_vals))
-    patch 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    patch 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestBasicPackCodeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:update_basic_pack_code).returns(bad_response)
     Masterfiles::Fruit::BasicPackCode::Edit.stub(:call, bland_page) do
-      patch 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      patch 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestBasicPackCodeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:delete_basic_pack_code).returns(ok_response)
-    delete 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    delete 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
   #
@@ -70,7 +70,7 @@ class TestBasicPackCodeRoutes < RouteTester
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
   #   MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:delete_basic_pack_code).returns(bad_response)
-  #   delete 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+  #   delete 'masterfiles/fruit/basic_pack_codes/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_bad_redirect
   # end
 
@@ -95,7 +95,7 @@ class TestBasicPackCodeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:create_basic_pack_code).returns(ok_response)
-    post 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
 
@@ -103,7 +103,7 @@ class TestBasicPackCodeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:create_basic_pack_code).returns(ok_response)
-    post_as_fetch 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post_as_fetch 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 
@@ -112,7 +112,7 @@ class TestBasicPackCodeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:create_basic_pack_code).returns(bad_response)
     Masterfiles::Fruit::BasicPackCode::New.stub(:call, bland_page) do
-      post 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_bad_redirect(url: '/masterfiles/fruit/basic_pack_codes/new')
   end
@@ -122,7 +122,7 @@ class TestBasicPackCodeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::BasicPackCodeInteractor.any_instance.stubs(:create_basic_pack_code).returns(bad_response)
     Masterfiles::Fruit::BasicPackCode::New.stub(:call, bland_page) do
-      post_as_fetch 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'masterfiles/fruit/basic_pack_codes', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

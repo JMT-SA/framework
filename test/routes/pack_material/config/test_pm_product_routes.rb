@@ -44,7 +44,7 @@ class TestPmProductRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:update_pm_product).returns(ok_response(instance: row_vals))
-    patch 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    patch 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestPmProductRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:update_pm_product).returns(bad_response)
     PackMaterial::Config::PmProduct::Edit.stub(:call, bland_page) do
-      patch 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      patch 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestPmProductRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:delete_pm_product).returns(ok_response)
-    delete 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    delete 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
   #
@@ -70,7 +70,7 @@ class TestPmProductRoutes < RouteTester
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
   #   PackMaterialApp::PmProductInteractor.any_instance.stubs(:delete_pm_product).returns(bad_response)
-  #   delete 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+  #   delete 'pack_material/config/pack_material_products/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_bad_redirect
   # end
 
@@ -95,7 +95,7 @@ class TestPmProductRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:create_pm_product).returns(ok_response)
-    post 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
 
@@ -103,7 +103,7 @@ class TestPmProductRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:create_pm_product).returns(ok_response)
-    post_as_fetch 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post_as_fetch 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 
@@ -112,12 +112,12 @@ class TestPmProductRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:create_pm_product).returns(bad_response)
     PackMaterial::Config::PmProduct::New.stub(:call, bland_page) do
-      post_as_fetch 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_bad_page
 
     PackMaterial::Config::PmProduct::New.stub(:call, bland_page) do
-      post 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_bad_redirect(url: '/pack_material/config/pack_material_products/new')
   end
@@ -127,7 +127,7 @@ class TestPmProductRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:create_pm_product).returns(bad_response)
     PackMaterial::Config::PmProduct::New.stub(:call, bland_page) do
-      post_as_fetch 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'pack_material/config/pack_material_products', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end
@@ -167,10 +167,10 @@ class TestPmProductRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:clone_pm_product).returns(ok_response)
-    post 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
 
-    post_as_fetch 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post_as_fetch 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 
@@ -179,7 +179,7 @@ class TestPmProductRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:clone_pm_product).returns(bad_response)
     PackMaterial::Config::PmProduct::Clone.stub(:call, bland_page) do
-      post 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     # expect_bland_page
     # expect_bad_redirect(url: '/pack_material/config/pack_material_products/clone/1')
@@ -190,7 +190,7 @@ class TestPmProductRoutes < RouteTester
     # p last_response.body
     #
     PackMaterial::Config::PmProduct::Clone.stub(:call, bland_page) do
-      post_as_fetch 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

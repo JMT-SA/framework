@@ -44,7 +44,7 @@ class TestMarketingVarietyRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:update_marketing_variety).returns(ok_response(instance: row_vals))
-    patch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    patch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestMarketingVarietyRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:update_marketing_variety).returns(bad_response)
     Masterfiles::Fruit::MarketingVariety::Edit.stub(:call, bland_page) do
-      patch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      patch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestMarketingVarietyRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(ok_response)
-    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     url = '/list/cultivar_marketing_varieties/multi?key=cultivars&id=1'
     assert last_response.redirect?
     assert_equal url, header_location
@@ -72,10 +72,10 @@ class TestMarketingVarietyRoutes < RouteTester
     # assert last_response.body.include?('OK')
 
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(ok_response(message: 'notice message'))
-    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice('notice message')
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:link_marketing_varieties).returns(bad_response(message: 'error message'))
-    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_error('error message')
   end
 
@@ -100,7 +100,7 @@ class TestMarketingVarietyRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:create_marketing_variety).returns(ok_response)
-    post 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
 
@@ -108,7 +108,7 @@ class TestMarketingVarietyRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:create_marketing_variety).returns(ok_response)
-    post_as_fetch 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post_as_fetch 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 
@@ -117,7 +117,7 @@ class TestMarketingVarietyRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:create_marketing_variety).returns(bad_response)
     Masterfiles::Fruit::MarketingVariety::New.stub(:call, bland_page) do
-      post 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_bad_redirect(url: '/masterfiles/fruit/cultivars/1/marketing_varieties/new')
   end
@@ -127,7 +127,7 @@ class TestMarketingVarietyRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::CultivarInteractor.any_instance.stubs(:create_marketing_variety).returns(bad_response)
     Masterfiles::Fruit::MarketingVariety::New.stub(:call, bland_page) do
-      post_as_fetch 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      post_as_fetch 'masterfiles/fruit/cultivars/1/marketing_varieties', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

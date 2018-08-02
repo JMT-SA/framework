@@ -19,7 +19,7 @@ public/assets/*.*
 # public/js/ag-grid-*.*
 # public/js/jackbox*.*
 # public/css/jackbox*.*
-public/css/font*.*
+# public/css/font*.*
 public/css/pure.css
 public/css/grids-responsive.css
 # public/fonts

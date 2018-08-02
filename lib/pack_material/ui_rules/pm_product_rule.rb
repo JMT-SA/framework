@@ -7,10 +7,11 @@ module UiRules
       @config_repo = PackMaterialApp::ConfigRepo.new
       @commodity_repo = MasterfilesApp::CommodityRepo.new
       @variety_repo = MasterfilesApp::CultivarRepo.new
+
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields @mode == :preselect ? preselect_fields : edit_fields
 
       set_show_fields if @mode == :show
 
@@ -19,11 +20,9 @@ module UiRules
 
     def set_show_fields
       material_resource_sub_type_id_label = @config_repo.find_matres_sub_type(@form_object.material_resource_sub_type_id)&.sub_type_name
-      commodity_id_label = @commodity_repo.find_commodity(@form_object.commodity_id)&.code
-      variety_id_label = @variety_repo.find_marketing_variety(@form_object.variety_id)&.marketing_variety_code
       fields[:material_resource_sub_type_id] = { renderer: :label, with_value: material_resource_sub_type_id_label, caption: 'Sub Type' }
-      fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label, caption: 'commodity' }
-      fields[:variety_id] = { renderer: :label, with_value: variety_id_label, caption: 'variety' }
+      fields[:commodity_id] = { renderer: :label, with_value: @form_object.commodity_id ? commodity_id_label : nil, caption: 'Commodity' }
+      fields[:marketing_variety_id] = { renderer: :label, with_value: @form_object.marketing_variety_id ? variety_id_label : nil, caption: 'Variety' }
       fields[:product_number] = { renderer: :label }
       fields[:product_code] = { renderer: :label }
       fields[:unit] = { renderer: :label }
@@ -31,13 +30,8 @@ module UiRules
       fields[:alternate] = { renderer: :label }
       fields[:shape] = { renderer: :label, caption: 'Shape' }
       fields[:reference_size] = { renderer: :label }
+      fields[:reference_dimension] = { renderer: :label }
       fields[:reference_quantity] = { renderer: :label }
-      fields[:length_mm] = { renderer: :label }
-      fields[:width_mm] = { renderer: :label }
-      fields[:height_mm] = { renderer: :label }
-      fields[:diameter_mm] = { renderer: :label }
-      fields[:thick_mm] = { renderer: :label }
-      fields[:thick_mic] = { renderer: :label }
       fields[:brand_1] = { renderer: :label }
       fields[:brand_2] = { renderer: :label }
       fields[:colour] = { renderer: :label }
@@ -55,67 +49,56 @@ module UiRules
       fields[:specification_notes] = { renderer: :label }
     end
 
-    def common_fields
+    def preselect_fields
       {
-        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_matres_sub_types, caption: 'Sub Type', required: true },
-        commodity_id: { renderer: :select, options: @commodity_repo.for_select_commodities, caption: 'Commodity' },
-        variety_id: { renderer: :select, options: @variety_repo.for_select_marketing_varieties, caption: 'Variety' },
-        product_number: {},
-        product_code: {},
-        unit: {},
-        style: {},
-        alternate: {},
-        shape: {},
-        reference_size: {},
-        reference_quantity: {},
-        length_mm: { renderer: :numeric },
-        width_mm: { renderer: :numeric },
-        height_mm: { renderer: :numeric },
-        diameter_mm: { renderer: :numeric },
-        thick_mm: { renderer: :numeric },
-        thick_mic: { renderer: :numeric },
-        brand_1: {},
-        brand_2: {},
-        colour: {},
-        material: {},
-        assembly: {},
-        reference_mass: {},
-        reference_number: {},
-        market: {},
-        marking: {},
-        model: {},
-        pm_class: { caption: 'Class' },
-        grade: {},
-        language: {},
-        other: {},
-        specification_notes: { renderer: :text }
+        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_configured_sub_types, caption: 'Please select Sub Type', required: true },
       }
     end
 
+    def edit_fields
+      material_resource_sub_type_id_label = @config_repo.find_matres_sub_type(@form_object[:material_resource_sub_type_id])&.sub_type_name
+      x = {
+        material_resource_sub_type_name: { renderer: :label, with_value: material_resource_sub_type_id_label, caption: 'Sub Type', readonly: true },
+        material_resource_sub_type_id: { renderer: :hidden, with_value: @form_object.material_resource_sub_type_id },
+        specification_notes: { renderer: :text, required: true }
+      }
+
+      product_column_set.each do |col_name|
+        list = master_list_items(col_name)
+        list = @commodity_repo.for_select_commodities if col_name == :commodity_id
+        list = @variety_repo.for_select_marketing_varieties if col_name == :marketing_variety_id
+
+        caption = col_name.to_s.gsub('_id', '').gsub('pm_', '').gsub('_', ' ').capitalize
+        caption = 'Variety' if col_name == :marketing_variety_id
+
+        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: true } : { required: true }
+      end
+      x
+    end
+
     def make_form_object
+      make_preselect_form_object && return if @mode == :preselect
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_pm_product(@options[:id])
     end
 
+    def make_preselect_form_object
+      @form_object = OpenStruct.new(material_resource_sub_type_id: nil)
+    end
+
     def make_new_form_object
-      @form_object = OpenStruct.new(material_resource_sub_type_id: nil,
+      @form_object = OpenStruct.new(material_resource_sub_type_id: @options[:sub_type_id],
                                     commodity_id: nil,
-                                    variety_id: nil,
+                                    marketing_variety_id: nil,
                                     product_number: nil,
                                     product_code: nil,
                                     unit: nil,
                                     style: nil,
                                     alternate: nil,
-                                    format: nil,
+                                    shape: nil,
                                     reference_size: nil,
                                     reference_quantity: nil,
-                                    length_mm: nil,
-                                    width_mm: nil,
-                                    height_mm: nil,
-                                    diameter_mm: nil,
-                                    thick_mm: nil,
-                                    thick_mic: nil,
                                     brand_1: nil,
                                     brand_2: nil,
                                     colour: nil,
@@ -130,7 +113,25 @@ module UiRules
                                     grade: nil,
                                     language: nil,
                                     other: nil,
-                                    specification_notes: nil)
+                                    specification_notes: nil,
+                                    reference_dimension: nil)
+    end
+
+    def product_column_set
+      applicable_columns = @config_repo.product_code_columns(@form_object[:material_resource_sub_type_id])
+      applicable_columns.map { |r| r[0].to_sym }
+    end
+
+    def master_list_items(product_column)
+      @config_repo.for_select_sub_type_master_list_items(@form_object[:material_resource_sub_type_id], product_column)
+    end
+
+    def variety_id_label
+      @variety_repo.find_marketing_variety(@form_object.marketing_variety_id)&.marketing_variety_code
+    end
+
+    def commodity_id_label
+      @commodity_repo.find_commodity(@form_object.commodity_id)&.code
     end
   end
 end

@@ -2,7 +2,7 @@
   <a href="<%= request.referer.gsub('?back=y', '') %>?back=y" class="f6 link dim br2 ph3 pv2 mr4 dib white bg-dark-blue"><i class="fa fa-arrow-left"></i> Back</a>
   <a href="#" class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false"><i class="fa fa-info"></i> Toggle SQL</a>
   <a href="/dataminer/prepared_reports/new/<%= @page.id %>?json_var=<%= Base64.encode64(@page.json_var) %>" class="f6 link dim br2 ph3 pv2 dib white bg-silver" data-popup-dialog="true"><i class="fa fa-save"></i> Save prepared report</a>
-  <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
+  <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.sql_to_run) %></pre>
 </section>
 
 <section class="crossbeams-layout crossbeams_layout-fit-height">

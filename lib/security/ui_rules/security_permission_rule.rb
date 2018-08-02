@@ -20,7 +20,7 @@ module UiRules
 
     def common_fields
       {
-        security_permission: {}
+        security_permission: { required: true }
       }
     end
 

@@ -114,6 +114,7 @@ class TestAddressRoutes < RouteTester
     Masterfiles::Parties::Address::New.stub(:call, bland_page) do
       post 'masterfiles/parties/addresses', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
+    expect_flash_error
     expect_bad_redirect(url: '/masterfiles/parties/addresses/new')
   end
 

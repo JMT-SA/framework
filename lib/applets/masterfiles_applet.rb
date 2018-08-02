@@ -1,4 +1,4 @@
-root_dir = File.expand_path('../..', __FILE__)
+root_dir = File.expand_path('..', __dir__)
 Dir["#{root_dir}/masterfiles/entities/*.rb"].each { |f| require f }
 Dir["#{root_dir}/masterfiles/interactors/*.rb"].each { |f| require f }
 Dir["#{root_dir}/masterfiles/repositories/*.rb"].each { |f| require f }

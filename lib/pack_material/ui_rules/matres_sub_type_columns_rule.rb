@@ -16,7 +16,7 @@ module UiRules
 
     def common_fields
       unless @form_object.chosen_column_ids.nil?
-        options     = @repo.product_code_column_subset(@form_object.chosen_column_ids.split(',').map(&:to_i))
+        options = @repo.product_code_column_subset(@form_object.chosen_column_ids.split(',').map(&:to_i))
       end
       {
         chosen_column_ids: { renderer: :hidden },
@@ -27,8 +27,8 @@ module UiRules
     end
 
     def make_form_object
-      sub_type    = @repo.find_matres_sub_type(@options[:id])
-      options     = @repo.product_code_columns(@options[:id]).map { |_, id| id }
+      sub_type = @repo.find_matres_sub_type(@options[:id])
+      options = @repo.product_code_columns(@options[:id]).map { |_, id| id }
 
       @form_object = OpenStruct.new(product_code_column_ids: options,
                                     chosen_column_ids: (sub_type.product_column_ids || []).join(','))

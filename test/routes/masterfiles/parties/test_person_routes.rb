@@ -96,6 +96,7 @@ class TestPersonRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::PersonInteractor.any_instance.stubs(:create_person).returns(ok_response)
     post 'masterfiles/parties/people', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    expect_flash_notice
     expect_ok_redirect
   end
 
@@ -114,6 +115,7 @@ class TestPersonRoutes < RouteTester
     Masterfiles::Parties::Person::New.stub(:call, bland_page) do
       post 'masterfiles/parties/people', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
+    expect_flash_error
     expect_bad_redirect(url: '/masterfiles/parties/people/new')
   end
 

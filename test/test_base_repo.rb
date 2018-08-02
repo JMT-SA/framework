@@ -153,6 +153,21 @@ class TestBaseRepo < MiniTestWithHooks
     assert_equal expected, result
   end
 
+  def test_optgroup_array
+    rows = [{type: 'A', sub: 'B', id: 1}, {type: 'A', sub: 'C', id: 2}, {type: 'B', sub: 'D', id: 4}, {type: 'A', sub: 'E', id: 7}]
+    res = BaseRepo.new.optgroup_array(rows, :type, :sub, :id)
+    assert_equal %w[A B], res.keys.sort
+    assert_equal %w[B C E], res['A'].map(&:first)
+    assert_equal [1, 2, 7], res['A'].map(&:last)
+    assert_equal %w[D], res['B'].map(&:first)
+    assert_equal [4], res['B'].map(&:last)
+
+    res = BaseRepo.new.optgroup_array(rows, :type, :sub)
+    assert_equal %w[A B], res.keys.sort
+    assert_equal %w[B C E], res['A'].map(&:first)
+    assert_equal %w[B C E], res['A'].map(&:last)
+  end
+
   # MethodBuilder tests
   # ----------------------------------------------------------------------------
   def test_build_for_select_basic

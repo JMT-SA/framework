@@ -17,16 +17,11 @@ class Framework < Roda
 
       r.on 'unit' do
         r.on 'new' do    # NEW
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
+          check_auth!('config', 'new')
           show_partial_or_page(r) { PackMaterial::Config::MatresType::Unit.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          if params[:matres_type] && params[:matres_type][:unit_of_measure] == 'other'
-            res = interactor.create_matres_unit(id, params[:matres_type])
-          else
-            res = interactor.add_matres_unit(id, params[:matres_type])
-          end
-
+          res = interactor.add_a_matres_unit(id, params[:matres_type])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
@@ -41,12 +36,12 @@ class Framework < Roda
         end
       end
       r.on 'edit' do
-        raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
+        check_auth!('config', 'edit')
         show_partial { PackMaterial::Config::MatresType::Edit.call(id) }
       end
       r.is do
         r.get do
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
+          check_auth!('config', 'read')
           show_partial { PackMaterial::Config::MatresType::Show.call(id) }
         end
         r.patch do
@@ -65,7 +60,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'delete')
+          check_auth!('config', 'delete')
           res = interactor.delete_matres_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -75,7 +70,7 @@ class Framework < Roda
     r.on 'material_resource_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
+        check_auth!('config', 'new')
         show_partial_or_page(r) { PackMaterial::Config::MatresType::New.call(remote: fetch?(r)) }
       end
       r.post do
@@ -102,20 +97,68 @@ class Framework < Roda
       r.on !interactor.exists?(:material_resource_sub_types, id) do
         handle_not_found(r)
       end
-
       r.on 'edit' do
-        raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
+        check_auth!('config', 'edit')
         show_partial { PackMaterial::Config::MatresSubType::Edit.call(id) }
+      end
+      r.on 'product_columns' do
+        check_auth!('config', 'edit')
+        repo = PackMaterialApp::ConfigRepo.new
+        product_column_ids = repo.find_matres_sub_type(id).product_column_ids || []
+        if product_column_ids.any?
+          r.redirect "/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=#{id}&product_column_ids=#{product_column_ids}"
+        else
+          flash[:error] = 'No product columns selected, please see config.'
+          r.redirect '/list/material_resource_sub_types'
+        end
+      end
+      r.on 'material_resource_master_list_items', Integer do |item_id|
+        r.on 'edit' do
+          check_auth!('config', 'edit')
+          show_partial { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id) }
+        end
+        r.patch do     # UPDATE
+          return_json_response
+          res = interactor.update_matres_master_list_item(item_id, params[:matres_master_list_item])
+          if res.success
+            row_keys = %i[
+              material_resource_master_list_id
+              short_code
+              long_name
+              description
+              active
+            ]
+            update_grid_row(item_id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            content = show_partial { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id, params[:matres_master_list_item], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+      end
+      r.on 'material_resource_master_lists', Integer do |list_id|
+        r.on 'new' do
+          check_auth!('config', 'new')
+          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(list_id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = interactor.create_matres_master_list_item(list_id, params[:matres_master_list_item])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/#{list_id}/new") do
+              PackMaterial::Config::MatresMasterListItem::New.call(list_id,
+                                                                   form_values: params[:matres_master_list_item],
+                                                                   form_errors: res.errors,
+                                                                   remote: fetch?(r))
+            end
+          end
+        end
       end
       r.on 'config' do
         r.is 'edit' do
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_page { PackMaterial::Config::MatresSubType::Config.call(id) }
-          end
+          check_auth!('config', 'edit')
+          show_partial_or_page(r) { PackMaterial::Config::MatresSubType::Config.call(id) }
         end
         r.patch do
           return_json_response
@@ -127,7 +170,6 @@ class Framework < Roda
           end
         end
       end
-
       r.on 'update_product_code_configuration' do
         r.post do
           res = interactor.update_product_code_configuration(id, params[:product_code_columns])
@@ -142,10 +184,9 @@ class Framework < Roda
           end
         end
       end
-
       r.is do
         r.get do
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
+          check_auth!('config', 'read')
           show_partial { PackMaterial::Config::MatresSubType::Show.call(id) }
         end
         r.patch do
@@ -169,17 +210,16 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'delete')
+          check_auth!('config', 'delete')
           res = interactor.delete_matres_sub_type(id)
           delete_grid_row(id, notice: res.message)
         end
       end
     end
-
     r.on 'material_resource_sub_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
+        check_auth!('config', 'new')
         show_partial_or_page(r) { PackMaterial::Config::MatresSubType::New.call(remote: fetch?(r)) }
       end
       r.post do
@@ -196,7 +236,6 @@ class Framework < Roda
         end
       end
     end
-
     r.on 'link_product_columns' do
       r.post do
         interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
@@ -207,6 +246,7 @@ class Framework < Roda
                      'Re-assigned product columns')
       end
     end
+
     # PACK MATERIAL PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_products', Integer do |id|
@@ -216,14 +256,50 @@ class Framework < Roda
       r.on !interactor.exists?(:pack_material_products, id) do
         handle_not_found(r)
       end
-
+      r.on 'pack_material_product_variants' do
+        r.on 'new' do    # NEW
+          check_auth!('config', 'new')
+          show_partial_or_page(r) { PackMaterial::Config::PmProductVariant::New.call(id, remote: fetch?(r)) }
+        end
+        r.on 'clone', Integer do |variant_id|
+          r.post do
+            res = interactor.clone_pm_product_variant(id, params[:pm_product_variant])
+            if res.success
+              flash[:notice] = res.message
+              redirect_to_last_grid(r)
+            else
+              re_show_form(r, res, url: "/pack_material/config/pack_material_product_variants/clone/#{variant_id}") do
+                PackMaterial::Config::PmProductVariant::Clone.call(variant_id, params[:pm_product_variant], res.errors)
+              end
+            end
+          end
+        end
+        r.post do        # CREATE
+          res = interactor.create_pm_product_variant(id, params[:pm_product_variant])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/pack_material_product_variants/new") do
+              PackMaterial::Config::PmProductVariant::New.call(id,
+                                                               form_values: params[:pm_product_variant],
+                                                               form_errors: res.errors,
+                                                               remote: fetch?(r))
+            end
+          end
+        end
+      end
       r.on 'edit' do
-        raise Crossbeams::AuthorizationError unless authorised?('config', 'edit')
+        check_auth!('config', 'edit')
         show_partial { PackMaterial::Config::PmProduct::Edit.call(id) }
+      end
+      r.on 'clone' do
+        check_auth!('config', 'new')
+        show_partial_or_page(r) { PackMaterial::Config::PmProduct::Clone.call(id) }
       end
       r.is do
         r.get do
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'read')
+          check_auth!('config', 'read')
           show_partial { PackMaterial::Config::PmProduct::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -237,11 +313,8 @@ class Framework < Roda
               brand_2
               colour
               commodity_id
-              diameter_mm
               grade
-              height_mm
               language
-              length_mm
               market
               marking
               material
@@ -251,6 +324,7 @@ class Framework < Roda
               pm_class
               product_code
               product_number
+              reference_dimension
               reference_mass
               reference_number
               reference_quantity
@@ -258,13 +332,10 @@ class Framework < Roda
               shape
               specification_notes
               style
-              thick_mic
-              thick_mm
               unit
-              variety_id
-              width_mm
+              marketing_variety_id
             ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys, other: 'SOME override CHANGE'), notice: res.message)
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             content = show_partial { PackMaterial::Config::PmProduct::Edit.call(id, params[:pm_product], res.errors) }
             update_dialog_content(content: content, error: res.message)
@@ -272,7 +343,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('config', 'delete')
+          check_auth!('config', 'delete')
           res = interactor.delete_pm_product(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -280,9 +351,40 @@ class Framework < Roda
     end
     r.on 'pack_material_products' do
       interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'preselect' do
+        check_auth!('config', 'new')
+        show_partial_or_page(r) { PackMaterial::Config::PmProduct::Preselect.call(remote: fetch?(r)) }
+      end
+      r.on 'new', Integer do |sub_type_id|
+        check_auth!('config', 'new')
+        show_partial_or_page(r) { PackMaterial::Config::PmProduct::New.call(sub_type_id: sub_type_id, remote: fetch?(r)) }
+      end
       r.on 'new' do
-        raise Crossbeams::AuthorizationError unless authorised?('config', 'new')
-        show_partial_or_page(r) { PackMaterial::Config::PmProduct::New.call(remote: fetch?(r)) }
+        r.post do
+          return_json_response
+          check_auth!('config', 'new')
+          sub_type_id = params[:pm_product][:material_resource_sub_type_id].to_i
+
+          re_show_form(r, OpenStruct.new(message: nil), url: "/pack_material/config/pack_material_products/new/#{sub_type_id}") do
+            PackMaterial::Config::PmProduct::New.call(sub_type_id)
+          end
+        end
+      end
+      r.on 'clone', Integer do |id|
+        r.post do        # CLONE
+          res = interactor.clone_pm_product(params[:pm_product])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            # content = show_partial { PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors) }
+            # update_dialog_content(content: content, error: res.message)
+
+            re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/clone") do
+              PackMaterial::Config::PmProduct::Clone.call(id, params[:pm_product], res.errors)
+            end
+          end
+        end
       end
       r.post do        # CREATE
         res = interactor.create_pm_product(params[:pm_product])
@@ -290,11 +392,75 @@ class Framework < Roda
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         else
-          re_show_form(r, res, url: '/pack_material/config/pack_material_products/new') do
-            PackMaterial::Config::PmProduct::New.call(form_values: params[:pm_product],
-                                                      form_errors: res.errors,
-                                                      remote: fetch?(r))
+          sub_type_id = params[:pm_product][:material_resource_sub_type_id].to_i
+          re_show_form(r, res, url: "/pack_material/config/pack_material_products/new/#{sub_type_id}") do
+            PackMaterial::Config::PmProduct::New.call(sub_type_id, params[:pm_product], res.errors)
           end
+        end
+      end
+    end
+    # PACK MATERIAL PRODUCT VARIANTS
+    # --------------------------------------------------------------------------
+    r.on 'pack_material_product_variants', Integer do |id|
+      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:pack_material_product_variants, id) do
+        handle_not_found(r)
+      end
+      r.on 'edit' do   # EDIT
+        check_auth!('config', 'edit')
+        show_partial { PackMaterial::Config::PmProductVariant::Edit.call(id) }
+      end
+      r.on 'clone' do    # CLONE
+        check_auth!('config', 'new')
+        show_partial_or_page(r) { PackMaterial::Config::PmProductVariant::Clone.call(id) }
+      end
+      r.is do
+        r.get do       # SHOW
+          check_auth!('config', 'read')
+          show_partial { PackMaterial::Config::PmProductVariant::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          return_json_response
+          res = interactor.update_pm_product_variant(id, params[:pm_product_variant])
+          if res.success
+            row_keys = %i[
+              pack_material_product_id
+              product_variant_number
+              unit
+              style
+              alternate
+              shape
+              reference_size
+              reference_dimension
+              reference_quantity
+              brand_1
+              brand_2
+              colour
+              material
+              assembly
+              reference_mass
+              reference_number
+              market
+              marking
+              model
+              pm_class
+              grade
+              language
+              other
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            content = show_partial { PackMaterial::Config::PmProductVariant::Edit.call(id, params[:pm_product_variant], res.errors) }
+            update_dialog_content(content: content, error: res.message)
+          end
+        end
+        r.delete do    # DELETE
+          return_json_response
+          check_auth!('config', 'delete')
+          res = interactor.delete_pm_product_variant(id)
+          delete_grid_row(id, notice: res.message)
         end
       end
     end

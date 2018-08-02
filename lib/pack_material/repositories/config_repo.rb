@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module PackMaterialApp
   class ConfigRepo < BaseRepo
     build_for_select :material_resource_domains,
@@ -36,6 +38,14 @@ module PackMaterialApp
     crud_calls_for :material_resource_types, name: :matres_type, wrapper: MatresType
     crud_calls_for :material_resource_sub_types, name: :matres_sub_type, wrapper: MatresSubType
     crud_calls_for :pack_material_products, name: :pm_product, wrapper: PmProduct
+    crud_calls_for :material_resource_master_list_items, name: :matres_master_list_item, wrapper: MatresMasterListItem
+    crud_calls_for :material_resource_master_lists, name: :matres_master_list, wrapper: MatresMasterList
+
+    def for_select_configured_sub_types
+      optgroup_array(DB['SELECT mrst.sub_type_name, mrst.id, mrt.short_code as type_name from material_resource_sub_types mrst
+      LEFT JOIN material_resource_types mrt on mrst.material_resource_type_id = mrt.id
+      WHERE mrst.active IS true AND mrst.product_code_ids is not null;'].all, :type_name, :sub_type_name, :id)
+    end
 
     # TYPES
     def find_matres_type(id)
@@ -52,12 +62,12 @@ module PackMaterialApp
 
       # TODO: A helper method for the backend use of multi select ids for the simplest case?
       DB[:measurement_units_for_matres_types].where(material_resource_type_id: id).delete
-      measurement_unit_ids.each do |unit_id|
+      measurement_unit_ids&.each do |unit_id|
         DB[:measurement_units_for_matres_types].insert(
           material_resource_type_id: id,
           measurement_unit_id: unit_id
         )
-      end if measurement_unit_ids
+      end
 
       DB[:material_resource_types].where(id: id).update(params)
     end
@@ -70,14 +80,14 @@ module PackMaterialApp
       DB[:measurement_units].where(id: DB[:measurement_units_for_matres_types]
                                          .where(material_resource_type_id: matres_type_id)
                                          .select_map(:measurement_unit_id))
-        .select_map(:unit_of_measure)
+                            .select_map(:unit_of_measure)
     end
 
     def matres_type_measurement_unit_ids(matres_type_id)
       DB[:measurement_units].where(id: DB[:measurement_units_for_matres_types]
                                          .where(material_resource_type_id: matres_type_id)
                                          .select_map(:measurement_unit_id))
-        .select_map(:id)
+                            .select_map(:id)
     end
 
     def create_matres_type_unit(matres_type_id, unit_of_measure_string)
@@ -118,10 +128,25 @@ module PackMaterialApp
       end
     end
 
-    def product_code_columns(id)
+    def product_variant_columns(sub_type_id)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
+      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
+      DB[:material_resource_product_columns].where(id: product_variant_column_ids)
+                                            .map { |rec| [rec[:column_name], rec[:id]] }
+    end
+
+    def product_variant_columns_optional(sub_type_id)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
+      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
+      DB[:material_resource_product_columns].where(material_resource_domain_id: sub_type[:material_resource_domain_id])
+                                            .exclude(id: product_variant_column_ids)
+                                            .map { |rec| [rec[:column_name], rec[:id]] }
+    end
+
+    def product_code_columns(sub_type_id)
       query = <<~SQL
         SELECT pc.column_name, pc.id
-        FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{id})) product_code_id
+        FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{sub_type_id})) product_code_id
         LEFT JOIN material_resource_product_columns pc on pc.id = product_code_id
       SQL
       DB[query].map { |rec| [rec[:column_name], rec[:id]] }
@@ -142,5 +167,22 @@ module PackMaterialApp
       DB[changes].update
       success_response('ok')
     end
+
+    def sub_type_master_list_items(sub_type_id)
+      DB[get_dataminer_report('matres_prodcol_sub_type_list_items.yml').sql].where(sub_type_id: sub_type_id)
+
+    end
+
+    def for_select_sub_type_master_list_items(sub_type_id, product_column)
+      sub_type_master_list_items(sub_type_id).map { |r| [(r[:short_code] + (r[:long_name] ? ' - ' + r[:long_name] : '')).to_s, r[:id]] if r[:column_name] == product_column.to_s && r[:active] }
+        .compact
+    end
+
+    def get_dataminer_report(file_name)
+      path = File.join(ENV['ROOT'], 'grid_definitions', 'dataminer_queries', file_name.sub('.yml', '') << '.yml')
+      rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
+      Crossbeams::Dataminer::Report.load(rpt_hash)
+    end
   end
 end
+# rubocop:enable Metrics/ClassLength

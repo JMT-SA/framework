@@ -4,52 +4,30 @@ module PackMaterial
   module Config
     module PmProduct
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:pm_product, :new, form_values: form_values)
+        def self.call(sub_type_id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:pm_product, :new, sub_type_id: sub_type_id, form_values: form_values)
           rules   = ui_rule.compile
+
+          repo = PackMaterialApp::ConfigRepo.new
+          set = repo.product_code_columns(sub_type_id).map { |r| r[0].to_sym }
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action '/pack_material/config/pack_material_products'
-              form.remote! if remote
+              form.action "/pack_material/config/pack_material_products"
+              form.remote!
+              form.add_field :material_resource_sub_type_name
               form.add_field :material_resource_sub_type_id
-              form.add_field :commodity_id
-              form.add_field :variety_id
-              form.add_field :product_number
-              form.add_field :product_code
-              form.add_field :unit
-              form.add_field :style
-              form.add_field :alternate
-              form.add_field :shape
-              form.add_field :reference_size
-              form.add_field :reference_quantity
-              form.add_field :length_mm
-              form.add_field :width_mm
-              form.add_field :height_mm
-              form.add_field :diameter_mm
-              form.add_field :thick_mm
-              form.add_field :thick_mic
-              form.add_field :brand_1
-              form.add_field :brand_2
-              form.add_field :colour
-              form.add_field :material
-              form.add_field :assembly
-              form.add_field :reference_mass
-              form.add_field :reference_number
-              form.add_field :market
-              form.add_field :marking
-              form.add_field :model
-              form.add_field :pm_class
-              form.add_field :grade
-              form.add_field :language
-              form.add_field :other
+
+              set.each do |item|
+                form.add_field item
+              end
+
               form.add_field :specification_notes
             end
           end
-
           layout
         end
       end

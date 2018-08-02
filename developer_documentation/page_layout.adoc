@@ -37,7 +37,7 @@ They can be replaceable via AJAX calls - without affecting the rest of the page.
 
 ==== Callback sections
 
-A callback section is a special type if section that has no content initially.
+A callback section is a special type of section that has no content initially.
 Its only attributes are the (optional) caption and the url to call once the page has loaded.
 The called url is responsible for providing the content. This is a useful way of loading the same page in different ways and in different pages. It can also be useful if the page will take some time to load, as the page will display a loading indicator while the section is being fetched.
 

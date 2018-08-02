@@ -7,11 +7,15 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- Building Material Resource Products - in progress
+### Changed
+### Fixed
+
+## [0.3.0] - 2018-08-02
+### Added
+- Building Material Resource Products
 ### Changed
 - Make user login case-insensitive.
 - Removed initial Products build
-### Fixed
 
 ## [0.2.0] - 2018-02-12
 ### Added

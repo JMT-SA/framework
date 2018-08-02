@@ -2,7 +2,6 @@
 
 module MasterfilesApp
   class FruitSizeInteractor < BaseInteractor
-
     def create_std_fruit_size_count(params)
       res = validate_std_fruit_size_count_params(params)
       return validation_failed_response(res) unless res.messages.empty?

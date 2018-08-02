@@ -26,11 +26,12 @@ module DataminerApp
       page.crosstab_config = repo.lookup_crosstab(id)
       page.json_var = params[:json_var]
       setup_report_with_parameters(page.report, params, page.crosstab_config, db)
+      db_type = repo.db_connection_for(db).database_type
+      page.sql_to_run = page.report.runnable_sql_delimited(db_type)
 
       # If just passing parameterised query to url, return page with base64 version of runnable_sql.
       if page.report.external_settings[:render_url]
-        db_type = repo.db_connection_for(db).database_type
-        page.runnable = Base64.encode64(page.report.runnable_sql_delimited(db_type))
+        page.runnable = Base64.encode64(page.sql_to_run)
         page.sql_run_url = page.report.external_settings[:render_url]
         return page
       end
@@ -67,8 +68,7 @@ module DataminerApp
         page.col_defs << hs
       end
       # Use module for BigDecimal change? - register_extension...?
-      db_type = repo.db_connection_for(db).database_type
-      page.row_defs = repo.db_connection_for(db)[page.report.runnable_sql_delimited(db_type)].to_a.map do |m|
+      page.row_defs = repo.db_connection_for(db)[page.sql_to_run].to_a.map do |m|
         m.each_key { |k| m[k] = m[k].to_f if m[k].is_a?(BigDecimal) }
         m
       end

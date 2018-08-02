@@ -13,6 +13,7 @@ require './lib/crossbeams_responses'
 require './lib/base_repo'
 require './lib/base_interactor'
 require './lib/base_service'
+require './lib/base_step'
 require './lib/local_store' # Will only work for processes running from one dir.
 require './lib/ui_rules'
 require './lib/library_versions'
@@ -111,17 +112,8 @@ class Framework < Roda
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do
-      # TODO: perhaps root should ALWAYS redirect to a config'd URL. which is customised.
-      # flash.now[:error] = 'A TEST' # <=== Add this...
-      s = <<-HTML
-      <h2>Kromco packhouse</h2>
-      <p>There are currently 99 bins and 99 pallets on site.</p>
-      <p>Since 1 December 2016: <ul>
-      <li>99 deliveries have been received</li>
-      <li>99 cartons have been packed</li>
-      </p>
-      HTML
-      view(inline: s)
+      # TODO: Config this, and maybe set it up per user.
+      r.redirect '/pack_material/summary'
     end
 
     r.on 'developer_documentation', String do |file|

@@ -20,6 +20,7 @@ module UiRules
       fields[:type_name] = { renderer: :label }
       fields[:short_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:internal_seq] = { renderer: :label }
       fields[:measurement_units] = { renderer: :list, items: @this_repo.matres_type_measurement_units(@options[:id]), caption: 'Measurement Units' }
     end
 
@@ -33,8 +34,8 @@ module UiRules
     def common_fields
       {
         material_resource_domain_id: { renderer: :select, options: @this_repo.for_select_domains, caption: 'Domain' },
-        type_name: {},
-        short_code: {},
+        type_name: { required: true },
+        short_code: { required: true },
         description: {},
         measurement_units: { renderer: :multi, options: @this_repo.for_select_units, selected: @this_repo.matres_type_measurement_unit_ids(@options[:id]), caption: 'Measurement Units' }
       }
@@ -72,6 +73,5 @@ module UiRules
     def measurement_units_list
       @this_repo.measurement_units + ['other']
     end
-
   end
 end

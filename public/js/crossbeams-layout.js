@@ -6,31 +6,11 @@
  */
 (function crossbeamsLayout() {
   /**
-   * Load a page section using a callback url.
-   * @param {element} elem - The section element in the DOM.
+   * Disable a button and change its caption.
+   * @param {element} button the button to disable.
+   * @param {string} disabledText the text to use to replace the caption.
    * @returns {void}
    */
-  function loadSection(elem) {
-    const xhr = new XMLHttpRequest();
-    const url = elem.dataset.crossbeams_callback_section;
-    const contentDiv = elem.querySelectorAll('.content-target')[0];
-
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        contentDiv.classList.remove('content-loading');
-        contentDiv.innerHTML = xhr.responseText;
-      }
-    };
-    xhr.open('GET', url, true); // true for asynchronous
-    xhr.send(null);
-  }
-  const elements = document.querySelectorAll('section');
-  elements.forEach((element) => {
-    if (element.dataset.crossbeams_callback_section !== undefined) {
-      loadSection(element);
-    }
-  });
-
   function disableButton(button, disabledText) {
     button.dataset.enableWith = button.value;
     button.value = disabledText;

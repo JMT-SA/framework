@@ -2,7 +2,6 @@
 
 module PackMaterialApp
   class ConfigInteractor < BaseInteractor
-
     def create_matres_type(params)
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -25,6 +24,14 @@ module PackMaterialApp
       name = matres_type.type_name
       repo.delete_matres_type(id)
       success_response("Deleted type #{name}")
+    end
+
+    def add_a_matres_unit(id, params)
+      if params && params[:unit_of_measure] == 'other'
+        create_matres_unit(id, params)
+      else
+        add_matres_unit(id, params)
+      end
     end
 
     def create_matres_unit(matres_type_id, params)
@@ -94,6 +101,30 @@ module PackMaterialApp
       success_response('Saved configuration')
     end
 
+    def create_matres_master_list_item(parent_id, params)
+      params[:material_resource_master_list_id] = parent_id
+      res = validate_matres_master_list_item_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+      id = nil
+      DB.transaction do
+        id = repo.create_matres_master_list_item(res)
+      end
+      instance = matres_master_list_item(id)
+      success_response("Created list item #{instance.short_code}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { short_code: ['This list item already exists'] }))
+    end
+
+    def update_matres_master_list_item(id, params)
+      res = validate_matres_master_list_item_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+      DB.transaction do
+        repo.update_matres_master_list_item(id, res)
+      end
+      instance = matres_master_list_item(id)
+      success_response("Updated list item #{instance.short_code}", instance)
+    end
+
     private
 
     def repo
@@ -134,6 +165,14 @@ module PackMaterialApp
 
     def validate_material_resource_type_config_code_columns_params(params)
       MatresSubTypeConfigColumnsSchema.call(params)
+    end
+
+    def matres_master_list_item(id)
+      repo.find_matres_master_list_item(id)
+    end
+
+    def validate_matres_master_list_item_params(params)
+      MatresMasterListItemSchema.call(params)
     end
   end
 end

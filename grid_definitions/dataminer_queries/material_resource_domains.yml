@@ -1,11 +1,12 @@
 ---
 :caption: Material Resource Domains
 :sql: SELECT "material_resource_domains"."id", "material_resource_domains"."domain_name",
-  "material_resource_domains"."product_table_name", "material_resource_domains"."variant_table_name",
-  "material_resource_domains"."created_at", "material_resource_domains"."updated_at"
-  FROM "material_resource_domains"
+  "material_resource_domains"."internal_seq", "material_resource_domains"."product_table_name",
+  "material_resource_domains"."variant_table_name", "material_resource_domains"."created_at",
+  "material_resource_domains"."updated_at" FROM "material_resource_domains"
 :limit: 
 :offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -37,9 +38,24 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  internal_seq:
+    :name: internal_seq
+    :sequence_no: 3
+    :caption: Internal seq
+    :namespaced_name: material_resource_domains.internal_seq
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   product_table_name:
     :name: product_table_name
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Product table name
     :namespaced_name: material_resource_domains.product_table_name
     :data_type: :string
@@ -54,7 +70,7 @@
     :group_max: false
   variant_table_name:
     :name: variant_table_name
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Variant table name
     :namespaced_name: material_resource_domains.variant_table_name
     :data_type: :string
@@ -69,7 +85,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: material_resource_domains.created_at
     :data_type: :datetime
@@ -84,7 +100,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: material_resource_domains.updated_at
     :data_type: :datetime

@@ -16,12 +16,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::CommodityGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -40,7 +40,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_commodity_group(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -53,32 +53,20 @@ class Framework < Roda
     r.on 'commodity_groups' do
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
-        end
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_commodity_group(params[:commodity_group])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/commodity_groups/new') do
             Masterfiles::Fruit::CommodityGroup::New.call(form_values: params[:commodity_group],
                                                          form_errors: res.errors,
-                                                         remote: true)
+                                                         remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::CommodityGroup::New.call(form_values: params[:commodity_group],
-                                                                  form_errors: res.errors,
-                                                                  remote: false))
-          r.redirect '/masterfiles/fruit/commodity_groups/new'
         end
       end
     end
@@ -93,12 +81,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::Commodity::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::Commodity::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -119,7 +107,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_commodity(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -132,32 +120,20 @@ class Framework < Roda
     r.on 'commodities' do
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
-        end
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_commodity(params[:commodity])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/commodities/new') do
             Masterfiles::Fruit::Commodity::New.call(form_values: params[:commodity],
                                                     form_errors: res.errors,
-                                                    remote: true)
+                                                    remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::Commodity::New.call(form_values: params[:commodity],
-                                                             form_errors: res.errors,
-                                                             remote: false))
-          r.redirect '/masterfiles/fruit/commodities/new'
         end
       end
     end
@@ -172,12 +148,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::CultivarGroup::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::CultivarGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -195,7 +171,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_cultivar_group(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -204,32 +180,20 @@ class Framework < Roda
     r.on 'cultivar_groups' do
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
-        end
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_cultivar_group(params[:cultivar_group])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/cultivar_groups/new') do
             Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
                                                         form_errors: res.errors,
-                                                        remote: true)
+                                                        remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::CultivarGroup::New.call(form_values: params[:cultivar_group],
-                                                                 form_errors: res.errors,
-                                                                 remote: false))
-          r.redirect '/masterfiles/fruit/cultivar_groups/new'
         end
       end
     end
@@ -244,7 +208,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::Cultivar::Edit.call(id) }
       end
 
@@ -266,40 +230,27 @@ class Framework < Roda
       r.on 'marketing_varieties' do
         interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(r) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
-          end
+          check_auth!('fruit', 'new')
+          show_partial_or_page(r) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_marketing_variety(id, params[:marketing_variety])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
-          elsif fetch?(r)
-            content = show_partial do
+          else
+            re_show_form(r, res, url: "/masterfiles/fruit/cultivars/#{id}/marketing_varieties/new") do
               Masterfiles::Fruit::MarketingVariety::New.call(id,
                                                              form_values: params[:marketing_variety],
                                                              form_errors: res.errors,
-                                                             remote: true)
+                                                             remote: fetch?(r))
             end
-            update_dialog_content(content: content, error: res.message)
-          else
-            flash[:error] = res.message
-            stash_page(Masterfiles::Fruit::MarketingVariety::New.call(id,
-                                                                      form_values: params[:marketing_variety],
-                                                                      form_errors: res.errors,
-                                                                      remote: false))
-            r.redirect "/masterfiles/fruit/cultivars/#{id}/marketing_varieties/new"
           end
         end
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::Cultivar::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -320,7 +271,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_cultivar(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -329,32 +280,20 @@ class Framework < Roda
     r.on 'cultivars' do
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
-        end
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_cultivar(params[:cultivar])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/cultivars/new') do
             Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
                                                    form_errors: res.errors,
-                                                   remote: true)
+                                                   remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::Cultivar::New.call(form_values: params[:cultivar],
-                                                            form_errors: res.errors,
-                                                            remote: false))
-          r.redirect '/masterfiles/fruit/cultivars/new'
         end
       end
     end
@@ -367,12 +306,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::MarketingVariety::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::MarketingVariety::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -401,12 +340,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::BasicPackCode::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::BasicPackCode::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -427,7 +366,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_basic_pack_code(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -440,32 +379,20 @@ class Framework < Roda
     r.on 'basic_pack_codes' do
       interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
-        end
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_basic_pack_code(params[:basic_pack_code])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/basic_pack_codes/new') do
             Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
                                                         form_errors: res.errors,
-                                                        remote: true)
+                                                        remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
-                                                                 form_errors: res.errors,
-                                                                 remote: false))
-          r.redirect '/masterfiles/fruit/basic_pack_codes/new'
         end
       end
     end
@@ -480,12 +407,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::StandardPackCode::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::StandardPackCode::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -502,7 +429,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_standard_pack_code(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -515,32 +442,20 @@ class Framework < Roda
     r.on 'standard_pack_codes' do
       interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
-        end
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_standard_pack_code(params[:standard_pack_code])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/standard_pack_codes/new') do
             Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
                                                            form_errors: res.errors,
-                                                           remote: true)
+                                                           remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
-                                                                    form_errors: res.errors,
-                                                                    remote: false))
-          r.redirect '/masterfiles/fruit/standard_pack_codes/new'
         end
       end
     end
@@ -554,46 +469,33 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id) }
       end
       r.on 'fruit_actual_counts_for_packs' do
         interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
-          end
+          check_auth!('fruit', 'new')
+          show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_fruit_actual_counts_for_pack(id, params[:fruit_actual_counts_for_pack])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
-          elsif fetch?(r)
-            content = show_partial do
+          else
+            re_show_form(r, res, url: "/masterfiles/fruit/std_fruit_size_counts/#{id}/fruit_actual_counts_for_packs/new") do
               Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
                                                                      form_values: params[:fruit_actual_counts_for_pack],
                                                                      form_errors: res.errors,
-                                                                     remote: true)
+                                                                     remote: fetch?(r))
             end
-            update_dialog_content(content: content, error: res.message)
-          else
-            flash[:error] = res.message
-            stash_page(Masterfiles::Fruit::FruitActualCountsForPack::New.call(id,
-                                                                              form_values: params[:fruit_actual_counts_for_pack],
-                                                                              form_errors: res.errors,
-                                                                              remote: false))
-            r.redirect "/masterfiles/fruit/std_fruit_size_counts/#{id}/fruit_actual_counts_for_packs/new"
           end
         end
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::StdFruitSizeCount::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -621,7 +523,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_std_fruit_size_count(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -630,32 +532,20 @@ class Framework < Roda
     r.on 'std_fruit_size_counts' do
       interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-        page = stashed_page
-        if page
-          show_page { page }
-        else
-          show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
-        end
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_std_fruit_size_count(params[:std_fruit_size_count])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
-        elsif fetch?(r)
-          content = show_partial do
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/std_fruit_size_counts/new') do
             Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
                                                             form_errors: res.errors,
-                                                            remote: true)
+                                                            remote: fetch?(r))
           end
-          update_dialog_content(content: content, error: res.message)
-        else
-          flash[:error] = res.message
-          stash_page(Masterfiles::Fruit::StdFruitSizeCount::New.call(form_values: params[:std_fruit_size_count],
-                                                                     form_errors: res.errors,
-                                                                     remote: false))
-          r.redirect '/masterfiles/fruit/std_fruit_size_counts/new'
         end
       end
     end
@@ -668,46 +558,33 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id) }
       end
       r.on 'fruit_size_references' do
         interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'new')
-          page = stashed_page
-          if page
-            show_page { page }
-          else
-            show_partial_or_page(r) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
-          end
+          check_auth!('fruit', 'new')
+          show_partial_or_page(r) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_fruit_size_reference(id, params[:fruit_size_reference])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
-          elsif fetch?(r)
-            content = show_partial do
+          else
+            re_show_form(r, res, url: "/masterfiles/fruit/fruit_actual_counts_for_packs/#{id}/fruit_size_references/new") do
               Masterfiles::Fruit::FruitSizeReference::New.call(id,
                                                                form_values: params[:fruit_size_reference],
                                                                form_errors: res.errors,
-                                                               remote: true)
+                                                               remote: fetch?(r))
             end
-            update_dialog_content(content: content, error: res.message)
-          else
-            flash[:error] = res.message
-            stash_page(Masterfiles::Fruit::FruitSizeReference::New.call(id,
-                                                                        form_values: params[:fruit_size_reference],
-                                                                        form_errors: res.errors,
-                                                                        remote: false))
-            r.redirect "/masterfiles/fruit/fruit_actual_counts_for_packs/#{id}/fruit_size_references/new"
           end
         end
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -728,7 +605,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_fruit_actual_counts_for_pack(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -745,12 +622,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'edit')
+        check_auth!('fruit', 'edit')
         show_partial { Masterfiles::Fruit::FruitSizeReference::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+          check_auth!('fruit', 'read')
           show_partial { Masterfiles::Fruit::FruitSizeReference::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -768,7 +645,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          raise Crossbeams::AuthorizationError unless authorised?('fruit', 'delete')
+          check_auth!('fruit', 'delete')
           res = interactor.delete_fruit_size_reference(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -778,10 +655,10 @@ class Framework < Roda
     r.on 'back', Integer do |id|
       r.on 'fruit_actual_counts_for_packs' do
         # NOTE: Working on the principle that your views are allowed access to your repositories
-        repo = MasterfilesApp::FruitSizeRepo.new()
+        repo = MasterfilesApp::FruitSizeRepo.new
         actual_count = repo.find_fruit_actual_counts_for_pack(id)
         handle_not_found(r) unless actual_count
-        raise Crossbeams::AuthorizationError unless authorised?('fruit', 'read')
+        check_auth!('fruit', 'read')
         parent_id = actual_count.std_fruit_size_count_id
         return_json_response
         r.redirect "/list/fruit_actual_counts_for_packs/with_params?key=standard&fruit_actual_counts_for_packs.std_fruit_size_count_id=#{parent_id}"

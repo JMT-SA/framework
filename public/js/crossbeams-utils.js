@@ -265,7 +265,10 @@ const crossbeamsUtils = {
   makeMultiSelects: function makeMultiSelects() {
     const sels = document.querySelectorAll('[data-multi]');
     sels.forEach((sel) => {
-      multi(sel); // multi select with two panes...
+      multi(sel, {
+        non_selected_header: 'Options',
+        selected_header: 'Selected',
+      }); // multi select with two panes...
 
       // observeSelected behaviour - get rules from select element and
       // add selected options to a sortable element.
@@ -669,7 +672,7 @@ const crossbeamsUtils = {
     const el = document.getElementById(`${prefix}-sortable-items`);
     const sortedIds = document.getElementById(`${prefix}-sorted_ids`);
     Sortable.create(el, {
-      group: groupName ? groupName : null,
+      group: groupName || null,
       animation: 150,
       handle: '.crossbeams-drag-handle',
       ghostClass: 'crossbeams-sortable-ghost',  // Class name for the drop placeholder
@@ -679,6 +682,182 @@ const crossbeamsUtils = {
         Array.from(el.children).forEach((child) => { idList.push(child.id.replace('si_', '')); });// strip si_ part...
         sortedIds.value = idList.join(',');
       },
+    });
+  },
+
+  /**
+   * Change a busy step of a progress step control to a visited, current step.
+   * @param {string} id - the id of the li component representing the step.
+   * @returns {void}
+   */
+  finaliseProgressStep: function finaliseProgressStep(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('busy');
+    el.classList.add('visited');
+    el.classList.add('current');
+  },
+
+  /**
+   * Keep polling a url.
+   * @param {DOM} element - the element to be updated.
+   * @param {string} url - the url to be fetched.
+   * @param {integer} interval - the amount of time in milliseconds between repeats of the fetch.
+   * @returns {void}
+   */
+  pollMessage: function pollMessage(element, url, interval) {
+    fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      throw new HttpError(response);
+    })
+      .then((data) => {
+        if (data.redirect) {
+          window.location = data.redirect;
+        } else if (data.updateMessage) {
+          if (data.updateMessage.finaliseProgressStep) {
+            crossbeamsUtils.finaliseProgressStep(data.updateMessage.finaliseProgressStep);
+          }
+          if (data.updateMessage.content) {
+            element.innerHTML = data.updateMessage.content;
+          }
+          if (data.updateMessage.continuePolling) {
+            setTimeout(pollMessage, interval, element, url, interval);
+          }
+        } else {
+          console.log('Not sure what to do with this:', data);
+        }
+        if (data.flash) {
+          if (data.flash.notice) {
+            Jackbox.success(data.flash.notice);
+          }
+          if (data.flash.error) {
+            if (data.exception) {
+              Jackbox.error(data.flash.error, { time: 20 });
+              if (data.backtrace) {
+                console.log('EXCEPTION:', data.exception, data.flash.error);
+                console.log('==Backend Backtrace==');
+                console.info(data.backtrace.join('\n'));
+              }
+            } else {
+              Jackbox.error(data.flash.error);
+            }
+          }
+        }
+      }).catch((data) => {
+        if (data.response && data.response.status === 500) {
+          data.response.json().then((body) => {
+            if (body.flash.error) {
+              if (body.exception) {
+                if (body.backtrace) {
+                  console.log('EXCEPTION:', body.exception, body.flash.error);
+                  console.log('==Backend Backtrace==');
+                  console.info(body.backtrace.join('\n'));
+                }
+              } else {
+                Jackbox.error(body.flash.error);
+              }
+            } else {
+              document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
+            }
+          });
+        }
+        Jackbox.error(`An error occurred ${data}`, { time: 20 });
+      });
+  },
+
+  /**
+   * Load the contents of a callback section from the results of a fetch.
+   * @param {string} section - A query string to use in finding callback sections.
+   * @param {string} url - the url to be fetched.
+   * @returns {void}
+   */
+  loadCallBackSection: function loadCallBackSection(section, url) {
+    const contentDiv = document.querySelector(section);
+
+    fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      throw new HttpError(response);
+    })
+    .then((data) => {
+      if (data.content) {
+        contentDiv.classList.remove('content-loading');
+        contentDiv.innerHTML = data.content;
+
+        // check if there are any areas in the content that should be modified by polling...
+        const pollsters = contentDiv.querySelectorAll('[data-poll-message-url]');
+        pollsters.forEach((pollable) => {
+          const pollUrl = pollable.dataset.pollMessageUrl;
+          const pollInterval = pollable.dataset.pollMessageInterval;
+          this.pollMessage(pollable, pollUrl, pollInterval);
+        });
+
+        crossbeamsUtils.makeMultiSelects();
+        crossbeamsUtils.makeSearchableSelects();
+        const grids = contentDiv.querySelectorAll('[data-grid]');
+        grids.forEach((grid) => {
+          const gridId = grid.getAttribute('id');
+          const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+          document.dispatchEvent(gridEvent);
+        });
+        const sortable = Array.from(contentDiv.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
+        sortable.forEach((elem) => {
+          crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix, elem.dataset.sortableGroup);
+        });
+      }
+      if (data.flash) {
+        if (data.flash.notice) {
+          Jackbox.success(data.flash.notice);
+        }
+        if (data.flash.error) {
+          if (data.exception) {
+            Jackbox.error(data.flash.error, { time: 20 });
+            if (data.backtrace) {
+              console.log('==Backend Backtrace==');
+              console.info(data.backtrace.join('\n'));
+            }
+          } else {
+            Jackbox.error(data.flash.error);
+          }
+        }
+      }
+    }).catch((data) => {
+      if (data.response && data.response.status === 500) {
+        data.response.json().then((body) => {
+          if (body.flash.error) {
+            contentDiv.classList.remove('content-loading');
+            contentDiv.innerHTML = body.flash.error;
+            if (body.exception) {
+              if (body.backtrace) {
+                console.log('EXCEPTION:', body.exception, body.flash.error);
+                console.log('==Backend Backtrace==');
+                console.info(body.backtrace.join('\n'));
+              }
+            } else {
+              Jackbox.error(body.flash.error);
+            }
+          } else {
+            console.log('==ERROR==', body);
+          }
+        });
+      }
+      Jackbox.error(`An error occurred ${data}`, { time: 20 });
     });
   },
 

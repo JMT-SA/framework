@@ -23,7 +23,7 @@ module UiRules
 
     def common_fields
       {
-        security_group_name: {}
+        security_group_name: { required: true }
       }
     end
 

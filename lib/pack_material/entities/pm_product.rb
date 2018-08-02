@@ -5,7 +5,7 @@ module PackMaterialApp
     attribute :id, Types::Int
     attribute :material_resource_sub_type_id, Types::Int
     attribute :commodity_id, Types::Int
-    attribute :variety_id, Types::Int
+    attribute :marketing_variety_id, Types::Int
     attribute :product_number, Types::Int
     attribute :product_code, Types::String
     attribute :unit, Types::String
@@ -13,13 +13,8 @@ module PackMaterialApp
     attribute :alternate, Types::String
     attribute :shape, Types::String
     attribute :reference_size, Types::String
+    attribute :reference_dimension, Types::String
     attribute :reference_quantity, Types::String
-    attribute :length_mm, Types::Decimal
-    attribute :width_mm, Types::Decimal
-    attribute :height_mm, Types::Decimal
-    attribute :diameter_mm, Types::Decimal
-    attribute :thick_mm, Types::Decimal
-    attribute :thick_mic, Types::Decimal
     attribute :brand_1, Types::String
     attribute :brand_2, Types::String
     attribute :colour, Types::String

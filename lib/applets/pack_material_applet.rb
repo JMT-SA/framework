@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-root_dir = File.expand_path('../..', __FILE__)
+root_dir = File.expand_path('..', __dir__)
 Dir["#{root_dir}/pack_material/entities/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/interactors/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/repositories/*.rb"].each { |f| require f }

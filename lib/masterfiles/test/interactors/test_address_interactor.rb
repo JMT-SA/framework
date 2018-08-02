@@ -1,4 +1,4 @@
-require File.join(File.expand_path('../../../../../test', __FILE__), 'test_helper')
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/AbcSize
@@ -37,41 +37,41 @@ module MasterfilesApp
       assert_empty x.errors
 
       # required(:address_line_1).filled(:str?)
-      addr_attrs_without_address_line_1 = address_attrs.reject { |k, _| k == :address_line_1 }
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_1)
+      addr_attrs_without_address_line1 = address_attrs.reject { |k, _| k == :address_line_1 }
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line1)
       assert_equal(['is missing'], x.errors[:address_line_1])
       refute_empty x.errors
 
-      addr_attrs_without_address_line_1[:address_line_1] = 1
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_1)
+      addr_attrs_without_address_line1[:address_line_1] = 1
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line1)
       refute_empty x.errors
-      expected = {address_line_1: ['must be a string']}
+      expected = { address_line_1: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:address_line_2).maybe(:str?)
-      addr_attrs_without_address_line_2 = address_attrs.reject { |k, _| k == :address_line_2 }
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_2)
+      addr_attrs_without_address_line2 = address_attrs.reject { |k, _| k == :address_line_2 }
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line2)
       assert_equal(['is missing'], x.errors[:address_line_2])
       refute_empty x.errors
-      addr_attrs_without_address_line_2[:address_line_2] = 'name'
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_2)
+      addr_attrs_without_address_line2[:address_line_2] = 'name'
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line2)
       assert_empty x.errors
-      addr_attrs_without_address_line_2[:address_line_2] = 1
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_2)
-      expected = {address_line_2: ['must be a string']}
+      addr_attrs_without_address_line2[:address_line_2] = 1
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line2)
+      expected = { address_line_2: ['must be a string'] }
       assert_equal(x.errors, expected)
 
       # required(:address_line_3).maybe(:str?)
-      addr_attrs_without_address_line_3 = address_attrs.reject { |k, _| k == :address_line_3 }
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_3)
+      addr_attrs_without_address_line3 = address_attrs.reject { |k, _| k == :address_line_3 }
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line3)
       assert_equal(['is missing'], x.errors[:address_line_3])
       refute_empty x.errors
-      addr_attrs_without_address_line_3[:address_line_3] = 'name'
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_3)
+      addr_attrs_without_address_line3[:address_line_3] = 'name'
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line3)
       assert_empty x.errors
-      addr_attrs_without_address_line_3[:address_line_3] = 1
-      x = interactor.send(:validate_address_params, addr_attrs_without_address_line_3)
-      expected = {address_line_3: ['must be a string']}
+      addr_attrs_without_address_line3[:address_line_3] = 1
+      x = interactor.send(:validate_address_params, addr_attrs_without_address_line3)
+      expected = { address_line_3: ['must be a string'] }
       assert_equal(x.errors, expected)
 
       # required(:city).maybe(:str?)
@@ -84,7 +84,7 @@ module MasterfilesApp
       assert_empty x.errors
       addr_attrs_without_city[:city] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_city)
-      expected = {city: ['must be a string']}
+      expected = { city: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:postal_code).maybe(:str?)
@@ -97,7 +97,7 @@ module MasterfilesApp
       assert_empty x.errors
       addr_attrs_without_postal_code[:postal_code] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_postal_code)
-      expected = {postal_code: ['must be a string']}
+      expected = { postal_code: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:country).maybe(:str?)
@@ -110,7 +110,7 @@ module MasterfilesApp
       assert_empty x.errors
       addr_attrs_without_country[:country] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_country)
-      expected = {country: ['must be a string']}
+      expected = { country: ['must be a string'] }
       assert_equal(expected, x.errors)
 
       # required(:active).maybe(:bool?)
@@ -194,7 +194,7 @@ module MasterfilesApp
     def invalid_address
       keys = %i[address_type_id address_line_1 address_line_2 address_line_3 city postal_code country active]
       addr_attrs = address_attrs.select { |key, _| keys.include?(key) }
-      addr_attrs[:address_line_1] = 789456
+      addr_attrs[:address_line_1] = 789_456
       addr_attrs
     end
 
@@ -203,3 +203,5 @@ module MasterfilesApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

@@ -8,5 +8,6 @@ module PackMaterialApp
     attribute :short_code, Types::String
     attribute :description, Types::String
     attribute :domain_name, Types::String
+    attribute :internal_seq, Types::Int
   end
 end

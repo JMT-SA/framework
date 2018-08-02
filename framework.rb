@@ -13,6 +13,7 @@ require './lib/crossbeams_responses'
 require './lib/base_repo'
 require './lib/base_interactor'
 require './lib/base_service'
+require './lib/base_step'
 require './lib/local_store' # Will only work for processes running from one dir.
 require './lib/ui_rules'
 require './lib/library_versions'

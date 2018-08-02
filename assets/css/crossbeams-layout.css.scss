@@ -256,11 +256,8 @@ input.cbl-input {
   min-height: 4em;
 }
 
-/* flexbox styles */
-/* fieldset div { */
 .crossbeams-field, .rodauth .form-group {
   display: flex;
-  /*align-items: center; */
 }
 
 .crossbeams-form label, .rodauth .control-label {
@@ -636,6 +633,90 @@ input:required {
 
 div.multi-wrapper.required {
   border-right: thick solid orange;
+}
+/* -------------------------------------------------------------------------- *\
+ * Styles for PROGRESS display
+ * -------------------------------------------------------------------------- */
+ul.cbl-progress-bar-wrapper {
+  width: 100%;
+}
+ul.cbl-progress-bar {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    list-style: none;
+}
+
+li.cbl-step {
+    display: inline-block;
+    padding-top: 45px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    line-height: 16px;
+    color: gray;
+    vertical-align: top;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+li.cbl-step:before {
+    content: 'x';
+    position: absolute;
+    top: 2px;
+    left: calc(50% - 15px);
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    color: white;
+    border: 2px solid white;
+    border-radius: 17px;
+    line-height: 30px;
+    background: gray;
+}
+.cbl-progress-status-bar {
+    height: 2px;
+    background: gray;
+    position: relative;
+    top: 20px;
+    margin: 0 auto;
+}
+.cbl-current-status {
+    height: 2px;
+    width: 0;
+    border-radius: 1px;
+    background: mediumseagreen;
+}
+li.cbl-step.visited:before {
+    content: '\2714';
+    background-color: mediumseagreen;
+}
+
+
+li.cbl-step.visited.current:before {
+    box-shadow: 0 0 0 2px mediumseagreen;
+}
+li.cbl-step.busy:before {
+    content: '\00BB';
+    background-color: cornflowerblue;
+    box-shadow: 0 0 0 2px cornflowerblue;
+}
+ul.cbl-progress-state {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+ul.cbl-progress-state > li {
+  margin-left: 3em;
+  font-size: 0.75em;
+  font-weight: bold;
+  line-height: 16px;
+  color: #000000a1;
+}
+div.cbl-progress-bar-text {
+  /* TODO: ...? */
 }
 /* RESPONSIVE */
 @media (max-width: 48em) {

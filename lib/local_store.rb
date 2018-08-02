@@ -11,8 +11,20 @@ class LocalStore
     @store.transaction { @store.delete(key) }
   end
 
+  def read(key, default_value = nil)
+    if default_value.nil?
+      @store.transaction { @store[key] }
+    else
+      @store.transaction { @store.fetch(key, default_value) }
+    end
+  end
+
   def write(key, value)
     @store.transaction { @store[key] = value }
+  end
+
+  def delete(key)
+    @store.transaction { @store.delete(key) }
   end
 
   def destroy

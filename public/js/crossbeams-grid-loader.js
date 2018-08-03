@@ -161,6 +161,9 @@ const crossbeamsGridEvents = {
                 this.updateGridInPlace(gridRow.id, gridRow.changes);
               });
             } else if (data.actions) {
+              if (data.actions.keep_dialog_open) {
+                closeDialog = false;
+              }
               data.actions.forEach((action) => {
                 if (action.replace_options) {
                   crossbeamsUtils.replaceSelectrOptions(action);

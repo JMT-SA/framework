@@ -232,9 +232,10 @@ module CommonHelpers
     { replace_list_items: { id: action.dom_id, items: action.items } }
   end
 
-  def json_actions(actions, message = nil)
+  def json_actions(actions, message = nil, keep_dialog_open: false)
     res = { actions: Array(actions).map { |a| build_json_action(a) } }
     res[:flash] = { notice: message } unless message.nil?
+    res[:keep_dialog_open] = true if keep_dialog_open
     res.to_json
   end
 

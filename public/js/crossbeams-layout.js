@@ -186,6 +186,24 @@
               data.updateGridInPlace.forEach((gridRow) => {
                 crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
               });
+            } else if (data.actions) {
+              if (data.keep_dialog_open) {
+                closeDialog = false;
+              }
+              data.actions.forEach((action) => {
+                if (action.replace_options) {
+                  crossbeamsUtils.replaceSelectrOptions(action);
+                }
+                if (action.replace_multi_options) {
+                  crossbeamsUtils.replaceMultiOptions(action);
+                }
+                if (action.replace_input_value) {
+                  crossbeamsUtils.replaceInputValue(action);
+                }
+                if (action.replace_list_items) {
+                  crossbeamsUtils.replaceListItems(action);
+                }
+              });
             } else if (data.replaceDialog) {
               closeDialog = false;
               const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());

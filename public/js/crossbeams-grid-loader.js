@@ -161,7 +161,7 @@ const crossbeamsGridEvents = {
                 this.updateGridInPlace(gridRow.id, gridRow.changes);
               });
             } else if (data.actions) {
-              if (data.actions.keep_dialog_open) {
+              if (data.keep_dialog_open) {
                 closeDialog = false;
               }
               data.actions.forEach((action) => {
@@ -175,7 +175,7 @@ const crossbeamsGridEvents = {
                   crossbeamsUtils.replaceInputValue(action);
                 }
                 if (action.replace_list_items) {
-                  this.replaceListItems(action);
+                  crossbeamsUtils.replaceListItems(action);
                 }
               });
             } else if (data.replaceDialog) {

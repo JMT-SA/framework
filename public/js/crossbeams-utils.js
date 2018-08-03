@@ -398,7 +398,7 @@ const crossbeamsUtils = {
     elem.innerHTML = '';
     action.replace_list_items.items.forEach((item) => {
       const li = document.createElement('li');
-      li.text = item;
+      li.append(document.createTextNode(item));
       elem.appendChild(li);
     });
   },

@@ -60,6 +60,15 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Generators' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Documentation', '/developer_documentation/start', 2);
 
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Logging', 3, (SELECT id FROM functional_areas WHERE functional_area_name = 'Development'));
+
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Logging' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Framework');
+
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Logging' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Search logged actions', '/search/logged_actions', 1);
+
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('Masterfiles', 2, (SELECT id FROM functional_areas WHERE functional_area_name = 'Development'));
 
 INSERT INTO programs_webapps (program_id, webapp)

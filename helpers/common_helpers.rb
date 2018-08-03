@@ -213,6 +213,7 @@ module CommonHelpers
     return action_replace_input_value(action) if action.type == :replace_input_value
     return action_replace_select_options(action) if action.type == :replace_select_options
     return action_replace_multi_options(action) if action.type == :replace_multi_options
+    return action_replace_list_items(action) if action.type == :replace_list_items
   end
 
   def action_replace_select_options(action)
@@ -225,6 +226,10 @@ module CommonHelpers
 
   def action_replace_input_value(action)
     { replace_input_value: { id: action.dom_id, value: action.value } }
+  end
+
+  def action_replace_list_items(action)
+    { replace_list_items: { id: action.dom_id, items: action.items } }
   end
 
   def json_actions(actions, message = nil)

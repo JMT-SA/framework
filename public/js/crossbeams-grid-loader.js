@@ -171,6 +171,9 @@ const crossbeamsGridEvents = {
                 if (action.replace_input_value) {
                   crossbeamsUtils.replaceInputValue(action);
                 }
+                if (action.replace_list_items) {
+                  this.replaceListItems(action);
+                }
               });
             } else if (data.replaceDialog) {
               closeDialog = false;

@@ -380,6 +380,28 @@ const crossbeamsUtils = {
     }
     elem.value = action.replace_input_value.value;
   },
+  /**
+   * Replace the items of a List element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceListItems: function replaceListItems(action) {
+    const elem = document.getElementById(action.replace_list_items.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_list_items.id}"`,
+        title: 'List items-change: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    elem.innerHTML = '';
+    action.replace_list_items.items.forEach((item) => {
+      const li = document.createElement('li');
+      li.text = item;
+      elem.appendChild(li);
+    });
+  },
 
   /**
    * Calls all urls for observeChange behaviour and applies changes to the DOM as required..
@@ -411,6 +433,9 @@ const crossbeamsUtils = {
           }
           if (action.replace_input_value) {
             this.replaceInputValue(action);
+          }
+          if (action.replace_list_items) {
+            this.replaceListItems(action);
           }
         });
       }

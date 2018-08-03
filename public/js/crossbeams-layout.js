@@ -118,6 +118,15 @@
     crossbeamsUtils.makeMultiSelects();
     crossbeamsUtils.makeSearchableSelects();
 
+    document.body.addEventListener('keydown', (event) => {
+      if (event.target.classList.contains('cbl-to-upper') && event.keyCode === 13) {
+        event.target.value = event.target.value.toUpperCase();
+      }
+      if (event.target.classList.contains('cbl-to-lower') && event.keyCode === 13) {
+        event.target.value = event.target.value.toLowerCase();
+      }
+    });
+
     document.body.addEventListener('click', (event) => {
       if (event.target.dataset && event.target.dataset.disableWith) {
         preventMultipleSubmits(event.target);

@@ -8,12 +8,6 @@
   :title: Edit Item Details
   :popup: true
   :hide_if_null: id
-# This needs to be smarter
-#- :url: "/pack_material/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_lists/$:master_list_id$/new"
-#  :text: add list item
-#  :icon: fa-plus
-#  :title: View
-#  :popup: true
 # TODO: Maybe consider a global way of activating & deactivating records
 #- :url: "/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_lists/"
 #  :text: activate

@@ -136,18 +136,43 @@ class Framework < Roda
         end
       end
       r.on 'material_resource_master_list_items' do
-        r.on 'new' do
+        r.on 'preselect' do
           check_auth!('config', 'new')
-          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(id, remote: fetch?(r)) }
+          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::Preselect.call(id) }
+        end
+        r.on 'new', Integer do |product_column_id|
+          check_auth!('config', 'new')
+          show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(id, product_column_id, fetch?(r)) }
+        end
+        r.on 'new' do
+          r.post do
+            return_json_response
+            check_auth!('config', 'new')
+            product_column_id = params[:matres_master_list_item][:material_resource_product_column_id].to_i
+
+            re_show_form(r, OpenStruct.new(message: nil), url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_list_items/new/#{product_column_id}") do
+              PackMaterial::Config::MatresMasterListItem::New.call(id, product_column_id)
+            end
+          end
         end
         r.post do        # CREATE
           res = interactor.create_matres_master_list_item(id, params[:matres_master_list_item])
+          product_column_id = params[:matres_master_list_item][:material_resource_product_column_id]
           if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            repo = PackMaterialApp::ConfigRepo.new
+            items = repo.matres_sub_type_master_list_items(id, product_column_id)
+            items = items.map { |r| "#{r[:short_code]} #{r[:long_name] ? '- ' + r[:long_name] : ''}" }
+            json_actions([
+                           OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_short_code', value: ''),
+                           OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_long_name', value: ''),
+                           OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_description', value: ''),
+                           OpenStruct.new(type: :replace_list_items, dom_id: 'matres_master_list_item_list_items', items: items)
+                         ],
+                         'Added new item',
+                         keep_dialog_open: true)
           else
             re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/new") do
-              PackMaterial::Config::MatresMasterListItem::New.call(id, form_values: params[:matres_master_list_item],
+              PackMaterial::Config::MatresMasterListItem::New.call(id, product_column_id, form_values: params[:matres_master_list_item],
                                                                    form_errors: res.errors,
                                                                    remote: fetch?(r))
             end

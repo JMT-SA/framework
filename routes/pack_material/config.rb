@@ -161,7 +161,7 @@ class Framework < Roda
           if res.success
             repo = PackMaterialApp::ConfigRepo.new
             items = repo.matres_sub_type_master_list_items(id, product_column_id)
-            items = items.map { |r| [r[:short_code], '-', r[:long_name]].join(' ') }
+            items = items.map { |r| "#{r[:short_code]} #{r[:long_name] ? '- ' + r[:long_name] : ''}" }
             json_actions([
                            OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_short_code', value: ''),
                            OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_long_name', value: ''),

@@ -54,7 +54,7 @@ module UiRules
 
     def list_items
       items = @repo.matres_sub_type_master_list_items(@options[:sub_type_id], @options[:product_column_id])
-      items.map { |r| [r[:short_code], '-', r[:long_name]].join(' ') }
+      items.map { |r| "#{r[:short_code]} #{r[:long_name] ? '- ' + r[:long_name] : ''}" }
     end
   end
 end

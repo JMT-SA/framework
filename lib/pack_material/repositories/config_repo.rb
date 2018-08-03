@@ -205,6 +205,21 @@ module PackMaterialApp
       DB[:material_resource_master_list_items].insert(new_attrs)
     end
 
+    def find_matres_product_column(id)
+      find(:material_resource_product_columns, MatresProductColumn, id)
+    end
+
+    def matres_sub_type_master_list_items(sub_type_id, product_column_id)
+      list = DB[:material_resource_master_lists].where(
+        material_resource_sub_type_id: sub_type_id,
+        material_resource_product_column_id: product_column_id
+      ).first
+      if list
+        all(:material_resource_master_list_items, MatresMasterListItem, material_resource_master_list_id: list[:id])
+      else
+        []
+      end
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength

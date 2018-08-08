@@ -196,16 +196,20 @@ module CommonHelpers
     res.to_json
   end
 
-  def json_replace_select_options(dom_id, options_array, message = nil)
-    json_actions(OpenStruct.new(type: :replace_select_options, dom_id: dom_id, options_array: options_array), message)
+  def json_replace_select_options(dom_id, options_array, message = nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :replace_select_options, dom_id: dom_id, options_array: options_array), message, keep_dialog_open)
   end
 
-  def json_replace_multi_options(dom_id, options_array, message = nil)
-    json_actions(OpenStruct.new(type: :replace_multi_options, dom_id: dom_id, options_array: options_array), message)
+  def json_replace_multi_options(dom_id, options_array, message = nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :replace_multi_options, dom_id: dom_id, options_array: options_array), message, keep_dialog_open)
   end
 
-  def json_replace_input_value(dom_id, value, message = nil)
-    json_actions(OpenStruct.new(type: :replace_input_value, dom_id: dom_id, value: value), message)
+  def json_replace_input_value(dom_id, value, message = nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :replace_input_value, dom_id: dom_id, value: value), message, keep_dialog_open)
+  end
+
+  def json_replace_list_items(dom_id, items, message = nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :replace_list_items, dom_id: dom_id, items: Array(items)), message, keep_dialog_open)
   end
 
   # This could be built in a class and receive send messages....

@@ -1,0 +1,107 @@
+= Icons
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Icons
+
+Font-awesome icons
+
+`<i class="fa-arrow-left"></i> text`
+
+|===
+|Icon |Font-awesome class |Notes
+
+|[.fa .fa-plus]#.#
+|fa-plus
+|New `(**C** RUD)`; Add an item to a list
+
+|[.fa .fa-plus-circle]#.#
+|fa-plus-circle
+|New `(**C** RUD)` - Alternate version
+
+|[.fa .fa-eye]#.#
+|fa-eye
+|View `(C **R** UD)`
+
+|[.fa .fa-edit]#.#
+|fa-edit
+|Edit `(CR **U** D)`
+
+|[.fa .fa-remove]#.#
+|fa-remove
+|Remove; Delete `(CRU **D**)`
+
+|[.fa .fa-arrow-left]#.#
+|fa-arrow-left
+|Used in "back" links.
+
+|[.fa .fa-book]#.#
+|fa-book
+|Properties
+
+|[.fa .fa-bug]#.#
+|fa-bug
+|Debug mode
+
+|[.fa .fa-check-square-o]#.#
+|fa-check-square-o
+|Toggle on; Check; set a boolean to true
+
+|[.fa .fa-square-o]#.#
+|fa-square-o
+|Toggle off; Un-check; set a boolean to false
+
+|[.fa .fa-chevron-right]#.#
+|fa-chevron-right
+|Sub menu; More
+
+|[.fa .fa-code]#.#
+|fa-code
+|Show code
+
+|[.fa .fa-columns]#.#
+|fa-columns
+|Columns
+
+|[.fa .fa-copy]#.#
+|fa-copy
+|Copy
+
+|[.fa .fa-file-excel-o]#.#
+|fa-file-excel-o
+|Export to Excel
+
+|[.fa .fa-info]#.#
+|fa-info
+|Information
+
+|[.fa .fa-link]#.#
+|fa-link
+|Link URL
+
+|[.fa .fa-list]#.#
+|fa-list
+|List
+
+|[.fa .fa-lock]#.#
+|fa-lock
+|Lock; Block
+
+|[.fa .fa-minus]#.#
+|fa-minus
+|Remove an item from a list
+
+|[.fa .fa-play]#.#
+|fa-play
+|Run; execute
+
+|[.fa .fa-save]#.#
+|fa-save
+|Save; Download; Save grid selection
+
+|[.fa .fa-sort]#.#
+|fa-sort
+|Sort
+
+|===

@@ -171,7 +171,7 @@ class Framework < Roda
                          'Added new item',
                          keep_dialog_open: true)
           else
-            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_lists/new") do
+            re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_list_items/new/#{product_column_id}") do
               PackMaterial::Config::MatresMasterListItem::New.call(id, product_column_id, form_values: params[:matres_master_list_item],
                                                                    form_errors: res.errors,
                                                                    remote: fetch?(r))

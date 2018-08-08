@@ -30,7 +30,7 @@ module UiRules
     def common_fields
       {
         material_resource_type_id: { renderer: :select, options: @repo.for_select_matres_types, caption: 'Type' },
-        sub_type_name: {},
+        sub_type_name: { required: true },
         short_code: { required: true, force_uppercase: true },
         product_code_separator: { renderer: :label },
         has_suppliers: { renderer: :checkbox },

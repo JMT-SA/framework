@@ -21,7 +21,7 @@ module UiRules
 
     def common_fields
       {
-        marketing_variety_code: {},
+        marketing_variety_code: { required: true },
         description: {}
       }
     end

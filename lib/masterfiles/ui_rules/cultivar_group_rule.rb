@@ -21,7 +21,7 @@ module UiRules
 
     def common_fields
       {
-        cultivar_group_code: {},
+        cultivar_group_code: { required: true },
         description: {}
       }
     end

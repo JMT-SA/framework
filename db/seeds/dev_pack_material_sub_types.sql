@@ -1,0 +1,76 @@
+-- TEST DATA ONLY
+-- uncomment to run
+
+-- TO CLEAR FIRST:
+-- DELETE FROM material_resource_types;
+-- DELETE FROM material_resource_sub_types;
+
+-- retail_unit: %w(bag_fruit punnet tray protective bag_liner),
+-- trade_unit: %w(carton bin lug),
+-- logistics_unit: %w(pallet_base pallet_material),
+-- label: %w(sticker fruit card ribbon),
+-- other: %w(glue promotion sealing),
+
+-- Types & Sub Types for testing
+--
+-- INSERT INTO material_resource_types (type_name, short_code, material_resource_domain_id)
+-- VALUES ('Retail Unit', 'RU', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
+--
+-- INSERT INTO material_resource_types (type_name, short_code, material_resource_domain_id)
+-- VALUES ('Trade Unit', 'TU', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
+--
+-- INSERT INTO material_resource_types (type_name, short_code, material_resource_domain_id)
+-- VALUES ('Logistics Unit', 'LU', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
+--
+-- INSERT INTO material_resource_types (type_name, short_code, material_resource_domain_id)
+-- VALUES ('Label', 'LB', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
+--
+-- INSERT INTO material_resource_types (type_name, short_code, material_resource_domain_id)
+-- VALUES ('Other', 'OT', (SELECT material_resource_domains.id AS id FROM material_resource_domains WHERE material_resource_domains.domain_name = 'Pack Material'));
+--
+-- INSERT INTO material_resource_sub_types (material_resource_type_id, sub_type_name, short_code)
+--   SELECT pt.id, sub.sub_type_name, sub.short_code
+--   FROM material_resource_types pt
+--     JOIN (SELECT * FROM (VALUES
+--       ('bag fruit', 'BF', 1),
+--       ('punnet', 'PN',1 ),
+--       ('tray', 'TR', 1),
+--       ('protective', 'PR', 1),
+--       ('bag liner', 'BL', 1)) AS t(sub_type_name, short_code, n)) sub ON sub.n = 1
+--   WHERE pt.type_name = 'Retail Unit';
+--
+-- INSERT INTO material_resource_sub_types (material_resource_type_id, sub_type_name, short_code)
+--   SELECT pt.id, sub.sub_type_name, sub.short_code
+--   FROM material_resource_types pt
+--     JOIN (SELECT * FROM (VALUES
+--       ('carton', 'CR', 1),
+--       ('bin', 'BN',1 ),
+--       ('lug', 'LG', 1)) AS t(sub_type_name, short_code, n)) sub ON sub.n = 1
+--   WHERE pt.type_name = 'Trade Unit';
+--
+-- INSERT INTO material_resource_sub_types (material_resource_type_id, sub_type_name, short_code)
+--   SELECT pt.id, sub.sub_type_name, sub.short_code
+--   FROM material_resource_types pt
+--     JOIN (SELECT * FROM (VALUES
+--       ('pallet base', 'PB', 1),
+--       ('pallet material', 'PM',1 )) AS t(sub_type_name, short_code, n)) sub ON sub.n = 1
+--   WHERE pt.type_name = 'Logistics Unit';
+--
+-- INSERT INTO material_resource_sub_types (material_resource_type_id, sub_type_name, short_code)
+--   SELECT pt.id, sub.sub_type_name, sub.short_code
+--   FROM material_resource_types pt
+--     JOIN (SELECT * FROM (VALUES
+--       ('sticker', 'ST', 1),
+--       ('fruit', 'FR', 1 ),
+--       ('card', 'CD', 1),
+--       ('ribbon', 'RB', 1)) AS t(sub_type_name, short_code, n)) sub ON sub.n = 1
+--   WHERE pt.type_name = 'Label';
+--
+-- INSERT INTO material_resource_sub_types (material_resource_type_id, sub_type_name, short_code)
+--   SELECT pt.id, sub.sub_type_name, sub.short_code
+--   FROM material_resource_types pt
+--     JOIN (SELECT * FROM (VALUES
+--       ('glue', 'GL', 1),
+--       ('promotion', 'PN',1 ),
+--       ('sealing', 'SL', 1)) AS t(sub_type_name, short_code, n)) sub ON sub.n = 1
+--   WHERE pt.type_name = 'Other';

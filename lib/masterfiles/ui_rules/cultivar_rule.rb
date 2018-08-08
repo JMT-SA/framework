@@ -27,7 +27,7 @@ module UiRules
       {
         commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities },
         cultivar_group_id: { renderer: :select, options: @repo.for_select_cultivar_groups },
-        cultivar_name: {},
+        cultivar_name: { required: true },
         description: {}
       }
     end

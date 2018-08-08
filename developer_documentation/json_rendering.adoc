@@ -11,12 +11,14 @@ NOTE: All such actions should call `return_json_response` to set the correct hea
 
 === Changing DOM elements
 
-The main helper for this is `json_actions` which receives an array of actions to be carried out in the page and an optional flash message to be displayed.
+The main helper for this is `json_actions` which receives an array of actions to be carried out in the page and an optional flash message to be displayed and optional flag to indicate that a dialog should not be closed after processing the response in the page.
 Each action is of a specific type which tells the calling javascript what to do.
 
 e.g.
 [source,ruby]
 ----
+json_actions(actions, message = nil, keep_dialog_open: false)
+
 json_actions([OpenStruct.new(type: :replace_multi_options,
                              dom_id: 'product_code_columns_product_code_column_ids',
                              options_array: res.instance[:code]),
@@ -28,3 +30,60 @@ json_actions([OpenStruct.new(type: :replace_multi_options,
 
 ==== Actions
 
+===== Replace the value of an input element
+
+Works on `input` elements (including hidden ones).
+
+type: `:replace_input_value`.
+
+dom_id: the value of the `id` attribute of the input element in the page. This is usually a combination of the `form_name` and `field_name`.
+e.g. if a form named `users` has a field named `surname`, then the dom_id will be `users_surname`.
+
+value: the value you want to change it to.
+
+===== Replace the options in a multi element
+
+Works on `Multi.js` elements only.
+
+type: `:replace_multi_options`.
+
+dom_id: as for `:replace_input_value`.
+
+options_array: A one- or two-dimensional array.
+
+===== Replace the options in a select element
+
+Works on `Selectr.js` elements only.
+
+type: `replace_select_options`
+
+dom_id: as for `:replace_input_value`.
+
+options_array: A one- or two-dimensional array.
+
+===== Replace the items in a list element
+
+Works on `ol` or `ul` elements only.
+
+type: `:replace_list_items`.
+
+dom_id: as for `:replace_input_value`.
+
+items: An array of `Strings`.
+
+
+==== Single actions
+
+There are also helper methods available that are easier to use when only returning a singe action.
+These work exactly the same as for their counterparts above.
+
+[source,ruby]
+----
+json_replace_select_options(dom_id, options_array, message = nil, keep_dialog_open: false)
+
+json_replace_multi_options(dom_id, options_array, message = nil, keep_dialog_open: false)
+
+json_replace_input_value(dom_id, value, message = nil, keep_dialog_open: false)
+
+json_replace_list_items(dom_id, items, message = nil, keep_dialog_open: false)
+----

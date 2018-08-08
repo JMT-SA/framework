@@ -22,6 +22,7 @@ The following special environment variables are available when running the app:
 * link:/developer_documentation/repositories.adoc[Repositories]
 * link:/developer_documentation/app_config.adoc[App Configuration]
 * link:/developer_documentation/json_rendering.adoc[JSON rendering]
+* link:/developer_documentation/icons.adoc[Icons]
 
 === Tutorials
 

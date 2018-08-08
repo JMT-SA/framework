@@ -1,0 +1,52 @@
+fa-arrow-left
+fa-book
+fa-bug
+fa-check-square-o
+fa-chevron-right
+fa-code
+fa-columns
+fa-copy
+fa-edit
+fa-eye
+fa-file-excel-o
+fa-info
+fa-link
+fa-list
+fa-lock
+fa-minus
+fa-play
+fa-plus
+fa-plus-circle
+fa-remove
+fa-save
+fa-sort
+fa-square-o
+fa-toggle-off
+fa-toggle-on
+
+
+Zondicons to replace fa-icons?
+
+fa-arrow-left       arrow-thin-left arro-thick-left arrow-outline-left   arrow-left
+fa-book             book-reference
+fa-bug              bug
+fa-check-square-o   checkmark   checkmark-outline
+fa-chevron-right    chevron-right   chevron-outline-right
+fa-code             code
+fa-columns          view-column
+fa-copy             edit-copy    duplicate   clipboard copy
+fa-edit             edit-pencil
+fa-eye              view-show
+fa-file-excel-o
+fa-info             information-solid   information-outline
+fa-link             link
+fa-list             view-list  list
+fa-lock             lock-open   lock-closed   block
+fa-minus            minus-sold   minus-outline
+fa-play             send    play
+fa-plus             list-add    document-add
+fa-plus-circle      add-solid add-outline
+fa-remove           trash   minus-sold   minus-outline close   close-solid   close-outline
+fa-save             save-disk   download
+fa-sort
+fa-square-o

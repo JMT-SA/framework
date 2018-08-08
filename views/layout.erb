@@ -29,6 +29,19 @@
     <link rel="stylesheet" href="/css/selectr.min.css">
     <link rel="stylesheet" href="/css/multi.min.css">
     <%= assets(:css) %>
+    <style type="text/css">
+.cbl-icon {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  fill: currentColor;
+  position: relative;
+  top: .125em;
+}
+.view-show {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M.2 10a11 11 0 0 1 19.6 0A11 11 0 0 1 .2 10zm9.8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-2a2 2 0 1 1 0-4 2 2 0 0 1 0 4z'/%3E%3C/svg%3E");
+}
+    </style>
 
     <%= content_for :late_head %>
   </head>
@@ -59,6 +72,7 @@
       <%= yield %>
     </div>
 
+
     <div class="dialog" aria-hidden="true" id="crossbeams-popup-dialog-level1">
       <div class="dialog-overlay" tabindex="-1"></div> <!-- data-a11y-dialog-hide></div> -->
       <div id="dialog-error-level1" class="brown bg-washed-red ba b--light-red absolute top-1 left-1 pa3" style="display:none;z-index:60;min-width:20em;"></div>
@@ -88,6 +102,8 @@
         <% if ENV['RACK_ENV'] == 'development' %>
           ASSETS: <i class="fa <%= assets_paths(:css).any? { |p| p.include?('scss') } ? 'fa-bug' : 'fa-eye' %>"></i>
         <% end %>
+  <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M17.94 11H13V9h4.94A8 8 0 0 0 11 2.06V7H9V2.06A8 8 0 0 0 2.06 9H7v2H2.06A8 8 0 0 0 9 17.94V13h2v4.94A8 8 0 0 0 17.94 11zM10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/></svg>
+    <i class="view-show"></i>
     </footer>
 
     <script src="/js/lodash.js" type="text/javascript"></script>

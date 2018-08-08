@@ -75,12 +75,12 @@
         :hide_if_null: :program_id
       - :url: /security/functional_areas/program_functions/$:id$/edit
         :text: edit program function
-        :icon: fa-edit
+        :icon: edit
         :popup: true
         :hide_if_null: :id
       - :url: /security/functional_areas/program_functions/$:id$
         :text: delete program function
-        :icon: fa-remove
+        :icon: remove
         :is_delete: true
         :popup: true
         :hide_if_null: :id

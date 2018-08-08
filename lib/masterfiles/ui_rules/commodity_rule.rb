@@ -18,16 +18,16 @@ module UiRules
                                       with_value: @repo.find_commodity_group(@form_object.commodity_group_id)&.code }
       fields[:code] = { renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:hs_code] = { renderer: :label }
-      fields[:active] = { renderer: :label }
+      fields[:hs_code] = { renderer: :label, caption: 'HS code' }
+      fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
         commodity_group_id: { renderer: :select, options: @repo.for_select_commodity_groups, disabled_options: @repo.for_select_inactive_commodity_groups },
-        code: {},
-        description: {},
-        hs_code: {},
+        code: { required: true },
+        description: { required: true },
+        hs_code: { required: true, caption: 'HS code' },
         active: { renderer: :checkbox }
       }
     end

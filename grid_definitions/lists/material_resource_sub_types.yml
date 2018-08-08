@@ -24,6 +24,7 @@
 - :url: "/pack_material/config/material_resource_sub_types/$:id$/product_columns"
   :text: product columns
   :icon: fa-list
+  :hide_if_null: product_column_ids
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/config/material_resource_sub_types/new"

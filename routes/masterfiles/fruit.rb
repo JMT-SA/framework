@@ -256,12 +256,15 @@ class Framework < Roda
         r.patch do     # UPDATE
           return_json_response
           res = interactor.update_cultivar(id, params[:cultivar])
+          comm_repo = MasterfilesApp::CommodityRepo.new
           if res.success
+            commodity_code = comm_repo.find_commodity(res.instance[:commodity_id])&.code
             update_grid_row(id,
                             changes: { commodity_id: res.instance[:commodity_id],
                                        cultivar_group_id: res.instance[:cultivar_group_id],
                                        cultivar_group_code: res.instance[:cultivar_group_code],
                                        cultivar_name: res.instance[:cultivar_name],
+                                       code: commodity_code,
                                        description: res.instance[:description] },
                             notice: res.message)
           else

@@ -42,7 +42,15 @@ module PackMaterialApp
 
     def test_for_select_configured_sub_types
       dom = DB[:material_resource_domains].where(domain_name: PackMaterialApp::DOMAIN_NAME).first
-      dom_id = dom ? dom[:id] : nil
+      if dom
+        dom_id = dom[:id]
+      else
+        dom_id = DB[:material_resource_domains].insert(
+          domain_name: 'Pack Material',
+          product_table_name: 'pack_material_products',
+          variant_table_name: 'pack_material_product_variants'
+        )
+      end
       type_id1 = DB[:material_resource_types].insert(
         material_resource_domain_id: dom_id,
         type_name: 'type one',
@@ -274,15 +282,31 @@ module PackMaterialApp
 
     def test_delete_matres_sub_type
       dom = DB[:material_resource_domains].where(domain_name: PackMaterialApp::DOMAIN_NAME).first
-      dom_id = dom ? dom[:id] : nil
+      if dom
+        dom_id = dom[:id]
+      else
+        dom_id = DB[:material_resource_domains].insert(
+          domain_name: 'Pack Material',
+          product_table_name: 'pack_material_products',
+          variant_table_name: 'pack_material_product_variants'
+        )
+      end
 
-      prodcol1 = DB[:material_resource_product_columns].where(column_name: 'unit').first
-      id1 = prodcol1 ? prodcol1[:id] : nil
-      prodcol2 = DB[:material_resource_product_columns].where(column_name: 'style').first
-      id2 = prodcol2 ? prodcol2[:id] : nil
-      prodcol3 = DB[:material_resource_product_columns].where(column_name: 'brand_1').first
-      id3 = prodcol3 ? prodcol3[:id] : nil
-
+      id1 = DB[:material_resource_product_columns].insert(
+        material_resource_domain_id: dom_id,
+        column_name: 'unit',
+        short_code: 'CN1'
+      )
+      id2 = DB[:material_resource_product_columns].insert(
+        material_resource_domain_id: dom_id,
+        column_name: 'style',
+        short_code: 'CN2'
+      )
+      id3 = DB[:material_resource_product_columns].insert(
+        material_resource_domain_id: dom_id,
+        column_name: 'brand_1',
+        short_code: 'CN3'
+      )
       type_id = DB[:material_resource_types].insert(
         material_resource_domain_id: dom_id,
         internal_seq: 1,

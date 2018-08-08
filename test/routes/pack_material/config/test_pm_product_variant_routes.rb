@@ -103,8 +103,8 @@ class TestPmProductVariantRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:create_pm_product_variant).returns(ok_response)
-    post 'pack_material/config/pack_material_products/1/pack_material_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
-    expect_ok_redirect
+    post 'pack_material/config/pack_material_products/1/pack_material_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_ok_json_redirect
   end
 
   def test_create_remotely
@@ -144,7 +144,7 @@ class TestPmProductVariantRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::PmProductInteractor.any_instance.stubs(:clone_pm_product_variant).returns(ok_response)
-    post 'pack_material/config/pack_material_products/1/pack_material_product_variants/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    post 'pack_material/config/pack_material_products/1/pack_material_product_variants/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/list/users' }
     expect_ok_redirect
 
     post_as_fetch 'pack_material/config/pack_material_products/1/pack_material_product_variants/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }

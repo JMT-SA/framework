@@ -17,13 +17,13 @@ module UiRules
     def set_show_fields
       fields[:code] = { renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:active] = { renderer: :label }
+      fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
-        code: {},
-        description: {},
+        code: { required: true },
+        description: { required: true },
         active: { renderer: :checkbox }
       }
     end

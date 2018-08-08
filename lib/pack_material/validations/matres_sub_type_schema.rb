@@ -6,10 +6,10 @@ module PackMaterialApp
     required(:material_resource_type_id).filled(:int?)
     required(:sub_type_name).filled(:str?)
     required(:short_code, Types::StrippedString).filled(:str?)
-    required(:product_code_separator).filled(:str?)
-    required(:has_suppliers).filled(:bool?)
-    required(:has_marketers).filled(:bool?)
-    required(:has_retailers).filled(:bool?)
+    optional(:product_code_separator).filled(:str?)
+    optional(:has_suppliers).filled(:bool?)
+    optional(:has_marketers).filled(:bool?)
+    optional(:has_retailers).filled(:bool?)
   end
 
   MatresSubTypeConfigColumnsSchema = Dry::Validation.Form do

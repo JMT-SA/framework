@@ -50,3 +50,135 @@ fa-remove           trash   minus-sold   minus-outline close   close-solid   clo
 fa-save             save-disk   download
 fa-sort
 fa-square-o
+
+
+
+
+
+Feather icons:
+fa-file-excel-o
+fa-sort
+fa-square-o          square
+
+
+add-outline
+add-solid
+
+
+
+
+checkmark
+
+
+close-outline
+
+copy
+cut
+
+document-add
+
+edit-pencil
+edit
+
+
+
+loading
+
+
+minus-solid
+paste
+
+quit
+
+trash
+
+
+
+
+
+
+
+for i in *.yml; do
+  sed -i 's/add-circle/add-solid/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-arrow-left/arrow-left/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-book/book-reference/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-bug/bug/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-check-square-o/check-square/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-chevron-right/cheveron-right/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-code/code/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-columns/view-column/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-copy/edit-copy/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-edit/edit/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-eye/view-show/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-info/information-solid/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-link/link/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-list/list/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-lock/lock-closed/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-minus/minus-outline/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-play/play/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-plus/add/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-plus-circle/add/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-remove/delete/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-save/save-disk/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-sort/sort/g' $i
+done
+
+
+
+
+--- NOT YET REPLACED...
+for i in *.yml; do
+  sed -i 's/fa-file-excel-o/xxx/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-square-o/xxx/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-toggle-off/xxx/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-toggle-on/xxx/g' $i
+done
+

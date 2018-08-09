@@ -3,37 +3,46 @@
 :actions:
 - :url: "/development/masterfiles/users/$:id$"
   :text: view
-  :icon: fa-eye
+  # :icon: view-show
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/development/masterfiles/users/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  # :icon: edit
+  :icon: edit
+  # :icon: edit-pencil
   :title: Edit
   :popup: true
 - :url: "/development/masterfiles/users/$:id$"
   :text: delete
-  :icon: fa-remove
+  # :icon: delete
+  :icon: delete
   :is_delete: true
   :popup: true
 - :separator: true
 - :url: "/list/programs/multi?key=program_users&id=$:id$"
   :text: select programs
-  :icon: fa-list
+  # :icon: list
+  :icon: list
   :popup: true
 - :url: "/list/user_program_permissions/with_params?key=standard&id=$:id$"
   :text: program permissions
   :title: Edit security group name for programs
-  :icon: fa-check-square-o
+  # :icon: check-square
+  # :icon: checkmark
+  :icon: check-square
   :popup: true
 - :url: "/list/user_program_permissions/multi?key=set_group&id=$:id$"
   :text: multiselect program permissions
-  :icon: fa-list
+  # :icon: list
+  :icon: list
   :popup: true
 - :separator: true
 - :url: "/development/masterfiles/users/$:id$/change_password"
   :text: Change password
-  :icon: fa-lock
+  # :icon: lock-closed
+  :icon: lock-closed
   :title: Change password
   :popup: true
 :page_controls:

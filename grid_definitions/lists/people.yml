@@ -3,25 +3,25 @@
 :actions:
 - :url: "/masterfiles/parties/people/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/parties/people/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/parties/people/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :popup: true
 - :url: "/list/party_contact_methods/multi?key=parties&id=$:party_id$"
   :text: contact methods
-  :icon: fa-list
+  :icon: list
 - :url: "/list/party_addresses/multi?key=parties&id=$:party_id$"
   :text: addresses
-  :icon: fa-list
+  :icon: list
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/parties/people/new"

@@ -6,7 +6,7 @@
       :items:
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$/edit
         :text: edit functional area
-        :icon: fa-edit
+        :icon: edit
         :title: Properties
         :popup: true
         :auth:
@@ -15,20 +15,20 @@
           :permission: edit
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$
         :text: delete functional area
-        :icon: fa-remove
+        :icon: delete
         :is_delete: true
         :popup: true
         :hide_if_present: :program_id
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$/reorder
         :text: re-order programs
-        :icon: fa-sort
+        :icon: sort
         :title: Re-order
         :hide_if_null: :program_id
         :popup: true
       - :separator: true
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$/sql
         :text: SQL for Functional area
-        :icon: fa-code
+        :icon: code
         :title: SQL for Functional area - $:functional_area_name$
         :popup: true
   - :separator: true
@@ -37,30 +37,30 @@
       :items:
       - :url: /security/functional_areas/programs/$:functional_area_id$/new
         :text: new program
-        :icon: fa-plus-circle
+        :icon: add-solid
         :popup: true
       - :url: /security/functional_areas/programs/$:program_id$/edit
         :text: edit program
-        :icon: fa-edit
+        :icon: edit
         :popup: true
         :hide_if_null: :program_id
       - :url: /security/functional_areas/programs/$:program_id$
         :text: delete program
-        :icon: fa-remove
+        :icon: delete
         :is_delete: true
         :popup: true
         :hide_if_null: :program_id
         :hide_if_present: :id
       - :url: /security/functional_areas/programs/$:program_id$/reorder
         :text: re-order program functions
-        :icon: fa-sort
+        :icon: sort
         :title: Re-order
         :hide_if_null: :id
         :popup: true
       - :separator: true
       - :url: /security/functional_areas/programs/$:program_id$/sql
         :text: SQL for Program
-        :icon: fa-code
+        :icon: code
         :title: SQL for Program - $:program_name$
         :hide_if_null: :id
         :popup: true
@@ -70,7 +70,7 @@
       :items:
       - :url: /security/functional_areas/program_functions/$:program_id$/new
         :text: new program function
-        :icon: fa-plus-circle
+        :icon: add-solid
         :popup: true
         :hide_if_null: :program_id
       - :url: /security/functional_areas/program_functions/$:id$/edit
@@ -80,19 +80,19 @@
         :hide_if_null: :id
       - :url: /security/functional_areas/program_functions/$:id$
         :text: delete program function
-        :icon: remove
+        :icon: delete
         :is_delete: true
         :popup: true
         :hide_if_null: :id
       - :url: "/list/users/multi?key=progfunc_users&id=$:id$"
         :text: restrict program function to specific users
-        :icon: fa-lock
+        :icon: lock-closed
         :hide_if_null: :id
         :hide_if_false: :restricted_user_access
       - :separator: true
       - :url: /security/functional_areas/program_functions/$:id$/sql
         :text: SQL for Program function
-        :icon: fa-code
+        :icon: code
         :title: SQL for Program function - $:program_function_name$
         :hide_if_null: :program_id
         :popup: true

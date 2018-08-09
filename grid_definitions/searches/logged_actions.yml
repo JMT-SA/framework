@@ -3,5 +3,5 @@
 :actions:
 - :url: "/development/logging/logged_actions/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View

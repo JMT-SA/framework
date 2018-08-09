@@ -3,17 +3,17 @@
 :actions:
 - :url: "/masterfiles/parties/contact_methods/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/parties/contact_methods/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/parties/contact_methods/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :prompt: 'By deleting this contact method you will also be removing it from linked parties. Are you sure you want to delete this contact method?'
   :popup: true

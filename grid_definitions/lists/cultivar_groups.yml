@@ -3,17 +3,17 @@
 :actions:
 - :url: "/masterfiles/fruit/cultivar_groups/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/fruit/cultivar_groups/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/fruit/cultivar_groups/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :prompt: 'By deleting this cultivar group you will also be removing its cultivars and marketing varieties. Are you sure you want to delete this cultivar group?'
   :popup: true

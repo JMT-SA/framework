@@ -4,7 +4,7 @@
 :actions:
 - :url: "/pack_material/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_list_items/$:id$/edit"
   :text: edit item details
-  :icon: fa-edit
+  :icon: edit
   :title: Edit Item Details
   :popup: true
   :hide_if_null: id

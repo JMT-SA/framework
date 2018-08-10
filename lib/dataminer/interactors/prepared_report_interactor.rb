@@ -83,26 +83,26 @@ module DataminerApp
         mk.action_column do |act| # rubocop:disable Metrics/BlockLength
           act.popup_link 'properties', '/dataminer/prepared_reports/$col1$/properties',
                          col1: 'id',
-                         icon: 'fa-book',
+                         icon: 'book-reference',
                          title: 'Prepared report properties'
           act.separator
           act.popup_link 'webquery link', '/dataminer/prepared_reports/$col1$/webquery_url',
                          col1: 'id',
-                         icon: 'fa-link',
+                         icon: 'link',
                          title_field: 'caption'
           act.link 'run', '/dataminer/prepared_reports/$col1$/run',
                    col1: 'id',
-                   icon: 'fa-play'
+                   icon: 'play'
           act.link 'Excel download', '/dataminer/prepared_reports/$col1$/xls',
                    col1: 'id',
-                   icon: 'fa-file-excel-o'
+                   icon: 'excel'
           act.separator
           act.popup_edit_link '/dataminer/prepared_reports/$col1$/edit',
                               col1: 'id',
                               hide_if_false: for_user ? 'owner' : nil
           act.popup_link 'change columns', '/dataminer/prepared_reports/$col1$/change_columns',
                          col1: 'id',
-                         icon: 'fa-columns',
+                         icon: 'view-columns',
                          hide_if_false: for_user ? 'owner' : nil
           act.popup_delete_link '/dataminer/prepared_reports/$col1$',
                                 col1: 'id',

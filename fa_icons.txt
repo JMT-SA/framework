@@ -129,6 +129,9 @@ for i in *.yml; do
   sed -i 's/fa-edit/edit/g' $i
 done
 for i in *.yml; do
+  sed -i 's/fa-file-excel-o/excel/g' $i
+done
+for i in *.yml; do
   sed -i 's/fa-eye/view-show/g' $i
 done
 for i in *.yml; do
@@ -169,9 +172,6 @@ done
 
 
 --- NOT YET REPLACED...
-for i in *.yml; do
-  sed -i 's/fa-file-excel-o/xxx/g' $i
-done
 for i in *.yml; do
   sed -i 's/fa-square-o/xxx/g' $i
 done

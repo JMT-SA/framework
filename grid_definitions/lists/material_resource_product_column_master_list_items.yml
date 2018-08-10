@@ -11,11 +11,11 @@
 # TODO: Maybe consider a global way of activating & deactivating records
 #- :url: "/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_lists/"
 #  :text: activate
-#  :icon: fa-toggle-on
+#  :icon: toggle-on
 #  :hide_if_true: :active
 #- :url: "/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_lists/"
 #  :text: deactivate
-#  :icon: fa-toggle-off
+#  :icon: toggle-off
 #  :hide_if_false: :active
 :page_controls:
 - :control_type: :link

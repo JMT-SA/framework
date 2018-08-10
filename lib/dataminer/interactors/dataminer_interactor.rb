@@ -127,8 +127,8 @@ module DataminerApp
                  end
       col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.action_column do |act|
-          act.edit_link '/dataminer/admin/$col1$/edit', col1: 'id'
-          act.popup_delete_link '/dataminer/admin/$col1$', col1: 'id'
+          act.edit_link '/dataminer/admin/$col1$/edit', col1: 'id', icon: 'edit'
+          act.popup_delete_link '/dataminer/admin/$col1$', col1: 'id', icon: 'delete'
         end
         mk.col 'db', 'Database'
         mk.col 'caption', 'Report caption', width: 300

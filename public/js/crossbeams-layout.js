@@ -128,24 +128,29 @@
     });
 
     document.body.addEventListener('click', (event) => {
+      // Disable a button on click
       if (event.target.dataset && event.target.dataset.disableWith) {
         preventMultipleSubmits(event.target);
       }
+      // Briefly disable a button
       if (event.target.dataset && event.target.dataset.brieflyDisableWith) {
         preventMultipleSubmitsBriefly(event.target);
       }
+      // Open modal dialog
       if (event.target.dataset && event.target.dataset.popupDialog) {
         crossbeamsUtils.popupDialog(event.target.text, event.target.href);
         event.stopPropagation();
         event.preventDefault();
       }
-      if (event.target.dataset && event.target.dataset.cbHintFor) {
-        const id = event.target.dataset.cbHintFor;
+      // Show hint dialog
+      if (event.target.parentNode.dataset && event.target.parentNode.dataset.cbHintFor) {
+        const id = event.target.parentNode.dataset.cbHintFor;
         const el = document.querySelector(`[data-cb-hint='${id}']`);
         if (el) {
           crossbeamsUtils.showHtmlInDialog('Hint', el.innerHTML);
         }
       }
+      // Copy to clipboard
       if (event.target.dataset && event.target.dataset.clipboard && event.target.dataset.clipboard === 'copy') {
         const input = document.getElementById(event.target.id.replace('_clip_i', '').replace('_clip', ''));
         input.select();
@@ -158,6 +163,7 @@
           Jackbox.warning('Cannot copy, hit Ctrl+C to copy the selected text');
         }
       }
+      // Close a modal dialog
       if (event.target.classList.contains('close-dialog')) {
         crossbeamsUtils.closePopupDialog();
         event.stopPropagation();

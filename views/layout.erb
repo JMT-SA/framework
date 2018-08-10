@@ -29,28 +29,6 @@
     <link rel="stylesheet" href="/css/selectr.min.css">
     <link rel="stylesheet" href="/css/multi.min.css">
     <%= assets(:css) %>
-    <style type="text/css">
-.cbl-icon {
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-  fill: currentColor;
-  position: relative;
-  top: .125em;
-}
-.cbl-icon-stroke {
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-  fill: none;
-  stroke: currentColor;
-  position: relative;
-  top: .125em;
-}
-.view-show {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M.2 10a11 11 0 0 1 19.6 0A11 11 0 0 1 .2 10zm9.8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-2a2 2 0 1 1 0-4 2 2 0 0 1 0 4z'/%3E%3C/svg%3E");
-}
-    </style>
 
     <%= content_for :late_head %>
   </head>
@@ -109,16 +87,9 @@
     <footer class="footness">
       <p>NOSOFT 2017
         <% if ENV['RACK_ENV'] == 'development' %>
-          ASSETS: <i class="fa <%= assets_paths(:css).any? { |p| p.include?('scss') } ? 'fa-bug' : 'fa-eye' %>"></i>
+          <% asset_type = assets_paths(:css).any? { |p| p.include?('scss') } ? :bug : :show %>
+          ASSETS: <%= Crossbeams::Layout::Icon.new(asset_type).render %>
         <% end %>
-  <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M17.94 11H13V9h4.94A8 8 0 0 0 11 2.06V7H9V2.06A8 8 0 0 0 2.06 9H7v2H2.06A8 8 0 0 0 9 17.94V13h2v4.94A8 8 0 0 0 17.94 11zM10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/></svg>
-    <i class="view-show"></i>
-<!--svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg-->
-
-<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cbl-icon-stroke"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-
-<svg class="cbl-icon" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1472 930v318q0 119-84.5 203.5t-203.5 84.5h-832q-119 0-203.5-84.5t-84.5-203.5v-832q0-119 84.5-203.5t203.5-84.5h832q63 0 117 25 15 7 18 23 3 17-9 29l-49 49q-10 10-23 10-3 0-9-2-23-6-45-6h-832q-66 0-113 47t-47 113v832q0 66 47 113t113 47h832q66 0 113-47t47-113v-254q0-13 9-22l64-64q10-10 23-10 6 0 12 3 20 8 20 29zm231-489l-814 814q-24 24-57 24t-57-24l-430-430q-24-24-24-57t24-57l110-110q24-24 57-24t57 24l263 263 647-647q24-24 57-24t57 24l110 110q24 24 24 57t-24 57z"/></svg>
-
 
     </footer>
 

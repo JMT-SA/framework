@@ -417,17 +417,17 @@ class GenerateNewScaffold < BaseService
       list[:actions] = []
       list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$",
                           text: 'view',
-                          icon: 'fa-eye',
+                          icon: 'view-show',
                           title: 'View',
                           popup: true }
       list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/edit",
                           text: 'edit',
-                          icon: 'fa-edit',
+                          icon: 'edit',
                           title: 'Edit',
                           popup: true }
       list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$",
                           text: 'delete',
-                          icon: 'fa-remove',
+                          icon: 'delete',
                           is_delete: true,
                           popup: true }
       list[:page_controls] = []
@@ -451,17 +451,17 @@ class GenerateNewScaffold < BaseService
       search[:actions] = []
       search[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$",
                             text: 'view',
-                            icon: 'fa-eye',
+                            icon: 'view-show',
                             title: 'View',
                             popup: true }
       search[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/edit",
                             text: 'edit',
-                            icon: 'fa-edit',
+                            icon: 'edit',
                             title: 'Edit',
                             popup: true }
       search[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$",
                             text: 'delete',
-                            icon: 'fa-remove',
+                            icon: 'delete',
                             is_delete: true,
                             popup: true }
       search[:page_controls] = []

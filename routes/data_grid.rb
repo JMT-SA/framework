@@ -94,16 +94,6 @@ class Framework < Roda
         response.headers['content_type'] = 'application/vnd.ms-excel'
         response.headers['Content-Disposition'] = "attachment; filename=\"#{caption.strip.gsub(%r{[/:*?"\\<>\|\r\n]}i, '-') + '.xls'}\""
         response.write(xls) # NOTE: could this use streaming to start downloading quicker?
-      rescue Sequel::DatabaseError => e
-        view(inline: <<-HTML)
-        <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
-        <p>Report: <em>#{caption}</em></p>The error message is:
-        <pre>#{e.message}</pre>
-        <button class="pure-button" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
-          <i class="fa fa-info"></i> Toggle SQL
-        </button>
-        <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@rpt.runnable_sql) %></pre>
-        HTML
       end
     end
   end

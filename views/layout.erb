@@ -20,10 +20,10 @@
     <!--link rel="stylesheet" href="/css/pure.css"-->
     <!--link rel="stylesheet" href="/css/grids-responsive.css"-->
     <link rel="stylesheet" href="/css/jackbox.css">
-    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <!-- link rel="stylesheet" href="/css/font-awesome.min.css" -->
     <link rel="stylesheet" href="/css/tachyons.min.css">
     <link rel="stylesheet" href="/css/sweetalert2.min.css">
-    <link rel="stylesheet" href="/css/jquery.contextMenu.css">
+    <link rel="stylesheet" href="/css/jquery.contextMenu.min.css">
     <link rel="stylesheet" href="/css/menu.css">
     <link rel="stylesheet" href="/css/skin.css">
     <link rel="stylesheet" href="/css/selectr.min.css">
@@ -86,17 +86,18 @@
     <footer class="footness">
       <p>NOSOFT 2017
         <% if ENV['RACK_ENV'] == 'development' %>
-          ASSETS: <i class="fa <%= assets_paths(:css).any? { |p| p.include?('scss') } ? 'fa-bug' : 'fa-eye' %>"></i>
+          <% asset_type = assets_paths(:css).any? { |p| p.include?('scss') } ? :bug : :show %>
+          ASSETS: <%= Crossbeams::Layout::Icon.new(asset_type).render %>
         <% end %>
     </footer>
 
     <script src="/js/lodash.js" type="text/javascript"></script>
-    <script src="/js/ag-grid-enterprise.js" type="text/javascript"></script>
+    <script src="/js/ag-grid-enterprise.min.js" type="text/javascript"></script>
     <script src="/js/ag-enterprise-activation.js" type="text/javascript"></script>
     <script src="/js/jackbox.min.js" type="text/javascript"></script>
     <script src="/js/jquery-3.2.1.min.js" type="text/javascript"></script>
-    <script src="/js/jquery.ui.position.js" type="text/javascript"></script>
-    <script src="/js/jquery.contextMenu.js" type="text/javascript"></script>
+    <script src="/js/jquery.ui.position.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.contextMenu.min.js" type="text/javascript"></script>
     <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
     <script src="/js/Sortable.min.js" type="text/javascript"></script>
     <script src="/js/crossbeams-local-storage.js" type="text/javascript"></script>

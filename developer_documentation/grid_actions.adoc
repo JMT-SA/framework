@@ -17,7 +17,7 @@ The actions are rendered as a context menu that can include submenu groupings.
 :actions:
   - :url: /path/to/resource
     :text: action item text
-    :icon: fa-edit
+    :icon: edit
     :title: The dialog title with $:id$ in it
     :popup: true
     :auth:
@@ -63,15 +63,17 @@ See <<URLs>> below for more information.
 
 |:icon
 |icon's css class name.
-a|Currently the system uses FontAwesome icons - e.g.:
+a|The system uses a fixed set of icons compiled into jQueryContextMenu
+See link:/development/grid_icons[Grid icons]
+e.g.:
 
-* view: fa-eye
-* edit: fa-edit
-* new: fa-plus-circle
-* delete: fa-remove
-* list/associations: fa-list
-* sort: fa-sort
-* restrict: fa-lock
+* view: view-show
+* edit: edit
+* new: add-solid
+* delete: delete
+* list/associations: list
+* sort: sort
+* restrict: lock-closed
 
 |:popup
 |`true` or `false`

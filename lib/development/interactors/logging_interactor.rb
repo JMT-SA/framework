@@ -53,7 +53,7 @@ module DevelopmentApp
         mk.action_column do |act|
           act.popup_link 'Detail diff', '/development/logging/logged_actions/$col1$/diff',
                          col1: 'event_id',
-                         icon: 'fa-list',
+                         icon: 'list',
                          title: 'View differences',
                          hide_if_null: :event_id
         end

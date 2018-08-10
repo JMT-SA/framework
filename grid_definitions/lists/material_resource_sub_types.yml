@@ -3,27 +3,27 @@
 :actions:
 - :url: "/pack_material/config/material_resource_sub_types/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/pack_material/config/material_resource_sub_types/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/pack_material/config/material_resource_sub_types/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :popup: true
   :hide_if_true: has_products
 - :url: "/pack_material/config/material_resource_sub_types/$:id$/config/edit"
   :text: config
-  :icon: fa-list
+  :icon: list
   :hide_if_true: has_products
 - :url: "/pack_material/config/material_resource_sub_types/$:id$/product_columns"
   :text: product columns
-  :icon: fa-list
+  :icon: list
   :hide_if_null: product_column_ids
 :page_controls:
 - :control_type: :link

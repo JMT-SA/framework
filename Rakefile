@@ -201,8 +201,3 @@ namespace :db do
     puts "Created migration #{fn}"
   end
 end
-
-# file 'migration_new_file' do
-#   # touch "db/migrate/#{Time.now.strftime('')}_mig.rb'
-#   touch File.join('db/migrations', Time.now.strftime('%Y%m%d%H%M_new_migration.rb'))
-# end

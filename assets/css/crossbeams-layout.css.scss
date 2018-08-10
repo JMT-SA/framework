@@ -634,6 +634,18 @@ input:required {
 div.multi-wrapper.required {
   border-right: thick solid orange;
 }
+
+.cbl-icon {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  fill: currentColor;
+  position: relative;
+  top: .125em;
+}
+.no-flex {
+  display: block;
+}
 /* -------------------------------------------------------------------------- *\
  * Styles for PROGRESS display
  * -------------------------------------------------------------------------- */

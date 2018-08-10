@@ -4,18 +4,18 @@
 :actions:
 - :url: "/pack_material/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_list_items/$:id$/edit"
   :text: edit item details
-  :icon: fa-edit
+  :icon: edit
   :title: Edit Item Details
   :popup: true
   :hide_if_null: id
 # TODO: Maybe consider a global way of activating & deactivating records
 #- :url: "/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_list_items/"
 #  :text: activate
-#  :icon: fa-toggle-on
+#  :icon: toggle-on
 #  :hide_if_true: :active
 #- :url: "/config/material_resource_sub_types/$:sub_type_id$/material_resource_master_list_items/"
 #  :text: deactivate
-#  :icon: fa-toggle-off
+#  :icon: toggle-off
 #  :hide_if_false: :active
 :page_controls:
 - :control_type: :link

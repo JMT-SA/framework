@@ -22,22 +22,21 @@ GIT
       erubis
       rack
 
-GIT
-  remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 3a40726aa00b72201152b87c4c3c1ba24b2571a0
-  specs:
-    roda-data_grid (0.1.6)
-      axlsx
-      crossbeams-dataminer
-      crossbeams-layout
-      roda
-
 PATH
   remote: /home/james/ra/crossbeams/crossbeams-layout
   specs:
     crossbeams-layout (0.1.9)
       diffy
       rouge
+
+PATH
+  remote: /home/james/ra/crossbeams/roda-data_grid
+  specs:
+    roda-data_grid (0.1.6)
+      axlsx
+      crossbeams-dataminer
+      crossbeams-layout
+      roda
 
 GEM
   remote: https://rubygems.org/

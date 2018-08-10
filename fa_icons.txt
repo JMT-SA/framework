@@ -99,7 +99,7 @@ trash
 
 
 for i in *.yml; do
-  sed -i 's/add-circle/add-solid/g' $i
+  sed -i 's/fa-add-circle/add-solid/g' $i
 done
 for i in *.yml; do
   sed -i 's/fa-arrow-left/arrow-left/g' $i
@@ -168,7 +168,18 @@ for i in *.yml; do
   sed -i 's/fa-sort/sort/g' $i
 done
 
-
+for i in *.yml; do
+  sed -i 's/fa-clone/copy/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-image/photo/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-print/printer/g' $i
+done
+for i in *.yml; do
+  sed -i 's/fa-download/download/g' $i
+done
 
 
 --- NOT YET REPLACED...

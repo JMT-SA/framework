@@ -59,7 +59,6 @@
       <%= yield %>
     </div>
 
-
     <div class="dialog" aria-hidden="true" id="crossbeams-popup-dialog-level1">
       <div class="dialog-overlay" tabindex="-1"></div> <!-- data-a11y-dialog-hide></div> -->
       <div id="dialog-error-level1" class="brown bg-washed-red ba b--light-red absolute top-1 left-1 pa3" style="display:none;z-index:60;min-width:20em;"></div>
@@ -90,7 +89,6 @@
           <% asset_type = assets_paths(:css).any? { |p| p.include?('scss') } ? :bug : :show %>
           ASSETS: <%= Crossbeams::Layout::Icon.new(asset_type).render %>
         <% end %>
-
     </footer>
 
     <script src="/js/lodash.js" type="text/javascript"></script>

@@ -561,9 +561,9 @@ const crossbeamsGridFormatters = {
     if (items.length === 0) {
       return '';
     }
-    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z"/></svg></button>`;
+    // svg: chevron-right
+    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"/></svg></button>`;
   },
-
 
   // Return a number with thousand separator and at least 2 digits after the decimal.
   numberWithCommas2: function numberWithCommas2(params) {

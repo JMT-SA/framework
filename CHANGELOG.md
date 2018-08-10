@@ -10,6 +10,10 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Changed
 ### Fixed
 
+## [0.4.0] - 2018-08-10
+### Changed
+- All icon usage changed from using FontAwesome to using embedded SVG icons.
+
 ## [0.3.0] - 2018-08-02
 ### Added
 - Building Material Resource Products

@@ -3,17 +3,17 @@
 :actions:
 - :url: "/masterfiles/target_markets/destination_cities/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/target_markets/destination_cities/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/target_markets/destination_cities/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :popup: true
 :conditions:

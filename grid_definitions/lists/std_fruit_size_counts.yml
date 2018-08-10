@@ -3,27 +3,27 @@
 :actions:
 - :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :popup: true
 - :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$/fruit_actual_counts_for_packs/new"
   :text: add actual count
-  :icon: fa-plus
+  :icon: add
   :title: New Actual Count for Pack
   :popup: true
 - :url: "/list/fruit_actual_counts_for_packs/with_params?key=standard&fruit_actual_counts_for_packs.std_fruit_size_count_id=$:id$"
   :text: actual counts list
-  :icon: fa-list
+  :icon: list
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/std_fruit_size_counts/new"

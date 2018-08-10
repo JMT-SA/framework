@@ -3,17 +3,17 @@
 :actions:
 - :url: "/masterfiles/fruit/basic_pack_codes/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/fruit/basic_pack_codes/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/fruit/basic_pack_codes/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :popup: true
 :page_controls:

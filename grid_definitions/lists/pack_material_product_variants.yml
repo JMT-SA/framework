@@ -3,32 +3,32 @@
 :actions:
 - :url: "/pack_material/config/pack_material_products/$:product_id$/pack_material_product_variants/new"
   :text: new variant
-  :icon: fa-plus-circle
+  :icon: add-solid
   :title: New Product Variant
   :popup: true
 - :separator: true
   :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
   :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
   :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$/clone"
   :text: clone
-  :icon: fa-copy
+  :icon: edit-copy
   :title: Clone
   :popup: true
   :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :popup: true
   :hide_if_null: id

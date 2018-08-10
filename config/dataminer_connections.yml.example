@@ -3,11 +3,11 @@ kromco:
   db: postgres://postgres:postgres@localhost/kromco
   path: ~/ra/crossbeams/testcall/dm_kr_yml_reports
   prepared_path: ~/ra/crossbeams/testcall/prepared_dm_kr_yml_reports
-exporter:
-  db: postgres://postgres:postgres@localhost/exporter
-  path: ~/ra/crossbeams/testcall/dm_yml_reports
-  prepared_path: ~/ra/crossbeams/testcall/prepared_dm_yml_reports
-framework:
-  db: postgres://postgres:postgres@localhost/crossbeams_framework
-  path: ~/ra/crossbeams/framework/reports
-  prepared_path: ~/ra/crossbeams/framework/prepared_reports
+# exporter:
+#   db: postgres://postgres:postgres@localhost/exporter
+#   path: ~/ra/crossbeams/testcall/dm_yml_reports
+#   prepared_path: ~/ra/crossbeams/testcall/prepared_dm_yml_reports
+# framework:
+#   db: postgres://postgres:postgres@localhost/crossbeams_framework
+#   path: ~/ra/crossbeams/framework/reports
+#   prepared_path: ~/ra/crossbeams/framework/prepared_reports

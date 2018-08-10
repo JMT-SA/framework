@@ -34,9 +34,9 @@
 </form>
 </section>
 <section class="crossbeams_layout-border pa2">
-  <a href="#" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false" class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><i class="fa fa-info"></i> Toggle SQL view</a>
-  <a href='/dataminer/admin/<%= @page.id %>/change_sql/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver">Change SQL</a>
-  <a href='/dataminer/admin/<%= @page.id %>/reorder_columns/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver">Re-order columns</a>
+  <a href="#" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false" class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle SQL view</a>
+  <a href='/dataminer/admin/<%= @page.id %>/change_sql/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:edit) %> Change SQL</a>
+  <a href='/dataminer/admin/<%= @page.id %>/reorder_columns/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:sort) %> Re-order columns</a>
   <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
 </section>
 
@@ -46,7 +46,7 @@
 </div>
 
 <p style="margin-top:5em;">
-  <a href='/dataminer/admin/<%= @page.id %>/parameter/new/' class="crossbeams-button link dim br2 pa3 white bg-blue"><i class="fa fa-plus"></i> Add a parameter</a>
+  <a href='/dataminer/admin/<%= @page.id %>/parameter/new/' class="crossbeams-button link dim br2 pa3 white bg-blue"><%= Crossbeams::Layout::Icon.render(:plus) %> Add a parameter</a>
 </p>
 <div style="height:20em">
   <%= Crossbeams::Layout::Renderer::Grid.header('grd2', 'Parameters') %>

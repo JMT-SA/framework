@@ -5,103 +5,22 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 == Icons
 
-Font-awesome icons
+Icons are used in three ways:
 
-`<i class="fa-arrow-left"></i> text`
+* In grid action list menu items
+* By using one of the icons defined in Crossbeams::Layout
+* By embedding SVG inline in HTML
 
-|===
-|Icon |Font-awesome class |Notes
+=== Grid Icons
 
-|[.fa .fa-plus]#.#
-|fa-plus
-|New `(**C** RUD)`; Add an item to a list
+link:/development/grid_icons[Grid icon list]
 
-|[.fa .fa-plus-circle]#.#
-|fa-plus-circle
-|New `(**C** RUD)` - Alternate version
+=== Layout Icons
 
-|[.fa .fa-eye]#.#
-|fa-eye
-|View `(C **R** UD)`
+link:/development/layout_icons[Layout icon list]
 
-|[.fa .fa-edit]#.#
-|fa-edit
-|Edit `(CR **U** D)`
+=== Embedded Icons
 
-|[.fa .fa-remove]#.#
-|fa-remove
-|Remove; Delete `(CRU **D**)`
+You should generally not need to do this.
 
-|[.fa .fa-arrow-left]#.#
-|fa-arrow-left
-|Used in "back" links.
-
-|[.fa .fa-book]#.#
-|fa-book
-|Properties
-
-|[.fa .fa-bug]#.#
-|fa-bug
-|Debug mode
-
-|[.fa .fa-check-square-o]#.#
-|fa-check-square-o
-|Toggle on; Check; set a boolean to true
-
-|[.fa .fa-square-o]#.#
-|fa-square-o
-|Toggle off; Un-check; set a boolean to false
-
-|[.fa .fa-chevron-right]#.#
-|fa-chevron-right
-|Sub menu; More
-
-|[.fa .fa-code]#.#
-|fa-code
-|Show code
-
-|[.fa .fa-columns]#.#
-|fa-columns
-|Columns
-
-|[.fa .fa-copy]#.#
-|fa-copy
-|Copy
-
-|[.fa .fa-file-excel-o]#.#
-|fa-file-excel-o
-|Export to Excel
-
-|[.fa .fa-info]#.#
-|fa-info
-|Information
-
-|[.fa .fa-link]#.#
-|fa-link
-|Link URL
-
-|[.fa .fa-list]#.#
-|fa-list
-|List
-
-|[.fa .fa-lock]#.#
-|fa-lock
-|Lock; Block
-
-|[.fa .fa-minus]#.#
-|fa-minus
-|Remove an item from a list
-
-|[.fa .fa-play]#.#
-|fa-play
-|Run; execute
-
-|[.fa .fa-save]#.#
-|fa-save
-|Save; Download; Save grid selection
-
-|[.fa .fa-sort]#.#
-|fa-sort
-|Sort
-
-|===
+If you do, the `svg` tag should get a class of `cbl-icon` to display at the correct size and aligned with text.

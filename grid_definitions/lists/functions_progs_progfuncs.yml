@@ -35,24 +35,24 @@
     1:
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$/edit
         :text: edit
-        :icon: fa-edit
+        :icon: edit
       - :url: /security/functional_areas/functional_areas/$:functional_area_id$
         :text: delete
         :is_delete: true
-        :icon: fa-remove
+        :icon: delete
     2:
       - :url: /security/functional_areas/programs/$:program_id$/edit
         :text: edit
-        :icon: fa-edit
+        :icon: edit
       - :url: /security/functional_areas/programs/$:program_id$
         :text: delete
         :is_delete: true
-        :icon: fa-remove
+        :icon: delete
     3:
       - :url: /security/functional_areas/program_functions/$:id$/edit
         :text: edit
-        :icon: fa-edit
+        :icon: edit
       - :url: /security/functional_areas/program_functions/$:id$
         :text: delete
         :is_delete: true
-        :icon: fa-remove
+        :icon: delete

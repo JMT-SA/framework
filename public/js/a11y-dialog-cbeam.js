@@ -1,5 +1,8 @@
 /* global NodeList, Element, define */
 
+// NoSoft: DO NOT TRAP ESC key.
+// Modified from version 4.0.0 so that the ESC key is ignored (so that AG-Grid search input can be cleared with ESC key without closing the dialog)
+
 (function (global) {
   'use strict';
 

@@ -3,17 +3,17 @@
 :actions:
 - :url: "/masterfiles/parties/addresses/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/parties/addresses/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/parties/addresses/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :prompt: 'By deleting this address you will also be removing it from linked parties. Are you sure you want to delete this address?'
   :popup: true

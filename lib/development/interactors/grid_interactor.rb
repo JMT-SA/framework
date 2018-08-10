@@ -90,7 +90,7 @@ module DevelopmentApp
     end
 
     def page_control_col_defs(file)
-      action_cols = [{ text: 'edit', icon: 'fa-edit', url: "/development/grids/grid_page_controls/#{file}/$col0$", col0: 'id', popup: true, title: 'Edit page control' }]
+      action_cols = [{ text: 'edit', icon: 'edit', url: "/development/grids/grid_page_controls/#{file}/$col0$", col0: 'id', popup: true, title: 'Edit page control' }]
 
       [{ headerName: '', pinned: 'left',
          width: 60,
@@ -125,7 +125,7 @@ module DevelopmentApp
     end
 
     def multiselect_col_defs
-      action_cols = [{ text: 'edit', icon: 'fa-edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
+      action_cols = [{ text: 'edit', icon: 'edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
 
       [{ headerName: '', pinned: 'left',
          width: 60,
@@ -166,7 +166,7 @@ module DevelopmentApp
     end
 
     def condition_col_defs
-      action_cols = [{ text: 'edit', icon: 'fa-edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
+      action_cols = [{ text: 'edit', icon: 'edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
 
       [{ headerName: '', pinned: 'left',
          width: 60,
@@ -199,7 +199,7 @@ module DevelopmentApp
     end
 
     def action_col_defs
-      action_cols = [{ text: 'edit', icon: 'fa-edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
+      action_cols = [{ text: 'edit', icon: 'edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
 
       [{ headerName: '', pinned: 'left',
          width: 60,
@@ -271,7 +271,7 @@ module DevelopmentApp
     end
 
     def list_col_defs
-      action_cols = [{ text: 'edit', icon: 'fa-edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
+      action_cols = [{ text: 'edit', icon: 'edit', url: '/development/grids/lists/edit/$col0$', col0: 'file' }]
 
       [{ headerName: '', pinned: 'left',
          width: 60,

@@ -34,14 +34,17 @@ class Framework < Roda
         # NOTE: could this use streaming to start downloading quicker?
         response.write(page.excel_file.to_stream.read)
       rescue Sequel::DatabaseError => e
+        @page = page
         view(inline: <<-HTML)
-        <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
-        <p>Report: <em>#{@page.nil? ? id : @page.report.caption}</em></p>The error message is:
-        <pre>#{e.message}</pre>
-        <button class="pure-button" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
-          <i class="fa fa-info"></i> Toggle SQL
-        </button>
-        <pre id="sql_code" style="display:none;">#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
+        <div>
+          <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
+          <p>Report: <em>#{@page.nil? ? id : @page.report.caption}</em></p>The error message is:
+          <pre>#{e.message}</pre>
+          <button class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
+            #{Crossbeams::Layout::Icon.render(:info)} Toggle SQL
+          </button>
+          <pre id="sql_code" style="display:none;">#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
+        </div>
         HTML
       end
 
@@ -56,13 +59,15 @@ class Framework < Roda
         end
       rescue Sequel::DatabaseError => e
         view(inline: <<-HTML)
-        <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
-        <p>Report: <em>#{@page.nil? ? id : @page.report.caption}</em></p>The error message is:
-        <pre>#{e.message}</pre>
-        <button class="pure-button" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
-          <i class="fa fa-info"></i> Toggle SQL
-        </button>
-        <pre id="sql_code" style="display:none;">#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
+        <div>
+          <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
+          <p>Report: <em>#{@page.nil? ? id : @page.report.caption}</em></p>The error message is:
+          <pre>#{e.message}</pre>
+          <button class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
+            #{Crossbeams::Layout::Icon.render(:info)} Toggle SQL
+          </button>
+          <pre id="sql_code" style="display:none;">#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
+        </div>
         HTML
       end
     end

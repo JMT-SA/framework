@@ -25,7 +25,7 @@ This page control displays a link in a page.
 e.g.
 [source,ruby]
 ----
-section.add_link(text: 'Do something', url: '/path/to/something', style: :button)
+section.add_control(control_type: :link, text: 'Do something', url: '/path/to/something', style: :button)
 ----
 
 |===
@@ -49,6 +49,11 @@ section.add_link(text: 'Do something', url: '/path/to/something', style: :button
 |options - :behaviour
 |How the link behaves when clicked. Can open the url in a new page, or can open the url in a popup dialog.
 |`:popup`.
+|n/a
+
+|options - :css_class
+|Extra class string to add to the link's class.
+|`String`.
 |n/a
 
 |===

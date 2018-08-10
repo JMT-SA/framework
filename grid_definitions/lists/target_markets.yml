@@ -3,25 +3,25 @@
 :actions:
 - :url: "/masterfiles/target_markets/target_markets/$:id$"
   :text: view
-  :icon: fa-eye
+  :icon: view-show
   :title: View
   :popup: true
 - :url: "/masterfiles/target_markets/target_markets/$:id$/edit"
   :text: edit
-  :icon: fa-edit
+  :icon: edit
   :title: Edit
   :popup: true
 - :url: "/masterfiles/target_markets/target_markets/$:id$"
   :text: delete
-  :icon: fa-remove
+  :icon: delete
   :is_delete: true
   :popup: true
 - :url: "/list/target_market_countries/multi?key=target_markets&id=$:id$"
   :text: countries
-  :icon: fa-list
+  :icon: list
 - :url: "/list/target_market_tm_groups/multi?key=target_markets&id=$:id$"
   :text: groups
-  :icon: fa-list
+  :icon: list
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/target_markets/target_markets/new"

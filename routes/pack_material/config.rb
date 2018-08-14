@@ -166,7 +166,8 @@ class Framework < Roda
                            OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_short_code', value: ''),
                            OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_long_name', value: ''),
                            OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_description', value: ''),
-                           OpenStruct.new(type: :replace_list_items, dom_id: 'matres_master_list_item_list_items', items: items)
+                           OpenStruct.new(type: :replace_list_items, dom_id: 'matres_master_list_item_list_items', items: items),
+                           OpenStruct.new(type: :clear_form_validation, dom_id: 'new_mrli_item')
                          ],
                          'Added new item',
                          keep_dialog_open: true)

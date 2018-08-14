@@ -72,6 +72,15 @@ dom_id: as for `:replace_input_value`.
 items: An array of `Strings`.
 
 
+===== Clear validation error messages from a form
+
+Clears all UI text and styling from validation errors of a particular form.
+
+type: `:clear_form_validation`.
+
+dom_id: the `id` of the `<form>`. (Use `form.form_id 'abc'` in the view to set this value)
+
+
 ==== Single actions
 
 There are also helper methods available that are easier to use when only returning a singe action.
@@ -79,11 +88,13 @@ These work exactly the same as for their counterparts above.
 
 [source,ruby]
 ----
-json_replace_select_options(dom_id, options_array, message = nil, keep_dialog_open: false)
+json_replace_select_options(dom_id, options_array, message: nil, keep_dialog_open: false)
 
-json_replace_multi_options(dom_id, options_array, message = nil, keep_dialog_open: false)
+json_replace_multi_options(dom_id, options_array, message: nil, keep_dialog_open: false)
 
-json_replace_input_value(dom_id, value, message = nil, keep_dialog_open: false)
+json_replace_input_value(dom_id, value, message: nil, keep_dialog_open: false)
 
-json_replace_list_items(dom_id, items, message = nil, keep_dialog_open: false)
+json_replace_list_items(dom_id, items, message: nil, keep_dialog_open: false)
+
+json_clear_form_validation(dom_id, message: nil, keep_dialog_open: false)
 ----

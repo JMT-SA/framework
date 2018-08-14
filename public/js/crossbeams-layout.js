@@ -218,6 +218,9 @@
                 if (action.replace_list_items) {
                   crossbeamsUtils.replaceListItems(action);
                 }
+                if (action.clear_form_validation) {
+                  crossbeamsUtils.clearFormValidation(action);
+                }
               });
             } else if (data.replaceDialog) {
               closeDialog = false;

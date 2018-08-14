@@ -15,6 +15,7 @@ module PackMaterial
             page.form do |form|
               form.action "/pack_material/config/material_resource_sub_types/#{sub_type_id}/material_resource_master_list_items"
               form.remote! if remote
+              form.form_id 'new_mrli_item'
               form.add_field :material_resource_product_column_name
               form.add_field :material_resource_product_column_id
               form.add_field :short_code

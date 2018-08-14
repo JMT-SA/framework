@@ -16,6 +16,7 @@ module Development
             page.form_errors form_errors
             page.form do |form|
               form.action '/development/generators/scaffolds'
+              form.form_id 'gen_form'
               form.add_field :table
               form.add_field :applet
               form.add_field :other

@@ -10,4 +10,19 @@ class TestCommonHelpers < Minitest::Test
     assert_equal({ one: 1, two: 2, three: 3 }, select_attributes(instance, row_keys, three: 3))
     assert_equal({ one: 1, two: 22, three: 3 }, select_attributes(instance, row_keys, three: 3, two: 22))
   end
+
+  def test_base_validation
+    assert_equal({ base: ['Err'] }, add_base_validation_errors({}, 'Err'))
+    assert_equal({ fld1: ['must be filled'], base: ['Err'] }, add_base_validation_errors({fld1: ['must be filled']}, 'Err'))
+    assert_equal({ base: ['Err-1', 'Err-2'] }, add_base_validation_errors({}, ['Err-1', 'Err-2']))
+  end
+
+  def test_base_validation_with_highlights
+    assert_equal({ base_with_highlights: { messages: ['Err'], highlights: :fld1 } },
+                 add_base_validation_errors_with_highlights({}, 'Err', :fld1))
+    assert_equal({ fld1: ['must be filled'], base_with_highlights: { messages: ['Err'], highlights: [:fld1, :fld2] } },
+                 add_base_validation_errors_with_highlights({fld1: ['must be filled']}, 'Err', [:fld1, :fld2]))
+    assert_equal({ base_with_highlights: { messages: ['Err-1', 'Err-2'], highlights: :fld1 } },
+                 add_base_validation_errors_with_highlights({}, ['Err-1', 'Err-2'], :fld1))
+  end
 end

@@ -46,6 +46,26 @@ module CommonHelpers
     end
   end
 
+  # Add validation errors that are not linked to a field in a form.
+  #
+  # @param messages [Hash] the current hash of validation messages.
+  # @param base_messages [String, Array] the new messages to be added to the base of the form.
+  # @return [Hash] the expanded validation messages.
+  def add_base_validation_errors(messages, base_messages)
+    (messages || {}).merge(base: Array(base_messages))
+  end
+
+  # Add validation errors that are not linked to a field in a form.
+  # At the same time highlight one or more fields in error
+  #
+  # @param messages [Hash] the current hash of validation messages.
+  # @param base_messages [String, Array] the new messages to be added to the base of the form.
+  # @param fields [Array] the fields in the form to be highlighted.
+  # @return [Hash] the expanded validation messages.
+  def add_base_validation_errors_with_highlights(messages, base_messages, fields)
+    (messages || {}).merge(base_with_highlights: { messages: Array(base_messages), highlights: fields })
+  end
+
   # Selection from a multiselect grid.
   # Returns an array of values.
   def multiselect_grid_choices(params, treat_as_integers: true)

@@ -234,7 +234,7 @@ form.rodauth div.form-group {
 }
 
 /* input, textarea, select { */
-.cbl-input, .rodauth .form-control {
+.cbl-input, .cbl-input-required, .rodauth .form-control {
   font-size: 1em;
   padding: 2px 5px 4px;
 /*  border: 0 none; */
@@ -271,7 +271,7 @@ input.cbl-input {
 }
 
 /* .crossbeams-form input, .crossbeams-form textarea, .crossbeams-form select { */
-.crossbeams-form .cbl-input, .crossbeams-form .cbl-copy-wrapper, .crossbeams-form .multi-wrapper, .rodauth .col-sm-10 {
+.crossbeams-form .cbl-input, .crossbeams-form .cbl-input-required, .crossbeams-form .cbl-copy-wrapper, .crossbeams-form .multi-wrapper, .rodauth .col-sm-10 {
   order: 2;
   flex: 1 1 auto;
 }
@@ -296,14 +296,6 @@ input.cbl-input {
   width: auto;
   text-align: left;
   padding-left: 0.4em;
-}
-
-.crossbeams-form-error {
-  color: brown;
-}
-
-.crossbeams-div-error {
-  background-color: #fee;
 }
 
 .crossbeams-info-note {
@@ -345,6 +337,7 @@ input.cbl-input {
 /* label state styles - relies on label placed after input in form...*/
 /* .crossbeams-form input:focus ~ label, .crossbeams-form textarea:focus ~ label, .crossbeams-form select:focus ~ label { */
 .crossbeams-form .cbl-input:focus ~ label,
+.crossbeams-form .cbl-input-required:focus ~ label,
 .crossbeams-form .searchable-multi:focus ~ label,
 .rodauth .form-control:focus ~ label {
   color: darkcyan;
@@ -464,6 +457,10 @@ tr.roweven {
 }
 .selectr-input {
   width: calc(100% - 4em);
+}
+
+div.selectr-container.cbl-input-required div.selectr-selected {
+  border-right: thick solid orange;
 }
 /*
 .selectr-selected[disabled] {
@@ -738,6 +735,7 @@ div.cbl-progress-bar-text {
 }
 @media (max-width: 600px) {
   .cbl-input,
+  .cbl-input-required,
   .cbl-copy-wrapper,
   .multi-wrapper,
   /* input, */

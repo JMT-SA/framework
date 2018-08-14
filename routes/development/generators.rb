@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Framework < Roda
-  route 'generators', 'development' do |r|
+  route 'generators', 'development' do |r| # rubocop:disable Metrics/BlockLength
     # SCAFFOLDS
     # --------------------------------------------------------------------------
     r.on 'scaffolds' do

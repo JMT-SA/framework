@@ -18,12 +18,12 @@ module UiRules
 
     def common_fields
       {
-        table: { renderer: :select, options: @repo.table_list, prompt: true },
+        table: { renderer: :select, options: @repo.table_list, prompt: true, required: true },
         applet: { renderer: :select, options: applets_list },
         other: { force_lowercase: true },
-        program: { force_lowercase: true },
+        program: { required: true, force_lowercase: true },
         label_field: {},
-        short_name: { caption: 'Short name based on table name' },
+        short_name: { required: true, caption: 'Short name based on table name' },
         shared_repo_name: { hint: 'Name of an existing or new repo to use to store persistence methods for more than one table.<p>The code will refer to this repo instead of using a name derived from the table.<br> Use CamelCase - <em>"MostAwesome"</em> for <em>"MostAwesoneRepo"</em>.</p>' },
         nested_route_parent: { renderer: :select, options: @repo.table_list, prompt: true }
       }

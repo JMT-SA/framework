@@ -496,8 +496,14 @@ const crossbeamsUtils = {
       if (sel.selectr) {
         // Selectr has already been applied...
       } else {
+        const isRequired = sel.required;
+        let cls = 'cbl-input';
+        if (isRequired) {
+          sel.required = false;
+          cls = 'cbl-input-required';
+        }
         holdSel = new Selectr(sel, {
-          customClass: 'cbl-input',
+          customClass: cls,
           defaultSelected: true, // should configure via data...
           // multiple: true,     // should configure via data...
           allowDeselect: false,

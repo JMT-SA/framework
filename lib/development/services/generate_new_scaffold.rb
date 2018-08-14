@@ -550,6 +550,8 @@ class GenerateNewScaffold < BaseService
           interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
           r.on 'new' do    # NEW
             check_auth!('#{opts.program_text}', 'new')
+            # FIXME: --- UNCOMMENT next line if this is called directly from a menu item
+            # set_last_grid_url('/list/#{opts.table}', r)
             show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
           end
           r.post do        # CREATE
@@ -576,6 +578,8 @@ class GenerateNewScaffold < BaseService
             interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
             r.on 'new' do    # NEW
               check_auth!('#{opts.program_text}', 'new')
+              # FIXME: --- UNCOMMENT next line if this is called directly from a menu item
+              # set_last_grid_url('/list/#{opts.table}', r)
               show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
             end
             r.post do        # CREATE

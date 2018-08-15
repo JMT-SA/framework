@@ -8,7 +8,7 @@
   \"material_resource_sub_types\".\"has_retailers\",\r\n  \"material_resource_sub_types\".\"product_column_ids\",
   \"material_resource_sub_types\".\"product_code_ids\",\r\n  \"material_resource_sub_types\".\"material_resource_type_id\",\r\n
   \ exists(select id from pack_material_products\r\n  where material_resource_sub_type_id
-  = material_resource_types.id) as has_products\r\nFROM \"material_resource_sub_types\"\r\nJOIN
+  = material_resource_sub_types.id) as has_products\r\nFROM \"material_resource_sub_types\"\r\nJOIN
   \"material_resource_types\" ON \"material_resource_types\".\"id\" =\r\n\"material_resource_sub_types\".\"material_resource_type_id\""
 :limit: 
 :offset: 

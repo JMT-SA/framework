@@ -112,7 +112,7 @@
     if (logoutLink) {
       logoutLink.addEventListener('click', () => {
         crossbeamsLocalStorage.removeItem('selectedFuncMenu');
-      });
+      }, false);
     }
     // Initialise any selects to be searchable or multi-selects.
     crossbeamsUtils.makeMultiSelects();
@@ -125,7 +125,7 @@
       if (event.target.classList.contains('cbl-to-lower') && event.keyCode === 13) {
         event.target.value = event.target.value.toLowerCase();
       }
-    });
+    }, false);
 
     document.body.addEventListener('click', (event) => {
       // Disable a button on click
@@ -143,7 +143,7 @@
         event.preventDefault();
       }
       // Show hint dialog
-      if (event.target.parentNode.dataset && event.target.parentNode.dataset.cbHintFor) {
+      if (event.target.closest('[data-cb-hint-for]')) {
         const id = event.target.parentNode.dataset.cbHintFor;
         const el = document.querySelector(`[data-cb-hint='${id}']`);
         if (el) {
@@ -169,7 +169,7 @@
         event.stopPropagation();
         event.preventDefault();
       }
-    });
+    }, false);
 
     /**
      * Turn a form into a remote (AJAX) form on submit.
@@ -282,8 +282,8 @@
         event.stopPropagation();
         event.preventDefault();
       }
-    });
-  });
+    }, false);
+  }, false);
 }());
 
 // function testEvt(gridId) {

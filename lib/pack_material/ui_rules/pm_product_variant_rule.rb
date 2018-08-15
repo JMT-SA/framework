@@ -42,7 +42,7 @@ module UiRules
       fields[:market] = { renderer: :label }
       fields[:marking] = { renderer: :label }
       fields[:model] = { renderer: :label }
-      fields[:pm_class] = { renderer: :label }
+      fields[:pm_class] = { renderer: :label, caption: 'Class' }
       fields[:grade] = { renderer: :label }
       fields[:language] = { renderer: :label }
       fields[:other] = { renderer: :label }

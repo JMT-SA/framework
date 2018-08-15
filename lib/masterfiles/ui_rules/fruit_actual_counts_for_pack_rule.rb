@@ -28,10 +28,10 @@ module UiRules
     def common_fields
       {
         std_fruit_size_count_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts },
-        basic_pack_code_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes },
-        standard_pack_code_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes },
-        actual_count_for_pack: {},
-        size_count_variation: {}
+        basic_pack_code_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes, required: true  },
+        standard_pack_code_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes, required: true  },
+        actual_count_for_pack: { required: true },
+        size_count_variation: { required: true }
       }
     end
 

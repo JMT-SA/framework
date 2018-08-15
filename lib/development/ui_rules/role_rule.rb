@@ -16,12 +16,12 @@ module UiRules
 
     def set_show_fields
       fields[:name] = { renderer: :label }
-      fields[:active] = { renderer: :label }
+      fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
-        name: { force_uppercase: true },
+        name: { force_uppercase: true, required: true },
         active: { renderer: :checkbox }
       }
     end

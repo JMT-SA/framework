@@ -19,13 +19,13 @@ module UiRules
                                           with_value: @repo.find_contact_method(@form_object.contact_method_type_id)&.contact_method_type }
       fields[:contact_method_type] = { renderer: :label }
       fields[:contact_method_code] = { renderer: :label }
-      fields[:active] = { renderer: :label }
+      fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
-        contact_method_type_id: { renderer: :select, options: @repo.for_select_contact_method_types },
-        contact_method_code: {},
+        contact_method_type_id: { renderer: :select, options: @repo.for_select_contact_method_types, required: true },
+        contact_method_code: { required: true },
         active: { renderer: :checkbox }
       }
     end

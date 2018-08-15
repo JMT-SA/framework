@@ -24,7 +24,7 @@ module UiRules
 
     def common_fields
       {
-        basic_pack_code: {},
+        basic_pack_code: { required: true },
         description: {},
         length_mm: {},
         width_mm: {},

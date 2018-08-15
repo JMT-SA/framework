@@ -24,7 +24,7 @@ module UiRules
       fields[:has_suppliers] = { renderer: :checkbox }
       fields[:has_marketers] = { renderer: :checkbox }
       fields[:has_retailers] = { renderer: :checkbox }
-      # fields[:active] = { renderer: :label }
+      # fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields

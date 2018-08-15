@@ -28,7 +28,7 @@
 - :control_type: :link
   :url: "/list/std_fruit_size_counts"
   :text: Back
-  :style: :button
+  :style: :back_button
 :conditions:
   :standard:
     - :col: fruit_actual_counts_for_packs.std_fruit_size_count_id

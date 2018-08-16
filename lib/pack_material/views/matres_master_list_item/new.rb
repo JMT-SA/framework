@@ -25,6 +25,9 @@ module PackMaterial
 
               form.submit_captions 'Add', 'Adding'
             end
+            page.section do |section|
+              section.add_control(control_type: :link, text: 'Done', url: "/pack_material/config/material_resource_sub_types/#{sub_type_id}/product_columns", style: :button)
+            end
           end
 
           layout

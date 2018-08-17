@@ -16,11 +16,13 @@ module UiRules
 
     def set_show_fields
       fields[:contact_method_type] = { renderer: :label }
+      fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
-        contact_method_type: {}
+        contact_method_type: { required: true },
+        active: { renderer: :checkbox }
       }
     end
 
@@ -31,7 +33,8 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(contact_method_type: nil)
+      @form_object = OpenStruct.new(contact_method_type: nil,
+                                    active: true)
     end
   end
 end

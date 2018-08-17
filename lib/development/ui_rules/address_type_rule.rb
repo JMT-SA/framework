@@ -21,7 +21,7 @@ module UiRules
 
     def common_fields
       {
-        address_type: {},
+        address_type: { required: true },
         active: { renderer: :checkbox }
       }
     end

@@ -6,6 +6,6 @@ module DevelopmentApp
 
     optional(:id, :int).filled(:int?)
     required(:address_type, Types::StrippedString).filled(:str?)
-    required(:active, :bool).maybe(:bool?)
+    required(:active, :bool).filled(:bool?)
   end
 end

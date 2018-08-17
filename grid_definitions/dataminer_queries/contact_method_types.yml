@@ -1,9 +1,11 @@
 ---
 :caption: Contact Method Types
-:sql: SELECT "contact_method_types"."id", "contact_method_types"."contact_method_type",
-        "contact_method_types"."created_at", "contact_method_types"."updated_at" FROM "contact_method_types"
-:limit:
-:offset:
+:sql: "SELECT \"contact_method_types\".\"id\", \"contact_method_types\".\"contact_method_type\",\r\n\"contact_method_types\".\"active\",
+  \"contact_method_types\".\"created_at\", \"contact_method_types\".\"updated_at\"
+  FROM \"contact_method_types\""
+:limit: 
+:offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -11,11 +13,11 @@
     :caption: Id
     :namespaced_name: contact_method_types.id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -26,41 +28,56 @@
     :caption: Contact method type
     :namespaced_name: contact_method_types.contact_method_type
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 3
+    :caption: Active
+    :namespaced_name: contact_method_types.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Created at
     :namespaced_name: contact_method_types.created_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Updated at
     :namespaced_name: contact_method_types.updated_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

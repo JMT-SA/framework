@@ -28,9 +28,7 @@ class Framework < Roda
           return_json_response
           res = interactor.update_role(id, params[:role])
           if res.success
-            update_grid_row(id,
-                            changes: { name: res.instance[:name],
-                                       active: res.instance[:active] },
+            update_grid_row(id, changes: { name: res.instance[:name], active: res.instance[:active] },
                             notice: res.message)
           else
             re_show_form(r, res) { Development::Masterfiles::Role::Edit.call(id, params[:role], res.errors) }
@@ -44,6 +42,7 @@ class Framework < Roda
         end
       end
     end
+
     r.on 'roles' do
       interactor = DevelopmentApp::RoleInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
@@ -87,9 +86,7 @@ class Framework < Roda
           return_json_response
           res = interactor.update_address_type(id, params[:address_type])
           if res.success
-            update_grid_row(id,
-                            changes: { address_type: res.instance[:address_type],
-                                       active: res.instance[:active] },
+            update_grid_row(id, changes: { address_type: res.instance[:address_type], active: res.instance[:active] },
                             notice: res.message)
           else
             re_show_form(r, res) { Development::Masterfiles::AddressType::Edit.call(id, params[:address_type], res.errors) }
@@ -103,6 +100,7 @@ class Framework < Roda
         end
       end
     end
+
     r.on 'address_types' do
       interactor = DevelopmentApp::AddressTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
@@ -146,8 +144,7 @@ class Framework < Roda
           return_json_response
           res = interactor.update_contact_method_type(id, params[:contact_method_type])
           if res.success
-            update_grid_row(id,
-                            changes: { contact_method_type: res.instance[:contact_method_type] },
+            update_grid_row(id, changes: { contact_method_type: res.instance[:contact_method_type], active: res.instance[:active] },
                             notice: res.message)
           else
             re_show_form(r, res) { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], res.errors) }
@@ -161,6 +158,7 @@ class Framework < Roda
         end
       end
     end
+
     r.on 'contact_method_types' do
       interactor = DevelopmentApp::ContactMethodTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
@@ -181,6 +179,7 @@ class Framework < Roda
         end
       end
     end
+
     # USERS
     # --------------------------------------------------------------------------
     r.on 'users', Integer do |id|

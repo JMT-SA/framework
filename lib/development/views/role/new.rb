@@ -4,7 +4,7 @@ module Development
   module Masterfiles
     module Role
       class New
-        def self.call(form_values = nil, form_errors = nil)
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:role, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -14,7 +14,7 @@ module Development
             page.form_errors form_errors
             page.form do |form|
               form.action '/development/masterfiles/roles'
-              form.remote!
+              form.remote! if remote
               form.add_field :name
               form.add_field :active
             end

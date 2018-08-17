@@ -13,6 +13,7 @@ module Development
             page.form do |form|
               form.view_only!
               form.add_field :contact_method_type
+              form.add_field :active
             end
           end
 

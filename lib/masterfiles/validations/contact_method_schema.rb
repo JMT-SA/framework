@@ -7,6 +7,6 @@ module MasterfilesApp
     optional(:id, :int).filled(:int?)
     required(:contact_method_type_id, :int).filled(:int?)
     required(:contact_method_code, Types::StrippedString).filled(:str?)
-    required(:active, :bool).maybe(:bool?)
+    required(:active, :bool).filled(:bool?)
   end
 end

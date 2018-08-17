@@ -21,7 +21,7 @@ module UiRules
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
       fields[:active] = { renderer: :checkbox }
-      fields[:role_names] = { renderer: :label, caption: 'Roles', with_value: @form_object.role_names.map(&:capitalize!).join(', ') }
+      fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
     end
 
     def common_fields

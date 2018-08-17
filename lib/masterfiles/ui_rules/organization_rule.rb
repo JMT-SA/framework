@@ -21,7 +21,7 @@ module UiRules
       fields[:medium_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      fields[:role_names] = { renderer: :label, caption: 'Roles', with_value: @form_object.role_names.map(&:capitalize!).join(', ') }
+      fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
       # fields[:variants] = { renderer: :label }
       # fields[:active] = { renderer: :checkbox }
     end

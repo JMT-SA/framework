@@ -74,7 +74,7 @@ class GenerateNewScaffold < BaseService
         test: {
           interactor: "lib/#{@applet}/test/interactors/test_#{@singlename}_interactor.rb",
           repo: "lib/#{@applet}/test/repositories/test_#{repofile}_repo.rb",
-          route: "test/routes/#{@applet}/test_#{@program}_routes.rb"
+          route: "test/routes/#{@applet}/#{@program}/test_#{@singlename}_routes.rb"
         }
       }
     end
@@ -514,7 +514,7 @@ class GenerateNewScaffold < BaseService
                   if res.success
                     #{update_grid_row.gsub("\n", "\n            ").sub(/            \Z/, '').sub(/\n\Z/, '')}
                   else
-                    content = show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id, params[:#{opts.singlename}], res.errors) }
+                    content = show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id, form_values: params[:#{opts.singlename}], form_errors: res.errors) }
                     update_dialog_content(content: content, error: res.message)
                   end
                 end
@@ -846,7 +846,7 @@ class GenerateNewScaffold < BaseService
       <<~RUBY
         # frozen_string_literal: true
 
-        require File.join(File.expand_path('./../', __dir__), 'test_helper_for_routes')
+        require File.join(File.expand_path('./../../../', __dir__), 'test_helper_for_routes')
 
         class Test#{opts.classnames[:class]}Routes < RouteTester
 
@@ -890,7 +890,7 @@ class GenerateNewScaffold < BaseService
             ensure_exists!(INTERACTOR)
             row_vals = Hash.new(1)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(ok_response(instance: row_vals))
-            patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_json_update_grid
           end
 
@@ -899,7 +899,7 @@ class GenerateNewScaffold < BaseService
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::Edit.stub(:call, bland_page) do
-              patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+              patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
             expect_json_replace_dialog(has_error: true)
           end
@@ -908,7 +908,7 @@ class GenerateNewScaffold < BaseService
             authorise_pass!
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(ok_response)
-            delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_json_delete_from_grid
           end
           #
@@ -916,7 +916,7 @@ class GenerateNewScaffold < BaseService
           #   authorise_pass!
           #   ensure_exists!(INTERACTOR)
           #   #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
-          #   delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+          #   delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
           #   expect_bad_redirect
           # end
 
@@ -941,7 +941,7 @@ class GenerateNewScaffold < BaseService
             authorise_pass!
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
-            post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_ok_redirect
           end
 
@@ -949,7 +949,7 @@ class GenerateNewScaffold < BaseService
             authorise_pass!
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
-            post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+            post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_ok_json_redirect
           end
 
@@ -958,12 +958,12 @@ class GenerateNewScaffold < BaseService
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
-              post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+              post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
             expect_bad_page
 
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
-              post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+              post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
             expect_bad_redirect(url: '/#{base_route}#{opts.table}/new')
           end
@@ -973,7 +973,7 @@ class GenerateNewScaffold < BaseService
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
-              post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+              post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
             expect_json_replace_dialog
           end
@@ -1058,7 +1058,7 @@ class GenerateNewScaffold < BaseService
           module #{opts.classnames[:program]}
             module #{opts.classnames[:class]}
               class Edit
-                def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+                def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
                   ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id, form_values: form_values)
                   rules   = ui_rule.compile
 

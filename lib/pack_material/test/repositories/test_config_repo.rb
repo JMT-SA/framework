@@ -2,6 +2,19 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module PackMaterialApp
   class TestConfigRepo < MiniTestWithHooks
+    def create_product(opts = {})
+      sub_id = DB[:material_resource_sub_types].select(:id).single_value
+      default = { material_resource_sub_type_id: sub_id,
+                  unit: 'unit',
+                  brand_1: 'brand',
+                  style: 'style' }
+      prod_id = DB[:pack_material_products].insert(default.merge(opts))
+      {
+        matres_sub_type_id: sub_id,
+        matres_product_id: prod_id
+      }
+    end
+
     def test_for_selects
       assert_respond_to repo, :for_select_domains
       assert_respond_to repo, :for_select_matres_types
@@ -41,16 +54,7 @@ module PackMaterialApp
     end
 
     def test_for_select_configured_sub_types
-      dom = DB[:material_resource_domains].where(domain_name: PackMaterialApp::DOMAIN_NAME).first
-      if dom
-        dom_id = dom[:id]
-      else
-        dom_id = DB[:material_resource_domains].insert(
-          domain_name: 'Pack Material',
-          product_table_name: 'pack_material_products',
-          variant_table_name: 'pack_material_product_variants'
-        )
-      end
+      dom_id = @fixed_table_set[:domain_id]
       type_id1 = DB[:material_resource_types].insert(
         material_resource_domain_id: dom_id,
         type_name: 'type one',
@@ -86,7 +90,7 @@ module PackMaterialApp
       )
       sub_id4 = DB[:material_resource_sub_types].insert(
         material_resource_type_id: type_id2,
-        sub_type_name: '2 sub type two',
+        sub_type_name: 'INACTIVE sub type',
         short_code: 'SC',
         active: false,
         product_code_ids: '{1,2,3}'
@@ -99,7 +103,7 @@ module PackMaterialApp
       other_type_id = DB[:material_resource_types].insert(
         material_resource_domain_id: dom_id2,
         type_name: 'type name',
-        short_code: 'T3',
+        short_code: 'OTHER_DOMAIN',
         description: 'This is the description field'
       )
       other_sub_id = DB[:material_resource_sub_types].insert(
@@ -112,7 +116,13 @@ module PackMaterialApp
 
       y = ConfigRepo.new.for_select_configured_sub_types(PackMaterialApp::DOMAIN_NAME)
       expected = { 'T1' => [['1 sub type one', sub_id1]], 'T2' => [['2 sub type one', sub_id3]] }
-      assert_equal(expected, y)
+      # assert_equal(expected, y)
+
+      refute(y['T2'].any? { |s| s.first == 'INACTIVE sub type' })
+      assert_nil y['OTHER_DOMAIN']
+
+      assert_equal y['T1'], expected['T1']
+      assert_equal y['T2'], expected['T2']
     end
 
     def test_find_matres_type
@@ -281,94 +291,30 @@ module PackMaterialApp
     end
 
     def test_delete_matres_sub_type
-      dom = DB[:material_resource_domains].where(domain_name: PackMaterialApp::DOMAIN_NAME).first
-      if dom
-        dom_id = dom[:id]
-      else
-        dom_id = DB[:material_resource_domains].insert(
-          domain_name: 'Pack Material',
-          product_table_name: 'pack_material_products',
-          variant_table_name: 'pack_material_product_variants'
-        )
-      end
+      # sub_id = @fixed_table_set[:matres_sub_types][:sc][:id]
 
-      id1 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'unit',
-        short_code: 'CN1'
-      )
-      id2 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'style',
-        short_code: 'CN2'
-      )
-      id3 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'brand_1',
-        short_code: 'CN3'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
-      sub_id = DB[:material_resource_sub_types].insert(
-        material_resource_type_id: type_id,
-        internal_seq: 1,
-        sub_type_name: 'sub type name',
-        short_code: 'SC',
-        product_code_ids: "{#{id1},#{id2},#{id3}}"
-      )
-      # comm_group_id = DB[:commodity_groups].insert(
-      #   code: 'group',
-      #   description: 'desc'
-      # )
-      # comm_id1 = DB[:commodities].insert(
-      #   commodity_group_id: comm_group_id,
-      #   code: 'AP',
-      #   hs_code: 'AP',
-      #   description: 'desc'
-      # )
-      # comm_id2 = DB[:commodities].insert(
-      #   commodity_group_id: comm_group_id,
-      #   code: 'PR',
-      #   hs_code: 'PR',
-      #   description: 'desc'
-      # )
-      # var_id = DB[:marketing_varieties].insert(
-      #   marketing_variety_code: 'variety'
-      # )
-      prod_id1 = DB[:pack_material_products].insert(
-        material_resource_sub_type_id: sub_id,
-        unit: 'unit',
-        brand_1: 'brand',
-        style: 'style'
-      )
-      prod_id2 = DB[:pack_material_products].insert(
-        material_resource_sub_type_id: sub_id,
-        unit: 'units',
-        brand_1: 'brands',
-        style: 'styles'
-      )
+      first = create_product
+      second = create_product(unit: 'units',
+                              brand_1: 'brands',
+                              style: 'styles')
 
-      x = ConfigRepo.new.delete_matres_sub_type(sub_id)
+      x = ConfigRepo.new.delete_matres_sub_type(first[:matres_sub_type_id])
       refute x.success
 
-      DB[:pack_material_products].where(id: [prod_id1, prod_id2]).delete
-      x = ConfigRepo.new.delete_matres_sub_type(sub_id)
+      DB[:pack_material_products].where(id: [first[:matres_product_id], second[:matres_product_id]]).delete
+      x = ConfigRepo.new.delete_matres_sub_type(first[:matres_sub_type_id])
       assert x.success
-      assert_nil ConfigRepo.new.find_matres_sub_type(sub_id)
+      assert_nil ConfigRepo.new.find_matres_sub_type(first[:matres_sub_type_id])
     end
 
     def test_product_variant_columns
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
+      dom_id = @fixed_table_set[:domain_id]
+      # dom_id = DB[:material_resource_domains].insert(
+      #   domain_name: 'domain name',
+      #   internal_seq: 10,
+      #   product_table_name: 'product table name',
+      #   variant_table_name: 'variant table name'
+      # )
       other_dom_id = DB[:material_resource_domains].insert(
         domain_name: 'other domain name',
         internal_seq: 11,

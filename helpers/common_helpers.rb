@@ -151,6 +151,10 @@ module CommonHelpers
     raise Crossbeams::AuthorizationError unless authorised?(programs, sought_permission, functional_area_id)
   end
 
+  def set_last_grid_url(url, route = nil)
+    session[:last_grid_url] = url unless route && fetch?(route)
+  end
+
   def redirect_to_last_grid(route)
     if fetch?(route)
       redirect_via_json(session[:last_grid_url])

@@ -6,6 +6,6 @@ module MasterfilesApp
 
     optional(:id, :int).filled(:int?)
     required(:party_type, Types::StrippedString).filled(:str?, max_size?: 1)
-    required(:active, :bool).maybe(:bool?)
+    required(:active, :bool).filled(:bool?)
   end
 end

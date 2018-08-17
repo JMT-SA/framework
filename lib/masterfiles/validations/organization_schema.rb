@@ -13,6 +13,6 @@ module MasterfilesApp
     required(:vat_number, Types::StrippedString).maybe(:str?)
     required(:role_ids, Types::IntArray).filled { each(:int?) }
     # required(:variants, Types::StrippedString).maybe(:str?)
-    # required(:active, :bool).maybe(:bool?)
+    # required(:active, :bool).filled(:bool?)
   end
 end

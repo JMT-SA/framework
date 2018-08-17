@@ -12,6 +12,6 @@ module MasterfilesApp
     required(:city, Types::StrippedString).maybe(:str?)
     required(:postal_code, Types::StrippedString).maybe(:str?)
     required(:country, Types::StrippedString).maybe(:str?)
-    required(:active, :bool).maybe(:bool?)
+    required(:active, :bool).filled(:bool?)
   end
 end

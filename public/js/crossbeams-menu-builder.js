@@ -126,7 +126,7 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
 
       if (event.target.dataset.menuLevel1) {
         crossbeamsLocalStorage.setItem('selectedFuncMenu', event.target.dataset.menuLevel1); // TODO?: make this per app?
-        event.target.parentNode.parentNode.children.forEach((el) => { el.classList.remove('active'); });
+        Array.from(event.target.parentNode.parentNode.children).forEach((el) => { el.classList.remove('active'); });
         buildSecondLevelMenu(event.target);
         event.stopPropagation();
         event.preventDefault();

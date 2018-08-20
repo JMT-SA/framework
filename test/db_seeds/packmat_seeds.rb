@@ -1,8 +1,18 @@
 module MiniTestSeeds
-  def db_create_packmat_seeds
-    @fixed_table_set = {}
+  def db_create_roles
     # roles
+    cust_id = DB[:roles].insert(
+      name: 'CUSTOMER'
+    )
+    supp_id = DB[:roles].insert(
+      name: 'SUPPLIER'
+    )
+    @fixed_table_set[:roles] = { cust: { id: cust_id },
+                                 supp: { id: supp_id }
+    }
+  end
 
+  def db_create_packmat_seeds
     # domain
     dom_id = DB[:material_resource_domains].insert(
       domain_name: PackMaterialApp::DOMAIN_NAME,

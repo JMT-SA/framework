@@ -15,6 +15,14 @@ module PackMaterialApp
       }
     end
 
+    def make_prod_col(opts = {})
+      DB[:material_resource_product_columns].insert(
+        material_resource_domain_id: opts[:dom_id] || @fixed_table_set[:domain_id],
+        column_name: opts[:col_name] || 'dummy',
+        short_code: "UN-#{Time.now.to_i}"
+      )
+    end
+
     def test_for_selects
       assert_respond_to repo, :for_select_domains
       assert_respond_to repo, :for_select_matres_types
@@ -321,26 +329,12 @@ module PackMaterialApp
         product_table_name: 'some table name',
         variant_table_name: 'other table name'
       )
-      id1 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'column name one',
-        short_code: 'CN1'
-      )
-      id2 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'column name two',
-        short_code: 'CN2'
-      )
-      id3 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'column name three',
-        short_code: 'CN3'
-      )
-      id4 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: other_dom_id,
-        column_name: 'other column',
-        short_code: 'CN3'
-      )
+      id1 = make_prod_col # (col_name: 'PM col1 SHOULD BE IGNORED')
+      id2 = make_prod_col(col_name: 'PM col2')
+      id3 = make_prod_col(col_name: 'PM col3')
+      id
+      make_prod_col(dom_id: other_dom_id, col_name: 'OTHER col1 SHOULD BE IGNORED')
+
       type_id = DB[:material_resource_types].insert(
         material_resource_domain_id: dom_id,
         internal_seq: 1,
@@ -358,11 +352,12 @@ module PackMaterialApp
       )
 
       y = ConfigRepo.new.product_variant_columns(sub_id)
-      assert_equal([['column name two', id2], ['column name three', id3]], y)
+      # assert_equal([['column name two', id2], ['column name three', id3]], y)
+      assert_equal([['PM col2', id2], ['PM col3', id3]], y)
 
       DB[:material_resource_sub_types].where(id: sub_id).delete
       y = ConfigRepo.new.product_variant_columns(sub_id)
-      assert_equal([], y)
+      assert_empty y
     end
 
     def test_product_code_columns

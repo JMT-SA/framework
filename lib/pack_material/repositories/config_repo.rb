@@ -138,7 +138,7 @@ module PackMaterialApp
 
     def product_variant_columns(sub_type_id)
       sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
-      product_variant_column_ids = sub_type ? (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || []) : nil
+      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
       DB[:material_resource_product_columns].where(id: product_variant_column_ids)
                                             .map { |rec| [rec[:column_name], rec[:id]] }
     end

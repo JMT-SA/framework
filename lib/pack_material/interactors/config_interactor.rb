@@ -9,7 +9,10 @@ module PackMaterialApp
       instance = matres_type(id)
       success_response("Created type #{instance.type_name}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { type_name: ['This type already exists'] }))
+      # TODO: How do we respond with a double unique constraint?
+      # I suspect we need to add 'This type already exists' to the form base error
+      # And then type name:'must be unique'
+      validation_failed_response(OpenStruct.new(messages: { type_name: ['This type already exists'], short_code: ['must be unique'] }))
     end
 
     def update_matres_type(id, params)
@@ -59,7 +62,7 @@ module PackMaterialApp
       instance = matres_sub_type(id)
       success_response("Created sub type #{instance.sub_type_name}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { sub_type_name: ['This sub type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { sub_type_name: ['This sub type already exists'], short_code: ['must be unique'] }))
     end
 
     def update_matres_sub_type(id, params)

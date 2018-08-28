@@ -74,7 +74,7 @@ module PackMaterialApp
         )
       end
 
-      DB[:material_resource_types].where(id: id).update(params)
+      DB[:material_resource_types].where(id: id).update(params) if params.any?
     end
 
     def measurement_units

@@ -41,6 +41,7 @@ group :test do
   gem 'minitest-stub_any_instance', '~>1.0.1'
   gem 'mocha', '~>1.5'
   gem 'rack-test'
+  gem 'faker', :git => 'https://github.com/stympy/faker.git', :branch => 'master'
 end
 
 group :development do

@@ -12,10 +12,7 @@ module PackMaterialApp
     # MATRES TYPE
     def test_matres_type
       ConfigRepo.any_instance.stubs(:find_matres_type).returns(fake_matres_type)
-      x = interactor.send(:matres_type)
-      assert x.is_a?(MatresType)
-
-      x = interactor.send(:matres_type, true)
+      x = interactor.send(:matres_type, 1)
       assert x.is_a?(MatresType)
     end
 
@@ -182,10 +179,7 @@ module PackMaterialApp
     # MATRES SUB TYPE
     def test_matres_sub_type
       ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns(fake_matres_sub_type)
-      x = interactor.send(:matres_sub_type)
-      assert x.is_a?(MatresSubType)
-
-      x = interactor.send(:matres_sub_type, true)
+      x = interactor.send(:matres_sub_type, 1)
       assert x.is_a?(MatresSubType)
     end
 

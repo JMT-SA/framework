@@ -63,9 +63,10 @@ module PackMaterialApp
 
     def update_matres_type(id, attrs)
       params = attrs.to_h
-      measurement_unit_ids = params.delete(:measurement_units)
+      measurement_unit_ids = params.delete(:measurement_units) || []
 
       # TODO: A helper method for the backend use of multi select ids for the simplest case?
+      units_added = nil
       DB[:measurement_units_for_matres_types].where(material_resource_type_id: id).delete
       measurement_unit_ids&.each do |unit_id|
         DB[:measurement_units_for_matres_types].insert(
@@ -73,8 +74,15 @@ module PackMaterialApp
           measurement_unit_id: unit_id
         )
       end
+      units_added = 'measurement units were added' if measurement_unit_ids.any?
 
-      DB[:material_resource_types].where(id: id).update(params) if params.any?
+      short_code_notice = nil
+      if matres_type_has_products(id)
+        params.delete(:short_code)
+        short_code_notice = 'Short code can not be updated if products are present'
+      end
+      update(:material_resource_types, id, params) if params.any?
+      { success: true, message: [units_added, short_code_notice].compact.join(', ') }
     end
 
     def measurement_units
@@ -114,6 +122,16 @@ module PackMaterialApp
     end
 
     # SUB TYPES
+    def update_matres_sub_type(id, attrs)
+      short_code_notice = nil
+      if matres_sub_type_has_products(id)
+        attrs.delete(:short_code)
+        short_code_notice = 'Short code can not be updated if products are present'
+      end
+      update(:material_resource_sub_types, id, attrs) if attrs.any?
+      { success: true, message: short_code_notice }
+    end
+
     def delete_matres_sub_type(id)
       query = <<~SQL
         SELECT product_table_name
@@ -219,6 +237,15 @@ module PackMaterialApp
       else
         []
       end
+    end
+
+    def matres_sub_type_has_products(sub_type_id)
+      exists?(:pack_material_products, material_resource_sub_type_id: sub_type_id)
+    end
+
+    def matres_type_has_products(type_id)
+      sub_type_ids = DB[:material_resource_sub_types].where(material_resource_type_id: type_id).select_map(:id)
+      exists?(:pack_material_products, material_resource_sub_type_id: sub_type_ids)
     end
   end
 end

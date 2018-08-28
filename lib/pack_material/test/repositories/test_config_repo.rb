@@ -125,6 +125,14 @@ module PackMaterialApp
           .select_map(:measurement_unit_id)
 
       assert_equal unit_list, x
+
+      # matres_type_with_products
+      ConfigRepo.any_instance.stubs(:matres_type_has_products).returns(true)
+      attrs = { type_name: 'new type name', short_code: 'TT' }
+      repo.update_matres_type(type_id, attrs)
+      type = DB[:material_resource_types].where(id: type_id).first
+      assert_equal('new type name', type[:type_name])
+      assert_equal('TN', type[:short_code])
     end
 
     def test_measurement_units
@@ -183,6 +191,25 @@ module PackMaterialApp
       assert_raises do
         repo.add_matres_type_unit(type_id, 'does not exist')
       end
+    end
+
+    def test_update_matres_sub_type
+      sub_id = create_sub_type(
+        sub_type_name: 'sub type name',
+        short_code: 'SN'
+      )
+
+      attrs = { sub_type_name: 'new sub name' }
+      repo.update_matres_sub_type(sub_id, attrs)
+      assert_equal('new sub name', DB[:material_resource_sub_types].where(id: sub_id).first[:sub_type_name])
+
+      # matres_sub_type_with_products
+      ConfigRepo.any_instance.stubs(:matres_sub_type_has_products).returns(true)
+      attrs = { sub_type_name: 'new sub name', short_code: 'TT' }
+      repo.update_matres_sub_type(sub_id, attrs)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_id).first
+      assert_equal('new sub name', sub_type[:sub_type_name])
+      assert_equal('SN', sub_type[:short_code])
     end
 
     def test_delete_matres_sub_type
@@ -269,6 +296,22 @@ module PackMaterialApp
     #   rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
     #   Crossbeams::Dataminer::Report.load(rpt_hash)
     # end
+
+    def test_matres_sub_type_has_products
+      product_set = create_product
+      assert repo.matres_sub_type_has_products(product_set[:matres_sub_type_id])
+
+      DB[:pack_material_products].where(id: product_set[:matres_product_id]).delete
+      refute repo.matres_sub_type_has_products(product_set[:matres_sub_type_id])
+    end
+
+    def test_matres_type_has_products
+      product_set = create_product
+      assert repo.matres_type_has_products(product_set[:matres_type_id])
+
+      DB[:pack_material_products].where(id: product_set[:matres_product_id]).delete
+      refute repo.matres_type_has_products(product_set[:matres_type_id])
+    end
 
     private
 

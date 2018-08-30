@@ -1,0 +1,24 @@
+---
+:dataminer_definition: customer_types
+:actions:
+- :url: "/masterfiles/parties/customer_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/parties/customer_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/parties/customer_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/parties/customer_types/new"
+  :text: New Customer Type
+  :style: :button
+  :behaviour: :popup

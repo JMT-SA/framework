@@ -1,0 +1,24 @@
+---
+:dataminer_definition: suppliers
+:actions:
+- :url: "/masterfiles/parties/suppliers/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/parties/suppliers/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/parties/suppliers/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/parties/suppliers/preselect"
+  :text: New Supplier
+  :style: :button
+  :behaviour: :popup

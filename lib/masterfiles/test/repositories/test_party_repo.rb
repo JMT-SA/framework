@@ -16,6 +16,8 @@ module MasterfilesApp
 
       assert_respond_to repo, :for_select_inactive_organizations
       assert_respond_to repo, :for_select_inactive_people
+
+      assert_respond_to repo, :for_select_customer_types
     end
 
     def test_crud_calls
@@ -38,6 +40,11 @@ module MasterfilesApp
       assert_respond_to repo, :create_contact_method
       assert_respond_to repo, :update_contact_method
       assert_respond_to repo, :delete_contact_method
+
+      assert_respond_to repo, :find_customer_type
+      assert_respond_to repo, :create_customer_type
+      assert_respond_to repo, :update_customer_type
+      assert_respond_to repo, :delete_customer_type
     end
 
     def test_party_repo_methods

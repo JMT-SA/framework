@@ -32,6 +32,34 @@ module MasterfilesApp
                      value: :id,
                      order_by: :name
 
+    build_for_select :customer_types,
+                     label: :type_code,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :type_code
+    build_for_select :customers,
+                     label: :erp_customer_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :erp_customer_number
+
+    crud_calls_for :customer_types, name: :customer_type, wrapper: CustomerType
+    crud_calls_for :customers, name: :customer, wrapper: Customer
+
+    build_for_select :supplier_types,
+                     label: :type_code,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :type_code
+    build_for_select :suppliers,
+                     label: :erp_supplier_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :erp_supplier_number
+
+    crud_calls_for :supplier_types, name: :supplier_type, wrapper: SupplierType
+    crud_calls_for :suppliers, name: :supplier, wrapper: Supplier
+
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
     end
@@ -231,6 +259,39 @@ module MasterfilesApp
                                 person_id: person_id,
                                 role_id: r_id)
       end
+    end
+
+    # Customers & Suppliers
+    def for_select_parties
+      DB[:parties].select_map(:id).map { |id| [DB['SELECT fn_party_name(?)', id].single_value, id] }
+    end
+
+    def create_customer(attrs)
+      new_attrs = attrs.to_h
+      party_id = new_attrs.delete(:party_id)
+
+      party_role_id = create_party_role(party_id, 'CUSTOMER')
+      new_attrs[:party_role_id] = party_role_id
+      create(:customers, new_attrs)
+    end
+
+    def create_supplier(attrs)
+      new_attrs = attrs.to_h
+      party_id = new_attrs.delete(:party_id)
+
+      party_role_id = create_party_role(party_id, 'SUPPLIER')
+      new_attrs[:party_role_id] = party_role_id
+      create(:suppliers, new_attrs)
+    end
+
+    def create_party_role(party_id, role_name)
+      org_type = DB[:parties].where(id: party_id).select(:party_type).single_value == 'O'
+      respective_id = DB[org_type ? :organizations : :people].where(party_id: party_id).select(:id).single_value
+
+      DB[:party_roles].insert(party_id: party_id,
+                              role_id: DB[:roles].where(name: role_name).select(:id).single_value,
+                              organization_id: (org_type ? respective_id : nil),
+                              person_id: (org_type ? nil : respective_id))
     end
 
     private

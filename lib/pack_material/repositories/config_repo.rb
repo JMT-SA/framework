@@ -29,7 +29,7 @@ module PackMaterialApp
                      no_active_check: true,
                      order_by: :column_name
     build_for_select :measurement_units,
-                     alias: :units,
+                     alias: 'units',
                      label: :unit_of_measure,
                      value: :id,
                      no_active_check: true,

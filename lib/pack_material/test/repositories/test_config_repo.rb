@@ -7,6 +7,8 @@ module PackMaterialApp
       assert_respond_to repo, :for_select_domains
       assert_respond_to repo, :for_select_matres_types
       assert_respond_to repo, :for_select_matres_sub_types
+      assert_respond_to repo, :for_select_material_resource_product_columns
+      assert_respond_to repo, :for_select_units
     end
 
     def test_crud_calls

@@ -50,6 +50,9 @@ class MiniTestWithHooks < Minitest::Test
       methods.grep(/^db_create_.+/).each { |m| send(m) }
       super
     end
+  rescue StandardError => e
+    p e
+    raise "Display possible around errors"
   end
 end
 

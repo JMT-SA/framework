@@ -527,7 +527,7 @@ class GenerateNewScaffold < BaseService
               end
             end
 
-            #{new_create_routes.gsub("\n", "\n    ").sub(/    \Z/, '')}
+            #{new_create_routes.chomp.gsub("\n", "\n    ")}
           end
         end
 
@@ -698,15 +698,20 @@ class GenerateNewScaffold < BaseService
         fk_repo = "#{opts.classnames[:module]}::#{klassname}Repo"
         code = tm.likely_label_field
         flds << "# #{f}_label = #{fk_repo}.new.find_#{singlename}(@form_object.#{f})&.#{code}"
-        flds << "#{f}_label = @repo.find(:#{fk[:table]}, #{klassname}, @form_object.#{f})&.#{code}"
+        flds << "#{f}_label = @repo.find(:#{fk[:table]}, #{opts.classnames[:module]}::#{klassname}, @form_object.#{f})&.#{code}"
       end
 
       flds + fields_to_use.map do |f|
         fk = opts.table_meta.fk_lookup[f]
         if fk.nil?
-          "fields[:#{f}] = { renderer: :label }"
+          this_col = opts.table_meta.col_lookup[f]
+          if this_col[:type] == :boolean
+            "fields[:#{f}] = { renderer: :label, as_boolean: true }"
+          else
+            "fields[:#{f}] = { renderer: :label }"
+          end
         else
-          "fields[:#{f}] = { renderer: :label, with_value: #{f}_label, caption: '#{f.to_s.chomp('_id')}' }"
+          "fields[:#{f}] = { renderer: :label, with_value: #{f}_label, caption: '#{f.to_s.chomp('_id').split('_').map(&:capitalize).join(' ')}' }"
         end
       end
     end
@@ -740,7 +745,7 @@ class GenerateNewScaffold < BaseService
       if tm.active_column_present?
         "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_inactive_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
       else
-        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
+        "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id').split('_').map(&:capitalize).join(' ')}'#{required} }"
       end
     end
 

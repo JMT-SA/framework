@@ -19,6 +19,9 @@ module Development
                   Preview of files to be generated.<br>
                   <em>Note the permissions required for program <strong>#{results[:opts].program}</strong></em>
                 </p>
+                <p>
+                <em>If your server code is reloaded automatically, be careful of the order you press the save buttons - otherwise some code might load that depends on some other code that has not yet been saved...</em>
+                </p>
               HTML
             end
             if results[:applet]
@@ -30,16 +33,22 @@ module Development
               end
             end
             page.section do |section|
-              section.caption = 'Repo'
-              section.hide_caption = false
-              save_snippet_form(section, results[:paths][:repo], results[:repo])
-              section.add_text(results[:repo], preformatted: true, syntax: :ruby)
-            end
-            page.section do |section|
               section.caption = 'Entity'
               section.hide_caption = false
               save_snippet_form(section, results[:paths][:entity], results[:entity])
               section.add_text(results[:entity], syntax: :ruby)
+            end
+            page.section do |section|
+              section.caption = 'Validation'
+              section.hide_caption = false
+              save_snippet_form(section, results[:paths][:validation], results[:validation])
+              section.add_text(results[:validation], syntax: :ruby)
+            end
+            page.section do |section|
+              section.caption = 'Repo'
+              section.hide_caption = false
+              save_snippet_form(section, results[:paths][:repo], results[:repo])
+              section.add_text(results[:repo], preformatted: true, syntax: :ruby)
             end
             page.section do |section|
               section.caption = 'Interactor'
@@ -62,12 +71,6 @@ module Development
               section.add_text(results[:view][:edit], syntax: :ruby)
               save_snippet_form(section, results[:paths][:view][:show], results[:view][:show])
               section.add_text(results[:view][:show], syntax: :ruby)
-            end
-            page.section do |section|
-              section.caption = 'Validation'
-              section.hide_caption = false
-              save_snippet_form(section, results[:paths][:validation], results[:validation])
-              section.add_text(results[:validation], syntax: :ruby)
             end
             page.section do |section|
               section.caption = 'UI Rules'

@@ -79,3 +79,64 @@ This example of `order_items.yml` list file will return different rows for the f
 ----
 <1> Key is `standard`, uses `WHERE order_id = 1`
 <2> Key is `customer`, uses `WHERE customer_id = 5 AND NOT active`
+
+=== Controls at the top of the page
+
+Links can be specified to appear at the top of the page. Typically they will be styled as buttons.
+
+This uses the same options as for link:/developer_documentation/non_field_renderers.adoc#_link[Link], but has the extra option `:hide_if_sql_returns_true`.
+
+The value of `:hide_if_sql_returns_true` **must** be a valid snippet of SQL that returns `true` or `false`. Typical is to return the result of an `EXISTS` query.
+
+This example will display an anchor (`<a>`) styled as a button that will render in a popup dialog when clicked.
+[source,yaml]
+----
+- :control_type: :link
+  :url: "/pack_material/locations/locations/new"
+  :text: New Location
+  :style: :button
+  :behaviour: :popup
+  :hide_if_sql_returns_true: SELECT EXISTS(SELECT id FROM locations)
+----
+
+=== Display a tree
+
+A query can be displayed as a tree grid if each row returns an array column that contains the row's ancestors.
+Also the list or search yml must provide some config values like the following:
+
+[source,yaml]
+----
+:tree:
+  :tree_column: path_array           # <1>
+  :tree_caption: Location Hierarchy  # <2>
+  :suppress_node_counts: false       # <3>
+----
+<1> `path_array` in this instance is the resultset column that contains the ancestors of the current row in an ordered array. See SQL example below.
+<2> The caption of the grid column that shows the expandable tree hierarchy.
+<3> If `false`, each node in the grid will show the number of child nodes. Set to true to hide the counts.
+
+==== Example SQL for a tree using the closure table method
+
+[source,sql]
+----
+SELECT "locations"."id", "locations"."location_code", "locations"."location_description",
+(SELECT array_agg("sub"."location_code") AS path
+  FROM (SELECT "loc"."location_code"
+          FROM "locations" loc
+          JOIN "tree_locations" tree ON "tree"."ancestor_location_id" = "loc"."id"
+          WHERE "tree"."descendant_location_id" = "locations"."id"
+          ORDER BY "tree"."path_length" DESC) sub) AS path_array,
+(SELECT max("path_length")
+  FROM "tree_locations"
+  WHERE "descendant_location_id" = "locations"."id") + 1 AS level
+FROM "locations"
+JOIN "location_types" ON "location_types"."id" = "locations"."location_type_id"
+JOIN "location_assignments" ON "location_assignments"."id" = "locations"."primary_assignment_id"
+JOIN "location_storage_types" ON "location_storage_types"."id" = "locations"."primary_storage_type_id"
+ORDER BY (SELECT string_agg("sub"."location_code", ';') AS path
+            FROM (SELECT "loc"."location_code"
+            FROM "locations" loc
+            JOIN "tree_locations" tree ON "tree"."ancestor_location_id" = "loc"."id"
+            WHERE "tree"."descendant_location_id" = "locations"."id"
+            ORDER BY "tree"."path_length" DESC) sub)
+----

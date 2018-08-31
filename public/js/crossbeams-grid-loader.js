@@ -1043,10 +1043,16 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     let gridOptions = null;
     let forPrint = false;
     let multisel = false;
+    let tree = false;
+    let treeConfig = {};
     const grid = document.getElementById(gridId);
 
     forPrint = grid.dataset.gridPrint;
     multisel = grid.dataset.gridMulti;
+    tree = grid.dataset.gridTree !== undefined;
+    if (tree) {
+      treeConfig = JSON.parse(grid.dataset.gridTree);
+    }
     // lookup of grid ids? populate here and clear when grid unloaded...
     if (grid.dataset.nestedGrid) {
       gridOptions = {
@@ -1115,6 +1121,17 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     if (forPrint) {
       gridOptions.forPrint = true;
       gridOptions.enableStatusBar = false;
+    }
+
+    if (tree) {
+      gridOptions.treeData = true;
+      gridOptions.getDataPath = data => data[treeConfig.treeColumn];
+      gridOptions.autoGroupColumnDef = {
+        headerName: treeConfig.treeCaption || 'Hierarchy',
+        cellRendererParams: {
+          suppressCount: treeConfig.suppressNodeCounts || false,
+        },
+      };
     }
 
     if (multisel) {

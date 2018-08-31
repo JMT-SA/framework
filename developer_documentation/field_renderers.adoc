@@ -222,6 +222,11 @@ and all words start with initial capital letter.
 |HTML text
 |None
 
+|:as_boolean
+|If `true` and the field value is `true`, show a checkon icon, else show a checkoff icon.
+|`true` or `false`
+|`false`
+
 |===
 
 === Renderer::List

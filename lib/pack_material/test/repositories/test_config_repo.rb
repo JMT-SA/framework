@@ -321,6 +321,14 @@ module PackMaterialApp
       ConfigRepo.new
     end
 
+    def test_factories
+      create_sub_type
+      create_product_column
+      create_product
+      create_other_domain
+      create_matres_type
+    end
+
     def create_product(opts = {})
       sub_type = repo.find_hash(:material_resource_sub_types, @fixed_table_set[:matres_sub_types][:sc][:id])
       sub_id = sub_type[:id]

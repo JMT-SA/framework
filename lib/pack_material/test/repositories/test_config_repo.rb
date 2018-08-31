@@ -248,7 +248,9 @@ module PackMaterialApp
       assert(variant_columns.any? { |r| r.last == id3 })
 
       DB[:material_resource_sub_types].where(id: sub_id).delete
-      assert_empty repo.product_variant_columns(sub_id)
+      assert_raises(NoMethodError) {
+        repo.product_variant_columns(sub_id)
+      }
     end
 
     def test_product_code_columns

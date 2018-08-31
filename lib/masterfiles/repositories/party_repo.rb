@@ -8,30 +8,14 @@ module MasterfilesApp
                      label: :short_description,
                      value: :id,
                      order_by: :short_description
-    build_inactive_select :organizations,
-                          label: :short_description,
-                          value: :id,
-                          order_by: :short_description
-
     build_for_select :people,
                      label: :surname,
                      value: :id,
                      order_by: :surname
-    build_inactive_select :people,
-                          label: :surname,
-                          value: :id,
-                          order_by: :surname
-
-    crud_calls_for :organizations, name: :organization, wrapper: Organization
-    crud_calls_for :people, name: :person, wrapper: Person
-    crud_calls_for :addresses, name: :address, wrapper: Address
-    crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
-
     build_for_select :roles,
                      label: :name,
                      value: :id,
                      order_by: :name
-
     build_for_select :customer_types,
                      label: :type_code,
                      value: :id,
@@ -42,10 +26,6 @@ module MasterfilesApp
                      value: :id,
                      no_active_check: true,
                      order_by: :erp_customer_number
-
-    crud_calls_for :customer_types, name: :customer_type, wrapper: CustomerType
-    crud_calls_for :customers, name: :customer, wrapper: Customer
-
     build_for_select :supplier_types,
                      label: :type_code,
                      value: :id,
@@ -57,6 +37,12 @@ module MasterfilesApp
                      no_active_check: true,
                      order_by: :erp_supplier_number
 
+    crud_calls_for :organizations, name: :organization, wrapper: Organization
+    crud_calls_for :people, name: :person, wrapper: Person
+    crud_calls_for :addresses, name: :address, wrapper: Address
+    crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
+    crud_calls_for :customer_types, name: :customer_type, wrapper: CustomerType
+    crud_calls_for :customers, name: :customer, wrapper: Customer
     crud_calls_for :supplier_types, name: :supplier_type, wrapper: SupplierType
     crud_calls_for :suppliers, name: :supplier, wrapper: Supplier
 
@@ -241,10 +227,10 @@ module MasterfilesApp
       DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
     end
 
-    def assign_roles(id, role_ids, type = 'organization')
+    def assign_roles(id, role_ids, type = 'O')
       return { error: 'Choose at least one role' } if role_ids.empty?
       organization_id = person_id = nil
-      if type == 'organization'
+      if type == 'O'
         party = find_organization(id)
         DB[:party_roles].where(organization_id: id).delete
         organization_id = id

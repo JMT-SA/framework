@@ -1,0 +1,78 @@
+---
+:caption: Location Storage Types
+:sql: SELECT "location_storage_types"."id", "location_storage_types"."storage_type_code",
+  "location_storage_types"."created_at", "location_storage_types"."updated_at" FROM
+  "location_storage_types"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: location_storage_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  storage_type_code:
+    :name: storage_type_code
+    :sequence_no: 2
+    :caption: Storage type code
+    :namespaced_name: location_storage_types.storage_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 3
+    :caption: Created at
+    :namespaced_name: location_storage_types.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 4
+    :caption: Updated at
+    :namespaced_name: location_storage_types.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: location_storage_types.storage_type_code
+  :caption: Storage type code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: 
+  :ui_priority: 1
+  :list_def: 

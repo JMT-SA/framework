@@ -1,0 +1,24 @@
+---
+:dataminer_definition: location_storage_types
+:actions:
+- :url: "/pack_material/locations/location_storage_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/pack_material/locations/location_storage_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/pack_material/locations/location_storage_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/locations/location_storage_types/new"
+  :text: New Location Storage Type
+  :style: :button
+  :behaviour: :popup

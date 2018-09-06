@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: bc31602906caa02fd50c2a9d5e05731848d23fc3
+  revision: ce317d84868b0a4752153220a173015bc3df7d70
   specs:
     crossbeams-dataminer (0.1.5)
       pg_query (= 1.0.2)
@@ -32,7 +32,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: dcd0b8357aa83382730e0cbf3a6f7b16fd29c26c
+  revision: 0bd38c0c9811a60fd23e5305547be51748414563
   specs:
     roda-data_grid (0.1.8)
       axlsx

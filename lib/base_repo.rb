@@ -1,6 +1,14 @@
 class BaseRepo
   include Crossbeams::Responses
 
+  # Wraps Sequel's transaction so that it is not exposed to calling code.
+  #
+  # @param block [Block] the work to take place within the transaction.
+  # @return [void] whatever the block returns.
+  def transaction(&block)
+    DB.transaction(&block)
+  end
+
   # Return all rows from a table as instances of the given wrapper.
   #
   # @param table_name [Symbol] the db table name.

@@ -63,7 +63,7 @@ module DevelopmentApp
       return invalid_password unless matching_password?(id, params[:old_password])
       res = validate_change_user_params(params)
       return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         repo.save_new_password(id, params[:password])
         log_transaction
       end
@@ -75,7 +75,7 @@ module DevelopmentApp
       # Force the user's password to the new value.
       res = validate_change_password(params)
       return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         repo.save_new_password(id, params[:password])
         log_transaction
       end

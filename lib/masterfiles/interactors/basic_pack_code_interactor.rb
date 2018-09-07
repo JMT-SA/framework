@@ -41,7 +41,7 @@ module MasterfilesApp
       @id = id
       name = basic_pack_code.basic_pack_code
       res = {}
-      DB.transaction do
+      repo.transaction do
         res = fruit_size_repo.delete_basic_pack_code(id)
       end
       if res[:error]

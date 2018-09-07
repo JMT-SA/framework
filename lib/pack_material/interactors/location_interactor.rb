@@ -18,7 +18,7 @@ module PackMaterialApp
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_root_location(res)
         log_transaction
       end
@@ -33,7 +33,7 @@ module PackMaterialApp
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       id = nil
-      DB.transaction do
+      repo.transaction do
         p ">>> INT: #{parent_id}"
         id = repo.create_child_location(parent_id, res)
         log_transaction
@@ -48,7 +48,7 @@ module PackMaterialApp
     def update_location(id, params)
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         repo.update_location(id, res)
         log_transaction
       end
@@ -60,7 +60,7 @@ module PackMaterialApp
     def delete_location(id)
       return failed_response('Cannot delete this location - it has sub-locations') if repo.location_has_children(id)
       name = location(id).location_code
-      DB.transaction do
+      repo.transaction do
         repo.delete_location(id)
         log_transaction
       end
@@ -69,7 +69,7 @@ module PackMaterialApp
 
     def link_assignments(id, multiselect_ids)
       res = nil
-      DB.transaction do
+      repo.transaction do
         res = repo.link_assignments(id, multiselect_ids)
       end
       return res unless res.success
@@ -78,7 +78,7 @@ module PackMaterialApp
 
     def link_storage_types(id, multiselect_ids)
       res = nil
-      DB.transaction do
+      repo.transaction do
         res = repo.link_storage_types(id, multiselect_ids)
       end
       return res unless res.success

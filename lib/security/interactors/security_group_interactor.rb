@@ -20,7 +20,7 @@ module SecurityApp
       return validation_failed_response(res) unless res.messages.empty?
       # res = validate_security_group
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_security_group(res)
         log_transaction
       end
@@ -35,7 +35,7 @@ module SecurityApp
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       # res = validate_security_group... etc.
-      DB.transaction do
+      repo.transaction do
         repo.update_security_group(id, res)
         log_transaction
       end
@@ -46,7 +46,7 @@ module SecurityApp
 
     def delete_security_group(id)
       name = security_group(id).security_group_name
-      DB.transaction do
+      repo.transaction do
         repo.delete_with_permissions(id)
         log_transaction
       end
@@ -55,7 +55,7 @@ module SecurityApp
 
     def assign_security_permissions(id, params)
       if params[:security_permissions]
-        DB.transaction do
+        repo.transaction do
           repo.assign_security_permissions(id, params[:security_permissions].map(&:to_i))
           log_transaction
         end

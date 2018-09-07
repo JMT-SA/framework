@@ -45,7 +45,7 @@ module SecurityApp
     end
 
     def link_user(program_function_id, user_ids)
-      DB.transaction do
+      repo.transaction do
         repo.link_users(program_function_id, user_ids)
       end
       success_response('Linked users to program function')

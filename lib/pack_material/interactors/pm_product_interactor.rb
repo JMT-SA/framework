@@ -18,7 +18,7 @@ module PackMaterialApp
       res = validate_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       resp = nil
-      DB.transaction do
+      repo.transaction do
         resp = repo.update_pm_product(id, res)
       end
       if resp.success
@@ -32,7 +32,7 @@ module PackMaterialApp
     def delete_pm_product(id)
       name = pm_product(id).product_code
       res = nil
-      DB.transaction do
+      repo.transaction do
         res = repo.delete_pm_product(id)
       end
       res.success ? success_response("Deleted product #{name}") : res
@@ -56,7 +56,7 @@ module PackMaterialApp
 
     def pm_product_variant_create(res)
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_pm_product_variant(res)
       end
       instance = pm_product_variant(id)
@@ -68,7 +68,7 @@ module PackMaterialApp
     def update_pm_product_variant(id, params)
       res = validate_pm_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         repo.update_pm_product_variant(id, res)
       end
       instance = pm_product_variant(id)
@@ -77,7 +77,7 @@ module PackMaterialApp
 
     def delete_pm_product_variant(id)
       name = pm_product_variant(id).product_variant_number
-      DB.transaction do
+      repo.transaction do
         repo.delete_pm_product_variant(id)
       end
       success_response("Deleted pack material product variant #{name}")
@@ -99,7 +99,7 @@ module PackMaterialApp
 
     def pm_product_create(res)
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_pm_product(res)
       end
       instance = pm_product(id)

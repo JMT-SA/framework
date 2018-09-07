@@ -5,7 +5,7 @@ module MasterfilesApp
     def create_region(params)
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         @region_id = destination_repo.create_region(res)
       end
       success_response("Created destination region #{region.destination_region_name}",
@@ -18,7 +18,7 @@ module MasterfilesApp
       @region_id = id
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         destination_repo.update_region(id, res)
       end
       success_response("Updated destination region #{region.destination_region_name}",
@@ -29,7 +29,7 @@ module MasterfilesApp
       @region_id = id
       name = region.destination_region_name
       res = {}
-      DB.transaction do
+      repo.transaction do
         res = destination_repo.delete_region(id)
       end
       if res[:error]
@@ -42,7 +42,7 @@ module MasterfilesApp
     def create_country(id, params)
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         @country_id = destination_repo.create_country(id, res)
       end
       success_response("Created destination country #{country.country_name}", country)
@@ -54,7 +54,7 @@ module MasterfilesApp
       @country_id = id
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         destination_repo.update_country(id, res)
       end
       success_response("Updated destination country #{country.country_name}", country(false))
@@ -64,7 +64,7 @@ module MasterfilesApp
       @country_id = id
       name = country.country_name
       res = {}
-      DB.transaction do
+      repo.transaction do
         res = destination_repo.delete_country(id)
       end
       if res[:error]
@@ -77,7 +77,7 @@ module MasterfilesApp
     def create_city(id, params)
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         @city_id = destination_repo.create_city(id, res)
       end
       success_response("Created destination city #{city.city_name}", city)
@@ -89,7 +89,7 @@ module MasterfilesApp
       @city_id = id
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         destination_repo.update_city(id, res)
       end
       success_response("Updated destination city #{city.city_name}", city(false))
@@ -98,7 +98,7 @@ module MasterfilesApp
     def delete_city(id)
       @city_id = id
       name = city.city_name
-      DB.transaction do
+      repo.transaction do
         destination_repo.delete_city(id)
       end
       success_response("Deleted destination city #{name}")

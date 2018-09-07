@@ -80,7 +80,7 @@ module MasterfilesApp
     end
 
     def link_marketing_varieties(cultivar_id, marketing_variety_ids)
-      DB.transaction do
+      repo.transaction do
         cultivar_repo.link_marketing_varieties(cultivar_id, marketing_variety_ids)
       end
 

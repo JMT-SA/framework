@@ -73,7 +73,7 @@ module PackMaterialApp
       @matres_sub_type_id = id
       name = matres_sub_type.sub_type_name
       res = nil
-      DB.transaction do
+      repo.transaction do
         res = repo.delete_matres_sub_type(id)
       end
       res.success ? success_response("Deleted sub type #{name}") : res
@@ -96,7 +96,7 @@ module PackMaterialApp
       res = validate_material_resource_type_config_code_columns_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      DB.transaction do
+      repo.transaction do
         repo.update_product_code_configuration(id, res)
       end
       success_response('Saved configuration')
@@ -106,7 +106,7 @@ module PackMaterialApp
       res = validate_matres_master_list_item_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_matres_sub_type_master_list_item(sub_type_id, res)
       end
       instance = matres_master_list_item(id)
@@ -118,7 +118,7 @@ module PackMaterialApp
     def update_matres_master_list_item(id, params)
       res = validate_matres_master_list_item_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         repo.update_matres_master_list_item(id, res)
       end
       instance = matres_master_list_item(id)

@@ -240,7 +240,7 @@ class GenerateNewScaffold < BaseService
               res = validate_#{opts.singlename}_params(params)
               return validation_failed_response(res) unless res.messages.empty?
               id = nil
-              DB.transaction do
+              repo.transaction do
                 id = repo.create_#{opts.singlename}(res)
                 log_transaction
               end
@@ -254,7 +254,7 @@ class GenerateNewScaffold < BaseService
             def update_#{opts.singlename}(id, params)
               res = validate_#{opts.singlename}_params(params)
               return validation_failed_response(res) unless res.messages.empty?
-              DB.transaction do
+              repo.transaction do
                 repo.update_#{opts.singlename}(id, res)
                 log_transaction
               end
@@ -265,7 +265,7 @@ class GenerateNewScaffold < BaseService
 
             def delete_#{opts.singlename}(id)
               name = #{opts.singlename}(id).#{opts.label_field}
-              DB.transaction do
+              repo.transaction do
                 repo.delete_#{opts.singlename}(id)
                 log_transaction
               end

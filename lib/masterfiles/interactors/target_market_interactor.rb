@@ -5,7 +5,7 @@ module MasterfilesApp
     def create_tm_group_type(params)
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         @tm_group_type_id = target_market_repo.create_tm_group_type(res)
       end
       success_response("Created target market group type #{tm_group_type.target_market_group_type_code}", tm_group_type)
@@ -17,7 +17,7 @@ module MasterfilesApp
       @tm_group_type_id = id
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         target_market_repo.update_tm_group_type(id, res)
       end
       success_response("Updated target market group type #{tm_group_type.target_market_group_type_code}",
@@ -27,7 +27,7 @@ module MasterfilesApp
     def delete_tm_group_type(id)
       @tm_group_type_id = id
       name = tm_group_type.target_market_group_type_code
-      DB.transaction do
+      repo.transaction do
         target_market_repo.delete_tm_group_type(id)
       end
       success_response("Deleted target market group type #{name}")
@@ -36,7 +36,7 @@ module MasterfilesApp
     def create_tm_group(params)
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         @tm_group_id = target_market_repo.create_tm_group(res)
       end
       success_response("Created target market group #{tm_group.target_market_group_name}",
@@ -49,7 +49,7 @@ module MasterfilesApp
       @tm_group_id = id
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      DB.transaction do
+      repo.transaction do
         target_market_repo.update_tm_group(id, res)
       end
       success_response("Updated target market group #{tm_group.target_market_group_name}", tm_group(false))
@@ -58,7 +58,7 @@ module MasterfilesApp
     def delete_tm_group(id)
       @tm_group_id = id
       name = tm_group.target_market_group_name
-      DB.transaction do
+      repo.transaction do
         target_market_repo.delete_tm_group(id)
       end
       success_response("Deleted target market group #{name}")
@@ -72,7 +72,7 @@ module MasterfilesApp
       country_ids = res.delete(:country_ids)
       tm_group_ids = res.delete(:tm_group_ids)
 
-      DB.transaction do
+      repo.transaction do
         @target_market_id = target_market_repo.create_target_market(res)
       end
       country_response = link_countries(@target_market_id, country_ids)
@@ -106,7 +106,7 @@ module MasterfilesApp
 
     def link_countries(target_market_id, country_ids)
       return failed_response('You have not selected any countries') unless country_ids
-      DB.transaction do
+      repo.transaction do
         target_market_repo.link_countries(target_market_id, country_ids)
       end
 
@@ -120,7 +120,7 @@ module MasterfilesApp
 
     def link_tm_groups(target_market_id, tm_group_ids)
       return failed_response('You have not selected any target market groups') unless tm_group_ids
-      DB.transaction do
+      repo.transaction do
         target_market_repo.link_tm_groups(target_market_id, tm_group_ids)
       end
 

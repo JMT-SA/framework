@@ -216,10 +216,12 @@ Then in the `user_program_permissions.yml` file in the `list` directory:
     :url: "/development/masterfiles/users/set_permissions/$:id$"
     :section_caption: "Set permissions for programs"
     :multiselect_save_method: dialog
-    :conditions:
-      - :col: pu.user_id
-        :op: =
-        :val: $:id$
+    :conditions: some_key
+:conditions:
+  :some_key:
+    - :col: pu.user_id
+      :op: =
+      :val: $:id$
 ----
 
 Possible options in the `:multiselect` section:
@@ -232,10 +234,7 @@ Possible options in the `:multiselect` section:
     :preselect: "SELECT statement"                       # <4>
     :multiselect_save_method: dialog/remote/http         # <5>
     :can_be_cleared: true                                # <6>
-    :conditions:                                         # <7>
-      - :col: param.column
-        :op: =
-        :val: $:id$
+    :conditions: some_key                                # <7>
 ----
 <1> Keyname to match `?key=` part of calling URL.
 <2> The path to be called when the user saves a selection.
@@ -245,5 +244,5 @@ Possible options in the `:multiselect` section:
     `remote` will send a `POST fetch` request.
     `dialog` will send a `GET fetch` request that will render in a modal dialog.
 <6> Optional. Can the user select no rows at all (to clear a previous selection). Default is `false`.
-<7> Conditions to apply to filter the grid. Same as per filtered lists (above).
+<7> Conditions key points to an entry in the `:conditions:` section to be used to filter the grid. See conditions section in filtered lists (above).
 

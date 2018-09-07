@@ -71,10 +71,14 @@ and all words start with initial capital letter.
 
 |:subtype
 |Specific input type. Date, time and month all render using the browser's HTML5 datepickers.
+
 Integer, numeric and number render with numeric inputs that only accept digits (and `-` and `.`) and have step-up and step-down arrows.
+
 :url and :email are rendered with patterns that check for valid formats. Note :url must include the protocol (`http:` etc.)
+
 Password renders with obscured characters.
-File renders a browser file picker.
+
+File renders a browser file picker. *Be sure to call `multipart!` on the form.*
 a|
 * :integer
 * :numeric
@@ -138,8 +142,12 @@ a|
 |false
 
 |accept
-|Filter for limiting filetpye of files that can be uploaded. Only applies to subtype `:file`.
-|String. e.g. `.yml`.
+|Filter for limiting filetype of files that can be uploaded.
+
+Only applies to subtype `:file`.
+
+Must start with ".".
+|String. e.g. `".yml"`.
 |n/a
 
 |:disabled

@@ -3,11 +3,11 @@
 
 link:/developer_documentation/start.adoc[Back to documentation home]
 
-== Page layout
+= Page layout
 
 Pages are laid out using a DSL which allows nesting of elements like sections, rows, columns and forms.
 
-=== Simplest way of laying out a form
+== Simplest way of laying out a form
 
 [source,ruby]
 ----
@@ -30,26 +30,26 @@ end
 <6> Optional. Call this to make the form call the action remotely - vi a javascript `fetch` call.
 <7> A field to be rendered. The form object should return a value when sent this method, and the rules should include a renderer spec for it.
 
-=== Sections
+== Sections
 
 Sections are divisions in a page. They can optionally display a caption (the default is no caption).
 They can be replaceable via AJAX calls - without affecting the rest of the page.
 
-==== Callback sections
+=== Callback sections
 
 A callback section is a special type of section that has no content initially.
 Its only attributes are the (optional) caption and the url to call once the page has loaded.
 The called url is responsible for providing the content. This is a useful way of loading the same page in different ways and in different pages. It can also be useful if the page will take some time to load, as the page will display a loading indicator while the section is being fetched.
 
-=== Rows and columns
+== Rows and columns
 
 Using rows and columns, a page can display columns of information alongside each other. The responsive design will try to adapt the flow of columns to suit smaller/larger screens.
 
-=== DSL methods
+== DSL methods
 
 These are the methods used in building a page layout.
 
-==== Page
+=== Page
 
 |===
 |method |args |description
@@ -100,7 +100,7 @@ These are the methods used in building a page layout.
 
 |===
 
-==== Section
+=== Section
 
 |===
 |method |args |description
@@ -143,7 +143,7 @@ These are the methods used in building a page layout.
 
 |===
 
-==== Row
+=== Row
 
 |===
 |method |args |description
@@ -158,7 +158,7 @@ These are the methods used in building a page layout.
 
 |===
 
-==== Column
+=== Column
 
 |===
 |method |args |description
@@ -189,7 +189,7 @@ These are the methods used in building a page layout.
 
 |===
 
-==== Form
+=== Form
 
 |===
 |method |args |description

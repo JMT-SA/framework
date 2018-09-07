@@ -1125,6 +1125,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
 
     if (tree) {
       gridOptions.treeData = true;
+      gridOptions.groupDefaultExpanded = treeConfig.groupDefaultExpanded || 0;
       gridOptions.getDataPath = data => data[treeConfig.treeColumn];
       gridOptions.autoGroupColumnDef = {
         headerName: treeConfig.treeCaption || 'Hierarchy',

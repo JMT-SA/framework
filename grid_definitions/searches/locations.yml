@@ -4,7 +4,7 @@
   :tree_column: path_array
   :tree_caption: Location Hierarchy
   :suppress_node_counts: false
-  :groupDefaultExpanded: 2
+  :groupDefaultExpanded: -1
 :actions:
 - :url: "/pack_material/locations/locations/$:id$"
   :text: view
@@ -35,10 +35,3 @@
   :text: Location storage types
   :icon: list
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/pack_material/locations/locations/new"
-  :text: New Location
-  :style: :button
-  :behaviour: :popup  
-  :hide_if_sql_returns_true: SELECT EXISTS(SELECT id FROM locations)

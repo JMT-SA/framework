@@ -110,10 +110,12 @@ Also the list or search yml must provide some config values like the following:
   :tree_column: path_array           # <1>
   :tree_caption: Location Hierarchy  # <2>
   :suppress_node_counts: false       # <3>
+  :groupDefaultExpanded: 1           # <4>
 ----
 <1> `path_array` in this instance is the resultset column that contains the ancestors of the current row in an ordered array. See SQL example below.
 <2> The caption of the grid column that shows the expandable tree hierarchy.
 <3> If `false`, each node in the grid will show the number of child nodes. Set to true to hide the counts.
+<4> How many levels in the hierarchy to expand on display. Default is `0`. Set to `-1` to expand all.
 
 ==== Example SQL for a tree using the closure table method
 

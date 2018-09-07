@@ -19,6 +19,13 @@ module DataminerApp
       page
     end
 
+    def check_db_connection(id)
+      db, = repo.split_db_and_id(id)
+      res = repo.db_connected?(db)
+      return success_response('ok') if res.success
+      res
+    end
+
     def run_report(id, params)
       db, = repo.split_db_and_id(id)
       page = OpenStruct.new(id: id, col_defs: [])

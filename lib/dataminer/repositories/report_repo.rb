@@ -2,12 +2,24 @@
 
 module DataminerApp
   class ReportRepo
+    include Crossbeams::Responses
+
     attr_reader :for_grid_queries
 
     GRID_DEFS = 'grid-definitions'
 
     def initialize(for_grid_queries = false)
       @for_grid_queries = for_grid_queries
+    end
+
+    # Check if a database connection from DM_CONNECTIONS for a specific key was made.
+    #
+    # @param key [String] the database key.
+    # @return [Crossbeams::Response] the database connection status.
+    def db_connected?(key)
+      config = DM_CONNECTIONS.config(key)
+      return success_response('ok') if config.connected
+      failed_response(config.connection_error, key)
     end
 
     # Get the database connection from DM_CONNECTIONS for a specific key.

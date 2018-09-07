@@ -19,6 +19,10 @@ class DataminerConnections
                                                                                 prepared_report_path: ENV['GRID_QUERIES_LOCATION'])
   end
 
+  def config(key)
+    connections[key]
+  end
+
   def [](key)
     connections[key].db
   end
@@ -39,7 +43,8 @@ class DataminerConnections
 end
 
 class DataminerConnection
-  attr_reader :name, :report_path, :prepared_report_path, :db
+  attr_reader :name, :report_path, :prepared_report_path, :db,
+              :connected, :connection_error
 
   ConnSchema = Dry::Validation.Schema do
     required(:name).value(format?: /\A[\da-z-]+\Z/)
@@ -50,6 +55,7 @@ class DataminerConnection
   end
 
   def initialize(config)
+    @connected = false
     validation = ConnSchema.call(config)
     raise %(Dataminer report config is not correct: #{validation.messages.map { |k, v| "#{k} #{v.join(', ')}" }.join(', ')}) unless validation.success?
     @name = validation[:name]
@@ -58,9 +64,13 @@ class DataminerConnection
     @db = if validation[:connection_string].nil?
             validation[:connection]
           else
+            # Sequel.connect(validation[:connection_string], after_connect: ->(_) { p 'CONNECTED' })
             Sequel.connect(validation[:connection_string])
           end
     # Ensure connections are not lost over time.
     @db.extension(:connection_validator) unless validation[:connection_string].nil?
+    @connected = true
+  rescue Sequel::DatabaseConnectionError => e
+    @connection_error = e.message
   end
 end

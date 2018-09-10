@@ -25,4 +25,18 @@ class TestCommonHelpers < Minitest::Test
     assert_equal({ base_with_highlights: { messages: ['Err-1', 'Err-2'], highlights: :fld1 } },
                  add_base_validation_errors_with_highlights({}, ['Err-1', 'Err-2'], :fld1))
   end
+
+  def test_load_via_json
+    plain = { loadNewUrl: '/test' }.to_json
+    with_notice = { loadNewUrl: '/test', flash: {notice: 'NOTE' } }.to_json
+    assert_equal plain, load_via_json('/test')
+    assert_equal with_notice, load_via_json('/test', notice: 'NOTE')
+  end
+
+  def test_reload_previous_dialog_via_json
+    plain = { reloadPreviousDialog: '/test' }.to_json
+    with_notice = { reloadPreviousDialog: '/test', flash: {notice: 'NOTE' } }.to_json
+    assert_equal plain, reload_previous_dialog_via_json('/test')
+    assert_equal with_notice, reload_previous_dialog_via_json('/test', notice: 'NOTE')
+  end
 end

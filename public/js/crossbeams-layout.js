@@ -194,6 +194,10 @@
             let closeDialog = true;
             if (data.redirect) {
               window.location = data.redirect;
+            } else if (data.reloadPreviousDialog) {
+              crossbeamsUtils.closePopupDialog();
+              closeDialog = false;
+              loadDialogContent(data.reloadPreviousDialog);
             } else if (data.loadNewUrl) {
               closeDialog = false;
               loadDialogContent(data.loadNewUrl); // promise...

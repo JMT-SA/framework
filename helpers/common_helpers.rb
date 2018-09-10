@@ -171,8 +171,16 @@ module CommonHelpers
     { redirect: url }.to_json
   end
 
-  def load_via_json(url)
-    { loadNewUrl: url }.to_json
+  def reload_previous_dialog_via_json(url, notice: nil)
+    res = { reloadPreviousDialog: url }
+    res[:flash] = { notice: notice } if notice
+    res.to_json
+  end
+
+  def load_via_json(url, notice: nil)
+    res = { loadNewUrl: url }
+    res[:flash] = { notice: notice } if notice
+    res.to_json
   end
 
   def make_id_correct_type(id_in)

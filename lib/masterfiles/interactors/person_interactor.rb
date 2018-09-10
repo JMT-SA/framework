@@ -6,7 +6,7 @@ module MasterfilesApp
       res = validate_person_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       response = nil
-      repo.transaction do
+      party_repo.transaction do
         response = party_repo.create_person(res)
       end
       if response[:id]
@@ -27,7 +27,7 @@ module MasterfilesApp
       role_ids = attrs.delete(:role_ids)
       roles_response = assign_person_roles(@person_id, role_ids)
       if roles_response.success
-        repo.transaction do
+        party_repo.transaction do
           party_repo.update_person(id, attrs)
         end
         success_response("Updated person #{person.party_name}, #{roles_response.message}", person(false))
@@ -39,7 +39,7 @@ module MasterfilesApp
     def delete_person(id)
       @person_id = id
       name = person.party_name
-      repo.transaction do
+      party_repo.transaction do
         party_repo.delete_person(id)
       end
       success_response("Deleted person #{name}")
@@ -47,7 +47,7 @@ module MasterfilesApp
 
     def assign_person_roles(id, role_ids)
       return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
-      repo.transaction do
+      party_repo.transaction do
         party_repo.assign_roles(id, role_ids, 'person')
       end
       success_response('Roles assigned successfully')

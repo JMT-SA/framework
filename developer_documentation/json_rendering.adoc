@@ -7,9 +7,42 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 This doc shows which helpers are available in route files to return JSON responses to update the page without reloading.
 
-NOTE: All such actions should call `return_json_response` to set the correct headers.
+=== Updating a dialog
+
+==== Replace the contents of a dialog
+
+Renders the text in `:content` in the current dialog's body.
+
+    update_dialog_content(content:, notice: nil, error: nil)
+
+==== Change the contents of a dialog by loading another URL
+
+Replaces the current dialog's content with the response from `url`.
+
+    load_via_json(url, notice: nil)
+
+==== Redirect to the last grid
+
+This uses a redirect to load the page that rendered the last grid.
+
+    redirect_to_last_grid(route)
+
+==== Redirect to a URL
+
+Pass the URL and the app will redirect to it.
+
+  redirect_via_json(url)
+
+==== Reload the dialog that opened the current dialog
+
+When a dialog opens another dialog, you might want to close the second dialog and then reload (refresh) the first dialog with the response from the original or another URL.
+
+    reload_previous_dialog_via_json(url, notice: nil)
+
 
 === Changing DOM elements
+
+NOTE: All such actions should call `return_json_response` to set the correct headers.
 
 The main helper for this is `json_actions` which receives an array of actions to be carried out in the page and an optional flash message to be displayed and optional flag to indicate that a dialog should not be closed after processing the response in the page.
 Each action is of a specific type which tells the calling javascript what to do.

@@ -47,7 +47,7 @@ class Framework < Roda
           res = interactor.link_assignments(id, multiselect_grid_choices(params))
           if res.success
             flash[:notice] = res.message
-            redirect_via_json_to_last_grid
+            redirect_to_last_grid(r)
           else
             show_json_error(res.message, status: 200)
           end
@@ -59,7 +59,7 @@ class Framework < Roda
           res = interactor.link_storage_types(id, multiselect_grid_choices(params))
           if res.success
             flash[:notice] = res.message
-            redirect_via_json_to_last_grid
+            redirect_to_last_grid(r)
           else
             show_json_error(res.message, status: 200)
           end

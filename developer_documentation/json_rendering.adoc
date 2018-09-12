@@ -39,6 +39,24 @@ When a dialog opens another dialog, you might want to close the second dialog an
 
     reload_previous_dialog_via_json(url, notice: nil)
 
+==== Close the dialog and update the grid
+
+After a grid action opens a dialog and changes are saved from the dialog, you might want to update certain values on the currect row without reloading the page.
+
+    update_grid_row(ids, changes:, notice: nil)
+
+`id` is the id of the row to change, but can also be an array of ids if you want to update several rows with the same changes.
+`changes` is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+
+==== Close the dialog and add a row to the grid
+
+Like with updating a grid row, this will close the dialog and append a row to the underlying grid.
+
+    add_grid_row(attrs:, notice: nil)
+
+`attrs` is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+
+`add_grid_row` will automatically set the `created_at` and `updated_at` fields in the new row if the grid has them (so they do not need to be included int the `attrs` Hash).
 
 === Changing DOM elements
 

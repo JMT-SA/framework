@@ -86,6 +86,17 @@ const crossbeamsGridEvents = {
   },
 
   /**
+   * Add a row to the end of a grid.
+   * @param {object} row - the row to be aded to the grid.
+   * @returns {void}
+   */
+  addRowToGrid: function addRowToGrid(row) {
+    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
+    const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+    gridOptions.api.updateRowData({ add: [row] });
+  },
+
+  /**
    * Remove a row from a grid.
    * @param {integer} id - the id of the grid's row.
    * @returns {void}
@@ -160,6 +171,8 @@ const crossbeamsGridEvents = {
               data.updateGridInPlace.forEach((gridRow) => {
                 this.updateGridInPlace(gridRow.id, gridRow.changes);
               });
+            } else if (data.addRowToGrid) {
+              this.addRowToGrid(data.addRowToGrid.changes);
             } else if (data.actions) {
               if (data.keep_dialog_open) {
                 closeDialog = false;
@@ -615,9 +628,14 @@ const crossbeamsGridFormatters = {
     return `<a href="/books/${params.value}/edit">edit</a>`;
   },
 
+  // The Tachyon classes required to style a link as a button.
+  buttonClassForLinks: function buttonClassForLinks(bgColour) {
+    return `link dim br1 ph2 dib white bg-${bgColour || 'green'}`;
+  },
+
   hrefSimpleFormatter: function hrefSimpleFormatter(params) {
     const vals = params.value.split('|');
-    return `<a href="${vals[0]}">${vals[1]}</a>`;
+    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href="${vals[0]}">${vals[1]}</a>`;
   },
 
   // Creates a link that when clicked prompts for a yes/no answer.
@@ -631,7 +649,7 @@ const crossbeamsGridFormatters = {
     [url, linkText, prompt, method] = params.value.split('|');
     prompt = prompt || 'Are you sure?';
     method = (method || 'post').toLowerCase();
-    return `<a href='#' data-prompt="${prompt}" data-method="${method}" data-url="${url}"
+    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href='#' data-prompt="${prompt}" data-method="${method}" data-url="${url}"
     onclick="crossbeamsGridEvents.promptClick(this);">${linkText}</a>`;
   },
 };
@@ -1271,6 +1289,8 @@ $(() => {
                     data.updateGridInPlace.forEach((gridRow) => {
                       crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
                     });
+                  } else if (data.addRowToGrid) {
+                    crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
                   } else {
                     console.log('Not sure what to do with this:', data);
                   }

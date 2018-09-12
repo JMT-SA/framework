@@ -205,6 +205,17 @@ module CommonHelpers
     res.to_json
   end
 
+  # Add a row to a grid. created_at and updated_at values are provided automatically.
+  #
+  # @param attrs [Hash] the columns and their values.
+  # @param notice [String/Nil] the flash message to show.
+  # @return [JSON] the changes to be applied.
+  def add_grid_row(attrs:, notice: nil)
+    res = { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
+    res[:flash] = { notice: notice } if notice
+    res.to_json
+  end
+
   # Create a list of attributes for passing to the +update_grid_row+ method.
   #
   # @param instance [Hash/Dry-type] the instance.

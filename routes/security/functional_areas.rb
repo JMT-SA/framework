@@ -310,8 +310,15 @@ class Framework < Roda
       r.post do        # CREATE
         res = interactor.create_security_group(params[:security_group])
         if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          if fetch?(r)
+            return_json_response
+            add_grid_row(attrs: { id: res.instance.id,
+                                  security_group_name: res.instance[:security_group_name] },
+                         notice: res.message)
+          else
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
         else
           re_show_form(r, res, url: '/security/functional_areas/security_groups/new') do
             Security::FunctionalAreas::SecurityGroup::New.call(form_values: params[:security_group],

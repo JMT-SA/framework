@@ -11,6 +11,7 @@ module DevelopmentApp
     required(:short_name, Types::StrippedString).filled(:str?)
     required(:shared_repo_name, Types::StrippedString).maybe(:str?)
     required(:nested_route_parent, :string).maybe(:str?)
+    required(:new_from_menu, :bool).maybe(:bool?)
 
     required(:applet, :string).filled(:str?).when(eql?: 'other') do
       value(:other).filled?

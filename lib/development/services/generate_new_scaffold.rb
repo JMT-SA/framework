@@ -9,7 +9,7 @@ class GenerateNewScaffold < BaseService
   class ScaffoldConfig
     attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
                 :table_meta, :label_field, :short_name, :has_short_name, :program_text,
-                :nested_route
+                :nested_route, :new_from_menu
 
     def initialize(params, roda_class_name)
       @roda_class_name  = roda_class_name
@@ -26,6 +26,7 @@ class GenerateNewScaffold < BaseService
       @label_field      = params[:label_field] || @table_meta.likely_label_field
       @shared_repo_name = params[:shared_repo_name]
       @nested_route     = params[:nested_route_parent].empty? ? nil : params[:nested_route_parent]
+      @new_from_menu    = params[:new_from_menu].nil? ? false : params[:new_from_menu]
     end
 
     def classnames
@@ -549,16 +550,13 @@ class GenerateNewScaffold < BaseService
         r.on '#{opts.table}' do
           interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
           r.on 'new' do    # NEW
-            check_auth!('#{opts.program_text}', 'new')
-            # FIXME: --- UNCOMMENT next line if this is called directly from a menu item
-            # set_last_grid_url('/list/#{opts.table}', r)
+            check_auth!('#{opts.program_text}', 'new')#{on_new_lastgrid.chomp}
             show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
           end
           r.post do        # CREATE
             res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
             if res.success
-              flash[:notice] = res.message
-              redirect_to_last_grid(r)
+              #{create_success.chomp.gsub("\n", "\n      ")}
             else
               re_show_form(r, res, url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new') do
                 #{opts.classnames[:view_prefix]}::New.call(form_values: params[:#{opts.singlename}],
@@ -630,6 +628,40 @@ class GenerateNewScaffold < BaseService
       opts.table_meta.columns_without(%i[id created_at updated_at active]).map do |col|
         "#{col}: res.instance[:#{col}]"
       end.join(', ')
+    end
+
+    def on_new_lastgrid
+      return '' unless opts.new_from_menu
+      "\n    set_last_grid_url('/list/#{opts.table}', r)"
+    end
+
+    def create_success
+      if opts.new_from_menu
+        row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n    ")
+        <<~RUBY
+          if fetch?(r)
+            return_json_response
+            row_keys = %i[
+              #{row_keys}
+            ]
+            add_grid_row(attrs: { select_attributes(res.instance, row_keys) },
+                         notice: res.message)
+          else
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
+        RUBY
+      else
+        row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n  ")
+        <<~RUBY
+          return_json_response
+          row_keys = %i[
+            #{row_keys}
+          ]
+          add_grid_row(attrs: { select_attributes(res.instance, row_keys) },
+                       notice: res.message)
+        RUBY
+      end
     end
   end
 
@@ -1308,13 +1340,13 @@ class GenerateNewScaffold < BaseService
                '#{opts.classnames[:roda_class]}');
 
         -- NEW menu item
-        /*
+        #{opts.new_from_menu ? '' : '/*'}
         INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
         VALUES ((SELECT id FROM programs WHERE program_name = '#{titleize(opts.program_text)}'
                  AND functional_area_id = (SELECT id FROM functional_areas
                                            WHERE functional_area_name = '#{titleize(opts.applet)}')),
                  'New #{opts.classnames[:class]}', '/#{opts.applet}/#{opts.program}/#{opts.table}/new', 1);
-        */
+        #{opts.new_from_menu ? '' : '*/'}
 
         -- LIST menu item
         INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)

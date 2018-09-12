@@ -100,7 +100,8 @@
    */
   document.addEventListener('invalid', (e) => {
     window.setTimeout(() => {
-      e.target.form.querySelectorAll('[disabled]').forEach(el => revertDisabledButton(el));
+      const sel = '[data-disable-with][disabled], [data-briefly-disable-with][disabled]';
+      e.target.form.querySelectorAll(sel).forEach(el => revertDisabledButton(el));
     }, 0); // Disable the button with a delay so the form still submits...
   }, true);
 

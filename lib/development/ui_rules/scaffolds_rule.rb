@@ -20,12 +20,13 @@ module UiRules
       {
         table: { renderer: :select, options: @repo.table_list, prompt: true, required: true },
         applet: { renderer: :select, options: applets_list },
-        other: { force_lowercase: true },
+        other: { force_lowercase: true, caption: 'New applet (Other)' },
         program: { required: true, force_lowercase: true },
         label_field: {},
         short_name: { required: true, caption: 'Short name based on table name' },
         shared_repo_name: { hint: 'Name of an existing or new repo to use to store persistence methods for more than one table.<p>The code will refer to this repo instead of using a name derived from the table.<br> Use CamelCase - <em>"MostAwesome"</em> for <em>"MostAwesoneRepo"</em>.</p>' },
-        nested_route_parent: { renderer: :select, options: @repo.table_list, prompt: true }
+        nested_route_parent: { renderer: :select, options: @repo.table_list, prompt: true },
+        new_from_menu: { renderer: :checkbox, caption: 'Menu item for new resource' }
       }
     end
 
@@ -43,7 +44,8 @@ module UiRules
                                     label_field: nil,
                                     short_name: nil,
                                     short_repo_name: nil,
-                                    nested_route_parent: nil)
+                                    nested_route_parent: nil,
+                                    new_from_menu: false)
     end
 
     private

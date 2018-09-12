@@ -17,14 +17,21 @@ module Development
             page.form do |form|
               form.action '/development/generators/scaffolds'
               form.form_id 'gen_form'
-              form.add_field :table
-              form.add_field :applet
-              form.add_field :other
-              form.add_field :program
-              form.add_field :label_field
-              form.add_field :short_name
-              form.add_field :shared_repo_name
-              form.add_field :nested_route_parent
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :table
+                  col.add_field :applet
+                  col.add_field :other
+                  col.add_field :program
+                  col.add_field :label_field
+                end
+                row.column do |col|
+                  col.add_field :short_name
+                  col.add_field :shared_repo_name
+                  col.add_field :nested_route_parent
+                  col.add_field :new_from_menu
+                end
+              end
             end
           end
 

@@ -26,7 +26,8 @@ module UiRules
         short_name: { required: true, caption: 'Short name based on table name' },
         shared_repo_name: { hint: 'Name of an existing or new repo to use to store persistence methods for more than one table.<p>The code will refer to this repo instead of using a name derived from the table.<br> Use CamelCase - <em>"MostAwesome"</em> for <em>"MostAwesoneRepo"</em>.</p>' },
         nested_route_parent: { renderer: :select, options: @repo.table_list, prompt: true },
-        new_from_menu: { renderer: :checkbox, caption: 'Menu item for new resource' }
+        new_from_menu: { renderer: :checkbox, caption: 'Menu item for new resource',
+                         hint: '<p>Set this if you want to call the new route from a menu item <br>(instead of or as well as from a button)</p>' }
       }
     end
 

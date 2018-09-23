@@ -3,6 +3,14 @@ require File.join(File.expand_path('./../', __FILE__), 'test_helper')
 class TestCommonHelpers < Minitest::Test
   include CommonHelpers
 
+  def test_make_options
+    [
+      { in: [1, 2, 3], out: ['<option value="1">1</option>', '<option value="2">2</option>', '<option value="3">3</option>'].join("\n") },
+      { in: [['one', 1], ['two', 2], ['three', 3]], out: ['<option value="1">one</option>', '<option value="2">two</option>', '<option value="3">three</option>'].join("\n") },
+      { in: ['one', 'two', 'three'], out: ['<option value="one">one</option>', '<option value="two">two</option>', '<option value="three">three</option>'].join("\n") }
+    ].each { |a| assert_equal a[:out], make_options(a[:in]) }
+  end
+
   def test_select_attributes
     instance = { one: 1, two: 2 }
     row_keys = %i[one two]

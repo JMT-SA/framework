@@ -554,6 +554,7 @@ class GenerateNewScaffold < BaseService
             show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
           end
           r.post do        # CREATE
+            return_json_response if fetch?(r)
             res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
             if res.success
               #{create_success.chomp.gsub("\n", "\n      ")}
@@ -640,7 +641,6 @@ class GenerateNewScaffold < BaseService
         row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n    ")
         <<~RUBY
           if fetch?(r)
-            return_json_response
             row_keys = %i[
               #{row_keys}
             ]
@@ -927,7 +927,7 @@ class GenerateNewScaffold < BaseService
             ensure_exists!(INTERACTOR)
             row_vals = Hash.new(1)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(ok_response(instance: row_vals))
-            patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+            patch_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_json_update_grid
           end
 
@@ -936,7 +936,7 @@ class GenerateNewScaffold < BaseService
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::Edit.stub(:call, bland_page) do
-              patch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+              patch_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
             expect_json_replace_dialog(has_error: true)
           end

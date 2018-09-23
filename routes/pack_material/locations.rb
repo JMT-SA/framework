@@ -25,8 +25,7 @@ class Framework < Roda
           show_partial { PackMaterial::Locations::Location::New.call(id: id) }
         end
         r.post do
-          # return_json_response
-          # update_dialog_content(content: "Got here with #{id} ::: #{params.inspect}", error: 'TESTING')
+          return_json_response
           res = interactor.create_location(id, params[:location])
           if res.success
             flash[:notice] = res.message
@@ -111,6 +110,7 @@ class Framework < Roda
         show_partial_or_page(r) { PackMaterial::Locations::Location::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
+        return_json_response
         res = interactor.create_root_location(params[:location])
         if res.success
           flash[:notice] = res.message

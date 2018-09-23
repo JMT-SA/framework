@@ -95,27 +95,27 @@ module CommonHelpers
     end.join("\n")
   end
 
-  # Make option tags for a select tag. Optionally pre-select an item and include a blank line.
-  #
-  # @param value [String] the selected option.
-  # @param opts [Array] the option items.
-  # @param with_blank [Boolean] true if the first option tag should be blank.
-  # @return [String] the HTML +option+ tags.
-  def select_options(value, opts, with_blank = true)
-    ar = []
-    ar << "<option value=''></option>" if with_blank
-    opts.each do |opt|
-      if opt.is_a? Array
-        text, val = opt
-      else
-        val  = opt
-        text = opt
-      end
-      is_sel = val.to_s == value.to_s
-      ar << "<option value='#{val}'#{is_sel ? ' selected' : ''}>#{text}</option>"
-    end
-    ar.join("\n")
-  end
+  # # Make option tags for a select tag. Optionally pre-select an item and include a blank line.
+  # #
+  # # @param value [String] the selected option.
+  # # @param opts [Array] the option items.
+  # # @param with_blank [Boolean] true if the first option tag should be blank.
+  # # @return [String] the HTML +option+ tags.
+  # def select_options(value, opts, with_blank = true)
+  #   ar = []
+  #   ar << "<option value=''></option>" if with_blank
+  #   opts.each do |opt|
+  #     if opt.is_a? Array
+  #       text, val = opt
+  #     else
+  #       val  = opt
+  #       text = opt
+  #     end
+  #     is_sel = val.to_s == value.to_s
+  #     ar << "<option value='#{val}'#{is_sel ? ' selected' : ''}>#{text}</option>"
+  #   end
+  #   ar.join("\n")
+  # end
 
   # Is this a fetch request?
   def fetch?(route)

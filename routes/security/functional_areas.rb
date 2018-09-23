@@ -66,6 +66,7 @@ class Framework < Roda
         show_partial_or_page(r) { Security::FunctionalAreas::FunctionalArea::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
+        return_json_response if fetch?(r)
         res = interactor.create_functional_area(params[:functional_area])
         if res.success
           flash[:notice] = res.message

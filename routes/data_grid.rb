@@ -12,6 +12,8 @@ class Framework < Roda
       end
 
       r.on 'with_params' do
+        # Pass query_string rather than params as it is passed through directly
+        # to the grid div's url.
         if fetch?(r)
           show_partial { render_data_grid_page(id, query_string: request.query_string) }
         else

@@ -2,8 +2,9 @@
 :dataminer_definition: material_resource_product_columns
 :multiselect:
   :material_resource_type_configs:
-    :url: '/pack_material/config/link_product_columns'
+    :url: '/pack_material/config/link_product_columns/$:id$'
     :preselect: "SELECT unnest(product_column_ids) FROM material_resource_sub_types WHERE id = $:id$"
-    :section_caption: "SELECT 'Select product columns'"
-    :can_be_cleared: false
+    :section_caption: "Select product columns"
+    :grid_caption: Assign product columns
+    :can_be_cleared: true
     :multiselect_save_method: remote

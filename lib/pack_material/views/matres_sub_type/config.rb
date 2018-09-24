@@ -12,6 +12,10 @@ module PackMaterial
           rules_for_cols = order_rule.compile
 
           repo = PackMaterialApp::ConfigRepo.new
+          grid_def = Crossbeams::DataGrid::ListGridDefinition.new(root_path: ENV['ROOT'],
+                                                                  id: 'multi_matres_product_columns',
+                                                                  multi_key: 'material_resource_type_configs',
+                                                                  params: { id: id, key: 'material_resource_type_configs' })
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
@@ -24,15 +28,7 @@ module PackMaterial
               section.row do |row|
                 row.column do |col|
                   col.add_text 'Assign Product Columns'
-                  col.add_grid('productColumnsGrid',
-                               '/list/multi_matres_product_columns/grid_multi/material_resource_type_configs',
-                               caption: 'Assign Product Columns',
-                               is_multiselect: true,
-                               multiselect_url: "/pack_material/config/link_product_columns/#{id}",
-                               multiselect_key: 'material_resource_type_config',
-                               multiselect_params: { id: id },
-                               can_be_cleared: true,
-                               multiselect_save_method: 'remote')
+                  col.add_grid('productColumnsGrid', grid_def.grid_path, grid_def.render_options)
                 end
               end
             end

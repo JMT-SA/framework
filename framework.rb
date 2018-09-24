@@ -171,6 +171,7 @@ class Framework < Roda
       HTML
     end
 
+    return_json_response if fetch?(r)
     r.multi_route
 
     r.on 'iframe', Integer do |id|

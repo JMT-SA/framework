@@ -7,10 +7,15 @@ module CommonHelpers
     view('crossbeams_layout_page')
   end
 
-  def show_partial(&block)
+  def render_partial(&block)
     @layout = block.yield
     @layout.add_csrf_tag(csrf_tag)
     @layout.render
+  end
+
+  def show_partial(&block)
+    content = render_partial(&block)
+    update_dialog_content(content: content)
   end
 
   def show_partial_or_page(route, &block)
@@ -27,7 +32,7 @@ module CommonHelpers
   def re_show_form(route, res, url: nil, &block)
     form = block.yield
     if fetch?(route)
-      content = show_partial { form }
+      content = render_partial { form }
       update_dialog_content(content: content, error: res.message)
     else
       flash[:error] = res.message
@@ -38,7 +43,7 @@ module CommonHelpers
 
   def show_page_or_update_dialog(route, res, &block)
     if fetch?(route)
-      content = show_partial(&block)
+      content = render_partial(&block)
       update_dialog_content(content: content, notice: res.message)
     else
       flash[:notice] = res.message

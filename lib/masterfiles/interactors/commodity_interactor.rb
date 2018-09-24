@@ -23,7 +23,7 @@ module MasterfilesApp
       @commodity_group_id = id
       name = commodity_group.code
       res = {}
-      repo.transaction do
+      commodity_repo.transaction do
         res = commodity_repo.delete_commodity_group(id)
       end
       if res[:error]
@@ -54,7 +54,7 @@ module MasterfilesApp
       @commodity_id = id
       name = commodity.code
       res = {}
-      repo.transaction do
+      commodity_repo.transaction do
         res = commodity_repo.delete_commodity(id)
       end
       if res[:error]

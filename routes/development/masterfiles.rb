@@ -33,8 +33,7 @@ class Framework < Roda
                                        active: res.instance[:active] },
                             notice: res.message)
           else
-            content = show_partial { Development::Masterfiles::Role::Edit.call(id, params[:role], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Development::Masterfiles::Role::Edit.call(id, params[:role], res.errors) }
           end
         end
         r.delete do    # DELETE
@@ -93,8 +92,7 @@ class Framework < Roda
                                        active: res.instance[:active] },
                             notice: res.message)
           else
-            content = show_partial { Development::Masterfiles::AddressType::Edit.call(id, params[:address_type], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Development::Masterfiles::AddressType::Edit.call(id, params[:address_type], res.errors) }
           end
         end
         r.delete do    # DELETE
@@ -152,8 +150,7 @@ class Framework < Roda
                             changes: { contact_method_type: res.instance[:contact_method_type] },
                             notice: res.message)
           else
-            content = show_partial { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Development::Masterfiles::ContactMethodType::Edit.call(id, params[:contact_method_type], res.errors) }
           end
         end
         r.delete do    # DELETE
@@ -251,8 +248,7 @@ class Framework < Roda
                                        active: res.instance[:active] },
                             notice: res.message)
           else
-            content = show_partial { Development::Masterfiles::User::Edit.call(id, params[:user], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Development::Masterfiles::User::Edit.call(id, params[:user], res.errors) }
           end
         end
         r.delete do    # DELETE

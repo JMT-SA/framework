@@ -107,8 +107,7 @@ class Framework < Roda
           update_grid_row(id, changes: { caption: res.instance[:report_description] },
                               notice: res.message)
         else
-          content = show_partial { DM::Report::PreparedReport::Edit.call(id, form_values: params[:prepared_report], form_errors: res.errors) }
-          update_dialog_content(content: content, error: res.message)
+          re_show_form(r, res) { DM::Report::PreparedReport::Edit.call(id, form_values: params[:prepared_report], form_errors: res.errors) }
         end
       end
 

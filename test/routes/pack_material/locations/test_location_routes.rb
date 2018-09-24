@@ -44,7 +44,7 @@ class TestLocationRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     PackMaterialApp::LocationInteractor.any_instance.stubs(:update_location).returns(ok_response(instance: row_vals))
-    patch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestLocationRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::LocationInteractor.any_instance.stubs(:update_location).returns(bad_response)
     PackMaterial::Locations::Location::Edit.stub(:call, bland_page) do
-      patch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestLocationRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::LocationInteractor.any_instance.stubs(:delete_location).returns(ok_response)
-    delete 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
   #

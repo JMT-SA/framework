@@ -475,7 +475,7 @@ class GenerateNewScaffold < BaseService
     end
   end
 
-  class RouteMaker < BaseService
+  class RouteMaker < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :opts
     def initialize(opts)
       @opts = opts
@@ -510,20 +510,21 @@ class GenerateNewScaffold < BaseService
                   show_partial { #{opts.classnames[:view_prefix]}::Show.call(id) }
                 end
                 r.patch do     # UPDATE
-                  return_json_response
                   res = interactor.update_#{opts.singlename}(id, params[:#{opts.singlename}])
                   if res.success
                     #{update_grid_row.gsub("\n", "\n            ").sub(/            \Z/, '').sub(/\n\Z/, '')}
                   else
-                    content = show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id, form_values: params[:#{opts.singlename}], form_errors: res.errors) }
-                    update_dialog_content(content: content, error: res.message)
+                    re_show_form(r, res) { #{opts.classnames[:view_prefix]}::Edit.call(id, form_values: params[:#{opts.singlename}], form_errors: res.errors) }
                   end
                 end
                 r.delete do    # DELETE
-                  return_json_response
                   check_auth!('#{opts.program_text}', 'delete')
                   res = interactor.delete_#{opts.singlename}(id)
-                  delete_grid_row(id, notice: res.message)
+                  if res.success
+                    delete_grid_row(id, notice: res.message)
+                  else
+                    show_json_error(res.message, status: 200)
+                  end
                 end
               end
             end
@@ -554,7 +555,6 @@ class GenerateNewScaffold < BaseService
             show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
           end
           r.post do        # CREATE
-            return_json_response if fetch?(r)
             res = interactor.create_#{opts.singlename}(params[:#{opts.singlename}])
             if res.success
               #{create_success.chomp.gsub("\n", "\n      ")}
@@ -576,16 +576,13 @@ class GenerateNewScaffold < BaseService
           r.on '#{opts.table}' do
             interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
             r.on 'new' do    # NEW
-              check_auth!('#{opts.program_text}', 'new')
-              # FIXME: --- UNCOMMENT next line if this is called directly from a menu item
-              # set_last_grid_url('/list/#{opts.table}', r)
+              check_auth!('#{opts.program_text}', 'new')#{on_new_lastgrid.chomp}
               show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
             end
             r.post do        # CREATE
               res = interactor.create_#{opts.singlename}(id, params[:#{opts.singlename}])
               if res.success
-                flash[:notice] = res.message
-                redirect_to_last_grid(r)
+                #{create_success.chomp.gsub("\n", "\n      ")}
               else
                 re_show_form(r, res, url: "/#{opts.applet}/#{opts.program}/#{opts.nested_route}/\#{id}/#{opts.table}/new") do
                   #{opts.classnames[:view_prefix]}::New.call(id,
@@ -654,7 +651,6 @@ class GenerateNewScaffold < BaseService
       else
         row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n  ")
         <<~RUBY
-          return_json_response
           row_keys = %i[
             #{row_keys}
           ]
@@ -665,7 +661,7 @@ class GenerateNewScaffold < BaseService
     end
   end
 
-  class UiRuleMaker < BaseService
+  class UiRuleMaker < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :opts
     def initialize(opts)
       @opts = opts
@@ -798,7 +794,7 @@ class GenerateNewScaffold < BaseService
     end
   end
 
-  class TestMaker < BaseService
+  class TestMaker < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :opts
     def initialize(opts)
       @opts = opts
@@ -945,17 +941,17 @@ class GenerateNewScaffold < BaseService
             authorise_pass!
             ensure_exists!(INTERACTOR)
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(ok_response)
-            delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+            delete_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_json_delete_from_grid
           end
-          #
-          # def test_delete_fail
-          #   authorise_pass!
-          #   ensure_exists!(INTERACTOR)
-          #   #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
-          #   delete '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-          #   expect_bad_redirect
-          # end
+
+          def test_delete_fail
+            authorise_pass!
+            ensure_exists!(INTERACTOR)
+            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
+            delete_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+            expect_json_error
+          end
 
           def test_new
             authorise_pass!
@@ -1019,7 +1015,7 @@ class GenerateNewScaffold < BaseService
     end
   end
 
-  class ViewMaker < BaseService
+  class ViewMaker < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :opts
     def initialize(opts)
       @opts = opts

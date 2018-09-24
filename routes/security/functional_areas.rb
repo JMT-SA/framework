@@ -39,18 +39,15 @@ class Framework < Roda
           show_partial { Security::FunctionalAreas::FunctionalArea::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_functional_area(id, params[:functional_area])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            content = show_partial { Security::FunctionalAreas::FunctionalArea::Edit.call(id, params[:functional_area], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Security::FunctionalAreas::FunctionalArea::Edit.call(id, params[:functional_area], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('menu', 'delete')
           res = interactor.delete_functional_area(id)
           flash[:notice] = res.message
@@ -66,7 +63,6 @@ class Framework < Roda
         show_partial_or_page(r) { Security::FunctionalAreas::FunctionalArea::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
-        return_json_response if fetch?(r)
         res = interactor.create_functional_area(params[:functional_area])
         if res.success
           flash[:notice] = res.message
@@ -110,18 +106,15 @@ class Framework < Roda
           show_partial { Security::FunctionalAreas::Program::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_program(id, params[:program])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            content = show_partial { Security::FunctionalAreas::Program::Edit.call(id, params[:program], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Security::FunctionalAreas::Program::Edit.call(id, params[:program], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('menu', 'delete')
           res = interactor.delete_program(id)
           flash[:notice] = res.message
@@ -200,18 +193,15 @@ class Framework < Roda
           show_partial { Security::FunctionalAreas::ProgramFunction::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_program_function(id, params[:program_function])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            content = show_partial { Security::FunctionalAreas::ProgramFunction::Edit.call(id, params[:program_function], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Security::FunctionalAreas::ProgramFunction::Edit.call(id, params[:program_function], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('menu', 'delete')
           res = interactor.delete_program_function(id)
           flash[:notice] = res.message
@@ -263,15 +253,13 @@ class Framework < Roda
       end
       r.on 'permissions' do
         r.post do
-          return_json_response
           res = interactor.assign_security_permissions(id, params[:security_group])
           if res.success
             update_grid_row(id,
                             changes: { permissions: res.instance.permission_list },
                             notice: res.message)
           else
-            content = show_partial { Security::FunctionalAreas::SecurityGroup::Permissions.call(id, params[:security_group], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Security::FunctionalAreas::SecurityGroup::Permissions.call(id, params[:security_group], res.errors) }
           end
         end
 
@@ -283,22 +271,23 @@ class Framework < Roda
           show_partial { Security::FunctionalAreas::SecurityGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_security_group(id, params[:security_group])
           if res.success
             update_grid_row(id,
                             changes: { security_group_name: res.instance[:security_group_name] },
                             notice: res.message)
           else
-            content = show_partial { Security::FunctionalAreas::SecurityGroup::Edit.call(id, params[:security_group], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Security::FunctionalAreas::SecurityGroup::Edit.call(id, params[:security_group], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('menu', 'delete')
           res = interactor.delete_security_group(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
         end
       end
     end
@@ -312,7 +301,6 @@ class Framework < Roda
         res = interactor.create_security_group(params[:security_group])
         if res.success
           if fetch?(r)
-            return_json_response
             add_grid_row(attrs: { id: res.instance.id,
                                   security_group_name: res.instance[:security_group_name] },
                          notice: res.message)
@@ -350,22 +338,23 @@ class Framework < Roda
           show_partial { Security::FunctionalAreas::SecurityPermission::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_security_permission(id, params[:security_permission])
           if res.success
             update_grid_row(id,
                             changes: { security_permission: res.instance[:security_permission] },
                             notice: res.message)
           else
-            content = show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id, params[:security_permission], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Security::FunctionalAreas::SecurityPermission::Edit.call(id, params[:security_permission], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('menu', 'delete')
           res = interactor.delete_security_permission(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
         end
       end
     end

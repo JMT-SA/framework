@@ -81,7 +81,7 @@ class TestSecurityRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:update_functional_area).returns(bad_response)
     Security::FunctionalAreas::FunctionalArea::Edit.stub(:call, bland_page) do
-      patch 'security/functional_areas/functional_areas/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'security/functional_areas/functional_areas/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end

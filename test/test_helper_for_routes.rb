@@ -116,6 +116,13 @@ class RouteTester < Minitest::Test
     assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
   end
 
+  def expect_json_error(message: 'FAILED')
+    assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
+    assert last_response.body.include?('exception'), "Expected 'exception' in last response - from: #{caller.first}"
+    assert last_response.body.include?(message), "Expected last response to include error message '#{message}' - from: #{caller.first}"
+    assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
+  end
+
   def expect_ok_redirect(url: DEFAULT_LAST_GRID_URL)
     assert last_response.redirect?, "Expected last response to be redirect (status is #{last_response.status}, location is #{last_response.location}) - from: #{caller.first}"
     assert_equal url, last_response.location, "Expected redirect to '#{url}', was '#{last_response.location}' - from: #{caller.first}"
@@ -157,6 +164,10 @@ class RouteTester < Minitest::Test
 
   def get_as_fetch(url, params = {}, options = nil)
     get url, params, options.merge('HTTP_X_CUSTOM_REQUEST_TYPE' => 'Y')
+  end
+
+  def delete_as_fetch(url, params = {}, options = nil)
+    delete url, params, options.merge('HTTP_X_CUSTOM_REQUEST_TYPE' => 'Y')
   end
 
   def expect_flash_notice(message = nil)

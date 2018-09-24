@@ -25,7 +25,6 @@ class Framework < Roda
           show_partial { PackMaterial::Locations::Location::New.call(id: id) }
         end
         r.post do
-          return_json_response
           res = interactor.create_location(id, params[:location])
           if res.success
             flash[:notice] = res.message
@@ -42,7 +41,6 @@ class Framework < Roda
       end
       r.on 'link_assignments' do
         r.post do
-          return_json_response
           res = interactor.link_assignments(id, multiselect_grid_choices(params))
           if res.success
             flash[:notice] = res.message
@@ -54,7 +52,6 @@ class Framework < Roda
       end
       r.on 'link_storage_types' do
         r.post do
-          return_json_response
           res = interactor.link_storage_types(id, multiselect_grid_choices(params))
           if res.success
             flash[:notice] = res.message
@@ -70,7 +67,6 @@ class Framework < Roda
           show_partial { PackMaterial::Locations::Location::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_location(id, params[:location])
           if res.success
             row_keys = %i[
@@ -85,12 +81,10 @@ class Framework < Roda
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            content = show_partial { PackMaterial::Locations::Location::Edit.call(id, form_values: params[:location], form_errors: res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::Locations::Location::Edit.call(id, form_values: params[:location], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('locations', 'delete')
           # Only delete a leaf - return an error if there are children.
           res = interactor.delete_location(id)
@@ -110,7 +104,6 @@ class Framework < Roda
         show_partial_or_page(r) { PackMaterial::Locations::Location::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
-        return_json_response
         res = interactor.create_root_location(params[:location])
         if res.success
           flash[:notice] = res.message

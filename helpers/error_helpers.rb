@@ -27,8 +27,8 @@ module ErrorHelpers
   def send_appropriate_error_response(err, json_response, fetch_request)
     if json_response
       show_json_error(err)
-    elsif fetch_request
-      dialog_error(err)
+    elsif fetch_request # THIS NO LONGER APPLICABLE - after the switch to fetch calls for dialogs.
+      dialog_error(err) # TODO: Go through all helpers that no longer apply. (all fetches expect only JSON)
     else
       show_page_error(err)
     end
@@ -91,7 +91,7 @@ module ErrorHelpers
 
   def show_json_permission_error
     response.status = 403
-    { flash: { error: 'You do not have permission for this task' } }.to_json
+    { flash: { error: 'You do not have permission for this task', type: 'permission' } }.to_json
   end
 
   def show_json_error(err, status: 500)

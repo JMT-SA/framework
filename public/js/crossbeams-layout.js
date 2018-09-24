@@ -71,24 +71,12 @@
       headers: new Headers({
         'X-Custom-Request-Type': 'Fetch',
       }),
-      // body: new FormData(event.target),
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then((data) => {
-      const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());
-      dlgContent.innerHTML = data;
-      crossbeamsUtils.makeMultiSelects();
-      crossbeamsUtils.makeSearchableSelects();
-      const grids = dlgContent.querySelectorAll('[data-grid]');
-      grids.forEach((grid) => {
-        const gridId = grid.getAttribute('id');
-        const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
-        document.dispatchEvent(gridEvent);
-      });
+      crossbeamsUtils.setDialogContent(data.replaceDialog.content);
     }).catch((data) => {
-      Jackbox.error('The action was unsuccessful...');
-      const htmlText = data.responseText ? data.responseText : '';
-      document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = htmlText;
+      crossbeamsUtils.fetchErrorHandler(data);
     });
   }
 
@@ -267,24 +255,7 @@
               crossbeamsUtils.closePopupDialog();
             }
           }).catch((data) => {
-            if (data.response && data.response.status === 500) {
-              data.response.json().then((body) => {
-                if (body.flash.error) {
-                  if (body.exception) {
-                    if (body.backtrace) {
-                      console.log('EXCEPTION:', body.exception, body.flash.error);
-                      console.log('==Backend Backtrace==');
-                      console.info(body.backtrace.join('\n'));
-                    }
-                  } else {
-                    Jackbox.error(body.flash.error);
-                  }
-                } else {
-                  document.getElementById(crossbeamsUtils.activeDialogContent()).innerHTML = body;
-                }
-              });
-            }
-            Jackbox.error(`An error occurred ${data}`, { time: 20 });
+            crossbeamsUtils.fetchErrorHandler(data);
           });
         event.stopPropagation();
         event.preventDefault();

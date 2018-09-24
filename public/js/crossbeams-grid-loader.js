@@ -233,7 +233,7 @@ const crossbeamsGridEvents = {
               }
             }
           }).catch((data) => {
-            Jackbox.error(`An error occurred ${data}`, { time: 20 });
+            crossbeamsUtils.fetchErrorHandler(data);
           });
       };
 
@@ -1312,7 +1312,7 @@ $(() => {
                     }
                   }
                 }).catch((data) => {
-                  Jackbox.error(`An error occurred ${data}`, { time: 20 });
+                  crossbeamsUtils.fetchErrorHandler(data);
                 });
             } else {
               document.body.innerHTML += `<form id="dynForm" action="${item.url}" method="post">

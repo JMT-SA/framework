@@ -75,7 +75,7 @@ class Framework < Roda
   end
   unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
     plugin :error_handler do |e|
-      show_error(e, request.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE'), @cbr_json_response)
+      show_error(e, request.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE'))
       # = if prod and unexpected exception type, just display "something whent wrong" and log
       # = use an exception library & email...
     end

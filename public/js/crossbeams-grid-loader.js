@@ -162,79 +162,84 @@ const crossbeamsGridEvents = {
             'X-Custom-Request-Type': 'Fetch',
           }),
           body: form,
-        }).then(response => response.json())
-          .then((data) => {
-            let closeDialog = true;
-            if (data.redirect) {
-              window.location = data.redirect;
-            } else if (data.updateGridInPlace) {
-              data.updateGridInPlace.forEach((gridRow) => {
-                this.updateGridInPlace(gridRow.id, gridRow.changes);
-              });
-            } else if (data.addRowToGrid) {
-              this.addRowToGrid(data.addRowToGrid.changes);
-            } else if (data.actions) {
-              if (data.keep_dialog_open) {
-                closeDialog = false;
-              }
-              data.actions.forEach((action) => {
-                if (action.replace_options) {
-                  crossbeamsUtils.replaceSelectrOptions(action);
-                }
-                if (action.replace_multi_options) {
-                  crossbeamsUtils.replaceMultiOptions(action);
-                }
-                if (action.replace_input_value) {
-                  crossbeamsUtils.replaceInputValue(action);
-                }
-                if (action.replace_list_items) {
-                  crossbeamsUtils.replaceListItems(action);
-                }
-                if (action.clear_form_validation) {
-                  crossbeamsUtils.clearFormValidation(action);
-                }
-              });
-            } else if (data.replaceDialog) {
+        }).then((response) => {
+          if (response.status === 404) {
+            Jackbox.error('The requested resource was not found', { time: 20 });
+            return {};
+          }
+          return response.json();
+        }).then((data) => {
+          let closeDialog = true;
+          if (data.redirect) {
+            window.location = data.redirect;
+          } else if (data.updateGridInPlace) {
+            data.updateGridInPlace.forEach((gridRow) => {
+              this.updateGridInPlace(gridRow.id, gridRow.changes);
+            });
+          } else if (data.addRowToGrid) {
+            this.addRowToGrid(data.addRowToGrid.changes);
+          } else if (data.actions) {
+            if (data.keep_dialog_open) {
               closeDialog = false;
-              const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());
-              dlgContent.innerHTML = data.replaceDialog.content;
-              crossbeamsUtils.makeMultiSelects();
-              crossbeamsUtils.makeSearchableSelects();
-              const grids = dlgContent.querySelectorAll('[data-grid]');
-              grids.forEach((grid) => {
-                const newGridId = grid.getAttribute('id');
-                const gridEvent = new CustomEvent('gridLoad', { detail: newGridId });
-                document.dispatchEvent(gridEvent);
-              });
-              const sortable = Array.from(dlgContent.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
-              sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
-                                                       elem.dataset.sortableGroup));
-            } else {
-              console.log('Not sure what to do with this:', data);
             }
-            if (closeDialog) {
-              crossbeamsUtils.closePopupDialog();
-            }
-            // Only if not redirect...
-            if (data.flash) {
-              if (data.flash.notice) {
-                Jackbox.success(data.flash.notice);
+            data.actions.forEach((action) => {
+              if (action.replace_options) {
+                crossbeamsUtils.replaceSelectrOptions(action);
               }
-              if (data.flash.error) {
-                if (data.exception) {
-                  Jackbox.error(data.flash.error, { time: 20 });
-                  if (data.backtrace) {
-                    console.log('==Backend Backtrace==');
-                    console.info(data.backtrace.join('\n'));
-                  }
-                } else {
-                  Jackbox.error(data.flash.error);
+              if (action.replace_multi_options) {
+                crossbeamsUtils.replaceMultiOptions(action);
+              }
+              if (action.replace_input_value) {
+                crossbeamsUtils.replaceInputValue(action);
+              }
+              if (action.replace_list_items) {
+                crossbeamsUtils.replaceListItems(action);
+              }
+              if (action.clear_form_validation) {
+                crossbeamsUtils.clearFormValidation(action);
+              }
+            });
+          } else if (data.replaceDialog) {
+            closeDialog = false;
+            const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());
+            dlgContent.innerHTML = data.replaceDialog.content;
+            crossbeamsUtils.makeMultiSelects();
+            crossbeamsUtils.makeSearchableSelects();
+            const grids = dlgContent.querySelectorAll('[data-grid]');
+            grids.forEach((grid) => {
+              const newGridId = grid.getAttribute('id');
+              const gridEvent = new CustomEvent('gridLoad', { detail: newGridId });
+              document.dispatchEvent(gridEvent);
+            });
+            const sortable = Array.from(dlgContent.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
+            sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
+                                                     elem.dataset.sortableGroup));
+          } else {
+            console.log('Not sure what to do with this:', data);
+          }
+          if (closeDialog) {
+            crossbeamsUtils.closePopupDialog();
+          }
+          // Only if not redirect...
+          if (data.flash) {
+            if (data.flash.notice) {
+              Jackbox.success(data.flash.notice);
+            }
+            if (data.flash.error) {
+              if (data.exception) {
+                Jackbox.error(data.flash.error, { time: 20 });
+                if (data.backtrace) {
+                  console.log('==Backend Backtrace==');
+                  console.info(data.backtrace.join('\n'));
                 }
+              } else {
+                Jackbox.error(data.flash.error);
               }
             }
-          }).catch((data) => {
-            crossbeamsUtils.fetchErrorHandler(data);
-          });
+          }
+        }).catch((data) => {
+          crossbeamsUtils.fetchErrorHandler(data);
+        });
       };
 
       let saveFunc;
@@ -1279,7 +1284,14 @@ $(() => {
                   'X-Custom-Request-Type': 'Fetch',
                 }),
                 body: form,
-              }).then(response => response.json())
+                // }).then(response => response.json())
+              }).then((response) => {
+                if (response.status === 404) {
+                  Jackbox.error('The requested resource was not found', { time: 20 });
+                  return {};
+                }
+                return response.json();
+              })
                 .then((data) => {
                   if (data.redirect) {
                     window.location = data.redirect;

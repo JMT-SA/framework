@@ -1,4 +1,4 @@
-module CommonHelpers
+module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # Show a Crossbeams::Layout page
   # - The block must return a Crossbeams::Layout::Page
   def show_page(&block)
@@ -7,6 +7,9 @@ module CommonHelpers
     view('crossbeams_layout_page')
   end
 
+  # Render a block of Crossbeams::Layout DSL as string.
+  #
+  # @return [String] HTML layout and content string.
   def render_partial(&block)
     @layout = block.yield
     @layout.add_csrf_tag(csrf_tag)
@@ -100,29 +103,10 @@ module CommonHelpers
     end.join("\n")
   end
 
-  # # Make option tags for a select tag. Optionally pre-select an item and include a blank line.
-  # #
-  # # @param value [String] the selected option.
-  # # @param opts [Array] the option items.
-  # # @param with_blank [Boolean] true if the first option tag should be blank.
-  # # @return [String] the HTML +option+ tags.
-  # def select_options(value, opts, with_blank = true)
-  #   ar = []
-  #   ar << "<option value=''></option>" if with_blank
-  #   opts.each do |opt|
-  #     if opt.is_a? Array
-  #       text, val = opt
-  #     else
-  #       val  = opt
-  #       text = opt
-  #     end
-  #     is_sel = val.to_s == value.to_s
-  #     ar << "<option value='#{val}'#{is_sel ? ' selected' : ''}>#{text}</option>"
-  #   end
-  #   ar.join("\n")
-  # end
-
   # Is this a fetch request?
+  #
+  # @param route [Roda.route] the route.
+  # @return [Boolean] true if this is a FETCH request.
   def fetch?(route)
     route.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE')
   end
@@ -221,7 +205,7 @@ module CommonHelpers
     res.to_json
   end
 
-  # Create a list of attributes for passing to the +update_grid_row+ method.
+  # Create a list of attributes for passing to the +update_grid_row+ and +add_grid_row+ methods.
   #
   # @param instance [Hash/Dry-type] the instance.
   # @param row_keys [Array] the keys to attributes of the instance.
@@ -264,13 +248,14 @@ module CommonHelpers
     json_actions(OpenStruct.new(type: :clear_form_validation, dom_id: dom_id), message, keep_dialog_open: keep_dialog_open)
   end
 
-  # This could be built in a class and receive send messages....
   def build_json_action(action)
-    return action_replace_input_value(action) if action.type == :replace_input_value
-    return action_replace_select_options(action) if action.type == :replace_select_options
-    return action_replace_multi_options(action) if action.type == :replace_multi_options
-    return action_replace_list_items(action) if action.type == :replace_list_items
-    return action_clear_form_validation(action) if action.type == :clear_form_validation
+    {
+      replace_input_value:    ->(act) { action_replace_input_value(act) },
+      replace_select_options: ->(act) { action_replace_select_options(act) },
+      replace_multi_options:  ->(act) { action_replace_multi_options(act) },
+      replace_list_items:     ->(act) { action_replace_list_items(act) },
+      clear_form_validation:  ->(act) { action_clear_form_validation(act) }
+    }[action.type].call(action)
   end
 
   def action_replace_select_options(action)
@@ -301,8 +286,9 @@ module CommonHelpers
   end
 
   def handle_not_found(route)
-    if request.xhr?
-      "<div class='crossbeams-error-note'><strong>Error</strong><br>The requested resource was not found.</div>"
+    if fetch?(route)
+      response.status = 404
+      {}.to_json
     else
       route.redirect '/not_found'
     end

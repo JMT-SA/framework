@@ -1,65 +1,34 @@
 module ErrorHelpers
   def initialize_route_instance_vars
-    @cbr_json_response = false
+    # @cbr_json_response = false
   end
 
   # For a JSON response, set the content-type header and an instance var.
   # The instance var is used in the error handler plugin.
   def return_json_response
     response['Content-Type'] = 'application/json'
-    @cbr_json_response = true
   end
 
-  def show_error(err, fetch_request, json_response)
+  def show_error(err, fetch_request)
     case err
     when Crossbeams::AuthorizationError
-      show_auth_error(fetch_request, json_response)
+      show_auth_error(fetch_request)
     when Sequel::UniqueConstraintViolation
-      send_appropriate_error_response('Adding a duplicate', json_response, fetch_request)
+      send_appropriate_error_response('Adding a duplicate', fetch_request)
     when Sequel::ForeignKeyConstraintViolation
       msg = pg_foreign_key_violation_msg(err)
-      send_appropriate_error_response(msg, json_response, fetch_request)
+      send_appropriate_error_response(msg, fetch_request)
     else
-      send_appropriate_error_response(err, json_response, fetch_request)
+      send_appropriate_error_response(err, fetch_request)
     end
   end
 
-  def send_appropriate_error_response(err, json_response, fetch_request)
-    if json_response
-      show_json_error(err)
-    elsif fetch_request # THIS NO LONGER APPLICABLE - after the switch to fetch calls for dialogs.
-      dialog_error(err) # TODO: Go through all helpers that no longer apply. (all fetches expect only JSON)
-    else
-      show_page_error(err)
-    end
+  def send_appropriate_error_response(err, fetch_request)
+    fetch_request ? show_json_error(err) : show_page_error(err)
   end
 
-  def show_auth_error(fetch_request, json_response)
-    if json_response
-      show_json_permission_error
-    elsif fetch_request
-      dialog_permission_error
-    else
-      show_unauthorised
-    end
-  end
-
-  def dialog_permission_error
-    response.status = 403
-    "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>You do not have permission for this task</p></div>"
-  end
-
-  def dialog_warning(message)
-    "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>#{message}</p></div>"
-  end
-
-  def dialog_error(err, state = nil)
-    response.status = 500
-    msg = err.respond_to?(:message) ? err.message : err.to_s
-    msg = "#{state} - #{msg}" unless state.nil?
-    puts err.full_message if err.respond_to?(:full_message) # Log the error too
-    return_json_response
-    { flash: { error: msg } }.to_json
+  def show_auth_error(fetch_request)
+    fetch_request ? show_json_permission_error : show_unauthorised
   end
 
   def show_unauthorised

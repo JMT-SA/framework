@@ -47,4 +47,44 @@ class TestCommonHelpers < Minitest::Test
     assert_equal plain, reload_previous_dialog_via_json('/test')
     assert_equal with_notice, reload_previous_dialog_via_json('/test', notice: 'NOTE')
   end
+
+  def test_build_json_action
+    res = build_json_action(OpenStruct.new(type: :replace_input_value, dom_id: 'html_dom_tag_id', value: 'TEST'))
+    expect = { replace_input_value: { id: 'html_dom_tag_id', value: 'TEST' } }
+    assert_equal expect, res
+
+    res = build_json_action(OpenStruct.new(type: :replace_select_options, dom_id: 'html_dom_tag_id', options_array: ['1', '2']))
+    expect = { replace_options: { id: 'html_dom_tag_id', options: ['1', '2'] } }
+    assert_equal expect, res
+
+    res = build_json_action(OpenStruct.new(type: :replace_multi_options, dom_id: 'html_dom_tag_id', options_array: ['1', '2']))
+    expect = { replace_multi_options: { id: 'html_dom_tag_id', options: ['1', '2'] } }
+    assert_equal expect, res
+
+    res = build_json_action(OpenStruct.new(type: :replace_list_items, dom_id: 'html_dom_tag_id', items: ['1', '2']))
+    expect = { replace_list_items: { id: 'html_dom_tag_id', items: ['1', '2'] } }
+    assert_equal expect, res
+
+    res = build_json_action(OpenStruct.new(type: :clear_form_validation, dom_id: 'html_dom_tag_id'))
+    expect = { clear_form_validation: { form_id: 'html_dom_tag_id' } }
+    assert_equal expect, res
+  end
+
+  def test_json_actions
+    res = json_actions([OpenStruct.new(type: :clear_form_validation, dom_id: 'html_dom_tag_id')], 'TEST', keep_dialog_open: true)
+    expect = { actions: [{ clear_form_validation: { form_id: 'html_dom_tag_id' } }], flash: { notice: 'TEST' }, keep_dialog_open: true }.to_json
+    assert_equal expect, res
+
+    res = json_actions([OpenStruct.new(type: :clear_form_validation, dom_id: 'html_dom_tag_id')])
+    expect = { actions: [{ clear_form_validation: { form_id: 'html_dom_tag_id' } }] }.to_json
+    assert_equal expect, res
+
+    res = json_actions([
+      OpenStruct.new(type: :replace_input_value, dom_id: 'html_dom_tag_id', value: 'TEST'),
+      OpenStruct.new(type: :clear_form_validation, dom_id: 'html_dom_tag_id')
+    ])
+    expect = { actions: [{ replace_input_value: { id: 'html_dom_tag_id', value: 'TEST' } },
+                         { clear_form_validation: { form_id: 'html_dom_tag_id' } }] }.to_json
+    assert_equal expect, res
+  end
 end

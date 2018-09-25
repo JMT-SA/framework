@@ -914,8 +914,7 @@ class GenerateNewScaffold < BaseService
             authorise_fail!
             ensure_exists!(INTERACTOR)
             get '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1 }
-            refute last_response.ok?
-            assert_match(/permission/i, last_response.body)
+            expect_permission_error
           end
 
           def test_update
@@ -966,8 +965,7 @@ class GenerateNewScaffold < BaseService
             authorise_fail!
             ensure_exists!(INTERACTOR)
             get '#{base_route}#{opts.table}/new', {}, 'rack.session' => { user_id: 1 }
-            refute last_response.ok?
-            assert_match(/permission/i, last_response.body)
+            expect_permission_error
           end
 
           def test_create
@@ -976,14 +974,6 @@ class GenerateNewScaffold < BaseService
             #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
             post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_ok_redirect
-          end
-
-          def test_create_remotely
-            authorise_pass!
-            ensure_exists!(INTERACTOR)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
-            post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-            expect_ok_json_redirect
           end
 
           def test_create_fail
@@ -999,17 +989,32 @@ class GenerateNewScaffold < BaseService
               post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
             expect_bad_redirect(url: '/#{base_route}#{opts.table}/new')
-          end
+          end#{non_fetch_new(base_route).chomp.gsub("\n", "\n  ")}
+        end
+      RUBY
+    end
 
-          def test_create_remotely_fail
-            authorise_pass!
-            ensure_exists!(INTERACTOR)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
-            #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
-              post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-            end
-            expect_json_replace_dialog
+    def non_fetch_new(base_route)
+      return nil unless opts.new_from_menu
+      <<~RUBY
+
+
+        def test_create_remotely
+          authorise_pass!
+          ensure_exists!(INTERACTOR)
+          #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
+          post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+          expect_ok_json_redirect
+        end
+
+        def test_create_remotely_fail
+          authorise_pass!
+          ensure_exists!(INTERACTOR)
+          #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
+          #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
+            post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
           end
+          expect_json_replace_dialog
         end
       RUBY
     end

@@ -7,34 +7,34 @@ INSERT INTO functional_areas (functional_area_name)
 VALUES ('Pack Material');
 
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
-VALUES ('Config', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'Pack Material'));
+VALUES ('Configuration', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'Pack Material'));
 
 INSERT INTO programs_webapps (program_id, webapp)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Config' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Pack Material')), 'Framework');
+VALUES ((SELECT id FROM programs WHERE program_name = 'Configuration' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Pack Material')), 'Framework');
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+VALUES ((SELECT id FROM programs WHERE program_name = 'Configuration'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
         'Types', '/list/material_resource_types', 1);
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+VALUES ((SELECT id FROM programs WHERE program_name = 'Configuration'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
         'Sub Types', '/list/material_resource_sub_types', 2);
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+VALUES ((SELECT id FROM programs WHERE program_name = 'Configuration'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'Product Codes', '/list/pack_material_products', 3);
+        'Products', '/list/pack_material_products', 3); -- Used to be 'Product Codes'
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Config'
+VALUES ((SELECT id FROM programs WHERE program_name = 'Configuration'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'Product Variants', '/list/pack_material_product_variants', 4);
+        'Product codes', '/list/pack_material_product_variants', 4); -- Used to be 'Product Variants'
 
 -- All product columns for Pack Material domain - NO CRUD AVAILABLE
 DELETE FROM material_resource_product_columns;
@@ -67,3 +67,19 @@ INSERT INTO material_resource_product_columns (material_resource_domain_id, colu
       ('marketing_variety_id', 'VARY', 'Variety', 1))
       AS t(column_name, short_code, description, n)) sub ON sub.n = 1
   WHERE dom.domain_name = 'Pack Material';
+
+
+
+-- PROGRAM: material_resource
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('material_resource', 2,
+        (SELECT id FROM functional_areas WHERE functional_area_name = 'Pack Material'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs
+WHERE program_name = 'material_resource'
+      AND functional_area_id = (SELECT id
+                                FROM functional_areas
+                                WHERE functional_area_name = 'Pack Material')),
+        'Framework');

@@ -20,7 +20,7 @@
 - :control_type: :link
   :url: "/masterfiles/fruit/back/$:fruit_size_references.fruit_actual_counts_for_pack_id$/fruit_actual_counts_for_packs"
   :text: Back
-  :style: :button
+  :style: :back_button
 :conditions:
   :standard:
     - :col: fruit_size_references.fruit_actual_counts_for_pack_id

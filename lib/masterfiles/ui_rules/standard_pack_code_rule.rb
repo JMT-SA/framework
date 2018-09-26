@@ -20,7 +20,7 @@ module UiRules
 
     def common_fields
       {
-        standard_pack_code: {}
+        standard_pack_code: { required: true }
       }
     end
 

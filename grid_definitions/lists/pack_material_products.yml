@@ -25,13 +25,13 @@
   :hide_if_true: has_variants
 - :separator: true
 - :url: "/pack_material/config/pack_material_products/$:id$/pack_material_product_variants/new"
-  :text: new variant
+  :text: new product code
   :icon: add-solid
-  :title: New Product Variant
+  :title: New Product Code
   :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/config/pack_material_products/preselect"
-  :text: New Product Code
+  :text: New Product
   :style: :button
   :behaviour: :popup

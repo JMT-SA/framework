@@ -65,7 +65,7 @@ class TestMarketingVarietyRoutes < RouteTester
     post '/masterfiles/fruit/cultivars/1/link_marketing_varieties', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     url = '/list/cultivar_marketing_varieties/multi?key=cultivars&id=1'
     assert last_response.redirect?
-    assert_equal url, header_location
+    assert_equal url, last_response.location
     # In order to follow the redirect we have to stub some methods because this is a dataminer url. I just want to test the route method here
     # follow_redirect!
     # assert last_response.ok?

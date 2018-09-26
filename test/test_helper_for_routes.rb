@@ -57,11 +57,6 @@ class RouteTester < Minitest::Test
     klass.any_instance.stubs(:exists?).returns(true)
   end
 
-  def header_location
-    p 'The helper <<header_location>> is deprecated. Please use <<last_response.location>> instead.'
-    last_response.location
-  end
-
   def bland_page(content: 'HTML_PAGE')
     Crossbeams::Layout::Page.build do |page, _|
       page.add_text content

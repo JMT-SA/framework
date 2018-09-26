@@ -2,32 +2,56 @@
 :dataminer_definition: pack_material_product_variants
 :actions:
 - :url: "/pack_material/config/pack_material_products/$:product_id$/pack_material_product_variants/new"
-  :text: new variant
+  :text: new product code
   :icon: add-solid
-  :title: New Product Variant
+  :title: New Product Code
   :popup: true
 - :separator: true
   :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$"
-  :text: view
+  :text: view product code
   :icon: view-show
-  :title: View
+  :title: View Product Code
   :popup: true
   :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$/edit"
-  :text: edit
+  :text: edit product code
   :icon: edit
-  :title: Edit
+  :title: Edit Product Code
   :popup: true
   :hide_if_null: id
+- :url: "/pack_material/material_resource/material_resource_product_variants/$:mr_id$/edit"
+  :text: edit inventory
+  :icon: edit
+  :title: Edit Inventory
+  :popup: true
+  :hide_if_null: mr_id
+- :url: "/list/material_resource_product_variant_party_roles/with_params?matres_variant_id=$:mr_id$"
+  :text: link party roles
+  :icon: edit
+  :title: Link Party Roles
+  :popup: true
+  :hide_if_null: mr_id
+- :separator: true
+- :url: "/list/alternative_matres_product_variants/multi?key=variants&id=$:mr_id$&sub_type_id=$:sub_type_id$"
+  :text: alternatives
+  :icon: list
+  :popup: true
+  :hide_if_null: mr_id
+- :url: "/list/co_use_matres_product_variants/multi?key=variants&id=$:mr_id$"
+  :text: co use product codes
+  :icon: list
+  :popup: true
+  :hide_if_null: mr_id
+- :separator: true
 - :url: "/pack_material/config/pack_material_product_variants/$:id$/clone"
-  :text: clone
+  :text: clone product code
   :icon: edit-copy
-  :title: Clone
+  :title: Clone Product Code
   :popup: true
   :hide_if_null: id
 - :url: "/pack_material/config/pack_material_product_variants/$:id$"
-  :text: delete
+  :text: delete product code
   :icon: delete
   :is_delete: true
   :popup: true

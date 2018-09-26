@@ -32,12 +32,12 @@ module UiRules
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities },
+        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities, required: true  },
         size_count_description: {},
         marketing_size_range_mm: {},
         marketing_weight_range: {},
         size_count_interval_group: {},
-        size_count_value: {},
+        size_count_value: { required: true },
         minimum_size_mm: { caption: 'min' },
         maximum_size_mm: { caption: 'max' },
         average_size_mm: { caption: 'avg' },

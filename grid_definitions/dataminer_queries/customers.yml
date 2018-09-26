@@ -1,0 +1,117 @@
+---
+:caption: Customers
+:sql: "SELECT \"customers\".\"id\", \"customers\".\"party_role_id\", \"customers\".\"erp_customer_number\",
+  \"customers\".\"created_at\", \"customers\".\"updated_at\", fn_party_role_name(\"customers\".\"party_role_id\")
+  AS party_role\r\nFROM \"customers\" "
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: customers.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_role_id:
+    :name: party_role_id
+    :sequence_no: 2
+    :caption: Party role
+    :namespaced_name: customers.party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_customer_number:
+    :name: erp_customer_number
+    :sequence_no: 3
+    :caption: Erp customer number
+    :namespaced_name: customers.erp_customer_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: customers.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 5
+    :caption: Updated at
+    :namespaced_name: customers.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_role:
+    :name: party_role
+    :sequence_no: 6
+    :caption: Party role
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: customers.party_role_id
+  :caption: Party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: customers.customer_type_id
+  :caption: Customer type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT type_code, id FROM customer_types ORDER BY type_code

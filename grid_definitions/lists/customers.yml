@@ -1,0 +1,24 @@
+---
+:dataminer_definition: customers
+:actions:
+- :url: "/masterfiles/parties/customers/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/parties/customers/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/parties/customers/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/parties/customers/preselect"
+  :text: New Customer
+  :style: :button
+  :behaviour: :popup

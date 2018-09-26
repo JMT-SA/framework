@@ -2,131 +2,84 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module PackMaterialApp
   class TestConfigRepo < MiniTestWithHooks
-    def create_product(opts = {})
-      sub_id = DB[:material_resource_sub_types].select(:id).single_value
-      default = { material_resource_sub_type_id: sub_id,
-                  unit: 'unit',
-                  brand_1: 'brand',
-                  style: 'style' }
-      prod_id = DB[:pack_material_products].insert(default.merge(opts))
-      {
-        matres_sub_type_id: sub_id,
-        matres_product_id: prod_id
-      }
-    end
-
-    def make_prod_col(opts = {})
-      DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: opts[:dom_id] || @fixed_table_set[:domain_id],
-        column_name: opts[:col_name] || 'dummy',
-        short_code: "UN-#{Time.now.to_i}"
-      )
-    end
+    include ConfigFactory
+    include MasterfilesApp::PartyFactory
+    include PmProductFactory
 
     def test_for_selects
       assert_respond_to repo, :for_select_domains
       assert_respond_to repo, :for_select_matres_types
       assert_respond_to repo, :for_select_matres_sub_types
+      assert_respond_to repo, :for_select_material_resource_product_columns
+      assert_respond_to repo, :for_select_units
+      assert_respond_to repo, :for_select_matres_product_variants
+      assert_respond_to repo, :for_select_matres_product_variant_party_roles
     end
 
-    def test_crud_calls
-      assert_respond_to repo, :find_matres_type
-      assert_respond_to repo, :create_matres_type
-      assert_respond_to repo, :update_matres_type
-      assert_respond_to repo, :delete_matres_type
+    def crud_call_for(key)
+      assert_respond_to repo, :"find_#{key}"
+      assert_respond_to repo, :"create_#{key}"
+      assert_respond_to repo, :"update_#{key}"
+      assert_respond_to repo, :"delete_#{key}"
+    end
 
-      assert_respond_to repo, :find_matres_sub_type
-      assert_respond_to repo, :create_matres_sub_type
-      assert_respond_to repo, :update_matres_sub_type
-      assert_respond_to repo, :delete_matres_sub_type
-
-      assert_respond_to repo, :find_pm_product
-      assert_respond_to repo, :create_pm_product
-      assert_respond_to repo, :update_pm_product
-      assert_respond_to repo, :delete_pm_product
-
-      assert_respond_to repo, :find_matres_master_list_item
-      assert_respond_to repo, :create_matres_master_list_item
-      assert_respond_to repo, :update_matres_master_list_item
-      assert_respond_to repo, :delete_matres_master_list_item
-
-      assert_respond_to repo, :find_matres_master_list
-      assert_respond_to repo, :create_matres_master_list
-      assert_respond_to repo, :update_matres_master_list
-      assert_respond_to repo, :delete_matres_master_list
+    def test_crud_call_responses
+      crud_call_for('matres_type')
+      crud_call_for('matres_sub_type')
+      crud_call_for('pm_product')
+      crud_call_for('matres_master_list_item')
+      crud_call_for('matres_master_list')
+      crud_call_for('matres_product_variant')
+      crud_call_for('matres_product_variant_party_role')
     end
 
     def test_product_code_column_subset
-      ConfigRepo.any_instance.stubs(:for_select_material_resource_product_columns).returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
+      ConfigRepo.any_instance
+                .stubs(:for_select_material_resource_product_columns)
+                .returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
       assert_equal [['a', 1], ['a', 2], ['a', 3]], repo.product_code_column_subset([1, 2, 3])
     end
 
     def test_for_select_configured_sub_types
-      dom_id = @fixed_table_set[:domain_id]
-      type_id1 = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        type_name: 'type one',
-        short_code: 'T1',
-        description: 'This is the description field'
-      )
-      sub_id1 = DB[:material_resource_sub_types].insert(
+      # First Type: one configured, one invalid sub type
+      type_id1 = create_matres_type(short_code: 'T1')
+      sub_id1 = create_sub_type(
         material_resource_type_id: type_id1,
-        sub_type_name: '1 sub type one',
-        short_code: 'SC',
-        active: true,
-        product_code_ids: '{1,2,3}'
+        sub_type_name: '1 sub type one'
       )
-      sub_id2 = DB[:material_resource_sub_types].insert(
+      sub_id2 = create_sub_type(
         material_resource_type_id: type_id1,
-        sub_type_name: '1 sub type two',
-        short_code: 'SC',
-        active: true,
+        sub_type_name: 'INVALID sub type',
         product_code_ids: nil
       )
-      type_id2 = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        type_name: 'type two',
-        short_code: 'T2',
-        description: 'This is the description field'
-      )
-      sub_id3 = DB[:material_resource_sub_types].insert(
+      # Second Type: one configured, one inactive sub type
+      type_id2 = create_matres_type(short_code: 'T2')
+      sub_id3 = create_sub_type(
         material_resource_type_id: type_id2,
-        sub_type_name: '2 sub type one',
-        short_code: 'SC',
-        active: true,
-        product_code_ids: '{1,2,3}'
+        sub_type_name: '2 sub type one'
       )
-      sub_id4 = DB[:material_resource_sub_types].insert(
+      sub_id4 = create_sub_type(
         material_resource_type_id: type_id2,
         sub_type_name: 'INACTIVE sub type',
-        short_code: 'SC',
-        active: false,
-        product_code_ids: '{1,2,3}'
+        active: false
       )
-      dom_id2 = DB[:material_resource_domains].insert(
-        domain_name: 'Other domain',
-        product_table_name: 'other table name',
-        variant_table_name: 'other variant table name'
-      )
-      other_type_id = DB[:material_resource_types].insert(
+      # Create sub type from other domain
+      dom_id2 = create_other_domain
+      other_type_id = create_matres_type(
         material_resource_domain_id: dom_id2,
-        type_name: 'type name',
-        short_code: 'OTHER_DOMAIN',
-        description: 'This is the description field'
+        short_code: 'OTHER_DOMAIN'
       )
-      other_sub_id = DB[:material_resource_sub_types].insert(
-        material_resource_type_id: other_type_id,
-        sub_type_name: 'sub type name',
-        short_code: 'SC',
-        active: true,
-        product_code_ids: '{1,2,3}'
+      create_sub_type(
+        material_resource_type_id: other_type_id
       )
 
-      y = ConfigRepo.new.for_select_configured_sub_types(PackMaterialApp::DOMAIN_NAME)
+      y = repo.for_select_configured_sub_types(PackMaterialApp::DOMAIN_NAME)
       expected = { 'T1' => [['1 sub type one', sub_id1]], 'T2' => [['2 sub type one', sub_id3]] }
-      # assert_equal(expected, y)
 
+      refute(y['T1'].any? { |s| s.first == 'INVALID sub type' })
+      refute(y['T1'].any? { |s| s.last == sub_id2 })
       refute(y['T2'].any? { |s| s.first == 'INACTIVE sub type' })
+      refute(y['T2'].any? { |s| s.last == sub_id4 })
       assert_nil y['OTHER_DOMAIN']
 
       assert_equal y['T1'], expected['T1']
@@ -134,313 +87,196 @@ module PackMaterialApp
     end
 
     def test_find_matres_type
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
+      type_id = create_matres_type
 
-      y = ConfigRepo.new.find_matres_type(type_id)
-      assert_instance_of(PackMaterialApp::MatresType, y)
-      assert_equal(y.domain_name, 'domain name')
-      assert_equal(y.id, type_id)
+      instance = repo.find_matres_type(type_id)
+      assert_instance_of(PackMaterialApp::MatresType, instance)
+      assert_equal PackMaterialApp::DOMAIN_NAME, instance.domain_name
+      assert_equal(instance.id, type_id)
 
       DB[:material_resource_types].where(id: type_id).delete
-      y = ConfigRepo.new.find_matres_type(type_id)
-      assert_nil y
-
-      DB[:material_resource_domains].where(id: dom_id).delete
+      instance = repo.find_matres_type(type_id)
+      assert_nil instance
     end
 
-    def update_matres_type
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
+    def test_update_matres_type
+      type_id = create_matres_type(
         type_name: 'type name',
-        short_code: 'SC',
+        short_code: 'TN',
         description: 'This is the description field'
       )
 
       attrs = { description: 'This is the updated description', measurement_units: [] }
-      ConfigRepo.new.update_matres_type(type_id, attrs)
-      assert_equal('This is the updated description', DB[:material_resource_types].where(id: type_id).select(:description))
+      repo.update_matres_type(type_id, attrs)
+      assert_equal(
+        'This is the updated description',
+        DB[:material_resource_types].where(id: type_id).first[:description]
+      )
 
-      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
-      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
-      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
-      attrs = { measurement_units: [each_id, pallets_id, bags_id] }
-      ConfigRepo.new.update_matres_type(type_id, attrs)
+      units = add_std_measurement_units
+      unit_list = [units[:each_id], units[:pallets_id], units[:bags_id]]
+      attrs = { measurement_units: unit_list }
+      repo.update_matres_type(type_id, attrs)
       x = DB[:measurement_units_for_matres_types]
           .where(material_resource_type_id: type_id)
           .select_map(:measurement_unit_id)
 
-      assert_equal [each_id, pallets_id, bags_id], x
+      assert_equal unit_list, x
+
+      # matres_type_with_products
+      ConfigRepo.any_instance.stubs(:matres_type_has_products).returns(true)
+      attrs = { type_name: 'new type name', short_code: 'TT' }
+      repo.update_matres_type(type_id, attrs)
+      type = DB[:material_resource_types].where(id: type_id).first
+      assert_equal('new type name', type[:type_name])
+      assert_equal('TN', type[:short_code])
     end
 
     def test_measurement_units
-      DB[:measurement_units].insert(unit_of_measure: 'each') # each_id
-      DB[:measurement_units].insert(unit_of_measure: 'pallets') # pallets_id
-      DB[:measurement_units].insert(unit_of_measure: 'bags') # bags_id
-
-      y = ConfigRepo.new.measurement_units
+      add_std_measurement_units
+      y = repo.measurement_units
       assert_equal y, %w[each pallets bags]
 
       DB[:measurement_units].delete
-      y = ConfigRepo.new.measurement_units
+      y = repo.measurement_units
       assert_equal y, []
     end
 
     def test_matres_type_measurement_units_and_ids
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
-      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
-      pallets_id = DB[:measurement_units].insert(unit_of_measure: 'pallets')
-      bags_id = DB[:measurement_units].insert(unit_of_measure: 'bags')
+      type_id = @fixed_table_set[:matres_types][:sc][:id]
+      units = add_std_measurement_units
+      unit_list = [units[:each_id], units[:pallets_id], units[:bags_id]]
       DB[:measurement_units_for_matres_types].insert(
         material_resource_type_id: type_id,
-        measurement_unit_id: each_id
+        measurement_unit_id: units[:each_id]
       )
       DB[:measurement_units_for_matres_types].insert(
         material_resource_type_id: type_id,
-        measurement_unit_id: pallets_id
+        measurement_unit_id: units[:pallets_id]
       )
       DB[:measurement_units_for_matres_types].insert(
         material_resource_type_id: type_id,
-        measurement_unit_id: bags_id
+        measurement_unit_id: units[:bags_id]
       )
-      y = ConfigRepo.new.matres_type_measurement_units(type_id)
-      assert_equal y, %w[each pallets bags]
-
-      y = ConfigRepo.new.matres_type_measurement_unit_ids(type_id)
-      assert_equal y, [each_id, pallets_id, bags_id]
+      assert_equal %w[each pallets bags], repo.matres_type_measurement_units(type_id)
+      assert_equal unit_list, repo.matres_type_measurement_unit_ids(type_id)
 
       DB[:measurement_units_for_matres_types].where(material_resource_type_id: type_id).delete
-      y = ConfigRepo.new.matres_type_measurement_units(type_id)
-      assert_equal y, []
-      y = ConfigRepo.new.matres_type_measurement_unit_ids(type_id)
-      assert_equal y, []
+      assert_equal [], repo.matres_type_measurement_units(type_id)
+      assert_equal [], repo.matres_type_measurement_unit_ids(type_id)
     end
 
     def test_create_matres_type_unit
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
-
-      ConfigRepo.new.create_matres_type_unit(type_id, 'test unit')
+      type_id = @fixed_table_set[:matres_types][:sc][:id]
+      repo.create_matres_type_unit(type_id, 'test unit')
       unit_id = DB[:measurement_units].where(unit_of_measure: 'test unit').select_map(:id)
       refute_nil unit_id
-      link_id = DB[:measurement_units_for_matres_types].where(material_resource_type_id: type_id).select_map(:measurement_unit_id)
+      link_id = DB[:measurement_units_for_matres_types].where(material_resource_type_id: type_id)
+                                                       .select_map(:measurement_unit_id)
       assert_equal link_id, unit_id
     end
 
     def test_add_matres_type_unit
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
-      each_id = DB[:measurement_units].insert(unit_of_measure: 'each')
-      DB[:measurement_units].insert(unit_of_measure: 'pallets') # pallets_id
-      DB[:measurement_units].insert(unit_of_measure: 'bags') # bags_id
-
-      ConfigRepo.new.add_matres_type_unit(type_id, 'each')
+      type_id = @fixed_table_set[:matres_types][:sc][:id]
+      each_id = add_measurement_unit('each')
+      repo.add_matres_type_unit(type_id, 'each')
       link_id = DB[:measurement_units_for_matres_types].where(
         material_resource_type_id: type_id,
         measurement_unit_id: each_id
       )
       refute_nil link_id
-
       assert_raises do
-        PackMaterialApp::ConfigRepo.new.add_matres_type_unit(type_id, 'does not exist')
+        repo.add_matres_type_unit(type_id, 'does not exist')
       end
     end
 
-    def test_delete_matres_sub_type
-      # sub_id = @fixed_table_set[:matres_sub_types][:sc][:id]
+    def test_update_matres_sub_type
+      sub_id = create_sub_type(
+        sub_type_name: 'sub type name',
+        short_code: 'SN'
+      )
 
+      attrs = { sub_type_name: 'new sub name' }
+      repo.update_matres_sub_type(sub_id, attrs)
+      assert_equal('new sub name', DB[:material_resource_sub_types].where(id: sub_id).first[:sub_type_name])
+
+      # matres_sub_type_with_products
+      ConfigRepo.any_instance.stubs(:matres_sub_type_has_products).returns(true)
+      attrs = { sub_type_name: 'new sub name', short_code: 'TT' }
+      repo.update_matres_sub_type(sub_id, attrs)
+      sub_type = DB[:material_resource_sub_types].where(id: sub_id).first
+      assert_equal('new sub name', sub_type[:sub_type_name])
+      assert_equal('SN', sub_type[:short_code])
+    end
+
+    def test_delete_matres_sub_type
       first = create_product
       second = create_product(unit: 'units',
                               brand_1: 'brands',
                               style: 'styles')
 
-      x = ConfigRepo.new.delete_matres_sub_type(first[:matres_sub_type_id])
+      x = repo.delete_matres_sub_type(first[:matres_sub_type_id])
       refute x.success
 
-      DB[:pack_material_products].where(id: [first[:matres_product_id], second[:matres_product_id]]).delete
-      x = ConfigRepo.new.delete_matres_sub_type(first[:matres_sub_type_id])
+      DB[:pack_material_products].where(id: [first[:id], second[:id]]).delete
+      x = repo.delete_matres_sub_type(first[:matres_sub_type_id])
       assert x.success
-      assert_nil ConfigRepo.new.find_matres_sub_type(first[:matres_sub_type_id])
+      assert_nil repo.find_matres_sub_type(first[:matres_sub_type_id])
     end
 
     def test_product_variant_columns
-      dom_id = @fixed_table_set[:domain_id]
-      # dom_id = DB[:material_resource_domains].insert(
-      #   domain_name: 'domain name',
-      #   internal_seq: 10,
-      #   product_table_name: 'product table name',
-      #   variant_table_name: 'variant table name'
-      # )
-      other_dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'other domain name',
-        internal_seq: 11,
-        product_table_name: 'some table name',
-        variant_table_name: 'other table name'
+      id1 = create_product_column
+      id2 = create_product_column
+      id3 = create_product_column
+      other_dom_id = create_other_domain
+      create_product_column(
+        material_resource_domain_id: other_dom_id,
       )
-      id1 = make_prod_col # (col_name: 'PM col1 SHOULD BE IGNORED')
-      id2 = make_prod_col(col_name: 'PM col2')
-      id3 = make_prod_col(col_name: 'PM col3')
-      id
-      make_prod_col(dom_id: other_dom_id, col_name: 'OTHER col1 SHOULD BE IGNORED')
-
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
-      sub_id = DB[:material_resource_sub_types].insert(
-        material_resource_type_id: type_id,
-        internal_seq: 1,
-        sub_type_name: 'sub type name',
-        short_code: 'SC',
+      sub_id = create_sub_type(
         product_code_ids: "{#{id1}}",
         product_column_ids: "{#{id1},#{id2},#{id3}}"
       )
 
-      y = ConfigRepo.new.product_variant_columns(sub_id)
-      # assert_equal([['column name two', id2], ['column name three', id3]], y)
-      assert_equal([['PM col2', id2], ['PM col3', id3]], y)
+      variant_columns = repo.product_variant_columns(sub_id)
+      assert(variant_columns.none? { |r| r.last == id1 })
+      assert(variant_columns.any? { |r| r.last == id2 })
+      assert(variant_columns.any? { |r| r.last == id3 })
 
       DB[:material_resource_sub_types].where(id: sub_id).delete
-      y = ConfigRepo.new.product_variant_columns(sub_id)
-      assert_empty y
+      assert_raises(NoMethodError) {
+        repo.product_variant_columns(sub_id)
+      }
     end
 
     def test_product_code_columns
-      # dom = create_dom
-      # id1 = create_pc(dom, seq=1)
-      # id2 = create_pc(dom, seq=2)
-      # typ = create_type(dom)
-      # sub = create_subtype(typ, prod_ids = [id1,id2])
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
-      id1 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'column name one',
-        short_code: 'CN1'
-      )
-      id2 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'column name two',
-        short_code: 'CN2'
-      )
-      id3 = DB[:material_resource_product_columns].insert(
-        material_resource_domain_id: dom_id,
-        column_name: 'column name three',
-        short_code: 'CN3'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
-      sub_id = DB[:material_resource_sub_types].insert(
-        material_resource_type_id: type_id,
-        internal_seq: 1,
-        sub_type_name: 'sub type name',
-        short_code: 'SC',
+      id1 = create_product_column
+      id2 = create_product_column
+      id3 = create_product_column
+      sub_id = create_sub_type(
         product_code_ids: "{#{id1},#{id2},#{id3}}"
       )
 
-      y = ConfigRepo.new.product_code_columns(sub_id)
-      assert_equal(y, [['column name one', id1], ['column name two', id2], ['column name three', id3]])
+      code_columns = repo.product_code_columns(sub_id)
+      assert(code_columns.any? { |r| r.last == id1 })
+      assert(code_columns.any? { |r| r.last == id2 })
+      assert(code_columns.any? { |r| r.last == id3 })
     end
 
     def test_update_product_code_configuration
-      # create_sub => {dom: {id: 1, type: {id: 2, sub: {id: 3}}}}
-      dom_id = DB[:material_resource_domains].insert(
-        domain_name: 'domain name',
-        internal_seq: 10,
-        product_table_name: 'product table name',
-        variant_table_name: 'variant table name'
-      )
-      type_id = DB[:material_resource_types].insert(
-        material_resource_domain_id: dom_id,
-        internal_seq: 1,
-        type_name: 'type name',
-        short_code: 'SC',
-        description: 'This is the description field'
-      )
-      sub_id = DB[:material_resource_sub_types].insert(
-        material_resource_type_id: type_id,
-        internal_seq: 1,
-        sub_type_name: 'sub type name',
-        short_code: 'SC'
-      )
+      sub_id = create_sub_type
       test_res = { chosen_column_ids: [77, 78, 79], columncodes_sorted_ids: [78, 79, 77] }
-      x = ConfigRepo.new.update_product_code_configuration(sub_id, test_res)
+      x = repo.update_product_code_configuration(sub_id, test_res)
       assert_equal(true, x.success)
 
-      matres_sub_type = ConfigRepo.new.find_matres_sub_type(sub_id)
+      matres_sub_type = repo.find_matres_sub_type(sub_id)
       assert_equal(matres_sub_type.product_column_ids.join(','), '77,78,79')
       assert_equal(matres_sub_type.product_code_ids.join(','), '78,79,77')
     end
 
     def test_sub_type_master_list_items
-      skip 'still todo'
-      sub_id = 1
-      y = ConfigRepo.new.sub_type_master_list_items(sub_id)
-      p y
+      skip 'todo'
+      # ConfigRepo.any_instance.stubs(:get_dataminer_report).returns('SELECT * FROM material_resource_master_lists')
+      # repo.sub_type_master_list_items
     end
 
     # def sub_type_master_list_items(sub_type_id)
@@ -461,6 +297,96 @@ module PackMaterialApp
     #   rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
     #   Crossbeams::Dataminer::Report.load(rpt_hash)
     # end
+
+    def test_matres_sub_type_has_products
+      product_set = create_product
+      assert repo.matres_sub_type_has_products(product_set[:matres_sub_type_id])
+
+      DB[:pack_material_products].where(id: product_set[:id]).delete
+      refute repo.matres_sub_type_has_products(product_set[:matres_sub_type_id])
+    end
+
+    def test_matres_type_has_products
+      product_set = create_product
+      assert repo.matres_type_has_products(product_set[:matres_type_id])
+
+      DB[:pack_material_products].where(id: product_set[:id]).delete
+      refute repo.matres_type_has_products(product_set[:matres_type_id])
+    end
+
+    def test_create_matres_product_variant_party_role
+      variant = create_material_resource_product_variant
+      supplier = create_supplier
+      customer = create_customer
+      attrs = {
+        supplier_id: nil,
+        customer_id: nil,
+        material_resource_product_variant_id: variant[:id],
+        supplier_lead_time: 12
+      }
+
+      result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id], customer_id: customer[:id]))
+      refute result.success
+      assert_equal 'Can not assign both customer and supplier', result.errors
+
+      result = repo.create_matres_product_variant_party_role(attrs)
+      refute result.success
+      assert_equal 'Must have customer or supplier', result.errors
+
+      repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
+      result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
+      refute result.success
+      assert_equal 'Supplier already exists', result.errors
+
+      repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
+      result = repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
+      refute result.success
+      assert_equal 'Customer already exists', result.errors
+    end
+
+    def test_find_full_party_role
+      customer = create_customer
+      role_link = create_matres_product_variant_party_role('customer', customer_id: customer[:id])
+
+      full_party_role = repo.find_full_party_role(role_link[:id])
+      assert full_party_role.is_a?(FullMatresProductVariantPartyRole)
+      assert_equal 'customer', full_party_role.role_type
+
+      expected_name = DB["SELECT fn_party_role_name(#{customer[:party_role_id]}) as party_name"].first
+      assert_equal expected_name[:party_name], full_party_role.party_name
+    end
+
+    def test_link_alternatives
+      alternative_ids = []
+      2.times do
+        alternative_ids << create_material_resource_product_variant[:id]
+      end
+      variant = create_material_resource_product_variant
+      repo.link_alternatives(variant[:id], alternative_ids)
+      assert repo.exists?(:alternative_material_resource_product_variants, alternative_id: alternative_ids[0])
+      assert repo.exists?(:alternative_material_resource_product_variants, alternative_id: alternative_ids[1])
+    end
+
+    def test_link_co_use_product_codes
+      co_use_ids = []
+      2.times do
+        co_use_ids << create_material_resource_product_variant[:id]
+      end
+      variant = create_material_resource_product_variant
+      repo.link_co_use_product_codes(variant[:id], co_use_ids)
+      assert repo.exists?(:co_use_material_resource_product_variants, co_use_id: co_use_ids[0])
+      assert repo.exists?(:co_use_material_resource_product_variants, co_use_id: co_use_ids[1])
+    end
+
+    def test_factories
+      create_sub_type
+      create_product_column
+      create_product
+      create_other_domain
+      create_matres_type
+    end
+
+    private
 
     def repo
       ConfigRepo.new

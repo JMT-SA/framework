@@ -4,6 +4,8 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module PackMaterialApp
   class TestConfigInteractor < Minitest::Test
+    include Crossbeams::Responses
+
     def test_repo
       x = interactor.send(:repo)
       assert x.is_a?(PackMaterialApp::ConfigRepo)
@@ -12,10 +14,7 @@ module PackMaterialApp
     # MATRES TYPE
     def test_matres_type
       ConfigRepo.any_instance.stubs(:find_matres_type).returns(fake_matres_type)
-      x = interactor.send(:matres_type)
-      assert x.is_a?(MatresType)
-
-      x = interactor.send(:matres_type, true)
+      x = interactor.send(:matres_type, 1)
       assert x.is_a?(MatresType)
     end
 
@@ -73,11 +72,11 @@ module PackMaterialApp
       assert_equal(false, x.success)
 
       # Updates successfully
-      ConfigRepo.any_instance.stubs(:update_matres_type).returns(true)
+      ConfigRepo.any_instance.stubs(:update_matres_type).returns(success_response('stub message'))
       ConfigInteractor.any_instance.stubs(:matres_type).returns(fake_matres_type)
       update_attrs = matres_type_attrs.merge(type_name: 'Retailers')
       x = interactor.update_matres_type(1, update_attrs)
-      expected = interactor.success_response('Updated type Retail', fake_matres_type)
+      expected = interactor.success_response('Updated type Retail, stub message', fake_matres_type)
       assert_equal(expected, x)
       assert x.success
 
@@ -182,10 +181,7 @@ module PackMaterialApp
     # MATRES SUB TYPE
     def test_matres_sub_type
       ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns(fake_matres_sub_type)
-      x = interactor.send(:matres_sub_type)
-      assert x.is_a?(MatresSubType)
-
-      x = interactor.send(:matres_sub_type, true)
+      x = interactor.send(:matres_sub_type, 1)
       assert x.is_a?(MatresSubType)
     end
 
@@ -292,7 +288,7 @@ module PackMaterialApp
     end
 
     def test_update_matres_sub_type
-      ConfigRepo.any_instance.stubs(:update_matres_sub_type).returns(fake_matres_sub_type)
+      ConfigRepo.any_instance.stubs(:update_matres_sub_type).returns(success_response('stub message'))
       ConfigInteractor.any_instance.stubs(:matres_sub_type).returns(fake_matres_sub_type)
 
       x = interactor.update_matres_sub_type(1, invalid_matres_sub_type_attrs)
@@ -301,7 +297,7 @@ module PackMaterialApp
 
       x = interactor.update_matres_sub_type(1, matres_sub_type_attrs.merge(sub_type_name: 'Updated value'))
       assert x.success
-      assert_equal 'Updated sub type Bag Fruit', x.message
+      assert_equal 'Updated sub type Bag Fruit, stub message', x.message
       assert_instance_of MatresSubType, x.instance
     end
 
@@ -380,7 +376,7 @@ module PackMaterialApp
     end
 
     def test_update_matres_config
-      ConfigRepo.any_instance.stubs(:update_matres_sub_type).returns(fake_matres_sub_type)
+      ConfigRepo.any_instance.stubs(:update_matres_sub_type).returns(success_response('ok'))
 
       x = interactor.update_matres_config(1, invalid_matres_config_attrs)
       assert_equal 'Validation error', x.message

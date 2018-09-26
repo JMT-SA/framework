@@ -1,14 +1,14 @@
 module MiniTestSeeds
   def db_create_roles
     # roles
-    cust_id = DB[:roles].insert(
-      name: 'CUSTOMER'
-    )
-    supp_id = DB[:roles].insert(
-      name: 'SUPPLIER'
-    )
-    @fixed_table_set[:roles] = { cust: { id: cust_id },
-                                 supp: { id: supp_id }
+    cus_id = DB[:roles].insert(name: 'CUSTOMER')
+    sup_id = DB[:roles].insert(name: 'SUPPLIER')
+    mar_id = DB[:roles].insert(name: 'MARKETER')
+    ret_id = DB[:roles].insert(name: 'RETAILER')
+    @fixed_table_set[:roles] = { customer: { id: cus_id },
+                                 supplier: { id: sup_id },
+                                 marketer: { id: mar_id },
+                                 retailer: { id: ret_id }
     }
   end
 
@@ -40,12 +40,18 @@ module MiniTestSeeds
       WHERE column_name IN ('unit', 'style', 'brand_1')
     SQL
     prod_code_ids = DB[sql].select_map
+    sql = <<~SQL
+      SELECT id FROM material_resource_product_columns
+      WHERE column_name IN ('unit', 'style', 'brand_1', 'reference_size', 'reference_dimension', 'reference_quantity')
+    SQL
+    prod_col_ids = DB[sql].select_map
     sub_id = DB[:material_resource_sub_types].insert(
       material_resource_type_id: type_id,
       internal_seq: 1,
       sub_type_name: 'PM SC Sub Type',
       short_code: 'SC',
-      product_code_ids: "{#{prod_code_ids.join(',')}}"
+      product_code_ids: "{#{prod_code_ids.join(',')}}",
+      product_column_ids: "{#{prod_col_ids.join(',')}}"
     )
     @fixed_table_set[:matres_sub_types] = { sc: { id: sub_id, short_code: 'SC', prod_code_ids: [prod_code_ids] } }
 

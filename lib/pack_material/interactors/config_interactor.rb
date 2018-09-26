@@ -5,23 +5,27 @@ module PackMaterialApp
     def create_matres_type(params)
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @matres_type_id = repo.create_matres_type(res)
-      success_response("Created type #{matres_type.type_name}", matres_type)
+      id = repo.create_matres_type(res)
+      instance = matres_type(id)
+      success_response("Created type #{instance.type_name}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { type_name: ['This type already exists'] }))
+      # TODO: How do we respond with a double unique constraint?
+      # I suspect we need to add 'This type already exists' to the form base error
+      # And then type name:'must be unique'
+      validation_failed_response(OpenStruct.new(messages: { type_name: ['This type already exists'], short_code: ['must be unique'] }))
     end
 
     def update_matres_type(id, params)
-      @matres_type_id = id
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      repo.update_matres_type(id, res)
-      success_response("Updated type #{matres_type.type_name}", matres_type(false))
+      response = repo.update_matres_type(id, res)
+      extra = response[:message] ? (', ' + response[:message]) : ''
+      instance = matres_type(id)
+      success_response("Updated type #{instance.type_name}#{extra}", instance)
     end
 
     def delete_matres_type(id)
-      @matres_type_id = id
-      name = matres_type.type_name
+      name = matres_type(id).type_name
       repo.delete_matres_type(id)
       success_response("Deleted type #{name}")
     end
@@ -46,8 +50,8 @@ module PackMaterialApp
 
     def add_matres_unit(matres_type_id, params)
       repo.add_matres_type_unit(matres_type_id, params[:unit_of_measure])
-      @matres_type_id = matres_type_id
-      success_response("Unit was added to #{matres_type.type_name}", matres_type(false))
+      instance = matres_type(matres_type_id)
+      success_response("Unit was added to #{instance.type_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { unit_of_measure: ['This unit is already assigned'] }))
     end
@@ -55,23 +59,24 @@ module PackMaterialApp
     def create_matres_sub_type(params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @matres_sub_type_id = repo.create_matres_sub_type(res)
-      success_response("Created sub type #{matres_sub_type.sub_type_name}", matres_sub_type)
+      id = repo.create_matres_sub_type(res)
+      instance = matres_sub_type(id)
+      success_response("Created sub type #{instance.sub_type_name}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { sub_type_name: ['This sub type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { sub_type_name: ['This sub type already exists'], short_code: ['must be unique'] }))
     end
 
     def update_matres_sub_type(id, params)
-      @matres_sub_type_id = id
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      repo.update_matres_sub_type(id, res)
-      success_response("Updated sub type #{matres_sub_type.sub_type_name}", matres_sub_type(false))
+      response = repo.update_matres_sub_type(id, res)
+      extra = response[:message] ? (', ' + response[:message]) : ''
+      instance = matres_sub_type(id)
+      success_response("Updated sub type #{instance.sub_type_name}#{extra}", instance)
     end
 
     def delete_matres_sub_type(id)
-      @matres_sub_type_id = id
-      name = matres_sub_type.sub_type_name
+      name = matres_sub_type(id).sub_type_name
       res = nil
       repo.transaction do
         res = repo.delete_matres_sub_type(id)
@@ -80,7 +85,6 @@ module PackMaterialApp
     end
 
     def update_matres_config(id, params)
-      @matres_sub_type_id = id
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.update_matres_sub_type(id, res)
@@ -131,12 +135,8 @@ module PackMaterialApp
       @repo ||= ConfigRepo.new
     end
 
-    def matres_type(cached = true)
-      if cached
-        @matres_type ||= repo.find_matres_type(@matres_type_id)
-      else
-        @matres_type = repo.find_matres_type(@matres_type_id)
-      end
+    def matres_type(id)
+      repo.find_matres_type(id)
     end
 
     def validate_matres_type_params(params)
@@ -147,12 +147,8 @@ module PackMaterialApp
       MatresTypeUnitSchema.call(params)
     end
 
-    def matres_sub_type(cached = true)
-      if cached
-        @matres_sub_type ||= repo.find_matres_sub_type(@matres_sub_type_id)
-      else
-        @matres_sub_type = repo.find_matres_sub_type(@matres_sub_type_id)
-      end
+    def matres_sub_type(id)
+      repo.find_matres_sub_type(id)
     end
 
     def validate_matres_sub_type_params(params)

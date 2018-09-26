@@ -16,12 +16,12 @@ module UiRules
 
     def set_show_fields
       fields[:address_type] = { renderer: :label }
-      fields[:active] = { renderer: :label }
+      fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
-        address_type: {},
+        address_type: { required: true },
         active: { renderer: :checkbox }
       }
     end

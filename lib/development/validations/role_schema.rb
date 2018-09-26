@@ -5,7 +5,7 @@ module DevelopmentApp
     configure { config.type_specs = true }
 
     optional(:id, :int).filled(:int?)
-    required(:name, Types::StrippedString).maybe(:str?)
-    required(:active, :bool).maybe(:bool?)
+    required(:name, Types::StrippedString).filled(:str?)
+    required(:active, :bool).filled(:bool?)
   end
 end

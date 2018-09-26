@@ -1,0 +1,240 @@
+---
+:caption: Customers & Suppliers
+:sql: "SELECT \"material_resource_product_variant_party_roles\".\"id\",\r\n  \"material_resource_product_variant_party_roles\".\"material_resource_product_variant_id\",\r\n
+  \ \"material_resource_product_variant_party_roles\".\"supplier_id\",\r\n  \"material_resource_product_variant_party_roles\".\"customer_id\",\r\n
+  \ fn_party_role_name(suppliers.party_role_id) as supplier_name,\r\n  fn_party_role_name(customers.party_role_id)
+  as customer_name,\r\n  \"material_resource_product_variant_party_roles\".\"party_stock_code\",\r\n
+  \ \"customers\".\"erp_customer_number\",\r\n  \"suppliers\".\"erp_supplier_number\",\r\n
+  \ \"material_resource_product_variant_party_roles\".\"supplier_lead_time\",\r\n
+  \ \"material_resource_product_variant_party_roles\".\"is_preferred_supplier\",\r\n
+  \ \"material_resource_product_variant_party_roles\".\"created_at\",\r\n  \"material_resource_product_variant_party_roles\".\"updated_at\"\r\nFROM
+  \"material_resource_product_variant_party_roles\"\r\nJOIN \"material_resource_product_variants\"
+  ON \"material_resource_product_variants\".\"id\" = \"material_resource_product_variant_party_roles\".\"material_resource_product_variant_id\"\r\nLEFT
+  JOIN \"customers\" ON \"customers\".\"id\" = \"material_resource_product_variant_party_roles\".\"customer_id\"\r\nLEFT
+  JOIN \"suppliers\" ON \"suppliers\".\"id\" = \"material_resource_product_variant_party_roles\".\"supplier_id\"\r\n"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: material_resource_product_variant_party_roles.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  material_resource_product_variant_id:
+    :name: material_resource_product_variant_id
+    :sequence_no: 2
+    :caption: Material resource product variant
+    :namespaced_name: material_resource_product_variant_party_roles.material_resource_product_variant_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_id:
+    :name: supplier_id
+    :sequence_no: 3
+    :caption: Supplier
+    :namespaced_name: material_resource_product_variant_party_roles.supplier_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_id:
+    :name: customer_id
+    :sequence_no: 4
+    :caption: Customer
+    :namespaced_name: material_resource_product_variant_party_roles.customer_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_name:
+    :name: supplier_name
+    :sequence_no: 5
+    :caption: Supplier name
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_name:
+    :name: customer_name
+    :sequence_no: 6
+    :caption: Customer name
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_stock_code:
+    :name: party_stock_code
+    :sequence_no: 7
+    :caption: Party stock code
+    :namespaced_name: material_resource_product_variant_party_roles.party_stock_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_customer_number:
+    :name: erp_customer_number
+    :sequence_no: 8
+    :caption: Erp customer number
+    :namespaced_name: customers.erp_customer_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_supplier_number:
+    :name: erp_supplier_number
+    :sequence_no: 9
+    :caption: Erp supplier number
+    :namespaced_name: suppliers.erp_supplier_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_lead_time:
+    :name: supplier_lead_time
+    :sequence_no: 10
+    :caption: Supplier lead time
+    :namespaced_name: material_resource_product_variant_party_roles.supplier_lead_time
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_preferred_supplier:
+    :name: is_preferred_supplier
+    :sequence_no: 11
+    :caption: Is preferred supplier
+    :namespaced_name: material_resource_product_variant_party_roles.is_preferred_supplier
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 12
+    :caption: Created at
+    :namespaced_name: material_resource_product_variant_party_roles.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 13
+    :caption: Updated at
+    :namespaced_name: material_resource_product_variant_party_roles.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: material_resource_product_variant_party_roles.material_resource_product_variant_id
+  :caption: Material resource product variant
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT product_variant_table_name, id FROM material_resource_product_variants
+    ORDER BY product_variant_table_name
+- :column: material_resource_product_variant_party_roles.supplier_id
+  :caption: Supplier
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT erp_supplier_number, id FROM suppliers ORDER BY erp_supplier_number
+- :column: material_resource_product_variant_party_roles.customer_id
+  :caption: Customer
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT erp_customer_number, id FROM customers ORDER BY erp_customer_number

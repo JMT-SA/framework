@@ -22,13 +22,13 @@ module UiRules
       fields[:city] = { renderer: :label }
       fields[:postal_code] = { renderer: :label }
       fields[:country] = { renderer: :label }
-      fields[:active] = { renderer: :label }
+      fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
-        address_type_id: { renderer: :select, options: @repo.for_select_address_types },
-        address_line_1: {},
+        address_type_id: { renderer: :select, options: @repo.for_select_address_types, required: true  },
+        address_line_1: { required: true },
         address_line_2: {},
         address_line_3: {},
         city: {},

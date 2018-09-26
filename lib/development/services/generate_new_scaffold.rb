@@ -1177,7 +1177,7 @@ class GenerateNewScaffold < BaseService
       opts.table_meta.foreigns.each do |fk|
         if fk[:table] == :party_roles # Special treatment for party_role lookups to get party name
           fk[:columns].each do |fk_col|
-            fk_cols << "fn_party_role_name(#{opts.table}.#{fk_col}) AS #{fk_col.sub(/_id$/, '')}"
+            fk_cols << "fn_party_role_name(#{opts.table}.#{fk_col}) AS #{fk_col.to_s.sub(/_id$/, '')}"
           end
         else
           fk_col = get_representative_col_from_table(fk[:table])

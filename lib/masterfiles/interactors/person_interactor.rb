@@ -48,7 +48,7 @@ module MasterfilesApp
     def assign_person_roles(id, role_ids)
       return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
       party_repo.transaction do
-        party_repo.assign_roles(id, role_ids, 'person')
+        party_repo.assign_roles(id, role_ids, 'P')
       end
       success_response('Roles assigned successfully')
     end

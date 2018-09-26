@@ -20,18 +20,18 @@ module UiRules
       fields[:first_name] = { renderer: :label }
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      fields[:active] = { renderer: :label }
-      fields[:role_names] = { renderer: :label, caption: 'Roles', with_value: @form_object.role_names.map(&:capitalize!).join(', ') }
+      fields[:active] = { renderer: :checkbox }
+      fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
     end
 
     def common_fields
       {
-        surname: {},
-        first_name: {},
-        title: {},
+        surname: { required: true },
+        first_name: { required: true },
+        title: { required: true },
         vat_number: {},
         active: { renderer: :checkbox },
-        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids }
+        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  }
       }
     end
 

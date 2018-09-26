@@ -21,19 +21,19 @@ module UiRules
       fields[:medium_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      fields[:role_names] = { renderer: :label, caption: 'Roles', with_value: @form_object.role_names.map(&:capitalize!).join(', ') }
+      fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
       # fields[:variants] = { renderer: :label }
-      # fields[:active] = { renderer: :label }
+      # fields[:active] = { renderer: :checkbox }
     end
 
     def common_fields
       {
         parent_id: { renderer: :select, options: @repo.for_select_organizations.reject { |i| i.include?(@options[:id]) }, prompt: true },
-        short_description: {},
+        short_description: { required: true },
         medium_description: {},
         long_description: {},
         vat_number: {},
-        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids }
+        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  }
         # variants: {},
         # active: { renderer: :checkbox }
       }

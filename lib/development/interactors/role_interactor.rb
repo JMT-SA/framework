@@ -6,12 +6,8 @@ module DevelopmentApp
       @repo ||= RoleRepo.new
     end
 
-    def role(cached = true)
-      if cached
-        @role ||= repo.find_role(@id)
-      else
-        @role = repo.find_role(@id)
-      end
+    def role(id)
+      repo.find_role(id)
     end
 
     def validate_role_params(params)
@@ -21,24 +17,31 @@ module DevelopmentApp
     def create_role(params)
       res = validate_role_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @id = repo.create_role(res)
-      success_response("Created role #{role.name}",
-                       role)
+      id = nil
+      DB.transaction do
+        id = repo.create_role(res)
+      end
+      instance = role(id)
+      success_response("Created role #{instance.name}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { name: ['This role already exists'] }))
     end
 
     def update_role(id, params)
-      @id = id
       res = validate_role_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      repo.update_role(id, res)
-      success_response("Updated role #{role.name}",
-                       role(false))
+      DB.transaction do
+        repo.update_role(id, res)
+      end
+      instance = role(id)
+      success_response("Updated role #{instance.name}", instance)
     end
 
     def delete_role(id)
-      @id = id
-      name = role.name
-      repo.delete_role(id)
+      name = role(id).name
+      DB.transaction do
+        repo.delete_role(id)
+      end
       success_response("Deleted role #{name}")
     end
   end

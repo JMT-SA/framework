@@ -22,8 +22,8 @@ module UiRules
 
     def common_fields
       {
-        fruit_actual_counts_for_pack_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs },
-        size_reference: {}
+        fruit_actual_counts_for_pack_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs, required: true  },
+        size_reference: { required: true }
       }
     end
 

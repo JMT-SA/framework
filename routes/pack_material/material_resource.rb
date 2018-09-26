@@ -85,7 +85,7 @@ class Framework < Roda
 
       r.on 'edit' do   # EDIT
         check_auth!('material_resource', 'edit')
-        type = PackMaterialApp::ConfigRepo.new.find_full_party_role(id)&.role_type
+        type = PackMaterialApp::ConfigRepo.new.find_full_party_role(id)&.role_type # Change view to get type from the id.
         show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id, type) }
       end
       r.is do

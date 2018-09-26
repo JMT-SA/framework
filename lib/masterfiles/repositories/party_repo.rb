@@ -33,8 +33,10 @@ module MasterfilesApp
     crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
     crud_calls_for :customer_types, name: :customer_type, wrapper: CustomerType
     crud_calls_for :customers, name: :customer, wrapper: Customer
+    # crud_calls_for :customers, name: :customer (wrapper not required if you rename find_full_customer to find_customer)
     crud_calls_for :supplier_types, name: :supplier_type, wrapper: SupplierType
     crud_calls_for :suppliers, name: :supplier, wrapper: Supplier
+    # crud_calls_for :suppliers, name: :supplier
 
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
@@ -356,7 +358,7 @@ module MasterfilesApp
       hash = find_hash(:customers, id)
       return nil if hash.nil?
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
-      hash[:role_type] = 'customer'
+      hash[:role_type] = 'customer' # CAN BE REMOVED WHEN ENTITY CHANGED
       hash[:customer_type_ids] = customers_customer_type_ids(id)
       hash[:customer_types] = customers_customer_type_names(hash[:customer_type_ids])
       CustomerWithName.new(hash)
@@ -374,7 +376,7 @@ module MasterfilesApp
       hash = find_hash(:suppliers, id)
       return nil if hash.nil?
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
-      hash[:role_type] = 'supplier'
+      hash[:role_type] = 'supplier' # CAN BE REMOVED WHEN ENTITY CHANGED
       hash[:supplier_type_ids] = suppliers_supplier_type_ids(id)
       hash[:supplier_types] = suppliers_supplier_type_names(hash[:supplier_type_ids])
       SupplierWithName.new(hash)

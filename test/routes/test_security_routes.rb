@@ -55,7 +55,7 @@ class TestSecurityRoutes < RouteTester
   def test_delete
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:delete_functional_area).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:delete_functional_area).returns(ok_response)
     delete 'security/functional_areas/functional_areas/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end

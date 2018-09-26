@@ -44,7 +44,7 @@ class TestAddressRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:update_address).returns(ok_response(instance: row_vals))
-    patch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestAddressRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     MasterfilesApp::AddressInteractor.any_instance.stubs(:update_address).returns(bad_response)
     Masterfiles::Parties::Address::Edit.stub(:call, bland_page) do
-      patch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end

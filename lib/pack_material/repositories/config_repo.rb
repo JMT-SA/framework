@@ -72,6 +72,7 @@ module PackMaterialApp
       hash = DB[:material_resource_product_variant_party_roles].where(id: id).first
       supplier_id = hash[:supplier_id]
       hash[:role_type] = supplier_id ? 'supplier' : 'customer'
+      # hash[:role_type] = supplier_id ? MasterfilesApp::SUPPLIER_ROLE : MasterfilesApp::CUSTOMER_ROLE
       party = supplier_id ? find_hash(:suppliers, supplier_id) : find_hash(:customers, hash[:customer_id])
       hash.merge!(DB["SELECT fn_party_role_name(#{party[:party_role_id]}) as party_name"].first)
       FullMatresProductVariantPartyRole.new(hash)

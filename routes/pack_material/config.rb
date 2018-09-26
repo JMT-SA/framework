@@ -103,6 +103,7 @@ class Framework < Roda
       end
       r.on 'product_columns' do
         check_auth!('configuration', 'edit')
+        # Move this into the Interactor. Use success/fail response with product_column_ids array as instance.
         repo = PackMaterialApp::ConfigRepo.new
         product_column_ids = repo.find_matres_sub_type(id).product_column_ids || []
         if product_column_ids.any?

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
+  # SUPPLIER_ROLE = 'SUPPLIER'
+
   class Supplier < Dry::Struct
     attribute :id, Types::Int
     attribute :party_role_id, Types::Int
@@ -11,6 +13,7 @@ module MasterfilesApp
     attribute :id, Types::Int
     attribute :party_role_id, Types::Int
     attribute :party_name, Types::String
+    # attribute :role_type, Types::String.default(SUPPLIER_ROLE)
     attribute :role_type, Types::String
     attribute :supplier_type_ids, Types::Array
     attribute :supplier_types, Types::Array

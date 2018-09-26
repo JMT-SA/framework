@@ -995,7 +995,7 @@ class GenerateNewScaffold < BaseService
     end
 
     def non_fetch_new(base_route)
-      return nil unless opts.new_from_menu
+      return '' unless opts.new_from_menu
       <<~RUBY
 
 

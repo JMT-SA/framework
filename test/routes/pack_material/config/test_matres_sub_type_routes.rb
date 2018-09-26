@@ -131,12 +131,17 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
 
     PackMaterialApp::ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns( OpenStruct.new({ product_column_ids: [1,2,3] }) )
+    # Change this to use something like the following: (Stub the interactor rather than the repo)
+    # INTERACTOR.any_instance.stubs(:whatever).returns(ok_response)
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }
     url = '/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=1&product_column_ids=[1, 2, 3]'
     assert last_response.redirect?
     assert_equal url, last_response.location
     follow_redirect!
     assert last_response.ok?
+    # Change the 4 lines above to this: (If you stub the interactor, the has_dummy_content can be removed.)
+    # expect_ok_redirect(url: url, has_dummy_content: false)
+
 
     PackMaterialApp::ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns(OpenStruct.new({ product_column_ids: nil }))
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }

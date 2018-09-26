@@ -45,6 +45,10 @@ module MasterfilesApp
       res = validate_cultivar_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       cultivar_repo.update_cultivar(id, res)
+      # instance = cultivar(id)
+      # comm_repo = MasterfilesApp::CommodityRepo.new
+      # commodity_code = comm_repo.find_commodity(instance.commodity_id)&.code
+      # success_response("Updated cultivar #{cultivar.cultivar_name}", instance.to_h.merge(commodity_code: commodity_code))
       success_response("Updated cultivar #{cultivar.cultivar_name}", cultivar(false))
     end
 

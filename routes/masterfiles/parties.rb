@@ -148,7 +148,6 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::Address::Show.call(id) }
         end
         r.patch do
-          return_json_response
           res = interactor.update_address(id, params[:address])
           if res.success
             update_grid_row(id,
@@ -162,8 +161,7 @@ class Framework < Roda
                                        active: res.instance[:active] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::Address::Edit.call(id, params[:address], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::Address::Edit.call(id, params[:address], res.errors) }
           end
         end
         r.delete do

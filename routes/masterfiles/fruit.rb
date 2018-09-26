@@ -255,7 +255,7 @@ class Framework < Roda
         end
         r.patch do     # UPDATE
           return_json_response
-          res = interactor.update_cultivar(id, params[:cultivar])
+          res = interactor.update_cultivar(id, params[:cultivar]) # Use Interactor - returned instance is "larger" entity (incl. commod code)
           comm_repo = MasterfilesApp::CommodityRepo.new
           if res.success
             commodity_code = comm_repo.find_commodity(res.instance[:commodity_id])&.code
@@ -658,6 +658,7 @@ class Framework < Roda
     r.on 'back', Integer do |id|
       r.on 'fruit_actual_counts_for_packs' do
         # NOTE: Working on the principle that your views are allowed access to your repositories
+        # Create interactor method to return parent. - return success/failure & not_found if fail...
         repo = MasterfilesApp::FruitSizeRepo.new
         actual_count = repo.find_fruit_actual_counts_for_pack(id)
         handle_not_found(r) unless actual_count

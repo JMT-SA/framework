@@ -288,7 +288,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def handle_not_found(route)
     if fetch?(route)
       response.status = 404
-      {}.to_json
+      response.write({}.to_json)
+      route.halt
     else
       route.redirect '/not_found'
     end

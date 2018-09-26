@@ -6,7 +6,7 @@ module MasterfilesApp
 
     optional(:id, :int).filled(:int?)
     required(:party_id, :int).filled(:int?)
-    required(:supplier_type_id, :int).filled(:int?)
+    required(:supplier_type_ids, Types::IntArray).filled { each(:int?) }
     required(:erp_supplier_number, Types::StrippedString).maybe(:str?)
   end
 
@@ -14,7 +14,7 @@ module MasterfilesApp
     configure { config.type_specs = true }
 
     optional(:id, :int).filled(:int?)
-    required(:supplier_type_id, :int).filled(:int?)
+    required(:supplier_type_ids, Types::IntArray).filled { each(:int?) }
     required(:erp_supplier_number, Types::StrippedString).maybe(:str?)
   end
 end

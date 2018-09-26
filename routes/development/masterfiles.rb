@@ -25,7 +25,6 @@ class Framework < Roda
           show_partial { Development::Masterfiles::Role::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_role(id, params[:role])
           if res.success
             update_grid_row(id, changes: { name: res.instance[:name], active: res.instance[:active] },
@@ -35,7 +34,6 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('masterfiles', 'delete')
           res = interactor.delete_role(id)
           delete_grid_row(id, notice: res.message)
@@ -83,7 +81,6 @@ class Framework < Roda
           show_partial { Development::Masterfiles::AddressType::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_address_type(id, params[:address_type])
           if res.success
             update_grid_row(id, changes: { address_type: res.instance[:address_type], active: res.instance[:active] },
@@ -93,7 +90,6 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('masterfiles', 'delete')
           res = interactor.delete_address_type(id)
           delete_grid_row(id, notice: res.message)
@@ -141,7 +137,6 @@ class Framework < Roda
           show_partial { Development::Masterfiles::ContactMethodType::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_contact_method_type(id, params[:contact_method_type])
           if res.success
             update_grid_row(id, changes: { contact_method_type: res.instance[:contact_method_type], active: res.instance[:active] },
@@ -151,7 +146,6 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('masterfiles', 'delete')
           res = interactor.delete_contact_method_type(id)
           delete_grid_row(id, notice: res.message)
@@ -236,7 +230,6 @@ class Framework < Roda
           show_partial { Development::Masterfiles::User::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_user(id, params[:user])
           if res.success
             update_grid_row(id,
@@ -251,7 +244,6 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('masterfiles', 'delete')
           res = interactor.delete_user(id)
           delete_grid_row(id, notice: res.message)

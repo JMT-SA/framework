@@ -5,14 +5,17 @@ module MasterfilesApp
     def create_customer(params)
       res = validate_new_customer_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      id = nil
+      result = nil
       DB.transaction do
-        id = repo.create_customer(res)
+        result = repo.create_customer(res)
         log_transaction
       end
-      instance = customer(id)
-      success_response("Created customer #{instance.erp_customer_number}",
-                       instance)
+      if result[:success]
+        instance = customer(result[:id])
+        success_response("Created customer #{instance.party_name}", instance)
+      else
+        validation_failed_response(OpenStruct.new(messages: result[:error]))
+      end
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { erp_customer_number: ['This customer already exists'] }))
     end
@@ -20,17 +23,21 @@ module MasterfilesApp
     def update_customer(id, params)
       res = validate_edit_customer_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+      result = nil
       DB.transaction do
-        repo.update_customer(id, res)
+        result = repo.update_customer(id, res)
         log_transaction
       end
-      instance = customer(id)
-      success_response("Updated customer #{instance.erp_customer_number}",
-                       instance)
+      if result[:success]
+        instance = customer(result[:id])
+        success_response("Updated customer #{instance.party_name}", instance)
+      else
+        validation_failed_response(OpenStruct.new(messages: result[:error]))
+      end
     end
 
     def delete_customer(id)
-      name = customer(id).erp_customer_number
+      name = customer(id).party_name
       DB.transaction do
         repo.delete_customer(id)
         log_transaction
@@ -45,7 +52,7 @@ module MasterfilesApp
     end
 
     def customer(id)
-      repo.find_customer(id)
+      repo.find_full_customer(id)
     end
 
     def validate_new_customer_params(params)

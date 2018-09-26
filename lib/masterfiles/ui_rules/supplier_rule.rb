@@ -15,11 +15,9 @@ module UiRules
     end
 
     def set_show_fields
-      party_name = @repo.find_party(party_id)&.party_name
-      supplier_type_id_label = @repo.find_supplier_type(@form_object.supplier_type_id)&.type_code
-      fields[:party_name] = { renderer: :label, with_value: party_name, caption: 'Party Name' }
+      fields[:party_name] = { renderer: :label }
       fields[:party_role_id] = { renderer: :hidden }
-      fields[:supplier_type_id] = { renderer: :label, with_value: supplier_type_id_label, caption: 'supplier_type' }
+      fields[:supplier_types] = { renderer: :list, items: @form_object.supplier_types, caption: 'Supplier Types' }
       fields[:erp_supplier_number] = { renderer: :label }
     end
 
@@ -27,7 +25,7 @@ module UiRules
       {
         party_name: { renderer: :label, with_value: @repo.find_party(party_id)&.party_name },
         party_id: { renderer: :hidden, with_value: party_id },
-        supplier_type_id: { renderer: :select, options: @repo.for_select_supplier_types, caption: 'supplier_type', required: true },
+        supplier_type_ids: { renderer: :multi, options: @repo.for_select_supplier_types, selected: @form_object.supplier_type_ids, caption: 'Supplier Types', required: true },
         erp_supplier_number: {}
       }
     end
@@ -42,7 +40,7 @@ module UiRules
       make_new_form_object && return if @mode == :new
       make_preselect_form_object && return if @mode == :preselect
 
-      @form_object = @repo.find_supplier(@options[:id])
+      @form_object = @repo.find_full_supplier(@options[:id])
     end
 
     def make_new_form_object

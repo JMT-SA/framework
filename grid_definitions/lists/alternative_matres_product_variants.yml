@@ -1,0 +1,14 @@
+---
+:dataminer_definition: material_resource_product_variants
+:conditions:
+  :sub_type:
+    - :col: material_resource_product_variants.sub_type_id
+      :op: =
+      :val: $:sub_type_id$
+:multiselect:
+  :variants:
+    :url: "/pack_material/material_resource/link_alternative_material_resource_product_variants/$:id$"
+    :preselect: "SELECT alternative_id AS id FROM alternative_material_resource_product_variants WHERE material_resource_product_variant_id = $:id$"
+    :section_caption: 'Alternative Product Codes'
+    :can_be_cleared: true
+    :conditions: sub_type

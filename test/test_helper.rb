@@ -33,9 +33,12 @@ Dir["#{root_dir}/lib/applets/*.rb"].each { |f| require f }
 module MiniTestSeeds end
 Dir["#{root_dir}/test/db_seeds/*.rb"].each { |f| require f }
 
+Dir["#{root_dir}/lib/*/test/factories/*.rb"].each { |f| require f }
+
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
   include MiniTestSeeds
+  include Crossbeams::Responses
 
   def around
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do

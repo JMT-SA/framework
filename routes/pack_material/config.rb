@@ -17,7 +17,7 @@ class Framework < Roda
 
       r.on 'unit' do
         r.on 'new' do    # NEW
-          check_auth!('config', 'new')
+          check_auth!('configuration', 'new')
           show_partial_or_page(r) { PackMaterial::Config::MatresType::Unit.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
@@ -36,12 +36,12 @@ class Framework < Roda
         end
       end
       r.on 'edit' do
-        check_auth!('config', 'edit')
+        check_auth!('configuration', 'edit')
         show_partial { PackMaterial::Config::MatresType::Edit.call(id) }
       end
       r.is do
         r.get do
-          check_auth!('config', 'read')
+          check_auth!('configuration', 'read')
           show_partial { PackMaterial::Config::MatresType::Show.call(id) }
         end
         r.patch do
@@ -60,7 +60,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          check_auth!('config', 'delete')
+          check_auth!('configuration', 'delete')
           res = interactor.delete_matres_type(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -70,7 +70,7 @@ class Framework < Roda
     r.on 'material_resource_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        check_auth!('config', 'new')
+        check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::MatresType::New.call(remote: fetch?(r)) }
       end
       r.post do
@@ -98,11 +98,11 @@ class Framework < Roda
         handle_not_found(r)
       end
       r.on 'edit' do
-        check_auth!('config', 'edit')
+        check_auth!('configuration', 'edit')
         show_partial { PackMaterial::Config::MatresSubType::Edit.call(id) }
       end
       r.on 'product_columns' do
-        check_auth!('config', 'edit')
+        check_auth!('configuration', 'edit')
         repo = PackMaterialApp::ConfigRepo.new
         product_column_ids = repo.find_matres_sub_type(id).product_column_ids || []
         if product_column_ids.any?
@@ -114,7 +114,7 @@ class Framework < Roda
       end
       r.on 'material_resource_master_list_items', Integer do |item_id|
         r.on 'edit' do
-          check_auth!('config', 'edit')
+          check_auth!('configuration', 'edit')
           show_partial { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id) }
         end
         r.patch do     # UPDATE
@@ -137,17 +137,17 @@ class Framework < Roda
       end
       r.on 'material_resource_master_list_items' do
         r.on 'preselect' do
-          check_auth!('config', 'new')
+          check_auth!('configuration', 'new')
           show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::Preselect.call(id) }
         end
         r.on 'new', Integer do |product_column_id|
-          check_auth!('config', 'new')
+          check_auth!('configuration', 'new')
           show_partial_or_page(r) { PackMaterial::Config::MatresMasterListItem::New.call(id, product_column_id, fetch?(r)) }
         end
         r.on 'new' do
           r.post do
             return_json_response
-            check_auth!('config', 'new')
+            check_auth!('configuration', 'new')
             product_column_id = params[:matres_master_list_item][:material_resource_product_column_id].to_i
 
             re_show_form(r, OpenStruct.new(message: nil), url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_list_items/new/#{product_column_id}") do
@@ -182,7 +182,7 @@ class Framework < Roda
       end
       r.on 'config' do
         r.is 'edit' do
-          check_auth!('config', 'edit')
+          check_auth!('configuration', 'edit')
           show_partial_or_page(r) { PackMaterial::Config::MatresSubType::Config.call(id) }
         end
         r.patch do
@@ -211,7 +211,7 @@ class Framework < Roda
       end
       r.is do
         r.get do
-          check_auth!('config', 'read')
+          check_auth!('configuration', 'read')
           show_partial { PackMaterial::Config::MatresSubType::Show.call(id) }
         end
         r.patch do
@@ -235,7 +235,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          check_auth!('config', 'delete')
+          check_auth!('configuration', 'delete')
           res = interactor.delete_matres_sub_type(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -249,7 +249,7 @@ class Framework < Roda
     r.on 'material_resource_sub_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
-        check_auth!('config', 'new')
+        check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::MatresSubType::New.call(remote: fetch?(r)) }
       end
       r.post do
@@ -288,7 +288,7 @@ class Framework < Roda
       end
       r.on 'pack_material_product_variants' do
         r.on 'new' do    # NEW
-          check_auth!('config', 'new')
+          check_auth!('configuration', 'new')
           show_partial_or_page(r) { PackMaterial::Config::PmProductVariant::New.call(id, remote: fetch?(r)) }
         end
         r.on 'clone', Integer do |variant_id|
@@ -321,16 +321,16 @@ class Framework < Roda
         end
       end
       r.on 'edit' do
-        check_auth!('config', 'edit')
+        check_auth!('configuration', 'edit')
         show_partial { PackMaterial::Config::PmProduct::Edit.call(id) }
       end
       r.on 'clone' do
-        check_auth!('config', 'new')
+        check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::PmProduct::Clone.call(id) }
       end
       r.is do
         r.get do
-          check_auth!('config', 'read')
+          check_auth!('configuration', 'read')
           show_partial { PackMaterial::Config::PmProduct::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -373,7 +373,7 @@ class Framework < Roda
         end
         r.delete do
           return_json_response
-          check_auth!('config', 'delete')
+          check_auth!('configuration', 'delete')
           res = interactor.delete_pm_product(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -387,17 +387,17 @@ class Framework < Roda
     r.on 'pack_material_products' do
       interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'preselect' do
-        check_auth!('config', 'new')
+        check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::PmProduct::Preselect.call(remote: fetch?(r)) }
       end
       r.on 'new', Integer do |sub_type_id|
-        check_auth!('config', 'new')
+        check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::PmProduct::New.call(sub_type_id: sub_type_id, remote: fetch?(r)) }
       end
       r.on 'new' do
         r.post do
           return_json_response
-          check_auth!('config', 'new')
+          check_auth!('configuration', 'new')
           sub_type_id = params[:pm_product][:material_resource_sub_type_id].to_i
 
           re_show_form(r, OpenStruct.new(message: nil), url: "/pack_material/config/pack_material_products/new/#{sub_type_id}") do
@@ -441,16 +441,16 @@ class Framework < Roda
         handle_not_found(r)
       end
       r.on 'edit' do   # EDIT
-        check_auth!('config', 'edit')
+        check_auth!('configuration', 'edit')
         show_partial { PackMaterial::Config::PmProductVariant::Edit.call(id) }
       end
       r.on 'clone' do    # CLONE
-        check_auth!('config', 'new')
+        check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::PmProductVariant::Clone.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          check_auth!('config', 'read')
+          check_auth!('configuration', 'read')
           show_partial { PackMaterial::Config::PmProductVariant::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -490,7 +490,7 @@ class Framework < Roda
         end
         r.delete do    # DELETE
           return_json_response
-          check_auth!('config', 'delete')
+          check_auth!('configuration', 'delete')
           res = interactor.delete_pm_product_variant(id)
           delete_grid_row(id, notice: res.message)
         end

@@ -46,5 +46,34 @@ module PackMaterialApp
     def pm_variant_ids(id)
       DB[:pack_material_product_variants].where(pack_material_product_id: id).all.map { |r| r[:id] }
     end
+
+    def create_pm_product_variant(attrs)
+      variant_id = create(:pack_material_product_variants, attrs)
+      variant = where_hash(:pack_material_product_variants, id: variant_id)
+      sub_type_id = DB[:pack_material_products].where(id: variant[:pack_material_product_id]).first[:material_resource_sub_type_id]
+      create(:material_resource_product_variants,
+             sub_type_id: sub_type_id,
+             product_variant_id: variant[:id],
+             product_variant_table_name: 'pack_material_product_variants',
+             product_variant_number: variant[:product_variant_number],
+             product_variant_code: variant[:product_variant_code])
+      variant_id
+    end
+
+    def delete_pm_product_variant(id)
+      # TODO: this is temporary - more advanced rules will apply here
+      variant = find_hash(:pack_material_product_variants, id)
+      # You should not be able to delete a variant if its material resource variant has matres items
+      # BUT - what about purchase orders, matres receipts, deliveries (see dia)
+      matres_variant_id = DB[:material_resource_product_variants].where(
+        product_variant_id: variant[:id],
+        product_variant_table_name: 'pack_material_product_variants'
+      ).first[:id]
+      # items = DB[:material_resource_skus].where(material_resource_product_variant_id: matres_variant_id).all
+      # unless items.any?
+      delete(:material_resource_product_variants, matres_variant_id)
+      delete(:pack_material_product_variants, id)
+      # end
+    end
   end
 end

@@ -17,8 +17,8 @@ module Masterfiles
               form.remote! if remote
               form.add_field :party_name
               form.add_field :party_id
-              form.add_field :supplier_type_id
               form.add_field :erp_supplier_number
+              form.add_field :supplier_type_ids
             end
           end
 

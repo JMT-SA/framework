@@ -44,7 +44,7 @@ class TestRoleRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     DevelopmentApp::RoleInteractor.any_instance.stubs(:update_role).returns(ok_response(instance: row_vals))
-    patch 'development/masterfiles/roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'development/masterfiles/roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestRoleRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     DevelopmentApp::RoleInteractor.any_instance.stubs(:update_role).returns(bad_response)
     Development::Masterfiles::Role::Edit.stub(:call, bland_page) do
-      patch 'development/masterfiles/roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'development/masterfiles/roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestRoleRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     DevelopmentApp::RoleInteractor.any_instance.stubs(:delete_role).returns(ok_response)
-    delete 'development/masterfiles/roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'development/masterfiles/roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
   #

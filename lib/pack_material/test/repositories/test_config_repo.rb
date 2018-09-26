@@ -1,41 +1,36 @@
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
-require 'faker'
 
 module PackMaterialApp
   class TestConfigRepo < MiniTestWithHooks
+    include ConfigFactory
+    include MasterfilesApp::PartyFactory
+    include PmProductFactory
+
     def test_for_selects
       assert_respond_to repo, :for_select_domains
       assert_respond_to repo, :for_select_matres_types
       assert_respond_to repo, :for_select_matres_sub_types
       assert_respond_to repo, :for_select_material_resource_product_columns
       assert_respond_to repo, :for_select_units
+      assert_respond_to repo, :for_select_matres_product_variants
+      assert_respond_to repo, :for_select_matres_product_variant_party_roles
     end
 
-    def test_crud_calls
-      assert_respond_to repo, :find_matres_type
-      assert_respond_to repo, :create_matres_type
-      assert_respond_to repo, :update_matres_type
-      assert_respond_to repo, :delete_matres_type
+    def crud_call_for(key)
+      assert_respond_to repo, :"find_#{key}"
+      assert_respond_to repo, :"create_#{key}"
+      assert_respond_to repo, :"update_#{key}"
+      assert_respond_to repo, :"delete_#{key}"
+    end
 
-      assert_respond_to repo, :find_matres_sub_type
-      assert_respond_to repo, :create_matres_sub_type
-      assert_respond_to repo, :update_matres_sub_type
-      assert_respond_to repo, :delete_matres_sub_type
-
-      assert_respond_to repo, :find_pm_product
-      assert_respond_to repo, :create_pm_product
-      assert_respond_to repo, :update_pm_product
-      assert_respond_to repo, :delete_pm_product
-
-      assert_respond_to repo, :find_matres_master_list_item
-      assert_respond_to repo, :create_matres_master_list_item
-      assert_respond_to repo, :update_matres_master_list_item
-      assert_respond_to repo, :delete_matres_master_list_item
-
-      assert_respond_to repo, :find_matres_master_list
-      assert_respond_to repo, :create_matres_master_list
-      assert_respond_to repo, :update_matres_master_list
-      assert_respond_to repo, :delete_matres_master_list
+    def test_crud_call_responses
+      crud_call_for('matres_type')
+      crud_call_for('matres_sub_type')
+      crud_call_for('pm_product')
+      crud_call_for('matres_master_list_item')
+      crud_call_for('matres_master_list')
+      crud_call_for('matres_product_variant')
+      crud_call_for('matres_product_variant_party_role')
     end
 
     def test_product_code_column_subset
@@ -223,7 +218,7 @@ module PackMaterialApp
       x = repo.delete_matres_sub_type(first[:matres_sub_type_id])
       refute x.success
 
-      DB[:pack_material_products].where(id: [first[:matres_product_id], second[:matres_product_id]]).delete
+      DB[:pack_material_products].where(id: [first[:id], second[:id]]).delete
       x = repo.delete_matres_sub_type(first[:matres_sub_type_id])
       assert x.success
       assert_nil repo.find_matres_sub_type(first[:matres_sub_type_id])
@@ -279,7 +274,9 @@ module PackMaterialApp
     end
 
     def test_sub_type_master_list_items
-      skip 'still todo'
+      skip 'todo'
+      # ConfigRepo.any_instance.stubs(:get_dataminer_report).returns('SELECT * FROM material_resource_master_lists')
+      # repo.sub_type_master_list_items
     end
 
     # def sub_type_master_list_items(sub_type_id)
@@ -305,7 +302,7 @@ module PackMaterialApp
       product_set = create_product
       assert repo.matres_sub_type_has_products(product_set[:matres_sub_type_id])
 
-      DB[:pack_material_products].where(id: product_set[:matres_product_id]).delete
+      DB[:pack_material_products].where(id: product_set[:id]).delete
       refute repo.matres_sub_type_has_products(product_set[:matres_sub_type_id])
     end
 
@@ -313,14 +310,72 @@ module PackMaterialApp
       product_set = create_product
       assert repo.matres_type_has_products(product_set[:matres_type_id])
 
-      DB[:pack_material_products].where(id: product_set[:matres_product_id]).delete
+      DB[:pack_material_products].where(id: product_set[:id]).delete
       refute repo.matres_type_has_products(product_set[:matres_type_id])
     end
 
-    private
+    def test_create_matres_product_variant_party_role
+      variant = create_material_resource_product_variant
+      supplier = create_supplier
+      customer = create_customer
+      attrs = {
+        supplier_id: nil,
+        customer_id: nil,
+        material_resource_product_variant_id: variant[:id],
+        supplier_lead_time: 12
+      }
 
-    def repo
-      ConfigRepo.new
+      result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id], customer_id: customer[:id]))
+      refute result.success
+      assert_equal 'Can not assign both customer and supplier', result.errors
+
+      result = repo.create_matres_product_variant_party_role(attrs)
+      refute result.success
+      assert_equal 'Must have customer or supplier', result.errors
+
+      repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
+      result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
+      refute result.success
+      assert_equal 'Supplier already exists', result.errors
+
+      repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
+      result = repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
+      refute result.success
+      assert_equal 'Customer already exists', result.errors
+    end
+
+    def test_find_full_party_role
+      customer = create_customer
+      role_link = create_matres_product_variant_party_role('customer', customer_id: customer[:id])
+
+      full_party_role = repo.find_full_party_role(role_link[:id])
+      assert full_party_role.is_a?(FullMatresProductVariantPartyRole)
+      assert_equal 'customer', full_party_role.role_type
+
+      expected_name = DB["SELECT fn_party_role_name(#{customer[:party_role_id]}) as party_name"].first
+      assert_equal expected_name[:party_name], full_party_role.party_name
+    end
+
+    def test_link_alternatives
+      alternative_ids = []
+      2.times do
+        alternative_ids << create_material_resource_product_variant[:id]
+      end
+      variant = create_material_resource_product_variant
+      repo.link_alternatives(variant[:id], alternative_ids)
+      assert repo.exists?(:alternative_material_resource_product_variants, alternative_id: alternative_ids[0])
+      assert repo.exists?(:alternative_material_resource_product_variants, alternative_id: alternative_ids[1])
+    end
+
+    def test_link_co_use_product_codes
+      co_use_ids = []
+      2.times do
+        co_use_ids << create_material_resource_product_variant[:id]
+      end
+      variant = create_material_resource_product_variant
+      repo.link_co_use_product_codes(variant[:id], co_use_ids)
+      assert repo.exists?(:co_use_material_resource_product_variants, co_use_id: co_use_ids[0])
+      assert repo.exists?(:co_use_material_resource_product_variants, co_use_id: co_use_ids[1])
     end
 
     def test_factories
@@ -331,78 +386,10 @@ module PackMaterialApp
       create_matres_type
     end
 
-    def create_product(opts = {})
-      sub_type = repo.find_hash(:material_resource_sub_types, @fixed_table_set[:matres_sub_types][:sc][:id])
-      sub_id = sub_type[:id]
-      type_id = sub_type[:material_resource_type_id]
-      default = { material_resource_sub_type_id: sub_id,
-                  unit: 'unit',
-                  brand_1: 'brand',
-                  style: 'style' }
-      prod_id = DB[:pack_material_products].insert(default.merge(opts))
-      {
-        matres_type_id: type_id,
-        matres_sub_type_id: sub_id,
-        matres_product_id: prod_id
-      }
-    end
+    private
 
-    def create_other_domain
-      DB[:material_resource_domains].insert(
-        domain_name: 'Other Domain',
-        product_table_name: 'other_products',
-        variant_table_name: 'other_product_variants'
-      )
-    end
-
-    def create_matres_type(opts = {})
-      default = {
-        material_resource_domain_id: @fixed_table_set[:domain_id],
-        type_name: Faker::Company.name.to_s,
-        short_code: 'PZ',
-        description: 'Material used to palletize'
-      }
-      DB[:material_resource_types].insert(default.merge(opts))
-    end
-
-    def create_sub_type(opts = {})
-      sql = <<~SQL
-        SELECT id FROM material_resource_product_columns
-        WHERE column_name IN ('unit', 'style', 'brand_1', 'reference_size', 'reference_dimension', 'reference_quantity')
-      SQL
-      prod_col_ids = DB[sql].select_map
-      prod_code_ids = prod_col_ids[0..2]
-      default = {
-        material_resource_type_id: @fixed_table_set[:matres_types][:sc][:id],
-        sub_type_name: Faker::Company.name.to_s,
-        short_code: Faker::Lorem.unique.word,
-        active: true,
-        product_code_ids: "{#{prod_code_ids.join(',')}}",
-        product_column_ids: "{#{prod_col_ids.join(',')}}"
-      }
-      DB[:material_resource_sub_types].insert(default.merge(opts))
-    end
-
-    def add_measurement_unit(unit_name)
-      DB[:measurement_units].insert(unit_of_measure: unit_name)
-    end
-
-    def add_std_measurement_units
-      {
-        each_id: add_measurement_unit('each'),
-        pallets_id: add_measurement_unit('pallets'),
-        bags_id: add_measurement_unit('bags')
-      }
-    end
-
-    def create_product_column(opts = {})
-      dom_id = @fixed_table_set[:domain_id]
-      default = {
-        material_resource_domain_id: dom_id,
-        column_name: Faker::Company.unique.name,
-        short_code: Faker::Lorem.unique.word
-      }
-      DB[:material_resource_product_columns].insert(default.merge(opts))
+    def repo
+      ConfigRepo.new
     end
   end
 end

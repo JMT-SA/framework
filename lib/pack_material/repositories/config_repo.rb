@@ -34,12 +34,48 @@ module PackMaterialApp
                      value: :id,
                      no_active_check: true,
                      order_by: :unit_of_measure
+    build_for_select :material_resource_product_variants,
+                     alias: 'matres_product_variants',
+                     label: :product_variant_table_name,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :product_variant_table_name
+    build_for_select :material_resource_product_variant_party_roles,
+                     alias: 'matres_product_variant_party_roles',
+                     label: :party_stock_code,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :party_stock_code
 
     crud_calls_for :material_resource_types, name: :matres_type, wrapper: MatresType
     crud_calls_for :material_resource_sub_types, name: :matres_sub_type, wrapper: MatresSubType
     crud_calls_for :pack_material_products, name: :pm_product, wrapper: PmProduct
     crud_calls_for :material_resource_master_list_items, name: :matres_master_list_item, wrapper: MatresMasterListItem
     crud_calls_for :material_resource_master_lists, name: :matres_master_list, wrapper: MatresMasterList
+    crud_calls_for :material_resource_product_variants, name: :matres_product_variant, wrapper: MatresProductVariant
+    crud_calls_for :material_resource_product_variant_party_roles, name: :matres_product_variant_party_role, wrapper: MatresProductVariantPartyRole
+
+    def create_matres_product_variant_party_role(attrs)
+      hash = attrs.to_h
+      message = nil
+      message = 'Can not assign both customer and supplier' if hash[:supplier_id] && hash[:customer_id]
+      message ||= 'Must have customer or supplier' if hash[:supplier_id].nil? && hash[:customer_id].nil?
+      message ||= 'Supplier already exists' if hash[:supplier_id] && exists?(:material_resource_product_variant_party_roles, supplier_id: hash[:supplier_id])
+      message ||= 'Customer already exists' if hash[:customer_id] && exists?(:material_resource_product_variant_party_roles, customer_id: hash[:customer_id])
+      return validation_failed_response(OpenStruct.new(messages: message)) if message
+
+      role_id = DB[:material_resource_product_variant_party_roles].insert(hash.to_h)
+      success_response('ok', role_id)
+    end
+
+    def find_full_party_role(id)
+      hash = DB[:material_resource_product_variant_party_roles].where(id: id).first
+      supplier_id = hash[:supplier_id]
+      hash[:role_type] = supplier_id ? 'supplier' : 'customer'
+      party = supplier_id ? find_hash(:suppliers, supplier_id) : find_hash(:customers, hash[:customer_id])
+      hash.merge!(DB["SELECT fn_party_role_name(#{party[:party_role_id]}) as party_name"].first)
+      FullMatresProductVariantPartyRole.new(hash)
+    end
 
     def domain_id
       DB[:material_resource_domains].where(domain_name: DOMAIN_NAME).first[:id]
@@ -82,7 +118,7 @@ module PackMaterialApp
         short_code_notice = 'Short code can not be updated if products are present'
       end
       update(:material_resource_types, id, params) if params.any?
-      { success: true, message: [units_added, short_code_notice].compact.join(', ') }
+      success_response([units_added, short_code_notice].compact.join(', '))
     end
 
     def measurement_units
@@ -246,6 +282,20 @@ module PackMaterialApp
     def matres_type_has_products(type_id)
       sub_type_ids = DB[:material_resource_sub_types].where(material_resource_type_id: type_id).select_map(:id)
       exists?(:pack_material_products, material_resource_sub_type_id: sub_type_ids)
+    end
+
+    def link_alternatives(variant_id, alternative_ids)
+      DB[:alternative_material_resource_product_variants].where(material_resource_product_variant_id: variant_id).delete
+      alternative_ids.each do |prog_id|
+        DB[:alternative_material_resource_product_variants].insert(material_resource_product_variant_id: variant_id, alternative_id: prog_id)
+      end
+    end
+
+    def link_co_use_product_codes(variant_id, co_use_ids)
+      DB[:co_use_material_resource_product_variants].where(material_resource_product_variant_id: variant_id).delete
+      co_use_ids.each do |prog_id|
+        DB[:co_use_material_resource_product_variants].insert(material_resource_product_variant_id: variant_id, co_use_id: prog_id)
+      end
     end
   end
 end

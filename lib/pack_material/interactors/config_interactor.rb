@@ -18,9 +18,10 @@ module PackMaterialApp
     def update_matres_type(id, params)
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      repo.update_matres_type(id, res)
+      response = repo.update_matres_type(id, res)
+      extra = response[:message] ? (', ' + response[:message]) : ''
       instance = matres_type(id)
-      success_response("Updated type #{instance.type_name}", instance)
+      success_response("Updated type #{instance.type_name}#{extra}", instance)
     end
 
     def delete_matres_type(id)
@@ -68,9 +69,10 @@ module PackMaterialApp
     def update_matres_sub_type(id, params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      repo.update_matres_sub_type(id, res)
+      response = repo.update_matres_sub_type(id, res)
+      extra = response[:message] ? (', ' + response[:message]) : ''
       instance = matres_sub_type(id)
-      success_response("Updated sub type #{instance.sub_type_name}", instance)
+      success_response("Updated sub type #{instance.sub_type_name}#{extra}", instance)
     end
 
     def delete_matres_sub_type(id)

@@ -361,8 +361,7 @@ class Framework < Roda
           res = interactor.update_customer(id, params[:customer])
           if res.success
             update_grid_row(id,
-                            changes: { customer_type_id: res.instance[:customer_type_id],
-                                       erp_customer_number: res.instance[:erp_customer_number] },
+                            changes: { erp_customer_number: res.instance[:erp_customer_number] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Customer::Edit.call(id, form_values: params[:customer], form_errors: res.errors) }
@@ -494,8 +493,7 @@ class Framework < Roda
           res = interactor.update_supplier(id, params[:supplier])
           if res.success
             update_grid_row(id,
-                            changes: { supplier_type_id: res.instance[:supplier_type_id],
-                                       erp_supplier_number: res.instance[:erp_supplier_number] },
+                            changes: { erp_supplier_number: res.instance[:erp_supplier_number] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Supplier::Edit.call(id, form_values: params[:supplier], form_errors: res.errors) }

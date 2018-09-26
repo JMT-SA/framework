@@ -14,8 +14,8 @@ module Masterfiles
               form.view_only!
               form.add_field :party_name
               form.add_field :party_role_id
-              form.add_field :customer_type_id
               form.add_field :erp_customer_number
+              form.add_field :customer_types
             end
           end
 

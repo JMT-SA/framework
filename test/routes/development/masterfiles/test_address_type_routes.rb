@@ -44,7 +44,7 @@ class TestAddressTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     DevelopmentApp::AddressTypeInteractor.any_instance.stubs(:update_address_type).returns(ok_response(instance: row_vals))
-    patch 'development/masterfiles/address_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'development/masterfiles/address_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestAddressTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     DevelopmentApp::AddressTypeInteractor.any_instance.stubs(:update_address_type).returns(bad_response)
     Development::Masterfiles::AddressType::Edit.stub(:call, bland_page) do
-      patch 'development/masterfiles/address_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'development/masterfiles/address_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,17 +62,9 @@ class TestAddressTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     DevelopmentApp::AddressTypeInteractor.any_instance.stubs(:delete_address_type).returns(ok_response)
-    delete 'development/masterfiles/address_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'development/masterfiles/address_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
-  #
-  # def test_delete_fail
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   DevelopmentApp::AddressTypeInteractor.any_instance.stubs(:delete_address_type).returns(bad_response)
-  #   delete 'development/masterfiles/address_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_bad_redirect
-  # end
 
   def test_new
     authorise_pass!

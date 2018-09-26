@@ -15,11 +15,9 @@ module UiRules
     end
 
     def set_show_fields
-      party_name = @repo.find_party(party_id)&.party_name
-      customer_type_id_label = @repo.find_customer_type(@form_object.customer_type_id)&.type_code
-      fields[:party_name] = { renderer: :label, with_value: party_name, caption: 'Party Name' }
+      fields[:party_name] = { renderer: :label }
       fields[:party_role_id] = { renderer: :hidden }
-      fields[:customer_type_id] = { renderer: :label, with_value: customer_type_id_label, caption: 'customer_type' }
+      fields[:customer_types] = { renderer: :list, items: @form_object.customer_types, caption: 'Customer Types' }
       fields[:erp_customer_number] = { renderer: :label }
     end
 
@@ -27,7 +25,7 @@ module UiRules
       {
         party_name: { renderer: :label, with_value: @repo.find_party(party_id)&.party_name },
         party_id: { renderer: :hidden, with_value: party_id },
-        customer_type_id: { renderer: :select, options: @repo.for_select_customer_types, caption: 'Customer Type', required: true },
+        customer_type_ids: { renderer: :multi, options: @repo.for_select_customer_types, selected: @form_object.customer_type_ids, caption: 'Customer Type', required: true },
         erp_customer_number: {}
       }
     end
@@ -42,7 +40,7 @@ module UiRules
       make_new_form_object && return if @mode == :new
       make_preselect_form_object && return if @mode == :preselect
 
-      @form_object = @repo.find_customer(@options[:id])
+      @form_object = @repo.find_full_customer(@options[:id])
     end
 
     def make_new_form_object

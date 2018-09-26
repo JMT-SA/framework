@@ -1,0 +1,194 @@
+---
+:caption: Material Resource Product Variants
+:sql: SELECT "material_resource_product_variants"."id", "material_resource_product_variants"."sub_type_id",
+  "material_resource_product_variants"."product_variant_id", "material_resource_product_variants"."product_variant_table_name",
+  "material_resource_product_variants"."product_variant_number", "material_resource_product_variants"."old_product_code",
+  "material_resource_product_variants"."supplier_lead_time", "material_resource_product_variants"."minimum_stock_level",
+  "material_resource_product_variants"."re_order_stock_level", "material_resource_product_variants"."created_at",
+  "material_resource_product_variants"."updated_at" FROM "material_resource_product_variants"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: material_resource_product_variants.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sub_type_id:
+    :name: sub_type_id
+    :sequence_no: 2
+    :caption: Sub type
+    :namespaced_name: material_resource_product_variants.sub_type_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_id:
+    :name: product_variant_id
+    :sequence_no: 3
+    :caption: Product variant
+    :namespaced_name: material_resource_product_variants.product_variant_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_table_name:
+    :name: product_variant_table_name
+    :sequence_no: 4
+    :caption: Product variant table name
+    :namespaced_name: material_resource_product_variants.product_variant_table_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_number:
+    :name: product_variant_number
+    :sequence_no: 5
+    :caption: Product variant number
+    :namespaced_name: material_resource_product_variants.product_variant_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  old_product_code:
+    :name: old_product_code
+    :sequence_no: 6
+    :caption: Old product code
+    :namespaced_name: material_resource_product_variants.old_product_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_lead_time:
+    :name: supplier_lead_time
+    :sequence_no: 7
+    :caption: Supplier lead time
+    :namespaced_name: material_resource_product_variants.supplier_lead_time
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  minimum_stock_level:
+    :name: minimum_stock_level
+    :sequence_no: 8
+    :caption: Minimum stock level
+    :namespaced_name: material_resource_product_variants.minimum_stock_level
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  re_order_stock_level:
+    :name: re_order_stock_level
+    :sequence_no: 9
+    :caption: Re order stock level
+    :namespaced_name: material_resource_product_variants.re_order_stock_level
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: material_resource_product_variants.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: material_resource_product_variants.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: material_resource_product_variants.product_variant_id
+  :caption: Product variant
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: material_resource_product_variants.sub_type_id
+  :caption: sub_type_id
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

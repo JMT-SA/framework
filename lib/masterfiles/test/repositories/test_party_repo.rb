@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
-require 'faker'
+require File.join(File.expand_path('../factories', __dir__), 'party_factory')
 
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/AbcSize
 
 module MasterfilesApp
   class TestPartyRepo < MiniTestWithHooks
+    include PartyFactory
 
     def test_for_selects
       assert_respond_to repo, :for_select_organizations
@@ -61,7 +62,7 @@ module MasterfilesApp
       exp = { roles: ['You did not choose a role'] }
       assert_equal exp, result_code[:error]
 
-      role_id = create_role
+      role_id = create_role[:id]
       new_attrs = attrs.merge(role_ids: [role_id],
                               medium_description: nil,
                               long_description: nil)
@@ -271,7 +272,7 @@ module MasterfilesApp
     def test_assign_roles
       role_ids = []
       4.times do
-        role_ids << create_role
+        role_ids << create_role[:id]
       end
 
       org_id = create_organization[:id]
@@ -299,41 +300,191 @@ module MasterfilesApp
 
     def test_create_customer
       party_id = create_party
-      sup_id = repo.create_customer(
+      attrs = {
         party_id: party_id,
-        customer_type_id: create_customer_type,
+        customer_type_ids: [],
         erp_customer_number: 123_456_789
-      )
-      my_party_role_id = 123
-      PartyRepo.any_instance.stubs(:create_party_role).returns(my_party_role_id)
+      }
+      actual = repo.create_customer(attrs)
+      exp = { error: { customer_type_ids: ['You did not choose any customer types'] } }
+      assert_equal exp, actual
 
-      actual_hash = repo.find_hash(:customers, sup_id)
-      refute_empty actual_hash
-      assert my_party_role_id, actual_hash[:party_role_id]
+      type_ids = []
+      2.times do
+        type_ids << create_customer_type[:id]
+      end
+      party_role_info = create_party_role('O', 'CUSTOMER')
+      attrs[:customer_type_ids] = type_ids
+      attrs[:party_id] = party_role_info[:party_id]
+      actual = repo.create_customer(attrs)
+      exp = { error: { base: ['You already have this party set up as a customer'] } }
+      assert_equal exp, actual
+
+      attrs[:customer_type_ids] = type_ids
+      attrs[:party_id] = party_id
+      actual = repo.create_customer(attrs)
+      type_links = DB[:customers_customer_types].where(customer_id: actual[:id])
+      refute_empty type_links
+      assert_equal 2, type_links.count
+      assert actual[:success]
     end
 
     def test_create_supplier
       party_id = create_party
-      sup_id = repo.create_supplier(
+      attrs = {
         party_id: party_id,
-        supplier_type_id: create_supplier_type,
+        supplier_type_ids: [],
         erp_supplier_number: 123_456_789
-      )
-      my_party_role_id = 123
-      PartyRepo.any_instance.stubs(:create_party_role).returns(my_party_role_id)
+      }
+      actual = repo.create_supplier(attrs)
+      exp = { error: { supplier_type_ids: ['You did not choose any supplier types'] } }
+      assert_equal exp, actual
 
-      actual_hash = repo.find_hash(:suppliers, sup_id)
-      refute_empty actual_hash
-      assert my_party_role_id, actual_hash[:party_role_id]
+      type_ids = []
+      2.times do
+        type_ids << create_supplier_type[:id]
+      end
+      party_role_info = create_party_role('O', 'SUPPLIER')
+      attrs[:supplier_type_ids] = type_ids
+      attrs[:party_id] = party_role_info[:party_id]
+      actual = repo.create_supplier(attrs)
+      exp = { error: { base: ['You already have this party set up as a supplier'] } }
+      assert_equal exp, actual
+
+      attrs[:supplier_type_ids] = type_ids
+      attrs[:party_id] = party_id
+      actual = repo.create_supplier(attrs)
+      type_links = DB[:suppliers_supplier_types].where(supplier_id: actual[:id])
+      refute_empty type_links
+      assert_equal 2, type_links.count
+      assert actual[:success]
     end
 
     def test_create_party_role
       org = create_organization
-      role_id = create_role(name: 'Given Role Name')
+      role_id = create_role(name: 'Given Role Name')[:id]
       repo.create_party_role(org[:party_id], 'Given Role Name')
 
       party_role = repo.where_hash(:party_roles, role_id: role_id)
       assert org[:party_id], party_role[:party_id]
+    end
+
+    def test_update_customer
+      customer = create_customer
+      attrs = {
+        customer_type_ids: [],
+        erp_customer_number: 123_456_789
+      }
+      actual = repo.update_customer(customer[:id], attrs)
+      exp = { error: { customer_type_ids: ['You did not choose any customer types'] } }
+      assert_equal exp, actual
+
+      attrs[:customer_type_ids] = customer[:customer_type_ids]
+      assert repo.update_customer(customer[:id], attrs)
+    end
+
+    def test_update_supplier
+      supplier = create_supplier
+      attrs = {
+        supplier_type_ids: [],
+        erp_supplier_number: 123_456_789
+      }
+      actual = repo.update_supplier(supplier[:id], attrs)
+      exp = { error: { supplier_type_ids: ['You did not choose any supplier types'] } }
+      assert_equal exp, actual
+
+      attrs[:supplier_type_ids] = supplier[:supplier_type_ids]
+      assert repo.update_supplier(supplier[:id], attrs)
+    end
+
+    def test_delete_customer
+      customer = create_customer
+      assert DB[:customers_customer_types].where(customer_id: customer[:id]).first
+      assert DB[:customers].where(id: customer[:id]).first
+      assert DB[:party_roles].where(id: customer[:party_role_id]).first
+
+      repo.delete_customer(customer[:id])
+      refute DB[:customers_customer_types].where(customer_id: customer[:id]).first
+      refute DB[:customers].where(id: customer[:id]).first
+      refute DB[:party_roles].where(id: customer[:party_role_id]).first
+    end
+
+    def test_delete_supplier
+      supplier = create_supplier
+      assert DB[:suppliers_supplier_types].where(supplier_id: supplier[:id]).first
+      assert DB[:suppliers].where(id: supplier[:id]).first
+      assert DB[:party_roles].where(id: supplier[:party_role_id]).first
+
+      repo.delete_supplier(supplier[:id])
+      refute DB[:suppliers_supplier_types].where(supplier_id: supplier[:id]).first
+      refute DB[:suppliers].where(id: supplier[:id]).first
+      refute DB[:party_roles].where(id: supplier[:party_role_id]).first
+    end
+
+    def test_customers_customer_type_ids
+      customer = create_customer
+      actual = repo.customers_customer_type_ids(customer[:id])
+      assert_equal customer[:customer_type_ids], actual
+    end
+
+    def test_customers_customer_type_names
+      customer = create_customer
+      actual = repo.customers_customer_type_names(customer[:customer_type_ids])
+      exp = DB[:customer_types].where(id: customer[:customer_type_ids][0]).first[:type_code]
+      assert_equal exp, actual[0]
+    end
+
+    def test_suppliers_supplier_type_ids
+      supplier = create_supplier
+      actual = repo.suppliers_supplier_type_ids(supplier[:id])
+      assert_equal supplier[:supplier_type_ids], actual
+    end
+
+    def test_suppliers_supplier_type_names
+      supplier = create_supplier
+      actual = repo.suppliers_supplier_type_names(supplier[:supplier_type_ids])
+      exp = DB[:supplier_types].where(id: supplier[:supplier_type_ids][0]).first[:type_code]
+      assert_equal exp, actual[0]
+    end
+
+    def test_for_select_customers
+      5.times do
+        create_customer
+      end
+      actual = repo.for_select_customers
+      assert actual.count == 5
+      assert actual[0].is_a?(Array)
+      assert actual[0].count == 2
+    end
+
+    def test_for_select_suppliers
+      5.times do
+        create_supplier
+      end
+      actual = repo.for_select_suppliers
+      assert actual.count == 5
+      assert actual[0].is_a?(Array)
+      assert actual[0].count == 2
+    end
+
+    def test_find_full_customer
+      customer = create_customer
+      full_customer = repo.find_full_customer(customer[:id])
+      assert_equal 'customer', full_customer.role_type
+      assert full_customer.party_name
+      assert full_customer.customer_type_ids
+      assert full_customer.customer_types
+      assert full_customer.is_a?(CustomerWithName)
+    end
+
+    def test_find_full_supplier
+      supplier = create_supplier
+      full_supplier = repo.find_full_supplier(supplier[:id])
+      assert_equal 'supplier', full_supplier.role_type
+      assert full_supplier.party_name
+      assert full_supplier.supplier_type_ids
+      assert full_supplier.supplier_types
+      assert full_supplier.is_a?(SupplierWithName)
     end
 
     def test_add_party_name
@@ -387,130 +538,14 @@ module MasterfilesApp
       create_contact_method
       create_party_address
       create_party_contact_method
+      create_supplier
+      create_customer
     end
 
     private
 
     def repo
       PartyRepo.new
-    end
-
-    def create_party(opts = {})
-      default = {
-        party_type: 'O', # || 'P'
-        active: true
-      }
-      DB[:parties].insert(default.merge(opts))
-    end
-
-    def create_person(opts = {})
-      party_id = create_party(party_type: 'P')
-      default = {
-        party_id: party_id,
-        title: Faker::Company.name.to_s,
-        first_name: Faker::Company.name.to_s,
-        surname: Faker::Company.name.to_s,
-        vat_number: Faker::Number.number(10),
-        active: true
-      }
-      {
-        id: DB[:people].insert(default.merge(opts)),
-        party_id: party_id
-      }
-    end
-
-    def create_organization(opts = {})
-      party_id = create_party(party_type: 'O')
-      default = {
-        party_id: party_id,
-        parent_id: nil,
-        short_description: Faker::Company.unique.name.to_s,
-        medium_description: Faker::Company.name.to_s,
-        long_description: Faker::Company.name.to_s,
-        vat_number: Faker::Number.number(10),
-        active: true
-      }
-      {
-        id: DB[:organizations].insert(default.merge(opts)),
-        party_id: party_id
-      }
-    end
-
-    def create_role(opts = {})
-      default = {
-        name: Faker::Lorem.unique.word,
-        active: true
-      }
-      DB[:roles].insert(default.merge(opts))
-    end
-
-    def create_party_role(party_type = 'O', role = nil, opts = {})
-      party_id = create_party(party_type: party_type)
-      role_id = role ? create_role(name: role) : create_role
-      default = {
-        party_id: party_id,
-        role_id: role_id,
-        active: true
-      }
-      default[:organization_id] = create_organization(party_id: party_id)[:id] if party_type == 'O'
-      default[:person_id] = create_person(party_id: party_id)[:id] if party_type == 'P'
-      final_options = default.merge(opts)
-      {
-        id: DB[:party_roles].insert(final_options),
-        party_id: party_id,
-        organization_id: final_options[:organization_id],
-        person_id: final_options[:person_id],
-        role_id: role_id
-      }
-    end
-
-    def create_address(opts = {})
-      type_id = DB[:address_types].insert(address_type: Faker::Lorem.unique.word)
-      default = {
-        address_type_id: type_id,
-        address_line_1: Faker::Lorem.word,
-        address_line_2: Faker::Lorem.word,
-        address_line_3: Faker::Lorem.word,
-        city: Faker::Lorem.word,
-        postal_code: Faker::Number.number(4),
-        country: Faker::Lorem.word,
-        active: true
-      }
-      DB[:addresses].insert(default.merge(opts))
-    end
-
-    def create_contact_method(opts = {})
-      type_id = DB[:contact_method_types].insert(contact_method_type: Faker::Lorem.unique.word)
-      default = {
-        contact_method_type_id: type_id,
-        contact_method_code: Faker::Lorem.word,
-        active: true
-      }
-      DB[:contact_methods].insert(default.merge(opts))
-    end
-
-    def create_party_address(opts = {})
-      default = {
-        party_id: create_party,
-        address_id: create_address
-      }
-      DB[:party_addresses].insert(default.merge(opts))
-    end
-
-    def create_party_contact_method(opts = {})
-      default = {
-        party_id: create_party,
-        contact_method_id: create_contact_method
-      }
-      DB[:party_contact_methods].insert(default.merge(opts))
-    end
-
-    def create_supplier_type
-      DB[:supplier_types].insert(type_code: Faker::Lorem.unique.word)
-    end
-
-    def create_customer_type
-      DB[:customer_types].insert(type_code: Faker::Lorem.unique.word)
     end
   end
 end

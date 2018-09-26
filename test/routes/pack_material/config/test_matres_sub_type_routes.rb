@@ -237,14 +237,6 @@ class TestMatresSubTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_master_list_item).returns(ok_response)
-    post 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items', { matres_master_list_item: { material_resource_product_column_id: 1 }}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    # expect_ok_redirect
-    expect_json_response
-    assert last_response.ok?
-    assert last_response.body.include?('actions')
-    assert last_response.body.include?('replace_input_value')
-    assert last_response.body.include?('replace_list_items')
-    assert last_response.body.include?('Added new item')
 
     # remotely
     post_as_fetch 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items', { matres_master_list_item: { material_resource_product_column_id: 1 }}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
@@ -357,15 +349,6 @@ class TestMatresSubTypeRoutes < RouteTester
   def test_link_product_columns
     authorise_pass!
     ensure_exists!(INTERACTOR)
-
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:chosen_product_columns).returns(ok_response(instance: OpenStruct.new(code: [1,2,3])))
-    post 'pack_material/config/link_product_columns', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_response
-    assert last_response.ok?
-    assert last_response.body.include?('actions')
-    assert last_response.body.include?('replace_input_value')
-    assert last_response.body.include?('replace_multi_options')
-    assert last_response.body.include?('Re-assigned product columns')
 
     PackMaterialApp::ConfigInteractor.any_instance.stubs(:chosen_product_columns).returns(ok_response(instance: OpenStruct.new(code: [1,2,3])))
     post_as_fetch 'pack_material/config/link_product_columns', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }

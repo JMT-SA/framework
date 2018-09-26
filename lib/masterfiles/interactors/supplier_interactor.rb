@@ -5,13 +5,17 @@ module MasterfilesApp
     def create_supplier(params)
       res = validate_new_supplier_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      id = nil
+      result = nil
       DB.transaction do
-        id = repo.create_supplier(res)
+        result = repo.create_supplier(res)
         log_transaction
       end
-      instance = supplier(id)
-      success_response("Created supplier #{instance.erp_supplier_number}", instance)
+      if result[:success]
+        instance = supplier(result[:id])
+        success_response("Created supplier #{instance.party_name}", instance)
+      else
+        validation_failed_response(OpenStruct.new(messages: result[:error]))
+      end
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { erp_supplier_number: ['This supplier already exists'] }))
     end
@@ -19,16 +23,21 @@ module MasterfilesApp
     def update_supplier(id, params)
       res = validate_edit_supplier_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+      result = nil
       DB.transaction do
-        repo.update_supplier(id, res)
+        result = repo.update_supplier(id, res)
         log_transaction
       end
-      instance = supplier(id)
-      success_response("Updated supplier #{instance.erp_supplier_number}", instance)
+      if result[:success]
+        instance = supplier(result[:id])
+        success_response("Updated supplier #{instance.party_name}", instance)
+      else
+        validation_failed_response(OpenStruct.new(messages: result[:error]))
+      end
     end
 
     def delete_supplier(id)
-      name = supplier(id).erp_supplier_number
+      name = supplier(id).party_name
       DB.transaction do
         repo.delete_supplier(id)
         log_transaction
@@ -43,7 +52,7 @@ module MasterfilesApp
     end
 
     def supplier(id)
-      repo.find_supplier(id)
+      repo.find_full_supplier(id)
     end
 
     def validate_new_supplier_params(params)

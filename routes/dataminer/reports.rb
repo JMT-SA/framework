@@ -77,12 +77,9 @@ class Framework < Roda
     end
 
     r.on 'grid' do
-      return_json_response
-      begin
-        interactor.report_list_grid
-      rescue StandardError => e
-        show_json_exception(e)
-      end
+      interactor.report_list_grid
+    rescue StandardError => e
+      show_json_exception(e)
     end
   end
 end

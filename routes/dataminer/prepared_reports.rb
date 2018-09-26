@@ -23,12 +23,9 @@ class Framework < Roda
     end
 
     r.on 'grid' do
-      return_json_response
-      begin
-        interactor.prepared_report_list_grid(true)
-      rescue StandardError => e
-        show_json_exception(e)
-      end
+      interactor.prepared_report_list_grid(true)
+    rescue StandardError => e
+      show_json_exception(e)
     end
 
     r.on 'list_all' do
@@ -36,12 +33,9 @@ class Framework < Roda
     end
 
     r.on 'grid_all' do
-      return_json_response
-      begin
-        interactor.prepared_report_list_grid
-      rescue StandardError => e
-        show_json_exception(e)
-      end
+      interactor.prepared_report_list_grid
+    rescue StandardError => e
+      show_json_exception(e)
     end
 
     r.on :id do |id|
@@ -87,12 +81,9 @@ class Framework < Roda
       end
 
       r.on 'grid' do
-        return_json_response
-        begin
-          interactor.prepared_report_grid(id)
-        rescue StandardError => e
-          show_json_exception(e)
-        end
+        interactor.prepared_report_grid(id)
+      rescue StandardError => e
+        show_json_exception(e)
       end
 
       r.on 'edit' do
@@ -101,7 +92,6 @@ class Framework < Roda
       end
 
       r.patch do     # UPDATE
-        return_json_response
         res = interactor.update_prepared_report(id, params[:prepared_report])
         if res.success
           update_grid_row(id, changes: { caption: res.instance[:report_description] },
@@ -112,7 +102,6 @@ class Framework < Roda
       end
 
       r.delete do
-        return_json_response
         res = interactor.delete_prepared_report(id)
         if res.success
           delete_grid_row(id, notice: res.message)

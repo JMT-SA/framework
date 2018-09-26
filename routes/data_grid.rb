@@ -31,34 +31,25 @@ class Framework < Roda
       end
 
       r.on 'grid' do
-        return_json_response
-        begin
-          if params && !params.empty?
-            render_data_grid_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, params)
-          else
-            render_data_grid_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) })
-          end
-        rescue StandardError => e
-          show_json_exception(e)
+        if params && !params.empty?
+          render_data_grid_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, params)
+        else
+          render_data_grid_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) })
         end
+      rescue StandardError => e
+        show_json_exception(e)
       end
 
       r.on 'grid_multi', String do |key|
-        return_json_response
-        begin
-          render_data_grid_multiselect_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, key, params)
-        rescue StandardError => e
-          show_json_exception(e)
-        end
+        render_data_grid_multiselect_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, key, params)
+      rescue StandardError => e
+        show_json_exception(e)
       end
 
       r.on 'nested_grid' do
-        return_json_response
-        begin
-          render_data_grid_nested_rows(id)
-        rescue StandardError => e
-          show_json_exception(e)
-        end
+        render_data_grid_nested_rows(id)
+      rescue StandardError => e
+        show_json_exception(e)
       end
     end
   end
@@ -83,12 +74,9 @@ class Framework < Roda
       end
 
       r.on 'grid' do
-        return_json_response
-        begin
-          render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program, permission) })
-        rescue StandardError => e
-          show_json_exception(e)
-        end
+        render_search_grid_rows(id, params, ->(function, program, permission) { auth_blocked?(function, program, permission) })
+      rescue StandardError => e
+        show_json_exception(e)
       end
 
       r.on 'xls' do

@@ -12,21 +12,15 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'reports_grid' do
-      return_json_response
-      begin
-        interactor.admin_report_list_grid
-      rescue StandardError => e
-        show_json_exception(e)
-      end
+      interactor.admin_report_list_grid
+    rescue StandardError => e
+      show_json_exception(e)
     end
 
     r.on 'grids_grid' do
-      return_json_response
-      begin
-        interactor.admin_report_list_grid(for_grids: true)
-      rescue StandardError => e
-        show_json_exception(e)
-      end
+      interactor.admin_report_list_grid(for_grids: true)
+    rescue StandardError => e
+      show_json_exception(e)
     end
 
     r.on 'reports' do
@@ -98,7 +92,6 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.delete do
-        return_json_response
         res = interactor.delete_report(id)
         if res.success
           delete_grid_row(id, notice: res.message)

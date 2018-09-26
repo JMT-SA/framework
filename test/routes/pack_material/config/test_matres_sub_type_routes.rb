@@ -134,7 +134,7 @@ class TestMatresSubTypeRoutes < RouteTester
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }
     url = '/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=1&product_column_ids=[1, 2, 3]'
     assert last_response.redirect?
-    assert_equal url, header_location
+    assert_equal url, last_response.location
     follow_redirect!
     assert last_response.ok?
 
@@ -144,7 +144,7 @@ class TestMatresSubTypeRoutes < RouteTester
     expect_flash_error('No product columns selected, please see config.')
 
     assert last_response.redirect?
-    assert_equal url, header_location
+    assert_equal url, last_response.location
     follow_redirect!
     assert last_response.ok?
   end

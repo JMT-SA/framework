@@ -201,7 +201,7 @@ class TestPmProductRoutes < RouteTester
       post 'pack_material/config/pack_material_products/clone/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     assert last_response.redirect?
-    assert_equal '/pack_material/config/pack_material_products/1/clone', header_location
+    assert_equal '/pack_material/config/pack_material_products/1/clone', last_response.location
     refute last_response.ok?
 
     PackMaterial::Config::PmProduct::Clone.stub(:call, bland_page) do

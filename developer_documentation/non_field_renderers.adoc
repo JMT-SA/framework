@@ -110,6 +110,13 @@ a|* :p
 |`String`.
 |`Show/Hide Text`
 
+|options - :toggle_element_id
+|Optional: Toggle text based on the `toggle_element_id` (which *must* appear as an `id` within the text)
+
+This is instead of the default -- which is to use the `id` of the text wrapper's div.
+|`String`.
+|None
+
 |===
 
 === List

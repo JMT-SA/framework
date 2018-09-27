@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: ce317d84868b0a4752153220a173015bc3df7d70
+  revision: c79eb1d2d45376b601e606ebb196237aec59bacb
   specs:
     crossbeams-dataminer (0.1.5)
       pg_query (= 1.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: ed31580e13c715f6b174350291ea2462137dce0a
+  revision: 8b7dd5d56fa0884422732300743bac5b62017d30
   specs:
     crossbeams-layout (0.1.11)
       diffy
@@ -32,21 +32,13 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 01c2d6eaa1ba7f6a7895e9023ef8407668a70fce
+  revision: 7adec7d4d25939a60093ff21e72d306635004568
   specs:
     roda-data_grid (0.1.8)
       axlsx
       crossbeams-dataminer
       crossbeams-layout
       roda
-
-GIT
-  remote: https://github.com/stympy/faker.git
-  revision: edff2e4898a7222a98e9a9ce81c48d6d88fe26c9
-  branch: master
-  specs:
-    faker (1.9.1)
-      i18n (>= 0.7)
 
 GEM
   remote: https://rubygems.org/
@@ -117,6 +109,8 @@ GEM
     erubi (1.7.1)
     erubis (2.7.0)
     eventmachine (1.2.5)
+    faker (1.9.1)
+      i18n (>= 0.7)
     ffi (1.9.23)
     htmlentities (4.3.4)
     i18n (1.0.0)
@@ -233,7 +227,7 @@ DEPENDENCIES
   dry-inflector
   dry-struct
   dry-validation
-  faker!
+  faker
   minitest (~> 5.11)
   minitest-hooks (= 1.4.2)
   minitest-rg

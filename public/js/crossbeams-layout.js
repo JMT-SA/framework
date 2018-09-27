@@ -116,6 +116,12 @@
       }
     }, false);
 
+    // Display report parameters if applicable.
+    document.querySelectorAll('[data-report-param-display]').forEach((el) => {
+      const key = el.dataset.reportParamDisplay;
+      el.innerHTML = crossbeamsDataMinerParams.loadSelectedParams(key);
+    });
+
     document.body.addEventListener('click', (event) => {
       // Disable a button on click
       if (event.target.dataset && event.target.dataset.disableWith) {

@@ -43,7 +43,7 @@ class TestLocationRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
-    PackMaterialApp::LocationInteractor.any_instance.stubs(:update_location).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:update_location).returns(ok_response(instance: row_vals))
     patch_as_fetch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
@@ -51,7 +51,7 @@ class TestLocationRoutes < RouteTester
   def test_update_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::LocationInteractor.any_instance.stubs(:update_location).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_location).returns(bad_response)
     PackMaterial::Locations::Location::Edit.stub(:call, bland_page) do
       patch_as_fetch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -61,18 +61,10 @@ class TestLocationRoutes < RouteTester
   def test_delete
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::LocationInteractor.any_instance.stubs(:delete_location).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:delete_location).returns(ok_response)
     delete_as_fetch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
-  #
-  # def test_delete_fail
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::LocationInteractor.any_instance.stubs(:delete_location).returns(bad_response)
-  #   delete 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_bad_redirect
-  # end
 
   def test_new
     authorise_pass!
@@ -94,7 +86,7 @@ class TestLocationRoutes < RouteTester
   def test_create_root
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::LocationInteractor.any_instance.stubs(:create_root_location).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_root_location).returns(ok_response)
     post 'pack_material/locations/locations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
@@ -102,7 +94,7 @@ class TestLocationRoutes < RouteTester
   def test_create_root_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::LocationInteractor.any_instance.stubs(:create_root_location).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_root_location).returns(ok_response)
     post_as_fetch 'pack_material/locations/locations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
@@ -110,7 +102,7 @@ class TestLocationRoutes < RouteTester
   def test_create_root_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::LocationInteractor.any_instance.stubs(:create_root_location).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_root_location).returns(bad_response)
     PackMaterial::Locations::Location::New.stub(:call, bland_page) do
       post_as_fetch 'pack_material/locations/locations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -125,7 +117,7 @@ class TestLocationRoutes < RouteTester
   def test_create_root_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::LocationInteractor.any_instance.stubs(:create_root_location).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_root_location).returns(bad_response)
     PackMaterial::Locations::Location::New.stub(:call, bland_page) do
       post_as_fetch 'pack_material/locations/locations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

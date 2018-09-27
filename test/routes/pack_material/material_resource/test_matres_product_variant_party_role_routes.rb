@@ -45,7 +45,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigRepo.any_instance.stubs(:find_full_party_role).returns(OpenStruct.new(role_type: 'supplier'))
     row_vals = Hash.new(1)
-    PackMaterialApp::MatresProductVariantPartyRoleInteractor.any_instance.stubs(:update_matres_product_variant_party_role).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:update_matres_product_variant_party_role).returns(ok_response(instance: row_vals))
     patch 'pack_material/material_resource/material_resource_product_variant_party_roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
@@ -54,7 +54,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     PackMaterialApp::ConfigRepo.any_instance.stubs(:find_full_party_role).returns(OpenStruct.new(role_type: 'supplier'))
-    PackMaterialApp::MatresProductVariantPartyRoleInteractor.any_instance.stubs(:update_matres_product_variant_party_role).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_matres_product_variant_party_role).returns(bad_response)
     PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.stub(:call, bland_page) do
       patch 'pack_material/material_resource/material_resource_product_variant_party_roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -64,18 +64,10 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
   def test_delete
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::MatresProductVariantPartyRoleInteractor.any_instance.stubs(:delete_matres_product_variant_party_role).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:delete_matres_product_variant_party_role).returns(ok_response)
     delete 'pack_material/material_resource/material_resource_product_variant_party_roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
-
-  # def test_delete_fail
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::MatresProductVariantPartyRoleInteractor.any_instance.stubs(:delete_matres_product_variant_party_role).returns(bad_response)
-  #   delete 'pack_material/material_resource/material_resource_product_variant_party_roles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_bad_redirect
-  # end
 
   def test_new
     authorise_pass!
@@ -100,7 +92,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     ensure_exists!(PackMaterialApp::MatresProductVariantInteractor)
-    PackMaterialApp::MatresProductVariantPartyRoleInteractor.any_instance.stubs(:create_matres_product_variant_party_role).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_matres_product_variant_party_role).returns(ok_response)
     post_as_fetch 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles', { type: 'supplier' }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     assert last_response.ok?
     assert last_response.body.include?('/list/material_resource_product_variant_party_roles/with_params?matres_variant_id=1')
@@ -111,7 +103,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     ensure_exists!(PackMaterialApp::MatresProductVariantInteractor)
-    PackMaterialApp::MatresProductVariantPartyRoleInteractor.any_instance.stubs(:create_matres_product_variant_party_role).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_matres_product_variant_party_role).returns(bad_response)
     PackMaterial::MaterialResource::MatresProductVariantPartyRole::New.stub(:call, bland_page) do
       post_as_fetch 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles', { type: 'supplier' }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

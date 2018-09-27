@@ -44,7 +44,7 @@ class TestTmGroupTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
-    MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:update_tm_group_type).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:update_tm_group_type).returns(ok_response(instance: row_vals))
     patch 'masterfiles/target_markets/target_market_group_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
@@ -52,7 +52,7 @@ class TestTmGroupTypeRoutes < RouteTester
   def test_update_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:update_tm_group_type).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_tm_group_type).returns(bad_response)
     Masterfiles::TargetMarkets::TmGroupType::Edit.stub(:call, bland_page) do
       patch 'masterfiles/target_markets/target_market_group_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -62,18 +62,10 @@ class TestTmGroupTypeRoutes < RouteTester
   def test_delete
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:delete_tm_group_type).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:delete_tm_group_type).returns(ok_response)
     delete 'masterfiles/target_markets/target_market_group_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
-  #
-  # def test_delete_fail
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:delete_tm_group_type).returns(bad_response)
-  #   delete 'masterfiles/target_markets/target_market_group_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_bad_redirect
-  # end
 
   def test_new
     authorise_pass!
@@ -95,7 +87,7 @@ class TestTmGroupTypeRoutes < RouteTester
   def test_create
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:create_tm_group_type).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_tm_group_type).returns(ok_response)
     post 'masterfiles/target_markets/target_market_group_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
@@ -103,7 +95,7 @@ class TestTmGroupTypeRoutes < RouteTester
   def test_create_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:create_tm_group_type).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_tm_group_type).returns(ok_response)
     post_as_fetch 'masterfiles/target_markets/target_market_group_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
@@ -111,7 +103,7 @@ class TestTmGroupTypeRoutes < RouteTester
   def test_create_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:create_tm_group_type).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_tm_group_type).returns(bad_response)
     Masterfiles::TargetMarkets::TmGroupType::New.stub(:call, bland_page) do
       post 'masterfiles/target_markets/target_market_group_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -121,7 +113,7 @@ class TestTmGroupTypeRoutes < RouteTester
   def test_create_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::TargetMarketInteractor.any_instance.stubs(:create_tm_group_type).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_tm_group_type).returns(bad_response)
     Masterfiles::TargetMarkets::TmGroupType::New.stub(:call, bland_page) do
       post_as_fetch 'masterfiles/target_markets/target_market_group_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

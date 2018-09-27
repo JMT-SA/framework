@@ -3,11 +3,6 @@
 require File.join(File.expand_path('./../../../../', __FILE__), 'test_helper_for_routes')
 
 class TestPartyRoutes < RouteTester
-  # def around
-  #   MasterfilesApp::OrganizationInteractor.any_instance.stubs(:exists?).returns(true)
-  #   super
-  # end
-
   def test_link_addresses
     authorise_pass!
     ensure_exists!(MasterfilesApp::PartyInteractor)

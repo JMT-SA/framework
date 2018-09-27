@@ -43,7 +43,7 @@ class TestOrganizationRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
-    MasterfilesApp::OrganizationInteractor.any_instance.stubs(:update_organization).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:update_organization).returns(ok_response(instance: row_vals))
     patch 'masterfiles/parties/organizations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
@@ -51,7 +51,7 @@ class TestOrganizationRoutes < RouteTester
   def test_update_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::OrganizationInteractor.any_instance.stubs(:update_organization).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_organization).returns(bad_response)
     Masterfiles::Parties::Organization::Edit.stub(:call, bland_page) do
       patch 'masterfiles/parties/organizations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -61,18 +61,10 @@ class TestOrganizationRoutes < RouteTester
   def test_delete
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::OrganizationInteractor.any_instance.stubs(:delete_organization).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:delete_organization).returns(ok_response)
     delete 'masterfiles/parties/organizations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
-  #
-  # def test_delete_fail
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   MasterfilesApp::OrganizationInteractor.any_instance.stubs(:delete_organization).returns(bad_response)
-  #   delete 'masterfiles/parties/organizations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_bad_redirect
-  # end
 
   def test_new
     authorise_pass!
@@ -94,7 +86,7 @@ class TestOrganizationRoutes < RouteTester
   def test_create
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::OrganizationInteractor.any_instance.stubs(:create_organization).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_organization).returns(ok_response)
     post 'masterfiles/parties/organizations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice
     expect_ok_redirect
@@ -103,7 +95,7 @@ class TestOrganizationRoutes < RouteTester
   def test_create_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::OrganizationInteractor.any_instance.stubs(:create_organization).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_organization).returns(ok_response)
     post_as_fetch 'masterfiles/parties/organizations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
@@ -111,7 +103,7 @@ class TestOrganizationRoutes < RouteTester
   def test_create_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::OrganizationInteractor.any_instance.stubs(:create_organization).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_organization).returns(bad_response)
     Masterfiles::Parties::Organization::New.stub(:call, bland_page) do
       post 'masterfiles/parties/organizations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -122,7 +114,7 @@ class TestOrganizationRoutes < RouteTester
   def test_create_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    MasterfilesApp::OrganizationInteractor.any_instance.stubs(:create_organization).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_organization).returns(bad_response)
     Masterfiles::Parties::Organization::New.stub(:call, bland_page) do
       post_as_fetch 'masterfiles/parties/organizations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

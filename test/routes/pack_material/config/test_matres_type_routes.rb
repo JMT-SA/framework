@@ -43,7 +43,7 @@ class TestMatresTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:update_matres_type).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:update_matres_type).returns(ok_response(instance: row_vals))
     patch 'pack_material/config/material_resource_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
@@ -51,7 +51,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_update_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:update_matres_type).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_matres_type).returns(bad_response)
     PackMaterial::Config::MatresType::Edit.stub(:call, bland_page) do
       patch 'pack_material/config/material_resource_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -61,18 +61,10 @@ class TestMatresTypeRoutes < RouteTester
   def test_delete
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:delete_matres_type).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:delete_matres_type).returns(ok_response)
     delete 'pack_material/config/material_resource_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
-  #
-  # def test_delete_fail
-  #   authorise_pass!
-  #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::ConfigInteractor.any_instance.stubs(:delete_matres_type).returns(bad_response)
-  #   delete 'pack_material/config/material_resource_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_bad_redirect
-  # end
 
   def test_new
     authorise_pass!
@@ -94,7 +86,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_type).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_matres_type).returns(ok_response)
     post 'pack_material/config/material_resource_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice
     expect_ok_redirect
@@ -103,7 +95,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_type).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_matres_type).returns(ok_response)
     post_as_fetch 'pack_material/config/material_resource_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice
     expect_ok_json_redirect
@@ -112,7 +104,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_type).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_matres_type).returns(bad_response)
     PackMaterial::Config::MatresType::New.stub(:call, bland_page) do
       post_as_fetch 'pack_material/config/material_resource_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -127,7 +119,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:create_matres_type).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_matres_type).returns(bad_response)
     PackMaterial::Config::MatresType::New.stub(:call, bland_page) do
       post_as_fetch 'pack_material/config/material_resource_types', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -154,7 +146,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create_unit
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
     post 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice
     expect_ok_redirect
@@ -163,7 +155,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create_unit_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:add_a_matres_unit).returns(ok_response)
     post_as_fetch 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice
     expect_ok_json_redirect
@@ -172,7 +164,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create_unit_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:add_a_matres_unit).returns(bad_response)
     PackMaterial::Config::MatresType::Unit.stub(:call, bland_page) do
       post_as_fetch 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -187,7 +179,7 @@ class TestMatresTypeRoutes < RouteTester
   def test_create_unit_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::ConfigInteractor.any_instance.stubs(:add_a_matres_unit).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:add_a_matres_unit).returns(bad_response)
     PackMaterial::Config::MatresType::Unit.stub(:call, bland_page) do
       post_as_fetch 'pack_material/config/material_resource_types/1/unit', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

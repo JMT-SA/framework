@@ -43,7 +43,7 @@ class TestMatresProductVariantRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
-    PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:update_matres_product_variant).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:update_matres_product_variant).returns(ok_response(instance: row_vals))
     patch 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
@@ -51,7 +51,7 @@ class TestMatresProductVariantRoutes < RouteTester
   def test_update_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:update_matres_product_variant).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_matres_product_variant).returns(bad_response)
     PackMaterial::MaterialResource::MatresProductVariant::Edit.stub(:call, bland_page) do
       patch 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -61,7 +61,7 @@ class TestMatresProductVariantRoutes < RouteTester
   # def test_delete
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:delete_matres_product_variant).returns(ok_response)
+  #   INTERACTOR.any_instance.stubs(:delete_matres_product_variant).returns(ok_response)
   #   delete 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_json_delete_from_grid
   # end
@@ -69,7 +69,7 @@ class TestMatresProductVariantRoutes < RouteTester
   # def test_delete_fail
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:delete_matres_product_variant).returns(bad_response)
+  #   INTERACTOR.any_instance.stubs(:delete_matres_product_variant).returns(bad_response)
   #   delete 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_bad_redirect
   # end
@@ -94,7 +94,7 @@ class TestMatresProductVariantRoutes < RouteTester
   # def test_create
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:create_matres_product_variant).returns(ok_response)
+  #   INTERACTOR.any_instance.stubs(:create_matres_product_variant).returns(ok_response)
   #   post 'pack_material/material_resource/material_resource_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_ok_redirect
   # end
@@ -102,7 +102,7 @@ class TestMatresProductVariantRoutes < RouteTester
   # def test_create_remotely
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:create_matres_product_variant).returns(ok_response)
+  #   INTERACTOR.any_instance.stubs(:create_matres_product_variant).returns(ok_response)
   #   post_as_fetch 'pack_material/material_resource/material_resource_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   expect_ok_json_redirect
   # end
@@ -110,7 +110,7 @@ class TestMatresProductVariantRoutes < RouteTester
   # def test_create_fail
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:create_matres_product_variant).returns(bad_response)
+  #   INTERACTOR.any_instance.stubs(:create_matres_product_variant).returns(bad_response)
   #   PackMaterial::MaterialResource::MatresProductVariant::New.stub(:call, bland_page) do
   #     post_as_fetch 'pack_material/material_resource/material_resource_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   end
@@ -125,7 +125,7 @@ class TestMatresProductVariantRoutes < RouteTester
   # def test_create_remotely_fail
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)
-  #   PackMaterialApp::MatresProductVariantInteractor.any_instance.stubs(:create_matres_product_variant).returns(bad_response)
+  #   INTERACTOR.any_instance.stubs(:create_matres_product_variant).returns(bad_response)
   #   PackMaterial::MaterialResource::MatresProductVariant::New.stub(:call, bland_page) do
   #     post_as_fetch 'pack_material/material_resource/material_resource_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
   #   end

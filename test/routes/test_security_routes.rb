@@ -63,7 +63,7 @@ class TestSecurityRoutes < RouteTester
   def test_delete_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:delete_functional_area).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:delete_functional_area).returns(bad_response)
     delete 'security/functional_areas/functional_areas/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_bad_redirect
   end
@@ -71,7 +71,7 @@ class TestSecurityRoutes < RouteTester
   def test_update
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:update_functional_area).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:update_functional_area).returns(ok_response)
     patch_as_fetch 'security/functional_areas/functional_areas/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
@@ -79,7 +79,7 @@ class TestSecurityRoutes < RouteTester
   def test_update_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:update_functional_area).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_functional_area).returns(bad_response)
     Security::FunctionalAreas::FunctionalArea::Edit.stub(:call, bland_page) do
       patch_as_fetch 'security/functional_areas/functional_areas/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -89,7 +89,7 @@ class TestSecurityRoutes < RouteTester
   def test_create
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:create_functional_area).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_functional_area).returns(ok_response)
     post 'security/functional_areas/functional_areas', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_redirect
   end
@@ -97,7 +97,7 @@ class TestSecurityRoutes < RouteTester
   def test_create_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:create_functional_area).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:create_functional_area).returns(ok_response)
     post_as_fetch 'security/functional_areas/functional_areas', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
@@ -105,7 +105,7 @@ class TestSecurityRoutes < RouteTester
   def test_create_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:create_functional_area).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_functional_area).returns(bad_response)
     Security::FunctionalAreas::FunctionalArea::New.stub(:call, bland_page) do
       post_as_fetch 'security/functional_areas/functional_areas', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -120,7 +120,7 @@ class TestSecurityRoutes < RouteTester
   def test_create_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    SecurityApp::FunctionalAreaInteractor.any_instance.stubs(:create_functional_area).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_functional_area).returns(bad_response)
     Security::FunctionalAreas::FunctionalArea::New.stub(:call, bland_page) do
       post_as_fetch 'security/functional_areas/functional_areas', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

@@ -31,7 +31,7 @@ class TestLoggingRoutes < RouteTester
       }.to_json
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    DevelopmentApp::LoggingInteractor.any_instance.stubs(:logged_actions_grid).returns(expected)
+    INTERACTOR.any_instance.stubs(:logged_actions_grid).returns(expected)
     get_as_fetch 'development/logging/logged_actions/1/grid', {}, 'rack.session' => { user_id: 1 }
     assert_equal expected, last_response.body
   end

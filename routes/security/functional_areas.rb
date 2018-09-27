@@ -368,8 +368,17 @@ class Framework < Roda
       r.post do        # CREATE
         res = interactor.create_security_permission(params[:security_permission])
         if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          if fetch?(r)
+            row_keys = %i[
+              id
+              security_permission
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
+          else
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
         else
           re_show_form(r, res, url: '/security/functional_areas/security_permissions/new') do
             Security::FunctionalAreas::SecurityPermission::New.call(form_values: params[:security_permission],

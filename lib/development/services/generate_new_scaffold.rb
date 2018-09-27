@@ -641,7 +641,7 @@ class GenerateNewScaffold < BaseService
             row_keys = %i[
               #{row_keys}
             ]
-            add_grid_row(attrs: { select_attributes(res.instance, row_keys) },
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
           else
             flash[:notice] = res.message
@@ -654,7 +654,7 @@ class GenerateNewScaffold < BaseService
           row_keys = %i[
             #{row_keys}
           ]
-          add_grid_row(attrs: { select_attributes(res.instance, row_keys) },
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
         RUBY
       end
@@ -921,7 +921,7 @@ class GenerateNewScaffold < BaseService
             authorise_pass!
             ensure_exists!(INTERACTOR)
             row_vals = Hash.new(1)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(ok_response(instance: row_vals))
+            INTERACTOR.any_instance.stubs(:update_#{opts.singlename}).returns(ok_response(instance: row_vals))
             patch_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_json_update_grid
           end
@@ -929,7 +929,7 @@ class GenerateNewScaffold < BaseService
           def test_update_fail
             authorise_pass!
             ensure_exists!(INTERACTOR)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:update_#{opts.singlename}).returns(bad_response)
+            INTERACTOR.any_instance.stubs(:update_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::Edit.stub(:call, bland_page) do
               patch_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
@@ -939,7 +939,7 @@ class GenerateNewScaffold < BaseService
           def test_delete
             authorise_pass!
             ensure_exists!(INTERACTOR)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(ok_response)
+            INTERACTOR.any_instance.stubs(:delete_#{opts.singlename}).returns(ok_response)
             delete_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_json_delete_from_grid
           end
@@ -947,7 +947,7 @@ class GenerateNewScaffold < BaseService
           def test_delete_fail
             authorise_pass!
             ensure_exists!(INTERACTOR)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
+            INTERACTOR.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
             delete_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_json_error
           end
@@ -971,7 +971,7 @@ class GenerateNewScaffold < BaseService
           def test_create
             authorise_pass!
             ensure_exists!(INTERACTOR)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
+            INTERACTOR.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
             post '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             expect_ok_redirect
           end
@@ -979,7 +979,7 @@ class GenerateNewScaffold < BaseService
           def test_create_fail
             authorise_pass!
             ensure_exists!(INTERACTOR)
-            #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
+            INTERACTOR.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
             #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
               post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
             end
@@ -1002,15 +1002,16 @@ class GenerateNewScaffold < BaseService
         def test_create_remotely
           authorise_pass!
           ensure_exists!(INTERACTOR)
-          #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response)
+          row_vals = Hash.new(1)
+          INTERACTOR.any_instance.stubs(:create_#{opts.singlename}).returns(ok_response(instance: row_vals))
           post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-          expect_ok_json_redirect
+          expect_json_add_to_grid(has_notice: true)
         end
 
         def test_create_remotely_fail
           authorise_pass!
           ensure_exists!(INTERACTOR)
-          #{opts.classnames[:namespaced_interactor]}.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
+          INTERACTOR.any_instance.stubs(:create_#{opts.singlename}).returns(bad_response)
           #{opts.classnames[:view_prefix]}::New.stub(:call, bland_page) do
             post_as_fetch '#{base_route}#{opts.table}', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
           end

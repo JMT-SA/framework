@@ -64,11 +64,11 @@ class RouteTester < Minitest::Test
   end
 
   def ok_response(message: nil, instance: nil)
-    success_response((message || 'OK'), instance)
+    success_response((message || 'OK'), instance.nil? ? nil : OpenStruct.new(instance))
   end
 
   def bad_response(message: nil, instance: nil)
-    failed_response((message || 'FAILED'), instance)
+    failed_response((message || 'FAILED'), instance.nil? ? nil : OpenStruct.new(instance))
   end
 
   def has_json_response
@@ -104,6 +104,13 @@ class RouteTester < Minitest::Test
     assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
   end
 
+  def expect_json_add_to_grid(has_notice: false)
+    assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
+    assert last_response.body.include?('addRowToGrid'), "Expected 'updateGridRowInPlace' in last response - from: #{caller.first}"
+    assert last_response.body.include?('notice'), "Expected last response to include notice flash - from: #{caller.first}" if has_notice
+    assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
+  end
+
   def expect_json_delete_from_grid(has_notice: false)
     assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
     assert last_response.body.include?('removeGridRowInPlace'), "Expected 'removeGridRowInPlace' in last response - from: #{caller.first}"
@@ -118,12 +125,12 @@ class RouteTester < Minitest::Test
     assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
   end
 
-  def expect_ok_redirect(url: DEFAULT_LAST_GRID_URL)
+  def expect_ok_redirect(url: DEFAULT_LAST_GRID_URL, has_dummy_content: true)
     assert last_response.redirect?, "Expected last response to be redirect (status is #{last_response.status}, location is #{last_response.location}) - from: #{caller.first}"
     assert_equal url, last_response.location, "Expected redirect to '#{url}', was '#{last_response.location}' - from: #{caller.first}"
     follow_redirect!
     assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
-    assert last_response.body.include?('OK'), "Expected 'OK' in last response - from: #{caller.first}"
+    assert last_response.body.include?('OK'), "Expected 'OK' in last response - from: #{caller.first}" if has_dummy_content
   end
 
   def expect_bad_redirect(url: DEFAULT_LAST_GRID_URL)

@@ -4,14 +4,14 @@ module MasterfilesApp
   # SUPPLIER_ROLE = 'SUPPLIER'
 
   class Supplier < Dry::Struct
-    attribute :id, Types::Int
-    attribute :party_role_id, Types::Int
+    attribute :id, Types::Integer
+    attribute :party_role_id, Types::Integer
     attribute :erp_supplier_number, Types::String
   end
 
   class SupplierWithName < Dry::Struct
-    attribute :id, Types::Int
-    attribute :party_role_id, Types::Int
+    attribute :id, Types::Integer
+    attribute :party_role_id, Types::Integer
     attribute :party_name, Types::String
     # attribute :role_type, Types::String.default(SUPPLIER_ROLE)
     attribute :role_type, Types::String

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  ScaffoldNewSchema = Dry::Validation.Form do
+  ScaffoldNewSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     required(:table, :string).filled

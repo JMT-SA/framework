@@ -2,7 +2,7 @@ require File.join(File.expand_path('./', __dir__), 'test_helper')
 
 class TestDryTypeConstructors < Minitest::Test
   def test_stripped_string_required_filled
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::StrippedString).filled(:str?)
@@ -30,7 +30,7 @@ class TestDryTypeConstructors < Minitest::Test
   end
 
   def test_stripped_string_required_maybe
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::StrippedString).maybe(:str?)
@@ -58,7 +58,7 @@ class TestDryTypeConstructors < Minitest::Test
   end
 
   def test_int_array_required_filled
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::IntArray).filled { each(:int?) }
@@ -94,7 +94,7 @@ class TestDryTypeConstructors < Minitest::Test
   end
 
   def test_int_array_required_maybe
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::IntArray) { each(:int?) }
@@ -130,7 +130,7 @@ class TestDryTypeConstructors < Minitest::Test
   end
 
   def test_int_array_required_any_type
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::IntArray).filled
@@ -166,7 +166,7 @@ class TestDryTypeConstructors < Minitest::Test
   end
 
   def test_array_required_can_be_nil_or_ints
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::IntArray).maybe(min_size?: 1) { each(:int?) }

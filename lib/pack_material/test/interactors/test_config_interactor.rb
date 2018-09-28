@@ -474,7 +474,7 @@ module PackMaterialApp
       x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :id })
       assert_empty x. errors
 
-      # optional(:material_resource_master_list_id, :int).filled(:int?)
+      # optional(:material_resource_master_list_id, :integer).filled(:int?)
       x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(material_resource_master_list_id: 'string'))
       assert_equal(['must be an integer'], x.errors[:material_resource_master_list_id])
 

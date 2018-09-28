@@ -2,8 +2,8 @@
 
 module MasterfilesApp
   class Person < Dry::Struct
-    attribute :id, Types::Int
-    attribute :party_id, Types::Int
+    attribute :id, Types::Integer
+    attribute :party_id, Types::Integer
     attribute :party_name, Types::String
     attribute :surname, Types::String
     attribute :first_name, Types::String

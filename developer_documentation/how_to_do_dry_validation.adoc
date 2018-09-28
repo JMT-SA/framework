@@ -12,17 +12,17 @@ This page gives a simple overview of usage - mainly as a reminder of typical use
 == Schemas
 
 Create one or more schemas in a file (typically in `lib/applet_name/validations`.
-In most cases we want to inherit from `Dry::Validation.Form` rather than `Dry::Validation.Schema` because it is more flexible about its inputs.
+In most cases we want to inherit from `Dry::Validation.Params` rather than `Dry::Validation.Schema` because it is more flexible about its inputs.
 
 An example showing some simple variations:
 
 [source,ruby]
 ----
-NewThingSchema = Dry::Validation.Form do
+NewThingSchema = Dry::Validation.Params do
   configure { config.type_specs = true }
 
-  optional(:id, :int).filled(:int?)
-  required(:join_id, :int).filled(:int?)
+  optional(:id, :integer).filled(:int?)
+  required(:join_id, :integer).filled(:int?)
   required(:code, Types::StrippedString).filled(:str?)
   required(:name, Types::StrippedString).maybe(:str?)
   required(:active, :bool).filled(:bool?)
@@ -80,7 +80,7 @@ e.g. `{ col: 'some_value' }`
 |Y
 |Y
 |Integer
-|`required(:col, :int).filled(:int?)`
+|`required(:col, :integer).filled(:int?)`
 |`{col: '123'}`
 
 |Y
@@ -98,19 +98,19 @@ e.g. `{ col: 'some_value' }`
 |Y
 |N
 |Integer
-|`required(:col, :int).maybe(:int?)`
+|`required(:col, :integer).maybe(:int?)`
 |`{col: nil}`
 
 |N
 |Y
 |Integer
-|`optional(:col, :int).filled(:int?)`
+|`optional(:col, :integer).filled(:int?)`
 |`{}`
 
 |N
 |N
 |Integer
-|`optional(:col, :int).maybe(:int?)`
+|`optional(:col, :integer).maybe(:int?)`
 |`{}`
 
 |Y

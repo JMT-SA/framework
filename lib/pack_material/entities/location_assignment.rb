@@ -2,7 +2,7 @@
 
 module PackMaterialApp
   class LocationAssignment < Dry::Struct
-    attribute :id, Types::Int
+    attribute :id, Types::Integer
     attribute :assignment_code, Types::String
   end
 end

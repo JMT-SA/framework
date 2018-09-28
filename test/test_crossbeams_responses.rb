@@ -58,7 +58,7 @@ class TestCrossbeamsResponses < Minitest::Test
   end
 
   def test_validation_failed_with_dry
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::StrippedString).filled(:str?)
@@ -73,7 +73,7 @@ class TestCrossbeamsResponses < Minitest::Test
   end
 
   def test_validation_failed_with_dry_and_instance
-    schema = Dry::Validation.Form do
+    schema = Dry::Validation.Params do
       configure { config.type_specs = true }
 
       required(:in, Types::StrippedString).filled(:str?)

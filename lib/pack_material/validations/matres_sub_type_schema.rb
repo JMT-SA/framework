@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MatresSubTypeSchema = Dry::Validation.Form do
+  MatresSubTypeSchema = Dry::Validation.Params do
     optional(:id).filled(:int?)
     required(:material_resource_type_id).filled(:int?)
     required(:sub_type_name).filled(:str?)
@@ -12,7 +12,7 @@ module PackMaterialApp
     optional(:has_retailers).filled(:bool?)
   end
 
-  MatresSubTypeConfigColumnsSchema = Dry::Validation.Form do
+  MatresSubTypeConfigColumnsSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     required(:chosen_column_ids, Types::ArrayFromString).filled { each(:int?) }

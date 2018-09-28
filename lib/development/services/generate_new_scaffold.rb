@@ -379,7 +379,7 @@ class GenerateNewScaffold < BaseService
         # frozen_string_literal: true
 
         module #{opts.classnames[:module]}
-          #{opts.classnames[:schema]} = Dry::Validation.Form do
+          #{opts.classnames[:schema]} = Dry::Validation.Params do
             configure { config.type_specs = true }
 
             #{attr.join("\n    ")}

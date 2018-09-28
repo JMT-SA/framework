@@ -2,8 +2,8 @@
 
 module PackMaterialApp
   class MatresSubType < Dry::Struct
-    attribute :id, Types::Int
-    attribute :material_resource_type_id, Types::Int
+    attribute :id, Types::Integer
+    attribute :material_resource_type_id, Types::Integer
     attribute :sub_type_name, Types::String
     attribute :short_code, Types::String
     attribute :product_code_separator, Types::String
@@ -13,6 +13,6 @@ module PackMaterialApp
     # attribute :active, Types::Bool
     attribute :product_column_ids, Types::Array
     attribute :product_code_ids, Types::Array
-    attribute :internal_seq, Types::Int
+    attribute :internal_seq, Types::Integer
   end
 end

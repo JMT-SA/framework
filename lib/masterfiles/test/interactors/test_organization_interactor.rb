@@ -100,7 +100,7 @@ module MasterfilesApp
       expected = { role_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
       assert_equal(expected, x.errors)
 
-      # OrganizationSchema = Dry::Validation.Form do
+      # OrganizationSchema = Dry::Validation.Params do
       #   # required(:party_id).filled(:int?)
       #   # required(:variants).maybe(:str?)
       #   # required(:active).maybe(:bool?)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  UserChangeSchema = Dry::Validation.Form do
+  UserChangeSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     required(:old_password, Types::StrippedString).filled(min_size?: 4)

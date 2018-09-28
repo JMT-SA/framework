@@ -2,11 +2,11 @@
 
 module PackMaterialApp
   class PmProduct < Dry::Struct
-    attribute :id, Types::Int
-    attribute :material_resource_sub_type_id, Types::Int
-    attribute :commodity_id, Types::Int
-    attribute :marketing_variety_id, Types::Int
-    attribute :product_number, Types::Int
+    attribute :id, Types::Integer
+    attribute :material_resource_sub_type_id, Types::Integer
+    attribute :commodity_id, Types::Integer
+    attribute :marketing_variety_id, Types::Integer
+    attribute :product_number, Types::Integer
     attribute :product_code, Types::String
     attribute :unit, Types::String
     attribute :style, Types::String

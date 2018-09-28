@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  UserNewSchema = Dry::Validation.Form do
+  UserNewSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     # required(:login_name, Types::StrippedString).filled(:str?, min_size?: 3) # block hidden chars... [:print:]

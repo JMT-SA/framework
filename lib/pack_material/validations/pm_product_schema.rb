@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  PmProductSchema = Dry::Validation.Form do
+  PmProductSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    optional(:material_resource_sub_type_id, :int).filled(:int?)
+    optional(:material_resource_sub_type_id, :integer).filled(:int?)
 
-    optional(:commodity_id, :int).filled(:int?)
-    optional(:marketing_variety_id, :int).filled(:int?)
+    optional(:commodity_id, :integer).filled(:int?)
+    optional(:marketing_variety_id, :integer).filled(:int?)
 
     optional(:unit, Types::StrippedString).filled(:str?)
     optional(:style, Types::StrippedString).filled(:str?)
@@ -32,13 +32,13 @@ module PackMaterialApp
     optional(:other, Types::StrippedString).filled(:str?)
   end
 
-  ClonePmProductSchema = Dry::Validation.Form do
+  ClonePmProductSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    required(:material_resource_sub_type_id, :int).filled(:int?)
+    required(:material_resource_sub_type_id, :integer).filled(:int?)
 
-    optional(:commodity_id, :int).filled(:int?)
-    optional(:marketing_variety_id, :int).filled(:int?)
+    optional(:commodity_id, :integer).filled(:int?)
+    optional(:marketing_variety_id, :integer).filled(:int?)
 
     optional(:unit, Types::StrippedString).filled(:str?)
     optional(:style, Types::StrippedString).filled(:str?)
@@ -63,10 +63,10 @@ module PackMaterialApp
     optional(:other, Types::StrippedString).filled(:str?)
   end
 
-  CompletedPmProductSchema = Dry::Validation.Form do
+  CompletedPmProductSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    required(:product_number, :int).filled(:int?)
+    required(:product_number, :integer).filled(:int?)
     required(:product_code, Types::StrippedString).filled(:str?)
   end
 end

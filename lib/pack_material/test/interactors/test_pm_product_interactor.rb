@@ -254,7 +254,7 @@ module PackMaterialApp
     def test_validate_clone_pm_product_params
       # ClonePmProductSchema
       test_attrs = pm_product_attrs
-      # required(:material_resource_sub_type_id, :int).filled(:int?)
+      # required(:material_resource_sub_type_id, :integer).filled(:int?)
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.reject { |k| k == :material_resource_sub_type_id })
       assert_equal(['is missing'], x.errors[:material_resource_sub_type_id])
 
@@ -264,14 +264,14 @@ module PackMaterialApp
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.merge(material_resource_sub_type_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:material_resource_sub_type_id])
 
-      # optional(:commodity_id, :int).filled(:int?)
+      # optional(:commodity_id, :integer).filled(:int?)
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.reject { |k| k == :commodity_id })
       assert_empty x. errors
 
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.merge(commodity_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:commodity_id])
 
-      # optional(:marketing_variety_id, :int).filled(:int?)
+      # optional(:marketing_variety_id, :integer).filled(:int?)
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.reject { |k| k == :marketing_variety_id })
       assert_empty x. errors
 
@@ -315,7 +315,7 @@ module PackMaterialApp
     def test_validate_completed_pm_product_params
       # CompletedPmProductSchema
       test_attrs = pm_product_attrs
-      # required(:product_number, :int).filled(:int?)
+      # required(:product_number, :integer).filled(:int?)
       x = interactor.send(:validate_completed_pm_product_params, test_attrs.reject { |k| k == :product_number })
       assert_equal(['is missing'], x.errors[:product_number])
 
@@ -339,21 +339,21 @@ module PackMaterialApp
     def test_validate_pm_product_variant_params
       # PmProductVariantSchema
       test_attrs = pm_product_variant_attrs
-      # optional(:id, :int).filled(:int?)
+      # optional(:id, :integer).filled(:int?)
       x = interactor.send(:validate_pm_product_variant_params, test_attrs.reject { |k| k == :id })
       assert_empty x. errors
 
       x = interactor.send(:validate_pm_product_variant_params, test_attrs.merge(id: 'name'))
       assert_equal(['must be an integer'], x.errors[:id])
 
-      # optional(:pack_material_product_id, :int).filled(:int?)
+      # optional(:pack_material_product_id, :integer).filled(:int?)
       x = interactor.send(:validate_pm_product_variant_params, test_attrs.reject { |k| k == :pack_material_product_id })
       assert_empty x.errors
 
       x = interactor.send(:validate_pm_product_variant_params, test_attrs.merge(pack_material_product_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:pack_material_product_id])
 
-      # optional(:product_variant_number, :int).filled(:int?)
+      # optional(:product_variant_number, :integer).filled(:int?)
       x = interactor.send(:validate_pm_product_variant_params, test_attrs.reject { |k| k == :product_variant_number })
       assert_empty x.errors
 
@@ -394,7 +394,7 @@ module PackMaterialApp
     def test_validate_clone_pm_product_variant_params
       # ClonePmProductVariantSchema
       test_attrs = pm_product_variant_attrs
-      # required(:pack_material_product_id, :int).filled(:int?)
+      # required(:pack_material_product_id, :integer).filled(:int?)
       x = interactor.send(:validate_clone_pm_product_variant_params, test_attrs.reject { |k| k == :pack_material_product_id })
       assert_equal(['is missing'], x.errors[:pack_material_product_id])
 

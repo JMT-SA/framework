@@ -2,8 +2,8 @@
 
 module MasterfilesApp
   class Address < Dry::Struct
-    attribute :id, Types::Int
-    attribute :address_type_id, Types::Int
+    attribute :id, Types::Integer
+    attribute :address_type_id, Types::Integer
     attribute :address_line_1, Types::String
     attribute :address_line_2, Types::String
     attribute :address_line_3, Types::String

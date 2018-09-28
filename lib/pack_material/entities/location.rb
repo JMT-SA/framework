@@ -2,10 +2,10 @@
 
 module PackMaterialApp
   class Location < Dry::Struct
-    attribute :id, Types::Int
-    attribute :primary_storage_type_id, Types::Int
-    attribute :location_type_id, Types::Int
-    attribute :primary_assignment_id, Types::Int
+    attribute :id, Types::Integer
+    attribute :primary_storage_type_id, Types::Integer
+    attribute :location_type_id, Types::Integer
+    attribute :primary_assignment_id, Types::Integer
     attribute :location_code, Types::String
     attribute :location_description, Types::String
     attribute :has_single_container, Types::Bool

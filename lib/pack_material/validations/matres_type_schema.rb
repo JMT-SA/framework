@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MatresTypeSchema = Dry::Validation.Form do
+  MatresTypeSchema = Dry::Validation.Params do
     optional(:id).filled(:int?)
     required(:material_resource_domain_id).filled(:int?)
     required(:type_name).filled(:str?)
@@ -10,7 +10,7 @@ module PackMaterialApp
     optional(:measurement_units, Types::IntArray).maybe { each(:int?) }
   end
 
-  MatresTypeUnitSchema = Dry::Validation.Form do
+  MatresTypeUnitSchema = Dry::Validation.Params do
     required(:unit_of_measure).filled(:str?)
   end
 end

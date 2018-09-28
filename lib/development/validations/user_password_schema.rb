@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  UserPasswordSchema = Dry::Validation.Form do
+  UserPasswordSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     required(:password, Types::StrippedString).filled(min_size?: 4)

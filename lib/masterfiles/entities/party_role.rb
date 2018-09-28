@@ -2,11 +2,11 @@
 
 module MasterfilesApp
   class PartyRole < Dry::Struct
-    attribute :id, Types::Int
-    attribute :party_id, Types::Int
-    attribute :role_id, Types::Int
-    attribute :organization_id, Types::Int
-    attribute :person_id, Types::Int
+    attribute :id, Types::Integer
+    attribute :party_id, Types::Integer
+    attribute :role_id, Types::Integer
+    attribute :organization_id, Types::Integer
+    attribute :person_id, Types::Integer
     attribute :active, Types::Bool
 
     def organization?

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  PmProductVariantSchema = Dry::Validation.Form do
+  PmProductVariantSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    optional(:id, :int).filled(:int?)
-    optional(:pack_material_product_id, :int).filled(:int?)
-    optional(:product_variant_number, :int).maybe(:int?)
+    optional(:id, :integer).filled(:int?)
+    optional(:pack_material_product_id, :integer).filled(:int?)
+    optional(:product_variant_number, :integer).maybe(:int?)
 
     optional(:unit, Types::StrippedString).maybe(:str?)
     optional(:style, Types::StrippedString).maybe(:str?)
@@ -31,10 +31,10 @@ module PackMaterialApp
     optional(:other, Types::StrippedString).maybe(:str?)
   end
 
-  ClonePmProductVariantSchema = Dry::Validation.Form do
+  ClonePmProductVariantSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    required(:pack_material_product_id, :int).filled(:int?)
+    required(:pack_material_product_id, :integer).filled(:int?)
 
     optional(:unit, Types::StrippedString).maybe(:str?)
     optional(:style, Types::StrippedString).maybe(:str?)
@@ -59,7 +59,7 @@ module PackMaterialApp
     optional(:other, Types::StrippedString).maybe(:str?)
   end
 
-  CompletedPmProductVariantSchema = Dry::Validation.Form do
-    required(:product_variant_number, :int).filled(:int?)
+  CompletedPmProductVariantSchema = Dry::Validation.Params do
+    required(:product_variant_number, :integer).filled(:int?)
   end
 end

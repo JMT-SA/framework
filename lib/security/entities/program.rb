@@ -2,10 +2,10 @@
 
 module SecurityApp
   class Program < Dry::Struct
-    attribute :id, Types::Int
+    attribute :id, Types::Integer
     attribute :program_name, Types::String
-    attribute :functional_area_id, Types::Int
-    attribute :program_sequence, Types::Int
+    attribute :functional_area_id, Types::Integer
+    attribute :program_sequence, Types::Integer
     attribute :active, Types::Bool
   end
 end

@@ -76,7 +76,7 @@ const crossbeamsDataMinerParams = {
         valTo = '';
       }
     }
-    return `<li>${item.caption} ${item.opText} ${val}${valTo}</li>`;
+    return `<li><strong>${item.caption}</strong> ${item.opText} ${val}${valTo}</li>`;
   },
 
   /**
@@ -113,18 +113,33 @@ const crossbeamsDataMinerParams = {
       return '<ul><li>No parameters chosen</li></ul>';
     }
     const items = [];
-    // TODO: convert multiple = items to one IN item...
-    // group together all '=' items per column
-    // ar.filter(el => el.op == '=').each { hash[col] = hash[col] || []; hash[col].push(val) }
-    // hash.each { if col.length == 1 {delete col } else { delete all col from input items }
-    // hash.each { add IN to items }
-    // OR
-    // go through hash:
-    // - if ar length is one, add item from input with matching col, else add an IN from hash
-    // - then go through all inputs that are not part of hash and add them...
-    // change all groups with > 1 item into an IN item
-    // remove those items from the original list.
-    paramValues.forEach((item) => {
+    const res = { colNames: {} };
+    paramValues.filter(el => el.op === '=').forEach((el) => {
+      res[el.col] = res[el.col] || [];
+      res[el.col].push(el.text);
+      res.colNames[el.col] = el.caption;
+    });
+    const newItems = [];
+    const inKeys = [];
+    Object.keys(res).forEach((el) => {
+      if (el !== 'colNames') {
+        if (res[el].length > 1) {
+          inKeys.push(el);
+          const s = `${res[el].slice(0, res[el].length - 1).join(', ')} or ${res[el].slice(-1)}`;
+          newItems.push({ caption: res.colNames[el], opText: 'is any of', op: 'in', text: s, textTo: '' });
+        }
+      }
+    });
+    paramValues.filter(pv => !inKeys.includes(pv.col)).forEach((pv) => {
+      newItems.push({ caption: pv.caption,
+        opText: pv.opText,
+        op: pv.op,
+        text: pv.text,
+        textTo: pv.textTo,
+      });
+    });
+
+    newItems.forEach((item) => {
       items.push(crossbeamsDataMinerParams.queryItemForDisplay(item));
     });
     return `<ul>${items.join('')}</ul>`;

@@ -94,6 +94,27 @@ class BaseRepo
     DB.select(1).where(DB[table_name].where(args).exists).one?
   end
 
+  # Find a row in a table with one or more associated sub-tables.
+  # Returns nil if it is not found.
+  # Returns a Hash if no wrapper is provided, else an instance of the wrapper class.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param id [Integer] the id of the row.
+  # @param sub_tables [Array] the rules for how to find associated rows.
+  # @param wrapper [Class, nil] the class of the object to return.
+  # @return [Object, nil, Hash] the row wrapped in a new wrapper object.
+  def find_with_association(table_name, id, sub_tables: [], wrapper: nil)
+    rec = find_hash(table_name, id)
+    return nil if rec.nil?
+    return rec if sub_tables.empty? && wrapper.nil?
+    return wrapper.new(rec) if sub_tables.empty?
+
+    sub_tables.each { |sub| rec = add_association(table_name, id, rec, sub) }
+
+    return rec if wrapper.nil?
+    wrapper.new(rec)
+  end
+
   # Create a record.
   #
   # @param table_name [Symbol] the db table name.
@@ -180,6 +201,26 @@ class BaseRepo
   end
 
   private
+
+  def unpack_sub_table_rule(main_table, sub)
+    inflector = Dry::Inflector.new
+    main_table_id = "#{inflector.singularize(main_table)}_id".to_sym
+    sub_table_id = "#{inflector.singularize(sub[:sub_table])}_id".to_sym
+    join_table = sub[:join_table]
+    cols = sub[:all_columns] ? Sequel.lit('*') : sub[:columns]
+    [main_table_id, sub[:sub_table], sub_table_id, join_table, cols]
+  end
+
+  def add_association(main_table, id, rec, sub)
+    main_table_id, sub_table, sub_table_id, join_table, cols = unpack_sub_table_rule(main_table, sub)
+
+    rec[sub_table] = if join_table
+                       DB[sub_table].where(id: DB[join_table].where(main_table_id => id).select(sub_table_id)).select(*cols).all
+                     else
+                       DB[sub_table].where(main_table_id => id).select(*cols).all
+                     end
+    rec
+  end
 
   def make_order(dataset, sel_options)
     if sel_options[:desc]

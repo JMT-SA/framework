@@ -1,4 +1,6 @@
-class BaseRepo
+# frozen_string_literal: true
+
+class BaseRepo # rubocop:disable Metrics/ClassLength
   include Crossbeams::Responses
 
   # Wraps Sequel's transaction so that it is not exposed to calling code.
@@ -97,6 +99,22 @@ class BaseRepo
   # Find a row in a table with one or more associated sub-tables.
   # Returns nil if it is not found.
   # Returns a Hash if no wrapper is provided, else an instance of the wrapper class.
+  #
+  # Each Hash in the sub_tables array must include:
+  # sub_table: Symbol - if no other options provided, assumes that the sub table has a column named "main_table_id" and all columns are returned.
+  #
+  # Optional keys:
+  # columns: Array of Symbols - one for each desired column. If not present, all columns are returned
+  # uses_join_table: Boolean - if true, will create a join table name using main_table and sub_table names sorted and joined with "_".
+  # join_table: String - if present, use this as the join table.
+  # active_only: Boolean (Only return active rows.)
+  # inactive_only: Boolean (Only return inactive rows. The key in the main hash becomes :inactive_sub_table)
+  #
+  # examples:
+  #     find_with_association(:security_groups, 123, sub_tables: [{ sub_table: :security_groups, uses_join_table: true }], SecurityGroupWithPermissions)
+  #     find_with_association(:security_groups, 123, sub_tables: [{ sub_table: :security_groups, join_table: :security_groups_security_permissions }])
+  #     find_with_association(:programs, 123, sub_tables: [{ sub_table: :program_functions },
+  #                                                        { sub_table: :users, uses_join_table: true, active_only: true, columns: [:id, :user_name] }])
   #
   # @param table_name [Symbol] the db table name.
   # @param id [Integer] the id of the row.
@@ -205,15 +223,55 @@ class BaseRepo
   def unpack_sub_table_rule(main_table, sub)
     inflector = Dry::Inflector.new
     main_table_id = "#{inflector.singularize(main_table)}_id".to_sym
-    sub_table_id = "#{inflector.singularize(sub[:sub_table])}_id".to_sym
-    join_table = sub[:join_table]
-    cols = sub[:all_columns] ? Sequel.lit('*') : sub[:columns]
+    sub_table_id = "#{inflector.singularize(sub.fetch(:sub_table))}_id".to_sym
+    join_table = sub_table_join_table(main_table, sub[:sub_table], sub[:uses_join_table], sub[:join_table])
+    cols = columns_from_sub_table(sub)
     [main_table_id, sub[:sub_table], sub_table_id, join_table, cols]
+  end
+
+  def columns_from_sub_table(sub)
+    # If a list of columns is specified, return just those columns.
+    # Otherwise default to all columns.
+    sub[:columns] || Sequel.lit('*')
+  end
+
+  def sub_table_join_table(main_table, sub_table, uses_join_table, join_table)
+    return nil unless join_table || uses_join_table
+    return join_table unless uses_join_table
+    [main_table, sub_table].sort.join('_').to_sym
   end
 
   def add_association(main_table, id, rec, sub)
     main_table_id, sub_table, sub_table_id, join_table, cols = unpack_sub_table_rule(main_table, sub)
 
+    if sub[:active_only]
+      add_active_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols)
+    elsif sub[:inactive_only]
+      add_inactive_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols)
+    else
+      add_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols)
+    end
+  end
+
+  def add_active_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols) # rubocop:disable Metrics/ParameterLists
+    rec[sub_table] = if join_table
+                       DB[sub_table].where(id: DB[join_table].where(main_table_id => id).select(sub_table_id)).select(*cols).where(:active).all
+                     else
+                       DB[sub_table].where(main_table_id => id).select(*cols).where(:active).all
+                     end
+    rec
+  end
+
+  def add_inactive_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols) # rubocop:disable Metrics/ParameterLists
+    rec["inactive_#{sub_table}".to_sym] = if join_table
+                                            DB[sub_table].where(id: DB[join_table].where(main_table_id => id).select(sub_table_id)).select(*cols).where(active: false).all
+                                          else
+                                            DB[sub_table].where(main_table_id => id).select(*cols).where(active: false).all
+                                          end
+    rec
+  end
+
+  def add_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols) # rubocop:disable Metrics/ParameterLists
     rec[sub_table] = if join_table
                        DB[sub_table].where(id: DB[join_table].where(main_table_id => id).select(sub_table_id)).select(*cols).all
                      else
@@ -261,7 +319,7 @@ module MethodBuilder
   # no_activity_check: Boolean
   # - Set to true if this table does not have an +active+ column,
   #   or to return inactive records as well as active ones.
-  def build_for_select(table_name, options = {})
+  def build_for_select(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
     define_method(:"for_select_#{options[:alias] || table_name}") do |opts = {}|
       dataset = DB[table_name]
       dataset = make_order(dataset, options) if options[:order_by]
@@ -315,7 +373,7 @@ module MethodBuilder
   # - The wrapper class. If not provided, there will be no +find_+ method.
   # exclude: Array
   # - A list of symbols to exclude (:create, :update, :delete)
-  def crud_calls_for(table_name, options = {})
+  def crud_calls_for(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
     name    = options[:name] || table_name
     wrapper = options[:wrapper]
     skip    = options[:exclude] || []

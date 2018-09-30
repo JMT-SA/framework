@@ -244,4 +244,51 @@ class TestBaseRepo < MiniTestWithHooks
     assert_respond_to repo, :delete_tablename
     assert_respond_to repo, :find_tablename
   end
+
+  def test_find_with_associations
+    repo = BaseRepo.new
+    user1 = repo.where_hash(:users, login_name: "usr_1")
+    user2 = repo.where_hash(:users, login_name: "usr_2")
+    repo.update(:users, user2[:id], active: false)
+    sg_id = DB[:security_groups].insert(security_group_name: 'SG-TEST1')
+    func_id = DB[:functional_areas].insert(functional_area_name: 'F-TEST1')
+    prog_id = DB[:programs].insert(program_name: 'P-TEST1', program_sequence: 1, functional_area_id: func_id)
+    DB[:programs_users].insert(user_id: user1[:id], program_id: prog_id, security_group_id: sg_id)
+    DB[:programs_users].insert(user_id: user2[:id], program_id: prog_id, security_group_id: sg_id)
+    DB[:program_functions].insert(program_function_name: 'PF-TEST1', program_id: prog_id, url: '/some/path')
+
+    # Basic association (belongs_to)
+    res = repo.find_with_association(:functional_areas, func_id, sub_tables: [{ sub_table: :programs }])
+    assert_equal 1, res[:programs].length
+    assert res[:programs].first.length > 2
+
+    # Certain cols only
+    res = repo.find_with_association(:functional_areas, func_id, sub_tables: [{ sub_table: :programs, columns: [:id, :program_name] }])
+    assert_equal 1, res[:programs].length
+    assert_equal 2, res[:programs].first.length
+
+    # Join table association.
+    res = repo.find_with_association(:programs, prog_id, sub_tables: [{ sub_table: :users, uses_join_table: true }])
+    assert_equal 2, res[:users].length
+
+    # Join table association with provided join table.
+    res = repo.find_with_association(:programs, prog_id, sub_tables: [{ sub_table: :users, join_table: :programs_users }])
+    assert_equal 2, res[:users].length
+
+    # Active only
+    res = repo.find_with_association(:programs, prog_id, sub_tables: [{ sub_table: :users, uses_join_table: true, active_only: true }])
+    assert_equal 1, res[:users].length
+    assert_equal 'usr_1', res[:users].first[:login_name]
+
+    # Inactive only
+    res = repo.find_with_association(:programs, prog_id, sub_tables: [{ sub_table: :users, uses_join_table: true, inactive_only: true }])
+    assert_equal 1, res[:inactive_users].length
+    assert_equal 'usr_2', res[:inactive_users].first[:login_name]
+
+    # More than one association
+    res = repo.find_with_association(:programs, prog_id, sub_tables: [{ sub_table: :users, uses_join_table: true },
+                                                                      { sub_table: :program_functions }])
+    assert_equal 2, res[:users].length
+    assert_equal 1, res[:program_functions].length
+  end
 end

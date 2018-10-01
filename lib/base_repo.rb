@@ -97,7 +97,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   end
 
   # Find a row in a table with one or more associated sub-tables.
-  # Returns nil if it is not found.
+  # Returns nil if the row is not found.
   # Returns a Hash if no wrapper is provided, else an instance of the wrapper class.
   #
   # Each Hash in the sub_tables array must include:
@@ -120,17 +120,9 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param id [Integer] the id of the row.
   # @param sub_tables [Array] the rules for how to find associated rows.
   # @param wrapper [Class, nil] the class of the object to return.
-  # @return [Object, nil, Hash] the row wrapped in a new wrapper object.
+  # @return [Object, nil, Hash] the row wrapped in a new wrapper object or as a Hash.
   def find_with_association(table_name, id, sub_tables: [], wrapper: nil)
-    rec = find_hash(table_name, id)
-    return nil if rec.nil?
-    return rec if sub_tables.empty? && wrapper.nil?
-    return wrapper.new(rec) if sub_tables.empty?
-
-    sub_tables.each { |sub| rec = add_association(table_name, id, rec, sub) }
-
-    return rec if wrapper.nil?
-    wrapper.new(rec)
+    BaseRepoAssocationFinder.new(table_name, id, sub_tables: sub_tables, wrapper: wrapper).call
   end
 
   # Create a record.
@@ -219,66 +211,6 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   end
 
   private
-
-  def unpack_sub_table_rule(main_table, sub)
-    inflector = Dry::Inflector.new
-    main_table_id = "#{inflector.singularize(main_table)}_id".to_sym
-    sub_table_id = "#{inflector.singularize(sub.fetch(:sub_table))}_id".to_sym
-    join_table = sub_table_join_table(main_table, sub[:sub_table], sub[:uses_join_table], sub[:join_table])
-    cols = columns_from_sub_table(sub)
-    [main_table_id, sub[:sub_table], sub_table_id, join_table, cols]
-  end
-
-  def columns_from_sub_table(sub)
-    # If a list of columns is specified, return just those columns.
-    # Otherwise default to all columns.
-    sub[:columns] || Sequel.lit('*')
-  end
-
-  def sub_table_join_table(main_table, sub_table, uses_join_table, join_table)
-    return nil unless join_table || uses_join_table
-    return join_table unless uses_join_table
-    [main_table, sub_table].sort.join('_').to_sym
-  end
-
-  def add_association(main_table, id, rec, sub)
-    main_table_id, sub_table, sub_table_id, join_table, cols = unpack_sub_table_rule(main_table, sub)
-
-    if sub[:active_only]
-      add_active_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols)
-    elsif sub[:inactive_only]
-      add_inactive_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols)
-    else
-      add_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols)
-    end
-  end
-
-  def add_active_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols) # rubocop:disable Metrics/ParameterLists
-    rec[sub_table] = if join_table
-                       DB[sub_table].where(id: DB[join_table].where(main_table_id => id).select(sub_table_id)).select(*cols).where(:active).all
-                     else
-                       DB[sub_table].where(main_table_id => id).select(*cols).where(:active).all
-                     end
-    rec
-  end
-
-  def add_inactive_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols) # rubocop:disable Metrics/ParameterLists
-    rec["inactive_#{sub_table}".to_sym] = if join_table
-                                            DB[sub_table].where(id: DB[join_table].where(main_table_id => id).select(sub_table_id)).select(*cols).where(active: false).all
-                                          else
-                                            DB[sub_table].where(main_table_id => id).select(*cols).where(active: false).all
-                                          end
-    rec
-  end
-
-  def add_sub_table_recs(rec, id, main_table_id, sub_table, sub_table_id, join_table, cols) # rubocop:disable Metrics/ParameterLists
-    rec[sub_table] = if join_table
-                       DB[sub_table].where(id: DB[join_table].where(main_table_id => id).select(sub_table_id)).select(*cols).all
-                     else
-                       DB[sub_table].where(main_table_id => id).select(*cols).all
-                     end
-    rec
-  end
 
   def make_order(dataset, sel_options)
     if sel_options[:desc]

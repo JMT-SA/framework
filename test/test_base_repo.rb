@@ -257,6 +257,16 @@ class TestBaseRepo < MiniTestWithHooks
     DB[:programs_users].insert(user_id: user2[:id], program_id: prog_id, security_group_id: sg_id)
     DB[:program_functions].insert(program_function_name: 'PF-TEST1', program_id: prog_id, url: '/some/path')
 
+    # Validation
+    assert_raises(KeyError) { repo.find_with_association(:functional_areas, func_id, sub_tables: [{ miss_spelled_sub_table: :programs }]) }
+    assert_raises(ArgumentError) { repo.find_with_association('functional_areas', func_id, sub_tables: [{ sub_table: :programs }]) }
+    assert_raises(ArgumentError) { repo.find_with_association(:functional_areas, func_id, sub_tables: [{ sub_table: :programs, non_existent_key: 'WRONG' }]) }
+
+    # No association specified - just returns functional_areas Hash.
+    res = repo.find_with_association(:functional_areas, func_id)
+    assert_nil res[:programs]
+    assert_equal 'F-TEST1', res[:functional_area_name]
+
     # Basic association (belongs_to)
     res = repo.find_with_association(:functional_areas, func_id, sub_tables: [{ sub_table: :programs }])
     assert_equal 1, res[:programs].length

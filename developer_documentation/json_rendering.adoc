@@ -60,8 +60,6 @@ Like with updating a grid row, this will close the dialog and append a row to th
 
 === Changing DOM elements
 
-NOTE: All such actions should call `return_json_response` to set the correct headers.
-
 The main helper for this is `json_actions` which receives an array of actions to be carried out in the page and an optional flash message to be displayed and optional flag to indicate that a dialog should not be closed after processing the response in the page.
 Each action is of a specific type which tells the calling javascript what to do.
 

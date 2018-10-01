@@ -44,7 +44,7 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_matres_sub_type).returns(ok_response(instance: row_vals))
-    patch 'pack_material/config/material_resource_sub_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'pack_material/config/material_resource_sub_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_matres_sub_type).returns(bad_response)
     PackMaterial::Config::MatresSubType::Edit.stub(:call, bland_page) do
-      patch 'pack_material/config/material_resource_sub_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'pack_material/config/material_resource_sub_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -62,7 +62,7 @@ class TestMatresSubTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_matres_sub_type).returns(ok_response)
-    delete 'pack_material/config/material_resource_sub_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'pack_material/config/material_resource_sub_types/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
 
@@ -163,13 +163,13 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_matres_master_list_item).returns(ok_response(instance: row_vals))
-    patch 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
 
     # update fail
     INTERACTOR.any_instance.stubs(:update_matres_master_list_item).returns(bad_response)
     PackMaterial::Config::MatresMasterListItem::Edit.stub(:call, bland_page) do
-      patch 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'pack_material/config/material_resource_sub_types/1/material_resource_master_list_items/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -277,7 +277,7 @@ class TestMatresSubTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_matres_config).returns(ok_response)
-    patch 'pack_material/config/material_resource_sub_types/1/config', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'pack_material/config/material_resource_sub_types/1/config', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_response
     assert last_response.ok?
     assert last_response.body.include?('notice')
@@ -288,7 +288,7 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_matres_config).returns(bad_response)
     PackMaterial::Config::MatresSubType::Config.stub(:call, bland_page) do
-      patch 'pack_material/config/material_resource_sub_types/1/config', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'pack_material/config/material_resource_sub_types/1/config', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_response
     refute last_response.ok?

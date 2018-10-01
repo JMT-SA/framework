@@ -25,7 +25,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::CommodityGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_commodity_group(id, params[:commodity_group])
           if res.success
             update_grid_row(id,
@@ -33,12 +32,10 @@ class Framework < Roda
                                        description: res.instance[:description] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id, params[:commodity_group], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::CommodityGroup::Edit.call(id, params[:commodity_group], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_commodity_group(id)
           if res.success
@@ -89,7 +86,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::Commodity::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_commodity(id, params[:commodity])
           if res.success
             update_grid_row(id,
@@ -99,12 +95,10 @@ class Framework < Roda
                                        hs_code: res.instance[:hs_code] },
                             notice:  res.message)
           else
-            content = show_partial { Masterfiles::Fruit::Commodity::Edit.call(id, params[:commodity], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::Commodity::Edit.call(id, params[:commodity], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_commodity(id)
           if res.success
@@ -155,7 +149,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::CultivarGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_cultivar_group(id, params[:cultivar_group])
           if res.success
             update_grid_row(id,
@@ -163,12 +156,10 @@ class Framework < Roda
                                        description: res.instance[:description] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::CultivarGroup::Edit.call(id, params[:cultivar_group], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::CultivarGroup::Edit.call(id, params[:cultivar_group], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_cultivar_group(id)
           delete_grid_row(id, notice: res.message)
@@ -252,7 +243,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::Cultivar::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_cultivar(id, params[:cultivar]) # Use Interactor - returned instance is "larger" entity (incl. commod code)
           comm_repo = MasterfilesApp::CommodityRepo.new
           if res.success
@@ -266,12 +256,10 @@ class Framework < Roda
                                        description: res.instance[:description] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::Cultivar::Edit.call(id, params[:cultivar], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::Cultivar::Edit.call(id, params[:cultivar], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_cultivar(id)
           delete_grid_row(id, notice: res.message)
@@ -316,7 +304,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::MarketingVariety::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_marketing_variety(id, params[:marketing_variety])
           if res.success
             update_grid_row(id,
@@ -324,8 +311,7 @@ class Framework < Roda
                                        description: res.instance[:description] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::MarketingVariety::Edit.call(id, params[:marketing_variety], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::MarketingVariety::Edit.call(id, params[:marketing_variety], res.errors) }
           end
         end
       end
@@ -350,7 +336,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::BasicPackCode::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_basic_pack_code(id, params[:basic_pack_code])
           if res.success
             update_grid_row(id,
@@ -361,12 +346,10 @@ class Framework < Roda
                                        height_mm: res.instance[:height_mm] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::BasicPackCode::Edit.call(id, params[:basic_pack_code], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::BasicPackCode::Edit.call(id, params[:basic_pack_code], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_basic_pack_code(id)
           if res.success
@@ -417,19 +400,16 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::StandardPackCode::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_standard_pack_code(id, params[:standard_pack_code])
           if res.success
             update_grid_row(id,
                             changes: { standard_pack_code: res.instance[:standard_pack_code] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::StandardPackCode::Edit.call(id, params[:standard_pack_code], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::StandardPackCode::Edit.call(id, params[:standard_pack_code], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_standard_pack_code(id)
           if res.success
@@ -500,7 +480,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::StdFruitSizeCount::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_std_fruit_size_count(id, params[:std_fruit_size_count])
           if res.success
             update_grid_row(id,
@@ -518,12 +497,10 @@ class Framework < Roda
                                        average_weight_gm: res.instance[:average_weight_gm] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id, params[:std_fruit_size_count], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id, params[:std_fruit_size_count], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_std_fruit_size_count(id)
           delete_grid_row(id, notice: res.message)
@@ -589,7 +566,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_fruit_actual_counts_for_pack(id, params[:fruit_actual_counts_for_pack])
           if res.success
             update_grid_row(id,
@@ -600,12 +576,10 @@ class Framework < Roda
                                        size_count_variation: res.instance[:size_count_variation] },
                             notice:  res.message)
           else
-            content = show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id, params[:fruit_actual_counts_for_pack], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id, params[:fruit_actual_counts_for_pack], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_fruit_actual_counts_for_pack(id)
           delete_grid_row(id, notice: res.message)
@@ -632,7 +606,6 @@ class Framework < Roda
           show_partial { Masterfiles::Fruit::FruitSizeReference::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_fruit_size_reference(id, params[:fruit_size_reference])
           if res.success
             update_grid_row(id,
@@ -640,12 +613,10 @@ class Framework < Roda
                                        size_reference: res.instance[:size_reference] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Fruit::FruitSizeReference::Edit.call(id, params[:fruit_size_reference], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Fruit::FruitSizeReference::Edit.call(id, params[:fruit_size_reference], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('fruit', 'delete')
           res = interactor.delete_fruit_size_reference(id)
           delete_grid_row(id, notice: res.message)
@@ -662,9 +633,11 @@ class Framework < Roda
         handle_not_found(r) unless actual_count
         check_auth!('fruit', 'read')
         parent_id = actual_count.std_fruit_size_count_id
-        return_json_response
         r.redirect "/list/fruit_actual_counts_for_packs/with_params?key=standard&fruit_actual_counts_for_packs.std_fruit_size_count_id=#{parent_id}"
       end
     end
   end
 end
+
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/BlockLength

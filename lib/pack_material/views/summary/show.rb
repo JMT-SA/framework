@@ -20,4 +20,3 @@ module PackMaterial
     end
   end
 end
-

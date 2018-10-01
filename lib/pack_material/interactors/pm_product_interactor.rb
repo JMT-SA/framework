@@ -133,7 +133,7 @@ module PackMaterialApp
     end
 
     def parent_id_missing
-      validation_failed_response(OpenStruct.new(messages: { pack_material_product_id: ["is missing"] }))
+      validation_failed_response(OpenStruct.new(messages: { pack_material_product_id: ['is missing'] }))
     end
   end
 end

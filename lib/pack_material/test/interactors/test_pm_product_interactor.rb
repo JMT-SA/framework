@@ -120,8 +120,6 @@ module PackMaterialApp
     # end
     #
 
-
-
     def test_create_pm_product_variant
       x = interactor.create_pm_product_variant(nil, {})
       refute x.success

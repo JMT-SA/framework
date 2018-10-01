@@ -44,7 +44,7 @@ class TestMarketingVarietyRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_marketing_variety).returns(ok_response(instance: row_vals))
-    patch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestMarketingVarietyRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_marketing_variety).returns(bad_response)
     Masterfiles::Fruit::MarketingVariety::Edit.stub(:call, bland_page) do
-      patch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'masterfiles/fruit/marketing_varieties/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end

@@ -233,7 +233,7 @@ module PackMaterialApp
 
     def for_select_sub_type_master_list_items(sub_type_id, product_column)
       sub_type_master_list_items(sub_type_id).map { |r| [(r[:short_code] + (r[:long_name] ? ' - ' + r[:long_name] : '')).to_s, r[:id]] if r[:column_name] == product_column.to_s && r[:active] }
-        .compact
+                                             .compact
     end
 
     def get_dataminer_report(file_name)

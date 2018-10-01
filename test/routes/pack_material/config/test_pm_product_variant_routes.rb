@@ -60,7 +60,7 @@ class TestPmProductVariantRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_pm_product_variant).returns(ok_response(instance: row_vals))
-    patch 'pack_material/config/pack_material_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    patch_as_fetch 'pack_material/config/pack_material_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     expect_json_update_grid
   end
 
@@ -69,7 +69,7 @@ class TestPmProductVariantRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_pm_product_variant).returns(bad_response)
     PackMaterial::Config::PmProductVariant::Edit.stub(:call, bland_page) do
-      patch 'pack_material/config/pack_material_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+      patch_as_fetch 'pack_material/config/pack_material_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     end
     expect_json_replace_dialog(has_error: true)
   end
@@ -78,7 +78,7 @@ class TestPmProductVariantRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_pm_product_variant).returns(ok_response)
-    delete 'pack_material/config/pack_material_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
+    delete_as_fetch 'pack_material/config/pack_material_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: '/' }
     expect_json_delete_from_grid
   end
 
@@ -103,7 +103,7 @@ class TestPmProductVariantRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_pm_product_variant).returns(ok_response)
-    post 'pack_material/config/pack_material_products/1/pack_material_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    post_as_fetch 'pack_material/config/pack_material_products/1/pack_material_product_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
 

@@ -12,7 +12,7 @@ module PackMaterialApp
     attribute :party_name, Types::String
 
     def supplier?
-      supplier_id && true
+      !!supplier_id
     end
   end
 end

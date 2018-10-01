@@ -44,7 +44,7 @@ class TestMatresProductVariantRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_matres_product_variant).returns(ok_response(instance: row_vals))
-    patch 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_update_grid
   end
 
@@ -53,7 +53,7 @@ class TestMatresProductVariantRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_matres_product_variant).returns(bad_response)
     PackMaterial::MaterialResource::MatresProductVariant::Edit.stub(:call, bland_page) do
-      patch 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      patch_as_fetch 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
   end

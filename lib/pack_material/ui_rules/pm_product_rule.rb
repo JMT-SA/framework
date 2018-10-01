@@ -50,7 +50,10 @@ module UiRules
 
     def preselect_fields
       {
-        material_resource_sub_type_id: { renderer: :select, options: @config_repo.for_select_configured_sub_types(PackMaterialApp::DOMAIN_NAME), caption: 'Please select Sub Type', required: true },
+        material_resource_sub_type_id: { renderer: :select,
+                                         options: @config_repo.for_select_configured_sub_types(PackMaterialApp::DOMAIN_NAME),
+                                         caption: 'Please select Sub Type',
+                                         required: true }
       }
     end
 
@@ -58,7 +61,7 @@ module UiRules
       material_resource_sub_type_id_label = @config_repo.find_matres_sub_type(@form_object[:material_resource_sub_type_id])&.sub_type_name
       x = {
         material_resource_sub_type_name: { renderer: :label, with_value: material_resource_sub_type_id_label, caption: 'Sub Type', readonly: true },
-        material_resource_sub_type_id: { renderer: :hidden, with_value: @form_object.material_resource_sub_type_id },
+        material_resource_sub_type_id: { renderer: :hidden, with_value: @form_object.material_resource_sub_type_id }
       }
 
       product_column_set.each do |col_name|

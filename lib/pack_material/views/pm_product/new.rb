@@ -16,7 +16,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/pack_material/config/pack_material_products"
+              form.action '/pack_material/config/pack_material_products'
               form.remote!
               form.add_field :material_resource_sub_type_name
               form.add_field :material_resource_sub_type_id

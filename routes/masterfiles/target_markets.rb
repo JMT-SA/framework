@@ -25,19 +25,16 @@ class Framework < Roda
           show_partial { Masterfiles::TargetMarkets::TmGroupType::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_tm_group_type(id, params[:tm_group_type])
           if res.success
             update_grid_row(id,
                             changes: { target_market_group_type_code: res.instance[:target_market_group_type_code] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::TargetMarkets::TmGroupType::Edit.call(id, params[:tm_group_type], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::TargetMarkets::TmGroupType::Edit.call(id, params[:tm_group_type], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('Target Markets', 'delete')
           res = interactor.delete_tm_group_type(id)
           delete_grid_row(id, notice: res.message)
@@ -84,7 +81,6 @@ class Framework < Roda
           show_partial { Masterfiles::TargetMarkets::TmGroup::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_tm_group(id, params[:tm_group])
           if res.success
             update_grid_row(id,
@@ -92,12 +88,10 @@ class Framework < Roda
                                        target_market_group_name: res.instance[:target_market_group_name] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::TargetMarkets::TmGroup::Edit.call(id, params[:tm_group], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::TargetMarkets::TmGroup::Edit.call(id, params[:tm_group], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('Target Markets', 'delete')
           res = interactor.delete_tm_group(id)
           delete_grid_row(id, notice: res.message)
@@ -168,19 +162,16 @@ class Framework < Roda
           show_partial { Masterfiles::TargetMarkets::TargetMarket::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_target_market(id, params[:target_market])
           if res.success
             update_grid_row(id,
                             changes: { target_market_name: res.instance[:target_market_name] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::TargetMarkets::TargetMarket::Edit.call(id, params[:target_market], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::TargetMarkets::TargetMarket::Edit.call(id, params[:target_market], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('Target Markets', 'delete')
           res = interactor.delete_target_market(id)
           delete_grid_row(id, notice: res.message)
@@ -247,19 +238,16 @@ class Framework < Roda
           show_partial { Masterfiles::TargetMarkets::Region::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_region(id, params[:region])
           if res.success
             update_grid_row(id,
                             changes: { destination_region_name: res.instance[:destination_region_name] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::TargetMarkets::Region::Edit.call(id, params[:region], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::TargetMarkets::Region::Edit.call(id, params[:region], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('Target Markets', 'delete')
           res = interactor.delete_region(id)
 
@@ -331,7 +319,6 @@ class Framework < Roda
           show_partial { Masterfiles::TargetMarkets::Country::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_country(id, params[:country])
           if res.success
             update_grid_row(id,
@@ -339,12 +326,10 @@ class Framework < Roda
                                        country_name: res.instance[:country_name] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::TargetMarkets::Country::Edit.call(id, params[:country], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::TargetMarkets::Country::Edit.call(id, params[:country], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('Target Markets', 'delete')
           res = interactor.delete_country(id)
           if res.success
@@ -375,7 +360,6 @@ class Framework < Roda
           show_partial { Masterfiles::TargetMarkets::City::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_city(id, params[:city])
           if res.success
             update_grid_row(id,
@@ -383,12 +367,10 @@ class Framework < Roda
                                        city_name: res.instance[:city_name] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::TargetMarkets::City::Edit.call(id, params[:city], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::TargetMarkets::City::Edit.call(id, params[:city], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('Target Markets', 'delete')
           res = interactor.delete_city(id)
           delete_grid_row(id, notice: res.message)
@@ -397,3 +379,6 @@ class Framework < Roda
     end
   end
 end
+
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/BlockLength

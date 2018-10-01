@@ -23,4 +23,3 @@ module MasterfilesApp
     end
   end
 end
-

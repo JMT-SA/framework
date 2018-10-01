@@ -62,7 +62,7 @@ class TestAddressRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_address).returns(ok_response)
-    delete 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    delete_as_fetch 'masterfiles/parties/addresses/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_delete_from_grid
   end
 

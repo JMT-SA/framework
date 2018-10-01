@@ -23,7 +23,6 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::Organization::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_organization(id, params[:organization])
           if res.success
             update_grid_row(id, changes: { party_id: res.instance[:party_id],
@@ -35,12 +34,10 @@ class Framework < Roda
                                            variants: res.instance[:variants] },
                                 notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_organization(id)
           delete_grid_row(id, notice: res.message)
@@ -86,7 +83,6 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::Person::Show.call(id) }
         end
         r.patch do
-          return_json_response
           res = interactor.update_person(id, params[:person])
           if res.success
             update_grid_row(id,
@@ -96,12 +92,10 @@ class Framework < Roda
                                        vat_number: res.instance[:vat_number] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::Person::Edit.call(id, params[:person], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::Person::Edit.call(id, params[:person], res.errors) }
           end
         end
         r.delete do
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_person(id)
           delete_grid_row(id, notice: res.message)
@@ -163,7 +157,6 @@ class Framework < Roda
           end
         end
         r.delete do
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_address(id)
           delete_grid_row(id, notice: res.message)
@@ -209,7 +202,6 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::ContactMethod::Show.call(id) }
         end
         r.patch do
-          return_json_response
           res = interactor.update_contact_method(id, params[:contact_method])
           if res.success
             update_grid_row(id,
@@ -217,12 +209,10 @@ class Framework < Roda
                                        contact_method_code: res.instance[:contact_method_code] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id, params[:contact_method], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::ContactMethod::Edit.call(id, params[:contact_method], res.errors) }
           end
         end
         r.delete do
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_contact_method(id)
           delete_grid_row(id, notice: res.message)
@@ -295,17 +285,14 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::CustomerType::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_customer_type(id, params[:customer_type])
           if res.success
             update_grid_row(id, changes: { type_code: res.instance[:type_code] }, notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::CustomerType::Edit.call(id, form_values: params[:customer_type], form_errors: res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::CustomerType::Edit.call(id, form_values: params[:customer_type], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_customer_type(id)
           delete_grid_row(id, notice: res.message)
@@ -351,19 +338,16 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::Customer::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_customer(id, params[:customer])
           if res.success
             update_grid_row(id,
                             changes: { erp_customer_number: res.instance[:erp_customer_number] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::Customer::Edit.call(id, form_values: params[:customer], form_errors: res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::Customer::Edit.call(id, form_values: params[:customer], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_customer(id)
           delete_grid_row(id, notice: res.message)
@@ -382,7 +366,6 @@ class Framework < Roda
       end
       r.on 'new' do
         r.post do
-          return_json_response
           check_auth!('parties', 'new')
           party_id = params[:customer][:party_id].to_i
           re_show_form(r, OpenStruct.new(message: nil), url: "/masterfiles/parties/customers/new/#{party_id}") do
@@ -425,19 +408,16 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::SupplierType::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_supplier_type(id, params[:supplier_type])
           if res.success
             update_grid_row(id,
                             changes: { type_code: res.instance[:type_code] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::SupplierType::Edit.call(id, form_values: params[:supplier_type], form_errors: res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::SupplierType::Edit.call(id, form_values: params[:supplier_type], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_supplier_type(id)
           delete_grid_row(id, notice: res.message)
@@ -483,19 +463,16 @@ class Framework < Roda
           show_partial { Masterfiles::Parties::Supplier::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_supplier(id, params[:supplier])
           if res.success
             update_grid_row(id,
                             changes: { erp_supplier_number: res.instance[:erp_supplier_number] },
                             notice: res.message)
           else
-            content = show_partial { Masterfiles::Parties::Supplier::Edit.call(id, form_values: params[:supplier], form_errors: res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { Masterfiles::Parties::Supplier::Edit.call(id, form_values: params[:supplier], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('parties', 'delete')
           res = interactor.delete_supplier(id)
           delete_grid_row(id, notice: res.message)
@@ -515,7 +492,6 @@ class Framework < Roda
       end
       r.on 'new' do
         r.post do
-          return_json_response
           check_auth!('parties', 'new')
           party_id = params[:supplier][:party_id].to_i
           re_show_form(r, OpenStruct.new(message: nil), url: "/masterfiles/parties/suppliers/new/#{party_id}") do
@@ -541,3 +517,6 @@ class Framework < Roda
     end
   end
 end
+
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/BlockLength

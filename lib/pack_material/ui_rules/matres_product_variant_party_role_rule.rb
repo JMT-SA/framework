@@ -34,7 +34,7 @@ module UiRules
     end
 
     def form_fields
-      supplier = @repo.find_party_role(id)&.supplier? # I get type directly from the repo so that it can't be changed from the edit view
+      supplier = @repo.find_party_role(@options[:id])&.supplier? # I get type directly from the repo so that it can't be changed from the edit view
       {
         material_resource_product_variant_id: { renderer: :hidden, required: true },
         product_variant_code: { renderer: :label, with_value: product_variant.product_variant_code, readonly: true, caption: 'Product Code' },
@@ -55,7 +55,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find_matres_product_variant_party_role(@options[:id])
+      @form_object = @repo.find_party_role(@options[:id])
     end
 
     def make_new_form_object

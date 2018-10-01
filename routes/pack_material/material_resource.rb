@@ -49,7 +49,6 @@ class Framework < Roda
           show_partial { PackMaterial::MaterialResource::MatresProductVariant::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_matres_product_variant(id, params[:matres_product_variant])
           if res.success
             row_keys = %i[
@@ -61,12 +60,10 @@ class Framework < Roda
             parent_variant_id = res.instance[:product_variant_id]
             update_grid_row(parent_variant_id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            content = show_partial { PackMaterial::MaterialResource::MatresProductVariant::Edit.call(id, form_values: params[:matres_product_variant], form_errors: res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::MaterialResource::MatresProductVariant::Edit.call(id, form_values: params[:matres_product_variant], form_errors: res.errors) }
           end
         end
         # r.delete do    # DELETE
-        #   return_json_response
         #   check_auth!('material_resource', 'delete')
         #   res = interactor.delete_matres_product_variant(id)
         #   delete_grid_row(id, notice: res.message)
@@ -93,7 +90,6 @@ class Framework < Roda
           show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_matres_product_variant_party_role(id, params[:matres_product_variant_party_role])
           if res.success
             row_keys = %i[
@@ -106,12 +102,10 @@ class Framework < Roda
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            content = show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id, form_values: params[:matres_product_variant_party_role], form_errors: res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id, form_values: params[:matres_product_variant_party_role], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('material_resource', 'delete')
           res = interactor.delete_matres_product_variant_party_role(id)
           delete_grid_row(id, notice: res.message)

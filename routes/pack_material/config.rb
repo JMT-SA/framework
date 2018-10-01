@@ -45,7 +45,6 @@ class Framework < Roda
           show_partial { PackMaterial::Config::MatresType::Show.call(id) }
         end
         r.patch do
-          return_json_response
           res = interactor.update_matres_type(id, params[:matres_type])
           if res.success
             update_grid_row(id, changes: { material_resource_domain_id: res.instance[:material_resource_domain_id],
@@ -54,12 +53,10 @@ class Framework < Roda
                                            description: res.instance[:description] },
                                 notice: res.message)
           else
-            content = show_partial { PackMaterial::Config::MatresType::Edit.call(id, params[:matres_type], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::Config::MatresType::Edit.call(id, params[:matres_type], res.errors) }
           end
         end
         r.delete do
-          return_json_response
           check_auth!('configuration', 'delete')
           res = interactor.delete_matres_type(id)
           delete_grid_row(id, notice: res.message)
@@ -117,7 +114,6 @@ class Framework < Roda
           show_partial { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_matres_master_list_item(item_id, params[:matres_master_list_item])
           if res.success
             row_keys = %i[
@@ -128,8 +124,7 @@ class Framework < Roda
             ]
             update_grid_row(item_id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            content = show_partial { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id, params[:matres_master_list_item], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id, params[:matres_master_list_item], res.errors) }
           end
         end
       end
@@ -144,7 +139,6 @@ class Framework < Roda
         end
         r.on 'new' do
           r.post do
-            return_json_response
             check_auth!('configuration', 'new')
             product_column_id = params[:matres_master_list_item][:material_resource_product_column_id].to_i
 
@@ -184,7 +178,6 @@ class Framework < Roda
           show_partial_or_page(r) { PackMaterial::Config::MatresSubType::Config.call(id) }
         end
         r.patch do
-          return_json_response
           res = interactor.update_matres_config(id, params[:matres_sub_type])
           if res.success
             show_json_notice(res.message)
@@ -213,7 +206,6 @@ class Framework < Roda
           show_partial { PackMaterial::Config::MatresSubType::Show.call(id) }
         end
         r.patch do
-          return_json_response
           res = interactor.update_matres_sub_type(id, params[:matres_sub_type])
           if res.success
             update_grid_row(id, changes: {  material_resource_type_id: res.instance[:material_resource_type_id],
@@ -227,12 +219,10 @@ class Framework < Roda
                                             product_code_ids: res.instance[:product_code_ids] },
                                 notice: res.message)
           else
-            content = show_partial { PackMaterial::Config::MatresSubType::Edit.call(id, params[:matres_sub_type], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::Config::MatresSubType::Edit.call(id, params[:matres_sub_type], res.errors) }
           end
         end
         r.delete do
-          return_json_response
           check_auth!('configuration', 'delete')
           res = interactor.delete_matres_sub_type(id)
           if res.success
@@ -303,7 +293,6 @@ class Framework < Roda
           end
         end
         r.post do        # CREATE
-          return_json_response
           res = interactor.create_pm_product_variant(id, params[:pm_product_variant])
           if res.success
             flash[:notice] = res.message
@@ -332,7 +321,6 @@ class Framework < Roda
           show_partial { PackMaterial::Config::PmProduct::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_pm_product(id, params[:pm_product])
           if res.success
             row_keys = %i[
@@ -365,12 +353,10 @@ class Framework < Roda
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            content = show_partial { PackMaterial::Config::PmProduct::Edit.call(id, params[:pm_product], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::Config::PmProduct::Edit.call(id, params[:pm_product], res.errors) }
           end
         end
         r.delete do
-          return_json_response
           check_auth!('configuration', 'delete')
           res = interactor.delete_pm_product(id)
           if res.success
@@ -394,7 +380,6 @@ class Framework < Roda
       end
       r.on 'new' do
         r.post do
-          return_json_response
           check_auth!('configuration', 'new')
           sub_type_id = params[:pm_product][:material_resource_sub_type_id].to_i
 
@@ -452,7 +437,6 @@ class Framework < Roda
           show_partial { PackMaterial::Config::PmProductVariant::Show.call(id) }
         end
         r.patch do     # UPDATE
-          return_json_response
           res = interactor.update_pm_product_variant(id, params[:pm_product_variant])
           if res.success
             row_keys = %i[
@@ -482,12 +466,10 @@ class Framework < Roda
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            content = show_partial { PackMaterial::Config::PmProductVariant::Edit.call(id, params[:pm_product_variant], res.errors) }
-            update_dialog_content(content: content, error: res.message)
+            re_show_form(r, res) { PackMaterial::Config::PmProductVariant::Edit.call(id, params[:pm_product_variant], res.errors) }
           end
         end
         r.delete do    # DELETE
-          return_json_response
           check_auth!('configuration', 'delete')
           res = interactor.delete_pm_product_variant(id)
           delete_grid_row(id, notice: res.message)

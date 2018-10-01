@@ -6,6 +6,5 @@ module DevelopmentApp
 
     optional(:id, :integer).filled(:int?)
     required(:contact_method_type, Types::StrippedString).filled(:str?)
-    required(:active, :bool).filled(:bool?)
   end
 end

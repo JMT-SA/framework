@@ -85,8 +85,7 @@ class Framework < Roda
 
       r.on 'edit' do   # EDIT
         check_auth!('material_resource', 'edit')
-        type = PackMaterialApp::ConfigRepo.new.find_full_party_role(id)&.role_type # Change view to get type from the id.
-        show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id, type) }
+        show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
@@ -96,7 +95,6 @@ class Framework < Roda
         r.patch do     # UPDATE
           return_json_response
           res = interactor.update_matres_product_variant_party_role(id, params[:matres_product_variant_party_role])
-          type = PackMaterialApp::ConfigRepo.new.find_full_party_role(id)&.role_type
           if res.success
             row_keys = %i[
               material_resource_product_variant_id
@@ -108,7 +106,7 @@ class Framework < Roda
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            content = show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id, type, form_values: params[:matres_product_variant_party_role], form_errors: res.errors) }
+            content = show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id, form_values: params[:matres_product_variant_party_role], form_errors: res.errors) }
             update_dialog_content(content: content, error: res.message)
           end
         end

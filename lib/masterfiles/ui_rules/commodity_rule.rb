@@ -19,7 +19,7 @@ module UiRules
       fields[:code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:hs_code] = { renderer: :label, caption: 'HS code' }
-      fields[:active] = { renderer: :checkbox }
+      fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields

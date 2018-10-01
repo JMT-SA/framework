@@ -23,7 +23,7 @@ module UiRules
       fields[:vat_number] = { renderer: :label }
       fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
       # fields[:variants] = { renderer: :label }
-      # fields[:active] = { renderer: :checkbox }
+      # fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -34,8 +34,7 @@ module UiRules
         long_description: {},
         vat_number: {},
         role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  }
-        # variants: {},
-        # active: { renderer: :checkbox }
+        # variants: {}
       }
     end
 

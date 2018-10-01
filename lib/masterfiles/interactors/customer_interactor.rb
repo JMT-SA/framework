@@ -52,7 +52,7 @@ module MasterfilesApp
     end
 
     def customer(id)
-      repo.find_full_customer(id)
+      repo.find_customer(id)
     end
 
     def validate_new_customer_params(params)

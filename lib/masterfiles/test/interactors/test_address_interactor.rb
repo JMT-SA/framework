@@ -112,17 +112,6 @@ module MasterfilesApp
       x = interactor.send(:validate_address_params, addr_attrs_without_country)
       expected = { country: ['must be a string'] }
       assert_equal(expected, x.errors)
-
-      # required(:active).maybe(:bool?)
-      addr_attrs_without_active = address_attrs.reject { |k, _| k == :active }
-      x = interactor.send(:validate_address_params, addr_attrs_without_active)
-      assert_equal(['is missing'], x.errors[:active])
-      refute_empty x.errors
-      addr_attrs_without_active[:active] = 'truthy'
-      x = interactor.send(:validate_address_params, addr_attrs_without_active)
-      refute_empty x.errors
-      expected = { active: ['must be boolean'] }
-      assert_equal(expected, x.errors)
     end
 
     def test_create_address
@@ -144,7 +133,8 @@ module MasterfilesApp
       x = interactor.update_address(1, invalid_address)
       assert_equal(false, x.success)
       # Gives validation failed response on fail
-      expected = interactor.validation_failed_response(OpenStruct.new(messages: { address_line_1: ['must be a string'] }, **invalid_address))
+      response_attrs = invalid_address.reject { |k| k == :active }
+      expected = interactor.validation_failed_response(OpenStruct.new(messages: { address_line_1: ['must be a string'] }, **response_attrs))
       assert_equal(expected, x)
 
       # Updates successfully

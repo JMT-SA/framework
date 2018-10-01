@@ -17,7 +17,6 @@ module Masterfiles
               form.remote! if remote
               form.add_field :code
               form.add_field :description
-              form.add_field :active
             end
           end
 

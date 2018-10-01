@@ -313,7 +313,7 @@ module MasterfilesApp
       2.times do
         type_ids << create_customer_type[:id]
       end
-      party_role_info = create_party_role('O', 'CUSTOMER')
+      party_role_info = create_party_role('O', MasterfilesApp::CUSTOMER_ROLE)
       attrs[:customer_type_ids] = type_ids
       attrs[:party_id] = party_role_info[:party_id]
       actual = repo.create_customer(attrs)
@@ -344,7 +344,7 @@ module MasterfilesApp
       2.times do
         type_ids << create_supplier_type[:id]
       end
-      party_role_info = create_party_role('O', 'SUPPLIER')
+      party_role_info = create_party_role('O', SUPPLIER_ROLE)
       attrs[:supplier_type_ids] = type_ids
       attrs[:party_id] = party_role_info[:party_id]
       actual = repo.create_supplier(attrs)
@@ -467,24 +467,24 @@ module MasterfilesApp
       assert actual[0].count == 2
     end
 
-    def test_find_full_customer
+    def test_find_customer
       customer = create_customer
-      full_customer = repo.find_full_customer(customer[:id])
-      assert_equal 'customer', full_customer.role_type
+      full_customer = repo.find_customer(customer[:id])
+      refute full_customer.supplier?
       assert full_customer.party_name
       assert full_customer.customer_type_ids
       assert full_customer.customer_types
-      assert full_customer.is_a?(CustomerWithName)
+      assert full_customer.is_a?(Customer)
     end
 
-    def test_find_full_supplier
+    def test_find_supplier
       supplier = create_supplier
-      full_supplier = repo.find_full_supplier(supplier[:id])
-      assert_equal 'supplier', full_supplier.role_type
+      full_supplier = repo.find_supplier(supplier[:id])
+      assert full_supplier.supplier?
       assert full_supplier.party_name
       assert full_supplier.supplier_type_ids
       assert full_supplier.supplier_types
-      assert full_supplier.is_a?(SupplierWithName)
+      assert full_supplier.is_a?(Supplier)
     end
 
     def test_add_party_name

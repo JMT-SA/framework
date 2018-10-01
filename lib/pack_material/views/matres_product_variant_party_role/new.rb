@@ -8,7 +8,7 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:matres_product_variant_party_role, :new, parent_id: parent_id, type: type, form_values: form_values)
           rules   = ui_rule.compile
 
-          supplier = type == 'supplier'
+          supplier = type == MasterfilesApp::SUPPLIER_ROLE
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values

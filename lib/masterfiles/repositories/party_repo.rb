@@ -33,10 +33,8 @@ module MasterfilesApp
     crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
     crud_calls_for :customer_types, name: :customer_type, wrapper: CustomerType
     crud_calls_for :customers, name: :customer, wrapper: Customer
-    # crud_calls_for :customers, name: :customer (wrapper not required if you rename find_full_customer to find_customer)
     crud_calls_for :supplier_types, name: :supplier_type, wrapper: SupplierType
     crud_calls_for :suppliers, name: :supplier, wrapper: Supplier
-    # crud_calls_for :suppliers, name: :supplier
 
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
@@ -250,7 +248,7 @@ module MasterfilesApp
       return { error: { customer_type_ids: ['You did not choose any customer types'] } } if customer_type_ids.empty?
 
       party_id = params.delete(:party_id)
-      party_role_id = create_party_role(party_id, 'CUSTOMER')[:id]
+      party_role_id = create_party_role(party_id, MasterfilesApp::CUSTOMER_ROLE)[:id]
       return { error: { base: ['You already have this party set up as a customer'] } } if party_role_id.nil?
 
       customer_id = create(:customers, params.merge(party_role_id: party_role_id))
@@ -292,7 +290,7 @@ module MasterfilesApp
       return { error: { supplier_type_ids: ['You did not choose any supplier types'] } } if supplier_type_ids.empty?
 
       party_id = params.delete(:party_id)
-      party_role_id = create_party_role(party_id, 'SUPPLIER')[:id]
+      party_role_id = create_party_role(party_id, SUPPLIER_ROLE)[:id]
       return { error: { base: ['You already have this party set up as a supplier'] } } if party_role_id.nil?
 
       supplier_id = create(:suppliers, params.merge(party_role_id: party_role_id))
@@ -354,14 +352,13 @@ module MasterfilesApp
           FROM suppliers'].all.map { |r| [r[:party_name], r[:id]] }
     end
 
-    def find_full_customer(id)
+    def find_customer(id)
       hash = find_hash(:customers, id)
       return nil if hash.nil?
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
-      hash[:role_type] = 'customer' # CAN BE REMOVED WHEN ENTITY CHANGED
       hash[:customer_type_ids] = customers_customer_type_ids(id)
       hash[:customer_types] = customers_customer_type_names(hash[:customer_type_ids])
-      CustomerWithName.new(hash)
+      Customer.new(hash)
     end
 
     def customers_customer_type_ids(customer_id)
@@ -372,14 +369,13 @@ module MasterfilesApp
       DB[:customer_types].where(id: customer_type_ids).select_map(:type_code)
     end
 
-    def find_full_supplier(id)
+    def find_supplier(id)
       hash = find_hash(:suppliers, id)
       return nil if hash.nil?
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
-      hash[:role_type] = 'supplier' # CAN BE REMOVED WHEN ENTITY CHANGED
       hash[:supplier_type_ids] = suppliers_supplier_type_ids(id)
       hash[:supplier_types] = suppliers_supplier_type_names(hash[:supplier_type_ids])
-      SupplierWithName.new(hash)
+      Supplier.new(hash)
     end
 
     def suppliers_supplier_type_ids(supplier_id)

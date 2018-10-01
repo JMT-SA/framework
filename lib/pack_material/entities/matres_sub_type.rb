@@ -10,7 +10,7 @@ module PackMaterialApp
     attribute :has_suppliers, Types::Bool
     attribute :has_marketers, Types::Bool
     attribute :has_retailers, Types::Bool
-    # attribute :active, Types::Bool
+    attribute :active, Types::Bool
     attribute :product_column_ids, Types::Array
     attribute :product_code_ids, Types::Array
     attribute :internal_seq, Types::Integer

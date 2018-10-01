@@ -103,13 +103,11 @@ class Framework < Roda
       end
       r.on 'product_columns' do
         check_auth!('configuration', 'edit')
-        # Move this into the Interactor. Use success/fail response with product_column_ids array as instance.
-        repo = PackMaterialApp::ConfigRepo.new
-        product_column_ids = repo.find_matres_sub_type(id).product_column_ids || []
-        if product_column_ids.any?
-          r.redirect "/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=#{id}&product_column_ids=#{product_column_ids}"
+        res = interactor.matres_sub_types_product_column_ids(id)
+        if res.success
+          r.redirect "/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=#{id}&product_column_ids=#{res.instance}"
         else
-          flash[:error] = 'No product columns selected, please see config.'
+          flash[:error] = res.message
           r.redirect '/list/material_resource_sub_types'
         end
       end
@@ -127,7 +125,6 @@ class Framework < Roda
               short_code
               long_name
               description
-              active
             ]
             update_grid_row(item_id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -160,9 +157,7 @@ class Framework < Roda
           res = interactor.create_matres_master_list_item(id, params[:matres_master_list_item])
           product_column_id = params[:matres_master_list_item][:material_resource_product_column_id]
           if res.success
-            repo = PackMaterialApp::ConfigRepo.new
-            items = repo.matres_sub_type_master_list_items(id, product_column_id)
-            items = items.map { |r| "#{r[:short_code]} #{r[:long_name] ? '- ' + r[:long_name] : ''}" }
+            items = interactor.matres_sub_type_master_list_items(id, product_column_id)
             json_actions([
                            OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_short_code', value: ''),
                            OpenStruct.new(type: :replace_input_value, dom_id: 'matres_master_list_item_long_name', value: ''),
@@ -174,7 +169,9 @@ class Framework < Roda
                          keep_dialog_open: true)
           else
             re_show_form(r, res, url: "/pack_material/config/material_resource_sub_types/#{id}/material_resource_master_list_items/new/#{product_column_id}") do
-              PackMaterial::Config::MatresMasterListItem::New.call(id, product_column_id, form_values: params[:matres_master_list_item],
+              PackMaterial::Config::MatresMasterListItem::New.call(id,
+                                                                   product_column_id,
+                                                                   form_values: params[:matres_master_list_item],
                                                                    form_errors: res.errors,
                                                                    remote: fetch?(r))
             end

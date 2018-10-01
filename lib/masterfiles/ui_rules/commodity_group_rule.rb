@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields
       fields[:code] = { renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:active] = { renderer: :checkbox }
+      fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields

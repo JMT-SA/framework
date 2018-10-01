@@ -16,7 +16,6 @@ module Development
               form.action '/development/masterfiles/contact_method_types'
               form.remote! if remote
               form.add_field :contact_method_type
-              form.add_field :active
             end
           end
 

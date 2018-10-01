@@ -103,7 +103,6 @@ module MasterfilesApp
       # OrganizationSchema = Dry::Validation.Params do
       #   # required(:party_id).filled(:int?)
       #   # required(:variants).maybe(:str?)
-      #   # required(:active).maybe(:bool?)
       # end
     end
 

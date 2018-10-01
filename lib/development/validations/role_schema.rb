@@ -6,6 +6,5 @@ module DevelopmentApp
 
     optional(:id, :integer).filled(:int?)
     required(:name, Types::StrippedString).filled(:str?)
-    required(:active, :bool).filled(:bool?)
   end
 end

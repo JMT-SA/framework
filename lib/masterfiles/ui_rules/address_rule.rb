@@ -22,7 +22,6 @@ module UiRules
       fields[:city] = { renderer: :label }
       fields[:postal_code] = { renderer: :label }
       fields[:country] = { renderer: :label }
-      # fields[:active] = { renderer: :checkbox }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 

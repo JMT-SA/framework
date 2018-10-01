@@ -37,11 +37,11 @@ module PackMaterialApp
       }
     end
 
-    def create_matres_product_variant_party_role(type = 'supplier', opts = {})
+    def create_matres_product_variant_party_role(type = MasterfilesApp::SUPPLIER_ROLE, opts = {})
       variant = create_material_resource_product_variant
       supplier = create_supplier
       customer = create_customer
-      supplier_type = type == 'supplier'
+      supplier_type = type == MasterfilesApp::SUPPLIER_ROLE
       supplier_id = supplier_type ? supplier[:id] : nil
       customer_id = supplier_type ? nil : customer[:id]
       default = {

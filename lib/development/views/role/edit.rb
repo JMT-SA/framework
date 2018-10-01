@@ -17,7 +17,6 @@ module Development
               form.remote!
               form.method :update
               form.add_field :name
-              form.add_field :active
             end
           end
 

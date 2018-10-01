@@ -40,7 +40,7 @@ module UiRules
       make_new_form_object && return if @mode == :new
       make_preselect_form_object && return if @mode == :preselect
 
-      @form_object = @repo.find_full_customer(@options[:id])
+      @form_object = @repo.find_customer(@options[:id])
     end
 
     def make_new_form_object

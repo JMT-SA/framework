@@ -42,7 +42,7 @@ module UiRules
       fields[:login_name] = { renderer: :label }
       fields[:user_name] = { renderer: :label }
       fields[:email] = { renderer: :label }
-      fields[:active] = { renderer: :checkbox }
+      fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields

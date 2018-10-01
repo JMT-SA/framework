@@ -11,7 +11,7 @@ module MasterfilesApp
       x = interactor.create_customer(party_id: 1)
       refute x.success
 
-      PartyRepo.any_instance.stubs(:find_full_customer).returns(fake_customer)
+      PartyRepo.any_instance.stubs(:find_customer).returns(fake_customer)
 
       exp = interactor.success_response('Created customer Customer Name', fake_customer)
       PartyRepo.any_instance.stubs(:create_customer).returns(OpenStruct.new(success: true))
@@ -36,7 +36,7 @@ module MasterfilesApp
       x = interactor.create_customer(party_id: 1)
       refute x.success
 
-      PartyRepo.any_instance.stubs(:find_full_customer).returns(fake_customer)
+      PartyRepo.any_instance.stubs(:find_customer).returns(fake_customer)
 
       exp = interactor.success_response('Updated customer Customer Name', fake_customer)
       PartyRepo.any_instance.stubs(:update_customer).returns(OpenStruct.new(success: true))
@@ -51,7 +51,7 @@ module MasterfilesApp
     end
 
     def test_delete_customer
-      PartyRepo.any_instance.stubs(:find_full_customer).returns(OpenStruct.new(party_name: 'Customer Name'))
+      PartyRepo.any_instance.stubs(:find_customer).returns(OpenStruct.new(party_name: 'Customer Name'))
       PartyRepo.any_instance.stubs(:delete_customer).returns(true)
 
       x = interactor.delete_customer(1)
@@ -169,7 +169,7 @@ module MasterfilesApp
 
     def test_customer
       expected = 'This is a full customer returned from the repo'
-      PartyRepo.any_instance.stubs(:find_full_customer).returns(expected)
+      PartyRepo.any_instance.stubs(:find_customer).returns(expected)
       actual = interactor.send(:customer, 1)
       assert_equal expected, actual
     end

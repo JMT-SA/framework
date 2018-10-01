@@ -22,7 +22,6 @@ module Masterfiles
               form.add_field :vat_number
               form.add_field :role_ids
               # form.add_field :variants
-              # form.add_field :active
             end
           end
 

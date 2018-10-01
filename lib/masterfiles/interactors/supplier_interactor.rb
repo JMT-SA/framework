@@ -52,7 +52,7 @@ module MasterfilesApp
     end
 
     def supplier(id)
-      repo.find_full_supplier(id)
+      repo.find_supplier(id)
     end
 
     def validate_new_supplier_params(params)

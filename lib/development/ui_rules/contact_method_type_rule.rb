@@ -16,7 +16,7 @@ module UiRules
 
     def set_show_fields
       fields[:contact_method_type] = { renderer: :label }
-      fields[:active] = { renderer: :checkbox }
+      fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields

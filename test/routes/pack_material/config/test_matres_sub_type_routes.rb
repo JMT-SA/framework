@@ -129,29 +129,16 @@ class TestMatresSubTypeRoutes < RouteTester
   def test_product_columns
     authorise_pass!
     ensure_exists!(INTERACTOR)
-
-    PackMaterialApp::ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns( OpenStruct.new({ product_column_ids: [1,2,3] }) )
-    # Change this to use something like the following: (Stub the interactor rather than the repo)
-    # INTERACTOR.any_instance.stubs(:whatever).returns(ok_response)
+    INTERACTOR.any_instance.stubs(:matres_sub_types_product_column_ids).returns(success_response('Success', [1,2,3]))
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }
     url = '/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=1&product_column_ids=[1, 2, 3]'
-    assert last_response.redirect?
-    assert_equal url, last_response.location
-    follow_redirect!
-    assert last_response.ok?
-    # Change the 4 lines above to this: (If you stub the interactor, the has_dummy_content can be removed.)
-    # expect_ok_redirect(url: url, has_dummy_content: false)
+    expect_ok_redirect(url: url, has_dummy_content: false)
 
-
-    PackMaterialApp::ConfigRepo.any_instance.stubs(:find_matres_sub_type).returns(OpenStruct.new({ product_column_ids: nil }))
+    INTERACTOR.any_instance.stubs(:matres_sub_types_product_column_ids).returns(failed_response('No product columns selected, please see config.'))
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }
     url = '/list/material_resource_sub_types'
     expect_flash_error('No product columns selected, please see config.')
-
-    assert last_response.redirect?
-    assert_equal url, last_response.location
-    follow_redirect!
-    assert last_response.ok?
+    expect_ok_redirect(url: url, has_dummy_content: false)
   end
 
   def test_master_list_items_edit

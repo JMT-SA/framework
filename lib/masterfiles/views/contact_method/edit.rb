@@ -18,7 +18,6 @@ module Masterfiles
               form.method :update
               form.add_field :contact_method_type_id
               form.add_field :contact_method_code
-              form.add_field :active
             end
           end
 

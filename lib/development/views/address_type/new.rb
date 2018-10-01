@@ -16,7 +16,6 @@ module Development
               form.action '/development/masterfiles/address_types'
               form.remote! if remote
               form.add_field :address_type
-              form.add_field :active
             end
           end
 

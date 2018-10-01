@@ -20,7 +20,7 @@ module PackMaterial
               form.add_field :has_suppliers
               form.add_field :has_marketers
               form.add_field :has_retailers
-              # form.add_field :active
+              form.add_field :active
             end
           end
 

@@ -19,7 +19,6 @@ module Masterfiles
               form.add_field :first_name
               form.add_field :surname
               form.add_field :vat_number
-              form.add_field :active
               form.add_field :role_ids
             end
           end

@@ -10,6 +10,5 @@ module PackMaterialApp
     optional(:short_code, Types::StrippedString).filled(:str?)
     required(:long_name, Types::StrippedString).maybe(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
-    optional(:active, :bool).filled(:bool?)
   end
 end

@@ -42,7 +42,7 @@ module PackMaterialApp
     end
 
     def link_name(instance)
-      "#{instance.role_type.capitalize}, #{instance.party_name}"
+      "#{instance.supplier? ? 'supplier' : 'customer'}, #{instance.party_name}"
     end
 
     private
@@ -52,7 +52,7 @@ module PackMaterialApp
     end
 
     def matres_product_variant_party_role(id)
-      repo.find_full_party_role(id)
+      repo.find_party_role(id)
     end
 
     def validate_matres_product_variant_party_role_params(params)

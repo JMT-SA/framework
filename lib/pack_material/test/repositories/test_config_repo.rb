@@ -344,13 +344,13 @@ module PackMaterialApp
       assert_equal 'Customer already exists', result.errors
     end
 
-    def test_find_full_party_role
+    def test_find_party_role
       customer = create_customer
-      role_link = create_matres_product_variant_party_role('customer', customer_id: customer[:id])
+      role_link = create_matres_product_variant_party_role(MasterfilesApp::CUSTOMER_ROLE, customer_id: customer[:id])
 
-      full_party_role = repo.find_full_party_role(role_link[:id])
-      assert full_party_role.is_a?(FullMatresProductVariantPartyRole)
-      assert_equal 'customer', full_party_role.role_type
+      full_party_role = repo.find_party_role(role_link[:id])
+      assert full_party_role.is_a?(MatresProductVariantPartyRole)
+      refute full_party_role.supplier?
 
       expected_name = DB["SELECT fn_party_role_name(#{customer[:party_role_id]}) as party_name"].first
       assert_equal expected_name[:party_name], full_party_role.party_name

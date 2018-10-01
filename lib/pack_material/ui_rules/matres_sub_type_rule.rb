@@ -21,10 +21,10 @@ module UiRules
       fields[:short_code] = { renderer: :label }
       fields[:internal_seq] = { renderer: :label }
       fields[:product_code_separator] = { renderer: :label }
-      fields[:has_suppliers] = { renderer: :checkbox }
-      fields[:has_marketers] = { renderer: :checkbox }
-      fields[:has_retailers] = { renderer: :checkbox }
-      # fields[:active] = { renderer: :checkbox }
+      fields[:has_suppliers] = { renderer: :label, as_boolean: true }
+      fields[:has_marketers] = { renderer: :label, as_boolean: true }
+      fields[:has_retailers] = { renderer: :label, as_boolean: true }
+      fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -36,7 +36,6 @@ module UiRules
         has_suppliers: { renderer: :checkbox },
         has_marketers: { renderer: :checkbox },
         has_retailers: { renderer: :checkbox }
-        # active: { renderer: :checkbox }
       }
     end
 

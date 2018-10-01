@@ -19,7 +19,6 @@ module Masterfiles
               form.add_field :code
               form.add_field :description
               form.add_field :hs_code
-              form.add_field :active
             end
           end
 

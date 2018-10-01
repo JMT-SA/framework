@@ -22,19 +22,19 @@ module UiRules
       fields[:party_name] = { renderer: :label, with_value: supplier ? supplier_name : customer_name, caption: 'Name', readonly: true }
       fields[:party_stock_code] = { renderer: :label, caption: 'Stock Code' }
       fields[:supplier_lead_time] = { renderer: :label, caption: 'Lead Time (days)' } if supplier
-      fields[:is_preferred_supplier] = { renderer: :checkbox } if supplier
+      fields[:is_preferred_supplier] = { renderer: :label, as_boolean: true } if supplier
     end
 
     def supplier_name
-      @party_repo.find_full_supplier(@form_object.supplier_id)&.party_name
+      @party_repo.find_supplier(@form_object.supplier_id)&.party_name
     end
 
     def customer_name
-      @party_repo.find_full_customer(@form_object.customer_id)&.party_name
+      @party_repo.find_customer(@form_object.customer_id)&.party_name
     end
 
     def form_fields
-      supplier = @options[:type] == 'supplier'
+      supplier = @repo.find_party_role(id)&.supplier? # I get type directly from the repo so that it can't be changed from the edit view
       {
         material_resource_product_variant_id: { renderer: :hidden, required: true },
         product_variant_code: { renderer: :label, with_value: product_variant.product_variant_code, readonly: true, caption: 'Product Code' },

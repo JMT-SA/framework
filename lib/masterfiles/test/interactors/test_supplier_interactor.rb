@@ -11,7 +11,7 @@ module MasterfilesApp
       x = interactor.create_supplier(party_id: 1)
       refute x.success
 
-      PartyRepo.any_instance.stubs(:find_full_supplier).returns(fake_supplier)
+      PartyRepo.any_instance.stubs(:find_supplier).returns(fake_supplier)
 
       exp = interactor.success_response('Created supplier Supplier Name', fake_supplier)
       PartyRepo.any_instance.stubs(:create_supplier).returns(OpenStruct.new(success: true))
@@ -36,7 +36,7 @@ module MasterfilesApp
       x = interactor.create_supplier(party_id: 1)
       refute x.success
 
-      PartyRepo.any_instance.stubs(:find_full_supplier).returns(fake_supplier)
+      PartyRepo.any_instance.stubs(:find_supplier).returns(fake_supplier)
 
       exp = interactor.success_response('Updated supplier Supplier Name', fake_supplier)
       PartyRepo.any_instance.stubs(:update_supplier).returns(OpenStruct.new(success: true))
@@ -51,7 +51,7 @@ module MasterfilesApp
     end
 
     def test_delete_supplier
-      PartyRepo.any_instance.stubs(:find_full_supplier).returns(OpenStruct.new(party_name: 'Supplier Name'))
+      PartyRepo.any_instance.stubs(:find_supplier).returns(OpenStruct.new(party_name: 'Supplier Name'))
       PartyRepo.any_instance.stubs(:delete_supplier).returns(true)
 
       x = interactor.delete_supplier(1)
@@ -169,7 +169,7 @@ module MasterfilesApp
 
     def test_supplier
       expected = 'This is a full supplier returned from the repo'
-      PartyRepo.any_instance.stubs(:find_full_supplier).returns(expected)
+      PartyRepo.any_instance.stubs(:find_supplier).returns(expected)
       actual = interactor.send(:supplier, 1)
       assert_equal expected, actual
     end

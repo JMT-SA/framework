@@ -328,7 +328,8 @@ module PackMaterialApp
         has_marketers: false,
         has_retailers: false,
         product_column_ids: [],
-        product_code_ids: []
+        product_code_ids: [],
+        active: true
       }
     end
 
@@ -440,6 +441,22 @@ module PackMaterialApp
       assert_instance_of MatresMasterListItem, x.instance
     end
 
+    def test_matres_sub_type_master_list_items #(sub_type_id, product_column_id)
+      skip 'todo'
+      # items = repo.matres_sub_type_master_list_items(sub_type_id, product_column_id)
+      # items.map { |r| "#{r[:short_code]} #{r[:long_name] ? '- ' + r[:long_name] : ''}" }
+    end
+
+    def test_matres_sub_types_product_column_ids #(sub_type_id)
+      skip 'todo'
+      # product_column_ids = repo.find_matres_sub_type(sub_type_id).product_column_ids || []
+      # if product_column_ids.any?
+      #   success_response('Success', product_column_ids)
+      # else
+      #   failed_response('No product columns selected, please see config.')
+      # end
+    end
+
     def matres_master_list_item_attrs
       {
         id: 1,
@@ -502,15 +519,15 @@ module PackMaterialApp
       x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(description: 1))
       assert_equal(['must be a string'], x.errors[:description])
 
-      # optional(:active, :bool).filled(:bool?)
-      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :active })
-      assert_nil x.errors[:active]
-
-      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(active: nil))
-      assert_equal(['must be filled'], x.errors[:active])
-
-      x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(active: 'string'))
-      assert_equal(['must be boolean'], x.errors[:active])
+      # # optional(:active, :bool).filled(:bool?)
+      # x = interactor.send(:validate_matres_master_list_item_params, test_attrs.reject { |k| k == :active })
+      # assert_nil x.errors[:active]
+      #
+      # x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(active: nil))
+      # assert_equal(['must be filled'], x.errors[:active])
+      #
+      # x = interactor.send(:validate_matres_master_list_item_params, test_attrs.merge(active: 'string'))
+      # assert_equal(['must be boolean'], x.errors[:active])
     end
 
     private

@@ -22,7 +22,6 @@ module Masterfiles
               form.add_field :city
               form.add_field :postal_code
               form.add_field :country
-              form.add_field :active
             end
           end
 

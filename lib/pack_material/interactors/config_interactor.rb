@@ -119,6 +119,11 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { short_code: ['This list item already exists'] }))
     end
 
+    def matres_sub_type_master_list_items(sub_type_id, product_column_id)
+      items = repo.matres_sub_type_master_list_items(sub_type_id, product_column_id)
+      items.map { |r| "#{r[:short_code]} #{r[:long_name] ? '- ' + r[:long_name] : ''}" }
+    end
+
     def update_matres_master_list_item(id, params)
       res = validate_matres_master_list_item_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -127,6 +132,15 @@ module PackMaterialApp
       end
       instance = matres_master_list_item(id)
       success_response("Updated list item #{instance.short_code}", instance)
+    end
+
+    def matres_sub_types_product_column_ids(sub_type_id)
+      product_column_ids = repo.find_matres_sub_type(sub_type_id).product_column_ids || []
+      if product_column_ids.any?
+        success_response('Success', product_column_ids)
+      else
+        failed_response('No product columns selected, please see config.')
+      end
     end
 
     private

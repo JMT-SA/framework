@@ -16,7 +16,6 @@ module Development
               form.action '/development/masterfiles/roles'
               form.remote! if remote
               form.add_field :name
-              form.add_field :active
             end
           end
 

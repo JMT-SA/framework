@@ -30,8 +30,7 @@ class Framework < Roda
           if res.success
             update_grid_row(id,
                             changes: { code: res.instance[:code],
-                                       description: res.instance[:description],
-                                       active: res.instance[:active] },
+                                       description: res.instance[:description] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Fruit::CommodityGroup::Edit.call(id, params[:commodity_group], res.errors) }
@@ -97,8 +96,7 @@ class Framework < Roda
                             changes: { commodity_group_id: res.instance[:commodity_group_id],
                                        code: res.instance[:code],
                                        description: res.instance[:description],
-                                       hs_code: res.instance[:hs_code],
-                                       active: res.instance[:active] },
+                                       hs_code: res.instance[:hs_code] },
                             notice:  res.message)
           else
             content = show_partial { Masterfiles::Fruit::Commodity::Edit.call(id, params[:commodity], res.errors) }

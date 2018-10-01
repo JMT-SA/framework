@@ -20,7 +20,7 @@ module UiRules
       fields[:first_name] = { renderer: :label }
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      fields[:active] = { renderer: :checkbox }
+      fields[:active] = { renderer: :label, as_boolean: true }
       fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
     end
 

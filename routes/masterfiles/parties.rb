@@ -32,8 +32,7 @@ class Framework < Roda
                                            medium_description: res.instance[:medium_description],
                                            long_description: res.instance[:long_description],
                                            vat_number: res.instance[:vat_number],
-                                           variants: res.instance[:variants],
-                                           active: res.instance[:active] },
+                                           variants: res.instance[:variants] },
                                 notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
@@ -157,8 +156,7 @@ class Framework < Roda
                                        address_line_3: res.instance[:address_line_3],
                                        city: res.instance[:city],
                                        postal_code: res.instance[:postal_code],
-                                       country: res.instance[:country],
-                                       active: res.instance[:active] },
+                                       country: res.instance[:country] },
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Parties::Address::Edit.call(id, params[:address], res.errors) }
@@ -216,8 +214,7 @@ class Framework < Roda
           if res.success
             update_grid_row(id,
                             changes: { contact_method_type_id: res.instance[:contact_method_type_id],
-                                       contact_method_code: res.instance[:contact_method_code],
-                                       active: res.instance[:active] },
+                                       contact_method_code: res.instance[:contact_method_code] },
                             notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::ContactMethod::Edit.call(id, params[:contact_method], res.errors) }
@@ -301,8 +298,7 @@ class Framework < Roda
           return_json_response
           res = interactor.update_customer_type(id, params[:customer_type])
           if res.success
-            update_grid_row(id, changes: { type_code: res.instance[:type_code] },
-                            notice: res.message)
+            update_grid_row(id, changes: { type_code: res.instance[:type_code] }, notice: res.message)
           else
             content = show_partial { Masterfiles::Parties::CustomerType::Edit.call(id, form_values: params[:customer_type], form_errors: res.errors) }
             update_dialog_content(content: content, error: res.message)

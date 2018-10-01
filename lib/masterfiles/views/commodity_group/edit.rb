@@ -18,7 +18,6 @@ module Masterfiles
               form.method :update
               form.add_field :code
               form.add_field :description
-              form.add_field :active
             end
           end
 

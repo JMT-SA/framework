@@ -1,8 +1,8 @@
 module MiniTestSeeds
   def db_create_roles
     # roles
-    cus_id = DB[:roles].insert(name: 'CUSTOMER')
-    sup_id = DB[:roles].insert(name: 'SUPPLIER')
+    cus_id = DB[:roles].insert(name: MasterfilesApp::CUSTOMER_ROLE)
+    sup_id = DB[:roles].insert(name: MasterfilesApp::SUPPLIER_ROLE)
     mar_id = DB[:roles].insert(name: 'MARKETER')
     ret_id = DB[:roles].insert(name: 'RETAILER')
     @fixed_table_set[:roles] = { customer: { id: cus_id },

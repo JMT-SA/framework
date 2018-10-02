@@ -300,5 +300,18 @@ class TestBaseRepo < MiniTestWithHooks
                                                                       { sub_table: :program_functions }])
     assert_equal 2, res[:users].length
     assert_equal 1, res[:program_functions].length
+
+    # Parent association
+    res = repo.find_with_association(:programs, prog_id, parent_tables: [{ parent_table: :functional_areas, columns: [:functional_area_name] }])
+    assert_equal 'F-TEST1', res[:functional_area][:functional_area_name]
+
+    # Parent association - flattened columns
+    res = repo.find_with_association(:programs, prog_id, parent_tables: [{ parent_table: :functional_areas, columns: [:functional_area_name],
+                                                                           flatten_columns: { functional_area_name: :funcname } }])
+    assert_equal 'F-TEST1', res[:funcname]
+
+    # Function lookup
+    res = repo.find_with_association(:programs, prog_id, lookup_functions: [{ function: :fn_party_role_name, args: [:functional_area_id], col_name: :customer_name }])
+    assert res.keys.include?(:customer_name)
   end
 end

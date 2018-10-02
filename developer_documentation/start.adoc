@@ -34,6 +34,7 @@ The following special environment variables are available when running the app:
 * How to link:/developer_documentation/how_to_use_multiselect_grid.adoc[use a multiselect grid].
 * How to link:/developer_documentation/how_to_use_repositories.adoc[use repositories].
 * How to link:/developer_documentation/how_to_do_dry_validation.adoc[do dry validation].
+* How to link:/developer_documentation/how_to_populate_entity_with_associated_entities.adoc[populate an entity with associated entities].
 * How to disable/enable a field based on the value of another field.
 * How to layout a multi-column form.
 * How to layout a page to include a form and a grid.

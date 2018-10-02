@@ -96,7 +96,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB.select(1).where(DB[table_name].where(args).exists).one?
   end
 
-  # Find a row in a table with one or more associated sub-tables.
+  # Find a row in a table with one or more associated sub-tables, parent tables or lookup functions.
   # Returns nil if the row is not found.
   # Returns a Hash if no wrapper is provided, else an instance of the wrapper class.
   #
@@ -116,13 +116,33 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #     find_with_association(:programs, 123, sub_tables: [{ sub_table: :program_functions },
   #                                                        { sub_table: :users, uses_join_table: true, active_only: true, columns: [:id, :user_name] }])
   #
+  # Each Hash in the parent_tables array must include:
+  # parent_table: Symbol - If no :columns array provided, returns all columns.
+  #
+  # Optional keys:
+  # columns: Array of Symbols - one for each desired column. If not present, all columns are returned
+  # flatten_columns: Hash of Symbol => Symbol - key is the column in the parent and value is the new name to be used on the entity.
+  #
+  # examples:
+  #     find_with_association(:programs, prog_id, parent_tables: [{ parent_table: :functional_areas, columns: [:functional_area_name] }])
+  #
+  # Each Hash in the lookup_functions array must include:
+  # function: Symbol - the name of the function to call.
+  # args: Array of Symbols for values from the main table or of literals to be used as arguments for the function.
+  # col_name: Symbol - the name to be used for the value that the function returns.
+  #
+  # examples:
+  #     find_with_association(:customers, 123, lookup_functions: [{ function: :fn_party_role_name, args: [:party_role_id], col_name: :customer_name }])
+  #
   # @param table_name [Symbol] the db table name.
   # @param id [Integer] the id of the row.
   # @param sub_tables [Array] the rules for how to find associated rows.
+  # @param parent_tables [Array] the rules for how to find associated parent values.
+  # @param lookup_functions [Array] the rules for how to find values via SQL functions (e.g. party_name)
   # @param wrapper [Class, nil] the class of the object to return.
   # @return [Object, nil, Hash] the row wrapped in a new wrapper object or as a Hash.
-  def find_with_association(table_name, id, sub_tables: [], wrapper: nil)
-    BaseRepoAssocationFinder.new(table_name, id, sub_tables: sub_tables, wrapper: wrapper).call
+  def find_with_association(table_name, id, sub_tables: [], parent_tables: [], lookup_functions: [], wrapper: nil) # rubocop:disable Metrics/ParameterLists
+    BaseRepoAssocationFinder.new(table_name, id, sub_tables: sub_tables, parent_tables: parent_tables, lookup_functions: lookup_functions, wrapper: wrapper).call
   end
 
   # Create a record.

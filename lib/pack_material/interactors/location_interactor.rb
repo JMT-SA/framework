@@ -34,7 +34,6 @@ module PackMaterialApp
       return validation_failed_response(res) unless res.messages.empty?
       id = nil
       repo.transaction do
-        p ">>> INT: #{parent_id}"
         id = repo.create_child_location(parent_id, res)
         log_transaction
       end

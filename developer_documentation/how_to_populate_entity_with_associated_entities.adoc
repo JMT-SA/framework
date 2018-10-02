@@ -1,0 +1,151 @@
+= How to populate an entity with associated entities
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to populate an entity with associated entities
+
+Sometimes there is a need to work with an entity and its associations without doing several separate database requests to build up a chunk of data.
+The method `find_with_association` as defined on `BaseRepo` can be used to return an entity along with any number of "has_many" or "belongs_to" attributes.
+
+In a repo that inherits from `BaseRepo`, methods (that only receive an `id` parameter) should be writen to call this method. i.e. it should not be called directly from any non-repo code.
+
+The method has the following features:
+
+* Can return a Hash or an entity.
+* Called with just a tablename and id parameter, it behaves just like `repo.find_hash`.
+* Called with just a tablename, id and wrapper parameter, it behaves just like `repo.find`.
+* Can include attributes from one or more sub-tables in arrays in the result. *(has_many)*
+* Can include attributes from one or more parent-tables in the result. *(belongs_to)*
+* Can include attributes from one or more lookup functions in the result.
+
+=== General
+
+Method signature:
+
+[source,ruby]
+----
+find_with_association(table_name,
+                      id,
+                      sub_tables: [],
+                      parent_tables: [],
+                      lookup_functions: [],
+                      wrapper: nil)
+----
+
+* Parameters `table_name` and `id` are required.
+* Returns nil if the row is not found.
+* Returns a Hash if no `wrapper` is provided.
+* Returns an instance of the `wrapper` if it is provided.
+
+=== Sub-tables
+
+The `:sub_tables` parameter specifies rules for returning associated sub-table data.
+
+Each Hash in the sub_tables array must include:
+
+* `sub_table`: Symbol - if no other options provided, assumes that the sub table has a column named "main_table_id" and all columns are returned.
+
+Optional keys:
+
+* `columns`: Array of Symbols - one for each desired column. If not present, all columns are returned
+* `uses_join_table`: Boolean - if true, will create a join table name using main_table and sub_table names sorted and joined with "_".
+* `join_table`: String - if present, use this as the join table.
+* `active_only`: Boolean (Only return active rows.)
+* `inactive_only`: Boolean (Only return inactive rows. The key in the main hash becomes `:inactive_sub_table`)
+
+examples:
+[source,ruby]
+----
+# Return a SecurityGRoupWithPermissions entity.
+# Link via a join table - derived by combining main table and sub table names.
+find_with_association(:security_groups,
+                      123,
+                      sub_tables: [{ sub_table: :security_groups,
+                                     uses_join_table: true }],
+                      SecurityGroupWithPermissions)
+
+# Return a Hash.
+# Link via a named join table.
+find_with_association(:security_groups,
+                      123,
+                      sub_tables: [{ sub_table: :security_groups,
+                      join_table: :security_groups_security_permissions }])
+
+# Two sub-tables.
+# One uses a join table, the other does not.
+# One returns active rows only.
+# One limits the returned columns.
+find_with_association(:programs,
+                      123,
+                      sub_tables: [{ sub_table: :program_functions },
+                                   { sub_table: :users,
+                                     uses_join_table: true,
+                                     active_only: true,
+                                     columns: [:id, :user_name] }])
+----
+
+=== Parent tables
+
+Each Hash in the parent_tables array must include:
+
+* `parent_table`: Symbol - If no :columns array provided, returns all columns.
+
+Optional keys:
+
+* `columns`: Array of Symbols - one for each desired column. If not present, all columns are returned
+* `flatten_columns`: Hash of Symbol => Symbol - key is the column in the parent and value is the new name to be used on the entity.
+
+examples:
+[source,ruby]
+----
+find_with_association(:programs,
+                      123,
+                      parent_tables: [{ parent_table: :functional_areas,
+                                        columns: [:functional_area_name] }])
+----
+
+=== Lookup functions
+
+Each Hash in the lookup_functions array must include:
+
+* `function`: Symbol - the name of the function to call.
+* `args`: Array of Symbols for values from the main table or of literals to be used as arguments for the function.
+* `col_name`: Symbol - the name to be used for the value that the function returns.
+
+examples:
+[source,ruby]
+----
+find_with_association(:customers,
+                      123,
+                      lookup_functions: [{ function: :fn_party_role_name,
+                                           args: [:party_role_id],
+                                           col_name: :customer_name }])
+----
+
+=== Entity example
+
+Here is an example of an entity with associated data.
+
+[source,ruby]
+----
+class SecurityGroupWithPermissions < Dry::Struct
+  attribute :id, Types::Integer
+  attribute :security_group_name, Types::String
+
+  attribute :security_permissions, Types::Array.default([]) do   # <1>
+    attribute :id, Types::Integer
+    attribute :security_permission, Types::String
+  end
+
+  attribute :parent_assoc do                                     # <2>
+    attribute :code, Types::String
+  end
+
+  attribute :customer_name_from_function, Types::String          # <3>
+end
+----
+
+<1> Array for sub-tables. Note the default empty array - this makes the whole thing optional.
+<2> Attributes from a parent table.
+<3> The result of a function call.

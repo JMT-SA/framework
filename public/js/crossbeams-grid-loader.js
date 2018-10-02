@@ -42,12 +42,9 @@ const crossbeamsGridStore = {
    */
   listGridIds: function listGridIds() {
     const lst = [];
-    this.gridStore.forEach((gridId) => {
+    Object.keys(this.gridStore).forEach((gridId) => {
       lst.push(gridId);
     });
-    // for (gridId in this.gridStore) {
-    //   lst.push(gridId);
-    // }
     return lst.join(', ');
   },
 };

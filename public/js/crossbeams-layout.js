@@ -133,6 +133,9 @@
       }
       // Open modal dialog
       if (event.target.dataset && event.target.dataset.popupDialog) {
+        if (event.target.dataset.gridId) {
+          crossbeamsUtils.recordGridIdForPopup(event.target.dataset.gridId);
+        }
         crossbeamsUtils.popupDialog(event.target.text, event.target.href);
         event.stopPropagation();
         event.preventDefault();

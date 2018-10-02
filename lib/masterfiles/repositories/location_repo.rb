@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterialApp
+module MasterfilesApp
   class LocationRepo < BaseRepo
     build_for_select :locations,
                      label: :location_code,

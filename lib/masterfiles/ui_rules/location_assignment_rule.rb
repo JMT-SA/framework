@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LocationStorageTypeRule < Base
+  class LocationAssignmentRule < Base
     def generate_rules
-      @repo = PackMaterialApp::LocationRepo.new
+      @repo = MasterfilesApp::LocationRepo.new
       make_form_object
       apply_form_values
 
@@ -11,27 +11,27 @@ module UiRules
 
       set_show_fields if @mode == :show
 
-      form_name 'location_storage_type'
+      form_name 'location_assignment'
     end
 
     def set_show_fields
-      fields[:storage_type_code] = { renderer: :label }
+      fields[:assignment_code] = { renderer: :label }
     end
 
     def common_fields
       {
-        storage_type_code: { required: true }
+        assignment_code: { required: true }
       }
     end
 
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find_location_storage_type(@options[:id])
+      @form_object = @repo.find_location_assignment(@options[:id])
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(storage_type_code: nil)
+      @form_object = OpenStruct.new(assignment_code: nil)
     end
   end
 end

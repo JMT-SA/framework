@@ -2,7 +2,7 @@
 :dataminer_definition: location_storage_types
 :multiselect:
   :locations:
-    :url: "/pack_material/locations/locations/$:id$/link_storage_types"
+    :url: "/masterfiles/locations/locations/$:id$/link_storage_types"
     :preselect: "SELECT location_storage_type_id AS id FROM location_storage_types_locations WHERE location_id = $:id$"
     :section_caption: "SELECT 'Location storage types for ' || location_code FROM locations WHERE id = $:id$"
     :multiselect_save_method: remote

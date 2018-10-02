@@ -9,7 +9,7 @@ class TestLocationRoutes < RouteTester
   def test_edit
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterial::Locations::Location::Edit.stub(:call, bland_page) do
+    Masterfiles::Locations::Location::Edit.stub(:call, bland_page) do
       get 'pack_material/locations/locations/1/edit', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
@@ -25,7 +25,7 @@ class TestLocationRoutes < RouteTester
   def test_show
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterial::Locations::Location::Show.stub(:call, bland_page) do
+    Masterfiles::Locations::Location::Show.stub(:call, bland_page) do
       get 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
@@ -52,7 +52,7 @@ class TestLocationRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_location).returns(bad_response)
-    PackMaterial::Locations::Location::Edit.stub(:call, bland_page) do
+    Masterfiles::Locations::Location::Edit.stub(:call, bland_page) do
       patch_as_fetch 'pack_material/locations/locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog(has_error: true)
@@ -69,7 +69,7 @@ class TestLocationRoutes < RouteTester
   def test_new
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    PackMaterial::Locations::Location::New.stub(:call, bland_page) do
+    Masterfiles::Locations::Location::New.stub(:call, bland_page) do
       get  'pack_material/locations/locations/new', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
@@ -103,22 +103,22 @@ class TestLocationRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_root_location).returns(bad_response)
-    PackMaterial::Locations::Location::New.stub(:call, bland_page) do
+    Masterfiles::Locations::Location::New.stub(:call, bland_page) do
       post_as_fetch 'pack_material/locations/locations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_bad_page
 
-    PackMaterial::Locations::Location::New.stub(:call, bland_page) do
+    Masterfiles::Locations::Location::New.stub(:call, bland_page) do
       post 'pack_material/locations/locations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
-    expect_bad_redirect(url: '/pack_material/locations/locations/new')
+    expect_bad_redirect(url: '/masterfiles/locations/locations/new')
   end
 
   def test_create_root_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_root_location).returns(bad_response)
-    PackMaterial::Locations::Location::New.stub(:call, bland_page) do
+    Masterfiles::Locations::Location::New.stub(:call, bland_page) do
       post_as_fetch 'pack_material/locations/locations', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog

@@ -4,11 +4,11 @@
 # rubocop:disable Metrics/BlockLength
 
 class Framework < Roda
-  route 'locations', 'pack_material' do |r|
+  route 'locations', 'masterfiles' do |r|
     # LOCATIONS
     # --------------------------------------------------------------------------
     r.on 'locations', Integer do |id|
-      interactor = PackMaterialApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:locations, id) do
@@ -17,12 +17,12 @@ class Framework < Roda
 
       r.on 'edit' do   # EDIT
         check_auth!('locations', 'edit')
-        show_partial { PackMaterial::Locations::Location::Edit.call(id) }
+        show_partial { Masterfiles::Locations::Location::Edit.call(id) }
       end
       r.on 'add_child' do   # NEW CHILD
         r.get do
           check_auth!('locations', 'edit')
-          show_partial { PackMaterial::Locations::Location::New.call(id: id) }
+          show_partial { Masterfiles::Locations::Location::New.call(id: id) }
         end
         r.post do
           res = interactor.create_location(id, params[:location])
@@ -30,11 +30,11 @@ class Framework < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res, url: "/pack_material/locations/locations/#{id}/add_child") do
-              PackMaterial::Locations::Location::New.call(id: id,
-                                                          form_values: params[:location],
-                                                          form_errors: res.errors,
-                                                          remote: fetch?(r))
+            re_show_form(r, res, url: "/masterfiles/locations/locations/#{id}/add_child") do
+              Masterfiles::Locations::Location::New.call(id: id,
+                                                         form_values: params[:location],
+                                                         form_errors: res.errors,
+                                                         remote: fetch?(r))
             end
           end
         end
@@ -64,7 +64,7 @@ class Framework < Roda
       r.is do
         r.get do       # SHOW
           check_auth!('locations', 'read')
-          show_partial { PackMaterial::Locations::Location::Show.call(id) }
+          show_partial { Masterfiles::Locations::Location::Show.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_location(id, params[:location])
@@ -81,7 +81,7 @@ class Framework < Roda
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { PackMaterial::Locations::Location::Edit.call(id, form_values: params[:location], form_errors: res.errors) }
+            re_show_form(r, res) { Masterfiles::Locations::Location::Edit.call(id, form_values: params[:location], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
@@ -98,10 +98,10 @@ class Framework < Roda
     end
 
     r.on 'locations' do
-      interactor = PackMaterialApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         check_auth!('locations', 'new')
-        show_partial_or_page(r) { PackMaterial::Locations::Location::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Masterfiles::Locations::Location::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_root_location(params[:location])
@@ -109,10 +109,10 @@ class Framework < Roda
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         else
-          re_show_form(r, res, url: '/pack_material/locations/locations/new') do
-            PackMaterial::Locations::Location::New.call(form_values: params[:location],
-                                                        form_errors: res.errors,
-                                                        remote: fetch?(r))
+          re_show_form(r, res, url: '/masterfiles/locations/locations/new') do
+            Masterfiles::Locations::Location::New.call(form_values: params[:location],
+                                                       form_errors: res.errors,
+                                                       remote: fetch?(r))
           end
         end
       end

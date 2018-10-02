@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterial
+module Masterfiles
   module Locations
     module Location
       class Show

@@ -6,23 +6,23 @@
   :suppress_node_counts: false
   :groupDefaultExpanded: 2
 :actions:
-- :url: "/pack_material/locations/locations/$:id$"
+- :url: "/masterfiles/locations/locations/$:id$"
   :text: view
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/pack_material/locations/locations/$:id$/edit"
+- :url: "/masterfiles/locations/locations/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/pack_material/locations/locations/$:id$"
+- :url: "/masterfiles/locations/locations/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
 - :separator: true
-- :url: "/pack_material/locations/locations/$:id$/add_child"
+- :url: "/masterfiles/locations/locations/$:id$/add_child"
   :text: New sub-location
   :icon: add-solid
   :title: New sub-location
@@ -37,7 +37,7 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/pack_material/locations/locations/new"
+  :url: "/masterfiles/locations/locations/new"
   :text: New Location
   :style: :button
   :behaviour: :popup  

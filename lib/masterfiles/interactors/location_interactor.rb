@@ -1,19 +1,7 @@
 # frozen_string_literal: true
 
-module PackMaterialApp
+module MasterfilesApp
   class LocationInteractor < BaseInteractor
-    def repo
-      @repo ||= LocationRepo.new
-    end
-
-    def location(id)
-      repo.find_location(id)
-    end
-
-    def validate_location_params(params)
-      LocationSchema.call(params)
-    end
-
     def create_root_location(params)
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -82,6 +70,20 @@ module PackMaterialApp
       end
       return res unless res.success
       success_response('Storage types linked successfully')
+    end
+
+    private
+
+    def repo
+      @repo ||= LocationRepo.new
+    end
+
+    def location(id)
+      repo.find_location(id)
+    end
+
+    def validate_location_params(params)
+      LocationSchema.call(params)
     end
   end
 end

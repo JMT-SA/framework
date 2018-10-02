@@ -2,7 +2,7 @@
 :dataminer_definition: location_assignments
 :multiselect:
   :locations:
-    :url: "/pack_material/locations/locations/$:id$/link_assignments"
+    :url: "/masterfiles/locations/locations/$:id$/link_assignments"
     :preselect: "SELECT location_assignment_id AS id FROM location_assignments_locations WHERE location_id = $:id$"
     :section_caption: "SELECT 'Location assignments for ' || location_code FROM locations WHERE id = $:id$"
     :multiselect_save_method: remote

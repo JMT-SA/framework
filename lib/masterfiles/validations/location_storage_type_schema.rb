@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterialApp
+module MasterfilesApp
   LocationStorageTypeSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 

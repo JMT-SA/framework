@@ -3,7 +3,7 @@
 module UiRules
   class LocationRule < Base
     def generate_rules
-      @repo = PackMaterialApp::LocationRepo.new
+      @repo = MasterfilesApp::LocationRepo.new
       make_form_object
       apply_form_values
 
@@ -17,9 +17,9 @@ module UiRules
     private
 
     def set_show_fields
-      primary_storage_type_id_label = @repo.find(:location_storage_types, PackMaterialApp::LocationStorageType, @form_object.primary_storage_type_id)&.storage_type_code
-      location_type_id_label = @repo.find(:location_types, PackMaterialApp::LocationType, @form_object.location_type_id)&.location_type_code
-      primary_assignment_id_label = @repo.find(:location_assignments, PackMaterialApp::LocationAssignment, @form_object.primary_assignment_id)&.assignment_code
+      primary_storage_type_id_label = @repo.find(:location_storage_types, MasterfilesApp::LocationStorageType, @form_object.primary_storage_type_id)&.storage_type_code
+      location_type_id_label = @repo.find(:location_types, MasterfilesApp::LocationType, @form_object.location_type_id)&.location_type_code
+      primary_assignment_id_label = @repo.find(:location_assignments, MasterfilesApp::LocationAssignment, @form_object.primary_assignment_id)&.assignment_code
 
       fields[:primary_storage_type_id] = { renderer: :label, with_value: primary_storage_type_id_label, caption: 'Primary Storage Type' }
       fields[:location_type_id] = { renderer: :label, with_value: location_type_id_label, caption: 'Location Type' }

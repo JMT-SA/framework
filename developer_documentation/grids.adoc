@@ -92,7 +92,7 @@ This example will display an anchor (`<a>`) styled as a button that will render 
 [source,yaml]
 ----
 - :control_type: :link
-  :url: "/pack_material/locations/locations/new"
+  :url: "/masterfiles/locations/locations/new"
   :text: New Location
   :style: :button
   :behaviour: :popup

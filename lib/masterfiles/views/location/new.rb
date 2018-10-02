@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterial
+module Masterfiles
   module Locations
     module Location
       class New
@@ -8,7 +8,7 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:location, :new, form_values: form_values)
           rules   = ui_rule.compile
 
-          action = id.nil? ? '/pack_material/locations/locations' : "/pack_material/locations/locations/#{id}/add_child"
+          action = id.nil? ? '/masterfiles/locations/locations' : "/masterfiles/locations/locations/#{id}/add_child"
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object

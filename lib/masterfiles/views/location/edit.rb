@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterial
+module Masterfiles
   module Locations
     module Location
       class Edit
@@ -13,7 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/pack_material/locations/locations/#{id}"
+              form.action "/masterfiles/locations/locations/#{id}"
               form.remote!
               form.method :update
               form.add_field :primary_storage_type_id

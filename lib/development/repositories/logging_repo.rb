@@ -2,7 +2,7 @@
 
 module DevelopmentApp
   class LoggingRepo < BaseRepo
-    crud_calls_for :logged_action_details, name: :logged_action_detail, wrapper: LoggedActionDetail
+    crud_calls_for :logged_action_details, name: :logged_action_detail, wrapper: LoggedActionDetail, schema: :audit
 
     def find_logged_action_hash(id)
       where_hash(Sequel[:audit][:logged_actions], event_id: id)

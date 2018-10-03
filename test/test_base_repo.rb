@@ -227,22 +227,47 @@ class TestBaseRepo < MiniTestWithHooks
 
   def test_crud_calls_without_wrapper
     klass = Class.new(BaseRepo)
-    klass.crud_calls_for(:tablename)
+    klass.crud_calls_for(:users)
     repo = klass.new
-    assert_respond_to repo, :create_tablename
-    assert_respond_to repo, :update_tablename
-    assert_respond_to repo, :delete_tablename
-    refute_respond_to repo, :find_tablename
+    assert_respond_to repo, :create_users
+    assert_respond_to repo, :update_users
+    assert_respond_to repo, :delete_users
+    refute_respond_to repo, :find_users
+  end
+
+  def test_crud_calls_fails_for_table_that_does_not_exist
+    klass = Class.new(BaseRepo)
+    assert_raises(ArgumentError) { klass.crud_calls_for(:some_table_no_one_would_want_to_create) }
+  end
+
+  def test_crud_calls_with_schema
+    klass = Class.new(BaseRepo)
+    klass.crud_calls_for(:users, schema: :public)
+    repo = klass.new
+    assert_respond_to repo, :create_users
+    assert_respond_to repo, :update_users
+    assert_respond_to repo, :delete_users
+    refute_respond_to repo, :find_users
+  end
+
+  def test_crud_calls_with_exclusion
+    klass = Class.new(BaseRepo)
+    klass.crud_calls_for(:users, exclude: %i[update delete])
+    repo = klass.new
+    assert_respond_to repo, :create_users
+    refute_respond_to repo, :update_users
+    refute_respond_to repo, :delete_users
+    refute_respond_to repo, :find_users
   end
 
   def test_crud_calls
     klass = Class.new(BaseRepo)
-    klass.crud_calls_for(:tablename, wrapper: DevelopmentApp::User)
+    klass.crud_calls_for(:users, wrapper: DevelopmentApp::User)
     repo = klass.new
-    assert_respond_to repo, :create_tablename
-    assert_respond_to repo, :update_tablename
-    assert_respond_to repo, :delete_tablename
-    assert_respond_to repo, :find_tablename
+    assert_respond_to repo, :create_users
+    assert_respond_to repo, :update_users
+    assert_respond_to repo, :delete_users
+    assert_respond_to repo, :find_users
   end
 
   def test_find_with_associations

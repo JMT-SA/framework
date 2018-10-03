@@ -307,7 +307,7 @@ module MethodBuilder
   # Call like this: +crud_calls_for+ :table_name.
   #
   # This creates find_name, create_name, update_name and delete_name methods for the repo.
-  # There are 2 optional params.
+  # There are a few optional params allowed.
   #
   #     crud_calls_for :table_name, name: :table, wrapper: Table
   #
@@ -325,33 +325,38 @@ module MethodBuilder
   # - The wrapper class. If not provided, there will be no +find_+ method.
   # exclude: Array
   # - A list of symbols to exclude (:create, :update, :delete)
-  def crud_calls_for(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+  # schema: Symbol
+  # - The schema to which the table belongs if not "public".
+  def crud_calls_for(table_name, options = {}) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, Metrics/AbcSize
     name    = options[:name] || table_name
     wrapper = options[:wrapper]
     skip    = options[:exclude] || []
 
+    table_with_schema = options[:schema] ? Sequel[options[:schema]][table_name] : table_name
+    raise ArgumentError, "Crud calls for: Table #{table_name} does not exist" unless DB.table_exists?(table_with_schema)
+
     unless wrapper.nil?
       define_method(:"find_#{name}") do |id|
-        find(table_name, wrapper, id)
+        find(table_with_schema, wrapper, id)
       end
     end
 
     unless skip.include?(:create)
       define_method(:"create_#{name}") do |attrs|
-        create(table_name, attrs)
+        create(table_with_schema, attrs)
       end
     end
 
     unless skip.include?(:update)
       define_method(:"update_#{name}") do |id, attrs|
-        update(table_name, id, attrs)
+        update(table_with_schema, id, attrs)
       end
     end
 
     return if skip.include?(:delete)
 
     define_method(:"delete_#{name}") do |id|
-      delete(table_name, id)
+      delete(table_with_schema, id)
     end
   end
 end

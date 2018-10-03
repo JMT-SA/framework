@@ -827,10 +827,7 @@ class GenerateNewScaffold < BaseService
             end
 
             def test_crud_calls
-              assert_respond_to repo, :find_#{opts.singlename}
-              assert_respond_to repo, :create_#{opts.singlename}
-              assert_respond_to repo, :update_#{opts.singlename}
-              assert_respond_to repo, :delete_#{opts.singlename}
+              test_crud_calls_for :#{opts.table}, name: :#{opts.singlename}, wrapper: #{opts.classnames[:class]}
             end
 
             private

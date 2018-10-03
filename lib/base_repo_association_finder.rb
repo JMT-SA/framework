@@ -16,14 +16,15 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     @inflector = Dry::Inflector.new
   end
 
-  # Get the entity for the given id.
+  # Get the entity for the given id (include function lookups if any are provided).
   # Then use the provided rules to add sub-table or parent table attributes to the entity.
   # Return as a Hash - unless a wrapper object was provided.
   def call
-    @rec = DB[@main_table].where(id: @id).first
+    @dataset = DB[@main_table]
+    apply_lookup_functions
+    @rec = @dataset.where(id: @id).first
     return nil if @rec.nil?
 
-    apply_lookup_functions
     apply_sub_tables
     apply_parent_tables
 
@@ -43,7 +44,9 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
 
   def apply_lookup_functions
     return if @lookup_functions.empty?
+    @function_selects = []
     @lookup_functions.each { |rule| apply_lkp_function_rule(rule) }
+    @dataset = @dataset.select(Sequel.lit('*'), *@function_selects)
   end
 
   def apply_sub_tables
@@ -107,7 +110,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     args = rule[:args].map do |key|
       case key
       when Symbol
-        @rec[key]
+        key
       when String
         "'#{key}'"
       else
@@ -115,7 +118,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
       end
     end
     col_name = rule[:col_name]
-    @rec[col_name] = DB["SELECT #{function}(#{args.join(',')})"].get
+    @function_selects << Sequel.lit("#{function}(#{args.join(',')}) AS #{col_name}")
   end
 
   def apply_parent_table_rule(rule)

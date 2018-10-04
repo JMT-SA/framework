@@ -711,13 +711,18 @@ class GenerateNewScaffold < BaseService
 
     private
 
-    def fields_to_use
-      opts.table_meta.columns_without(%i[id created_at updated_at active])
+    def fields_to_use(for_show = false)
+      cols = if for_show
+               %i[id created_at updated_at]
+             else
+               %i[id created_at updated_at active]
+             end
+      opts.table_meta.columns_without(cols)
     end
 
     def show_fields
       flds = []
-      fields_to_use.each do |f|
+      fields_to_use(true).each do |f|
         fk = opts.table_meta.fk_lookup[f]
         next unless fk
         tm = TableMeta.new(fk[:table])
@@ -729,7 +734,7 @@ class GenerateNewScaffold < BaseService
         flds << "#{f}_label = @repo.find(:#{fk[:table]}, #{opts.classnames[:module]}::#{klassname}, @form_object.#{f})&.#{code}"
       end
 
-      flds + fields_to_use.map do |f|
+      flds + fields_to_use(true).map do |f|
         fk = opts.table_meta.fk_lookup[f]
         if fk.nil?
           this_col = opts.table_meta.col_lookup[f]
@@ -1034,12 +1039,17 @@ class GenerateNewScaffold < BaseService
 
     private
 
-    def fields_to_use
-      opts.table_meta.columns_without(%i[id created_at updated_at active])
+    def fields_to_use(for_show = false)
+      cols = if for_show
+               %i[id created_at updated_at]
+             else
+               %i[id created_at updated_at active]
+             end
+      opts.table_meta.columns_without(cols)
     end
 
-    def form_fields
-      fields_to_use.map { |f| "form.add_field :#{f}" }.join(UtilityFunctions.newline_and_spaces(14))
+    def form_fields(for_show = false)
+      fields_to_use(for_show).map { |f| "form.add_field :#{f}" }.join(UtilityFunctions.newline_and_spaces(14))
     end
 
     def needs_id
@@ -1135,7 +1145,7 @@ class GenerateNewScaffold < BaseService
                     page.form_object ui_rule.form_object
                     page.form do |form|
                       form.view_only!
-                      #{form_fields}
+                      #{form_fields(true)}
                     end
                   end
 

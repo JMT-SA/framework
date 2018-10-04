@@ -1184,7 +1184,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
   };
 }).call();
 
-$(() => {
+document.addEventListener('DOMContentLoaded', () => {
   const buildSubMenuItems = function buildSubMenuItems(subs, gridId) {
     const itemSet = {};
     if (subs) {
@@ -1212,12 +1212,7 @@ $(() => {
     return node;
   };
 
-  // $.contextMenu({
-  //   selector: '.grid-tools-menu',
-  //   trigger: 'left',
-  // });
-
-  $.contextMenu({
+  jQuery.contextMenu({
     selector: '.grid-context-menu',
     trigger: 'left',
     build: ($trigger, e) => {

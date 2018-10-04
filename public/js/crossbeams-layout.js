@@ -1,5 +1,3 @@
-// for equiv of $ready() -- place this code at end of <body> or use:
-// document.addEventListener('DOMContentLoaded', fn, false);
 /**
  * Build a crossbeamsLayout page.
  * @namespace {function} crossbeamsLayout

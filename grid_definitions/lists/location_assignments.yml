@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/locations/location_assignments/new"
-  :text: New Location Assignment
+  :text: New Assignment
   :style: :button
   :behaviour: :popup

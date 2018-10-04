@@ -336,6 +336,7 @@ module MethodBuilder
     raise ArgumentError, "Crud calls for: Table #{table_name} does not exist" unless DB.table_exists?(table_with_schema)
 
     unless wrapper.nil?
+      raise ArgumentError, 'Crud calls for: Wrapper not defined' unless wrapper.is_a?(Class)
       define_method(:"find_#{name}") do |id|
         find(table_with_schema, wrapper, id)
       end

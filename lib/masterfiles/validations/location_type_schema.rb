@@ -6,5 +6,6 @@ module MasterfilesApp
 
     optional(:id, :integer).filled(:int?)
     required(:location_type_code, Types::StrippedString).filled(:str?)
+    required(:short_code, Types::StrippedString).filled(:str?)
   end
 end

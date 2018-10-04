@@ -28,10 +28,10 @@
   :title: New sub-location
   :popup: true
 - :url: "/list/location_location_assignments/multi?key=locations&id=$:id$"
-  :text: Location assignments
+  :text: Assignments
   :icon: list
   :popup: true
 - :url: "/list/location_location_storage_types/multi?key=locations&id=$:id$"
-  :text: Location storage types
+  :text: Storage types
   :icon: list
   :popup: true

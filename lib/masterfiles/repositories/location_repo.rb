@@ -127,5 +127,21 @@ module MasterfilesApp
       DB.execute(ins)
       success_response('ok')
     end
+
+    def location_code_suggestion(ancestor_id, location_type_id)
+      sibling_count = DB[:tree_locations].where(path_length: 1).where(ancestor_location_id: ancestor_id).count
+      code = ''
+      code += "#{find_hash(:locations, ancestor_id)[:location_code]}_" unless location_is_root?(ancestor_id)
+      code += type_abbreviation(location_type_id) + (sibling_count + 1).to_s
+      success_response('ok', code)
+    end
+
+    def type_abbreviation(location_type_id)
+      find_hash(:location_types, location_type_id)[:short_code]
+    end
+
+    def location_is_root?(id)
+      DB[:tree_locations].where(descendant_location_id: id).count == 1
+    end
   end
 end

@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/locations/location_storage_types/new"
-  :text: New Location Storage Type
+  :text: New Storage Type
   :style: :button
   :behaviour: :popup

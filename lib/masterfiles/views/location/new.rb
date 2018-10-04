@@ -5,7 +5,7 @@ module Masterfiles
     module Location
       class New
         def self.call(id: nil, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:location, :new, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:location, :new, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           action = id.nil? ? '/masterfiles/locations/locations' : "/masterfiles/locations/locations/#{id}/add_child"

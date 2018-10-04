@@ -1,0 +1,102 @@
+= Development Guide
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Development Guide
+
+This project has some non-negotiable rules for development and some guidelines which can be followed a bit more loosely.
+
+=== Gem reference
+
+==== Crossbeams gems
+
+Crossbeams::Layout:: Used to create HTML docs - https://github.com/NoSoft-SA/crossbeams-layout[layout]
+Roda::DataGrid:: Used in defining and populating grids - https://github.com/NoSoft-SA/roda-data_grid[roda-data_grid]
+Crossbeams::Dataminer:: Used to define queries with parameters - https://github.com/NoSoft-SA/crossbeams-dataminer[dataminer]
+Crossbeams::LabelDesigner:: Design labels in the browser for printing - https://github.com/NoSoft-SA/crossbeams-label_designer[label_designer]
+
+==== External gems
+
+Roda:: Webapp route-handling - link:http://roda.jeremyevans.net/documentation.html[roda]
+Rodauth:: Manage login, logout and current user - link:[rodauth]
+Sequel:: Database ORM - link:http://sequel.jeremyevans.net/documentation.html[sequel]
+Dry::Struct:: Define data entities - link:https://dry-rb.org/gems/dry-struct/[dry-struct]
+Dry::Validation:: Define rules for validating inputs - link:https://dry-rb.org/gems/dry-validation/[dry-validation]
+Minitest:: Test runnner - link:https://github.com/seattlerb/minitest[minitest]
+
+==== Javascript libraries
+
+AG Grid:: Agnostic javascript data grid. - link:https://www.ag-grid.com/documentation-main/documentation.php[AG Grid]
+A11Y Modal Dialog:: Popup dialog (special version that blocks "close with ESC") - link:https://github.com/edenspiekermann/a11y-dialog[a11y-dialog]
+
+==== CSS
+
+Tachyons:: functional css - link:https://tachyons.io/[Tachyons]
+
+Most classes in code should be tachyons classes (e.g. `class="b blue br3"` means `font-weight: bold`, `color: blue` `border-radius: .5rem`).
+Custom css should only be written if tachyons does not cover the desired outcome.
+
+=== Ruby code
+
+Use link:http://batsov.com/rubocop/[rubocop] to lint code.
+
+Rubocop follows the style guide found at link:https://github.com/rubocop-hq/ruby-style-guide[Ruby Style Guide] with some overrides specified in `.rubocop.yml`.
+
+Code should have no rubocop errors or warnings before being checked in.
+
+Running rubocop (ideally integrate it in your IDE/editor so it runs in real-time while you write code):
+[source,bash]
+----
+bundle exec rake rubocop
+# This will fix "fixable" violations, but check the changed code carefully
+# as it may not always be 100% correct.
+bundle exec rake rubocop:auto_correct
+
+# To check a particular set of directories or files:
+bundle exec rubocop lib routes config/deploy.rb
+----
+
+Notes to come for:
+
+* versions
+* changelog
+* deploy
+* migrations (default values for booleans, audit log, created/updated etc)
+* scaffold
+* testing
+* philosophy - repo, entities, separation of code etc.
+
+=== Javascript
+
+The Crossbeams framework tries to wrap all javascript in configuration so if there is some javascript behaviour required, it should be written into the framework and not become client code.
+
+Use link:https://eslint.org/[ESLint] to lint code. Explanations for rule violations can be found link:https://eslint.org/docs/rules/[here].
+The rules in use are based on the link:https://github.com/airbnb/javascript[Airbnb JavaScript Style Guide] and further refined by the rules in `.eslint.js`.
+
+=== Source Code Management
+
+All Crossbeams framework code follows the link:https://nvie.com/posts/a-successful-git-branching-model/[git flow] branching model where no work is done on the master branch directly.
+
+Developers work on the `develop` branch, the `develop` branch is merged into `master` and `master` is deployed via `capistrano`.
+
+Any sizable chunk of work should be developed in a feature branch that is merged into the `develop` branch when complete.
+
+A good tool to use on the commandline for this is link:https://github.com/petervanderdoes/gitflow-avh/wiki[git-flow].
+
+Other useful git tools:
+
+* link:https://jonas.github.io/tig/[tig]
+* link:https://git-scm.com/docs/gitk[gitk]
+
+=== Aliases
+
+`checkp` - searches source code for debugging `p` or `puts` statements.
+
+[source,bash]
+alias checkp="ag '\s(p|puts)\s' lib helpers routes test"
+
+`gitfiles` - lists files that have not been committed. Zip them with `gitfiles | zip afile.zip -@` or open all in vim with `vim $(gitfiles)`.
+[source,bash]
+alias gitfiles="git status -su | awk '{sub(/^(R.*-> )|[ M?]+/,\"\")};1' | awk '!/^D/'"
+

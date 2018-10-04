@@ -14,27 +14,6 @@ class Framework < Roda
       r.on !interactor.exists?(:material_resource_types, id) do
         handle_not_found(r)
       end
-
-      r.on 'unit' do
-        r.on 'new' do    # NEW
-          check_auth!('configuration', 'new')
-          show_partial_or_page(r) { PackMaterial::Config::MatresType::Unit.call(id, remote: fetch?(r)) }
-        end
-        r.post do        # CREATE
-          res = interactor.add_a_matres_unit(id, params[:matres_type])
-          if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
-          else
-            re_show_form(r, res, url: "/pack_material/config/material_resource_types/#{id}/unit/new") do
-              PackMaterial::Config::MatresType::Unit.call(id,
-                                                          form_values: params[:matres_type],
-                                                          form_errors: res.errors,
-                                                          remote: fetch?(r))
-            end
-          end
-        end
-      end
       r.on 'edit' do
         check_auth!('configuration', 'edit')
         show_partial { PackMaterial::Config::MatresType::Edit.call(id) }

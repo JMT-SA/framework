@@ -107,69 +107,6 @@ module PackMaterialApp
       }
     end
 
-    def test_validate_matres_unit_params
-      test_attrs = { unit_of_measure: 'each', other: 'new unit' }
-      # required(:unit_of_measure).filled(:str?)
-      x = interactor.send(:validate_matres_unit_params, test_attrs.reject { |k| k == :unit_of_measure })
-      assert_equal(['is missing'], x.errors[:unit_of_measure])
-
-      x = interactor.send(:validate_matres_unit_params, test_attrs.merge(unit_of_measure: nil))
-      assert_equal(['must be filled'], x.errors[:unit_of_measure])
-
-      x = interactor.send(:validate_matres_unit_params, test_attrs.merge(unit_of_measure: 1))
-      assert_equal(['must be a string'], x.errors[:unit_of_measure])
-    end
-
-    def test_add_a_matres_unit
-      ConfigInteractor.any_instance.stubs(:create_matres_unit).returns(true)
-      ConfigInteractor.any_instance.stubs(:add_matres_unit).returns(false)
-
-      params = { other: 'new unit', unit_of_measure: 'other' }
-      x = interactor.add_a_matres_unit(1, params)
-      assert_equal true, x
-
-      params = { unit_of_measure: 'thing' }
-      x = interactor.add_a_matres_unit(1, params)
-      assert_equal false, x
-    end
-
-    def test_create_matres_unit
-      ConfigRepo.any_instance.stubs(:create_matres_type_unit).returns(true)
-      params = { other: 'new unit' }
-
-      x = interactor.create_matres_unit(1, params)
-      expected = interactor.success_response('Created unit new unit')
-      assert_equal(expected, x)
-      assert x.success
-
-      ConfigRepo.any_instance.stubs(:create_matres_type_unit).raises(Sequel::UniqueConstraintViolation)
-      params = { other: 'new unit' }
-
-      x = interactor.create_matres_unit(1, params)
-      expected = interactor.validation_failed_response(OpenStruct.new(messages: { other: ['This unit already exists'] }))
-      assert_equal(expected, x)
-      refute x.success
-    end
-
-    def test_add_matres_unit
-      ConfigRepo.any_instance.stubs(:add_matres_type_unit).returns(true)
-      ConfigInteractor.any_instance.stubs(:matres_type).returns(fake_matres_type)
-      params = { unit_of_measure: 'new unit' }
-
-      x = interactor.add_matres_unit(1, params)
-      expected = interactor.success_response("Unit was added to #{fake_matres_type.type_name}", fake_matres_type)
-      assert_equal expected, x
-      assert x.success
-
-      ConfigRepo.any_instance.stubs(:add_matres_type_unit).raises(Sequel::UniqueConstraintViolation)
-      params = { unit_of_measure: 'new unit' }
-
-      x = interactor.add_matres_unit(1, params)
-      expected = interactor.validation_failed_response(OpenStruct.new(messages: { unit_of_measure: ['This unit is already assigned'] }))
-      assert_equal expected, x
-      refute x.success
-    end
-
     def fake_matres_type
       MatresType.new(matres_type_attrs)
     end

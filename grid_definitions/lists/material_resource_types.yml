@@ -16,11 +16,6 @@
   :icon: delete
   :is_delete: true
   :popup: true
-- :url: "/pack_material/config/material_resource_types/$:id$/unit/new"
-  :text: add Measurement Unit
-  :icon: add
-  :title: Add Measurement Unit
-  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/config/material_resource_types/new"

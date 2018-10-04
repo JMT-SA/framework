@@ -30,32 +30,6 @@ module PackMaterialApp
       success_response("Deleted type #{name}")
     end
 
-    def add_a_matres_unit(id, params)
-      if params && params[:unit_of_measure] == 'other'
-        create_matres_unit(id, params)
-      else
-        add_matres_unit(id, params)
-      end
-    end
-
-    def create_matres_unit(matres_type_id, params)
-      params[:unit_of_measure] = params[:other]
-      res = validate_matres_unit_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
-      repo.create_matres_type_unit(matres_type_id, res[:unit_of_measure])
-      success_response("Created unit #{res[:unit_of_measure]}")
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { other: ['This unit already exists'] }))
-    end
-
-    def add_matres_unit(matres_type_id, params)
-      repo.add_matres_type_unit(matres_type_id, params[:unit_of_measure])
-      instance = matres_type(matres_type_id)
-      success_response("Unit was added to #{instance.type_name}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { unit_of_measure: ['This unit is already assigned'] }))
-    end
-
     def create_matres_sub_type(params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -155,10 +129,6 @@ module PackMaterialApp
 
     def validate_matres_type_params(params)
       MatresTypeSchema.call(params)
-    end
-
-    def validate_matres_unit_params(params)
-      MatresTypeUnitSchema.call(params)
     end
 
     def matres_sub_type(id)

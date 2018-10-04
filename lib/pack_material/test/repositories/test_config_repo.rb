@@ -11,7 +11,6 @@ module PackMaterialApp
       assert_respond_to repo, :for_select_matres_types
       assert_respond_to repo, :for_select_matres_sub_types
       assert_respond_to repo, :for_select_material_resource_product_columns
-      assert_respond_to repo, :for_select_units
       assert_respond_to repo, :for_select_matres_product_variants
       assert_respond_to repo, :for_select_matres_product_variant_party_roles
     end
@@ -106,22 +105,12 @@ module PackMaterialApp
         description: 'This is the description field'
       )
 
-      attrs = { description: 'This is the updated description', measurement_units: [] }
+      attrs = { description: 'This is the updated description' }
       repo.update_matres_type(type_id, attrs)
       assert_equal(
         'This is the updated description',
         DB[:material_resource_types].where(id: type_id).first[:description]
       )
-
-      units = add_std_measurement_units
-      unit_list = [units[:each_id], units[:pallets_id], units[:bags_id]]
-      attrs = { measurement_units: unit_list }
-      repo.update_matres_type(type_id, attrs)
-      x = DB[:measurement_units_for_matres_types]
-          .where(material_resource_type_id: type_id)
-          .select_map(:measurement_unit_id)
-
-      assert_equal unit_list, x
 
       # matres_type_with_products
       ConfigRepo.any_instance.stubs(:matres_type_has_products).returns(true)
@@ -130,64 +119,6 @@ module PackMaterialApp
       type = DB[:material_resource_types].where(id: type_id).first
       assert_equal('new type name', type[:type_name])
       assert_equal('TN', type[:short_code])
-    end
-
-    def test_measurement_units
-      add_std_measurement_units
-      y = repo.measurement_units
-      assert_equal y, %w[each pallets bags]
-
-      DB[:measurement_units].delete
-      y = repo.measurement_units
-      assert_equal y, []
-    end
-
-    def test_matres_type_measurement_units_and_ids
-      type_id = @fixed_table_set[:matres_types][:sc][:id]
-      units = add_std_measurement_units
-      unit_list = [units[:each_id], units[:pallets_id], units[:bags_id]]
-      DB[:measurement_units_for_matres_types].insert(
-        material_resource_type_id: type_id,
-        measurement_unit_id: units[:each_id]
-      )
-      DB[:measurement_units_for_matres_types].insert(
-        material_resource_type_id: type_id,
-        measurement_unit_id: units[:pallets_id]
-      )
-      DB[:measurement_units_for_matres_types].insert(
-        material_resource_type_id: type_id,
-        measurement_unit_id: units[:bags_id]
-      )
-      assert_equal %w[each pallets bags], repo.matres_type_measurement_units(type_id)
-      assert_equal unit_list, repo.matres_type_measurement_unit_ids(type_id)
-
-      DB[:measurement_units_for_matres_types].where(material_resource_type_id: type_id).delete
-      assert_equal [], repo.matres_type_measurement_units(type_id)
-      assert_equal [], repo.matres_type_measurement_unit_ids(type_id)
-    end
-
-    def test_create_matres_type_unit
-      type_id = @fixed_table_set[:matres_types][:sc][:id]
-      repo.create_matres_type_unit(type_id, 'test unit')
-      unit_id = DB[:measurement_units].where(unit_of_measure: 'test unit').select_map(:id)
-      refute_nil unit_id
-      link_id = DB[:measurement_units_for_matres_types].where(material_resource_type_id: type_id)
-                                                       .select_map(:measurement_unit_id)
-      assert_equal link_id, unit_id
-    end
-
-    def test_add_matres_type_unit
-      type_id = @fixed_table_set[:matres_types][:sc][:id]
-      each_id = add_measurement_unit('each')
-      repo.add_matres_type_unit(type_id, 'each')
-      link_id = DB[:measurement_units_for_matres_types].where(
-        material_resource_type_id: type_id,
-        measurement_unit_id: each_id
-      )
-      refute_nil link_id
-      assert_raises do
-        repo.add_matres_type_unit(type_id, 'does not exist')
-      end
     end
 
     def test_update_matres_sub_type

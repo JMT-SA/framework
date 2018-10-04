@@ -21,7 +21,6 @@ module PackMaterial
               form.add_field :type_name
               form.add_field :short_code
               form.add_field :description
-              form.add_field :measurement_units
             end
           end
 

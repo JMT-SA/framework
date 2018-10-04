@@ -28,12 +28,6 @@ module PackMaterialApp
                      value: :id,
                      no_active_check: true,
                      order_by: :column_name
-    build_for_select :measurement_units,
-                     alias: 'units',
-                     label: :unit_of_measure,
-                     value: :id,
-                     no_active_check: true,
-                     order_by: :unit_of_measure
     build_for_select :material_resource_product_variants,
                      alias: 'matres_product_variants',
                      label: :product_variant_table_name,
@@ -98,62 +92,14 @@ module PackMaterialApp
 
     def update_matres_type(id, attrs)
       params = attrs.to_h
-      measurement_unit_ids = params.delete(:measurement_units) || []
 
-      # TODO: A helper method for the backend use of multi select ids for the simplest case?
-      units_added = nil
-      DB[:measurement_units_for_matres_types].where(material_resource_type_id: id).delete
-      measurement_unit_ids&.each do |unit_id|
-        DB[:measurement_units_for_matres_types].insert(
-          material_resource_type_id: id,
-          measurement_unit_id: unit_id
-        )
-      end
-      units_added = 'measurement units were added' if measurement_unit_ids.any?
-
-      short_code_notice = nil
+      short_code_notice = 'ok'
       if matres_type_has_products(id)
         params.delete(:short_code)
         short_code_notice = 'Short code can not be updated if products are present'
       end
       update(:material_resource_types, id, params) if params.any?
-      success_response([units_added, short_code_notice].compact.join(', '))
-    end
-
-    def measurement_units
-      DB[:measurement_units].select_map(:unit_of_measure)
-    end
-
-    def matres_type_measurement_units(matres_type_id)
-      DB[:measurement_units].where(id: DB[:measurement_units_for_matres_types]
-                                         .where(material_resource_type_id: matres_type_id)
-                                         .select_map(:measurement_unit_id))
-                            .select_map(:unit_of_measure)
-    end
-
-    def matres_type_measurement_unit_ids(matres_type_id)
-      DB[:measurement_units].where(id: DB[:measurement_units_for_matres_types]
-                                         .where(material_resource_type_id: matres_type_id)
-                                         .select_map(:measurement_unit_id))
-                            .select_map(:id)
-    end
-
-    def create_matres_type_unit(matres_type_id, unit_of_measure_string)
-      unit_id = DB[:measurement_units].insert(unit_of_measure: unit_of_measure_string)
-      if unit_id
-        DB[:measurement_units_for_matres_types].insert(
-          material_resource_type_id: matres_type_id,
-          measurement_unit_id: unit_id
-        )
-      end
-      unit_id
-    end
-
-    def add_matres_type_unit(matres_type_id, unit_of_measure_string)
-      DB[:measurement_units_for_matres_types].insert(
-        material_resource_type_id: matres_type_id,
-        measurement_unit_id: DB[:measurement_units].where(unit_of_measure: unit_of_measure_string).select(:id)
-      )
+      success_response(short_code_notice)
     end
 
     # SUB TYPES

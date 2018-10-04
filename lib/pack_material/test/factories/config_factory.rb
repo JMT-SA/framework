@@ -59,18 +59,6 @@ module PackMaterialApp
       DB[:material_resource_sub_types].insert(default.merge(opts))
     end
 
-    def add_measurement_unit(unit_name)
-      DB[:measurement_units].insert(unit_of_measure: unit_name)
-    end
-
-    def add_std_measurement_units
-      {
-        each_id: add_measurement_unit('each'),
-        pallets_id: add_measurement_unit('pallets'),
-        bags_id: add_measurement_unit('bags')
-      }
-    end
-
     def create_product_column(opts = {})
       dom_id = @fixed_table_set[:domain_id]
       default = {

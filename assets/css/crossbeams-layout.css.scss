@@ -55,6 +55,38 @@ section.crossbeams_layout-fit-height {
 .grid-boolean-column {
   text-align: center;
 }
+/* Grid row background colours */
+.grid-row-bg-light-red {
+  background-color: #FF725C !important;
+}
+.grid-row-bg-yellow {
+  background-color: #FFD700 !important;
+}
+.grid-row-bg-light-yellow {
+  background-color: #FBF1A9 !important;
+}
+.grid-row-bg-washed-yellow {
+  background-color: #FFFCEB !important;
+}
+.grid-row-bg-gold {
+  background-color: #FFB700 !important;
+}
+.grid-row-bg-light-purple {
+  background-color: #A463F2 !important;
+}
+.grid-row-bg-pink {
+  background-color: #FF80CC !important;
+}
+.grid-row-bg-light-pink {
+  background-color: #FFA3D7 !important;
+}
+.grid-row-bg-green {
+  background-color: #19A974 !important;
+}
+.grid-row-bg-light-green {
+  background-color: #9EEBCF !important;
+}
+
 .grid-row-red {
   color: red;
   background-color: yellow;

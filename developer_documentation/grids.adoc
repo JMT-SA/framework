@@ -142,3 +142,92 @@ ORDER BY (SELECT string_agg("sub"."location_code", ';') AS path
             WHERE "tree"."descendant_location_id" = "locations"."id"
             ORDER BY "tree"."path_length" DESC) sub)
 ----
+
+=== Simple row colouring
+
+The grid will automatically set the font colour of a row to red if the row has a column named `active` which has a value of `false`.
+
+The grid query can return a rule for colouring a row in a column named `colour_rule`. If there is a value in the column,
+the grid will apply it as a class (or classes) for the row. If it is nil, the row colour will remain at the default (black).
+This column should always be hidden.
+
+Because this column's value is applied as a class, it can be anything, not just colour - e.g. bold (`b`), italic (`em`).
+
+Your queries should preferably return Tachyons classes rather than custom classes (except for the background classes - Tachyons cannot be used here because the grid design means we have to apply `!important` to the class style).
+
+Try to exercise restraint - only colour rows if it will be useful to the user. Not every grid needs to be lit up like a christmas tree!
+
+Example:
+[source,sql]
+----
+SELECT
+CASE WHEN cancelled THEN 'red b'  -- red and bold classes for cancelled
+     WHEN approved THEN 'green'   -- green for approved
+     WHEN completed THEN 'orange' -- orange for complete but not yet approved
+     ELSE NULL                    -- default to no class
+     END AS colour_rule,          -- column must be named "colour_rule"
+*
+FROM invoices
+----
+
+Some useful Tachyons (and built-in background colour) classes:
+
+|===
+|class |description
+
+|b
+|*Bold text*
+
+|i
+|_Italic text_
+
+|strike
+|~~Strike through text~~
+
+|underline
+|pass:[<u>Underline text</u>]
+
+|ttl
+|lowercase text
+
+|ttu
+|UPPERCASE text
+
+|red
+|pass:[<span class="red">Example text colour as if in a grid row</span>]
+
+|orange
+|pass:[<span class="orange">Example text colour as if in a grid row</span>]
+
+|green
+|pass:[<span class="green">Example text colour as if in a grid row</span>]
+
+|grid-row-bg-light-red
+|pass:[<span class="grid-row-bg-light-red">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-gold
+|pass:[<span class="grid-row-bg-gold">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-yellow
+|pass:[<span class="grid-row-bg-yellow">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-light-yellow
+|pass:[<span class="grid-row-bg-light-yellow">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-washed-yellow
+|pass:[<span class="grid-row-bg-washed-yellow">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-light-purple
+|pass:[<span class="grid-row-bg-light-purple">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-pink
+|pass:[<span class="grid-row-bg-pink">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-light-pink
+|pass:[<span class="grid-row-bg-light-pink">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-green
+|pass:[<span class="grid-row-bg-green">Example background colour as if in a grid row</span>]
+
+|grid-row-bg-light-green
+|pass:[<span class="grid-row-bg-light-green">Example background colour as if in a grid row</span>]

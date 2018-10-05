@@ -1125,6 +1125,17 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         enableRangeSelection: true,
         enableStatusBar: true,
         suppressAggFuncInHeader: true,
+        getRowClass(params) {
+          if (params.data) {
+            if (params.data.colour_rule) {
+              return params.data.colour_rule;
+            }
+            if (typeof params.data.active !== 'undefined' && !params.data.active) {
+              return 'red';
+            }
+          }
+          return null;
+        },
         onFilterChanged() {
           if (!forPrint) {
             let filterLength = 0;

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterialApp
+module MasterfilesApp
   class Location < Dry::Struct
     attribute :id, Types::Integer
     attribute :primary_storage_type_id, Types::Integer

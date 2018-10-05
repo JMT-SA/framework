@@ -7,6 +7,7 @@ Sequel.migration do
     create_table(:location_types, ignore_index_errors: true) do
       primary_key :id
       String :location_type_code, size: 255, null: false
+      String :short_code, size: 255, null: false
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 

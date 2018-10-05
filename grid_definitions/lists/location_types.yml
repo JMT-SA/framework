@@ -1,0 +1,24 @@
+---
+:dataminer_definition: location_types
+:actions:
+- :url: "/masterfiles/locations/location_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/locations/location_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/locations/location_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/locations/location_types/new"
+  :text: New Type
+  :style: :button
+  :behaviour: :popup

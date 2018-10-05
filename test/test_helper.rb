@@ -33,28 +33,23 @@ Dir["#{root_dir}/lib/applets/*.rb"].each { |f| require f }
 module MiniTestSeeds end
 Dir["#{root_dir}/test/db_seeds/*.rb"].each { |f| require f }
 
+# Include helper methods & factories
+Dir["#{root_dir}/test/helper_methods/*.rb"].each { |f| require f }
 Dir["#{root_dir}/lib/*/test/factories/*.rb"].each { |f| require f }
 
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
   include MiniTestSeeds
 
-  def around
-    DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
-      super
-    end
+  def self.inherited(klass)
+    # klass.extend(CommonHelperMethods)
+    klass.extend(RepoHelperMethods)
   end
+end
 
-  def around_all
-    DB.transaction(rollback: :always) do
-      # Run all the seed-creation methods:
-      @fixed_table_set = {}
-      methods.grep(/^db_create_.+/).each { |m| send(m) }
-      super
-    end
-  rescue StandardError => e
-    p e
-    raise "Display possible around errors"
+class MinitestInteractor < Minitest::Test
+  def self.inherited(klass)
+    # klass.extend(CommonHelperMethods)
   end
 end
 

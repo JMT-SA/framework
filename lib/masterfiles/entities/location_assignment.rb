@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PackMaterialApp
+module MasterfilesApp
   class LocationAssignment < Dry::Struct
     attribute :id, Types::Integer
     attribute :assignment_code, Types::String

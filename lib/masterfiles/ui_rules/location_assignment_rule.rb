@@ -3,7 +3,7 @@
 module UiRules
   class LocationAssignmentRule < Base
     def generate_rules
-      @repo = PackMaterialApp::LocationRepo.new
+      @repo = MasterfilesApp::LocationRepo.new
       make_form_object
       apply_form_values
 

@@ -1131,7 +1131,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
               return params.data.colour_rule;
             }
             if (typeof params.data.active !== 'undefined' && !params.data.active) {
-              return 'red';
+              return 'gray i';
             }
           }
           return null;

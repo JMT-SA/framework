@@ -58,7 +58,7 @@ module UiRules
       @form_object = OpenStruct.new(primary_storage_type_id: nil,
                                     location_type_id: nil,
                                     primary_assignment_id: nil,
-                                    location_code: nil,
+                                    location_code: initial_code(@options[:id]),
                                     location_description: nil,
                                     has_single_container: nil,
                                     virtual_location: nil,
@@ -81,12 +81,18 @@ module UiRules
       end
     end
 
-    private
-
     def add_behaviour
       behaviours do |behaviour|
         behaviour.dropdown_change :location_type_id, notify: [{ url: "/masterfiles/locations/locations/#{@options[:id]}/add_child/location_type_changed" }]
       end
+    end
+
+    def initial_code(parent_id)
+      return nil if parent_id.nil?
+
+      location_type_id = @repo.for_select_location_types.first.last
+      res = @repo.location_code_suggestion(parent_id, location_type_id)
+      res.success ? res.instance : nil
     end
   end
 end

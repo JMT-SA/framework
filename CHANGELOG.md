@@ -11,6 +11,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 - Roda::DataGrid update to the way list grids are defined (using Crossbeams::DataGrid::ListGridDefinition instead of calling layout's grid renderer).
 - All fetch requests expect JSON responses. This mostly affects dialog-building responses which were returning HTML text. All `return_json_response` calls replaced by one in the main route.
 - Grid rows can be coloured simply by providing a class in a column named `colour_rule`.
+- Capture locations.
 ### Fixed
 
 ## [0.4.0] - 2018-08-10

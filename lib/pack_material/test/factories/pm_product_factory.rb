@@ -2,9 +2,6 @@
 
 require 'faker'
 
-# rubocop:disable Metrics/ModuleLength
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   module PmProductFactory
     # uses ConfigFactory

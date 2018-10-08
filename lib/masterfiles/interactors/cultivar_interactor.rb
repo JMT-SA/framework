@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module MasterfilesApp
   class CultivarInteractor < BaseInteractor
     def create_cultivar_group(params)
@@ -139,3 +141,4 @@ module MasterfilesApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

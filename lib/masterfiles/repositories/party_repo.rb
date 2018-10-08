@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
 
 module MasterfilesApp
   class PartyRepo < BaseRepo
@@ -410,3 +411,4 @@ module MasterfilesApp
   end
 end
 # rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

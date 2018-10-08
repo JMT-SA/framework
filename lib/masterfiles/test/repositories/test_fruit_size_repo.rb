@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class TestFruitSizeRepo < MiniTestWithHooks
     def test_for_selects
@@ -49,5 +46,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

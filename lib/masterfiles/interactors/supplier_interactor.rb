@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop#:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module MasterfilesApp
   class SupplierInteractor < BaseInteractor
     def create_supplier(params)
@@ -64,3 +67,5 @@ module MasterfilesApp
     end
   end
 end
+# rubocop#:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

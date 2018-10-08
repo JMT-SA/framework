@@ -2,7 +2,6 @@
 
 require 'faker'
 
-# rubocop:disable Metrics/ModuleLength
 # rubocop:disable Metrics/AbcSize
 
 module PackMaterialApp
@@ -70,3 +69,4 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/AbcSize

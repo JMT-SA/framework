@@ -378,14 +378,16 @@ module PackMaterialApp
       assert_instance_of MatresMasterListItem, x.instance
     end
 
-    def test_matres_sub_type_master_list_items #(sub_type_id, product_column_id)
+    def test_matres_sub_type_master_list_items
       skip 'todo'
+      # (sub_type_id, product_column_id)
       # items = repo.matres_sub_type_master_list_items(sub_type_id, product_column_id)
       # items.map { |r| "#{r[:short_code]} #{r[:long_name] ? '- ' + r[:long_name] : ''}" }
     end
 
-    def test_matres_sub_types_product_column_ids #(sub_type_id)
+    def test_matres_sub_types_product_column_ids
       skip 'todo'
+      # (sub_type_id)
       # product_column_ids = repo.find_matres_sub_type(sub_type_id).product_column_ids || []
       # if product_column_ids.any?
       #   success_response('Success', product_column_ids)

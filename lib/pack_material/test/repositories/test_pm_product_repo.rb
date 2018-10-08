@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class TestPmProductRepo < MiniTestWithHooks
     include PmProductFactory
@@ -89,5 +86,3 @@ module PackMaterialApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

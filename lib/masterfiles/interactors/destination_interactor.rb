@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module MasterfilesApp
   class DestinationInteractor < BaseInteractor
     def create_region(params)
@@ -147,3 +149,4 @@ module MasterfilesApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

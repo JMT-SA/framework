@@ -4,7 +4,7 @@ module PackMaterial
   module Config
     module MatresMasterListItem
       class Preselect
-        def self.call(sub_type_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(sub_type_id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:matres_master_list_item, :preselect, sub_type_id: sub_type_id, form_values: form_values)
           rules   = ui_rule.compile
 

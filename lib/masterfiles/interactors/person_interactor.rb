@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/AbcSize
+
 module MasterfilesApp
   class PersonInteractor < BaseInteractor
     def create_person(params)
@@ -72,3 +74,4 @@ module MasterfilesApp
     end
   end
 end
+# rubocop:enable Metrics/AbcSize

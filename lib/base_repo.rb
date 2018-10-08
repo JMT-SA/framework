@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BaseRepo # rubocop:disable Metrics/ClassLength
+class BaseRepo
   include Crossbeams::Responses
 
   # Wraps Sequel's transaction so that it is not exposed to calling code.

@@ -161,7 +161,7 @@ module PackMaterialApp
       id3 = create_product_column
       other_dom_id = create_other_domain
       create_product_column(
-        material_resource_domain_id: other_dom_id,
+        material_resource_domain_id: other_dom_id
       )
       sub_id = create_sub_type(
         product_code_ids: "{#{id1}}",

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module UiRules
   class PmProductVariantRule < Base
     def generate_rules
@@ -124,3 +127,5 @@ module UiRules
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

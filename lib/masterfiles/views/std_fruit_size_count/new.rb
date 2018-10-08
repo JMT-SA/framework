@@ -8,11 +8,11 @@ module Masterfiles
           ui_rule = UiRules::Compiler.new(:std_fruit_size_count, :new, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-            page.form do |form|
+            page.form do |form| # rubocop:disable Metrics/BlockLength
               form.action '/masterfiles/fruit/std_fruit_size_counts'
               form.remote! if remote
               form.row do |row|

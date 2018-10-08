@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop#:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module MasterfilesApp
   class OrganizationInteractor < BaseInteractor
     def create_organization(params)
@@ -77,3 +80,5 @@ module MasterfilesApp
     end
   end
 end
+# rubocop#:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

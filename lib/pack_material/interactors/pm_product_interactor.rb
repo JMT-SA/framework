@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop#:disable Metrics/AbcSize
+
 module PackMaterialApp
   class PmProductInteractor < BaseInteractor
     def create_pm_product(params)
@@ -137,3 +140,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop#:enable Metrics/AbcSize

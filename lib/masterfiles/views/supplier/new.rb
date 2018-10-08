@@ -4,7 +4,7 @@ module Masterfiles
   module Parties
     module Supplier
       class New
-        def self.call(party_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(party_id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:supplier, :new, party_id: party_id, form_values: form_values)
           rules   = ui_rule.compile
 

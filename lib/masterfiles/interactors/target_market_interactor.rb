@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module MasterfilesApp
   class TargetMarketInteractor < BaseInteractor
     def create_tm_group_type(params)
@@ -175,3 +178,5 @@ module MasterfilesApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

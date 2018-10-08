@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop#disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module PackMaterialApp
   class MatresProductVariantPartyRoleInteractor < BaseInteractor
     def create_matres_product_variant_party_role(parent_id, params)
@@ -64,3 +67,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop#enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

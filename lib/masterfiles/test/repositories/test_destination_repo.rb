@@ -11,20 +11,9 @@ module MasterfilesApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_region
-      assert_respond_to repo, :create_region
-      assert_respond_to repo, :update_region
-      assert_respond_to repo, :delete_region
-
-      assert_respond_to repo, :find_country
-      assert_respond_to repo, :create_country
-      assert_respond_to repo, :update_country
-      assert_respond_to repo, :delete_country
-
-      assert_respond_to repo, :find_city
-      assert_respond_to repo, :create_city
-      assert_respond_to repo, :update_city
-      assert_respond_to repo, :delete_city
+      test_crud_calls_for :destination_regions, name: :region, wrapper: Region
+      test_crud_calls_for :destination_countries, name: :country, wrapper: Country
+      test_crud_calls_for :destination_cities, name: :city, wrapper: City
     end
 
     private

@@ -9,10 +9,7 @@ module DevelopmentApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_contact_method_type
-      assert_respond_to repo, :create_contact_method_type
-      assert_respond_to repo, :update_contact_method_type
-      assert_respond_to repo, :delete_contact_method_type
+      test_crud_calls_for :contact_method_types, name: :contact_method_type, wrapper: ContactMethodType
     end
 
     private

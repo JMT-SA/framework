@@ -11,20 +11,9 @@ module MasterfilesApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_tm_group_type
-      assert_respond_to repo, :create_tm_group_type
-      assert_respond_to repo, :update_tm_group_type
-      assert_respond_to repo, :delete_tm_group_type
-
-      assert_respond_to repo, :find_tm_group
-      assert_respond_to repo, :create_tm_group
-      assert_respond_to repo, :update_tm_group
-      assert_respond_to repo, :delete_tm_group
-
-      assert_respond_to repo, :find_target_market
-      assert_respond_to repo, :create_target_market
-      assert_respond_to repo, :update_target_market
-      assert_respond_to repo, :delete_target_market
+      test_crud_calls_for :target_market_group_types, name: :tm_group_type, wrapper: TmGroupType
+      test_crud_calls_for :target_market_groups, name: :tm_group, wrapper: TmGroup
+      test_crud_calls_for :target_markets, name: :target_market, wrapper: TargetMarket
     end
 
     private

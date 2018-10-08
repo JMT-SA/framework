@@ -11,20 +11,9 @@ module MasterfilesApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_cultivar_group
-      assert_respond_to repo, :create_cultivar_group
-      assert_respond_to repo, :update_cultivar_group
-      assert_respond_to repo, :delete_cultivar_group
-
-      assert_respond_to repo, :find_cultivar
-      assert_respond_to repo, :create_cultivar
-      assert_respond_to repo, :update_cultivar
-      assert_respond_to repo, :delete_cultivar
-
-      assert_respond_to repo, :find_marketing_variety
-      assert_respond_to repo, :create_marketing_variety
-      assert_respond_to repo, :update_marketing_variety
-      assert_respond_to repo, :delete_marketing_variety
+      test_crud_calls_for :cultivar_groups, name: :cultivar_group, wrapper: CultivarGroup
+      test_crud_calls_for :cultivars, name: :cultivar, wrapper: Cultivar
+      test_crud_calls_for :marketing_varieties, name: :marketing_variety, wrapper: MarketingVariety
     end
 
     private

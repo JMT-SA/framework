@@ -9,10 +9,7 @@ module DevelopmentApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_role
-      assert_respond_to repo, :create_role
-      assert_respond_to repo, :update_role
-      assert_respond_to repo, :delete_role
+      test_crud_calls_for :roles, name: :role, wrapper: Role
     end
 
     private

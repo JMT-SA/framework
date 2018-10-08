@@ -13,15 +13,8 @@ module PackMaterialApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_pm_product
-      assert_respond_to repo, :create_pm_product
-      assert_respond_to repo, :update_pm_product
-      assert_respond_to repo, :delete_pm_product
-
-      assert_respond_to repo, :find_pm_product_variant
-      assert_respond_to repo, :create_pm_product_variant
-      assert_respond_to repo, :update_pm_product_variant
-      assert_respond_to repo, :delete_pm_product_variant
+      test_crud_calls_for :pack_material_products, name: :pm_product, wrapper: PmProduct
+      test_crud_calls_for :pack_material_product_variants, name: :pm_product_variant, wrapper: PmProductVariant
     end
 
     # def summary

@@ -10,15 +10,8 @@ module MasterfilesApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_commodity_group
-      assert_respond_to repo, :create_commodity_group
-      assert_respond_to repo, :update_commodity_group
-      assert_respond_to repo, :delete_commodity_group
-
-      assert_respond_to repo, :find_commodity
-      assert_respond_to repo, :create_commodity
-      assert_respond_to repo, :update_commodity
-      assert_respond_to repo, :delete_commodity
+      test_crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup
+      test_crud_calls_for :commodities, name: :commodity, wrapper: Commodity
     end
 
     private

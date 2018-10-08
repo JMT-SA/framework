@@ -9,10 +9,7 @@ module DevelopmentApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_address_type
-      assert_respond_to repo, :create_address_type
-      assert_respond_to repo, :update_address_type
-      assert_respond_to repo, :delete_address_type
+      test_crud_calls_for :address_types, name: :address_type, wrapper: AddressType
     end
 
     private

@@ -5,8 +5,8 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestCultivarInteractor < Minitest::Test
     def test_repo
-      cultivar_repo = interactor.send(:cultivar_repo)
-      assert cultivar_repo.is_a?(MasterfilesApp::CultivarRepo)
+      repo = interactor.send(:repo)
+      assert repo.is_a?(MasterfilesApp::CultivarRepo)
     end
 
     private

@@ -7,7 +7,7 @@ module MasterfilesApp
     def create_cultivar_group(params)
       res = validate_cultivar_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @cultivar_group_id = cultivar_repo.create_cultivar_group(res)
+      @cultivar_group_id = repo.create_cultivar_group(res)
       success_response("Created cultivar group #{cultivar_group.cultivar_group_code}", cultivar_group)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { cultivar_group_code: ['This cultivar group already exists'] }))
@@ -17,7 +17,7 @@ module MasterfilesApp
       @cultivar_group_id = id
       res = validate_cultivar_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      cultivar_repo.update_cultivar_group(id, res)
+      repo.update_cultivar_group(id, res)
       success_response("Updated cultivar group #{cultivar_group.cultivar_group_code}", cultivar_group(false))
     end
 
@@ -25,18 +25,18 @@ module MasterfilesApp
       @cultivar_group_id = id
       name = cultivar_group.cultivar_group_code
 
-      cultivar_group = cultivar_repo.find_cultivar_group(id)
+      cultivar_group = repo.find_cultivar_group(id)
       cultivar_group.cultivar_ids.each do |cultivar_id|
-        cultivar_repo.delete_cultivar(cultivar_id)
+        repo.delete_cultivar(cultivar_id)
       end
-      cultivar_repo.delete_cultivar_group(id)
+      repo.delete_cultivar_group(id)
       success_response("Deleted cultivar group #{name}")
     end
 
     def create_cultivar(params)
       res = validate_cultivar_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @cultivar_id = cultivar_repo.create_cultivar(res)
+      @cultivar_id = repo.create_cultivar(res)
       success_response("Created cultivar #{cultivar.cultivar_name}", cultivar)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { cultivar_name: ['This cultivar already exists'] }))
@@ -46,7 +46,7 @@ module MasterfilesApp
       @cultivar_id = id
       res = validate_cultivar_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      cultivar_repo.update_cultivar(id, res)
+      repo.update_cultivar(id, res)
       # instance = cultivar(id)
       # comm_repo = MasterfilesApp::CommodityRepo.new
       # commodity_code = comm_repo.find_commodity(instance.commodity_id)&.code
@@ -57,14 +57,14 @@ module MasterfilesApp
     def delete_cultivar(id)
       @cultivar_id = id
       name = cultivar.cultivar_name
-      cultivar_repo.delete_cultivar(id)
+      repo.delete_cultivar(id)
       success_response("Deleted cultivar #{name}")
     end
 
     def create_marketing_variety(cultivar_id, params)
       res = validate_marketing_variety_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @marketing_variety_id = cultivar_repo.create_marketing_variety(cultivar_id, res)
+      @marketing_variety_id = repo.create_marketing_variety(cultivar_id, res)
       success_response("Created marketing variety #{marketing_variety.marketing_variety_code}", marketing_variety)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { marketing_variety_code: ['This marketing variety already exists'] }))
@@ -74,23 +74,23 @@ module MasterfilesApp
       @marketing_variety_id = id
       res = validate_marketing_variety_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      cultivar_repo.update_marketing_variety(id, res)
+      repo.update_marketing_variety(id, res)
       success_response("Updated marketing variety #{marketing_variety.marketing_variety_code}", marketing_variety(false))
     end
 
     def delete_marketing_variety(id)
       @marketing_variety_id = id
       name = marketing_variety.marketing_variety_code
-      cultivar_repo.delete_marketing_variety(id)
+      repo.delete_marketing_variety(id)
       success_response("Deleted marketing variety #{name}")
     end
 
     def link_marketing_varieties(cultivar_id, marketing_variety_ids)
       repo.transaction do
-        cultivar_repo.link_marketing_varieties(cultivar_id, marketing_variety_ids)
+        repo.link_marketing_varieties(cultivar_id, marketing_variety_ids)
       end
 
-      existing_ids = cultivar_repo.cultivar_marketing_variety_ids(cultivar_id)
+      existing_ids = repo.cultivar_marketing_variety_ids(cultivar_id)
       if existing_ids.eql?(marketing_variety_ids.sort)
         success_response('Marketing varieties linked successfully')
       else
@@ -100,15 +100,15 @@ module MasterfilesApp
 
     private
 
-    def cultivar_repo
+    def repo
       @cultivar_repo ||= CultivarRepo.new
     end
 
     def cultivar_group(cached = true)
       if cached
-        @cultivar_group ||= cultivar_repo.find_cultivar_group(@cultivar_group_id)
+        @cultivar_group ||= repo.find_cultivar_group(@cultivar_group_id)
       else
-        @cultivar_group = cultivar_repo.find_cultivar_group(@cultivar_group_id)
+        @cultivar_group = repo.find_cultivar_group(@cultivar_group_id)
       end
     end
 
@@ -118,9 +118,9 @@ module MasterfilesApp
 
     def cultivar(cached = true)
       if cached
-        @cultivar ||= cultivar_repo.find_cultivar(@cultivar_id)
+        @cultivar ||= repo.find_cultivar(@cultivar_id)
       else
-        @cultivar = cultivar_repo.find_cultivar(@cultivar_id)
+        @cultivar = repo.find_cultivar(@cultivar_id)
       end
     end
 
@@ -130,9 +130,9 @@ module MasterfilesApp
 
     def marketing_variety(cached = true)
       if cached
-        @marketing_variety ||= cultivar_repo.find_marketing_variety(@marketing_variety_id)
+        @marketing_variety ||= repo.find_marketing_variety(@marketing_variety_id)
       else
-        @marketing_variety = cultivar_repo.find_marketing_variety(@marketing_variety_id)
+        @marketing_variety = repo.find_marketing_variety(@marketing_variety_id)
       end
     end
 

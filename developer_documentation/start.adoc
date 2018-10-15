@@ -10,6 +10,7 @@ The following special environment variables are available when running the app:
 
 * `NO_ERR_HANDLE` - Only applies in development mode. If set, the error_handler will not handle errors for you.
 * `DONOTLOGSQL` - If set, SQL statements are not included in the application logs. Note that statements are only logged in development mode.
+* `LOGSQLTOFILE` - If set, SQL will be logged to a separate file in the `log` directory.
 
 === General
 

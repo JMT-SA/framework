@@ -34,22 +34,28 @@ module MiniTestSeeds end
 Dir["#{root_dir}/test/db_seeds/*.rb"].each { |f| require f }
 
 # Include helper methods & factories
-Dir["#{root_dir}/test/helper_methods/*.rb"].each { |f| require f }
 Dir["#{root_dir}/lib/*/test/factories/*.rb"].each { |f| require f }
 
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
   include MiniTestSeeds
 
-  def self.inherited(klass)
-    # klass.extend(CommonHelperMethods)
-    klass.extend(RepoHelperMethods)
+  def around
+    DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
+      super
+    end
   end
-end
 
-class MinitestInteractor < Minitest::Test
-  def self.inherited(klass)
-    # klass.extend(CommonHelperMethods)
+  def around_all
+    DB.transaction(rollback: :always) do
+      # Run all the seed-creation methods:
+      @fixed_table_set = {}
+      methods.grep(/^db_create_.+/).each { |m| send(m) }
+      super
+    end
+  rescue StandardError => e
+    p e
+    raise "Display possible around errors"
   end
 end
 
@@ -62,4 +68,26 @@ def current_user
     email: 'current_user@example.com',
     active: true
   )
+end
+
+def test_crud_calls_for(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+  name    = options[:name] || table_name
+  wrapper = options[:wrapper]
+  skip    = options[:exclude] || []
+
+  repo = self.send(:repo)
+  unless wrapper.nil?
+    assert_respond_to repo, :"find_#{name}"
+  end
+
+  unless skip.include?(:create)
+    assert_respond_to repo, :"create_#{name}"
+  end
+
+  unless skip.include?(:update)
+    assert_respond_to repo, :"update_#{name}"
+  end
+
+  return if skip.include?(:delete)
+  assert_respond_to repo, :"delete_#{name}"
 end

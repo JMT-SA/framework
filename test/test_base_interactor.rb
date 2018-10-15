@@ -1,6 +1,6 @@
 require File.join(File.expand_path('./../', __FILE__), 'test_helper')
 
-class TestBaseInteractor < MinitestInteractor
+class TestBaseInteractor < Minitest::Test
 
   def interactor
     BaseInteractor.new(current_user, {}, {}, {})

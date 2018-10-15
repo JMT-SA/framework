@@ -2,6 +2,23 @@
 
 # rubocop:disable Metrics/BlockLength
 
+# TODO: Check that user has permission.
+# - get pf.id and restricted_access values for url (could be more than one menu item and with/without restriction)
+# Check if user has access
+# SELECT -- NB this logic not right - restricted takes precedence
+# EXISTS(SELECT pf.id FROM program_functions pf JOIN programs_users pu ON pu.program_id = pf.program_id
+#                            WHERE pf.url = '/list/target_markets' AND pu.user_id = 33)
+#                            OR
+#                            EXISTS(SELECT pf.id
+#                            FROM program_functions pf
+#                            JOIN program_functions_users pfu ON pfu.program_function_id = pf.id
+#                            WHERE pf.url = '/dataminer/admin/reports'
+#                              AND pf.restricted_user_access
+#                                AND pfu.user_id = 33) AS has_permission
+#
+# - url might not be a program function.
+#   = then ok to continue.
+#   = unless url was entered in browser (is there a difference in the referer?)
 class Framework < Roda
   # Generic grid lists.
   route('list') do |r|

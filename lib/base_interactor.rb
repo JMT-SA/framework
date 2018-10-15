@@ -23,4 +23,9 @@ class BaseInteractor
   def log_transaction
     repo.log_action(user_name: @user.user_name, context: @context.context, route_url: @context.route_url)
   end
+
+  # Log the status of a record. Uses the context passed to the Interactor constructor.
+  def log_status(table_name, id, status, comment: nil)
+    repo.log_status(table_name, id, status, user_name: @user.user_name, comment: comment)
+  end
 end

@@ -243,6 +243,7 @@ class GenerateNewScaffold < BaseService
               id = nil
               repo.transaction do
                 id = repo.create_#{opts.singlename}(res)
+                log_status('#{opts.table}', id, 'CREATED')
                 log_transaction
               end
               instance = #{opts.singlename}(id)
@@ -268,6 +269,7 @@ class GenerateNewScaffold < BaseService
               name = #{opts.singlename}(id).#{opts.label_field}
               repo.transaction do
                 repo.delete_#{opts.singlename}(id)
+                log_status('#{opts.table}', id, 'DELETED')
                 log_transaction
               end
               success_response("Deleted #{opts.classnames[:text_name].downcase} \#{name}")

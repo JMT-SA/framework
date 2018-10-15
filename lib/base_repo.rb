@@ -226,6 +226,37 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
                                                       route_url: route_url)
   end
 
+  # Log the status of a record.
+  #
+  # @param table_name [String] the name of the table.
+  # @param id [Integer] the id of the record with the changed status.
+  # @param status [String] the status to be logged.
+  # @param comment [String] extra information about the status change.
+  # @param user_name [String] the current user's name.
+  def log_status(table_name, id, status, comment: nil, user_name: nil) # rubocop:disable Metrics/AbcSize
+    # 1. UPSERT the current status.
+    DB[Sequel[:audit][:current_statuses]].insert_conflict(target: %i[table_name row_data_id],
+                                                          update: {
+                                                            user_name: Sequel[:excluded][:user_name],
+                                                            row_data_id: Sequel[:excluded][:row_data_id],
+                                                            status: Sequel[:excluded][:status],
+                                                            comment: Sequel[:excluded][:comment],
+                                                            transaction_id: Sequel.function(:txid_current),
+                                                            action_tstamp_tx: Time.now
+                                                          }).insert(user_name: user_name,
+                                                                    table_name: table_name.to_s,
+                                                                    row_data_id: id,
+                                                                    status: status.upcase,
+                                                                    comment: comment)
+
+    # 2. INSERT into log.
+    DB[Sequel[:audit][:status_logs]].insert(user_name: user_name,
+                                            table_name: table_name.to_s,
+                                            row_data_id: id,
+                                            status: status.upcase,
+                                            comment: comment)
+  end
+
   def self.inherited(klass)
     klass.extend(MethodBuilder)
   end

@@ -1128,7 +1128,20 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         getRowClass(params) {
           if (params.data) {
             if (params.data.colour_rule) {
-              return params.data.colour_rule;
+              switch (params.data.colour_rule) {
+                case 'error':
+                  return 'red';
+                case 'warning':
+                  return 'orange';
+                case 'inactive':
+                  return 'gray i';
+                case 'ok':
+                  return 'green';
+                case 'inprogress':
+                  return 'purple';
+                default:
+                  return params.data.colour_rule;
+              }
             }
             if (typeof params.data.active !== 'undefined' && !params.data.active) {
               return 'gray i';

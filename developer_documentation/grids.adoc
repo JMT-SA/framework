@@ -145,11 +145,13 @@ ORDER BY (SELECT string_agg("sub"."location_code", ';') AS path
 
 === Simple row colouring
 
-The grid will automatically set the font colour of a row to red if the row has a column named `active` which has a value of `false`.
+The grid will automatically set the font colour of a row to grey and make it italic if the row has a column named `active` which has a value of `false`.
 
 The grid query can return a rule for colouring a row in a column named `colour_rule`. If there is a value in the column,
 the grid will apply it as a class (or classes) for the row. If it is nil, the row colour will remain at the default (black).
 This column should always be hidden.
+
+NOTE: There are five standard classes that should be used in most cases. They are `ok`, `warning`, `error`, `inactive` and `inprogress`. Only use other classes if these five do not cover your requirement.
 
 Because this column's value is applied as a class, it can be anything, not just colour - e.g. bold (`b`), italic (`em`).
 
@@ -161,16 +163,16 @@ Example:
 [source,sql]
 ----
 SELECT
-CASE WHEN cancelled THEN 'red b'  -- red and bold classes for cancelled
-     WHEN approved THEN 'green'   -- green for approved
-     WHEN completed THEN 'orange' -- orange for complete but not yet approved
-     ELSE NULL                    -- default to no class
-     END AS colour_rule,          -- column must be named "colour_rule"
+CASE WHEN cancelled THEN 'b gray'  -- gray and bold Tachyon classes for cancelled
+     WHEN approved THEN 'ok'       -- green for approved
+     WHEN completed THEN 'warning' -- orange for complete but not yet approved
+     ELSE NULL                     -- default to no class
+     END AS colour_rule,           -- column must be named "colour_rule"
 *
 FROM invoices
 ----
 
-Some useful Tachyons (and built-in background colour) classes:
+Some useful Tachyons (and built-in) classes:
 
 |===
 |class |description
@@ -181,26 +183,30 @@ Some useful Tachyons (and built-in background colour) classes:
 |i
 |_Italic text_
 
-|strike
-|~~Strike through text~~
-
-|underline
-|pass:[<u>Underline text</u>]
-
 |ttl
 |lowercase text
 
 |ttu
 |UPPERCASE text
 
-|red
+|error
 |pass:[<span class="red">Example text colour as if in a grid row</span>]
 
-|orange
+|warning
 |pass:[<span class="orange">Example text colour as if in a grid row</span>]
 
-|green
+|ok
 |pass:[<span class="green">Example text colour as if in a grid row</span>]
+
+|inactive
+|pass:[<span class="gray i">Example text colour as if in a grid row</span>]
+
+|inprogress
+|pass:[<span class="purple">Example text colour as if in a grid row</span>]
+
+|**NOTE** The following should be _rarely_ used:
+|**These classes are defined but should ideally not be used.**
+The background colours will override the grid's `hover` and `selected` row colouring -- makes UX confusing.
 
 |grid-row-bg-light-red
 |pass:[<span class="grid-row-bg-light-red">Example background colour as if in a grid row</span>]

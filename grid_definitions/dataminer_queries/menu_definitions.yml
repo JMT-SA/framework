@@ -6,8 +6,8 @@
   -- p.functional_area_id\r\npf.group_name, pf.program_function_name, pf.url, p.program_sequence, pf.program_function_sequence,
   \r\n       pf.restricted_user_access, pf.active AS pf_active, pf.created_at AS pf_created_at,
   pf.updated_at AS pf_updated_at,\r\n  (SELECT string_agg(webapp, '; ') FROM (SELECT webapp FROM programs_webapps WHERE program_id = p.id) sub) AS webapps,
-  CASE WHEN NOT f.active THEN 'red' WHEN NOT p.active THEN 'red' WHEN NOT pf.active THEN 'red'
-  WHEN pf.restricted_user_access THEN 'orange' ELSE NULL END AS colour_rule \r\n  FROM
+  CASE WHEN NOT f.active THEN 'inactive' WHEN NOT p.active THEN 'inactive' WHEN NOT pf.active THEN 'inactive'
+  WHEN pf.restricted_user_access THEN 'warning' ELSE NULL END AS colour_rule \r\n  FROM
   functional_areas f\r\n LEFT OUTER JOIN programs p ON p.functional_area_id = f.id\r\n
   LEFT OUTER JOIN program_functions pf ON pf.program_id = p.id\r\nORDER BY f.functional_area_name,
   p.program_name, pf.group_name, pf.program_function_sequence, pf.program_function_name\r\n

@@ -68,7 +68,7 @@ module UiRules
       }
 
       product_column_set.each do |col_name|
-        list = master_list_items(col_name)
+        list = master_list_items(col_name.to_s)
         list = @commodity_repo.for_select_commodities if col_name == :commodity_id
         list = @variety_repo.for_select_marketing_varieties if col_name == :marketing_variety_id
 

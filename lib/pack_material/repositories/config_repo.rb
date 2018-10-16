@@ -173,19 +173,27 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def sub_type_master_list_items(sub_type_id)
-      DB[get_dataminer_report('matres_prodcol_sub_type_list_items.yml').sql].where(sub_type_id: sub_type_id)
+    def for_select_sub_type_master_list_items(sub_type_id, product_column_name)
+      product_column = product_column_by_name(product_column_name)
+      items = matres_sub_type_master_list_items(sub_type_id, product_column.id)
+      active_items = items.select(&:active)
+      active_items.map { |r| ["#{r[:short_code]}#{r[:long_name] ? ' - ' + r[:long_name] : ''}", r[:short_code]] }.compact
     end
 
-    def for_select_sub_type_master_list_items(sub_type_id, product_column)
-      sub_type_master_list_items(sub_type_id).map { |r| [(r[:short_code] + (r[:long_name] ? ' - ' + r[:long_name] : '')).to_s, r[:id]] if r[:column_name] == product_column.to_s && r[:active] }
-                                             .compact
+    def product_column_by_name(product_column)
+      where(:material_resource_product_columns, PackMaterialApp::MatresProductColumn, column_name: product_column)
     end
 
-    def get_dataminer_report(file_name)
-      path = File.join(ENV['ROOT'], 'grid_definitions', 'dataminer_queries', file_name.sub('.yml', '') << '.yml')
-      rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
-      Crossbeams::Dataminer::Report.load(rpt_hash)
+    def matres_sub_type_master_list_items(sub_type_id, product_column_id)
+      list = DB[:material_resource_master_lists].where(
+        material_resource_sub_type_id: sub_type_id,
+        material_resource_product_column_id: product_column_id
+      ).first
+      if list
+        all(:material_resource_master_list_items, MatresMasterListItem, material_resource_master_list_id: list[:id])
+      else
+        []
+      end
     end
 
     def create_matres_sub_type_master_list_item(sub_type_id, attrs)
@@ -206,18 +214,6 @@ module PackMaterialApp
 
     def find_matres_product_column(id)
       find(:material_resource_product_columns, MatresProductColumn, id)
-    end
-
-    def matres_sub_type_master_list_items(sub_type_id, product_column_id)
-      list = DB[:material_resource_master_lists].where(
-        material_resource_sub_type_id: sub_type_id,
-        material_resource_product_column_id: product_column_id
-      ).first
-      if list
-        all(:material_resource_master_list_items, MatresMasterListItem, material_resource_master_list_id: list[:id])
-      else
-        []
-      end
     end
 
     def matres_sub_type_has_products(sub_type_id)

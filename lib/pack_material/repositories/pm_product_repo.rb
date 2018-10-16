@@ -48,6 +48,7 @@ module PackMaterialApp
     end
 
     def create_pm_product_variant(attrs)
+      return validation_failed_response(OpenStruct.new(messages: { base: ['This product variant already exists'] })) if where_hash(:pack_material_product_variants, attrs.to_h)
       variant_id = create(:pack_material_product_variants, attrs)
       variant = where_hash(:pack_material_product_variants, id: variant_id)
       sub_type_id = DB[:pack_material_products].where(id: variant[:pack_material_product_id]).first[:material_resource_sub_type_id]
@@ -57,7 +58,7 @@ module PackMaterialApp
              product_variant_table_name: 'pack_material_product_variants',
              product_variant_number: variant[:product_variant_number],
              product_variant_code: variant[:product_variant_code])
-      variant_id
+      success_response('ok', variant_id)
     end
 
     def delete_pm_product_variant(id)

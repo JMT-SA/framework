@@ -31,7 +31,7 @@ class Framework < Roda
           res = role_interactor.create_matres_product_variant_party_role(id, params[:matres_product_variant_party_role])
           type = params[:type]
           if res.success
-            reload_previous_dialog_via_json("/list/material_resource_product_variant_party_roles/with_params?matres_variant_id=#{id}", notice: res.message)
+            reload_previous_dialog_via_json("/list/material_resource_product_variant_party_roles/with_params?key=standard&matres_variant_id=#{id}", notice: res.message)
           else
             re_show_form(r, res, url: "/pack_material/material_resource/material_resource_product_variants/#{id}/material_resource_product_variant_party_roles/new?type=#{type}") do
               PackMaterial::MaterialResource::MatresProductVariantPartyRole::New.call(id,

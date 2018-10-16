@@ -67,7 +67,7 @@ module UiRules
         caption = col_name.to_s.gsub('_id', '').gsub('pm_', '').tr('_', ' ').capitalize
         caption = 'Variety' if col_name == :marketing_variety_id
 
-        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: true } : { required: true }
+        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: true } : { required: true, caption: caption }
       end
       x
     end

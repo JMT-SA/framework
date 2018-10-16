@@ -50,16 +50,38 @@ module PackMaterialApp
     crud_calls_for :material_resource_product_variant_party_roles, name: :matres_product_variant_party_role, wrapper: MatresProductVariantPartyRole
 
     def create_matres_product_variant_party_role(attrs)
-      hash = attrs.to_h
       message = nil
-      message = 'Can not assign both customer and supplier' if hash[:supplier_id] && hash[:customer_id]
-      message ||= 'Must have customer or supplier' if hash[:supplier_id].nil? && hash[:customer_id].nil?
-      message ||= 'Supplier already exists' if hash[:supplier_id] && exists?(:material_resource_product_variant_party_roles, supplier_id: hash[:supplier_id])
-      message ||= 'Customer already exists' if hash[:customer_id] && exists?(:material_resource_product_variant_party_roles, customer_id: hash[:customer_id])
-      return validation_failed_response(OpenStruct.new(messages: message)) if message
+      message = 'Can not assign both customer and supplier' if attrs[:supplier_id] && attrs[:customer_id]
+      message ||= 'Must have customer or supplier' if attrs[:supplier_id].nil? && attrs[:customer_id].nil?
+      return validation_failed_response(OpenStruct.new(messages: { base: [message] })) if message
 
-      role_id = DB[:material_resource_product_variant_party_roles].insert(hash.to_h)
+      message = "#{role_type(attrs).downcase.capitalize} already exists" if role_type_exists(attrs)
+      return validation_failed_response(OpenStruct.new(messages: { base: [message] })) if message
+
+      role_id = DB[:material_resource_product_variant_party_roles].insert(attrs.to_h)
       success_response('ok', role_id)
+      # rescue Sequel::UniqueConstraintViolation # ???
+      #   validation_failed_response(OpenStruct.new(messages: { base: ['This role link already exists'] }))
+    end
+
+    # Check if role link to Customer or Supplier exists for applicable Product Variant
+    #
+    # @param attrs [Hash] material_resource_product_variant_party_roles attributes for create
+    # @return [Boolean]
+    def role_type_exists(attrs)
+      args = {
+        material_resource_product_variant_id: attrs[:material_resource_product_variant_id],
+        "#{role_type(attrs).downcase}_id": (attrs[:customer_id] || attrs[:supplier_id])
+      }
+      exists?(:material_resource_product_variant_party_roles, args)
+    end
+
+    # Returns applicable constant based on whether you have customer or supplier id
+    #
+    # @param attrs [Hash] material_resource_product_variant_party_roles attributes for create
+    # @return [String] role type constant
+    def role_type(attrs)
+      attrs[:supplier_id] ? MasterfilesApp::SUPPLIER_ROLE : MasterfilesApp::CUSTOMER_ROLE
     end
 
     def find_party_role(id)

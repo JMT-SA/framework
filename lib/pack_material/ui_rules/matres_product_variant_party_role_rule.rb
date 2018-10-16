@@ -36,8 +36,7 @@ module UiRules
     end
 
     def form_fields
-      supplier = @options[:type] == MasterfilesApp::SUPPLIER_ROLE.downcase
-      supplier = @repo.find_party_role(@options[:id])&.supplier? if @mode == :edit
+      supplier = supplier_type_check
       {
         material_resource_product_variant_id: { renderer: :hidden, required: true },
         product_variant_code: { renderer: :label, with_value: product_variant.product_variant_code, readonly: true, caption: 'Product Code' },
@@ -45,9 +44,14 @@ module UiRules
         supplier_id: supplier ? { renderer: :select, options: @party_repo.for_select_suppliers, caption: 'Supplier' } : { renderer: :hidden },
         customer_id: supplier ? { renderer: :hidden } : { renderer: :select, options: @party_repo.for_select_customers, caption: 'Customer' },
         party_stock_code: { caption: "#{supplier ? 'Supplier' : 'Customer'} Stock Code", required: true },
-        supplier_lead_time: (supplier ? { caption: 'Lead Time (days)' } : { renderer: :hidden }),
+        supplier_lead_time: (supplier ? { caption: 'Lead Time (days)', required: true } : { renderer: :hidden }),
         is_preferred_supplier: (supplier ? { renderer: :checkbox } : { renderer: :hidden })
       }
+    end
+
+    def supplier_type_check
+      # I get type directly from the repo so that it can't be changed from the edit view
+      @options[:type] ? @options[:type] == MasterfilesApp::SUPPLIER_ROLE.downcase : @repo.find_party_role(@options[:id])&.supplier?
     end
 
     def product_variant

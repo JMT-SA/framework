@@ -8,7 +8,6 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:matres_product_variant_party_role, :new, parent_id: parent_id, type: type, form_values: form_values)
           rules   = ui_rule.compile
 
-          supplier = type == MasterfilesApp::SUPPLIER_ROLE
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -19,11 +18,11 @@ module PackMaterial
               form.add_field :material_resource_product_variant_id
               form.add_field :product_variant_code
               form.add_field :product_variant_number
-              form.add_field :supplier_id if supplier
-              form.add_field :customer_id unless supplier
+              form.add_field :supplier_id
+              form.add_field :customer_id
               form.add_field :party_stock_code
-              form.add_field :supplier_lead_time if supplier
-              form.add_field :is_preferred_supplier if supplier
+              form.add_field :supplier_lead_time
+              form.add_field :is_preferred_supplier
             end
           end
 

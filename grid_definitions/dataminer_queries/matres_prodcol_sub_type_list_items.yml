@@ -156,7 +156,7 @@
 :query_parameter_definitions:
 - :column: material_resource_product_columns.id
   :caption: Product Column Id
-  :data_type: :string
+  :data_type: :integer
   :control_type: :text
   :default_value: 
   :ordered_list: 
@@ -164,7 +164,7 @@
   :list_def: 
 - :column: material_resource_master_lists.material_resource_sub_type_id
   :caption: Sub Type Id
-  :data_type: :string
+  :data_type: :integer
   :control_type: :text
   :default_value: 
   :ordered_list: 

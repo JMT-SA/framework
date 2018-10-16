@@ -265,23 +265,23 @@ module PackMaterialApp
 
       result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id], customer_id: customer[:id]))
       refute result.success
-      assert_equal 'Can not assign both customer and supplier', result.errors
+      assert_equal 'Can not assign both customer and supplier', result.errors[:base][0]
 
       result = repo.create_matres_product_variant_party_role(attrs)
       refute result.success
-      assert_equal 'Must have customer or supplier', result.errors
+      assert_equal 'Must have customer or supplier', result.errors[:base][0]
 
       result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
       assert result.success
       result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
       refute result.success
-      assert_equal 'Supplier already exists', result.errors
+      assert_equal 'Supplier already exists', result.errors[:base][0]
 
       result = repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
       assert result.success
       result = repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
       refute result.success
-      assert_equal 'Customer already exists', result.errors
+      assert_equal 'Customer already exists', result.errors[:base][0]
     end
 
     def test_find_party_role

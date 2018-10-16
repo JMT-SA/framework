@@ -81,7 +81,7 @@ class Framework < Roda
         check_auth!('configuration', 'edit')
         res = interactor.matres_sub_types_product_column_ids(id)
         if res.success
-          r.redirect "/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=#{id}&product_column_ids=#{res.instance}"
+          r.redirect "/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=#{id}&product_column_ids=#{res.instance.join(',')}"
         else
           flash[:error] = res.message
           r.redirect '/list/material_resource_sub_types'

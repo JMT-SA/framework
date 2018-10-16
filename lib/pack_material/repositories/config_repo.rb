@@ -103,14 +103,15 @@ module PackMaterialApp
     end
 
     # SUB TYPES
-    def update_matres_sub_type(id, attrs)
-      short_code_notice = nil
-      if matres_sub_type_has_products(id)
-        attrs.delete(:short_code)
-        short_code_notice = 'Short code can not be updated if products are present'
+    def update_matres_sub_type(id, params)
+      attrs = params.to_h
+      current_sub_type = find_hash(:material_resource_sub_types, id)
+      if matres_sub_type_has_products(id) && (attrs[:short_code] != current_sub_type[:short_code])
+        validation_failed_response(OpenStruct.new(messages: { short_code: ['Short code can not be updated if products are present'] }))
+      else
+        update(:material_resource_sub_types, id, attrs) if attrs.any?
+        success_response('ok')
       end
-      update(:material_resource_sub_types, id, attrs) if attrs.any?
-      { success: true, message: short_code_notice }
     end
 
     def delete_matres_sub_type(id)

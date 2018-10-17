@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: ac88be24f4b845d4241658690e23d0b75337efff
+  revision: 10aecd74a4ead35c0bddfedf1ae8ccf7c6a878cf
   specs:
     crossbeams-layout (0.1.11)
       diffy
@@ -193,6 +193,9 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
     sequel (5.7.1)
+    sequel_pg (1.11.0)
+      pg (>= 0.18.0)
+      sequel (>= 4.38.0)
     sequel_postgresql_triggers (1.4.0)
       sequel
     sshkit (1.17.0)
@@ -249,6 +252,7 @@ DEPENDENCIES
   rubocop
   sass
   sequel
+  sequel_pg
   sequel_postgresql_triggers
   thin
   tilt

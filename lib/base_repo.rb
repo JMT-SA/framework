@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# Base class for all database repository classes to inherit from.
+#
+# Contains several helper methods that can be called on the
+# inherited repo or can be overridden. These mostly handle reads
+# and writes.
+#
+# Contains a few helper directives to be called during inheritance
+# by the sub class that will generate appropriate methods on the
+# sub class.
+# For example basic CRUD calls for a particular table using:
+#     crud_calls_for
 class BaseRepo # rubocop:disable Metrics/ClassLength
   include Crossbeams::Responses
 
@@ -255,6 +266,43 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
                                             row_data_id: id,
                                             status: status.upcase,
                                             comment: comment)
+  end
+
+  # Log the status of several records.
+  #
+  # @param table_name [String] the name of the table.
+  # @param in_ids [Array/Integer] the ids of the records with the changed status.
+  # @param status [String] the status to be logged.
+  # @param comment [String] extra information about the status change.
+  # @param user_name [String] the current user's name.
+  def log_multiple_statuses(table_name, in_ids, status, comment: nil, user_name: nil) # rubocop:disable Metrics/AbcSize
+    ids = Array(in_ids)
+
+    ids.each do |id|
+      DB[Sequel[:audit][:current_statuses]].insert_conflict(target: %i[table_name row_data_id],
+                                                            update: {
+                                                              user_name: Sequel[:excluded][:user_name],
+                                                              row_data_id: Sequel[:excluded][:row_data_id],
+                                                              status: Sequel[:excluded][:status],
+                                                              comment: Sequel[:excluded][:comment],
+                                                              transaction_id: Sequel.function(:txid_current),
+                                                              action_tstamp_tx: Time.now
+                                                            }).insert(user_name: user_name,
+                                                                      table_name: table_name.to_s,
+                                                                      row_data_id: id,
+                                                                      status: status.upcase,
+                                                                      comment: comment)
+    end
+
+    items = []
+    ids.each do |id|
+      items << { user_name: user_name,
+                 table_name: table_name.to_s,
+                 row_data_id: id,
+                 status: status.upcase,
+                 comment: comment }
+    end
+    DB[Sequel[:audit][:status_logs]].multi_insert(items)
   end
 
   def self.inherited(klass)

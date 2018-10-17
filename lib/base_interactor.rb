@@ -28,4 +28,9 @@ class BaseInteractor
   def log_status(table_name, id, status, comment: nil)
     repo.log_status(table_name, id, status, user_name: @user.user_name, comment: comment)
   end
+
+  # Log the status of multiple records. Uses the context passed to the Interactor constructor.
+  def log_multiple_statuses(table_name, ids, status, comment: nil)
+    repo.log_multiple_statuses(table_name, ids, status, user_name: @user.user_name, comment: comment)
+  end
 end

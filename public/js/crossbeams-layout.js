@@ -62,6 +62,13 @@
     }
   }
 
+  /**
+   * loadDialogContent - fetches the given url and calls setDialogContent
+   *                     to replace the dialog's content area.
+   *
+   * @param {string} url - the url to call.
+   * @returns {void}
+   */
   function loadDialogContent(url) {
     fetch(url, {
       method: 'GET',
@@ -135,6 +142,12 @@
           crossbeamsUtils.recordGridIdForPopup(event.target.dataset.gridId);
         }
         crossbeamsUtils.popupDialog(event.target.text, event.target.href);
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      // Replace modal dialog
+      if (event.target.dataset && event.target.dataset.replaceDialog) {
+        loadDialogContent(event.target.href);
         event.stopPropagation();
         event.preventDefault();
       }

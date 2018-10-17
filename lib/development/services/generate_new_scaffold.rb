@@ -120,7 +120,7 @@ class GenerateNewScaffold < BaseService
     attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup, :indexed_columns
 
     DRY_TYPE_LOOKUP = {
-      integer: 'Types::Int',
+      integer: 'Types::Integer',
       string: 'Types::String',
       boolean: 'Types::Bool',
       float: 'Types::Float',
@@ -147,7 +147,7 @@ class GenerateNewScaffold < BaseService
     }.freeze
 
     VALIDATION_TYPE_LOOKUP = {
-      integer: ':int',
+      integer: ':integer',
       string: 'Types::StrippedString',
       boolean: ':bool',
       datetime: ':date_time',

@@ -22,6 +22,11 @@
     :icon: list
     :title: Assign Permissions
     :popup: true
+  - :url: /development/statuses/show/security_groups/$:id$
+    :text: status
+    :icon: information-solid
+    :title: Status
+    :popup: true
 :page_controls:
   - :control_type: :link
     :url: /security/functional_areas/security_groups/new

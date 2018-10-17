@@ -47,8 +47,8 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |`:link`
 
 |options - :behaviour
-|How the link behaves when clicked. Can open the url in a new page, or can open the url in a popup dialog.
-|`:popup`.
+|How the link behaves when clicked. Can open the url in a new page, can open the url in a popup dialog or can replace an already-open dialog.
+|`:popup` or `:replace_dialog`.
 |n/a
 
 |options - :css_class
@@ -290,7 +290,8 @@ section.add_table [{ keys: 'a', values: 1, amounts: 22 },
                    { keys: 'b', values: 2, amounts: 33 }],
                    %i[keys values amounts],
                    alignment: { amounts: :right },
-                   cell_classes: { amounts: neg_check }
+                   cell_classes: { amounts: neg_check },
+                   header_captions: { values: 'Value' }
 ----
 
 |===
@@ -316,6 +317,11 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |options - :cell_classes
 |A Hash of options
 |`cell_classes: { col: [callable] }`. The hash should only contain columns where you wish to apply logic to determine the css class. The value for each column must be something that responds to `call` - see example above using a lambda. NB. it is crucial to guard agains `nil` values for the column.
+|None.
+
+|options - :header_captions
+|A Hash of options
+|Provide captions for headers to override the default text (which is the header key capitalised with underscores changed to spaces).
 |None.
 
 |===

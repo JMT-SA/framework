@@ -230,6 +230,11 @@ and all words start with initial capital letter.
 |HTML text
 |None
 
+|:css_class
+|Extra class string to add to the label’s class.
+|String
+|None
+
 |:as_boolean
 |If `true` and the field value is `true`, show a checkon icon, else show a checkoff icon.
 |`true` or `false`

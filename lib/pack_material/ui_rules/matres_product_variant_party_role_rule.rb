@@ -37,16 +37,26 @@ module UiRules
 
     def form_fields
       supplier = supplier_type_check
-      {
+      fields = {
         material_resource_product_variant_id: { renderer: :hidden, required: true },
         product_variant_code: { renderer: :label, with_value: product_variant.product_variant_code, readonly: true, caption: 'Product Code' },
-        product_variant_number: { renderer: :label, with_value: product_variant.product_variant_number, readonly: true, caption: 'Product Number' },
-        supplier_id: supplier ? { renderer: :select, options: @party_repo.for_select_suppliers, caption: 'Supplier' } : { renderer: :hidden },
-        customer_id: supplier ? { renderer: :hidden } : { renderer: :select, options: @party_repo.for_select_customers, caption: 'Customer' },
-        party_stock_code: { caption: "#{supplier ? 'Supplier' : 'Customer'} Stock Code", required: true },
-        supplier_lead_time: (supplier ? { caption: 'Lead Time (days)', required: true } : { renderer: :hidden }),
-        is_preferred_supplier: (supplier ? { renderer: :checkbox } : { renderer: :hidden })
+        product_variant_number: { renderer: :label, with_value: product_variant.product_variant_number, readonly: true, caption: 'Product Number' }
       }
+      supplier_fields = {
+        supplier_id: { renderer: :select, options: @party_repo.for_select_suppliers, caption: 'Supplier' },
+        customer_id: { renderer: :hidden },
+        party_stock_code: { caption: 'Supplier Stock Code', required: true },
+        supplier_lead_time: { caption: 'Lead Time (days)', required: true },
+        is_preferred_supplier: { renderer: :checkbox }
+      }
+      customer_fields = {
+        supplier_id: { renderer: :hidden },
+        customer_id: { renderer: :select, options: @party_repo.for_select_customers, caption: 'Customer' },
+        party_stock_code: { caption: 'Customer Stock Code', required: true },
+        supplier_lead_time: { renderer: :hidden },
+        is_preferred_supplier: { renderer: :hidden }
+      }
+      supplier ? fields.merge(supplier_fields) : fields.merge(customer_fields)
     end
 
     def supplier_type_check

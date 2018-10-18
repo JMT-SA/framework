@@ -4,7 +4,7 @@ module Masterfiles
   module Locations
     module LocationStorageType
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:location_storage_type, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

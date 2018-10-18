@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class TestFruitSizeRepo < MiniTestWithHooks
     def test_for_selects
@@ -16,30 +13,11 @@ module MasterfilesApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_basic_pack_code
-      assert_respond_to repo, :create_basic_pack_code
-      assert_respond_to repo, :update_basic_pack_code
-      assert_respond_to repo, :delete_basic_pack_code
-
-      assert_respond_to repo, :find_standard_pack_code
-      assert_respond_to repo, :create_standard_pack_code
-      assert_respond_to repo, :update_standard_pack_code
-      assert_respond_to repo, :delete_standard_pack_code
-
-      assert_respond_to repo, :find_std_fruit_size_count
-      assert_respond_to repo, :create_std_fruit_size_count
-      assert_respond_to repo, :update_std_fruit_size_count
-      assert_respond_to repo, :delete_std_fruit_size_count
-
-      assert_respond_to repo, :find_fruit_actual_counts_for_pack
-      assert_respond_to repo, :create_fruit_actual_counts_for_pack
-      assert_respond_to repo, :update_fruit_actual_counts_for_pack
-      assert_respond_to repo, :delete_fruit_actual_counts_for_pack
-
-      assert_respond_to repo, :find_fruit_size_reference
-      assert_respond_to repo, :create_fruit_size_reference
-      assert_respond_to repo, :update_fruit_size_reference
-      assert_respond_to repo, :delete_fruit_size_reference
+      test_crud_calls_for :basic_pack_codes, name: :basic_pack_code, wrapper: BasicPackCode
+      test_crud_calls_for :standard_pack_codes, name: :standard_pack_code, wrapper: StandardPackCode
+      test_crud_calls_for :std_fruit_size_counts, name: :std_fruit_size_count, wrapper: StdFruitSizeCount
+      test_crud_calls_for :fruit_actual_counts_for_packs, name: :fruit_actual_counts_for_pack, wrapper: FruitActualCountsForPack
+      test_crud_calls_for :fruit_size_references, name: :fruit_size_reference, wrapper: FruitSizeReference
     end
 
     private
@@ -49,5 +27,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

@@ -92,7 +92,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     INTERACTOR.any_instance.stubs(:create_matres_product_variant_party_role).returns(ok_response)
     post_as_fetch 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles', { type: MasterfilesApp::SUPPLIER_ROLE }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     assert last_response.ok?
-    assert last_response.body.include?('/list/material_resource_product_variant_party_roles/with_params?matres_variant_id=1')
+    assert last_response.body.include?('/list/material_resource_product_variant_party_roles/with_params?key=standard&matres_variant_id=1')
     expect_json_response
   end
 

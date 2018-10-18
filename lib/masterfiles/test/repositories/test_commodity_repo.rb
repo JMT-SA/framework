@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class TestCommodityRepo < MiniTestWithHooks
     def test_for_selects
@@ -13,15 +10,8 @@ module MasterfilesApp
     end
 
     def test_crud_calls
-      assert_respond_to repo, :find_commodity_group
-      assert_respond_to repo, :create_commodity_group
-      assert_respond_to repo, :update_commodity_group
-      assert_respond_to repo, :delete_commodity_group
-
-      assert_respond_to repo, :find_commodity
-      assert_respond_to repo, :create_commodity
-      assert_respond_to repo, :update_commodity
-      assert_respond_to repo, :delete_commodity
+      test_crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup
+      test_crud_calls_for :commodities, name: :commodity, wrapper: Commodity
     end
 
     private
@@ -31,5 +21,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

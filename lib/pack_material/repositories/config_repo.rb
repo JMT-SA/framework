@@ -50,16 +50,38 @@ module PackMaterialApp
     crud_calls_for :material_resource_product_variant_party_roles, name: :matres_product_variant_party_role, wrapper: MatresProductVariantPartyRole
 
     def create_matres_product_variant_party_role(attrs)
-      hash = attrs.to_h
       message = nil
-      message = 'Can not assign both customer and supplier' if hash[:supplier_id] && hash[:customer_id]
-      message ||= 'Must have customer or supplier' if hash[:supplier_id].nil? && hash[:customer_id].nil?
-      message ||= 'Supplier already exists' if hash[:supplier_id] && exists?(:material_resource_product_variant_party_roles, supplier_id: hash[:supplier_id])
-      message ||= 'Customer already exists' if hash[:customer_id] && exists?(:material_resource_product_variant_party_roles, customer_id: hash[:customer_id])
-      return validation_failed_response(OpenStruct.new(messages: message)) if message
+      message = 'Can not assign both customer and supplier' if attrs[:supplier_id] && attrs[:customer_id]
+      message ||= 'Must have customer or supplier' if attrs[:supplier_id].nil? && attrs[:customer_id].nil?
+      return validation_failed_response(OpenStruct.new(messages: { base: [message] })) if message
 
-      role_id = DB[:material_resource_product_variant_party_roles].insert(hash.to_h)
+      message = "#{role_type(attrs).downcase.capitalize} already exists" if role_type_exists(attrs)
+      return validation_failed_response(OpenStruct.new(messages: { base: [message] })) if message
+
+      role_id = DB[:material_resource_product_variant_party_roles].insert(attrs.to_h)
       success_response('ok', role_id)
+      # rescue Sequel::UniqueConstraintViolation # ???
+      #   validation_failed_response(OpenStruct.new(messages: { base: ['This role link already exists'] }))
+    end
+
+    # Check if role link to Customer or Supplier exists for applicable Product Variant
+    #
+    # @param attrs [Hash] material_resource_product_variant_party_roles attributes for create
+    # @return [Boolean]
+    def role_type_exists(attrs)
+      args = {
+        material_resource_product_variant_id: attrs[:material_resource_product_variant_id],
+        "#{role_type(attrs).downcase}_id": (attrs[:customer_id] || attrs[:supplier_id])
+      }
+      exists?(:material_resource_product_variant_party_roles, args)
+    end
+
+    # Returns applicable constant based on whether you have customer or supplier id
+    #
+    # @param attrs [Hash] material_resource_product_variant_party_roles attributes for create
+    # @return [String] role type constant
+    def role_type(attrs)
+      attrs[:supplier_id] ? MasterfilesApp::SUPPLIER_ROLE : MasterfilesApp::CUSTOMER_ROLE
     end
 
     def find_party_role(id)
@@ -103,14 +125,15 @@ module PackMaterialApp
     end
 
     # SUB TYPES
-    def update_matres_sub_type(id, attrs)
-      short_code_notice = nil
-      if matres_sub_type_has_products(id)
-        attrs.delete(:short_code)
-        short_code_notice = 'Short code can not be updated if products are present'
+    def update_matres_sub_type(id, params)
+      attrs = params.to_h
+      current_sub_type = find_hash(:material_resource_sub_types, id)
+      if matres_sub_type_has_products(id) && (attrs[:short_code] != current_sub_type[:short_code])
+        validation_failed_response(OpenStruct.new(messages: { short_code: ['Short code can not be updated if products are present'] }))
+      else
+        update(:material_resource_sub_types, id, attrs) if attrs.any?
+        success_response('ok')
       end
-      update(:material_resource_sub_types, id, attrs) if attrs.any?
-      { success: true, message: short_code_notice }
     end
 
     def delete_matres_sub_type(id)
@@ -173,19 +196,27 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def sub_type_master_list_items(sub_type_id)
-      DB[get_dataminer_report('matres_prodcol_sub_type_list_items.yml').sql].where(sub_type_id: sub_type_id)
+    def for_select_sub_type_master_list_items(sub_type_id, product_column_name)
+      product_column = product_column_by_name(product_column_name)
+      items = matres_sub_type_master_list_items(sub_type_id, product_column.id)
+      active_items = items.select(&:active)
+      active_items.map { |r| ["#{r[:short_code]}#{r[:long_name] ? ' - ' + r[:long_name] : ''}", r[:short_code]] }.compact
     end
 
-    def for_select_sub_type_master_list_items(sub_type_id, product_column)
-      sub_type_master_list_items(sub_type_id).map { |r| [(r[:short_code] + (r[:long_name] ? ' - ' + r[:long_name] : '')).to_s, r[:id]] if r[:column_name] == product_column.to_s && r[:active] }
-                                             .compact
+    def product_column_by_name(product_column)
+      where(:material_resource_product_columns, PackMaterialApp::MatresProductColumn, column_name: product_column)
     end
 
-    def get_dataminer_report(file_name)
-      path = File.join(ENV['ROOT'], 'grid_definitions', 'dataminer_queries', file_name.sub('.yml', '') << '.yml')
-      rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
-      Crossbeams::Dataminer::Report.load(rpt_hash)
+    def matres_sub_type_master_list_items(sub_type_id, product_column_id)
+      list = DB[:material_resource_master_lists].where(
+        material_resource_sub_type_id: sub_type_id,
+        material_resource_product_column_id: product_column_id
+      ).first
+      if list
+        all(:material_resource_master_list_items, MatresMasterListItem, material_resource_master_list_id: list[:id])
+      else
+        []
+      end
     end
 
     def create_matres_sub_type_master_list_item(sub_type_id, attrs)
@@ -206,18 +237,6 @@ module PackMaterialApp
 
     def find_matres_product_column(id)
       find(:material_resource_product_columns, MatresProductColumn, id)
-    end
-
-    def matres_sub_type_master_list_items(sub_type_id, product_column_id)
-      list = DB[:material_resource_master_lists].where(
-        material_resource_sub_type_id: sub_type_id,
-        material_resource_product_column_id: product_column_id
-      ).first
-      if list
-        all(:material_resource_master_list_items, MatresMasterListItem, material_resource_master_list_id: list[:id])
-      else
-        []
-      end
     end
 
     def matres_sub_type_has_products(sub_type_id)

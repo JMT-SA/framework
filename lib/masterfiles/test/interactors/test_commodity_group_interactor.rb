@@ -2,14 +2,11 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class TestCommodityGroupInteractor < Minitest::Test
     def test_repo
-      commodity_repo = interactor.send(:commodity_repo)
-      assert commodity_repo.is_a?(MasterfilesApp::CommodityRepo)
+      repo = interactor.send(:repo)
+      assert repo.is_a?(MasterfilesApp::CommodityRepo)
     end
 
     private
@@ -19,5 +16,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

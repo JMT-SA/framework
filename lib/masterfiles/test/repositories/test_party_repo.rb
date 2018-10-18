@@ -3,9 +3,6 @@
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 require File.join(File.expand_path('../factories', __dir__), 'party_factory')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class TestPartyRepo < MiniTestWithHooks
     include PartyFactory
@@ -23,22 +20,15 @@ module MasterfilesApp
       assert_respond_to repo, :for_select_address_types
     end
 
-    def crud_call_for(key)
-      assert_respond_to repo, :"find_#{key}"
-      assert_respond_to repo, :"create_#{key}"
-      assert_respond_to repo, :"update_#{key}"
-      assert_respond_to repo, :"delete_#{key}"
-    end
-
-    def test_crud_call_responses
-      crud_call_for('organization')
-      crud_call_for('person')
-      crud_call_for('address')
-      crud_call_for('contact_method')
-      crud_call_for('customer_type')
-      crud_call_for('customer')
-      crud_call_for('supplier_type')
-      crud_call_for('supplier')
+    def test_crud_calls
+      test_crud_calls_for :organizations, name: :organization, wrapper: Organization
+      test_crud_calls_for :people, name: :person, wrapper: Person
+      test_crud_calls_for :addresses, name: :address, wrapper: Address
+      test_crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
+      test_crud_calls_for :customer_types, name: :customer_type, wrapper: CustomerType
+      test_crud_calls_for :customers, name: :customer, wrapper: Customer
+      test_crud_calls_for :supplier_types, name: :supplier_type, wrapper: SupplierType
+      test_crud_calls_for :suppliers, name: :supplier, wrapper: Supplier
     end
 
     def test_find_party
@@ -549,5 +539,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

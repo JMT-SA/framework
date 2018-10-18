@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop#disable Metrics/AbcSize
+
 module PackMaterialApp
   class ConfigInteractor < BaseInteractor
     def create_matres_type(params)
@@ -43,10 +46,13 @@ module PackMaterialApp
     def update_matres_sub_type(id, params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      response = repo.update_matres_sub_type(id, res)
-      extra = response[:message] ? (', ' + response[:message]) : ''
-      instance = matres_sub_type(id)
-      success_response("Updated sub type #{instance.sub_type_name}#{extra}", instance)
+      result = repo.update_matres_sub_type(id, res)
+      if result.success
+        instance = matres_sub_type(id)
+        success_response("Updated sub type #{instance.sub_type_name}", instance)
+      else
+        result
+      end
     end
 
     def delete_matres_sub_type(id)
@@ -152,3 +158,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop#enable Metrics/AbcSize

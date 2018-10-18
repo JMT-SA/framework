@@ -131,7 +131,7 @@ class TestMatresSubTypeRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:matres_sub_types_product_column_ids).returns(success_response('Success', [1,2,3]))
     get 'pack_material/config/material_resource_sub_types/1/product_columns', {}, 'rack.session' => { user_id: 1 }
-    url = '/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=1&product_column_ids=[1, 2, 3]'
+    url = '/list/material_resource_product_column_master_list_items/with_params?key=standard&sub_type_id=1&product_column_ids=1,2,3'
     expect_ok_redirect(url: url, has_dummy_content: false)
 
     INTERACTOR.any_instance.stubs(:matres_sub_types_product_column_ids).returns(failed_response('No product columns selected, please see config.'))

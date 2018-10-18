@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module DevelopmentApp
   class GridInteractor < BaseInteractor
     def list_grids
@@ -300,3 +303,5 @@ module DevelopmentApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

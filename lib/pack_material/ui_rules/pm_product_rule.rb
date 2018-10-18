@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module UiRules
   class PmProductRule < Base
     def generate_rules
@@ -65,14 +68,14 @@ module UiRules
       }
 
       product_column_set.each do |col_name|
-        list = master_list_items(col_name)
+        list = master_list_items(col_name.to_s)
         list = @commodity_repo.for_select_commodities if col_name == :commodity_id
         list = @variety_repo.for_select_marketing_varieties if col_name == :marketing_variety_id
 
         caption = col_name.to_s.gsub('_id', '').gsub('pm_', '').tr('_', ' ').capitalize
         caption = 'Variety' if col_name == :marketing_variety_id
 
-        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: true } : { required: true }
+        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: true } : { required: true, caption: caption }
       end
       x
     end
@@ -135,3 +138,5 @@ module UiRules
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

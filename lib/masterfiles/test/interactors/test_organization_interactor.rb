@@ -2,13 +2,10 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class TestOrganizationInteractor < Minitest::Test
-    def test_party_repo
-      x = interactor.send(:party_repo)
+    def test_repo
+      x = interactor.send(:repo)
       assert x.is_a?(PartyRepo)
     end
 
@@ -227,5 +224,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

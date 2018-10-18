@@ -179,5 +179,5 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/ModuleLength
 # rubocop:enable Metrics/AbcSize

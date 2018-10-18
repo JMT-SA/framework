@@ -4,7 +4,7 @@ module PackMaterial
   module Config
     module MatresSubType
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:matres_sub_type, :show, id: id)
           rules   = ui_rule.compile
 

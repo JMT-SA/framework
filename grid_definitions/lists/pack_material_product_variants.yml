@@ -26,7 +26,7 @@
   :title: Edit Inventory
   :popup: true
   :hide_if_null: mr_id
-- :url: "/list/material_resource_product_variant_party_roles/with_params?matres_variant_id=$:mr_id$"
+- :url: "/list/material_resource_product_variant_party_roles/with_params?key=standard&matres_variant_id=$:mr_id$"
   :text: link party roles
   :icon: edit
   :title: Link Party Roles

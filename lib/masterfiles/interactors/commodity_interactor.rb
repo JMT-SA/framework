@@ -5,7 +5,7 @@ module MasterfilesApp
     def create_commodity_group(params)
       res = validate_commodity_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @commodity_group_id = commodity_repo.create_commodity_group(res)
+      @commodity_group_id = repo.create_commodity_group(res)
       success_response("Created commodity group #{commodity_group.code}", commodity_group)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { code: ['This commodity group already exists'] }))
@@ -15,7 +15,7 @@ module MasterfilesApp
       @commodity_group_id = id
       res = validate_commodity_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      commodity_repo.update_commodity_group(id, res)
+      repo.update_commodity_group(id, res)
       success_response("Updated commodity group #{commodity_group.code}", commodity_group(false))
     end
 
@@ -23,8 +23,8 @@ module MasterfilesApp
       @commodity_group_id = id
       name = commodity_group.code
       res = {}
-      commodity_repo.transaction do
-        res = commodity_repo.delete_commodity_group(id)
+      repo.transaction do
+        res = repo.delete_commodity_group(id)
       end
       if res[:error]
         failed_response(res[:error])
@@ -36,7 +36,7 @@ module MasterfilesApp
     def create_commodity(params)
       res = validate_commodity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      @commodity_id = commodity_repo.create_commodity(res)
+      @commodity_id = repo.create_commodity(res)
       success_response("Created commodity #{commodity.code}", commodity)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { code: ['This commodity already exists'] }))
@@ -46,7 +46,7 @@ module MasterfilesApp
       @commodity_id = id
       res = validate_commodity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      commodity_repo.update_commodity(id, res)
+      repo.update_commodity(id, res)
       success_response("Updated commodity #{commodity.code}", commodity(false))
     end
 
@@ -54,8 +54,8 @@ module MasterfilesApp
       @commodity_id = id
       name = commodity.code
       res = {}
-      commodity_repo.transaction do
-        res = commodity_repo.delete_commodity(id)
+      repo.transaction do
+        res = repo.delete_commodity(id)
       end
       if res[:error]
         failed_response(res[:error])
@@ -66,15 +66,15 @@ module MasterfilesApp
 
     private
 
-    def commodity_repo
+    def repo
       @commodity_repo ||= CommodityRepo.new
     end
 
     def commodity_group(cached = true)
       if cached
-        @commodity_group ||= commodity_repo.find_commodity_group(@commodity_group_id)
+        @commodity_group ||= repo.find_commodity_group(@commodity_group_id)
       else
-        @commodity_group = commodity_repo.find_commodity_group(@commodity_group_id)
+        @commodity_group = repo.find_commodity_group(@commodity_group_id)
       end
     end
 
@@ -84,9 +84,9 @@ module MasterfilesApp
 
     def commodity(cached = true)
       if cached
-        @commodity ||= commodity_repo.find_commodity(@commodity_id)
+        @commodity ||= repo.find_commodity(@commodity_id)
       else
-        @commodity = commodity_repo.find_commodity(@commodity_id)
+        @commodity = repo.find_commodity(@commodity_id)
       end
     end
 

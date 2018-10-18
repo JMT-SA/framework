@@ -53,7 +53,7 @@ module MiniTestSeeds
       product_code_ids: "{#{prod_code_ids.join(',')}}",
       product_column_ids: "{#{prod_col_ids.join(',')}}"
     )
-    @fixed_table_set[:matres_sub_types] = { sc: { id: sub_id, short_code: 'SC', prod_code_ids: [prod_code_ids] } }
+    @fixed_table_set[:matres_sub_types] = { sc: { id: sub_id, short_code: 'SC', prod_code_ids: prod_code_ids } }
 
     # commodities
 

@@ -31,4 +31,4 @@
   :standard:
     - :col: material_resource_product_variant_party_roles.material_resource_product_variant_id
       :op: =
-      :val: $:matres_product_variant_id$
+      :val: $:matres_variant_id$

@@ -4,7 +4,7 @@ module PackMaterial
   module Config
     module MatresSubType
       class Edit
-        def self.call(id, form_values = nil, form_errors = nil)
+        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:matres_sub_type, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 

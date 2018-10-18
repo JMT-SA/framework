@@ -2,8 +2,8 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
+# rubocop#:disable Metrics/ClassLength
+# rubocop#:disable Metrics/AbcSize
 
 module PackMaterialApp
   class TestPmProductInteractor < Minitest::Test
@@ -539,5 +539,5 @@ module PackMaterialApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize
+# rubocop#:enable Metrics/ClassLength
+# rubocop#:enable Metrics/AbcSize

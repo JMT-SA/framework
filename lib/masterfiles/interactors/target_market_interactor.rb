@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module MasterfilesApp
   class TargetMarketInteractor < BaseInteractor
     def create_tm_group_type(params)
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        @tm_group_type_id = target_market_repo.create_tm_group_type(res)
+        @tm_group_type_id = repo.create_tm_group_type(res)
       end
       success_response("Created target market group type #{tm_group_type.target_market_group_type_code}", tm_group_type)
     rescue Sequel::UniqueConstraintViolation
@@ -18,7 +21,7 @@ module MasterfilesApp
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        target_market_repo.update_tm_group_type(id, res)
+        repo.update_tm_group_type(id, res)
       end
       success_response("Updated target market group type #{tm_group_type.target_market_group_type_code}",
                        tm_group_type(false))
@@ -28,7 +31,7 @@ module MasterfilesApp
       @tm_group_type_id = id
       name = tm_group_type.target_market_group_type_code
       repo.transaction do
-        target_market_repo.delete_tm_group_type(id)
+        repo.delete_tm_group_type(id)
       end
       success_response("Deleted target market group type #{name}")
     end
@@ -37,7 +40,7 @@ module MasterfilesApp
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        @tm_group_id = target_market_repo.create_tm_group(res)
+        @tm_group_id = repo.create_tm_group(res)
       end
       success_response("Created target market group #{tm_group.target_market_group_name}",
                        tm_group)
@@ -50,7 +53,7 @@ module MasterfilesApp
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        target_market_repo.update_tm_group(id, res)
+        repo.update_tm_group(id, res)
       end
       success_response("Updated target market group #{tm_group.target_market_group_name}", tm_group(false))
     end
@@ -59,7 +62,7 @@ module MasterfilesApp
       @tm_group_id = id
       name = tm_group.target_market_group_name
       repo.transaction do
-        target_market_repo.delete_tm_group(id)
+        repo.delete_tm_group(id)
       end
       success_response("Deleted target market group #{name}")
     end
@@ -73,7 +76,7 @@ module MasterfilesApp
       tm_group_ids = res.delete(:tm_group_ids)
 
       repo.transaction do
-        @target_market_id = target_market_repo.create_target_market(res)
+        @target_market_id = repo.create_target_market(res)
       end
       country_response = link_countries(@target_market_id, country_ids)
       tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
@@ -93,24 +96,24 @@ module MasterfilesApp
 
       country_response = link_countries(@target_market_id, country_ids)
       tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
-      target_market_repo.update_target_market(id, res)
+      repo.update_target_market(id, res)
       success_response("Updated target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market(false))
     end
 
     def delete_target_market(id)
       @target_market_id = id
       name = target_market.target_market_name
-      target_market_repo.delete_target_market(id)
+      repo.delete_target_market(id)
       success_response("Deleted target market #{name}")
     end
 
     def link_countries(target_market_id, country_ids)
       return failed_response('You have not selected any countries') unless country_ids
       repo.transaction do
-        target_market_repo.link_countries(target_market_id, country_ids)
+        repo.link_countries(target_market_id, country_ids)
       end
 
-      existing_ids = target_market_repo.target_market_country_ids(target_market_id)
+      existing_ids = repo.target_market_country_ids(target_market_id)
       if existing_ids.eql?(country_ids.sort)
         success_response('Countries linked successfully')
       else
@@ -121,10 +124,10 @@ module MasterfilesApp
     def link_tm_groups(target_market_id, tm_group_ids)
       return failed_response('You have not selected any target market groups') unless tm_group_ids
       repo.transaction do
-        target_market_repo.link_tm_groups(target_market_id, tm_group_ids)
+        repo.link_tm_groups(target_market_id, tm_group_ids)
       end
 
-      existing_ids = target_market_repo.target_market_tm_group_ids(target_market_id)
+      existing_ids = repo.target_market_tm_group_ids(target_market_id)
       if existing_ids.eql?(tm_group_ids.sort)
         success_response('Target market groups linked successfully')
       else
@@ -134,15 +137,15 @@ module MasterfilesApp
 
     private
 
-    def target_market_repo
+    def repo
       @target_market_repo ||= TargetMarketRepo.new
     end
 
     def tm_group_type(cached = true)
       if cached
-        @tm_group_type ||= target_market_repo.find_tm_group_type(@tm_group_type_id)
+        @tm_group_type ||= repo.find_tm_group_type(@tm_group_type_id)
       else
-        @tm_group_type = target_market_repo.find_tm_group_type(@tm_group_type_id)
+        @tm_group_type = repo.find_tm_group_type(@tm_group_type_id)
       end
     end
 
@@ -152,9 +155,9 @@ module MasterfilesApp
 
     def tm_group(cached = true)
       if cached
-        @tm_group ||= target_market_repo.find_tm_group(@tm_group_id)
+        @tm_group ||= repo.find_tm_group(@tm_group_id)
       else
-        @tm_group = target_market_repo.find_tm_group(@tm_group_id)
+        @tm_group = repo.find_tm_group(@tm_group_id)
       end
     end
 
@@ -164,9 +167,9 @@ module MasterfilesApp
 
     def target_market(cached = true)
       if cached
-        @target_market ||= target_market_repo.find_target_market(@target_market_id)
+        @target_market ||= repo.find_target_market(@target_market_id)
       else
-        @target_market = target_market_repo.find_target_market(@target_market_id)
+        @target_market = repo.find_target_market(@target_market_id)
       end
     end
 
@@ -175,3 +178,5 @@ module MasterfilesApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

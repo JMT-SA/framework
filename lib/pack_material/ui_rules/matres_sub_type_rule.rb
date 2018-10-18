@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/AbcSize
+
 module UiRules
   class MatresSubTypeRule < Base
     def generate_rules
@@ -51,3 +53,4 @@ module UiRules
     end
   end
 end
+# rubocop:enable Metrics/AbcSize

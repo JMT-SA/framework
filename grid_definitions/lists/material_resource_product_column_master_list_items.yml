@@ -32,3 +32,6 @@
     - :col: material_resource_product_columns.id
       :op: in
       :val: $:product_column_ids$
+    - :col: material_resource_master_lists.material_resource_sub_type_id
+      :op: =
+      :val: $:sub_type_id$

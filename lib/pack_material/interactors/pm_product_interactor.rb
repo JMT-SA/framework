@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop#:disable Metrics/AbcSize
+
 module PackMaterialApp
   class PmProductInteractor < BaseInteractor
     def create_pm_product(params)
@@ -55,14 +58,18 @@ module PackMaterialApp
     end
 
     def pm_product_variant_create(res)
-      id = nil
+      result = nil
       repo.transaction do
-        id = repo.create_pm_product_variant(res)
+        result = repo.create_pm_product_variant(res)
       end
-      instance = pm_product_variant(id)
-      success_response('Created product variant', instance)
+      if result.success
+        variant = pm_product_variant(result.instance)
+        success_response('Created product variant', variant)
+      else
+        result
+      end
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { unit: ['This product variant already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { base: ['This product variant already exists'] }))
     end
 
     def update_pm_product_variant(id, params)
@@ -137,3 +144,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop#:enable Metrics/AbcSize

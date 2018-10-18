@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
+# rubocop#disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module PackMaterialApp
   class MatresProductVariantPartyRoleInteractor < BaseInteractor
     def create_matres_product_variant_party_role(parent_id, params)
       params[:material_resource_product_variant_id] = parent_id
       res = validate_matres_product_variant_party_role_params(params)
+      res.messages[:base] = res.messages[:customer_or_supplier] if res.messages && res.messages[:customer_or_supplier]
       return validation_failed_response(res) unless res.messages.empty?
       result = nil
       DB.transaction do
@@ -15,10 +19,8 @@ module PackMaterialApp
         instance = matres_product_variant_party_role(result.instance)
         success_response("Created #{link_name(instance)}", instance)
       else
-        validation_failed_response(OpenStruct.new(messages: result.messages))
+        validation_failed_response(OpenStruct.new(messages: result.errors))
       end
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { party_stock_code: ['This role link already exists'] }))
     end
 
     def update_matres_product_variant_party_role(id, params)
@@ -64,3 +66,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop#enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

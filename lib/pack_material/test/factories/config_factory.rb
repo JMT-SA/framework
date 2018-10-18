@@ -2,7 +2,6 @@
 
 require 'faker'
 
-# rubocop:disable Metrics/ModuleLength
 # rubocop:disable Metrics/AbcSize
 
 module PackMaterialApp
@@ -68,5 +67,29 @@ module PackMaterialApp
       }
       DB[:material_resource_product_columns].insert(default.merge(opts))
     end
+
+    def create_matres_master_list(opts = {})
+      default = {
+        material_resource_sub_type_id: @fixed_table_set[:matres_sub_types][:sc][:id],
+        material_resource_product_column_id: @fixed_table_set[:matres_sub_types][:sc][:prod_code_ids].first
+      }
+      merged_attrs = default.merge(opts)
+      list_id = DB[:material_resource_master_lists].insert(merged_attrs)
+      merged_attrs.merge(id: list_id)
+    end
+
+    def create_matres_master_list_item(opts = {})
+      list = create_matres_master_list
+      default = {
+        material_resource_master_list_id: list[:id],
+        short_code: Faker::Lorem.unique.word,
+        long_name: Faker::Lorem.word,
+        description: Faker::Lorem.word
+      }
+      merged_attrs = default.merge(opts)
+      item_id = DB[:material_resource_master_list_items].insert(merged_attrs)
+      merged_attrs.merge(id: item_id)
+    end
   end
 end
+# rubocop:enable Metrics/AbcSize

@@ -5,10 +5,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module DevelopmentApp
   class TestLoggingRepo < MiniTestWithHooks
     def test_crud_calls
-      assert_respond_to repo, :find_logged_action_detail
-      assert_respond_to repo, :create_logged_action_detail
-      assert_respond_to repo, :update_logged_action_detail
-      assert_respond_to repo, :delete_logged_action_detail
+      test_crud_calls_for :logged_action_details, name: :logged_action_detail, wrapper: LoggedActionDetail, schema: :audit
     end
 
     def test_find_logged_action

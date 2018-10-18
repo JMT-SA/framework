@@ -161,7 +161,7 @@ module PackMaterialApp
       id3 = create_product_column
       other_dom_id = create_other_domain
       create_product_column(
-        material_resource_domain_id: other_dom_id,
+        material_resource_domain_id: other_dom_id
       )
       sub_id = create_sub_type(
         product_code_ids: "{#{id1}}",
@@ -202,30 +202,39 @@ module PackMaterialApp
       assert_equal(matres_sub_type.product_code_ids.join(','), '78,79,77')
     end
 
-    def test_sub_type_master_list_items
-      skip 'todo'
-      # ConfigRepo.any_instance.stubs(:get_dataminer_report).returns('SELECT * FROM material_resource_master_lists')
-      # repo.sub_type_master_list_items
+    def test_for_select_sub_type_master_list_items
+      list = create_matres_master_list
+      3.times do
+        create_matres_master_list_item(material_resource_master_list_id: list[:id])
+      end
+      create_matres_master_list_item(material_resource_master_list_id: list[:id], active: false)
+      prod_col_id = list[:material_resource_product_column_id]
+      prod = repo.where_hash(:material_resource_product_columns, id: prod_col_id)
+      sub_type_id = @fixed_table_set[:matres_sub_types][:sc][:id]
+      result = repo.for_select_sub_type_master_list_items(sub_type_id, prod[:column_name])
+      assert_equal 3, result.count
     end
 
-    # def sub_type_master_list_items(sub_type_id)
-    #   DB[get_dataminer_report('matres_prodcol_sub_type_list_items.yml').sql].where(sub_type_id: sub_type_id)
-    #
-    # end
-    #
-    # def for_select_sub_type_master_list_items(sub_type_id, product_column)
-    #   sub_type_master_list_items(sub_type_id).map do |r|
-    #     if r[:column_name] == product_column.to_s && r[:active]
-    #       [(r[:short_code] + (r[:long_name] ? ' - ' + r[:long_name] : '')).to_s, r[:id]]
-    #     end
-    #   end.compact
-    # end
-    #
-    # def get_dataminer_report(file_name)
-    #   path = File.join(ENV['ROOT'], 'grid_definitions', 'dataminer_queries', file_name.sub('.yml', '') << '.yml')
-    #   rpt_hash = Crossbeams::Dataminer::YamlPersistor.new(path)
-    #   Crossbeams::Dataminer::Report.load(rpt_hash)
-    # end
+    def test_product_column_name
+      result = repo.product_column_by_name('unit')
+      assert result.is_a?(PackMaterialApp::MatresProductColumn)
+      assert_equal 'unit', result.column_name
+    end
+
+    def test_matres_sub_type_master_list_items
+      list = create_matres_master_list
+      3.times do
+        create_matres_master_list_item(material_resource_master_list_id: list[:id])
+      end
+
+      sub_type_id = @fixed_table_set[:matres_sub_types][:sc][:id]
+      prod_col_id = list[:material_resource_product_column_id]
+      result = repo.matres_sub_type_master_list_items(sub_type_id, prod_col_id)
+      assert_equal 3, result.count
+
+      result = repo.matres_sub_type_master_list_items(sub_type_id, (prod_col_id + 1))
+      assert_equal 0, result.count
+    end
 
     def test_matres_sub_type_has_products
       product_set = create_product
@@ -256,21 +265,23 @@ module PackMaterialApp
 
       result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id], customer_id: customer[:id]))
       refute result.success
-      assert_equal 'Can not assign both customer and supplier', result.errors
+      assert_equal 'Can not assign both customer and supplier', result.errors[:base][0]
 
       result = repo.create_matres_product_variant_party_role(attrs)
       refute result.success
-      assert_equal 'Must have customer or supplier', result.errors
+      assert_equal 'Must have customer or supplier', result.errors[:base][0]
 
-      repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
+      result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
+      assert result.success
       result = repo.create_matres_product_variant_party_role(attrs.merge(supplier_id: supplier[:id]))
       refute result.success
-      assert_equal 'Supplier already exists', result.errors
+      assert_equal 'Supplier already exists', result.errors[:base][0]
 
-      repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
+      result = repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
+      assert result.success
       result = repo.create_matres_product_variant_party_role(attrs.merge(customer_id: customer[:id]))
       refute result.success
-      assert_equal 'Customer already exists', result.errors
+      assert_equal 'Customer already exists', result.errors[:base][0]
     end
 
     def test_find_party_role

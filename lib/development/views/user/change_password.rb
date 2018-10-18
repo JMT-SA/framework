@@ -4,7 +4,7 @@ module Development
   module Masterfiles
     module User
       class ChangePassword
-        def self.call(id, form_values: nil, form_errors: nil)
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:user, :change_password, id: id, form_values: form_values, form_errors: form_errors)
           rules   = ui_rule.compile
 

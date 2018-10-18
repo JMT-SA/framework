@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module MasterfilesApp
   class DestinationInteractor < BaseInteractor
     def create_region(params)
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        @region_id = destination_repo.create_region(res)
+        @region_id = repo.create_region(res)
       end
       success_response("Created destination region #{region.destination_region_name}",
                        region)
@@ -19,7 +21,7 @@ module MasterfilesApp
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        destination_repo.update_region(id, res)
+        repo.update_region(id, res)
       end
       success_response("Updated destination region #{region.destination_region_name}",
                        region(false))
@@ -30,7 +32,7 @@ module MasterfilesApp
       name = region.destination_region_name
       res = {}
       repo.transaction do
-        res = destination_repo.delete_region(id)
+        res = repo.delete_region(id)
       end
       if res[:error]
         failed_response(res[:error])
@@ -43,7 +45,7 @@ module MasterfilesApp
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        @country_id = destination_repo.create_country(id, res)
+        @country_id = repo.create_country(id, res)
       end
       success_response("Created destination country #{country.country_name}", country)
     rescue Sequel::UniqueConstraintViolation
@@ -55,7 +57,7 @@ module MasterfilesApp
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        destination_repo.update_country(id, res)
+        repo.update_country(id, res)
       end
       success_response("Updated destination country #{country.country_name}", country(false))
     end
@@ -65,7 +67,7 @@ module MasterfilesApp
       name = country.country_name
       res = {}
       repo.transaction do
-        res = destination_repo.delete_country(id)
+        res = repo.delete_country(id)
       end
       if res[:error]
         failed_response(res[:error])
@@ -78,7 +80,7 @@ module MasterfilesApp
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        @city_id = destination_repo.create_city(id, res)
+        @city_id = repo.create_city(id, res)
       end
       success_response("Created destination city #{city.city_name}", city)
     rescue Sequel::UniqueConstraintViolation
@@ -90,7 +92,7 @@ module MasterfilesApp
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
-        destination_repo.update_city(id, res)
+        repo.update_city(id, res)
       end
       success_response("Updated destination city #{city.city_name}", city(false))
     end
@@ -99,22 +101,22 @@ module MasterfilesApp
       @city_id = id
       name = city.city_name
       repo.transaction do
-        destination_repo.delete_city(id)
+        repo.delete_city(id)
       end
       success_response("Deleted destination city #{name}")
     end
 
     private
 
-    def destination_repo
-      @destination_repo ||= DestinationRepo.new
+    def repo
+      @repo ||= DestinationRepo.new
     end
 
     def region(cached = true)
       if cached
-        @region ||= destination_repo.find_region(@region_id)
+        @region ||= repo.find_region(@region_id)
       else
-        @region = destination_repo.find_region(@region_id)
+        @region = repo.find_region(@region_id)
       end
     end
 
@@ -124,9 +126,9 @@ module MasterfilesApp
 
     def country(cached = true)
       if cached
-        @country ||= destination_repo.find_country(@country_id)
+        @country ||= repo.find_country(@country_id)
       else
-        @country = destination_repo.find_country(@country_id)
+        @country = repo.find_country(@country_id)
       end
     end
 
@@ -136,9 +138,9 @@ module MasterfilesApp
 
     def city(cached = true)
       if cached
-        @city ||= destination_repo.find_city(@city_id)
+        @city ||= repo.find_city(@city_id)
       else
-        @city = destination_repo.find_city(@city_id)
+        @city = repo.find_city(@city_id)
       end
     end
 
@@ -147,3 +149,4 @@ module MasterfilesApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

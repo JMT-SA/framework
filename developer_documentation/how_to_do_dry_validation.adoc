@@ -142,19 +142,20 @@ e.g. `{ col: 'some_value' }`
 == Base validation errors
 
 Sometimes you need to add a validation error message to a form, not a specific field.
-There are two helper methods that can be used to achieve this:
+There are three helper methods that can be used to achieve this:
 
 1. `add_base_validation_errors(messages, base_messages)`
 2. `add_base_validation_errors_with_highlights(messages, base_messages, fields)`
+3. `move_validation_errors_to_base(messages, keys, highlights: {})`
 
 The first displays one or more error messages on a form:
 
 [source,ruby]
 ----
-  add_base_validation_errors(res.errors,
+  res.errors = add_base_validation_errors(res.errors,
                              'Wrong time of month for this action')
 
-  add_base_validation_errors(res.errors,
+  res.errors = add_base_validation_errors(res.errors,
                              ['Wrong time of month for this action', 'Your clock is fast'])
 ----
 
@@ -162,10 +163,24 @@ The second behaves exactly the same as the first, but you can also highlight one
 
 [source,ruby]
 ----
-  add_base_validation_errors_with_highlights(res.errors,
-                                             'This date and time combination is not allowed',
-                                             [:date, :time])
+  res.errors = add_base_validation_errors_with_highlights(res.errors,
+                             'This date and time combination is not allowed',
+                             [:date, :time])
 
-  add_base_validation_errors_with_highlights(res.errors,
-                                             'Too much time has elapsed', :time)
+  res.errors = add_base_validation_errors_with_highlights(res.errors,
+                             'Too much time has elapsed', :time)
+----
+
+The third takes messages that are already in the result and moves them to `:base`. You can optionally also highlight fields.
+
+[source,ruby]
+----
+  res.errors = move_validation_errors_to_base(res.errors, :field1)
+  # { field1: ['Not OK'] } will become { base: ['Not OK'] }
+
+  res.errors = move_validation_errors_to_base(res.errors,
+                             [:field1, :field2],
+                             highlights: { field1: [:customer, :supplier] })
+  # Messages for :field1 and :field2 will become base messages.
+  # The customer and supplier fields will be highlighted.
 ----

@@ -60,7 +60,13 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param base_messages [String, Array] the new messages to be added to the base of the form.
   # @return [Hash] the expanded validation messages.
   def add_base_validation_errors(messages, base_messages)
-    (messages || {}).merge(base: Array(base_messages))
+    if messages && messages[:base]
+      interim = messages
+      interim[:base] += Array(base_messages)
+      interim
+    else
+      (messages || {}).merge(base: Array(base_messages))
+    end
   end
 
   # Add validation errors that are not linked to a field in a form.
@@ -71,7 +77,38 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param fields [Array] the fields in the form to be highlighted.
   # @return [Hash] the expanded validation messages.
   def add_base_validation_errors_with_highlights(messages, base_messages, fields)
-    (messages || {}).merge(base_with_highlights: { messages: Array(base_messages), highlights: fields })
+    if messages && messages[:base_with_highlights]
+      interim = messages
+      interim[:base_with_highlights][:messages] += Array(base_messages)
+      curr = Array(interim[:base_with_highlights][:highlights])
+      interim[:base_with_highlights][:highlights] = curr + Array(fields)
+      interim
+    else
+      (messages || {}).merge(base_with_highlights: { messages: Array(base_messages), highlights: fields })
+    end
+  end
+
+  # Move validation errors that are linked to a specific key up to base.
+  # Optionally also  highlight one or more fields in error.
+  #
+  # @param messages [Hash] the current hash of validation messages.
+  # @param keys [String, Array] the existing message keys to be moved to the base of the form.
+  # @param highlights [Hash] the fields in the form to be highlighted. Specifiy as a Hash of key: [fields].
+  # @return [Hash] the expanded validation messages.
+  def move_validation_errors_to_base(messages, keys, highlights: {}) # rubocop:disable Metrics/AbcSize
+    interim = messages || {}
+    Array(keys).each do |key|
+      raise ArgumentError, "Move validation errors - key not present: #{key}" unless interim.key?(key)
+      if highlights.key?(key)
+        interim[:base_with_highlights] ||= { messages: [], highlights: [] }
+        interim[:base_with_highlights][:messages] +=  Array(interim.delete(key))
+        interim[:base_with_highlights][:highlights] = Array(interim[:base_with_highlights][:highlights]) + Array(highlights.delete(key))
+      else
+        interim[:base] ||= []
+        interim[:base] += Array(interim.delete(key))
+      end
+    end
+    interim
   end
 
   # Selection from a multiselect grid.

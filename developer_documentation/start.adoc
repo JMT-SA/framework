@@ -44,6 +44,14 @@ The following special environment variables are available when running the app:
 * How to layout a multi-column form.
 * How to layout a page to include a form and a grid.
 
+=== Yard Doc
+
+* link:/yarddocthis/helpers=common_helpers.rb[Common Helper methods]
+* link:/yarddocthis/helpers=error_helpers.rb[Error Helper methods]
+* link:/yarddocthis/lib=base_repo.rb[BaseRepo methods]
+* link:/yarddocthis/lib=base_interactor.rb[BaseInteractor methods]
+* link:/yarddocthis/lib=crossbeams_responses.rb[Responses methods]
+
 === Notes
 
 * UI Rules: renderers

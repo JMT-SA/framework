@@ -322,6 +322,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
+  # Redirect to "Not found" page or return 404 status.
+  #
+  # @param route [Roda.route] the route.
+  # @return [void]
   def handle_not_found(route)
     if fetch?(route)
       response.status = 404
@@ -332,16 +336,31 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     end
   end
 
+  # Stash a page in local storage for fetching later.
+  # Only one page per user can be stashed at a time.
+  # Used for storing a page after it has failed validation.
+  #
+  # @param value [String] the page HTML.
+  # @return [void]
   def stash_page(value)
     store = LocalStore.new(current_user.id)
     store.write(:stashed_page, value)
   end
 
+  # Return the stashed page from local storage.
+  # Used to display a page with invalid state instead of the usual new/edit etc. page after a redirect.
+  #
+  # @return [String] the HTML page.
   def stashed_page
     store = LocalStore.new(current_user.id)
     store.read_once(:stashed_page)
   end
 
+  # Create a URL for a report so that it can be called
+  # from a spreadsheet app's webquery.
+  #
+  # @param report_id [Integer] the id of the prepared report.
+  # @return [String] the URL.
   def webquery_url_for(report_id)
     port = request.port == '80' || request.port.nil? ? '' : ":#{request.port}"
     "http://#{request.host}#{port}/webquery/#{report_id}"

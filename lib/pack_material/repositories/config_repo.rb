@@ -168,8 +168,9 @@ module PackMaterialApp
     def product_code_columns(sub_type_id)
       query = <<~SQL
         SELECT pc.column_name, pc.id
-        FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{sub_type_id})) product_code_id
-        LEFT JOIN material_resource_product_columns pc on pc.id = product_code_id
+        FROM unnest((SELECT st.product_code_ids FROM material_resource_sub_types st WHERE st.id = #{sub_type_id})) WITH ORDINALITY t(id, ord)
+        LEFT JOIN material_resource_product_columns pc on pc.id = t.id
+        ORDER BY t.ord
       SQL
       DB[query].map { |rec| [rec[:column_name], rec[:id]] }
     end

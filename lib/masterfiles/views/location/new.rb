@@ -17,8 +17,8 @@ module Masterfiles
             page.form do |form|
               form.action action
               form.remote! if remote
-              form.add_field :primary_storage_type_id
               form.add_field :location_type_id
+              form.add_field :primary_storage_type_id
               form.add_field :primary_assignment_id
               form.add_field :location_code
               form.add_field :location_description

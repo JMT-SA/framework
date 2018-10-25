@@ -16,8 +16,8 @@ module Masterfiles
               form.action "/masterfiles/locations/locations/#{id}"
               form.remote!
               form.method :update
-              form.add_field :primary_storage_type_id
               form.add_field :location_type_id
+              form.add_field :primary_storage_type_id
               form.add_field :primary_assignment_id
               form.add_field :location_code
               form.add_field :location_description

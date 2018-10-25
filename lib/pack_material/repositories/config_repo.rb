@@ -149,6 +149,11 @@ module PackMaterialApp
       if product_ids.any?
         failed_response('There are products linked to this sub-type', associated_product_ids: product_ids)
       else
+        list_ids = DB[:material_resource_master_lists].where(material_resource_sub_type_id: id).select_map(:id)
+        if list_ids
+          DB[:material_resource_master_list_items].where(material_resource_master_list_id: list_ids).delete
+          DB[:material_resource_master_lists].where(id: list_ids).delete
+        end
         delete(:material_resource_sub_types, id)
         success_response('ok')
       end

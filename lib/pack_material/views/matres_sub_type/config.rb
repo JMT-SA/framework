@@ -22,6 +22,10 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
 
+            page.section do |section|
+              section.add_control(control_type: :link, text: 'Back', url: '/list/material_resource_sub_types', style: :back_button)
+            end
+
             # Product Columns
             page.section do |section|
               section.show_border!

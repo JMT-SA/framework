@@ -57,9 +57,9 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(primary_storage_type_id: nil,
+      @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(@options[:id]),
                                     location_type_id: nil,
-                                    primary_assignment_id: nil,
+                                    primary_assignment_id: initial_assignment(@options[:id]),
                                     location_code: initial_code(@options[:id]),
                                     location_description: nil,
                                     has_single_container: nil,
@@ -95,6 +95,18 @@ module UiRules
       location_type_id = @repo.for_select_location_types.first.last
       res = @repo.location_code_suggestion(parent_id, location_type_id)
       res.success ? res.instance : nil
+    end
+
+    def initial_storage_type(parent_id)
+      return nil if parent_id.nil?
+
+      @repo.find_location(parent_id).primary_storage_type_id
+    end
+
+    def initial_assignment(parent_id)
+      return nil if parent_id.nil?
+
+      @repo.find_location(parent_id).primary_assignment_id
     end
   end
 end

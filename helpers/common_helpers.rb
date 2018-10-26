@@ -277,6 +277,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :replace_input_value, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
   end
 
+  def json_replace_inner_html(dom_id, value, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :replace_inner_html, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
+  end
+
   def json_replace_list_items(dom_id, items, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :replace_list_items, dom_id: dom_id, items: Array(items)), message, keep_dialog_open: keep_dialog_open)
   end
@@ -288,6 +292,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def build_json_action(action)
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
+      replace_inner_html:     ->(act) { action_replace_inner_html(act) },
       replace_select_options: ->(act) { action_replace_select_options(act) },
       replace_multi_options:  ->(act) { action_replace_multi_options(act) },
       replace_list_items:     ->(act) { action_replace_list_items(act) },
@@ -305,6 +310,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
 
   def action_replace_input_value(action)
     { replace_input_value: { id: action.dom_id, value: action.value } }
+  end
+
+  def action_replace_inner_html(action)
+    { replace_inner_html: { id: action.dom_id, value: action.value } }
   end
 
   def action_replace_list_items(action)

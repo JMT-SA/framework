@@ -81,12 +81,22 @@ json_actions([OpenStruct.new(type: :replace_multi_options,
 
 ===== Replace the value of an input element
 
-Works on `input` elements (including hidden ones).
+Works on `input` elements (including hidden or disabled ones).
 
 type: `:replace_input_value`.
 
 dom_id: the value of the `id` attribute of the input element in the page. This is usually a combination of the `form_name` and `field_name`.
 e.g. if a form named `users` has a field named `surname`, then the dom_id will be `users_surname`.
+
+value: the value you want to change it to.
+
+===== Replace the inner HTML of a DOM element
+
+Works on DOM elements (usually for label text).
+
+type: `:replace_inner_html`.
+
+dom_id: the value of the `id` attribute of the element in the page.
 
 value: the value you want to change it to.
 

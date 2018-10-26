@@ -395,6 +395,23 @@ const crossbeamsUtils = {
     elem.value = action.replace_input_value.value;
   },
   /**
+   * Replace the contents of a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceInnerHtml: function replaceInnerHtml(action) {
+    const elem = document.getElementById(action.replace_inner_html.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_inner_html.id}"`,
+        title: 'Replace inner html: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    elem.innerHTML = action.replace_inner_html.value;
+  },
+  /**
    * Replace the items of a List element.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
@@ -472,6 +489,9 @@ const crossbeamsUtils = {
           }
           if (action.replace_input_value) {
             this.replaceInputValue(action);
+          }
+          if (action.replace_inner_html) {
+            this.replaceInnerHtml(action);
           }
           if (action.replace_list_items) {
             this.replaceListItems(action);

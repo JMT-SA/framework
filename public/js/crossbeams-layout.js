@@ -230,6 +230,9 @@
                 if (action.replace_input_value) {
                   crossbeamsUtils.replaceInputValue(action);
                 }
+                if (action.replace_inner_html) {
+                  crossbeamsUtils.replaceInnerHtml(action);
+                }
                 if (action.replace_list_items) {
                   crossbeamsUtils.replaceListItems(action);
                 }

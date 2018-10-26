@@ -13,6 +13,12 @@ The following renderers are available to a page:
 |:checkbox
 |<<Renderer::Checkbox>>
 
+|:date
+|<<Renderer::Input>>
+
+|:datetime
+|<<Renderer::Input>>
+
 |:email
 |<<Renderer::Input>>
 
@@ -48,6 +54,9 @@ The following renderers are available to a page:
 
 |:textarea
 |<<Renderer::Textarea>>
+
+|:time
+|<<Renderer::Input>>
 
 |:url
 |<<Renderer::Input>>

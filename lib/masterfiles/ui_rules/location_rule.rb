@@ -57,10 +57,12 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(@options[:id]),
+      parent = @options[:id].nil? ? nil : @repo.find_location(@options[:id])
+
+      @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(parent),
                                     location_type_id: nil,
-                                    primary_assignment_id: initial_assignment(@options[:id]),
-                                    location_code: initial_code(@options[:id]),
+                                    primary_assignment_id: initial_assignment(parent),
+                                    location_code: initial_code(parent),
                                     location_description: nil,
                                     has_single_container: nil,
                                     virtual_location: nil,
@@ -89,24 +91,24 @@ module UiRules
       end
     end
 
-    def initial_code(parent_id)
-      return nil if parent_id.nil?
+    def initial_code(parent)
+      return nil if parent.nil?
 
       location_type_id = @repo.for_select_location_types.first.last
-      res = @repo.location_code_suggestion(parent_id, location_type_id)
+      res = @repo.location_code_suggestion(parent.id, location_type_id)
       res.success ? res.instance : nil
     end
 
-    def initial_storage_type(parent_id)
-      return nil if parent_id.nil?
+    def initial_storage_type(parent)
+      return nil if parent.nil?
 
-      @repo.find_location(parent_id).primary_storage_type_id
+      parent.primary_storage_type_id
     end
 
-    def initial_assignment(parent_id)
-      return nil if parent_id.nil?
+    def initial_assignment(parent)
+      return nil if parent.nil?
 
-      @repo.find_location(parent_id).primary_assignment_id
+      parent.primary_assignment_id
     end
   end
 end

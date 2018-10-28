@@ -1,0 +1,12 @@
+purchase_order:
+  db_sequence_name: doc_seqs_po
+  data_type: :integer
+  table: purchase_orders
+  column: purchase_order_number
+dummy_invoice:
+  db_sequence_name: doc_seqs_inv
+  data_type: :string
+  prefix: INV
+  digit_length: 7
+  table: invoices
+  column: invoice_ref

@@ -305,6 +305,16 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[Sequel[:audit][:status_logs]].multi_insert(items)
   end
 
+  # Update a document sequence number for a table row.
+  #
+  # @param document_name [string] the document name (key to document sequence hash)
+  # @param id [integer] the id of the row to be updated.
+  # @return [void]
+  def next_sequence(document_name, id)
+    doc_seq = DocumentSequence.new(document_name)
+    DB[doc_seq.next_sequence_update_sql(id)].update
+  end
+
   def self.inherited(klass)
     klass.extend(MethodBuilder)
   end

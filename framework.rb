@@ -15,6 +15,7 @@ require './lib/base_repo_association_finder'
 require './lib/base_interactor'
 require './lib/base_service'
 require './lib/base_step'
+require './lib/document_sequence'
 require './lib/local_store' # Will only work for processes running from one dir.
 require './lib/ui_rules'
 require './lib/library_versions'

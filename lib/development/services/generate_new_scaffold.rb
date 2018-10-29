@@ -89,9 +89,14 @@ class GenerateNewScaffold < BaseService
   def call
     sources = { opts: opts, paths: @opts.filenames }
 
-    report               = QueryMaker.call(opts)
-    sources[:query]      = wrapped_sql_from_report(report)
-    sources[:dm_query]   = DmQueryMaker.call(report, opts)
+    begin
+      report               = QueryMaker.call(opts)
+      sources[:query]      = wrapped_sql_from_report(report)
+      sources[:dm_query]   = DmQueryMaker.call(report, opts)
+    rescue StandardError => e
+      sources[:query]      = "Error building report: #{e.message}"
+      sources[:dm_query]   = "Error building report: #{e.message}"
+    end
     sources[:list]       = ListMaker.call(opts)
     sources[:search]     = SearchMaker.call(opts)
     sources[:repo]       = RepoMaker.call(opts)

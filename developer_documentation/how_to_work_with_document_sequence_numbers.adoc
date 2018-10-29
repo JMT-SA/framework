@@ -1,0 +1,94 @@
+= How to work with document sequence numbers
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to work with document sequence numbers
+
+Document numbers are numbers used to uniquely identify documents or transactions in the system.
+For example a purchase order number or invoice number.
+Sometimes these are just integer numbers and sometimes they are strings with text prefixes (INV000123).
+
+These numbers use database sequences to handle incrementing; and a configuration to define how they are formatted and stored.
+There is a repository method `next_document_number` that updates a row's document number.
+
+=== Creating a sequence
+
+NOTE: Sequence names should be prefixed with `doc_seqs_` -- e.g. `doc_seqs_invoice`. This is not a requirement, just a convention so that sequences are listed together.
+
+Include the sequence in a migration:
+[source,ruby]
+----
+Sequel.migration do
+  up   { run 'CREATE SEQUENCE doc_seqs_invoice;' }
+  down { run 'DROP SEQUENCE doc_seqs_invoice;' }
+end
+----
+
+=== Setting up the configuration
+
+Rules for generating sequences are defined in `config/document_sequence.yml`. This is a hash keyed by the document type.
+
+Required entries are:
+
+* `db_sequence_name` -- must match the name of a sequence in the database.
+* `data_type` -- must be `:integer` or `:string`.
+* `table` -- the table name.
+* `column` -- the column in which the document number is stored.
+
+Optional entries (which only apply if the data_type is `:string`) are:
+
+* `prefix` -- A string to be placed in front of the sequence number.
+* `digit_length` -- the number of digits after the prefix. These will be used to zero-pad the number.
+
+e.g. with prefix = 'INV' and digit_length = 5, and the sequence at 44, the document number would be set to `'INV00044'`.
+
+=== Setting the number on a row
+
+There are two ways to do this:
+
+* In the database with a default -- if a number is generated on create of a row (Only for integer doc numbers).
+* In code -- when the number is only generated at a certain point in the row's lifetime (more typical).
+
+==== Default declared in table definition
+
+If the sequence is automatically generated on create of a row (and the number is stored as an integer), the column can be specified with a `DEFAULT`.
+
+[source,sql]
+----
+ALTER TABLE xyz
+ADD COLUMN docno integer DEFAULT nextval('doc_seqs_invoice') NOT NULL;
+----
+
+or as a migration:
+[source,ruby]
+----
+Sequel.migration do
+  up do
+    alter_table(:invoices) do
+      add_column :invoice_ref, Integer, default: Sequel.function(:nextval, 'doc_seqs_invoice')
+      set_column_default :int_ref, Sequel.function(:nextval, 'doc_seqs_invoice')
+    end
+  end
+
+  down do
+    alter_table(:invoices) do
+      drop_column
+      set_column_default :int_ref, nil
+    end
+  end
+end
+----
+
+==== Setting the number in code
+
+This is as simple as passing the document type and id to a method on a repository. The method consults the document sequence configuration to work out how to run the update.
+[source,ruby]
+----
+repo.transaction do
+  repo.update_invoice(id, options)
+  repo.update_with_document_number('invoice', id) if invoice_now_valid
+end
+----
+
+NOTE: The `update_with_document_number` method does not return the new document number -- you'll need to query the database to get it.

@@ -42,7 +42,7 @@ class DocumentSequence
   # @param name [string] the name of the document sequence.
   # @return [DocumentSequence]
   def initialize(name)
-    @name = name
+    @name = name.to_s
     raise ArgumentError, "Document sequence #{name} has no configuration" if rule.nil?
     assert_rule_ok!
   end

@@ -66,22 +66,12 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_mr_purchase_order(id, params[:mr_purchase_order])
           if res.success
-            # row_keys = %i[
-            #   mr_delivery_term_id
-            #   supplier_party_role_id
-            #   mr_vat_type_id
-            #   delivery_address_id
-            #   purchase_account_code
-            #   fin_object_code
-            #   valid_until
-            #   purchase_order_number
-            # ]
-            # update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
             flash[:notice] = res.message
-            r.redirect("/pack_material/replenish/mr_purchase_orders/#{res.instance.id}/edit")
+            r.redirect("/pack_material/replenish/mr_purchase_orders/#{id}/edit")
           else
-            # TODO: this doesn't work yet
-            re_show_form(r, res) { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id, form_values: params[:mr_purchase_order], form_errors: res.errors) }
+            re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/edit") do
+              PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id, form_values: params[:mr_purchase_order], form_errors: res.errors)
+            end
           end
         end
         r.delete do    # DELETE

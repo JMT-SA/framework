@@ -84,11 +84,12 @@ module PackMaterialApp
       attrs[:supplier_id] ? MasterfilesApp::SUPPLIER_ROLE : MasterfilesApp::CUSTOMER_ROLE
     end
 
-    def find_party_role(id)
+    def find_product_variant_party_role(id)
       hash = DB[:material_resource_product_variant_party_roles].where(id: id).first
       supplier_id = hash[:supplier_id]
       party = supplier_id ? find_hash(:suppliers, supplier_id) : find_hash(:customers, hash[:customer_id])
       hash.merge!(DB["SELECT fn_party_role_name(#{party[:party_role_id]}) as party_name"].first)
+      hash[:erp_number] = supplier_id ? party.erp_supplier_number : party.erp_customer_number
       MatresProductVariantPartyRole.new(hash)
     end
 

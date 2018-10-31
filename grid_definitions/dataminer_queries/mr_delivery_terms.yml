@@ -1,0 +1,62 @@
+---
+:caption: MDelivery Terms
+:sql: SELECT "mr_delivery_terms"."id", "mr_delivery_terms"."delivery_term_code", "mr_delivery_terms"."is_consignment_stock"
+  FROM "mr_delivery_terms"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_delivery_terms.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_term_code:
+    :name: delivery_term_code
+    :sequence_no: 2
+    :caption: Delivery term code
+    :namespaced_name: mr_delivery_terms.delivery_term_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_consignment_stock:
+    :name: is_consignment_stock
+    :sequence_no: 3
+    :caption: Is consignment stock
+    :namespaced_name: mr_delivery_terms.is_consignment_stock
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_delivery_terms.delivery_term_code
+  :caption: Delivery term code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

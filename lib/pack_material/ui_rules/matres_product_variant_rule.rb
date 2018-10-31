@@ -30,9 +30,9 @@ module UiRules
         product_variant_table_name: { renderer: :hidden, required: true },
         product_variant_number: { renderer: :label, required: true },
         old_product_code: {},
-        supplier_lead_time: { caption: 'Lead Time (days)' },
-        minimum_stock_level: {},
-        re_order_stock_level: {}
+        supplier_lead_time: { renderer: :integer, caption: 'Lead Time (days)' },
+        minimum_stock_level: { renderer: :integer },
+        re_order_stock_level: { renderer: :integer }
       }
     end
 

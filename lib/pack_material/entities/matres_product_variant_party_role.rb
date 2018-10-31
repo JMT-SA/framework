@@ -10,6 +10,7 @@ module PackMaterialApp
     attribute :supplier_lead_time, Types::Integer
     attribute :is_preferred_supplier, Types::Bool
     attribute :party_name, Types::String
+    attribute :erp_number, Types::String
 
     def supplier?
       !supplier_id.nil?

@@ -1,7 +1,7 @@
-purchase_order:
-  db_sequence_name: doc_seqs_po
+doc_seqs_po_number:
+  db_sequence_name: doc_seqs_po_number
   data_type: :integer
-  table: purchase_orders
+  table: mr_purchase_orders
   column: purchase_order_number
 dummy_invoice:
   db_sequence_name: doc_seqs_inv

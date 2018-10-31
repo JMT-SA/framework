@@ -168,10 +168,11 @@ module MasterfilesApp
       end
     end
 
-    def addresses_for_party(party_id: nil, organization_id: nil, person_id: nil)
+    def addresses_for_party(party_id: nil, organization_id: nil, person_id: nil, party_role_id: nil, address_type: nil)
       id = party_id unless party_id.nil?
       id = party_id_from_organization(organization_id) unless organization_id.nil?
       id = party_id_from_person(person_id) unless person_id.nil?
+      id = party_id_from_party_role(party_role_id) unless party_role_id.nil?
 
       query = <<~SQL
         SELECT addresses.*, address_types.address_type
@@ -180,7 +181,24 @@ module MasterfilesApp
         JOIN address_types ON address_types.id = addresses.address_type_id
         WHERE party_addresses.party_id = #{id}
       SQL
-      DB[query].map { |r| Address.new(r) }
+
+      addresses = DB[query].all
+      addresses = addresses.select { |r| r[:address_type] == address_type } if address_type
+      addresses.map { |r| MasterfilesApp::Address.new(r) }
+    end
+
+    def for_select_addresses_for_party(party_id: nil, organization_id: nil, person_id: nil, party_role_id: nil, address_type: nil)
+      addresses = addresses_for_party(party_id: party_id, organization_id: organization_id, person_id: person_id, party_role_id: party_role_id, address_type: address_type)
+      syms = %i[address_line_1 address_line_2 address_line_3 postal_code city country]
+      address_descriptions = []
+      addresses.each do |addr|
+        set = []
+        syms.each do |sym|
+          set << addr[sym] if addr[sym]
+        end
+        address_descriptions << [set.join(', '), addr[:id]]
+      end
+      address_descriptions
     end
 
     def contact_methods_for_party(party_id: nil, organization_id: nil, person_id: nil)
@@ -204,6 +222,10 @@ module MasterfilesApp
 
     def party_id_from_person(id)
       DB[:people].where(id: id).select(:party_id).single_value
+    end
+
+    def party_id_from_party_role(id)
+      DB[:party_roles].where(id: id).select(:party_id).single_value
     end
 
     def party_address_ids(party_id)
@@ -370,8 +392,9 @@ module MasterfilesApp
       DB[:customer_types].where(id: customer_type_ids).select_map(:type_code)
     end
 
-    def find_supplier(id)
-      hash = find_hash(:suppliers, id)
+    def find_supplier(id, by_party_role: false)
+      opt = by_party_role ? { party_role_id: id } : { id: id }
+      hash = where_hash(:suppliers, opt)
       return nil if hash.nil?
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
       hash[:supplier_type_ids] = suppliers_supplier_type_ids(id)

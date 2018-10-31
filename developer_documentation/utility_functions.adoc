@@ -1,0 +1,21 @@
+= Utility functions
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Utility functions
+
+There are a few utility functions that are defined in the `UtilityFunctions` module that perform miscellaneous tasks.
+
+=== Date functions
+
+[source,ruby]
+----
+UtilityFunctions.weeks_ago(Date.today, 3)   # => Date - three weeks before Date.today.
+UtilityFunctions.weeks_ago(Time.now, 3)     # => Time
+UtilityFunctions.weeks_ago(DateTime.now, 3) # => DateTime
+UtilityFunctions.weeks_since(Date.today, 3) # => Date - three weeks after Date.today.
+
+UtilityFunctions.days_ago(Date.today, 3)    # => Date - three days before Date.today.
+UtilityFunctions.days_since(Date.today, 3)  # => Date - three days after Date.today.
+----

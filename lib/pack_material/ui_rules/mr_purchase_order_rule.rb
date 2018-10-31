@@ -108,7 +108,7 @@ module UiRules
                                     delivery_address_id: nil,
                                     purchase_account_code: nil,
                                     fin_object_code: nil,
-                                    valid_until: Time.now)
+                                    valid_until: UtilityFunctions.weeks_since(Time.now, 1))
     end
 
     def supplier

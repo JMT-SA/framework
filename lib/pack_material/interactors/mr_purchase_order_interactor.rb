@@ -52,6 +52,10 @@ module PackMaterialApp
       success_response("Deleted purchase order #{name}")
     end
 
+    def po_sub_totals(id)
+      repo.sub_totals(id)
+    end
+
     private
 
     def repo

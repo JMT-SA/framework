@@ -32,8 +32,16 @@ class Framework < Roda
               quantity_required
               unit_price
             ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            # add_grid_row(attrs: select_attributes(res.instance, row_keys),
+            #              notice: res.message)
+            sub_totals = interactor.po_sub_totals(id)
+            json_actions([
+                           OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
+                           OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+                           OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
+                           OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
+                           OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys))
+                         ], res.message)
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new") do
               PackMaterial::Replenish::MrPurchaseOrderItem::New.call(id,
@@ -174,16 +182,33 @@ class Framework < Roda
               quantity_required
               unit_price
             ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            # update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            sub_totals = interactor.po_sub_totals(id)
+            json_actions([
+                           OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
+                           OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+                           OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
+                           OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
+                           OpenStruct.new(ids: id, type: :update_grid_row, changes: select_attributes(res.instance, row_keys))
+                         ], res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrPurchaseOrderItem::Edit.call(id, form_values: params[:mr_purchase_order_item], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
           check_auth!('replenish', 'delete')
+          po_id = interactor.mr_purchase_order_item(id).mr_purchase_order_id
           res = interactor.delete_mr_purchase_order_item(id)
           if res.success
-            delete_grid_row(id, notice: res.message)
+            # delete_grid_row(id, notice: res.message)
+            sub_totals = interactor.po_sub_totals(parent_id: po_id)
+            json_actions([
+                           OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
+                           OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+                           OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
+                           OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
+                           OpenStruct.new(id: id, type: :delete_grid_row)
+                         ], res.message)
           else
             show_json_error(res.message, status: 200)
           end

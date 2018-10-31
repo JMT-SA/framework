@@ -17,6 +17,7 @@ module UiRules
                                  preselect_fields
                                end
 
+      @rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
       form_name 'mr_purchase_order'
     end
 

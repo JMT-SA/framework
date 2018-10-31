@@ -51,6 +51,7 @@ module PackMaterial
                     col.add_field :fin_object_code
                     col.add_field :valid_until
                     col.add_field :delivery_address_id
+                    col.add_text po_totals(rules)
                   end
                 end
               end
@@ -75,6 +76,19 @@ module PackMaterial
             end
           end
           layout
+        end
+
+        def self.po_totals(rules)
+          <<~HTML
+            <div class="fr">
+            <table><tbody>
+            <tr><th class="tr pr2">Sub-total</th><td class="tr"><span id="po_totals_subtotal">#{rules[:sub_totals][:subtotal]}</span></td></tr>
+            <tr><th class="tr pr2">Costs</th><td class="tr"><span id="po_totals_costs">#{rules[:sub_totals][:costs]}</span></td></tr>
+            <tr><th class="tr pr2">VAT</th><td class="tr"><span id="po_totals_vat">#{rules[:sub_totals][:vat]}</span></td></tr>
+            <tr><th class="tr pr2">Total</th><td class="tr b bb bt"><span id="po_totals_total">#{rules[:sub_totals][:total]}</span></td></tr>
+            </tbody></table>
+            </div>
+          HTML
         end
       end
     end

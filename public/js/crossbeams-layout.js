@@ -239,6 +239,15 @@
                 if (action.clear_form_validation) {
                   crossbeamsUtils.clearFormValidation(action);
                 }
+                if (action.addRowToGrid) {
+                  crossbeamsUtils.addGridRow(action);
+                }
+                if (action.updateGridInPlace) {
+                  crossbeamsUtils.updateGridRow(action);
+                }
+                if (action.removeGridRowInPlace) {
+                  crossbeamsUtils.deleteGridRow(action);
+                }
               });
             } else if (data.replaceDialog) {
               closeDialog = false;

@@ -60,5 +60,31 @@ module PackMaterialApp
       end
       product_variants.map { |r| [r[:product_variant_code], r[:id]] }
     end
+
+    def sub_totals(id)
+      subtotal = po_total_items(id)
+      costs = po_total_costs(id)
+      vat = po_total_vat(id, subtotal)
+      {
+        subtotal: UtilityFunctions.delimited_number(subtotal),
+        costs: UtilityFunctions.delimited_number(costs),
+        vat: UtilityFunctions.delimited_number(vat),
+        total: UtilityFunctions.delimited_number(subtotal + costs + vat)
+      }
+    end
+
+    def po_total_items(id)
+      DB['SELECT SUM(quantity_required * unit_price) AS total FROM mr_purchase_order_items WHERE mr_purchase_order_id = ?', id].single_value || BigDecimal('0')
+    end
+
+    def po_total_costs(id)
+      DB[:mr_purchase_order_costs].where(mr_purchase_order_id: id).sum(:amount) || BigDecimal('0')
+    end
+
+    def po_total_vat(id, subtotal)
+      return BigDecimal('0') if subtotal.zero?
+      factor = DB['SELECT percentage_applicable / 100.0 AS vat_factor FROM mr_vat_types WHERE id = (SELECT mr_vat_type_id FROM mr_purchase_orders WHERE id = ?)', id].single_value || BigDecimal('0')
+      subtotal * factor
+    end
   end
 end

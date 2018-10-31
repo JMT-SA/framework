@@ -198,6 +198,15 @@ const crossbeamsGridEvents = {
               if (action.clear_form_validation) {
                 crossbeamsUtils.clearFormValidation(action);
               }
+              if (action.addRowToGrid) {
+                crossbeamsUtils.addGridRow(action);
+              }
+              if (action.updateGridInPlace) {
+                crossbeamsUtils.updateGridRow(action);
+              }
+              if (action.removeGridRowInPlace) {
+                crossbeamsUtils.deleteGridRow(action);
+              }
             });
           } else if (data.replaceDialog) {
             closeDialog = false;
@@ -1322,6 +1331,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                   } else if (data.addRowToGrid) {
                     crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
+                  } else if (data.actions) {
+                    data.actions.forEach((action) => {
+                      if (action.replace_options) {
+                        crossbeamsUtils.replaceSelectrOptions(action);
+                      }
+                      if (action.replace_multi_options) {
+                        crossbeamsUtils.replaceMultiOptions(action);
+                      }
+                      if (action.replace_input_value) {
+                        crossbeamsUtils.replaceInputValue(action);
+                      }
+                      if (action.replace_inner_html) {
+                        crossbeamsUtils.replaceInnerHtml(action);
+                      }
+                      if (action.replace_list_items) {
+                        crossbeamsUtils.replaceListItems(action);
+                      }
+                      if (action.clear_form_validation) {
+                        crossbeamsUtils.clearFormValidation(action);
+                      }
+                      if (action.addRowToGrid) {
+                        crossbeamsUtils.addGridRow(action);
+                      }
+                      if (action.updateGridInPlace) {
+                        crossbeamsUtils.updateGridRow(action);
+                      }
+                      if (action.removeGridRowInPlace) {
+                        crossbeamsUtils.deleteGridRow(action);
+                      }
+                    });
                   } else {
                     console.log('Not sure what to do with this:', data);
                   }

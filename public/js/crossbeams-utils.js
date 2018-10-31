@@ -459,6 +459,20 @@ const crossbeamsUtils = {
     });
   },
 
+  addGridRow: function addGridRow(action) {
+    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes);
+  },
+
+  updateGridRow: function updateGridRow(action) {
+    action.updateGridInPlace.forEach((gridRow) => {
+      crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
+    });
+  },
+
+  deleteGridRow: function deleteGridRow(action) {
+    crossbeamsGridEvents.removeGridRowInPlace(action.removeGridRowInPlace.id);
+  },
+
   /**
    * Calls all urls for observeChange behaviour and applies changes to the DOM as required..
    * @param {string} url - the url to be called.
@@ -498,6 +512,15 @@ const crossbeamsUtils = {
           }
           if (action.clear_form_validation) {
             this.clearFormValidation(action);
+          }
+          if (action.addRowToGrid) {
+            this.addGridRow(action);
+          }
+          if (action.updateGridInPlace) {
+            this.updateGridRow(action);
+          }
+          if (action.removeGridRowInPlace) {
+            this.deleteGridRow(action);
           }
         });
       }

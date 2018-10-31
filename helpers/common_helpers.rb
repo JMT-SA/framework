@@ -226,9 +226,22 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param notice [String/Nil] the flash message to show.
   # @return [JSON] the changes to be applied.
   def update_grid_row(ids, changes:, notice: nil)
-    res = { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes } } }
+    # res = { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes } } }
+    res = action_update_grid_row(ids, changes)
     res[:flash] = { notice: notice } if notice
     res.to_json
+  end
+
+  def action_add_grid_row(attrs:)
+    { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
+  end
+
+  def action_update_grid_row(ids, changes:)
+    { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes } } }
+  end
+
+  def action_delete_grid_row(id)
+    { removeGridRowInPlace: { id: make_id_correct_type(id) } }
   end
 
   # Add a row to a grid. created_at and updated_at values are provided automatically.
@@ -237,7 +250,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param notice [String/Nil] the flash message to show.
   # @return [JSON] the changes to be applied.
   def add_grid_row(attrs:, notice: nil)
-    res = { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
+    # res = { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
+    res = action_add_grid_row(attrs)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end
@@ -253,7 +267,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   end
 
   def delete_grid_row(id, notice: nil)
-    res = { removeGridRowInPlace: { id: make_id_correct_type(id) } }
+    # res = { removeGridRowInPlace: { id: make_id_correct_type(id) } }
+    res = action_delete_grid_row(id)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end
@@ -296,6 +311,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       replace_select_options: ->(act) { action_replace_select_options(act) },
       replace_multi_options:  ->(act) { action_replace_multi_options(act) },
       replace_list_items:     ->(act) { action_replace_list_items(act) },
+      add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs) },
+      update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes) },
+      delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
       clear_form_validation:  ->(act) { action_clear_form_validation(act) }
     }[action.type].call(action)
   end

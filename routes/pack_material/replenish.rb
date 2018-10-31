@@ -44,6 +44,33 @@ class Framework < Roda
           end
         end
       end
+      r.on 'mr_purchase_order_costs' do
+        cost_interactor = PackMaterialApp::MrPurchaseOrderCostInteractor.new(current_user, {}, { route_url: request.path }, {})
+        r.on 'new' do    # NEW
+          check_auth!('replenish', 'new')
+          show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrderCost::New.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = cost_interactor.create_mr_purchase_order_cost(id, params[:mr_purchase_order_cost])
+          if res.success
+            row_keys = %i[
+              id
+              mr_cost_type_id
+              mr_purchase_order_id
+              amount
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
+          else
+            re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_costs/new") do
+              PackMaterial::Replenish::MrPurchaseOrderCost::New.call(id,
+                                                                     form_values: params[:mr_purchase_order_cost],
+                                                                     form_errors: res.errors,
+                                                                     remote: fetch?(r))
+            end
+          end
+        end
+      end
       r.on 'approve_purchase_order' do   # EDIT
         check_auth!('replenish', 'edit')
         res = interactor.approve_purchase_order(id)
@@ -160,6 +187,46 @@ class Framework < Roda
         r.delete do    # DELETE
           check_auth!('replenish', 'delete')
           res = interactor.delete_mr_purchase_order_item(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    # MR PURCHASE ORDER COSTS
+    # --------------------------------------------------------------------------
+    r.on 'mr_purchase_order_costs', Integer do |id|
+      interactor = PackMaterialApp::MrPurchaseOrderCostInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:mr_purchase_order_costs, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('replenish', 'edit')
+        show_partial { PackMaterial::Replenish::MrPurchaseOrderCost::Edit.call(id) }
+      end
+      r.is do
+        r.get do       # SHOW
+          check_auth!('replenish', 'read')
+          show_partial { PackMaterial::Replenish::MrPurchaseOrderCost::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mr_purchase_order_cost(id, params[:mr_purchase_order_cost])
+          if res.success
+            update_grid_row(id, changes: { mr_cost_type_id: res.instance[:mr_cost_type_id], mr_purchase_order_id: res.instance[:mr_purchase_order_id], amount: res.instance[:amount] },
+                            notice: res.message)
+          else
+            re_show_form(r, res) { PackMaterial::Replenish::MrPurchaseOrderCost::Edit.call(id, form_values: params[:mr_purchase_order_cost], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('replenish', 'delete')
+          res = interactor.delete_mr_purchase_order_cost(id)
           if res.success
             delete_grid_row(id, notice: res.message)
           else

@@ -41,6 +41,15 @@ Dir["#{root_dir}/lib/*/test/factories/*.rb"].each { |f| require f }
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
   include MiniTestSeeds
+  include Crossbeams::Responses
+
+  def ok_response(message: nil, instance: nil)
+    success_response((message || 'OK'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
+
+  def bad_response(message: nil, instance: nil)
+    failed_response((message || 'FAILED'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
 
   def around
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do

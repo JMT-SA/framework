@@ -20,7 +20,7 @@ module PackMaterial
                                   style: :back_button)
               section.add_control(control_type: :link,
                                   text: 'Add Costs',
-                                  url: "/pack_material/replenish/mr_purchase_orders/#{id}/add_costs",
+                                  url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_costs/new",
                                   style: :button,
                                   behaviour: :popup)
               if ui_rule.form_object.purchase_order_number.nil?

@@ -34,8 +34,16 @@ module PackMaterialApp
 
     crud_calls_for :mr_purchase_order_items, name: :mr_purchase_order_item, wrapper: MrPurchaseOrderItem
 
+    build_for_select :mr_purchase_order_costs,
+                     label: :id,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :id
+
+    crud_calls_for :mr_purchase_order_costs, name: :mr_purchase_order_cost, wrapper: MrPurchaseOrderCost
+
     def for_select_suppliers
-      valid_supplier_ids = DB[:material_resource_product_variant_party_roles].select_map(:supplier_id).compact.uniq
+      valid_supplier_ids = DB[:material_resource_product_variant_party_roles].distinct.select_map(:supplier_id).compact
       MasterfilesApp::PartyRepo.new.for_select_suppliers.select { |r| valid_supplier_ids.include?(r[1]) }
     end
 

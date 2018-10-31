@@ -89,7 +89,7 @@ module PackMaterialApp
       supplier_id = hash[:supplier_id]
       party = supplier_id ? find_hash(:suppliers, supplier_id) : find_hash(:customers, hash[:customer_id])
       hash.merge!(DB["SELECT fn_party_role_name(#{party[:party_role_id]}) as party_name"].first)
-      hash[:erp_number] = supplier_id ? party.erp_supplier_number : party.erp_customer_number
+      hash[:erp_number] = supplier_id ? party[:erp_supplier_number] : party[:erp_customer_number]
       MatresProductVariantPartyRole.new(hash)
     end
 

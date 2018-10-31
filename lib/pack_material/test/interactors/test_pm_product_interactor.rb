@@ -149,7 +149,7 @@ module PackMaterialApp
     end
 
     def test_pm_product_variant_create
-      PmProductRepo.any_instance.stubs(:create_pm_product_variant).returns(nil)
+      PmProductRepo.any_instance.stubs(:create_pm_product_variant).returns(ok_response('ok', 1))
       PmProductRepo.any_instance.stubs(:find_pm_product_variant).returns(fake_pm_product)
 
       x = interactor.send(:pm_product_variant_create, {})

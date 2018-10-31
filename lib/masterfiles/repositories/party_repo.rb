@@ -262,7 +262,8 @@ module MasterfilesApp
 
     # Customers & Suppliers
     def for_select_parties
-      DB[:parties].select_map(:id).map { |id| [DB['SELECT fn_party_name(?)', id].single_value, id] }
+      # Only non suppliers(for supp) or non customers(for cust) & active
+      DB[:parties].select(:id, Sequel.function(:fn_party_name, :id)).map { |r| [r[:fn_party_name], r[:id]] }
     end
 
     def create_customer(attrs)

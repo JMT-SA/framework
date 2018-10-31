@@ -17,7 +17,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'New Purchase Order', '/pack_material/replenish/mr_purchase_orders/new', 1);
+        'New Purchase Order', '/pack_material/replenish/mr_purchase_orders/preselect', 1);
 
 
 -- LIST menu item

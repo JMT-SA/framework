@@ -1,0 +1,119 @@
+---
+:caption: Mr Purchase Order Costs
+:sql: SELECT "mr_purchase_order_costs"."id", "mr_purchase_order_costs"."mr_cost_type_id",
+  "mr_purchase_order_costs"."mr_purchase_order_id", "mr_purchase_order_costs"."amount",
+  "mr_cost_types"."cost_code_string", "mr_purchase_orders"."purchase_account_code"
+  FROM "mr_purchase_order_costs" LEFT JOIN "mr_cost_types" ON "mr_cost_types"."id"
+  = "mr_purchase_order_costs"."mr_cost_type_id" LEFT JOIN "mr_purchase_orders" ON
+  "mr_purchase_orders"."id" = "mr_purchase_order_costs"."mr_purchase_order_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_purchase_order_costs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_cost_type_id:
+    :name: mr_cost_type_id
+    :sequence_no: 2
+    :caption: Mr cost type
+    :namespaced_name: mr_purchase_order_costs.mr_cost_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_purchase_order_id:
+    :name: mr_purchase_order_id
+    :sequence_no: 3
+    :caption: Mr purchase order
+    :namespaced_name: mr_purchase_order_costs.mr_purchase_order_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  amount:
+    :name: amount
+    :sequence_no: 4
+    :caption: Amount
+    :namespaced_name: mr_purchase_order_costs.amount
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cost_code_string:
+    :name: cost_code_string
+    :sequence_no: 5
+    :caption: Cost code string
+    :namespaced_name: mr_cost_types.cost_code_string
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  purchase_account_code:
+    :name: purchase_account_code
+    :sequence_no: 6
+    :caption: Purchase account code
+    :namespaced_name: mr_purchase_orders.purchase_account_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_purchase_order_costs.mr_cost_type_id
+  :caption: Mr cost type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cost_code_string, id FROM mr_cost_types ORDER BY cost_code_string
+- :column: mr_purchase_order_costs.mr_purchase_order_id
+  :caption: Mr purchase order
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT purchase_account_code, id FROM mr_purchase_orders ORDER BY purchase_account_code

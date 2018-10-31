@@ -52,6 +52,7 @@ class MiniTestWithHooks < Minitest::Test
   end
 
   def around
+    Faker::UniqueGenerator.clear
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
       super
     end
@@ -67,6 +68,22 @@ class MiniTestWithHooks < Minitest::Test
   rescue StandardError => e
     p e
     raise "Display possible around errors"
+  end
+end
+
+class MiniTestInteractors < Minitest::Test
+  include Crossbeams::Responses
+
+  def ok_response(message: nil, instance: nil)
+    success_response((message || 'OK'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
+
+  def bad_response(message: nil, instance: nil)
+    failed_response((message || 'FAILED'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
+
+  def around
+    Faker::UniqueGenerator.clear
   end
 end
 

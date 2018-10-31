@@ -86,10 +86,6 @@ class Framework < Roda
         show_page { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id) }
       end
       r.is do
-        r.get do       # SHOW
-          check_auth!('replenish', 'read')
-          r.redirect("/pack_material/replenish/mr_purchase_orders/#{res.instance.id}/edit")
-        end
         r.patch do     # UPDATE
           res = interactor.update_mr_purchase_order(id, params[:mr_purchase_order])
           if res.success
@@ -117,11 +113,11 @@ class Framework < Roda
       interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'preselect' do
         check_auth!('replenish', 'new')
-        show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrder::Preselect.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrder::Preselect.call }
       end
       r.on 'new', Integer do |supplier_id|    # NEW
         check_auth!('replenish', 'new')
-        show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrder::New.call(supplier_id, remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrder::New.call(supplier_id) }
       end
       r.on 'new' do
         r.post do
@@ -142,8 +138,7 @@ class Framework < Roda
           re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/new/#{supplier_id}") do
             PackMaterial::Replenish::MrPurchaseOrder::New.call(supplier_id,
                                                                form_values: params[:mr_purchase_order],
-                                                               form_errors: res.errors,
-                                                               remote: fetch?(r))
+                                                               form_errors: res.errors)
           end
         end
       end

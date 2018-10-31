@@ -15,6 +15,7 @@ class RouteTester < Minitest::Test
   DEFAULT_LAST_GRID_URL = '/list/users'
 
   def around
+    Faker::UniqueGenerator.clear
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
       super
     end

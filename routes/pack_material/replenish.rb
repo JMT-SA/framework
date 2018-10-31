@@ -213,7 +213,10 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_mr_purchase_order_cost(id, params[:mr_purchase_order_cost])
           if res.success
-            update_grid_row(id, changes: { mr_cost_type_id: res.instance[:mr_cost_type_id], mr_purchase_order_id: res.instance[:mr_purchase_order_id], amount: res.instance[:amount] },
+            update_grid_row(id, changes: { mr_cost_type_id: res.instance[:mr_cost_type_id],
+                                           mr_purchase_order_id: res.instance[:mr_purchase_order_id],
+                                           cost_code_string: res.instance[:cost_code_string],
+                                           amount: res.instance[:amount] },
                             notice: res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrPurchaseOrderCost::Edit.call(id, form_values: params[:mr_purchase_order_cost], form_errors: res.errors) }

@@ -3,6 +3,7 @@
 module UiRules
   class MrPurchaseOrderCostRule < Base
     def generate_rules
+      @general_repo = MasterfilesApp::GeneralRepo.new
       @repo = PackMaterialApp::ReplenishRepo.new
       make_form_object
       apply_form_values
@@ -15,20 +16,17 @@ module UiRules
     end
 
     def set_show_fields
-      # mr_cost_type_id_label = PackMaterialApp::MrCostTypeRepo.new.find_mr_cost_type(@form_object.mr_cost_type_id)&.cost_code_string
-      mr_cost_type_id_label = @repo.find(:mr_cost_types, PackMaterialApp::MrCostType, @form_object.mr_cost_type_id)&.cost_code_string
-      # mr_purchase_order_id_label = PackMaterialApp::MrPurchaseOrderRepo.new.find_mr_purchase_order(@form_object.mr_purchase_order_id)&.purchase_account_code
-      mr_purchase_order_id_label = @repo.find(:mr_purchase_orders, PackMaterialApp::MrPurchaseOrder, @form_object.mr_purchase_order_id)&.purchase_account_code
-      fields[:mr_cost_type_id] = { renderer: :label, with_value: mr_cost_type_id_label, caption: 'Mr Cost Type' }
-      fields[:mr_purchase_order_id] = { renderer: :label, with_value: mr_purchase_order_id_label, caption: 'Mr Purchase Order' }
+      mr_cost_type_id_label = @general_repo.find_mr_cost_type(@form_object.mr_cost_type_id)&.cost_code_string
+      fields[:mr_cost_type_id] = { renderer: :label, with_value: mr_cost_type_id_label, caption: 'Cost Type' }
+      fields[:mr_purchase_order_id] = { renderer: :hidden }
       fields[:amount] = { renderer: :label }
     end
 
     def common_fields
       {
-        mr_cost_type_id: { renderer: :select, options: PackMaterialApp::MrCostTypeRepo.new.for_select_mr_cost_types, caption: 'Mr Cost Type' },
-        mr_purchase_order_id: { renderer: :select, options: PackMaterialApp::MrPurchaseOrderRepo.new.for_select_mr_purchase_orders, caption: 'Mr Purchase Order' },
-        amount: {}
+        mr_cost_type_id: { renderer: :select, options: @general_repo.for_select_mr_cost_types, caption: 'Cost Type' },
+        mr_purchase_order_id: { renderer: :hidden },
+        amount: { renderer: :numeric }
       }
     end
 
@@ -40,7 +38,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(mr_cost_type_id: nil,
-                                    mr_purchase_order_id: nil,
+                                    mr_purchase_order_id: @options[:parent_id],
                                     amount: nil)
     end
   end

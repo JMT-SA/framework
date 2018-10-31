@@ -4,8 +4,8 @@ module PackMaterial
   module Replenish
     module MrPurchaseOrderCost
       class New
-        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:mr_purchase_order_cost, :new, form_values: form_values)
+        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true)
+          ui_rule = UiRules::Compiler.new(:mr_purchase_order_cost, :new, parent_id: parent_id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

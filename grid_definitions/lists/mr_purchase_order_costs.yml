@@ -18,7 +18,12 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/pack_material/replenish/mr_purchase_order_costs/new"
-  :text: New Mr Purchase Order Cost
+  :url: "/pack_material/replenish/mr_purchase_orders/$:purchase_order_id$/mr_purchase_order_costs/new"
+  :text: New Cost
   :style: :button
   :behaviour: :popup
+:conditions:
+  :standard:
+  - :col: mr_purchase_order_costs.mr_purchase_order_id
+    :op: =
+    :val: $:purchase_order_id$

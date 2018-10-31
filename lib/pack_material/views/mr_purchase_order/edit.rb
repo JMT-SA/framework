@@ -19,8 +19,8 @@ module PackMaterial
                                   url: '/list/mr_purchase_orders',
                                   style: :back_button)
               section.add_control(control_type: :link,
-                                  text: 'Add Costs',
-                                  url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_costs/new",
+                                  text: 'Manage Costs',
+                                  url: "/list/mr_purchase_order_costs/with_params?key=standard&purchase_order_id=#{id}",
                                   style: :button,
                                   behaviour: :popup)
               if ui_rule.form_object.purchase_order_number.nil?

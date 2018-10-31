@@ -17,5 +17,13 @@ module MasterfilesApp
                      order_by: :uom_code
 
     crud_calls_for :uoms, name: :uom, wrapper: Uom
+
+    build_for_select :mr_cost_types,
+                     label: :cost_code_string,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :cost_code_string
+
+    crud_calls_for :mr_cost_types, name: :mr_cost_type, wrapper: MrCostType
   end
 end

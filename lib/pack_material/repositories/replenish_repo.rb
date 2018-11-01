@@ -42,6 +42,12 @@ module PackMaterialApp
 
     crud_calls_for :mr_purchase_order_costs, name: :mr_purchase_order_cost, wrapper: MrPurchaseOrderCost
 
+    def find_mr_purchase_order_cost(id)
+      find_with_association(:mr_purchase_order_costs, id,
+                            parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_code_string: :cost_type } }],
+                            wrapper: MrPurchaseOrderCost)
+    end
+
     def for_select_suppliers
       valid_supplier_ids = DB[:material_resource_product_variant_party_roles].distinct.select_map(:supplier_id).compact
       MasterfilesApp::PartyRepo.new.for_select_suppliers.select { |r| valid_supplier_ids.include?(r[1]) }

@@ -62,7 +62,7 @@ class Framework < Roda
             ]
             sub_totals = interactor.po_sub_totals(id)
             json_actions(po_sub_total_changes(sub_totals) +
-                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys))], res.message)
+                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys, cost_code_string: res.instance[:cost_type]))], res.message)
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_costs/new") do
               PackMaterial::Replenish::MrPurchaseOrderCost::New.call(id,
@@ -220,18 +220,13 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_mr_purchase_order_cost(id, params[:mr_purchase_order_cost])
           if res.success
-            # update_grid_row(id, changes: { mr_cost_type_id: res.instance[:mr_cost_type_id],
-            #                                mr_purchase_order_id: res.instance[:mr_purchase_order_id],
-            #                                cost_code_string: res.instance[:cost_code_string],
-            #                                amount: res.instance[:amount] },
-            #                 notice: res.message)
             sub_totals = interactor.po_sub_totals(id)
             json_actions(po_sub_total_changes(sub_totals) +
                          [OpenStruct.new(ids: id, type: :update_grid_row, changes:
                                          {
                                            mr_cost_type_id: res.instance[:mr_cost_type_id],
                                            mr_purchase_order_id: res.instance[:mr_purchase_order_id],
-                                           # cost_code_string: res.instance[:cost_code_string],
+                                           cost_code_string: res.instance[:cost_type],
                                            amount: res.instance[:amount]
                                          })], res.message)
           else

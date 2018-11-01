@@ -90,11 +90,12 @@ class GenerateNewScaffold < BaseService
     sources = { opts: opts, paths: @opts.filenames }
 
     begin
-      report               = QueryMaker.call(opts)
+      qm                   = QueryMaker.new(opts)
+      report               = qm.call
       sources[:query]      = wrapped_sql_from_report(report)
       sources[:dm_query]   = DmQueryMaker.call(report, opts)
     rescue StandardError => e
-      sources[:query]      = "Error building report: #{e.message}"
+      sources[:query]      = "-- Error building report - needs tuning: #{e.message}\n\n #{wrapped_sql(qm.base_sql)}"
       sources[:dm_query]   = "Error building report: #{e.message}"
     end
     sources[:list]       = ListMaker.call(opts)
@@ -116,8 +117,12 @@ class GenerateNewScaffold < BaseService
   private
 
   def wrapped_sql_from_report(report)
+    wrapped_sql(report.runnable_sql)
+  end
+
+  def wrapped_sql(sql)
     width = 120
-    ar = report.runnable_sql.gsub(/from /i, "\nFROM ").gsub(/where /i, "\nWHERE ").gsub(/(left outer join |left join |inner join |join )/i, "\n\\1").split("\n")
+    ar = sql.gsub(/from /i, "\nFROM ").gsub(/where /i, "\nWHERE ").gsub(/(left outer join |left join |inner join |join )/i, "\n\\1").split("\n")
     ar.map { |a| a.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n") }.join("\n")
   end
 
@@ -1167,39 +1172,52 @@ class GenerateNewScaffold < BaseService
   end
 
   class QueryMaker < BaseService
-    attr_reader :opts
+    attr_reader :opts, :base_sql
     def initialize(opts)
       @opts = opts
+      @base_sql = nil
       @repo = DevelopmentApp::DevelopmentRepo.new
     end
 
     def call
-      base_sql = <<~SQL
+      @base_sql = <<~SQL
         SELECT #{columns}
         FROM #{opts.table}
         #{make_joins}
       SQL
       report = Crossbeams::Dataminer::Report.new(opts.table.split('_').map(&:capitalize).join(' '))
-      report.sql = base_sql
+      report.sql = @base_sql
       report
     end
 
     private
 
-    def columns
+    def columns # rubocop:disable Metrics/PerceivedComplexity
       tab_cols = opts.table_meta.column_names.map { |col| "#{opts.table}.#{col}" }
       fk_cols  = []
+      used_tables = Hash.new(0)
       opts.table_meta.foreigns.each do |fk|
         if fk[:table] == :party_roles # Special treatment for party_role lookups to get party name
           fk[:columns].each do |fk_col|
             fk_cols << "fn_party_role_name(#{opts.table}.#{fk_col}) AS #{fk_col.to_s.sub(/_id$/, '')}"
           end
         else
+          tab_alias = fk[:table]
+          cnt       = used_tables[fk[:table]] += 1
+          tab_alias = "#{tab_alias}#{cnt}" if cnt > 1
           fk_col = get_representative_col_from_table(fk[:table])
+          pre = if fk[:table].to_s.start_with?(fk[:columns].first.to_s.sub(/_id$/, ''))
+                  ''
+                else
+                  "#{fk[:columns].first.to_s.sub(/_id$/, '')}_"
+                end
+
           fk_cols << if opts.table_meta.column_names.include?(fk_col.to_sym)
-                       "#{fk[:table]}.#{fk_col} AS #{fk[:table]}_#{fk_col}"
+                       "#{tab_alias}.#{fk_col} AS #{fk[:table]}_#{fk_col}"
+                     elsif pre == ''
+                       "#{tab_alias}.#{fk_col}"
                      else
-                       "#{fk[:table]}.#{fk_col}"
+                       "#{tab_alias}.#{fk_col} AS #{pre}#{fk_col}"
                      end
         end
       end

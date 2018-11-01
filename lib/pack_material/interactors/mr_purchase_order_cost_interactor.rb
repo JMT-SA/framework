@@ -52,5 +52,9 @@ module PackMaterialApp
       end
       success_response("Deleted mr purchase order cost #{name}")
     end
+
+    def po_sub_totals(id)
+      repo.sub_totals(id)
+    end
   end
 end

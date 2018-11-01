@@ -532,8 +532,9 @@ const crossbeamsUtils = {
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.log('==Backend Backtrace==');
+              console.groupCollapsed('==Backend Backtrace==');
               console.info(data.backtrace.join('\n'));
+              console.groupEnd();
             }
           } else {
             Jackbox.error(data.flash.error);
@@ -817,9 +818,10 @@ const crossbeamsUtils = {
         if (body.flash.error) {
           if (body.exception) {
             if (body.backtrace) {
-              console.log('EXCEPTION:', body.exception, body.flash.error);
-              console.log('==Backend Backtrace==');
+              console.groupCollapsed('EXCEPTION:', body.exception, body.flash.error);
+              console.info('==Backend Backtrace==');
               console.info(body.backtrace.join('\n'));
+              console.groupEnd();
             }
           } else {
             Jackbox.error(body.flash.error);

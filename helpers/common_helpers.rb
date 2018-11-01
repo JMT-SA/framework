@@ -251,7 +251,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [JSON] the changes to be applied.
   def add_grid_row(attrs:, notice: nil)
     # res = { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
-    res = action_add_grid_row(attrs)
+    res = action_add_grid_row(attrs: attrs)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end

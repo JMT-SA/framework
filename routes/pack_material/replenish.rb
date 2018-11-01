@@ -32,16 +32,9 @@ class Framework < Roda
               quantity_required
               unit_price
             ]
-            # add_grid_row(attrs: select_attributes(res.instance, row_keys),
-            #              notice: res.message)
             sub_totals = interactor.po_sub_totals(id)
-            json_actions([
-                           OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
-                           OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
-                           OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
-                           OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
-                           OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys))
-                         ], res.message)
+            json_actions(po_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys))], res.message)
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new") do
               PackMaterial::Replenish::MrPurchaseOrderItem::New.call(id,
@@ -67,8 +60,9 @@ class Framework < Roda
               mr_purchase_order_id
               amount
             ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            sub_totals = interactor.po_sub_totals(id)
+            json_actions(po_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys))], res.message)
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_costs/new") do
               PackMaterial::Replenish::MrPurchaseOrderCost::New.call(id,
@@ -182,15 +176,9 @@ class Framework < Roda
               quantity_required
               unit_price
             ]
-            # update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
             sub_totals = interactor.po_sub_totals(id)
-            json_actions([
-                           OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
-                           OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
-                           OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
-                           OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
-                           OpenStruct.new(ids: id, type: :update_grid_row, changes: select_attributes(res.instance, row_keys))
-                         ], res.message)
+            json_actions(po_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(ids: id, type: :update_grid_row, changes: select_attributes(res.instance, row_keys))], res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrPurchaseOrderItem::Edit.call(id, form_values: params[:mr_purchase_order_item], form_errors: res.errors) }
           end
@@ -200,15 +188,9 @@ class Framework < Roda
           po_id = interactor.mr_purchase_order_item(id).mr_purchase_order_id
           res = interactor.delete_mr_purchase_order_item(id)
           if res.success
-            # delete_grid_row(id, notice: res.message)
             sub_totals = interactor.po_sub_totals(parent_id: po_id)
-            json_actions([
-                           OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
-                           OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
-                           OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
-                           OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
-                           OpenStruct.new(id: id, type: :delete_grid_row)
-                         ], res.message)
+            json_actions(po_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(id: id, type: :delete_grid_row)], res.message)
           else
             show_json_error(res.message, status: 200)
           end
@@ -238,20 +220,33 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_mr_purchase_order_cost(id, params[:mr_purchase_order_cost])
           if res.success
-            update_grid_row(id, changes: { mr_cost_type_id: res.instance[:mr_cost_type_id],
+            # update_grid_row(id, changes: { mr_cost_type_id: res.instance[:mr_cost_type_id],
+            #                                mr_purchase_order_id: res.instance[:mr_purchase_order_id],
+            #                                cost_code_string: res.instance[:cost_code_string],
+            #                                amount: res.instance[:amount] },
+            #                 notice: res.message)
+            sub_totals = interactor.po_sub_totals(id)
+            json_actions(po_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(ids: id, type: :update_grid_row, changes:
+                                         {
+                                           mr_cost_type_id: res.instance[:mr_cost_type_id],
                                            mr_purchase_order_id: res.instance[:mr_purchase_order_id],
-                                           cost_code_string: res.instance[:cost_code_string],
-                                           amount: res.instance[:amount] },
-                            notice: res.message)
+                                           # cost_code_string: res.instance[:cost_code_string],
+                                           amount: res.instance[:amount]
+                                         })], res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrPurchaseOrderCost::Edit.call(id, form_values: params[:mr_purchase_order_cost], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
           check_auth!('replenish', 'delete')
+          po_id = interactor.mr_purchase_order_cost(id).mr_purchase_order_id
           res = interactor.delete_mr_purchase_order_cost(id)
           if res.success
-            delete_grid_row(id, notice: res.message)
+            # delete_grid_row(id, notice: res.message)
+            sub_totals = interactor.po_sub_totals(po_id)
+            json_actions(po_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(id: id, type: :delete_grid_row)], res.message)
           else
             show_json_error(res.message, status: 200)
           end
@@ -324,6 +319,15 @@ class Framework < Roda
         end
       end
     end
+  end
+
+  def po_sub_total_changes(sub_totals)
+    [
+      OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
+      OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+      OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
+      OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
+    ]
   end
 end
 

@@ -15,6 +15,11 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :url: /development/statuses/show/mr_purchase_orders/$:id$
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/replenish/mr_purchase_orders/preselect"

@@ -33,7 +33,7 @@ module Development
                   col.add_table(rules[:details], rules[:headers], header_captions: rules[:header_captions])
                   col.add_text '<h3>Other status changes</h3>'
                   if remote
-                    col.add_table(rules[:other_details].map do |a|
+                    col.add_table((rules[:other_details] || []).map do |a|
                       a[:link] = a[:link].sub('<a', '<a data-replace-dialog="y" ')
                       a
                     end, rules[:other_headers], header_captions: rules[:other_header_captions])

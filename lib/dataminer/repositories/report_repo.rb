@@ -121,7 +121,7 @@ module DataminerApp
       report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab] } }
     end
 
-    def get_reports_for(key, path)
+    def get_reports_for(key, path) # rubocop:disable Metrics/AbcSize
       lkp = {}
       ymlfiles = File.join(path, '**', '*.yml')
       yml_list = Dir.glob(ymlfiles)
@@ -132,6 +132,23 @@ module DataminerApp
         lkp[index] = { file: yml_file, db: key, caption: Crossbeams::Dataminer::Report.load(yp).caption, crosstab: !yp.to_hash[:crosstab].nil?, external: external_render?(yp.to_hash) }
       end
       lkp
+    end
+
+    # Take a grid query definition and replace its where clause, returning the modified SQL.
+    # Assuems the where clause will be of the form: "WHERE id = value", but can be modified in other ways.
+    #
+    # @param id [string] the query definition file name (without 'yml')
+    # @param value [string, integer] the value to match.
+    # @param operator [string] the operator to apply to the column. Default "=".
+    # @param column [string] the column to match in the WHERE clause.
+    # @param data_type [Symbol] the data_type of the column. Defaults to :integer.
+    # @return [String] the SQL to be run.
+    def replace_grid_query_where_clause(id, value, operator: '=', column: 'id', data_type: :integer)
+      persistor = Crossbeams::Dataminer::YamlPersistor.new(File.join(ENV['GRID_QUERIES_LOCATION'], "#{id}.yml"))
+      rpt = Crossbeams::Dataminer::Report.load(persistor)
+      params = [Crossbeams::Dataminer::QueryParameter.new(column, Crossbeams::Dataminer::OperatorValue.new(operator, value, data_type))]
+      rpt.replace_where(params)
+      rpt.runnable_sql
     end
 
     private

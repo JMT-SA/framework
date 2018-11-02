@@ -36,7 +36,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
 
   VALID_LKP_KEYS = %i[function args col_name].freeze
   VALID_SUB_KEYS = %i[sub_table columns join_table uses_join_table active_only inactive_only].freeze
-  VALID_PARENT_KEYS = %i[parent_table columns flatten_columns].freeze
+  VALID_PARENT_KEYS = %i[parent_table columns flatten_columns foreign_key].freeze
 
   def main_table_id
     @main_table_id ||= "#{@inflector.singularize(@main_table)}_id".to_sym
@@ -58,6 +58,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     return if @parent_tables.empty?
     @parent_tables.each do |rule|
       @parent_table = rule.fetch(:parent_table)
+      @foreign_key = rule[:foreign_key]
       apply_parent_table_rule(rule)
     end
   end
@@ -123,9 +124,32 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
 
   def apply_parent_table_rule(rule)
     cols = rule[:columns] || Sequel.lit('*')
-    entity = DB[@parent_table].where(id: @rec[parent_table_id]).select(*cols).first
-    add_flattened_columns(rule, entity)
-    @rec[@inflector.singularize(@parent_table).to_sym] = entity unless entity.empty?
+    entity = DB[@parent_table].where(id: @rec[@foreign_key || parent_table_id]).select(*cols).first
+    if entity.nil?
+      blank_parent_entity(cols, rule)
+    else
+      add_flattened_columns(rule, entity)
+      @rec[parent_table_key] = entity unless entity.empty?
+    end
+  end
+
+  def blank_parent_entity(cols, rule)
+    cols = DB[@parent_table].columns if cols == Sequel.lit('*')
+    (rule[:flatten_columns] || []).each do |col, new_name|
+      cols.delete(col)
+      @rec[new_name] = nil
+    end
+    nc = {}
+    nc = cols.map { |c| [c, nil] }.to_h unless cols.empty?
+    @rec[parent_table_key] = nc unless cols.empty?
+  end
+
+  def parent_table_key
+    if @foreign_key
+      @foreign_key.to_s.sub(/_id$/, '').to_sym
+    else
+      @inflector.singularize(@parent_table).to_sym
+    end
   end
 
   def parent_table_id

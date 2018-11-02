@@ -95,6 +95,7 @@ Optional keys:
 
 * `columns`: Array of Symbols - one for each desired column. If not present, all columns are returned
 * `flatten_columns`: Hash of Symbol => Symbol - key is the column in the parent and value is the new name to be used on the entity.
+* `foreign_key`: Symbol - required if the foreign_key cnnot be inferred from the parent table name. e.g. `:admin_user_id` which points to `id` on the `users` table would be `foreign_key: :admin_user_id`.
 
 examples:
 [source,ruby]

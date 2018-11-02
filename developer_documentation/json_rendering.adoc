@@ -139,6 +139,27 @@ type: `:clear_form_validation`.
 
 dom_id: the `id` of the `<form>`. (Use `form.form_id 'abc'` in the view to set this value)
 
+===== Add a row to a grid
+
+As part of a set of actions, adds a row to a grid.
+
+type: `:add_grid_row`.
+attrs: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+
+===== Update a grid row
+
+As part of a set of actions, updates the columns of a row or rows in a grid.
+
+type: `:update_grid_row`.
+
+ids: the id (or Array of ids) of the row(s) to change.
+changes: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+
+===== Delete a grid row
+
+type: `:delete_grid_row`.
+
+id: the id of the row to delete.
 
 ==== Single actions
 

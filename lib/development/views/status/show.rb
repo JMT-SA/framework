@@ -15,13 +15,14 @@ module Development
               form.no_submit! unless remote
               form.row do |row| # rubocop:disable Metrics/BlockLength
                 row.column do |col|
-                  col.add_field :status
-                  col.add_field :user_name
-                  col.add_field :route_url
-                  col.add_field :action_tstamp_tx
-                  col.add_field :table_name
-                  col.add_field :row_data_id
-                  col.add_field :context
+                  # col.add_field :status
+                  # col.add_field :user_name
+                  # col.add_field :route_url
+                  # col.add_field :action_tstamp_tx
+                  # col.add_field :table_name
+                  # col.add_field :row_data_id
+                  # col.add_field :context
+                  col.add_table(rules[:rows], rules[:cols], pivot: true)
                   unless ui_rule.form_object[:diff_id].nil?
                     col.add_control(control_type: :link,
                                     text: 'View changes',

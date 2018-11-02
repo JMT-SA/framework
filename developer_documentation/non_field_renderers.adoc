@@ -324,6 +324,11 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |Provide captions for headers to override the default text (which is the header key capitalised with underscores changed to spaces).
 |None.
 
+|options - :pivot
+|Boolean
+|If true, pivot the table so that columns become rows. NB. the table **must** have columns specified.
+|None.
+
 |===
 
 === Diff

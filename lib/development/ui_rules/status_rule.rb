@@ -10,6 +10,7 @@ module UiRules
       common_values_for_fields select_fields
 
       set_show_fields if @mode == :show
+      rules[:rows] = [@form_object.to_h] if @mode == :show
 
       form_name 'status'
     end
@@ -29,6 +30,7 @@ module UiRules
       rules[:other_headers] = %i[link table_name row_data_id status comment user_name]
       rules[:other_details] = @form_object[:other_recs]
       rules[:other_header_captions] = { row_data_id: 'ID', link: 'View' }
+      rules[:cols] = %i[status user_name route_url action_tstamp_tx table_name row_data_id context]
     end
 
     def select_fields

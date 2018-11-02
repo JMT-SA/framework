@@ -227,7 +227,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [JSON] the changes to be applied.
   def update_grid_row(ids, changes:, notice: nil)
     # res = { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes } } }
-    res = action_update_grid_row(ids, changes)
+    res = action_update_grid_row(ids, changes: changes)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end

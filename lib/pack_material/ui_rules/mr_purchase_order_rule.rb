@@ -69,7 +69,7 @@ module UiRules
         },
         delivery_address_id: {
           renderer: :select,
-          options: @party_repo.for_select_addresses_for_party(party_role_id: @form_object.supplier_party_role_id,
+          options: @party_repo.for_select_addresses_for_party(party_role_id: @party_repo.implementation_owner_party_role&.id,
                                                               address_type: 'Delivery Address'),
           caption: 'Delivery Address',
           required: true

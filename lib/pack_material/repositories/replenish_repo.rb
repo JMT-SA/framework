@@ -48,6 +48,14 @@ module PackMaterialApp
                             wrapper: MrPurchaseOrderCost)
     end
 
+    def find_purchase_order_item(id)
+      find_with_association(:mr_purchase_order_items, id,
+                            parent_tables: [{ parent_table: :material_resource_product_variants, flatten_columns: { product_variant_code: :product_variant_code } },
+                                            { parent_table: :uoms, flatten_columns: { uom_code: :purchasing_uom_code }, foreign_key: :purchasing_uom_id },
+                                            { parent_table: :uoms, flatten_columns: { uom_code: :inventory_uom_code }, foreign_key: :inventory_uom_id }],
+                            wrapper: MrPurchaseOrderItem)
+    end
+
     def for_select_suppliers
       valid_supplier_ids = DB[:material_resource_product_variant_party_roles].distinct.select_map(:supplier_id).compact
       MasterfilesApp::PartyRepo.new.for_select_suppliers.select { |r| valid_supplier_ids.include?(r[1]) }
@@ -91,6 +99,29 @@ module PackMaterialApp
       return BigDecimal('0') if subtotal.zero?
       factor = DB['SELECT percentage_applicable / 100.0 AS vat_factor FROM mr_vat_types WHERE id = (SELECT mr_vat_type_id FROM mr_purchase_orders WHERE id = ?)', id].single_value || BigDecimal('0')
       subtotal * factor
+    end
+
+    # Purchase Order States/Statuses
+    def can_approve_purchase_order?(purchase_order_id)
+      po = find_with_association(:mr_purchase_orders, purchase_order_id,
+                                 sub_tables: [{ sub_table: :mr_purchase_order_items }])
+      no_po_number = po[:purchase_order_number].nil?
+      has_items = po[:mr_purchase_order_items].any?
+      has_items && (no_po_number || !po[:approved])
+    end
+
+    # def can_reopen_purchase_order?(purchase_order_id)
+    #   approved = find_hash(:mr_purchase_orders, purchase_order_id)[:approved]
+    #   receiving_deliveries = DB['SELECT']
+    #   approved && !receiving_deliveries
+    #   # approved && not currently receiving deliveries
+    # end
+
+    def approve_purchase_order!(purchase_order_id)
+      po = find_hash(:mr_purchase_orders, purchase_order_id)
+      log_status('mr_purchase_orders', purchase_order_id, 'APPROVED')
+      update(:mr_purchase_orders, purchase_order_id, approved: true)
+      update_with_document_number('doc_seqs_po_number', purchase_order_id) unless po[:purchase_order_number]
     end
   end
 end

@@ -23,7 +23,7 @@ module PackMaterial
                                   url: "/list/mr_purchase_order_costs/with_params?key=standard&purchase_order_id=#{id}",
                                   style: :button,
                                   behaviour: :popup)
-              if ui_rule.form_object.purchase_order_number.nil?
+              if rules[:can_approve]
                 section.add_control(control_type: :link,
                                     text: 'Approve Purchase Order',
                                     url: "/pack_material/replenish/mr_purchase_orders/#{id}/approve_purchase_order",
@@ -61,6 +61,12 @@ module PackMaterial
               section.show_border!
               section.row do |row|
                 row.column do |col|
+                  # if rules[:show]
+                  #   col.add_grid('po_items',
+                  #                "/list/mr_purchase_order_items_show/grid?key=standard&purchase_order_id=#{id}",
+                  #                height: 8,
+                  #                caption: 'Purchase Order Line Items')
+                  # else
                   col.add_control(control_type: :link,
                                   text: 'New Item',
                                   url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new",
@@ -71,6 +77,7 @@ module PackMaterial
                                "/list/mr_purchase_order_items/grid?key=standard&purchase_order_id=#{id}",
                                height: 8,
                                caption: 'Purchase Order Line Items')
+                  # end
                 end
               end
             end

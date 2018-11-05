@@ -88,6 +88,11 @@ class Framework < Roda
         show_page { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id) }
       end
       r.is do
+        r.get do       # SHOW
+          check_auth!('replenish', 'read')
+          # TODO: implement show view
+          show_page { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id) }
+        end
         r.patch do     # UPDATE
           res = interactor.update_mr_purchase_order(id, params[:mr_purchase_order])
           if res.success

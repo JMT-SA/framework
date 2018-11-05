@@ -8,17 +8,49 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
+      @rules[:can_approve] = @repo.can_approve_purchase_order?(@form_object.id) unless @mode == :new
+      # @rules[:show] = @repo.find_mr_purchase_order(@form_object.id)&.approved unless @mode == :new
+
       common_values_for_fields case @mode
                                when :edit
                                  edit_fields
+                                 # @rules[:show] ? show_fields : edit_fields
                                when :new
                                  new_fields
                                when :preselect
                                  preselect_fields
                                end
 
-      @rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
       form_name 'mr_purchase_order'
+    end
+
+    def show_fields
+      sup = supplier
+      {
+        mr_delivery_term_id: {
+          renderer: :label,
+          with_value: @repo.find_mr_delivery_term(@form_object.mr_delivery_term_id)&.delivery_term_code,
+          caption: 'Delivery Term',
+          readonly: true
+        },
+        mr_vat_type_id: {
+          renderer: :label,
+          with_value: @repo.find_mr_vat_type(@form_object.mr_vat_type_id)&.vat_type_code,
+          caption: 'Vat Type'
+        },
+        delivery_address_id: {
+          renderer: :label,
+          caption: 'Delivery Address'
+        },
+        purchase_account_code: { renderer: :label },
+        fin_object_code: { renderer: :label },
+        valid_until: { renderer: :label },
+        supplier_party_role_id: { renderer: :hidden },
+        supplier_name: { renderer: :label, with_value: sup.party_name },
+        supplier_erp_number: { renderer: :label, with_value: sup.erp_supplier_number },
+        purchase_order_number: { renderer: :label }
+      }
     end
 
     def common_fields

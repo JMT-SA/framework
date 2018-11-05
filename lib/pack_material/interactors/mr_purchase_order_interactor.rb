@@ -30,15 +30,16 @@ module PackMaterialApp
 
     def approve_purchase_order(id)
       instance = mr_purchase_order(id)
-      if instance.purchase_order_number
+      if instance.approved
         failed_response('This purchase order has already been approved')
-      else
+      elsif instance
         repo.transaction do
-          log_status('mr_purchase_orders', id, 'APPROVED')
-          repo.update_with_document_number('doc_seqs_po_number', id)
+          repo.approve_purchase_order!(id)
           log_transaction
         end
         success_response('Purchase Order Approved', instance)
+      else
+        failed_response('No Purchase Order found')
       end
     end
 

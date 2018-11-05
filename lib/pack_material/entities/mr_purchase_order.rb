@@ -11,5 +11,6 @@ module PackMaterialApp
     attribute :fin_object_code, Types::String
     attribute :valid_until, Types::DateTime
     attribute :purchase_order_number, Types::Integer
+    attribute :approved, Types::Bool
   end
 end

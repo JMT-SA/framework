@@ -1,3 +1,4 @@
+INSERT INTO roles (name) VALUES ('IMPLEMENTATION_OWNER');
 
 INSERT INTO functional_areas (functional_area_name)
 VALUES ('Masterfiles');

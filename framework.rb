@@ -30,6 +30,9 @@ ENV['GRID_QUERIES_LOCATION'] ||= File.expand_path('grid_definitions/dataminer_qu
 DM_CONNECTIONS = DataminerConnections.new
 
 module Crossbeams
+  class FrameworkError < StandardError
+  end
+
   class AuthorizationError < StandardError
   end
 end
@@ -111,6 +114,7 @@ class Framework < Roda
 
     r.rodauth
     rodauth.require_authentication
+    # If mobile, login with minimal layout (name: MOBILE / PDT?) - minimal tachonys for mobile?
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do

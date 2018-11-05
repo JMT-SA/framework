@@ -37,6 +37,8 @@ module MasterfilesApp
     crud_calls_for :supplier_types, name: :supplier_type, wrapper: SupplierType
     crud_calls_for :suppliers, name: :supplier, wrapper: Supplier
 
+    ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
+
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
     end
@@ -238,6 +240,26 @@ module MasterfilesApp
 
     def party_role_ids(party_id)
       DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
+    end
+
+    # Find the party role for the implementation owner.
+    # Requires that the ENV variable "IMPLEMENTATION_OWNER" has been correctly set.
+    #
+    # @return [MasterfilesApp::PartyRole] the party role entity.
+    def implementation_owner_party_role
+      query = <<~SQL
+        SELECT pr.id, pr.party_id, role_id, organization_id, person_id, pr.active
+        FROM public.party_roles pr
+        JOIN roles r ON r.id = pr.role_id
+        LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
+        LEFT OUTER JOIN people p ON p.id = pr.person_id
+        WHERE r.name = ?
+          AND COALESCE(o.short_description, p.first_name || ' ' || p.surname) = ?
+          AND pr.active
+      SQL
+      hash = DB[query, ROLE_IMPLEMENTATION_OWNER, ENV[ROLE_IMPLEMENTATION_OWNER]].first
+      raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{ENV[ROLE_IMPLEMENTATION_OWNER]}\" is not defined/active" if hash.nil?
+      MasterfilesApp::PartyRole.new(hash)
     end
 
     def assign_roles(id, role_ids, type = 'O')

@@ -1,10 +1,11 @@
 ---
-:caption: MDelivery Terms
+:caption: MR Delivery Terms
 :sql: SELECT "mr_delivery_terms"."id", "mr_delivery_terms"."delivery_term_code", "mr_delivery_terms"."is_consignment_stock"
   FROM "mr_delivery_terms"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id

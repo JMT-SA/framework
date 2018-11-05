@@ -1,11 +1,11 @@
 ---
 :dataminer_definition: mr_purchase_order_items
 :actions:
-- :url: "/pack_material/replenish/mr_purchase_order_items/$:id$/edit"
-  :text: view
-  :icon: view-show
-  :title: View
-  :popup: true
+#- :url: "/pack_material/replenish/mr_purchase_order_items/$:id$"
+#  :text: view
+#  :icon: view-show
+#  :title: View
+#  :popup: true
 - :url: "/pack_material/replenish/mr_purchase_order_items/$:id$/edit"
   :text: edit
   :icon: edit

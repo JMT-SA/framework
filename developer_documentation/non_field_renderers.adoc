@@ -56,6 +56,11 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |`String`.
 |n/a
 
+|options - :prompt
+|Prompt user with a confirm message. Only continue if user chooses to go ahead.
+|`String` or `true`/`false`. If `true` or `Y`, prompt will be "Are you sure?" -- otherwise the prompt will be the provided string.
+|n/a
+
 |===
 
 === Text

@@ -136,6 +136,19 @@
       if (event.target.dataset && event.target.dataset.brieflyDisableWith) {
         preventMultipleSubmitsBriefly(event.target);
       }
+      // Prompt for confirmation
+      if (event.target.dataset && event.target.dataset.prompt) {
+        event.stopPropagation();
+        event.preventDefault();
+        crossbeamsUtils.confirm({
+          prompt: event.target.dataset.prompt,
+          okFunc: () => {
+            console.log('to call HREF', event.target.href); // TODO: is this a fetch/std call?
+            // SHOULD actually be a POST, not a GET?
+            window.location = event.target.href;
+          },
+        });
+      }
       // Open modal dialog
       if (event.target.dataset && event.target.dataset.popupDialog) {
         if (event.target.dataset.gridId) {

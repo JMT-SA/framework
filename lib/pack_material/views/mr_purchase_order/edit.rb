@@ -27,6 +27,7 @@ module PackMaterial
                 section.add_control(control_type: :link,
                                     text: 'Approve Purchase Order',
                                     url: "/pack_material/replenish/mr_purchase_orders/#{id}/approve_purchase_order",
+                                    prompt: true,
                                     style: :button)
               end
             end

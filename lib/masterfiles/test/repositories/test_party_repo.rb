@@ -303,7 +303,7 @@ module MasterfilesApp
       2.times do
         type_ids << create_customer_type[:id]
       end
-      party_role_info = create_party_role('O', MasterfilesApp::CUSTOMER_ROLE)
+      party_role_info = create_party_role('O', AppConst::ROLE_CUSTOMER)
       attrs[:customer_type_ids] = type_ids
       attrs[:party_id] = party_role_info[:party_id]
       actual = repo.create_customer(attrs)

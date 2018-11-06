@@ -8,6 +8,7 @@ Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
 require 'base64'
 require 'pstore'
+require './config/app_const'
 require './lib/types_for_dry'
 require './lib/crossbeams_responses'
 require './lib/base_repo'

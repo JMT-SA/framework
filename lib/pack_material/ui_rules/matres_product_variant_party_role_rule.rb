@@ -61,7 +61,7 @@ module UiRules
 
     def supplier_type_check
       # I get type directly from the repo so that it can't be changed from the edit view
-      @options[:type] ? @options[:type] == MasterfilesApp::SUPPLIER_ROLE.downcase : @repo.find_product_variant_party_role(@options[:id])&.supplier?
+      @options[:type] ? @options[:type] == AppConst::ROLE_SUPPLIER.downcase : @repo.find_product_variant_party_role(@options[:id])&.supplier?
     end
 
     def product_variant

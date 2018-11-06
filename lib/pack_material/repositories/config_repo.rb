@@ -81,7 +81,7 @@ module PackMaterialApp
     # @param attrs [Hash] material_resource_product_variant_party_roles attributes for create
     # @return [String] role type constant
     def role_type(attrs)
-      attrs[:supplier_id] ? MasterfilesApp::SUPPLIER_ROLE : MasterfilesApp::CUSTOMER_ROLE
+      attrs[:supplier_id] ? AppConst::ROLE_SUPPLIER : AppConst::ROLE_CUSTOMER
     end
 
     def find_product_variant_party_role(id)

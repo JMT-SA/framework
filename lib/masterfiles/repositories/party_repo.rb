@@ -37,8 +37,6 @@ module MasterfilesApp
     crud_calls_for :supplier_types, name: :supplier_type, wrapper: SupplierType
     crud_calls_for :suppliers, name: :supplier, wrapper: Supplier
 
-    ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
-
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
     end
@@ -257,8 +255,8 @@ module MasterfilesApp
           AND COALESCE(o.short_description, p.first_name || ' ' || p.surname) = ?
           AND pr.active
       SQL
-      hash = DB[query, ROLE_IMPLEMENTATION_OWNER, ENV[ROLE_IMPLEMENTATION_OWNER]].first
-      raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{ENV[ROLE_IMPLEMENTATION_OWNER]}\" is not defined/active" if hash.nil?
+      hash = DB[query, AppConst::ROLE_IMPLEMENTATION_OWNER, ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]].first
+      raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]}\" is not defined/active" if hash.nil?
       MasterfilesApp::PartyRole.new(hash)
     end
 
@@ -294,7 +292,7 @@ module MasterfilesApp
       return { error: { customer_type_ids: ['You did not choose any customer types'] } } if customer_type_ids.empty?
 
       party_id = params.delete(:party_id)
-      party_role_id = create_party_role(party_id, MasterfilesApp::CUSTOMER_ROLE)[:id]
+      party_role_id = create_party_role(party_id, AppConst::ROLE_CUSTOMER)[:id]
       return { error: { base: ['You already have this party set up as a customer'] } } if party_role_id.nil?
 
       customer_id = create(:customers, params.merge(party_role_id: party_role_id))
@@ -336,7 +334,7 @@ module MasterfilesApp
       return { error: { supplier_type_ids: ['You did not choose any supplier types'] } } if supplier_type_ids.empty?
 
       party_id = params.delete(:party_id)
-      party_role_id = create_party_role(party_id, SUPPLIER_ROLE)[:id]
+      party_role_id = create_party_role(party_id, AppConst::ROLE_SUPPLIER)[:id]
       return { error: { base: ['You already have this party set up as a supplier'] } } if party_role_id.nil?
 
       supplier_id = create(:suppliers, params.merge(party_role_id: party_role_id))

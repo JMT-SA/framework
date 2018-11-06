@@ -71,7 +71,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     ensure_exists!(PackMaterialApp::MatresProductVariantInteractor)
     PackMaterial::MaterialResource::MatresProductVariantPartyRole::New.stub(:call, bland_page) do
-      get 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles/new', { type: MasterfilesApp::SUPPLIER_ROLE }, 'rack.session' => { user_id: 1 }
+      get 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles/new', { type: AppConst::ROLE_SUPPLIER }, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -80,7 +80,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     authorise_fail!
     ensure_exists!(INTERACTOR)
     ensure_exists!(PackMaterialApp::MatresProductVariantInteractor)
-    get 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles/new', { type: MasterfilesApp::SUPPLIER_ROLE }, 'rack.session' => { user_id: 1 }
+    get 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles/new', { type: AppConst::ROLE_SUPPLIER }, 'rack.session' => { user_id: 1 }
     refute last_response.ok?
     assert_match(/permission/i, last_response.body)
   end
@@ -90,7 +90,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     ensure_exists!(PackMaterialApp::MatresProductVariantInteractor)
     INTERACTOR.any_instance.stubs(:create_matres_product_variant_party_role).returns(ok_response)
-    post_as_fetch 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles', { type: MasterfilesApp::SUPPLIER_ROLE }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    post_as_fetch 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles', { type: AppConst::ROLE_SUPPLIER }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     assert last_response.ok?
     assert last_response.body.include?('/list/material_resource_product_variant_party_roles/with_params?key=standard&matres_variant_id=1')
     expect_json_response
@@ -102,7 +102,7 @@ class TestMatresProductVariantPartyRoleRoutes < RouteTester
     ensure_exists!(PackMaterialApp::MatresProductVariantInteractor)
     INTERACTOR.any_instance.stubs(:create_matres_product_variant_party_role).returns(bad_response)
     PackMaterial::MaterialResource::MatresProductVariantPartyRole::New.stub(:call, bland_page) do
-      post_as_fetch 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles', { type: MasterfilesApp::SUPPLIER_ROLE }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      post_as_fetch 'pack_material/material_resource/material_resource_product_variants/1/material_resource_product_variant_party_roles', { type: AppConst::ROLE_SUPPLIER }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

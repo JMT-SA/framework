@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_metatag %>
+
+    <title><%= ENV['APP_CAPTION'] %></title>
+
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"-->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="/css/jackbox.css">
+    <link rel="stylesheet" href="/css/tachyons.min.css">
+    <link rel="stylesheet" href="/css/sweetalert2.min.css">
+    <!--
+    <link rel="stylesheet" href="/css/jquery.contextMenu.min.css">
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="/css/skin.css">
+    -->
+    <link rel="stylesheet" href="/css/selectr.min.css">
+    <link rel="stylesheet" href="/css/multi.min.css">
+    <%#= assets(:css) %>
+
+    <%= content_for :late_head %>
+  </head>
+  <body class="site" data-utf-8-ensurer="О">
+  <header>
+    <select id="selMenu" name="selMenu" onchange="document.getElementById('shw').innerHTML=`Navigated to ${this.value}.`">
+      <optgroup label="Func area">
+        <option value="/pdt/one">PUT / One</option>
+        <option value="/pdt/two">PUT / Two</option>
+        <option value="/pdt/three">Stock / Three</option>
+      </optgroup>
+      <optgroup label="Another Func area">
+        <option value="/pdt/red">Trip / Red</option>
+        <option value="/pdt/blue">Trip / Blue</option>
+      </optgroup>
+    </select>
+    <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
+    <select id="selMenu" name="selMenu" onchange="document.getElementById('shw').innerHTML=`Navigated to ${this.value}.`">
+      <optgroup label="Func area">
+        <optgroup label="PUT">
+          <option value="/pdt/one">One</option>
+          <option value="/pdt/two">Two</option>
+        </optgroup>
+        <optgroup label="Stock">
+          <option value="/pdt/three">Three</option>
+        </optgroup>
+      </optgroup>
+      <optgroup label="Another Func area">
+        <optgroup label="Trip">
+          <option value="/pdt/red">Red</option>
+          <option value="/pdt/blue">Blue</option>
+        </optgroup>
+      </optgroup>
+    </select>
+    <div id="shw" class="ma2 blue pa1"></div>
+    <!-- menu, login/logout -->
+    <div id="container" class="container">
+      <%= yield %>
+    </div>
+
+    <p>
+      Could have only one func: PDT.<br>
+      then menu built as one select with prog as optgrp.<br>
+      BUT... maybe better to have user get limited choices (just current program)...<br>
+      NOTE: android browsers - may need to use older JS.... (not ES6) --- or polyfill.
+    </p>
+    <!--
+    <script src="/js/lodash.js" type="text/javascript"></script>
+    <script src="/js/ag-grid-enterprise.min.js" type="text/javascript"></script>
+    <script src="/js/ag-enterprise-activation.js" type="text/javascript"></script>
+    <script src="/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.ui.position.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.contextMenu.min.js" type="text/javascript"></script>
+    <script src="/js/Sortable.min.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-local-storage.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-utils.js?seq=5" type="text/javascript"></script>
+    <script src="/js/crossbeams-layout.js?seq=6" type="text/javascript"></script>
+    <script src="/js/crossbeams-grid-loader.js?seq=7" type="text/javascript"></script>
+    <script src="/js/crossbeams-data-miner-params.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-menu-builder.js?seq=1" type="text/javascript"></script>
+    <script src="/js/multi.min.js" type="text/javascript"></script>
+    <script src="/js/a11y-dialog-cbeam.js" type="text/javascript"></script>
+    -->
+    <script src="/js/jackbox.min.js" type="text/javascript"></script>
+    <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
+    <script src="/js/selectr.min.js" type="text/javascript"></script>
+    <script>
+      Jackbox.init();
+      <% if flash[:notice] %>
+        Jackbox.success('<%= flash[:notice].tr("'", "`") %>');
+      <% end %>
+      <% if flash[:error] %>
+        Jackbox.error('<%= flash[:error].tr("'", "`") %>', { time: 20 });
+      <% end %>
+
+    </script>
+    <%= content_for :late_javascript %>
+  </body>
+</html>

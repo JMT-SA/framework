@@ -89,6 +89,7 @@ class Framework < Roda
   Dir['./routes/*.rb'].each { |f| require f }
 
   route do |r|
+    # @mobile_device @mobile_start_page
     initialize_route_instance_vars
 
     r.assets unless ENV['RACK_ENV'] == 'production'
@@ -120,7 +121,11 @@ class Framework < Roda
 
     r.root do
       # TODO: Config this, and maybe set it up per user.
-      r.redirect '/pack_material/summary'
+      if @mobile_device
+        r.redirect @mobile_start_page || '/pdt/home'
+      else
+        r.redirect '/pack_material/summary'
+      end
     end
 
     r.on 'developer_documentation', String do |file|

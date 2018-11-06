@@ -1,4 +1,18 @@
 module MenuHelpers
+  def initialize_route_instance_vars
+    # @cbr_json_response = false
+    check_mobile_device
+  end
+
+  # Set instance vars related to mobile devices.
+  def check_mobile_device
+    @mobile_device = false
+    @mobile_start_page = nil
+    @mobile_device = true if ENV['MOBILE_DEVICE']
+    # Here we check the mobile_devices table for is mobile && for start page (possibly other things)
+    # First time - read table and store cache on disk - use file from then on. Could config in file?
+  end
+
   def menu_items(webapp)
     return nil if current_user.nil?
     repo      = SecurityApp::MenuRepo.new

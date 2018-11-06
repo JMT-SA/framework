@@ -304,7 +304,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :clear_form_validation, dom_id: dom_id), message, keep_dialog_open: keep_dialog_open)
   end
 
-  def build_json_action(action)
+  def build_json_action(action) # rubocop:disable Metrics/AbcSize
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
       replace_inner_html:     ->(act) { action_replace_inner_html(act) },

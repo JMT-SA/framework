@@ -34,30 +34,30 @@
   <header>
     <select id="selMenu" name="selMenu" onchange="document.getElementById('shw').innerHTML=`Navigated to ${this.value}.`">
       <optgroup label="Func area">
-        <option value="/pdt/one">PUT / One</option>
-        <option value="/pdt/two">PUT / Two</option>
-        <option value="/pdt/three">Stock / Three</option>
+        <option value="/rmd/one">PUT / One</option>
+        <option value="/rmd/two">PUT / Two</option>
+        <option value="/rmd/three">Stock / Three</option>
       </optgroup>
       <optgroup label="Another Func area">
-        <option value="/pdt/red">Trip / Red</option>
-        <option value="/pdt/blue">Trip / Blue</option>
+        <option value="/rmd/red">Trip / Red</option>
+        <option value="/rmd/blue">Trip / Blue</option>
       </optgroup>
     </select>
     <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
     <select id="selMenu" name="selMenu" onchange="document.getElementById('shw').innerHTML=`Navigated to ${this.value}.`">
       <optgroup label="Func area">
         <optgroup label="PUT">
-          <option value="/pdt/one">One</option>
-          <option value="/pdt/two">Two</option>
+          <option value="/rmd/one">One</option>
+          <option value="/rmd/two">Two</option>
         </optgroup>
         <optgroup label="Stock">
-          <option value="/pdt/three">Three</option>
+          <option value="/rmd/three">Three</option>
         </optgroup>
       </optgroup>
       <optgroup label="Another Func area">
         <optgroup label="Trip">
-          <option value="/pdt/red">Red</option>
-          <option value="/pdt/blue">Blue</option>
+          <option value="/rmd/red">Red</option>
+          <option value="/rmd/blue">Blue</option>
         </optgroup>
       </optgroup>
     </select>
@@ -68,7 +68,7 @@
     </div>
 
     <p>
-      Could have only one func: PDT.<br>
+      Could have only one func: RMD.<br>
       then menu built as one select with prog as optgrp.<br>
       BUT... maybe better to have user get limited choices (just current program)...<br>
       NOTE: android browsers - may need to use older JS.... (not ES6) --- or polyfill.

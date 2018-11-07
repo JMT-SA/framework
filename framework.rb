@@ -89,7 +89,6 @@ class Framework < Roda
   Dir['./routes/*.rb'].each { |f| require f }
 
   route do |r|
-    # @mobile_device @mobile_start_page
     initialize_route_instance_vars
 
     r.assets unless ENV['RACK_ENV'] == 'production'
@@ -116,13 +115,13 @@ class Framework < Roda
 
     r.rodauth
     rodauth.require_authentication
-    # If mobile, login with minimal layout (name: MOBILE / PDT?) - minimal tachonys for mobile?
+    # If rmd, login with minimal layout - minimal tachonys for rmd?
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do
       # TODO: Config this, and maybe set it up per user.
-      if @mobile_device
-        r.redirect @mobile_start_page || '/pdt/home'
+      if @registered_mobile_device
+        r.redirect @rmd_start_page || '/rmd/home'
       else
         r.redirect '/pack_material/summary'
       end

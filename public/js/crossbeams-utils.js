@@ -216,6 +216,14 @@ const crossbeamsUtils = {
           document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">Error</span>';
         }
         crossbeamsUtils.setDialogContent(data.flash.error);
+        if (data.exception) {
+          if (data.backtrace) {
+            console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+            console.info('==Backend Backtrace==');
+            console.info(data.backtrace.join('\n'));
+            console.groupEnd();
+          }
+        }
       } else if (data.replaceDialog) {
         crossbeamsUtils.setDialogContent(data.replaceDialog.content);
       }
@@ -532,7 +540,8 @@ const crossbeamsUtils = {
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.groupCollapsed('==Backend Backtrace==');
+              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+              console.info('==Backend Backtrace==');
               console.info(data.backtrace.join('\n'));
               console.groupEnd();
             }
@@ -880,9 +889,10 @@ const crossbeamsUtils = {
             if (data.exception) {
               Jackbox.error(data.flash.error, { time: 20 });
               if (data.backtrace) {
-                console.log('EXCEPTION:', data.exception, data.flash.error);
-                console.log('==Backend Backtrace==');
+                console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+                console.info('==Backend Backtrace==');
                 console.info(data.backtrace.join('\n'));
+                console.groupEnd();
               }
             } else {
               Jackbox.error(data.flash.error);
@@ -950,8 +960,10 @@ const crossbeamsUtils = {
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.log('==Backend Backtrace==');
+              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+              console.info('==Backend Backtrace==');
               console.info(data.backtrace.join('\n'));
+              console.groupEnd();
             }
           } else {
             Jackbox.error(data.flash.error);

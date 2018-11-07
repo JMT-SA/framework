@@ -334,7 +334,7 @@ module MasterfilesApp
       2.times do
         type_ids << create_supplier_type[:id]
       end
-      party_role_info = create_party_role('O', SUPPLIER_ROLE)
+      party_role_info = create_party_role('O', AppConst::ROLE_SUPPLIER)
       attrs[:supplier_type_ids] = type_ids
       attrs[:party_id] = party_role_info[:party_id]
       actual = repo.create_supplier(attrs)

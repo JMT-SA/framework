@@ -7,6 +7,12 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     view('crossbeams_layout_page')
   end
 
+  def show_rmd_page(&block)
+    @layout = block.yield
+    @layout.add_csrf_tag(csrf_tag)
+    view('crossbeams_layout_page', layout: 'layout_rmd')
+  end
+
   # Render a block of Crossbeams::Layout DSL as string.
   #
   # @return [String] HTML layout and content string.
@@ -304,7 +310,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :clear_form_validation, dom_id: dom_id), message, keep_dialog_open: keep_dialog_open)
   end
 
-  def build_json_action(action)
+  def build_json_action(action) # rubocop:disable Metrics/AbcSize
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
       replace_inner_html:     ->(act) { action_replace_inner_html(act) },

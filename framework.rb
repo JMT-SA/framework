@@ -113,14 +113,26 @@ class Framework < Roda
     # Do the same as XML?
     # --------------------------------------------
 
+    # OVERRIDE RodAuth's Login form:
+    r.get 'login' do
+      if @registered_mobile_device
+        view(:login, layout: 'layout_rmd')
+      else
+        view(:login)
+      end
+    end
+
     r.rodauth
     rodauth.require_authentication
-    # If mobile, login with minimal layout (name: MOBILE / PDT?) - minimal tachonys for mobile?
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do
       # TODO: Config this, and maybe set it up per user.
-      r.redirect '/pack_material/summary'
+      if @registered_mobile_device
+        r.redirect @rmd_start_page || '/rmd/home'
+      else
+        r.redirect '/pack_material/summary'
+      end
     end
 
     r.on 'developer_documentation', String do |file|

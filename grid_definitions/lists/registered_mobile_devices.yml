@@ -1,0 +1,24 @@
+---
+:dataminer_definition: registered_mobile_devices
+:actions:
+- :url: "/security/rmd/registered_mobile_devices/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/security/rmd/registered_mobile_devices/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/security/rmd/registered_mobile_devices/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/security/rmd/registered_mobile_devices/new"
+  :text: New Registered Mobile Device
+  :style: :button
+  :behaviour: :popup

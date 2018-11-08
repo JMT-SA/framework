@@ -86,3 +86,6 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles' AND function
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Party Roles', '/list/roles', 1);
 
+-- Registered Mobile Devices menu:
+INSERT INTO functional_areas (functional_area_name, rmd_menu)
+VALUES ('RMD', true);

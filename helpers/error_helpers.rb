@@ -1,8 +1,4 @@
 module ErrorHelpers
-  def initialize_route_instance_vars
-    # @cbr_json_response = false
-  end
-
   # For a JSON response, set the content-type header and an instance var.
   # The instance var is used in the error handler plugin.
   # @return [void]

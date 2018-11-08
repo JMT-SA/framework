@@ -1,0 +1,134 @@
+---
+:caption: Registered Mobile Devices
+:sql: SELECT "registered_mobile_devices"."id", "registered_mobile_devices"."ip_address",
+  "registered_mobile_devices"."start_page_program_function_id", "registered_mobile_devices"."active",
+  "registered_mobile_devices"."created_at", "registered_mobile_devices"."updated_at",
+  "program_functions"."program_function_name" AS start_page_program_function_program_function_name
+  FROM "registered_mobile_devices" LEFT JOIN "program_functions" ON "program_functions"."id"
+  = "registered_mobile_devices"."start_page_program_function_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: registered_mobile_devices.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ip_address:
+    :name: ip_address
+    :sequence_no: 2
+    :caption: Ip address
+    :namespaced_name: registered_mobile_devices.ip_address
+    :data_type: :ipaddr
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  start_page_program_function_id:
+    :name: start_page_program_function_id
+    :sequence_no: 3
+    :caption: Start page program function
+    :namespaced_name: registered_mobile_devices.start_page_program_function_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 4
+    :caption: Active
+    :namespaced_name: registered_mobile_devices.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: registered_mobile_devices.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: registered_mobile_devices.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  start_page_program_function_program_function_name:
+    :name: start_page_program_function_program_function_name
+    :sequence_no: 7
+    :caption: Start page
+    :namespaced_name: program_functions.program_function_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: registered_mobile_devices.ip_address
+  :caption: Ip address
+  :data_type: :ipaddr
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: registered_mobile_devices.start_page_program_function_id
+  :caption: Start page program function
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT program_function_name, id FROM program_functions ORDER BY program_function_name

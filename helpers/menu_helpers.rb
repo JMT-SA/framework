@@ -1,9 +1,37 @@
 module MenuHelpers
+  def initialize_route_instance_vars
+    # @cbr_json_response = false
+    check_registered_mobile_device
+  end
+
+  # Set instance vars related to registered mobile devices.
+  def check_registered_mobile_device
+    @rmd_start_page = nil
+    @registered_mobile_device = true && return if ENV['RUN_FOR_RMD']
+
+    repo = SecurityApp::RegisteredMobileDeviceRepo.new
+    res = repo.ip_address_is_rmd? request.ip
+    if res.success
+      @registered_mobile_device = true
+      @rmd_start_page = res.instance
+    else
+      @registered_mobile_device = false
+    end
+  end
+
   def menu_items(webapp)
     return nil if current_user.nil?
     repo      = SecurityApp::MenuRepo.new
     rows      = repo.menu_for_user(current_user, webapp)
     build_menu(rows).to_json
+  end
+
+  def rmd_menu_items(webapp, as_hash: false)
+    return nil if current_user.nil?
+    repo      = SecurityApp::MenuRepo.new
+    rows      = repo.rmd_menu_for_user(current_user, webapp)
+    hash = build_menu(rows)
+    as_hash ? hash : hash.to_json
   end
 
   def build_funcs(rows)

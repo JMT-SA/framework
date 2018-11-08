@@ -34,6 +34,27 @@ module MenuHelpers
     as_hash ? hash : hash.to_json
   end
 
+  def render_rmd_menu # rubocop:disable Metrics/AbcSize
+    out = ['<select class="mt2 pa2" id="rmd_menu" name="rmd_menu">',
+           '<optgroup label="Navigation">',
+           '<option value="" selected="selected">Menu choice</option>',
+           '</optgroup>']
+    menu_items = rmd_menu_items(self.class.name, as_hash: true)
+    return '' if menu_items.nil?
+
+    menu_items[:programs].each do |_, prog|
+      prog.each do |prg|
+        out << %(<optgroup label="#{prg[:name]}">)
+        menu_items[:program_functions][prg[:id]].each do |pf|
+          out << %(<option value="#{pf[:url]}">#{pf[:name]}</option>)
+        end
+        out << '</optgroup>'
+      end
+    end
+    out << '</select>'
+    out.join("\n")
+  end
+
   def build_funcs(rows)
     funcs = Set.new
     rows.each do |row|

@@ -47,7 +47,7 @@ module ErrorHelpers
   # @return [String] the HTML containing an error message.
   def show_unauthorised
     response.status = 403
-    view(inline: "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>")
+    view(inline: "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>", layout: appropriate_layout)
   end
 
   # Show an informational message page.
@@ -55,7 +55,7 @@ module ErrorHelpers
   # @param message [String] the information messge.
   # @return [String] the HTML containing the message.
   def show_page_info(message)
-    view(inline: "<div class='crossbeams-info-note'><p><strong>Note:</strong></p><p>#{message}</p></div>")
+    view(inline: "<div class='crossbeams-info-note'><p><strong>Note:</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
   end
 
   # Show a warning message page.
@@ -63,7 +63,7 @@ module ErrorHelpers
   # @param message [String] the warning messge.
   # @return [String] the HTML containing the message.
   def show_page_warning(message)
-    view(inline: "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>#{message}</p></div>")
+    view(inline: "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
   end
 
   # Show a success message page.
@@ -71,7 +71,7 @@ module ErrorHelpers
   # @param message [String] the messge.
   # @return [String] the HTML containing the message.
   def show_page_success(message)
-    view(inline: "<div class='crossbeams-success-note'><p><strong>Success:</strong></p><p>#{message}</p></div>")
+    view(inline: "<div class='crossbeams-success-note'><p><strong>Success:</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
   end
 
   # Show an error message page. Also logs the error.
@@ -81,7 +81,7 @@ module ErrorHelpers
   def show_page_error(err)
     message = err.respond_to?(:message) ? err.message : err.to_s
     puts err.full_message if err.respond_to?(:full_message) # Log the error too
-    view(inline: "<div class='crossbeams-error-note'><p><strong>Error</strong></p><p>#{message}</p></div>")
+    view(inline: "<div class='crossbeams-error-note'><p><strong>Error</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
   end
 
   # Show a message as a notice in JSON.
@@ -133,5 +133,9 @@ module ErrorHelpers
     table = msg.split('"')[1]
     foreign_table = msg.split('"').last
     "A \"#{foreign_table}\" record depends on this \"#{table}\" record. #{details}"
+  end
+
+  def appropriate_layout
+    @registered_mobile_device ? 'layout_rmd' : 'layout'
   end
 end

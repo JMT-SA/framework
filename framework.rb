@@ -94,6 +94,7 @@ class Framework < Roda
     r.assets unless ENV['RACK_ENV'] == 'production'
     r.public
 
+    # p request.ip
     # Routes that must work without authentication
     # --------------------------------------------
     r.on 'webquery', String do |id|
@@ -116,6 +117,7 @@ class Framework < Roda
     # OVERRIDE RodAuth's Login form:
     r.get 'login' do
       if @registered_mobile_device
+        @no_logout = true
         view(:login, layout: 'layout_rmd')
       else
         view(:login)

@@ -32,6 +32,7 @@
   </head>
   <body class="site" data-utf-8-ensurer="О">
   <header>
+    <% unless @no_menu %>
     <select id="selMenu" name="selMenu" onchange="document.getElementById('shw').innerHTML=`Navigated to ${this.value}.`">
       <optgroup label="Func area">
         <option value="/rmd/one">PUT / One</option>
@@ -43,8 +44,7 @@
         <option value="/rmd/blue">Trip / Blue</option>
       </optgroup>
     </select>
-    <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
-    <select id="selMenu" name="selMenu" onchange="document.getElementById('shw').innerHTML=`Navigated to ${this.value}.`">
+    <!-- select id="selMenu" name="selMenu" onchange="document.getElementById('shw').innerHTML=`Navigated to ${this.value}.`">
       <optgroup label="Func area">
         <optgroup label="PUT">
           <option value="/rmd/one">One</option>
@@ -60,19 +60,22 @@
           <option value="/rmd/blue">Blue</option>
         </optgroup>
       </optgroup>
-    </select>
+    </select -->
     <div id="shw" class="ma2 blue pa1"></div>
+  <% end %>
+    <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
     <!-- menu, login/logout -->
-    <div id="container" class="container">
+    <div id="container" class="container ma2">
       <%= yield %>
-    </div>
 
-    <p>
-      Could have only one func: RMD.<br>
-      then menu built as one select with prog as optgrp.<br>
-      BUT... maybe better to have user get limited choices (just current program)...<br>
-      NOTE: android browsers - may need to use older JS.... (not ES6) --- or polyfill.
-    </p>
+      <!-- p>
+        Could have only one func: RMD.<br>
+        then menu built as one select with prog as optgrp.<br>
+        BUT... maybe better to have user get limited choices (just current program)...<br>
+        NOTE: android browsers - may need to use older JS.... (not ES6) - or polyfill.
+      </p -->
+      <%#= rmd_menu_items(self.class.name) %>
+    </div>
     <!--
     <script src="/js/lodash.js" type="text/javascript"></script>
     <script src="/js/ag-grid-enterprise.min.js" type="text/javascript"></script>

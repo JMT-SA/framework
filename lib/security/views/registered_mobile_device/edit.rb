@@ -18,6 +18,7 @@ module Security
               form.method :update
               form.add_field :ip_address
               form.add_field :start_page_program_function_id
+              form.add_field :active
             end
           end
 

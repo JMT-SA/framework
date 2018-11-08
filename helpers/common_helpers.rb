@@ -7,6 +7,12 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     view('crossbeams_layout_page')
   end
 
+  def show_rmd_page(&block)
+    @layout = block.yield
+    @layout.add_csrf_tag(csrf_tag)
+    view('crossbeams_layout_page', layout: 'layout_rmd')
+  end
+
   # Render a block of Crossbeams::Layout DSL as string.
   #
   # @return [String] HTML layout and content string.

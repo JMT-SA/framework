@@ -15,7 +15,6 @@ module UiRules
     end
 
     def set_show_fields
-      # start_page_program_function_id_label = SecurityApp::ProgramFunctionRepo.new.find_program_function(@form_object.start_page_program_function_id)&.program_function_name
       start_page_program_function_id_label = @repo.find(:program_functions, SecurityApp::ProgramFunction, @form_object.start_page_program_function_id)&.program_function_name
       fields[:ip_address] = { renderer: :label }
       fields[:start_page_program_function_id] = { renderer: :label, with_value: start_page_program_function_id_label, caption: 'Start Page Program Function' }
@@ -23,9 +22,11 @@ module UiRules
     end
 
     def common_fields
+      @menu_repo = SecurityApp::MenuRepo.new
       {
         ip_address: { pattern: :ipv4_address, required: true },
-        # start_page_program_function_id: { renderer: :select, options: SecurityApp::MenuRepo.new.program_functions_for_select, disabled_options: SecurityApp::MenuRepo.new.for_inactive_select_program_functions, caption: 'start_page_program_function' }
+        start_page_program_function_id: { renderer: :select, options: SecurityApp::MenuRepo.new.program_functions_for_rmd_select, caption: 'start_page_program_function' },
+        active: { renderer: :checkbox }
       }
     end
 

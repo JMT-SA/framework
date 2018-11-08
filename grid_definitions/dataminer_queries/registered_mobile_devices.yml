@@ -103,7 +103,7 @@
   start_page_program_function_program_function_name:
     :name: start_page_program_function_program_function_name
     :sequence_no: 7
-    :caption: Start page program function program function name
+    :caption: Start page
     :namespaced_name: program_functions.program_function_name
     :data_type: :string
     :width: 

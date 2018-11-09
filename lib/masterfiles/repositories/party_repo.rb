@@ -51,6 +51,12 @@ module MasterfilesApp
       Party.new(hash)
     end
 
+    def find_party_role(id)
+      hash = DB['SELECT party_roles.* , fn_party_role_name(?) AS party_name FROM party_roles WHERE party_roles.id = ?', id, id].first
+      return nil if hash.nil?
+      PartyRole.new(hash)
+    end
+
     def create_organization(attrs)
       params = attrs.to_h
       role_ids = params.delete(:role_ids)
@@ -246,7 +252,7 @@ module MasterfilesApp
     # @return [MasterfilesApp::PartyRole] the party role entity.
     def implementation_owner_party_role
       query = <<~SQL
-        SELECT pr.id, pr.party_id, role_id, organization_id, person_id, pr.active
+        SELECT pr.id, pr.party_id, role_id, organization_id, person_id, pr.active, fn_party_role_name(pr.id) AS party_name
         FROM public.party_roles pr
         JOIN roles r ON r.id = pr.role_id
         LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
@@ -281,9 +287,22 @@ module MasterfilesApp
     end
 
     # Customers & Suppliers
-    def for_select_parties
-      # Only non suppliers(for supp) or non customers(for cust) & active
-      DB[:parties].select(:id, Sequel.function(:fn_party_name, :id)).map { |r| [r[:fn_party_name], r[:id]] }
+    def for_select_supplier_parties
+      parties_except_for_role(MasterfilesApp::SUPPLIER_ROLE)
+    end
+
+    def for_select_customer_parties
+      parties_except_for_role(MasterfilesApp::CUSTOMER_ROLE)
+    end
+
+    def parties_except_for_role(role)
+      query = <<~SQL
+        SELECT fn_party_name(p.id), p.id
+        FROM parties p
+        WHERE NOT EXISTS(SELECT id FROM party_roles WHERE party_id = p.id AND role_id = (SELECT id FROM roles WHERE name = '#{role}'))
+        AND p.active = true
+      SQL
+      DB[query].all.map { |r| [r[:fn_party_name] || 'Unknown party name', r[:id]] }
     end
 
     def create_customer(attrs)

@@ -80,4 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location = event.target.value;
     }
   });
+
+  const cameraScan = document.getElementById('cameraScan');
+  if (cameraScan) {
+    cameraScan.addEventListener('click', () => {
+      webSocket.send('Type=key248_all');
+    });
+  }
 });

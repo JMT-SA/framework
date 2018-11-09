@@ -7,13 +7,15 @@ module MenuHelpers
   # Set instance vars related to registered mobile devices.
   def check_registered_mobile_device
     @rmd_start_page = nil
+    @rmd_scan_with_camera = false
     @registered_mobile_device = true && return if ENV['RUN_FOR_RMD']
 
     repo = SecurityApp::RegisteredMobileDeviceRepo.new
     res = repo.ip_address_is_rmd? request.ip
     if res.success
       @registered_mobile_device = true
-      @rmd_start_page = res.instance
+      @rmd_start_page = res.instance.url
+      @rmd_scan_with_camera = res.instance.scan_with_camera
     else
       @registered_mobile_device = false
     end

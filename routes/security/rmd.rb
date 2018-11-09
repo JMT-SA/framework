@@ -27,8 +27,9 @@ class Framework < Roda
           res = interactor.update_registered_mobile_device(id, params[:registered_mobile_device])
           if res.success
             update_grid_row(id, changes: { ip_address: res.instance[:ip_address],
-                                           start_page_program_function_program_function_name: res.instance[:program_function_name],
-                                           active: res.instance[:active] },
+                                           start_page: res.instance[:start_page],
+                                           active: res.instance[:active],
+                                           scan_with_camera: res.instance[:scan_with_camera] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Security::Rmd::RegisteredMobileDevice::Edit.call(id, form_values: params[:registered_mobile_device], form_errors: res.errors) }
@@ -59,8 +60,10 @@ class Framework < Roda
             id
             ip_address
             active
+            scan_with_camera
+            start_page
           ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys, start_page_program_function_program_function_name: res.instance[:program_function_name]),
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
         else
           re_show_form(r, res, url: '/security/rmd/registered_mobile_devices/new') do

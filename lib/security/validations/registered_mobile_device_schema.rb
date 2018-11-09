@@ -8,5 +8,6 @@ module SecurityApp
     required(:ip_address, :string).filled(:str?)
     required(:start_page_program_function_id, :integer).maybe(:int?)
     optional(:active, :bool).filled(:bool?)
+    required(:scan_with_camera, :bool).filled(:bool?)
   end
 end

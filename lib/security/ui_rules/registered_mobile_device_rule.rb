@@ -19,6 +19,7 @@ module UiRules
       fields[:ip_address] = { renderer: :label }
       fields[:start_page_program_function_id] = { renderer: :label, with_value: start_page_program_function_id_label, caption: 'Start Page Program Function' }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:scan_with_camera] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -26,7 +27,8 @@ module UiRules
       {
         ip_address: { pattern: :ipv4_address, required: true },
         start_page_program_function_id: { renderer: :select, options: SecurityApp::MenuRepo.new.program_functions_for_rmd_select, caption: 'start_page_program_function' },
-        active: { renderer: :checkbox }
+        active: { renderer: :checkbox },
+        scan_with_camera: { renderer: :checkbox }
       }
     end
 

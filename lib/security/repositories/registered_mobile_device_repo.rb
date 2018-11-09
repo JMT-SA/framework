@@ -11,12 +11,18 @@ module SecurityApp
                           value: :id,
                           order_by: :ip_address
 
-    crud_calls_for :registered_mobile_devices, name: :registered_mobile_device, wrapper: RegisteredMobileDevice
+    crud_calls_for :registered_mobile_devices, name: :registered_mobile_device # , wrapper: RegisteredMobileDevice
 
-    def find_registered_mobile_device_with_start_page(id)
-      DB[:registered_mobile_devices].left_join(:program_functions, id: :start_page_program_function_id)
-                                    .select(Sequel[:registered_mobile_devices].*, Sequel[:program_functions][:program_function_name])
-                                    .where(Sequel[:registered_mobile_devices][:id] => id).first
+    def find_registered_mobile_device(id)
+      find_with_association(:registered_mobile_devices, id,
+                            wrapper: RegisteredMobileDevice,
+                            parent_tables: [{ parent_table: :program_functions,
+                                              foreign_key: :start_page_program_function_id,
+                                              columns: [:program_function_name],
+                                              flatten_columns: { program_function_name: :start_page } }])
+      # DB[:registered_mobile_devices].left_join(:program_functions, id: :start_page_program_function_id)
+      #                               .select(Sequel[:registered_mobile_devices].*, Sequel[:program_functions][:program_function_name])
+      #                               .where(Sequel[:registered_mobile_devices][:id] => id).first
     end
 
     # Is the given ip address for an active registered mobile device?

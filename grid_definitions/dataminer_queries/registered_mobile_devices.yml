@@ -1,11 +1,11 @@
 ---
 :caption: Registered Mobile Devices
-:sql: SELECT "registered_mobile_devices"."id", "registered_mobile_devices"."ip_address",
-  "registered_mobile_devices"."start_page_program_function_id", "registered_mobile_devices"."active",
-  "registered_mobile_devices"."created_at", "registered_mobile_devices"."updated_at",
-  "program_functions"."program_function_name" AS start_page_program_function_program_function_name
-  FROM "registered_mobile_devices" LEFT JOIN "program_functions" ON "program_functions"."id"
-  = "registered_mobile_devices"."start_page_program_function_id"
+:sql: "SELECT \"registered_mobile_devices\".\"id\", \"registered_mobile_devices\".\"ip_address\",
+  \r\n\"registered_mobile_devices\".\"start_page_program_function_id\", \"registered_mobile_devices\".\"active\",
+  \r\n\"registered_mobile_devices\".\"scan_with_camera\", \r\n\"registered_mobile_devices\".\"created_at\",
+  \"registered_mobile_devices\".\"updated_at\", \r\n\"program_functions\".\"program_function_name\"
+  AS start_page\r\nFROM \"registered_mobile_devices\" \r\nLEFT JOIN \"program_functions\"
+  ON \"program_functions\".\"id\" = \"registered_mobile_devices\".\"start_page_program_function_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -70,9 +70,24 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  scan_with_camera:
+    :name: scan_with_camera
+    :sequence_no: 5
+    :caption: Scan with camera?
+    :namespaced_name: registered_mobile_devices.scan_with_camera
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: registered_mobile_devices.created_at
     :data_type: :datetime
@@ -87,7 +102,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: registered_mobile_devices.updated_at
     :data_type: :datetime
@@ -100,9 +115,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  start_page_program_function_program_function_name:
-    :name: start_page_program_function_program_function_name
-    :sequence_no: 7
+  start_page:
+    :name: start_page
+    :sequence_no: 8
     :caption: Start page
     :namespaced_name: program_functions.program_function_name
     :data_type: :string

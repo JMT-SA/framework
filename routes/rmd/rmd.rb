@@ -35,6 +35,16 @@ class Framework < Roda
       loc_class = details[:errors]&.key?(:location) ? ' bg-light-red' : ''
       sku_class = details[:errors]&.key?(:sku) ? ' bg-light-red' : ''
       qty_class = details[:errors]&.key?(:quantity) ? ' bg-light-red' : ''
+      # view with locals for:
+      # camera scan on?
+      # error msg
+      # progress msg
+      # field array of hashes: fieldname, err_msg, caption, scan_rule, value, scan_type, data_type
+      # submit button caption
+      # autocomplete?
+      # form_caption
+      # form_action
+      # form_notes
       html = <<~HTML
         <h2>Delivery putaway</h2>
         <form action="/rmd/deliveries/save_putaway">

@@ -17,6 +17,7 @@ module Security
               form.remote! if remote
               form.add_field :ip_address
               form.add_field :start_page_program_function_id
+              form.add_field :scan_with_camera
             end
           end
 

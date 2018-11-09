@@ -10,10 +10,6 @@ module SecurityApp
       repo.find_registered_mobile_device(id)
     end
 
-    def registered_mobile_device_with_start_page(id)
-      repo.find_registered_mobile_device_with_start_page(id)
-    end
-
     def validate_registered_mobile_device_params(params)
       RegisteredMobileDeviceSchema.call(params)
     end
@@ -27,7 +23,7 @@ module SecurityApp
         log_status('registered_mobile_devices', id, 'CREATED')
         log_transaction
       end
-      instance = registered_mobile_device_with_start_page(id)
+      instance = registered_mobile_device(id)
       success_response("Created registered mobile device #{instance[:ip_address]}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
@@ -41,7 +37,7 @@ module SecurityApp
         repo.update_registered_mobile_device(id, res)
         log_transaction
       end
-      instance = registered_mobile_device_with_start_page(id)
+      instance = registered_mobile_device(id)
       success_response("Updated registered mobile device #{instance[:ip_address]}",
                        instance)
     end

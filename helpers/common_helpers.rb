@@ -369,6 +369,28 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     end
   end
 
+  # Store a value in local storage for fetching later.
+  # Used for storing something per user in one action and retrieving in another action.
+  #
+  # @param key [Symbol] the key to be used for later retrieval.
+  # @param value [Object] the value to stash (use simple Objects)
+  # @return [void]
+  def store_locally(key, value)
+    raise ArgumentError, 'store_locally: key must be a Symbol' unless key.is_a? Symbol
+    store = LocalStore.new(current_user.id)
+    store.write(key, value)
+  end
+
+  # Return a stored value for the current user from local storage (and remove it - read once).
+  #
+  # @param key [Symbol] the key that was used when stored.
+  # @return [Object] the retrieved value.
+  def retrieve_from_local_store(key)
+    raise ArgumentError, 'store_locally: key must be a Symbol' unless key.is_a? Symbol
+    store = LocalStore.new(current_user.id)
+    store.read_once(key)
+  end
+
   # Stash a page in local storage for fetching later.
   # Only one page per user can be stashed at a time.
   # Used for storing a page after it has failed validation.
@@ -376,8 +398,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param value [String] the page HTML.
   # @return [void]
   def stash_page(value)
-    store = LocalStore.new(current_user.id)
-    store.write(:stashed_page, value)
+    store_locally(:stashed_page, value)
   end
 
   # Return the stashed page from local storage.
@@ -385,8 +406,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   #
   # @return [String] the HTML page.
   def stashed_page
-    store = LocalStore.new(current_user.id)
-    store.read_once(:stashed_page)
+    retrieve_from_local_store(:stashed_page)
   end
 
   # Create a URL for a report so that it can be called

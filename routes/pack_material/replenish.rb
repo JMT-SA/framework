@@ -31,6 +31,9 @@ class Framework < Roda
               inventory_uom_id
               quantity_required
               unit_price
+              product_variant_code
+              purchasing_uom_code
+              inventory_uom_code
             ]
             sub_totals = interactor.po_sub_totals(id)
             json_actions(po_sub_total_changes(sub_totals) +
@@ -180,6 +183,9 @@ class Framework < Roda
               inventory_uom_id
               quantity_required
               unit_price
+              product_variant_code
+              purchasing_uom_code
+              inventory_uom_code
             ]
             sub_totals = interactor.po_sub_totals(id)
             json_actions(po_sub_total_changes(sub_totals) +
@@ -315,6 +321,151 @@ class Framework < Roda
             PackMaterial::Replenish::MrDeliveryTerm::New.call(form_values: params[:mr_delivery_term],
                                                               form_errors: res.errors,
                                                               remote: fetch?(r))
+          end
+        end
+      end
+    end
+    # MR DELIVERIES
+    # --------------------------------------------------------------------------
+    r.on 'mr_deliveries', Integer do |id|
+      interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:mr_deliveries, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'mr_delivery_items' do
+        item_interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+        r.on 'preselect' do
+          check_auth!('replenish', 'new')
+          show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItem::Preselect.call(id, purchase_order_id: flash[:purchase_order_id]) }
+        end
+        r.on 'purchase_order_changed' do
+          options_array = item_interactor.available_purchase_order_items(params[:changed_value], id)
+          json_replace_select_options('mr_delivery_item_mr_purchase_order_item_id', options_array, message: nil, keep_dialog_open: true)
+        end
+        r.on 'done' do
+          redirect_to_last_grid(r)
+        end
+        r.on 'new', Integer do |item_id|
+          check_auth!('replenish', 'new')
+          show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItem::New.call(id, item_id) }
+        end
+        r.on 'new' do
+          r.post do
+            check_auth!('replenish', 'new')
+            item_id = params[:mr_delivery_item][:mr_purchase_order_item_id]
+            if item_id
+              re_show_form(r, OpenStruct.new(message: nil), url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new/#{item_id}") do
+                PackMaterial::Replenish::MrDeliveryItem::New.call(id, item_id)
+              end
+            else
+              flash[:error] = 'No Purchase Order Item was selected'
+              redirect_to_last_grid(r)
+            end
+          end
+        end
+        r.post do        # CREATE
+          res = item_interactor.create_mr_delivery_item(id, params[:mr_delivery_item])
+          if res.success
+            flash[:purchase_order_id] = item_interactor.purchase_order_id_for_delivery_item(res.instance.id)
+            r.redirect("/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect")
+          else
+            re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new") do
+              PackMaterial::Replenish::MrDeliveryItem::New.call(id,
+                                                                form_values: params[:mr_delivery_item],
+                                                                form_errors: res.errors,
+                                                                remote: fetch?(r))
+            end
+          end
+        end
+      end
+      r.on 'edit' do   # EDIT
+        check_auth!('replenish', 'edit')
+        show_partial { PackMaterial::Replenish::MrDelivery::Edit.call(id) }
+      end
+      r.is do
+        r.get do       # SHOW
+          check_auth!('replenish', 'read')
+          show_partial { PackMaterial::Replenish::MrDelivery::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mr_delivery(id, params[:mr_delivery])
+          if res.success
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { PackMaterial::Replenish::MrDelivery::Edit.call(id, form_values: params[:mr_delivery], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('replenish', 'delete')
+          res = interactor.delete_mr_delivery(id)
+          if res.success
+            redirect_to_last_grid(r)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'mr_deliveries' do
+      interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'new' do    # NEW
+        check_auth!('replenish', 'new')
+        set_last_grid_url('/list/mr_deliveries', r)
+        show_partial_or_page(r) { PackMaterial::Replenish::MrDelivery::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_mr_delivery(params[:mr_delivery])
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        else
+          re_show_form(r, res, url: '/pack_material/replenish/mr_deliveries/new') do
+            PackMaterial::Replenish::MrDelivery::New.call(form_values: params[:mr_delivery],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # MR DELIVERY ITEMS
+    # --------------------------------------------------------------------------
+    r.on 'mr_delivery_items', Integer do |id|
+      interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:mr_delivery_items, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('replenish', 'edit')
+        show_partial { PackMaterial::Replenish::MrDeliveryItem::Edit.call(id) }
+      end
+      r.is do
+        r.get do       # SHOW
+          check_auth!('replenish', 'read')
+          show_partial { PackMaterial::Replenish::MrDeliveryItem::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mr_delivery_item(id, params[:mr_delivery_item])
+          if res.success
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItem::Edit.call(id, form_values: params[:mr_delivery_item], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('replenish', 'delete')
+          res = interactor.delete_mr_delivery_item(id)
+          if res.success
+            redirect_to_last_grid(r)
+          else
+            show_json_error(res.message, status: 200)
           end
         end
       end

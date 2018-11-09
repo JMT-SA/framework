@@ -9,7 +9,7 @@ module UiRules
       apply_form_values
 
       @rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
-      @rules[:can_approve] = @repo.can_approve_purchase_order?(@form_object.id) unless @mode == :new
+      @rules[:can_approve] = @repo.can_approve_purchase_order?(@form_object.id) unless @mode == :new || @mode == :preselect
       # @rules[:show] = @repo.find_mr_purchase_order(@form_object.id)&.approved unless @mode == :new
 
       common_values_for_fields case @mode

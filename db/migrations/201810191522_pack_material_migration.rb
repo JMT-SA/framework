@@ -53,7 +53,7 @@ Sequel.migration do
     create_table(:mr_vat_types, ignore_index_errors: true) do
       primary_key :id
       String :vat_type_code
-      BigDecimal :percentage_applicable, size: [7, 2]     # numeric(7, 2)
+      BigDecimal :percentage_applicable, size: [7, 2]
       TrueClass :vat_not_applicable, default: false
 
       index [:vat_type_code], name: :mr_vat_types_unique_vat_type_code, unique: true
@@ -81,13 +81,12 @@ Sequel.migration do
       foreign_key :mr_vat_type_id, :mr_vat_types, key: [:id]
       foreign_key :delivery_address_id, :addresses, key: [:id]
 
-      # String :erp_supplier_number - a lookup from the supplier
       String :purchase_account_code
       String :fin_object_code # What is this?
-      # String :process_status
       DateTime :valid_until
       Integer :purchase_order_number
       TrueClass :approved, default: false
+      TrueClass :deliveries_received, default: false
 
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
@@ -126,13 +125,11 @@ Sequel.migration do
       foreign_key :inventory_uom_id, :uoms, key: [:id]
       BigDecimal :quantity_required, size: [7, 2]
       BigDecimal :unit_price, size: [7, 2]
-      # String :process_status
 
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
-      index [:mr_purchase_order_id], name: :fki_mr_purchase_order_items_mr_purchase_orders
-      index [:mr_product_variant_id], name: :fki_mr_purchase_order_items_mr_product_variants
+      index [:mr_product_variant_id, :mr_purchase_order_id], name: :fki_mr_purchase_order_items_mr_product_variants_mr_purchase_orders, unique: true
     end
     pgt_created_at(:mr_purchase_order_items,
                    :created_at,
@@ -147,7 +144,7 @@ Sequel.migration do
 
     # SKUs, Batches & Inventory Transactions
     # --------------------------------------
-    create_table(:user_defined_batches, ignore_index_errors: true) do
+    create_table(:mr_internal_batch_numbers, ignore_index_errors: true) do
       primary_key :id
       Integer :batch_number
       String :description
@@ -156,84 +153,19 @@ Sequel.migration do
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
-      index [:batch_number], name: :user_defined_batches_unique_batch_number, unique: true
+      index [:batch_number], name: :mr_internal_batch_numbers_unique_batch_number, unique: true
     end
-    pgt_created_at(:user_defined_batches,
+    pgt_created_at(:mr_internal_batch_numbers,
                    :created_at,
-                   function_name: :user_defined_batches_set_created_at,
+                   function_name: :mr_internal_batch_numbers_set_created_at,
                    trigger_name: :set_created_at)
 
-    pgt_updated_at(:user_defined_batches,
+    pgt_updated_at(:mr_internal_batch_numbers,
                    :updated_at,
-                   function_name: :user_defined_batches_set_updated_at,
+                   function_name: :mr_internal_batch_numbers_set_updated_at,
                    trigger_name: :set_updated_at)
-    run "SELECT audit.audit_table('user_defined_batches', true, true,'{updated_at}'::text[]);"
-
-    create_table(:mr_delivery_item_batches, ignore_index_errors: true) do
-      primary_key :id
-      String :client_batch_number, text: true
-      Integer :internal_batch_number
-      BigDecimal :quantity_on_note, size: [7, 2]
-      BigDecimal :quantity_received, size: [7, 2]
-      # String :process_status
-
-      DateTime :created_at, null: false
-      DateTime :updated_at, null: false
-
-      index [:internal_batch_number], name: :mr_delivery_item_batches_unique_internal_batch_number, unique: true
-    end
-    pgt_created_at(:mr_delivery_item_batches,
-                   :created_at,
-                   function_name: :mr_delivery_item_batches_set_created_at,
-                   trigger_name: :set_created_at)
-
-    pgt_updated_at(:mr_delivery_item_batches,
-                   :updated_at,
-                   function_name: :mr_delivery_item_batches_set_updated_at,
-                   trigger_name: :set_updated_at)
-    run "SELECT audit.audit_table('mr_delivery_item_batches', true, true,'{updated_at}'::text[]);"
-
-    create_table(:mr_skus, ignore_index_errors: true) do
-      primary_key :id
-      foreign_key :mr_product_variant_id, :material_resource_product_variants, key: [:id]
-      foreign_key :owner_party_role_id, :party_roles, key: [:id]
-      foreign_key :mr_delivery_item_batch_id, :mr_delivery_item_batches, key: [:id]
-      foreign_key :user_defined_batch_id, :user_defined_batches, key: [:id]
-
-      TrueClass :is_consignment_stock, default: false
-      BigDecimal :quantity, size: [7,2]
-      Integer :sku_number
-
-      DateTime :created_at, null: false
-      DateTime :updated_at, null: false
-
-      index [:sku_number], name: :mr_skus_unique_sku_number, unique: true
-      index [:mr_product_variant_id], name: :fki_mr_skus_mr_product_variants
-      index [:owner_party_role_id], name: :fki_mr_skus_party_roles
-      index [:mr_delivery_item_batch_id], name: :fki_mr_skus_mr_item_batches
-      index [:user_defined_batch_id], name: :fki_mr_skus_user_defined_batches
-    end
-    pgt_created_at(:mr_skus,
-                   :created_at,
-                   function_name: :mr_skus_set_created_at,
-                   trigger_name: :set_created_at)
-
-    pgt_updated_at(:mr_skus,
-                   :updated_at,
-                   function_name: :mr_skus_set_updated_at,
-                   trigger_name: :set_updated_at)
-    run "SELECT audit.audit_table('mr_skus', true, true,'{updated_at}'::text[]);"
-
-    create_table(:mr_sku_locations, ignore_index_errors: true) do
-      primary_key :id
-      foreign_key :mr_sku_id, :mr_skus, key: [:id]
-      foreign_key :location_id, :locations, key: [:id]
-
-      BigDecimal :quantity, size: [7, 2]
-
-      index [:mr_sku_id, :location_id], name: :fki_mr_sku_locations, unique: true
-    end
-    run "SELECT audit.audit_table('mr_sku_locations', true, true,'{updated_at}'::text[]);"
+    run "SELECT audit.audit_table('mr_internal_batch_numbers', true, true,'{updated_at}'::text[]);"
+    run 'CREATE SEQUENCE doc_seqs_mr_batch_number;'
 
     create_table(:mr_inventory_transaction_types, ignore_index_errors: true) do
       primary_key :id
@@ -282,102 +214,25 @@ Sequel.migration do
     end
     run "SELECT audit.audit_table('mr_inventory_transaction_items', true, true,'{updated_at}'::text[]);"
 
-    create_table(:vehicle_types, ignore_index_errors: true) do
-      primary_key :id
-      String :type_code
-
-      index [:type_code], name: :vehicle_types_unique_type_code, unique: true
-    end
-
-    create_table(:vehicles, ignore_index_errors: true) do
-      primary_key :id
-      foreign_key :vehicle_type_id, :vehicle_types, key: [:id]
-      String :vehicle_code
-
-      index [:vehicle_code, :vehicle_type_id], name: :vehicles_unique_vehicle_code_per_type, unique: true
-    end
-
-    create_table(:vehicle_jobs, ignore_index_errors: true) do
-      primary_key :id
-      foreign_key :business_process_id, :business_processes, key: [:id]
-      foreign_key :vehicle_id, :vehicles, key: [:id]
-      foreign_key :departure_location_id, :locations, key: [:id]
-
-      Integer :trip_sheet_number
-      String :planned_location_to
-      DateTime :when_loaded
-      DateTime :when_offloaded
-      # String :process_status
-
-      DateTime :created_at, null: false
-      DateTime :updated_at, null: false
-
-      index [:business_process_id], name: :fki_vehicle_jobs_business_processes
-      index [:vehicle_id], name: :fki_vehicle_jobs_vehicles
-    end
-    pgt_created_at(:vehicle_jobs,
-                   :created_at,
-                   function_name: :vehicle_jobs_set_created_at,
-                   trigger_name: :set_created_at)
-
-    pgt_updated_at(:vehicle_jobs,
-                   :updated_at,
-                   function_name: :vehicle_jobs_set_updated_at,
-                   trigger_name: :set_updated_at)
-    run "SELECT audit.audit_table('vehicle_jobs', true, true,'{updated_at}'::text[]);"
-
-    create_table(:vehicle_job_units, ignore_index_errors: true) do
-      primary_key :id
-      foreign_key :mr_sku_location_from_id, :locations, key: [:id]
-      foreign_key :mr_inventory_transaction_item_id, :mr_inventory_transaction_items, key: [:id]
-
-      Integer :vehicle_job_id
-      # String :process_status
-      BigDecimal :quantity_to_move, size: [7, 2]
-      DateTime :when_loaded
-      DateTime :when_offloaded
-      DateTime :when_offloading
-      BigDecimal :quantity_moved, size: [7, 2]
-
-      DateTime :created_at, null: false
-      DateTime :updated_at, null: false
-
-      index [:mr_sku_location_from_id], name: :fki_vehicle_job_units_mr_sku_locations
-      index [:mr_inventory_transaction_item_id], name: :fki_vehicle_job_units_mr_inventory_transaction_items
-    end
-    pgt_created_at(:vehicle_job_units,
-                   :created_at,
-                   function_name: :vehicle_job_units_set_created_at,
-                   trigger_name: :set_created_at)
-
-    pgt_updated_at(:vehicle_job_units,
-                   :updated_at,
-                   function_name: :vehicle_job_units_set_updated_at,
-                   trigger_name: :set_updated_at)
-    run "SELECT audit.audit_table('vehicle_job_units', true, true,'{updated_at}'::text[]);"
-
+    run 'CREATE SEQUENCE doc_seqs_delivery_number;'
     create_table(:mr_deliveries, ignore_index_errors: true) do
       primary_key :id
       foreign_key :receipt_transaction_id, :mr_inventory_transactions, key: [:id]
       foreign_key :putaway_transaction_id, :mr_inventory_transactions, key: [:id]
-      foreign_key :mr_purchase_order_id, :mr_purchase_orders, key: [:id], null: false
-      # foreign_key :receiving_warehouse_location_id, :mr_purchase_orders, key: [:id] - is this still neccessary?
       foreign_key :transporter_party_role_id, :party_roles, key: [:id]
 
-      DateTime :received_on, null: false
-      # String :process_status
       String :driver_name, null: false
       String :client_delivery_ref_number, null: false
-      Integer :delivery_number, null: false
+      Integer :delivery_number, null: false, default: Sequel.function(:nextval, 'doc_seqs_delivery_number')
       String :vehicle_registration, null: false
       String :supplier_invoice_ref_number
+      TrueClass :verified, default: false
 
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
       index [:receipt_transaction_id], name: :fki_mr_deliveries_mr_inventory_transactions_receipts
       index [:putaway_transaction_id], name: :fki_mr_deliveries_mr_inventory_transactions_putaways
-      index [:mr_purchase_order_id], name: :fki_mr_deliveries_mr_purchase_orders
       index [:transporter_party_role_id], name: :fki_mr_deliveries_party_roles
     end
     pgt_created_at(:mr_deliveries,
@@ -404,6 +259,9 @@ Sequel.migration do
       BigDecimal :invoiced_unit_price, size: [7, 2]
       String :remarks
 
+      DateTime :created_at, null: false
+      DateTime :updated_at, null: false
+
       index [:mr_delivery_id], name: :fki_mr_delivery_items_mr_deliveries
       index [:mr_purchase_order_item_id], name: :fki_mr_delivery_items_mr_purchase_order_items
       index [:mr_product_variant_id], name: :fki_mr_delivery_items_material_resource_product_variants
@@ -418,17 +276,148 @@ Sequel.migration do
                    function_name: :mr_delivery_items_set_updated_at,
                    trigger_name: :set_updated_at)
     run "SELECT audit.audit_table('mr_delivery_items', true, true,'{updated_at}'::text[]);"
+
+    create_table(:mr_delivery_item_batches, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :mr_delivery_item_id, :mr_delivery_items, null: false
+      foreign_key :mr_internal_batch_number_id, :mr_internal_batch_numbers
+      String :client_batch_number, text: true
+      BigDecimal :quantity_on_note, size: [7, 2]
+      BigDecimal :quantity_received, size: [7, 2]
+
+      DateTime :created_at, null: false
+      DateTime :updated_at, null: false
+
+      index [:mr_internal_batch_number_id], name: :mr_delivery_item_batches_mr_internal_batch_numbers
+      index [:mr_delivery_item_id], name: :mr_delivery_item_batches_mr_delivery_items
+    end
+    pgt_created_at(:mr_delivery_item_batches,
+                   :created_at,
+                   function_name: :mr_delivery_item_batches_set_created_at,
+                   trigger_name: :set_created_at)
+
+    pgt_updated_at(:mr_delivery_item_batches,
+                   :updated_at,
+                   function_name: :mr_delivery_item_batches_set_updated_at,
+                   trigger_name: :set_updated_at)
+    run "SELECT audit.audit_table('mr_delivery_item_batches', true, true,'{updated_at}'::text[]);"
+
+    create_table(:mr_skus, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :mr_product_variant_id, :material_resource_product_variants, key: [:id]
+      foreign_key :owner_party_role_id, :party_roles, key: [:id]
+      foreign_key :mr_delivery_item_batch_id, :mr_delivery_item_batches, key: [:id]
+      foreign_key :mr_internal_batch_number_id, :mr_internal_batch_numbers, key: [:id]
+
+      TrueClass :is_consignment_stock, default: false
+      BigDecimal :initial_quantity, size: [7,2]
+      Integer :sku_number
+
+      DateTime :created_at, null: false
+      DateTime :updated_at, null: false
+
+      index [:sku_number], name: :mr_skus_unique_sku_number, unique: true
+      index [:mr_product_variant_id], name: :fki_mr_skus_mr_product_variants
+      index [:owner_party_role_id], name: :fki_mr_skus_party_roles
+      index [:mr_delivery_item_batch_id], name: :fki_mr_skus_mr_item_batches
+      index [:mr_internal_batch_number_id], name: :fki_mr_skus_mr_internal_batch_numbers
+    end
+    pgt_created_at(:mr_skus,
+                   :created_at,
+                   function_name: :mr_skus_set_created_at,
+                   trigger_name: :set_created_at)
+
+    pgt_updated_at(:mr_skus,
+                   :updated_at,
+                   function_name: :mr_skus_set_updated_at,
+                   trigger_name: :set_updated_at)
+    run "SELECT audit.audit_table('mr_skus', true, true,'{updated_at}'::text[]);"
+
+    create_table(:mr_sku_locations, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :mr_sku_id, :mr_skus, key: [:id]
+      foreign_key :location_id, :locations, key: [:id]
+
+      BigDecimal :quantity, size: [7, 2]
+
+      index [:mr_sku_id, :location_id], name: :fki_mr_sku_locations, unique: true
+    end
+    run "SELECT audit.audit_table('mr_sku_locations', true, true,'{updated_at}'::text[]);"
+
+    create_table(:vehicle_types, ignore_index_errors: true) do
+      primary_key :id
+      String :type_code
+
+      index [:type_code], name: :vehicle_types_unique_type_code, unique: true
+    end
+
+    create_table(:vehicles, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :vehicle_type_id, :vehicle_types, key: [:id]
+      String :vehicle_code
+
+      index [:vehicle_code, :vehicle_type_id], name: :vehicles_unique_vehicle_code_per_type, unique: true
+    end
+
+    create_table(:vehicle_jobs, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :business_process_id, :business_processes, key: [:id]
+      foreign_key :vehicle_id, :vehicles, key: [:id]
+      foreign_key :departure_location_id, :locations, key: [:id]
+
+      Integer :trip_sheet_number
+      String :planned_location_to
+      DateTime :when_loaded
+      DateTime :when_offloaded
+
+      DateTime :created_at, null: false
+      DateTime :updated_at, null: false
+
+      index [:business_process_id], name: :fki_vehicle_jobs_business_processes
+      index [:vehicle_id], name: :fki_vehicle_jobs_vehicles
+    end
+    pgt_created_at(:vehicle_jobs,
+                   :created_at,
+                   function_name: :vehicle_jobs_set_created_at,
+                   trigger_name: :set_created_at)
+
+    pgt_updated_at(:vehicle_jobs,
+                   :updated_at,
+                   function_name: :vehicle_jobs_set_updated_at,
+                   trigger_name: :set_updated_at)
+    run "SELECT audit.audit_table('vehicle_jobs', true, true,'{updated_at}'::text[]);"
+
+    create_table(:vehicle_job_units, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :mr_sku_location_from_id, :locations, key: [:id]
+      foreign_key :mr_inventory_transaction_item_id, :mr_inventory_transaction_items, key: [:id]
+
+      Integer :vehicle_job_id
+      BigDecimal :quantity_to_move, size: [7, 2]
+      DateTime :when_loaded
+      DateTime :when_offloaded
+      DateTime :when_offloading
+      BigDecimal :quantity_moved, size: [7, 2]
+
+      DateTime :created_at, null: false
+      DateTime :updated_at, null: false
+
+      index [:mr_sku_location_from_id], name: :fki_vehicle_job_units_mr_sku_locations
+      index [:mr_inventory_transaction_item_id], name: :fki_vehicle_job_units_mr_inventory_transaction_items
+    end
+    pgt_created_at(:vehicle_job_units,
+                   :created_at,
+                   function_name: :vehicle_job_units_set_created_at,
+                   trigger_name: :set_created_at)
+
+    pgt_updated_at(:vehicle_job_units,
+                   :updated_at,
+                   function_name: :vehicle_job_units_set_updated_at,
+                   trigger_name: :set_updated_at)
+    run "SELECT audit.audit_table('vehicle_job_units', true, true,'{updated_at}'::text[]);"
   end
 
   down do
-    drop_trigger(:mr_delivery_items, :audit_trigger_row)
-    drop_trigger(:mr_delivery_items, :audit_trigger_stm)
-    drop_table(:mr_delivery_items)
-
-    drop_trigger(:mr_deliveries, :audit_trigger_row)
-    drop_trigger(:mr_deliveries, :audit_trigger_stm)
-    drop_table(:mr_deliveries)
-
     drop_trigger(:vehicle_job_units, :audit_trigger_row)
     drop_trigger(:vehicle_job_units, :audit_trigger_stm)
     drop_trigger(:vehicle_job_units, :set_created_at)
@@ -447,15 +436,6 @@ Sequel.migration do
 
     drop_table(:vehicles)
     drop_table(:vehicle_types)
-
-    drop_trigger(:mr_inventory_transaction_items, :audit_trigger_row)
-    drop_trigger(:mr_inventory_transaction_items, :audit_trigger_stm)
-    drop_table(:mr_inventory_transaction_items)
-
-    drop_trigger(:mr_inventory_transactions, :audit_trigger_row)
-    drop_trigger(:mr_inventory_transactions, :audit_trigger_stm)
-    drop_table(:mr_inventory_transactions)
-    drop_table(:mr_inventory_transaction_types)
 
     drop_trigger(:mr_sku_locations, :audit_trigger_row)
     drop_trigger(:mr_sku_locations, :audit_trigger_stm)
@@ -477,14 +457,44 @@ Sequel.migration do
     drop_function(:mr_delivery_item_batches_set_updated_at)
     drop_table(:mr_delivery_item_batches)
 
+    drop_trigger(:mr_delivery_items, :set_created_at)
+    drop_function(:mr_delivery_items_set_created_at)
+    drop_trigger(:mr_delivery_items, :set_updated_at)
+    drop_function(:mr_delivery_items_set_updated_at)
+    drop_trigger(:mr_delivery_items, :audit_trigger_row)
+    drop_trigger(:mr_delivery_items, :audit_trigger_stm)
+    drop_table(:mr_delivery_items)
 
-    drop_trigger(:user_defined_batches, :audit_trigger_row)
-    drop_trigger(:user_defined_batches, :audit_trigger_stm)
-    drop_trigger(:user_defined_batches, :set_created_at)
-    drop_function(:user_defined_batches_set_created_at)
-    drop_trigger(:user_defined_batches, :set_updated_at)
-    drop_function(:user_defined_batches_set_updated_at)
-    drop_table(:user_defined_batches)
+    drop_trigger(:mr_deliveries, :audit_trigger_row)
+    drop_trigger(:mr_deliveries, :audit_trigger_stm)
+    drop_table(:mr_deliveries)
+    run 'DROP SEQUENCE doc_seqs_delivery_number;'
+
+    drop_trigger(:mr_inventory_transaction_items, :audit_trigger_row)
+    drop_trigger(:mr_inventory_transaction_items, :audit_trigger_stm)
+    drop_table(:mr_inventory_transaction_items)
+
+    drop_trigger(:mr_inventory_transactions, :audit_trigger_row)
+    drop_trigger(:mr_inventory_transactions, :audit_trigger_stm)
+    drop_table(:mr_inventory_transactions)
+    drop_table(:mr_inventory_transaction_types)
+
+    # drop_trigger(:user_defined_batches, :audit_trigger_row)
+    # drop_trigger(:user_defined_batches, :audit_trigger_stm)
+    # drop_trigger(:user_defined_batches, :set_created_at)
+    # drop_function(:user_defined_batches_set_created_at)
+    # drop_trigger(:user_defined_batches, :set_updated_at)
+    # drop_function(:user_defined_batches_set_updated_at)
+    # drop_table(:user_defined_batches)
+
+    run 'DROP SEQUENCE doc_seqs_mr_batch_number;'
+    drop_trigger(:mr_internal_batch_numbers, :audit_trigger_row)
+    drop_trigger(:mr_internal_batch_numbers, :audit_trigger_stm)
+    drop_trigger(:mr_internal_batch_numbers, :set_created_at)
+    drop_function(:mr_internal_batch_numbers_set_created_at)
+    drop_trigger(:mr_internal_batch_numbers, :set_updated_at)
+    drop_function(:mr_internal_batch_numbers_set_updated_at)
+    drop_table(:mr_internal_batch_numbers)
 
     drop_trigger(:mr_purchase_order_items, :audit_trigger_row)
     drop_trigger(:mr_purchase_order_items, :audit_trigger_stm)

@@ -286,6 +286,15 @@ module MasterfilesApp
       end
     end
 
+    def for_select_party_roles(role = 'TRANSPORTER')
+      DB[:party_roles].where(
+        role_id: DB[:roles].where(name: role).select(:id)
+      ).select(
+        :id,
+        Sequel.function(:fn_party_role_name, :id)
+      ).map { |r| [r[:fn_party_role_name], r[:id]] }
+    end
+
     # Customers & Suppliers
     def for_select_supplier_parties
       parties_except_for_role(MasterfilesApp::SUPPLIER_ROLE)

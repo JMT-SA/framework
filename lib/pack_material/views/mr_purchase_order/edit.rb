@@ -73,6 +73,7 @@ module PackMaterial
                                   url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new",
                                   style: :button,
                                   behaviour: :popup,
+                                  grid_id: 'po_items',
                                   css_class: 'mb1')
                   col.add_grid('po_items',
                                "/list/mr_purchase_order_items/grid?key=standard&purchase_order_id=#{id}",

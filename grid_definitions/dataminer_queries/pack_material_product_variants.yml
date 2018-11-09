@@ -600,7 +600,7 @@
   mr_id:
     :name: mr_id
     :sequence_no: 38
-    :caption: MR Variant id
+    :caption: Variant id
     :namespaced_name: material_resource_product_variants.id
     :data_type: :string
     :width: 
@@ -645,7 +645,7 @@
   mr_product_variant_number:
     :name: mr_product_variant_number
     :sequence_no: 41
-    :caption: Mr product variant number
+    :caption: product variant number
     :namespaced_name: material_resource_product_variants.product_variant_number
     :data_type: :string
     :width: 
@@ -720,7 +720,7 @@
   mr_created_at:
     :name: mr_created_at
     :sequence_no: 46
-    :caption: Mr created at
+    :caption: created at
     :namespaced_name: material_resource_product_variants.created_at
     :data_type: :string
     :width: 
@@ -735,7 +735,7 @@
   mr_updated_at:
     :name: mr_updated_at
     :sequence_no: 47
-    :caption: Mr updated at
+    :caption: updated at
     :namespaced_name: material_resource_product_variants.updated_at
     :data_type: :string
     :width: 

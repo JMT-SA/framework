@@ -24,10 +24,10 @@ module MasterfilesApp
         log_transaction
       end
       instance = mr_cost_type(id)
-      success_response("Created mr cost type #{instance.cost_code_string}",
+      success_response("Created cost type #{instance.cost_code_string}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { cost_code_string: ['This mr cost type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { cost_code_string: ['This cost type already exists'] }))
     end
 
     def update_mr_cost_type(id, params)
@@ -38,7 +38,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = mr_cost_type(id)
-      success_response("Updated mr cost type #{instance.cost_code_string}",
+      success_response("Updated cost type #{instance.cost_code_string}",
                        instance)
     end
 
@@ -49,7 +49,7 @@ module MasterfilesApp
         log_status('mr_cost_types', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted mr cost type #{name}")
+      success_response("Deleted cost type #{name}")
     end
   end
 end

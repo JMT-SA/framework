@@ -32,7 +32,7 @@
   mr_delivery_term_id:
     :name: mr_delivery_term_id
     :sequence_no: 2
-    :caption: Mr delivery term
+    :caption: delivery term
     :namespaced_name: mr_purchase_orders.mr_delivery_term_id
     :data_type: :integer
     :width: 
@@ -62,7 +62,7 @@
   mr_vat_type_id:
     :name: mr_vat_type_id
     :sequence_no: 4
-    :caption: Mr vat type
+    :caption: vat type
     :namespaced_name: mr_purchase_orders.mr_vat_type_id
     :data_type: :integer
     :width: 
@@ -241,7 +241,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: mr_purchase_orders.mr_delivery_term_id
-  :caption: Mr delivery term
+  :caption: delivery term
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -258,7 +258,7 @@
   :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
     id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
 - :column: mr_purchase_orders.mr_vat_type_id
-  :caption: Mr vat type
+  :caption: vat type
   :data_type: :integer
   :control_type: :list
   :default_value: 

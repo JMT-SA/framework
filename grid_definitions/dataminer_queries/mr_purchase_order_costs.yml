@@ -28,7 +28,7 @@
   mr_cost_type_id:
     :name: mr_cost_type_id
     :sequence_no: 2
-    :caption: Mr cost type
+    :caption: Cost type
     :namespaced_name: mr_purchase_order_costs.mr_cost_type_id
     :data_type: :integer
     :width: 
@@ -43,7 +43,7 @@
   mr_purchase_order_id:
     :name: mr_purchase_order_id
     :sequence_no: 3
-    :caption: Mr purchase order
+    :caption: Purchase order
     :namespaced_name: mr_purchase_order_costs.mr_purchase_order_id
     :data_type: :integer
     :width: 

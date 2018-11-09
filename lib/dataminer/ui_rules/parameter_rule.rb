@@ -10,7 +10,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      add_behaviour
+      add_behaviours
 
       preset_disable
 
@@ -63,7 +63,7 @@ module UiRules
     end
 
     # TODO: new behaviour: toggle enabled based on chosen/not chosen value
-    def add_behaviour
+    def add_behaviours
       behaviours do |behaviour|
         # behaviour.enable :table, when: :applet, changes_to: [''] # ANY VALUE....
         # behaviour.enable :field, when: :applet, changes_to: ['']

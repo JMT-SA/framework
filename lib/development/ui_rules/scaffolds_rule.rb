@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      add_behaviour
+      add_behaviours
 
       disable_other
 
@@ -51,7 +51,7 @@ module UiRules
 
     private
 
-    def add_behaviour
+    def add_behaviours
       behaviours do |behaviour|
         behaviour.enable :other, when: :applet, changes_to: ['other']
         behaviour.dropdown_change :table, notify: [{ url: '/development/generators/scaffolds/table_changed' }]

@@ -13,7 +13,7 @@ module UiRules
 
       set_show_fields if @mode == :show
 
-      add_behaviour if @options[:id]
+      add_behaviours if @options[:id]
 
       form_name 'location'
     end
@@ -85,7 +85,7 @@ module UiRules
       end
     end
 
-    def add_behaviour
+    def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :location_type_id, notify: [{ url: "/masterfiles/locations/locations/#{@options[:id]}/add_child/location_type_changed" }]
       end

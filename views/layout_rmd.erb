@@ -37,6 +37,9 @@
         position: relative;
         top: .125em;
       }
+      input:required {
+        border-right: thick solid orange;
+      }
     </style>
     <%= content_for :late_head %>
   </head>
@@ -46,7 +49,7 @@
       <%= render_rmd_menu %>
     <% end %>
     <% unless @no_logout %>
-      <a href="/logout" id="logout" class="f6 link dim br2 ph3 pv2 dib white bg-light-red" title="Logout">logout</a>
+      <a href="/logout" id="logout" class="f6 link dim br2 ph3 pv2 dib white bg-silver" title="Logout">logout</a>
     <% end %>
     <div id="container" class="container ma2">
       <%= yield %>

@@ -2,7 +2,7 @@
 
 class Framework < Roda
   class RMDForm
-    attr_reader :form_state, :progress, :notes, :scan_with_camera, :caption, :action, :button_caption
+    attr_reader :form_state, :progress, :notes, :scan_with_camera, :caption, :action, :button_caption, :csrf_tag
 
     def initialize(form_state, options)
       @form_state = form_state
@@ -13,37 +13,41 @@ class Framework < Roda
       @action = options[:action]
       @button_caption = options[:button_caption]
       @fields = []
+      @csrf_tag = nil
     end
 
     def add_field(name, label, options)
       @current_field = name
       for_scan = options[:scan] ? 'Scan ' : ''
       data_type = options[:data_type] || 'text'
-      scan_opts = if options[:scan]
-                    %( data-scanner="#{options[:scan]}" data-scan-rule="#{name}" autocomplete="off")
-                  else
-                    ''
-                  end
+      required = options[:required].nil? || options[:required] ? ' required' : ''
+      autofocus = @fields.empty? ? ' autofocus' : ''
       @fields << <<~HTML
         <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{name}" type="#{data_type}" name="#{name}" placeholder="#{for_scan}#{label}"#{scan_opts} value="#{form_state[name]}">
+        <td><input class="pa2#{field_error_class}" id="#{name}" type="#{data_type}" name="#{name}" placeholder="#{for_scan}#{label}"#{scan_opts(name, options)} value="#{form_state[name]}"#{required}#{autofocus}>
         </td></tr>
       HTML
     end
 
     def render
+      raise ArgumentError, 'RMDForm: no CSRF tag provided' if csrf_tag.nil?
       <<~HTML
         <h2>#{caption}</h2>
-        <form action="#{action}">
+        <form action="#{action}" method="POST">
           #{error_section}
           #{notes_section}
           #{camera_section}
+          #{csrf_tag}
           #{field_renders}
           #{submit_section}
         </form>
         #{progress_section}
         <textarea id="txtShow" style="background-color:darkseagreen;color:navy" rows="20", cols="35" readonly></textarea>
       HTML
+    end
+
+    def add_csrf_tag(value)
+      @csrf_tag = value
     end
 
     private
@@ -54,6 +58,14 @@ class Framework < Roda
           #{@fields.join("\n")}
         </tbody></table>
       HTML
+    end
+
+    def scan_opts(name, options)
+      if options[:scan]
+        %( data-scanner="#{options[:scan]}" data-scan-rule="#{name}" autocomplete="off")
+      else
+        ''
+      end
     end
 
     def field_error_state
@@ -115,65 +127,62 @@ class Framework < Roda
     end
   end
 
+  # RMD USER MENU PAGE
+  # --------------------------------------------------------------------------
   route 'home', 'rmd' do # |r|
-    # show the full menu
     @no_menu = true
     show_rmd_page { Rmd::Home::Show.call(rmd_menu_items(self.class.name, as_hash: true)) }
   end
 
-  route 'websocket_result', 'rmd' do # |r|
-    p params
-    s = <<-HTML
-    <h1>Websocket parameter results</h1>
-    <table>
-    <tr><th>Param</th><th>Value</th></tr>
-    #{params.map { |k, v| "<tr><td>#{k}</td><td style='padding:8px;background-color:#ddd'><strong>#{v.gsub(/\n/, '<br>')}</strong></td></tr>" }.join}
-    </table>
-    HTML
-    view(inline: s, layout: :layout_rmd)
-  end
-
+  # DELIVERIES
+  # --------------------------------------------------------------------------
   route 'deliveries', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
-    # REGISTERED MOBILE DEVICES
+    # PUTAWAYS
     # --------------------------------------------------------------------------
-    r.on 'putaway' do
-      details = retrieve_from_local_store(:delivery_putaway) || {}
-      form = RMDForm.new(details,
-                         progress: details[:delivery_id] ? 'Delivery 123: 3 of 5 items complete' : nil,
-                         notes: 'Scan the location, then the SKU and enter the quantity.',
-                         scan_with_camera: @rmd_scan_with_camera,
-                         caption: 'Delivery putaway',
-                         action: '/rmd/deliveries/save_putaway',
-                         button_caption: 'Putaway')
-      form.add_field(:location, 'Location', scan: 'key248_all')
-      form.add_field(:sku, 'SKU', scan: 'key248_all')
-      form.add_field(:quantity, 'Quantity', data_type: 'number')
-      view(inline: form.render, layout: :layout_rmd)
-    end
-
-    # TODO: change these putaway routes to use REST new/create paradigm...
-    r.on 'save_putaway' do
-      # Simulate interactor call:
-      instance = { delivery_id: 123 }
-      res = if Time.now.sec > 40
-              OpenStruct.new(success: false,
-                             instance: instance,
-                             errors: { sku: ['is not correct'] },
-                             message: 'Validation problem')
-            else
-              OpenStruct.new(success: true,
-                             instance: instance,
-                             errors: {},
-                             message: 'Successful putaway')
-            end
-      payload = { delivery_id: 123 }
-      unless res.success
-        payload[:error_message] = res.message
-        payload[:errors] = res.errors
-        payload.merge!(location: params[:location], sku: params[:sku], quantity: params[:quantity])
+    r.on 'putaways' do # rubocop:disable Metrics/BlockLength
+      # Interactor
+      r.on 'new' do    # NEW
+        # check auth...
+        details = retrieve_from_local_store(:delivery_putaway) || {}
+        p details
+        form = RMDForm.new(details,
+                           progress: details[:delivery_id] ? details[:progress] : '', # 'Delivery 123: 3 of 5 items complete' : nil,
+                           notes: 'Scan the location, then the SKU and enter the quantity.',
+                           scan_with_camera: @rmd_scan_with_camera,
+                           caption: 'Delivery putaway',
+                           action: '/rmd/deliveries/putaways',
+                           button_caption: 'Putaway')
+        form.add_field(:location, 'Location', scan: 'key248_all')
+        form.add_field(:sku, 'SKU', scan: 'key248_all')
+        form.add_field(:quantity, 'Quantity', data_type: 'number')
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
       end
-      store_locally(:delivery_putaway, payload)
-      r.redirect '/rmd/deliveries/putaway'
+
+      r.post do        # CREATE
+        # res = interactor.create_putaway...
+        # Simulate interactor call:
+        instance = { delivery_id: 123 }
+        res = if Time.now.sec > 40
+                OpenStruct.new(success: false,
+                               instance: instance.merge(progress: 'Delivery 123: 2 of 5 items.'),
+                               errors: { sku: ['is not correct'] },
+                               message: 'Validation problem')
+              else
+                OpenStruct.new(success: true,
+                               instance: instance.merge(progress: "Delivery 123: 3 of 5 items.<br>Last scan: LOC: #{params[:location]} / SKU: #{params[:sku]}"),
+                               errors: {},
+                               message: 'Successful putaway')
+              end
+        payload = { delivery_id: 123, progress: res.instance[:progress] }
+        unless res.success
+          payload[:error_message] = res.message
+          payload[:errors] = res.errors
+          payload.merge!(location: params[:location], sku: params[:sku], quantity: params[:quantity])
+        end
+        store_locally(:delivery_putaway, payload)
+        r.redirect '/rmd/deliveries/putaways/new'
+      end
     end
 
     r.on 'status' do

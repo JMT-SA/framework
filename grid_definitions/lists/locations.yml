@@ -35,6 +35,12 @@
   :text: Storage Types
   :icon: list
   :popup: true
+- :separator: true
+- :url: "/masterfiles/locations/locations/$:id$/print_barcode"
+  :text: Print barcode
+  :icon: printer
+  :title: Print barcode
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/locations/locations/new"

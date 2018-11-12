@@ -10,4 +10,7 @@ class AppConst
 
   # Menu
   FUNCTIONAL_AREA_RMD = 'RMD'
+
+  LABEL_SERVER_URI = ENV.fetch('LABEL_SERVER_URI')
+  POST_FORM_BOUNDARY = 'AaB03x'
 end

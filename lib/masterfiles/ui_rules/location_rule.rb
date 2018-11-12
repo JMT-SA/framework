@@ -12,6 +12,7 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
+      set_print_fields if @mode == :print_barcode
 
       add_behaviours if @options[:id]
 
@@ -37,6 +38,14 @@ module UiRules
       fields[:assignments] = { renderer: :list, items: location_assignments }
     end
 
+    def set_print_fields
+      printers = [['Label Designer', 'PRN-01']] # @repo.for_select_location_types # FIXME: hard-coded list...
+      fields[:location_code] = { renderer: :label, caption: 'Code' }
+      fields[:location_description] = { renderer: :label, caption: 'Description' }
+      fields[:printer] = { renderer: :select, options: printers, required: true }
+      fields[:no_of_prints] = { renderer: :integer, required: true }
+    end
+
     def common_fields
       {
         primary_storage_type_id: { renderer: :select, options: storage_types, caption: 'Primary Storage Type', required: true },
@@ -54,6 +63,7 @@ module UiRules
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_location(@options[:id])
+      @form_object = OpenStruct.new(@form_object.to_h.merge(printer: nil, no_of_prints: 1)) if @mode == :print_barcode
     end
 
     def make_new_form_object

@@ -179,6 +179,13 @@ module MasterfilesApp
       success_response('See location code suggestion', res.instance)
     end
 
+    def print_location_barcode(id, params)
+      instance = location(id)
+      vars = { F0: instance.location_code, F1: instance.location_description }
+      mes_repo = MesserverApp::MesserverRepo.new
+      mes_repo.print_label('KR_PM_LOCATION', vars, params[:quantity], params[:printer]) # TODO: config for nsld template name...
+    end
+
     private
 
     def repo

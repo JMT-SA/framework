@@ -4,6 +4,6 @@ Sequel.migration do
   end
 
   down do
-    drop_column :functional_areas, :rmd_menu, :boolean, default: false
+    drop_column :functional_areas, :rmd_menu
   end
 end

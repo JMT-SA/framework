@@ -18,10 +18,10 @@ module ErrorHelpers
     when Crossbeams::TaskNotPermittedError
       show_task_not_permitted_error(fetch_request, err)
     when Sequel::UniqueConstraintViolation
-      send_appropriate_error_response('Adding a duplicate', fetch_request)
+      send_appropriate_error_response('Adding a duplicate', fetch_request, status: 200)
     when Sequel::ForeignKeyConstraintViolation
       msg = pg_foreign_key_violation_msg(err)
-      send_appropriate_error_response(msg, fetch_request)
+      send_appropriate_error_response(msg, fetch_request, status: 200)
     else
       send_appropriate_error_response(err, fetch_request)
     end
@@ -32,8 +32,8 @@ module ErrorHelpers
   # @param err [Exception, String] the error.
   # @param fetch_request [Boolean] is the error to be displayed for a fetch or normal request.
   # @return [String, JSON] formatted error display.
-  def send_appropriate_error_response(err, fetch_request)
-    fetch_request ? show_json_error(err) : show_page_error(err)
+  def send_appropriate_error_response(err, fetch_request, status: 500)
+    fetch_request ? show_json_error(err, status: status) : show_page_error(err)
   end
 
   # Route the permission error-display for page/fetch calls.

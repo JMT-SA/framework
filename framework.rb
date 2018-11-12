@@ -36,6 +36,9 @@ module Crossbeams
 
   class AuthorizationError < StandardError
   end
+
+  class TaskNotPermittedError < StandardError
+  end
 end
 
 class Framework < Roda

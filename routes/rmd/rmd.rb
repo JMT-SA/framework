@@ -42,7 +42,7 @@ class Framework < Roda
           #{submit_section}
         </form>
         #{progress_section}
-        <textarea id="txtShow" style="background-color:darkseagreen;color:navy" rows="20", cols="35" readonly></textarea>
+        <textarea id="txtShow" class="navy bg-light-blue" rows="20", cols="35" readonly></textarea>
       HTML
     end
 
@@ -144,9 +144,8 @@ class Framework < Roda
       r.on 'new' do    # NEW
         # check auth...
         details = retrieve_from_local_store(:delivery_putaway) || {}
-        p details
         form = RMDForm.new(details,
-                           progress: details[:delivery_id] ? details[:progress] : '', # 'Delivery 123: 3 of 5 items complete' : nil,
+                           progress: details[:delivery_id] ? details[:progress] : nil, # 'Delivery 123: 3 of 5 items complete' : nil,
                            notes: 'Scan the location, then the SKU and enter the quantity.',
                            scan_with_camera: @rmd_scan_with_camera,
                            caption: 'Delivery putaway',

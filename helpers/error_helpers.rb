@@ -15,6 +15,8 @@ module ErrorHelpers
     case err
     when Crossbeams::AuthorizationError
       show_auth_error(fetch_request)
+    when Crossbeams::TaskNotPermittedError
+      show_task_not_permitted_error(fetch_request, err)
     when Sequel::UniqueConstraintViolation
       send_appropriate_error_response('Adding a duplicate', fetch_request)
     when Sequel::ForeignKeyConstraintViolation
@@ -48,6 +50,24 @@ module ErrorHelpers
   def show_unauthorised
     response.status = 403
     view(inline: "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>", layout: appropriate_layout)
+  end
+
+  # Route the task not permitted error-display for page/fetch calls.
+  #
+  # @param fetch_request [Boolean] is the error to be displayed for a fetch or normal request.
+  # @param err [Exception] The raised exception
+  # @return [String, JSON] formatted task not permitted error display.
+  def show_task_not_permitted_error(fetch_request, err)
+    fetch_request ? show_json_task_not_permitted_error(err) : show_task_not_permitted(err)
+  end
+
+  # Show a permission-refused page.
+  #
+  # @param err [Exception] The raised exception
+  # @return [String] the HTML containing an error message.
+  def show_task_not_permitted(err)
+    response.status = 403
+    view(inline: "<div class='crossbeams-warning-note'><strong>Task is not permitted</strong><br>#{err.message || 'The task may be performed at this time.'}</div>", layout: appropriate_layout)
   end
 
   # Show an informational message page.
@@ -98,6 +118,15 @@ module ErrorHelpers
   def show_json_permission_error
     response.status = 403
     { flash: { error: 'You do not have permission for this task', type: 'permission' } }.to_json
+  end
+
+  # Show a task-not-permitted message in JSON.
+  #
+  # @param err [Exception] The raised exception
+  # @return [JSON] the message formatted for javascript to handle.
+  def show_json_task_not_permitted_error(err)
+    response.status = 403
+    { flash: { error: "Task is not permitted - #{err.message || 'The task may be performed at this time.'}", type: 'permission' } }.to_json
   end
 
   # Show an error message in JSON.

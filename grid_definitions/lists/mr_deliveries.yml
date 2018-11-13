@@ -71,6 +71,7 @@
       :title: New Delivery Item Batch
       :popup: true
       :hide_if_true: verified
+      :hide_if_present: id
     - :url: "/pack_material/replenish/mr_delivery_item_batches/$:id$"
       :text: view
       :icon: view-show

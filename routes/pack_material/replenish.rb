@@ -380,6 +380,16 @@ class Framework < Roda
           end
         end
       end
+      r.on 'verify' do   # EDIT
+        check_auth!('replenish', 'edit')
+        res = interactor.verify_mr_delivery(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
         show_partial { PackMaterial::Replenish::MrDelivery::Edit.call(id) }

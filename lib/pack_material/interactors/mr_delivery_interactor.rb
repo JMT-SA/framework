@@ -40,6 +40,15 @@ module PackMaterialApp
       success_response("Updated delivery #{instance.delivery_number}", instance)
     end
 
+    def verify_mr_delivery(id)
+      res = nil
+      repo.transaction do
+        res = repo.verify_mr_delivery(id)
+        log_transaction
+      end
+      res
+    end
+
     def delete_mr_delivery(id)
       name = mr_delivery(id).delivery_number
       repo.transaction do

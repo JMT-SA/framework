@@ -266,51 +266,37 @@ module MasterfilesApp
       MasterfilesApp::PartyRole.new(hash)
     end
 
-    def assign_role(id, role_ids, type = 'O')
-      return { error: 'Choose at least one role' } if role_ids.empty?
-      organization_id = person_id = nil
-      if type == 'O'
-        party = find_organization(id)
-        DB[:party_roles].where(organization_id: id).delete
-        organization_id = id
-      else
-        party = find_person(id)
-        DB[:party_roles].where(person_id: id).delete
-        person_id = id
-      end
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: party.party_id,
-                                organization_id: organization_id,
-                                person_id: person_id,
-                                role_id: r_id)
-      end
-    end
-
     def assign_roles(id, role_ids, type = 'O')
       return { error: 'Choose at least one role' } if role_ids.empty?
-      organization_id = person_id = nil
-      if type == 'O'
-        party = find_organization(id)
-        party_roles = DB[:party_roles].where(organization_id: id)
-        organization_id = id
-      else
-        party = find_person(id)
-        party_roles = DB[:party_roles].where(person_id: id)
-        person_id = id
-      end
-      current_role_ids = party_roles.select_map(:role_id)
+      party_details = party_details_by_type(id, type)
+      current_role_ids = party_details[:party_roles].select_map(:role_id)
+
       removed_role_ids = current_role_ids - role_ids
-      party_roles.where(role_id: removed_role_ids).delete
+      party_details[:party_roles].where(role_id: removed_role_ids).delete
 
       new_role_ids = role_ids - current_role_ids
       new_role_ids.each do |r_id|
         DB[:party_roles].insert(
-          party_id: party.party_id,
-          organization_id: organization_id,
-          person_id: person_id,
+          party_id: party_details[:party_id],
+          organization_id: party_details[:organization_id],
+          person_id: party_details[:person_id],
           role_id: r_id
         )
       end
+    end
+
+    def party_details_by_type(id, type)
+      details = { organization_id: nil, person_id: nil }
+      if type == 'O'
+        details[:party_id] = find_organization(id).party_id
+        details[:party_roles] = DB[:party_roles].where(organization_id: id)
+        details[:organization_id] = id
+      else
+        details[:party_id] = find_person(id).party_id
+        details[:party_roles] = DB[:party_roles].where(person_id: id)
+        details[:person_id] = id
+      end
+      details
     end
 
     def for_select_party_roles(role = 'TRANSPORTER')

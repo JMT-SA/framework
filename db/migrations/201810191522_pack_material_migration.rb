@@ -308,8 +308,8 @@ Sequel.migration do
       foreign_key :mr_product_variant_id, :material_resource_product_variants, key: [:id]
       foreign_key :owner_party_role_id, :party_roles, key: [:id]
       foreign_key :mr_delivery_item_batch_id, :mr_delivery_item_batches, key: [:id]
-      foreign_key :mr_internal_batch_number_id, :mr_internal_batch_numbers, key: [:id]
 
+      String :batch_number, text: true
       TrueClass :is_consignment_stock, default: false
       BigDecimal :initial_quantity, size: [7,2]
       Integer :sku_number, default: Sequel.function(:nextval, 'doc_seqs_sku_number')
@@ -321,7 +321,6 @@ Sequel.migration do
       index [:mr_product_variant_id], name: :fki_mr_skus_mr_product_variants
       index [:owner_party_role_id], name: :fki_mr_skus_party_roles
       index [:mr_delivery_item_batch_id], name: :fki_mr_skus_mr_item_batches
-      index [:mr_internal_batch_number_id], name: :fki_mr_skus_mr_internal_batch_numbers
     end
     pgt_created_at(:mr_skus,
                    :created_at,

@@ -302,6 +302,7 @@ Sequel.migration do
                    trigger_name: :set_updated_at)
     run "SELECT audit.audit_table('mr_delivery_item_batches', true, true,'{updated_at}'::text[]);"
 
+    run 'CREATE SEQUENCE doc_seqs_sku_number;'
     create_table(:mr_skus, ignore_index_errors: true) do
       primary_key :id
       foreign_key :mr_product_variant_id, :material_resource_product_variants, key: [:id]
@@ -311,7 +312,7 @@ Sequel.migration do
 
       TrueClass :is_consignment_stock, default: false
       BigDecimal :initial_quantity, size: [7,2]
-      Integer :sku_number
+      Integer :sku_number, default: Sequel.function(:nextval, 'doc_seqs_sku_number')
 
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
@@ -441,6 +442,7 @@ Sequel.migration do
     drop_trigger(:mr_sku_locations, :audit_trigger_stm)
     drop_table(:mr_sku_locations)
 
+    run 'DROP SEQUENCE doc_seqs_sku_number;'
     drop_trigger(:mr_skus, :audit_trigger_row)
     drop_trigger(:mr_skus, :audit_trigger_stm)
     drop_trigger(:mr_skus, :set_created_at)

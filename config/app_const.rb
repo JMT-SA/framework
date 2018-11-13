@@ -11,6 +11,11 @@ class AppConst
   # Menu
   FUNCTIONAL_AREA_RMD = 'RMD'
 
+  # MesServer
   LABEL_SERVER_URI = ENV.fetch('LABEL_SERVER_URI')
   POST_FORM_BOUNDARY = 'AaB03x'
+
+  # Labels
+  LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
+  LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 end

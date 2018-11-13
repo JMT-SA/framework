@@ -20,7 +20,7 @@ module PackMaterial
               form.add_field :product_variant_code
               form.add_field :client_batch_number
               form.add_field :printer
-              form.add_field :no_of_prints # default to qty_rec'd on batch
+              form.add_field :no_of_prints
             end
           end
 

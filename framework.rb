@@ -97,7 +97,7 @@ class Framework < Roda
     r.assets unless ENV['RACK_ENV'] == 'production'
     r.public
 
-    # p request.ip
+    p request.ip
     # Routes that must work without authentication
     # --------------------------------------------
     r.on 'webquery', String do |id|

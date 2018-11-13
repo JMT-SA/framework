@@ -51,5 +51,15 @@ module PackMaterialApp
       end
       success_response("Deleted delivery item batch assignment to #{batch_number}")
     end
+
+    def print_sku_barcode(id, params)
+      instance = repo.sku_for_barcode(id)
+      # NOTE: we don't know for sure what the order of F1, F2 etc will always be...
+      #       - so we need to get those position/variable links from the label...
+      #       - ALSO: LD needs to change to allow for different variable sets...
+      vars = { F1: instance[:sku_number], F2: instance[:sku_number], F3: instance[:product_variant_code], F4: instance[:client_batch_number] }
+      mes_repo = MesserverApp::MesserverRepo.new
+      mes_repo.print_label(AppConst::LABEL_SKU_BARCODE, vars, params[:no_of_prints], params[:printer])
+    end
   end
 end

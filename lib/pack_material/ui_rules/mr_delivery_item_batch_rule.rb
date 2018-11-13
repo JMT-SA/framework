@@ -10,15 +10,27 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
+      set_print_fields if @mode == :print_barcode
 
       form_name 'mr_delivery_item_batch'
     end
+
+    private
 
     def set_show_fields
       fields[:internal_batch_number] = { renderer: :label }
       fields[:client_batch_number] = { renderer: :label }
       fields[:quantity_on_note] = { renderer: :label }
       fields[:quantity_received] = { renderer: :label }
+    end
+
+    def set_print_fields
+      printers = [['Label Designer', 'PRN-01']] # @repo.for_select_label_printers # FIXME: hard-coded list...
+      fields[:sku_number] = { renderer: :label }
+      fields[:product_variant_code] = { renderer: :label }
+      fields[:client_batch_number] = { renderer: :label }
+      fields[:printer] = { renderer: :select, options: printers, required: true }
+      fields[:no_of_prints] = { renderer: :integer, required: true }
     end
 
     def common_fields
@@ -33,8 +45,14 @@ module UiRules
 
     def make_form_object
       make_new_form_object && return if @mode == :new
+      form_object_for_barcode_print && return if @mode == :print_barcode
 
       @form_object = @repo.find_mr_delivery_item_batch(@options[:id])
+    end
+
+    def form_object_for_barcode_print
+      rec = @repo.sku_for_barcode(@options[:id])
+      @form_object = OpenStruct.new(rec.merge(printer: nil))
     end
 
     def make_new_form_object

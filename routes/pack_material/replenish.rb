@@ -475,6 +475,7 @@ class Framework < Roda
         check_auth!('replenish', 'edit')
         show_partial { PackMaterial::Replenish::MrDeliveryItem::Edit.call(id) }
       end
+
       r.is do
         r.get do       # SHOW
           check_auth!('replenish', 'read')
@@ -514,6 +515,23 @@ class Framework < Roda
         check_auth!('replenish', 'edit')
         show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::Edit.call(id) }
       end
+
+      r.on 'print_barcode' do # BARCODE
+        r.get do
+          show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(id) }
+        end
+        r.patch do
+          res = interactor.print_sku_barcode(id, params[:mr_delivery_item_batch])
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(id, form_values: params[:mr_delivery_item_batch], form_errors: res.errors) }
+          end
+          # call messerver... KR_PM_SKU, sku, sku, prod variant, batch no...
+          # show_json_notice('Pretend: label has been sent to printer')
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('replenish', 'read')

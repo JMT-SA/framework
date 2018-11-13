@@ -15,18 +15,6 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      # This moves to replenish: batch items
-      r.on 'print_barcode' do # BARCODE
-        r.get do
-          show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(id) } # Must move from Locations views dir...
-        end
-        r.patch do
-          # call messerver... KR_PM_SKU, sku, sku, prod variant, batch no...
-          # Use LD's repo for messerver?
-          show_json_notice('Pretend: label has been sent to printer')
-        end
-      end
-
       r.on 'edit' do   # EDIT
         check_auth!('locations', 'edit')
         show_partial { Masterfiles::Locations::LocationType::Edit.call(id) }

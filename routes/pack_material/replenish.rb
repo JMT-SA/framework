@@ -118,7 +118,6 @@ class Framework < Roda
         end
       end
     end
-
     r.on 'mr_purchase_orders' do
       interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'preselect' do
@@ -299,7 +298,6 @@ class Framework < Roda
         end
       end
     end
-
     r.on 'mr_delivery_terms' do
       interactor = PackMaterialApp::MrDeliveryTermInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
@@ -325,6 +323,7 @@ class Framework < Roda
         end
       end
     end
+
     # MR DELIVERIES
     # --------------------------------------------------------------------------
     r.on 'mr_deliveries', Integer do |id|
@@ -409,7 +408,6 @@ class Framework < Roda
         end
       end
     end
-
     r.on 'mr_deliveries' do
       interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
@@ -442,6 +440,27 @@ class Framework < Roda
         handle_not_found(r)
       end
 
+      r.on 'mr_delivery_item_batches' do
+        interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+        r.on 'new' do    # NEW
+          check_auth!('replenish', 'new')
+          show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItemBatch::New.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = interactor.create_mr_delivery_item_batch(id, params[:mr_delivery_item_batch])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/pack_material/replenish/mr_delivery_items/#{id}/mr_delivery_item_batches/new") do
+              PackMaterial::Replenish::MrDeliveryItemBatch::New.call(id,
+                                                                     form_values: params[:mr_delivery_item_batch],
+                                                                     form_errors: res.errors,
+                                                                     remote: fetch?(r))
+            end
+          end
+        end
+      end
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
         show_partial { PackMaterial::Replenish::MrDeliveryItem::Edit.call(id) }
@@ -463,6 +482,47 @@ class Framework < Roda
           check_auth!('replenish', 'delete')
           res = interactor.delete_mr_delivery_item(id)
           if res.success
+            redirect_to_last_grid(r)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    # MR DELIVERY ITEM BATCHES
+    # --------------------------------------------------------------------------
+    r.on 'mr_delivery_item_batches', Integer do |id|
+      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:mr_delivery_item_batches, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('replenish', 'edit')
+        show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::Edit.call(id) }
+      end
+      r.is do
+        r.get do       # SHOW
+          check_auth!('replenish', 'read')
+          show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mr_delivery_item_batch(id, params[:mr_delivery_item_batch])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItemBatch::Edit.call(id, form_values: params[:mr_delivery_item_batch], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('replenish', 'delete')
+          res = interactor.delete_mr_delivery_item_batch(id)
+          if res.success
+            flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
             show_json_error(res.message, status: 200)

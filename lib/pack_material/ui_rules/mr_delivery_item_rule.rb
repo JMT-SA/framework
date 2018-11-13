@@ -31,10 +31,10 @@ module UiRules
         mr_purchase_order_item_id: { renderer: :hidden },
         mr_product_variant_id: { renderer: :hidden },
         product_variant_code: { renderer: :label, with_value: product_variant_code },
-        quantity_on_note: { renderer: :integer, required: true },
-        quantity_over_supplied: { renderer: :integer },
-        quantity_under_supplied: { renderer: :integer },
-        quantity_received: { renderer: :integer, required: true },
+        quantity_on_note: { renderer: :numeric, required: true },
+        quantity_over_supplied: { renderer: :numeric },
+        quantity_under_supplied: { renderer: :numeric },
+        quantity_received: { renderer: :numeric, required: true },
         invoiced_unit_price: { renderer: :numeric, required: true },
         remarks: {}
       }

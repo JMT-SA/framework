@@ -26,6 +26,14 @@ module PackMaterialApp
 
     crud_calls_for :mr_vat_types, name: :mr_vat_type, wrapper: MrVatType
 
+    build_for_select :mr_cost_types,
+                     label: :cost_code_string,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :cost_code_string
+
+    crud_calls_for :mr_cost_types, name: :mr_cost_type, wrapper: MrCostType
+
     build_for_select :mr_purchase_order_items,
                      label: :mr_product_variant_id,
                      alias: 'raw_mr_purchase_order_items',
@@ -58,6 +66,22 @@ module PackMaterialApp
                      order_by: :remarks
 
     crud_calls_for :mr_delivery_items, name: :mr_delivery_item, wrapper: MrDeliveryItem
+
+    build_for_select :mr_delivery_item_batches,
+                     label: :client_batch_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :client_batch_number
+
+    crud_calls_for :mr_delivery_item_batches, name: :mr_delivery_item_batch, wrapper: MrDeliveryItemBatch
+
+    build_for_select :mr_internal_batch_numbers,
+                     label: :batch_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :batch_number
+
+    crud_calls_for :mr_internal_batch_numbers, name: :mr_internal_batch_number, wrapper: MrInternalBatchNumber
 
     def find_mr_purchase_order_cost(id)
       find_with_association(:mr_purchase_order_costs, id,
@@ -184,6 +208,16 @@ module PackMaterialApp
                                                  args: [:transporter_party_role_id],
                                                  col_name: :transporter }],
                             wrapper: MrDelivery)
+    end
+
+    def find_mr_delivery_item_batch(id)
+      hash = find_with_association(:mr_delivery_item_batches, id,
+                                   parent_tables: [{
+                                     parent_table: :mr_internal_batch_numbers,
+                                     flatten_columns: { batch_number: :internal_batch_number }
+                                   }])
+      hash[:batch_number] = hash[:client_batch_number] || hash[:internal_batch_number]
+      MrDeliveryItemBatch.new(hash)
     end
   end
 end

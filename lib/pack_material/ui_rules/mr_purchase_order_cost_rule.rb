@@ -3,7 +3,6 @@
 module UiRules
   class MrPurchaseOrderCostRule < Base
     def generate_rules
-      @general_repo = MasterfilesApp::GeneralRepo.new
       @repo = PackMaterialApp::ReplenishRepo.new
       make_form_object
       apply_form_values
@@ -16,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields
-      mr_cost_type_id_label = @general_repo.find_mr_cost_type(@form_object.mr_cost_type_id)&.cost_code_string
+      mr_cost_type_id_label = @repo.find_mr_cost_type(@form_object.mr_cost_type_id)&.cost_code_string
       fields[:mr_cost_type_id] = { renderer: :label, with_value: mr_cost_type_id_label, caption: 'Cost Type' }
       fields[:mr_purchase_order_id] = { renderer: :hidden }
       fields[:amount] = { renderer: :label }
@@ -24,7 +23,7 @@ module UiRules
 
     def common_fields
       {
-        mr_cost_type_id: { renderer: :select, options: @general_repo.for_select_mr_cost_types, caption: 'Cost Type' },
+        mr_cost_type_id: { renderer: :select, options: @repo.for_select_mr_cost_types, caption: 'Cost Type' },
         mr_purchase_order_id: { renderer: :hidden },
         amount: { renderer: :numeric }
       }

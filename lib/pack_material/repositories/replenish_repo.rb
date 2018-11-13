@@ -282,7 +282,7 @@ module PackMaterialApp
 
     def sku_for_barcode(id)
       query = <<~SQL
-        SELECT sku_number, pv.product_variant_code, db.quantity_received AS no_of_prints, db.client_batch_number
+        SELECT sku_number, pv.product_variant_code, db.quantity_received AS no_of_prints, batch_number
         FROM public.mr_skus
         join material_resource_product_variants pv ON pv.id = mr_product_variant_id
         JOIN mr_delivery_item_batches db ON db.id = mr_skus.mr_delivery_item_batch_id

@@ -129,37 +129,49 @@ module MesserverApp
 
     def post_print(uri, label_template_name, vars, quantity, printer) # rubocop:disable Metrics/AbcSize
       # <ProductLabel PID="223" Status="true" Printer="PRN-23" LabelTemplateFile="KRM_Carton_Lbl_PL.nsld" Threading="true" RunNumber="2018_AP_18351_11_181A" Code="42DP42"  F0="E2" F1="01100217924066" F2="200004224184" F3="(GDL 10) Golden Delicious"
-      # post_body = []
-      # post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
-      # post_body << "Content-Disposition: form-data; name=\"printer\"\r\n"
-      # post_body << "\r\n#{printer}"
-      # post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
-      # post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
-      # post_body << "Content-Disposition: form-data; name=\"label_template\"\r\n"
-      # post_body << "\r\n#{label_template_name}"
-      # post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
-      # post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
-      # post_body << "Content-Disposition: form-data; name=\"quantity\"\r\n"
-      # post_body << "\r\n#{quantity}"
-      # post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
-      # vars.each do |k, v|
-      #   post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
-      #   post_body << "Content-Disposition: form-data; name=\"#{k}\"\r\n"
-      #   post_body << "\r\n#{v}"
-      #   post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
-      # end
-
-      # <input type="hidden" name="printdata"
-      #               value="printername=PRN-01 & labeltemplate=KRM_Carton_Lbl_PU & labeltype=nsld & quantity=1 & F1=Fred&F2=Piet&F3=Hans" >
-      # f_vars = vars.each_with_index.map { |v, i| "F#{i + 1}=#{v}" }.join('&')
-      f_vars = vars.map { |k, v| "#{k}=#{v}" }.join('&')
-      print_string = "printername=#{printer} & labeltemplate=#{label_template_name} & labeltype=nsld & quantity=#{quantity} & #{f_vars}"
-      p print_string
       post_body = []
       post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
-      post_body << "Content-Disposition: form-data; name=\"printdata\"\r\n"
-      post_body << "\r\n#{print_string}"
+      post_body << "Content-Disposition: form-data; name=\"printername\"\r\n"
+      post_body << "\r\n#{printer}"
       post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
+      post_body << "Content-Disposition: form-data; name=\"labeltype\"\r\n"
+      post_body << "\r\nnsld"
+      post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
+      post_body << "Content-Disposition: form-data; name=\"labeltemplate\"\r\n"
+      post_body << "\r\n#{label_template_name}"
+      post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
+      post_body << "Content-Disposition: form-data; name=\"quantity\"\r\n"
+      post_body << "\r\n#{quantity}"
+      post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      vars.each do |k, v|
+        post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
+        post_body << "Content-Disposition: form-data; name=\"#{k}\"\r\n"
+        post_body << "\r\n#{v}"
+        post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      end
+      post_body << "Content-Disposition: form-data; name=\"eof\"\r\n"
+      post_body << "\r\neof"
+      post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      # p post_body
+
+      # # <input type="hidden" name="printdata"
+      # #               value="printername=PRN-01 & labeltemplate=KRM_Carton_Lbl_PU & labeltype=nsld & quantity=1 & F1=Fred&F2=Piet&F3=Hans" >
+      # # f_vars = vars.each_with_index.map { |v, i| "F#{i + 1}=#{v}" }.join('&')
+      # f_vars = vars.map { |k, v| "#{k}=#{v}" }.join('&')
+      # print_string = "printername=#{printer} & labeltemplate=#{label_template_name} & labeltype=nsld & quantity=#{quantity} & #{f_vars}"
+      # p print_string
+      # post_body = []
+      # post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
+      # post_body << "Content-Disposition: form-data; name=\"printdata\"\r\n"
+      # post_body << "\r\n#{print_string}"
+      # post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      # post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
+      # post_body << "Content-Disposition: form-data; name=\"eof\"\r\n"
+      # post_body << "\r\neof"
+      # post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
 
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)

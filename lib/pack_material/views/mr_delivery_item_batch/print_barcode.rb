@@ -18,7 +18,7 @@ module PackMaterial
               form.method :update
               form.add_field :sku_number
               form.add_field :product_variant_code
-              form.add_field :client_batch_number
+              form.add_field :batch_number
               form.add_field :printer
               form.add_field :no_of_prints
             end

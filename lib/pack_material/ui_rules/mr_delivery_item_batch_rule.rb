@@ -28,7 +28,7 @@ module UiRules
       printers = [['Label Designer', 'PRN-01']] # @repo.for_select_label_printers # FIXME: hard-coded list...
       fields[:sku_number] = { renderer: :label }
       fields[:product_variant_code] = { renderer: :label }
-      fields[:client_batch_number] = { renderer: :label }
+      fields[:batch_number] = { renderer: :label }
       fields[:printer] = { renderer: :select, options: printers, required: true }
       fields[:no_of_prints] = { renderer: :integer, required: true }
     end

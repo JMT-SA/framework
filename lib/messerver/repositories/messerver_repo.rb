@@ -185,6 +185,7 @@ module MesserverApp
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.')
     rescue StandardError => e
+      # return success_response(200, OpenStruct.new(body: 'sommer something')) if e.message.include?('Connection reset by peer') # FIXME: kludge for demo...
       failed_response("There was an error: #{e.message}")
     end
 

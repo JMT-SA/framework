@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields
       start_page_program_function_id_label = @repo.find(:program_functions, SecurityApp::ProgramFunction, @form_object.start_page_program_function_id)&.program_function_name
       fields[:ip_address] = { renderer: :label }
-      fields[:start_page_program_function_id] = { renderer: :label, with_value: start_page_program_function_id_label, caption: 'Start Page Program Function' }
+      fields[:start_page_program_function_id] = { renderer: :label, with_value: start_page_program_function_id_label, caption: 'Start Page' }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:scan_with_camera] = { renderer: :label, as_boolean: true }
     end
@@ -26,7 +26,7 @@ module UiRules
       @menu_repo = SecurityApp::MenuRepo.new
       {
         ip_address: { pattern: :ipv4_address, required: true },
-        start_page_program_function_id: { renderer: :select, options: SecurityApp::MenuRepo.new.program_functions_for_rmd_select, caption: 'start_page_program_function' },
+        start_page_program_function_id: { renderer: :select, options: SecurityApp::MenuRepo.new.program_functions_for_rmd_select, caption: 'Start Page', prompt: true },
         active: { renderer: :checkbox },
         scan_with_camera: { renderer: :checkbox }
       }

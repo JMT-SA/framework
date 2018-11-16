@@ -16,7 +16,8 @@
   = pack_material_products.id) as has_variants\r\nFROM \"pack_material_products\"\r\nLEFT
   JOIN \"commodities\" ON \"commodities\".\"id\" = \"pack_material_products\".\"commodity_id\"\r\nJOIN
   \"material_resource_sub_types\" ON \"material_resource_sub_types\".\"id\" =\r\n\"pack_material_products\".\"material_resource_sub_type_id\"\r\nLEFT
-  JOIN \"marketing_varieties\" ON \"marketing_varieties\".\"id\" = \"pack_material_products\".\"marketing_variety_id\""
+  JOIN \"marketing_varieties\" ON \"marketing_varieties\".\"id\" = \"pack_material_products\".\"marketing_variety_id\"
+  ORDER BY \"pack_material_products\".\"product_code\""
 :limit:
 :offset:
 :external_settings: {}

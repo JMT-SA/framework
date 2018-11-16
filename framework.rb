@@ -117,6 +117,20 @@ class Framework < Roda
     # Do the same as XML?
     # --------------------------------------------
 
+    r.on 'test_jasper' do
+      res = CreateJasperReport.call(report_name: 'test_framework',
+                                    user: current_user.login_name,
+                                    file: 'testj_rpt',
+                                    params: { invoice_id: 1,
+                                              invoice_type: 'CUSTOMER',
+                                              keep_file: true })
+      if res.success
+        %(Report printed: <a href="#{res.instance}">#{res.instance}</a>)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
     # OVERRIDE RodAuth's Login form:
     r.get 'login' do
       if @registered_mobile_device

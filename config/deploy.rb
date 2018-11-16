@@ -30,7 +30,7 @@ append :linked_files, 'public/js/ag-enterprise-activation.js', '.env.local', 'co
 
 # Default value for linked_dirs is []
 # append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system'
-append :linked_dirs, 'log', 'tmp', 'public/assets', 'public/tempfiles', 'vendor/bundle', 'prepared_reports'
+append :linked_dirs, 'log', 'tmp', 'public/assets', 'public/tempfiles', 'public/downloads/jasper', 'vendor/bundle', 'prepared_reports'
 
 # Default value for default_env is {}
 # set :default_env, { path: '/opt/ruby/bin:$PATH' }

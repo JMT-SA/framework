@@ -36,7 +36,8 @@
   = \"pack_material_product_variants\".\"id\"\r\n                                            AND
   \"material_resource_product_variants\".\"id\" IN (select id\r\n                                                                                          from
   \"material_resource_product_variants\"\r\n                                                                                          where
-  product_variant_table_name = 'pack_material_product_variants')\r\n"
+  product_variant_table_name = 'pack_material_product_variants')\r\n
+  ORDER BY \"material_resource_sub_types\".\"short_code\", \"pack_material_product_variants\".\"product_variant_code\""
 :limit: 
 :offset: 
 :external_settings:

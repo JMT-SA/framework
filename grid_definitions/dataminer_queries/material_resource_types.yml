@@ -6,6 +6,7 @@
   "material_resource_types"."short_code", "material_resource_types"."description",
   "material_resource_domains"."domain_name" FROM "material_resource_types" JOIN "material_resource_domains"
   ON "material_resource_domains"."id" = "material_resource_types"."material_resource_domain_id"
+  ORDER BY "material_resource_domains"."domain_name", "material_resource_types".type_name
 :limit:
 :offset:
 :external_settings: {}

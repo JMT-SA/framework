@@ -9,7 +9,8 @@
   \"material_resource_sub_types\".\"product_code_ids\",\r\n  \"material_resource_sub_types\".\"material_resource_type_id\",\r\n
   \ exists(select id from pack_material_products\r\n  where material_resource_sub_type_id
   = material_resource_sub_types.id) as has_products\r\nFROM \"material_resource_sub_types\"\r\nJOIN
-  \"material_resource_types\" ON \"material_resource_types\".\"id\" =\r\n\"material_resource_sub_types\".\"material_resource_type_id\""
+  \"material_resource_types\" ON \"material_resource_types\".\"id\" =\r\n\"material_resource_sub_types\".\"material_resource_type_id\"\r\nORDER
+  BY \"material_resource_types\".\"type_name\" ASC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -253,6 +254,6 @@
   :data_type: :string
   :control_type: :text
   :default_value: 
-  :ordered_list: 
+  :ordered_list: false
   :ui_priority: 1
   :list_def: 

@@ -44,6 +44,7 @@ The following special environment variables are available when running the app:
 * How to link:/developer_documentation/how_to_work_with_document_sequence_numbers.adoc[work with document sequence numbers].
 * How to link:/developer_documentation/how_to_set_up_implementation_owner.adoc[set up the implementation owner].
 * How to link:/developer_documentation/how_to_log_status_and_changes.adoc[log status and data changes] (Audit).
+* How to link:/developer_documentation/how_to_produce_a_jasper_report.adoc[produce a jasper report].
 * How to disable/enable a field based on the value of another field.
 * How to layout a multi-column form.
 * How to layout a page to include a form and a grid.

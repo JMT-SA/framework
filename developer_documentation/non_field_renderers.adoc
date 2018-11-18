@@ -61,6 +61,11 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |`String` or `true`/`false`. If `true` or `Y`, prompt will be "Are you sure?" -- otherwise the prompt will be the provided string.
 |n/a
 
+|options - :loading_window
+|Load the link in a new window that shows a loading animation while waiting for the action to return a new url.
+|`true` or `false`.
+|n/a
+
 |===
 
 === Text

@@ -136,6 +136,14 @@
       if (event.target.dataset && event.target.dataset.brieflyDisableWith) {
         preventMultipleSubmitsBriefly(event.target);
       }
+      // Open the href in a new window and show a loading animation.
+      if (event.target.dataset && event.target.dataset.loadingWindow) {
+        event.stopPropagation();
+        event.preventDefault();
+        crossbeamsLocalStorage.setItem('load_in_new_window', event.target.href);
+        window.open('/loading_window', '_blank', 'menubar=no,toolbar=no,top=100,left=100,width=800,height=800');
+      }
+
       // Prompt for confirmation
       if (event.target.dataset && event.target.dataset.prompt) {
         event.stopPropagation();

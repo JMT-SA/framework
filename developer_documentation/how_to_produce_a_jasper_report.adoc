@@ -12,14 +12,47 @@ At installation there are two environment variables that need to be set up: `JAS
 * `JASPER_REPORTING_ENGINE_PATH` is a fully qualified path that points to the directory where the `JasperReportPrinter.jar` is installed.
 * `JASPER_REPORTS_PATH` is a fully qualified path that points to the directory containing the designed jasper report files.
 
-=== Generating a report
+=== UI link to load report in a new window
 
+To load the report in a new window, the link must include `data-loading-window="true"`.
+
+e.g.
 [source, ruby]
 ----
-CreateJasperReport.call(report_name: 'abc',
-                        user: current_user.login_name,
-                        file: output_file_name_to_be_saved_without_extension_or_path,
-                        params: hash_of_report_parameters)
+page.section do |section|
+  section.add_control(control_type: :link,
+                      text: 'Load Jasper report',
+                      url: '/render_jasper',
+                      loading_window: true,
+                      style: :button)
+end
+----
+
+=== Generating a report
+
+Use the `CreateJasperReport` service to create a pdf report.
+The service returns a success/failure response object. A successful response has the name of the generated file as the instance value for `GENERATE` mode, or nil for `PRINT` mode..
+
+NOTE: To show a pdf in a loading window, return a JSON hash with the key `location` and the value set to the generated file.
+[source, ruby]
+----
+# Interactor:
+def create_report
+  CreateJasperReport.call(report_name: 'abc',
+                          user: current_user.login_name,
+                          file: output_file_name_to_be_saved_without_extension_or_path,
+                          params: hash_of_report_parameters)
+end
+
+# Route
+res = interactor.create_report
+
+if res.success
+  # show_json_notice('Sent to printer') # For PRINT MODE
+  { location: res.instance }.to_json
+else
+  show_error(res.message, fetch?(r))
+end
 ----
 
 If params includes `keep_file: true`, the script that runs the report will be saved in the tmp dir below the root.

@@ -117,7 +117,22 @@ class Framework < Roda
     # Do the same as XML?
     # --------------------------------------------
 
+    r.on 'loading_window' do
+      view(inline: 'Loading...', layout: 'layout_loading')
+    end
+
     r.on 'test_jasper' do
+      @layout = Crossbeams::Layout::Page.build do |page, _|
+        page.section do |section|
+          section.add_text('Test a Jasper report', wrapper: :h2)
+          section.add_control(control_type: :link, text: 'Load Jasper report', url: '/render_jasper_test', loading_window: true, style: :button)
+        end
+      end
+      view('crossbeams_layout_page')
+    end
+
+    r.on 'render_jasper_test' do
+      sleep 5
       res = CreateJasperReport.call(report_name: 'test_framework',
                                     user: current_user.login_name,
                                     file: 'testj_rpt',
@@ -125,7 +140,8 @@ class Framework < Roda
                                               invoice_type: 'CUSTOMER',
                                               keep_file: true })
       if res.success
-        %(Report printed: <a href="#{res.instance}">#{res.instance}</a>)
+        # show_json_notice('Sent to printer')
+        { location: res.instance }.to_json
       else
         show_error(res.message, fetch?(r))
       end

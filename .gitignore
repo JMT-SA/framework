@@ -16,7 +16,7 @@
 lib/applets/.sass-cache/
 public/assets/*.*
 public/downloads/jasper/*.*
-# public/js/ag-enterprise-activation.js
+public/js/ag-enterprise-activation.js
 # public/js/ag-grid-*.*
 # public/js/jackbox*.*
 # public/css/jackbox*.*

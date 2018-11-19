@@ -334,24 +334,10 @@ const crossbeamsGridEvents = {
         colKeys.push(col.colId);
       }
     });
-    // for (i = 0, len = visibleCols.length; i < len; i++) {
-    //   if (visibleCols[i].colDef.suppressCsvExport &&
-    //   visibleCols[i].colDef.suppressCsvExport === true) {
-    //   } else {
-    //     colKeys.push(visibleCols[i].colId);
-    //   }
-    // }
 
     params = {
       fileName,
       columnKeys: colKeys, // Visible, non-suppressed columns.
-      // skipHeader: true,
-      // skipFooters: true,
-      // skipGroups: true,
-      // allColumns: true,
-      // suppressQuotes: true,
-      // onlySelected: true,
-      // columnSeparator: ';'
     };
 
     // Ensure long numbers are exported as strings.
@@ -1079,6 +1065,26 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     let treeConfig = {};
     const grid = document.getElementById(gridId);
 
+    const sideBar = {
+      toolPanels: [
+        {
+          id: 'columns',
+          labelDefault: 'Columns',
+          labelKey: 'columns',
+          iconKey: 'columns',
+          toolPanel: 'agColumnsToolPanel',
+        },
+        {
+          id: 'filters',
+          labelDefault: 'Filters',
+          labelKey: 'filters',
+          iconKey: 'filter',
+          toolPanel: 'agFiltersToolPanel',
+        },
+      ],
+      // defaultToolPanel: 'columns',
+    };
+
     forPrint = grid.dataset.gridPrint;
     multisel = grid.dataset.gridMulti;
     tree = grid.dataset.gridTree !== undefined;
@@ -1095,7 +1101,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         enableSorting: true,
         enableFilter: true,
         enableRangeSelection: true,
-        enableStatusBar: true,
+        // enableStatusBar: true,
+        sideBar,
         suppressAggFuncInHeader: true,
         isFullWidthCell: function isFullWidthCell(rowNode) {
           return rowNode.level === 1;
@@ -1135,7 +1142,16 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         enableFilter: true,
         rowSelection: 'single',
         enableRangeSelection: true,
-        enableStatusBar: true,
+        // enableStatusBar: true,
+        statusBar: {
+          statusPanels: [
+            { statusPanel: 'agTotalRowCountComponent', align: 'left' },
+            { statusPanel: 'agFilteredRowCountComponent' },
+            { statusPanel: 'agSelectedRowCountComponent' },
+            { statusPanel: 'agAggregationComponent' },
+          ],
+        },
+        sideBar,
         suppressAggFuncInHeader: true,
         getRowClass(params) {
           if (params.data) {
@@ -1176,7 +1192,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
 
     if (forPrint) {
       gridOptions.forPrint = true;
-      gridOptions.enableStatusBar = false;
+      // gridOptions.enableStatusBar = false;
     }
 
     if (tree) {

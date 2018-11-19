@@ -132,7 +132,6 @@ class Framework < Roda
     end
 
     r.on 'render_jasper_test' do
-      sleep 5
       res = CreateJasperReport.call(report_name: 'test_framework',
                                     user: current_user.login_name,
                                     file: 'testj_rpt',

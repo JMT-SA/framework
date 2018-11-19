@@ -1,6 +1,5 @@
 module ErrorHelpers
-  # For a JSON response, set the content-type header and an instance var.
-  # The instance var is used in the error handler plugin.
+  # For a JSON response, set the content-type header.
   # @return [void]
   def return_json_response
     response['Content-Type'] = 'application/json'

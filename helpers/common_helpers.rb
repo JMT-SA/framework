@@ -215,6 +215,22 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
+  # Return a JSON response to change the window location to a new URL.
+  #
+  # Optionally provide a log_url to log to console.
+  # - this is useful if urlA builds a report and then the window location
+  # is changed to display the output file. The console can be checked to see
+  # which url did the work when debugging.
+  #
+  # @param new_location [string] - the new url.
+  # @param log_url [string] - the url to log in the console.
+  # @return [JSON] a JSON response.
+  def change_window_location_via_json(new_location, log_url = nil)
+    res = { location: new_location }
+    res[:log_url] = log_url unless log_url.nil?
+    res.to_json
+  end
+
   def make_id_correct_type(id_in)
     if id_in.is_a?(String)
       id_in.scan(/\D/).empty? ? id_in.to_i : id_in

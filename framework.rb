@@ -141,7 +141,7 @@ class Framework < Roda
                                               keep_file: true })
       if res.success
         # show_json_notice('Sent to printer')
-        { location: res.instance }.to_json
+        change_window_location_via_json(res.instance, request.path)
       else
         show_error(res.message, fetch?(r))
       end

@@ -123,6 +123,9 @@
         .then((data) => {
           if (data.location) {
             window.location = data.location;
+            if (data.log_url) {
+              console.info('URL loaded by this window:', data.log_url);
+            }
           } else {
             if (data.flash.notice) {
               document.getElementById('container').innerHTML = `<div class="crossbeams-info-note"><p>${data.flash.notice}</p></div>`;

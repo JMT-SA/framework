@@ -141,9 +141,15 @@
         event.stopPropagation();
         event.preventDefault();
         crossbeamsLocalStorage.setItem('load_in_new_window', event.target.href);
-        window.open('/loading_window', '_blank', 'menubar=no,toolbar=no,top=100,left=100,width=800,height=800');
+        const windowReturn = window.open('/loading_window', '_blank', 'titlebar=no,location=no,status');
+        if (windowReturn === null) {
+          crossbeamsUtils.alert({
+            prompt: 'Perhaps the browser is blocking popup windows and you just need to change the setting.',
+            title: 'The window did not seem to load',
+            type: 'warning',
+          });
+        }
       }
-
       // Prompt for confirmation
       if (event.target.dataset && event.target.dataset.prompt) {
         event.stopPropagation();
@@ -151,7 +157,7 @@
         crossbeamsUtils.confirm({
           prompt: event.target.dataset.prompt,
           okFunc: () => {
-            console.log('to call HREF', event.target.href); // TODO: is this a fetch/std call?
+            // console.log('to call HREF', event.target.href); // TODO: is this a fetch/std call?
             // SHOULD actually be a POST, not a GET?
             window.location = event.target.href;
           },

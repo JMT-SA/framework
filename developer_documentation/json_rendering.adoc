@@ -21,6 +21,13 @@ Replaces the current dialog's content with the response from `url`.
 
     load_via_json(url, notice: nil)
 
+==== Change the contents of a window by loading another URL
+
+Replaces the current window's content with the response from `url`.
+This should be used in the response to a link loaded in a "loading_window" (see Link: `loading_window` option).
+
+    change_window_location_via_json(new_location, log_url = nil)
+
 ==== Redirect to the last grid
 
 This uses a redirect to load the page that rendered the last grid.

@@ -1065,6 +1065,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     let treeConfig = {};
     const grid = document.getElementById(gridId);
 
+    const frame = document.getElementById(`${gridId}-frame`);
     const sideBar = {
       toolPanels: [
         {
@@ -1074,16 +1075,18 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           iconKey: 'columns',
           toolPanel: 'agColumnsToolPanel',
         },
-        {
-          id: 'filters',
-          labelDefault: 'Filters',
-          labelKey: 'filters',
-          iconKey: 'filter',
-          toolPanel: 'agFiltersToolPanel',
-        },
       ],
-      // defaultToolPanel: 'columns',
     };
+
+    if ((parseInt(frame.style.height, 10) || '100') > 10) {
+      sideBar.toolPanels.push({
+        id: 'filters',
+        labelDefault: 'Filters',
+        labelKey: 'filters',
+        iconKey: 'filter',
+        toolPanel: 'agFiltersToolPanel',
+      });
+    }
 
     forPrint = grid.dataset.gridPrint;
     multisel = grid.dataset.gridMulti;
@@ -1145,9 +1148,9 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         // enableStatusBar: true,
         statusBar: {
           statusPanels: [
-            { statusPanel: 'agTotalRowCountComponent', align: 'left' },
-            { statusPanel: 'agFilteredRowCountComponent' },
-            { statusPanel: 'agSelectedRowCountComponent' },
+            // { statusPanel: 'agTotalRowCountComponent', align: 'left' },
+            // { statusPanel: 'agFilteredRowCountComponent' }, - these two include group rows.
+            // { statusPanel: 'agSelectedRowCountComponent' },
             { statusPanel: 'agAggregationComponent' },
           ],
         },

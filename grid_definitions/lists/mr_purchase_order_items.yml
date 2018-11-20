@@ -1,5 +1,12 @@
 ---
 :dataminer_definition: mr_purchase_order_items
+:calculated_columns:
+  - :name: total_price
+    :caption: Total price
+    :data_type: :number
+    :format: :delimited_1000
+    :expression: quantity_required * unit_price
+    :position: 9
 :actions:
 #- :url: "/pack_material/replenish/mr_purchase_order_items/$:id$"
 #  :text: view

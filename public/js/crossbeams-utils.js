@@ -256,6 +256,23 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Load a URL in a new browser window with a "Loading" animation.
+   * @param {string} url - the URL to load.
+   * @returns {void}
+   */
+  loadingWindow: function loadingWindow(url) {
+    crossbeamsLocalStorage.setItem('load_in_new_window', url);
+    const windowReturn = window.open('/loading_window', '_blank', 'titlebar=no,location=no,status');
+    if (windowReturn === null) {
+      crossbeamsUtils.alert({
+        prompt: 'Perhaps the browser is blocking popup windows and you just need to change the setting.',
+        title: 'The window did not seem to load',
+        type: 'warning',
+      });
+    }
+  },
+
+  /**
    * Take selected options from a multiselect and return them in a sequence
    * that matches an array of selected ids.
    * @param {node} sel - a select DOM node;

@@ -75,6 +75,10 @@ e.g.:
 * sort: sort
 * restrict: lock-closed
 
+|:loading_window
+|`true` or `false`
+|If `true`, the link will be opened in a new window which displays a loading animation until the url returns anything. Used especially for previewing Japser report pdf files.
+
 |:popup
 |`true` or `false`
 |If `true`, the link will be opened in a popup dialog. If `false` or not present, the link will open in a new page.

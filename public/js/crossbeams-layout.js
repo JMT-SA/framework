@@ -140,15 +140,7 @@
       if (event.target.dataset && event.target.dataset.loadingWindow) {
         event.stopPropagation();
         event.preventDefault();
-        crossbeamsLocalStorage.setItem('load_in_new_window', event.target.href);
-        const windowReturn = window.open('/loading_window', '_blank', 'titlebar=no,location=no,status');
-        if (windowReturn === null) {
-          crossbeamsUtils.alert({
-            prompt: 'Perhaps the browser is blocking popup windows and you just need to change the setting.',
-            title: 'The window did not seem to load',
-            type: 'warning',
-          });
-        }
+        crossbeamsUtils.loadingWindow(event.target.href);
       }
       // Prompt for confirmation
       if (event.target.dataset && event.target.dataset.prompt) {

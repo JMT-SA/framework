@@ -549,6 +549,7 @@ const crossbeamsGridFormatters = {
       title_field: titleValue,
       icon: item.icon,
       popup: item.popup,
+      loading_window: item.loading_window,
     };
   },
 
@@ -1294,6 +1295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             is_separator: item.is_separator,
             is_submenu: item.is_submenu,
             popup: item.popup,
+            loading_window: item.loading_window,
             domGridId: gridId,
           };
           if (item.is_submenu) {
@@ -1311,6 +1313,8 @@ document.addEventListener('DOMContentLoaded', () => {
               if (item.popup) {
                 crossbeamsUtils.recordGridIdForPopup(item.domGridId);
                 crossbeamsUtils.popupDialog(item.title_field, item.url);
+              } else if (item.loading_window) {
+                crossbeamsUtils.loadingWindow(item.url);
               } else {
                 window.location = item.url;
               }

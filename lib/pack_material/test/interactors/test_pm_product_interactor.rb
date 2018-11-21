@@ -237,6 +237,9 @@ module PackMaterialApp
         grade
         language
         other
+        analysis_code
+        season_year_use
+        party
       ].each do |key|
         x = interactor.send(:validate_pm_product_params, test_attrs.reject { |k| k == key })
         assert_empty x.errors
@@ -298,6 +301,9 @@ module PackMaterialApp
         grade
         language
         other
+        analysis_code
+        season_year_use
+        party
       ].each do |key|
         x = interactor.send(:validate_clone_pm_product_params, test_attrs.reject { |k| k == key })
         assert_empty x.errors
@@ -380,6 +386,10 @@ module PackMaterialApp
         grade
         language
         other
+        analysis_code
+        season_year_use
+        party
+        specification_reference
       ].each do |key|
         x = interactor.send(:validate_pm_product_variant_params, test_attrs.reject { |k| k == key })
         assert_empty x.errors
@@ -424,6 +434,10 @@ module PackMaterialApp
         grade
         language
         other
+        analysis_code
+        season_year_use
+        party
+        specification_reference
       ].each do |key|
         x = interactor.send(:validate_clone_pm_product_variant_params, test_attrs.reject { |k| k == key })
         assert_empty x.errors
@@ -485,7 +499,10 @@ module PackMaterialApp
         shape: 'shape',
         style: 'style',
         unit: 'unit',
-        marketing_variety_id: 1
+        marketing_variety_id: 1,
+        analysis_code: 'analysis_code',
+        season_year_use: 'season_year_use',
+        party: 'party'
       }
     end
 
@@ -526,7 +543,11 @@ module PackMaterialApp
         shape: 'shape',
         style: 'style',
         unit: 'unit',
-        marketing_variety_id: 1
+        marketing_variety_id: 1,
+        analysis_code: 'analysis_code',
+        season_year_use: 'season_year_use',
+        party: 'party',
+        specification_reference: 'specification_reference'
       }
     end
 

@@ -26,6 +26,8 @@ module PackMaterial
               set.each do |item|
                 form.add_field item
               end
+
+              form.add_field :specification_reference
               # form.add_field :unit
               # form.add_field :style
               # form.add_field :alternate

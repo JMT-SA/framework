@@ -19,6 +19,8 @@
   \"pack_material_product_variants\".\"marking\",\r\n  \"pack_material_product_variants\".\"model\",
   \"pack_material_product_variants\".\"pm_class\" as class,\r\n  \"pack_material_product_variants\".\"grade\",
   \"pack_material_product_variants\".\"language\",\r\n  \"pack_material_product_variants\".\"other\",\r\n
+  \"pack_material_product_variants\".\"analysis_code\",\r\n  \"pack_material_product_variants\".\"season_year_use\",\r\n
+  \"pack_material_product_variants\".\"party\",\r\n  \"pack_material_product_variants\".\"specification_reference\",\r\n
   \ \"pack_material_product_variants\".\"created_at\",\r\n  \"pack_material_product_variants\".\"updated_at\",\r\n
   \ \"material_resource_product_variants\".\"id\" AS mr_id,\r\n  \"material_resource_product_variants\".\"product_variant_id\",\r\n
   \ \"material_resource_product_variants\".\"product_variant_table_name\",\r\n  \"material_resource_product_variants\".\"product_variant_number\"
@@ -568,9 +570,69 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  analysis_code:
+    :name: analysis_code
+    :sequence_no: 36
+    :caption: Analysis code
+    :namespaced_name: pack_material_products.analysis_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_year_use:
+    :name: season_year_use
+    :sequence_no: 37
+    :caption: Season year use
+    :namespaced_name: pack_material_products.season_year_use
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party:
+    :name: party
+    :sequence_no: 38
+    :caption: Party
+    :namespaced_name: pack_material_products.party
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  specification_reference:
+    :name: specification_reference
+    :sequence_no: 39
+    :caption: Specification Ref
+    :namespaced_name: pack_material_products.specification_reference
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 36
+    :sequence_no: 40
     :caption: Created at
     :namespaced_name: pack_material_product_variants.created_at
     :data_type: :string
@@ -585,7 +647,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 37
+    :sequence_no: 41
     :caption: Updated at
     :namespaced_name: pack_material_product_variants.updated_at
     :data_type: :string
@@ -600,7 +662,7 @@
     :group_max: false
   mr_id:
     :name: mr_id
-    :sequence_no: 38
+    :sequence_no: 42
     :caption: MR Variant id
     :namespaced_name: material_resource_product_variants.id
     :data_type: :string
@@ -615,7 +677,7 @@
     :group_max: false
   product_variant_id:
     :name: product_variant_id
-    :sequence_no: 39
+    :sequence_no: 43
     :caption: Product variant
     :namespaced_name: material_resource_product_variants.product_variant_id
     :data_type: :string
@@ -630,7 +692,7 @@
     :group_max: false
   product_variant_table_name:
     :name: product_variant_table_name
-    :sequence_no: 40
+    :sequence_no: 44
     :caption: Product variant table name
     :namespaced_name: material_resource_product_variants.product_variant_table_name
     :data_type: :string
@@ -645,7 +707,7 @@
     :group_max: false
   mr_product_variant_number:
     :name: mr_product_variant_number
-    :sequence_no: 41
+    :sequence_no: 45
     :caption: Mr product variant number
     :namespaced_name: material_resource_product_variants.product_variant_number
     :data_type: :string
@@ -660,7 +722,7 @@
     :group_max: false
   minimum_stock_level:
     :name: minimum_stock_level
-    :sequence_no: 42
+    :sequence_no: 46
     :caption: Minimum stock level
     :namespaced_name: material_resource_product_variants.minimum_stock_level
     :data_type: :string
@@ -675,7 +737,7 @@
     :group_max: false
   old_product_code:
     :name: old_product_code
-    :sequence_no: 43
+    :sequence_no: 47
     :caption: Old product code
     :namespaced_name: material_resource_product_variants.old_product_code
     :data_type: :string
@@ -690,7 +752,7 @@
     :group_max: false
   re_order_stock_level:
     :name: re_order_stock_level
-    :sequence_no: 44
+    :sequence_no: 48
     :caption: Re order stock level
     :namespaced_name: material_resource_product_variants.re_order_stock_level
     :data_type: :string
@@ -705,7 +767,7 @@
     :group_max: false
   supplier_lead_time:
     :name: supplier_lead_time
-    :sequence_no: 45
+    :sequence_no: 49
     :caption: Supplier lead time
     :namespaced_name: material_resource_product_variants.supplier_lead_time
     :data_type: :string
@@ -720,7 +782,7 @@
     :group_max: false
   mr_created_at:
     :name: mr_created_at
-    :sequence_no: 46
+    :sequence_no: 50
     :caption: Mr created at
     :namespaced_name: material_resource_product_variants.created_at
     :data_type: :string
@@ -735,7 +797,7 @@
     :group_max: false
   mr_updated_at:
     :name: mr_updated_at
-    :sequence_no: 47
+    :sequence_no: 51
     :caption: Mr updated at
     :namespaced_name: material_resource_product_variants.updated_at
     :data_type: :string

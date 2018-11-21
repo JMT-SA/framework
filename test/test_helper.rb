@@ -12,6 +12,7 @@ Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
 require './config/environment'
 
+require './config/app_const'
 require './lib/types_for_dry'
 require './lib/crossbeams_responses'
 require './lib/document_sequence'

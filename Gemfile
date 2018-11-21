@@ -16,7 +16,7 @@ gem 'rouge'
 gem 'rubocop'
 gem 'sass'
 gem 'sequel'
-gem 'sequel_pg'
+gem 'sequel_pg', require: false
 gem 'sequel_postgresql_triggers'
 gem 'thin'
 gem 'tilt'

@@ -27,7 +27,7 @@ const startScanner = function startScanner() {
     logit('Connection Closed...');
   };
 
-  webSocket.onerror = function onerror() {
+  webSocket.onerror = function onerror(event) {
     logit('Connection ERROR', event);
   };
 

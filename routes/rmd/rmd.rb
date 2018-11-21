@@ -112,7 +112,7 @@ class Framework < Roda
     def submit_section
       <<~HTML
         <p>
-          <input type="submit" value="#{button_caption}" class="dim br2 pa3 bn white bg-green">
+          <input type="submit" value="#{button_caption}" class="dim br2 pa3 bn white bg-green" data-rmd-btn="Y">
         </p>
       HTML
     end

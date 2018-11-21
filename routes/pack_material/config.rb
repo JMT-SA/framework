@@ -275,7 +275,7 @@ class Framework < Roda
           res = interactor.create_pm_product_variant(id, params[:pm_product_variant])
           if res.success
             flash[:notice] = res.message
-            redirect_via_json('/list/pack_material_product_variants')
+            redirect_to_last_grid(r)
           else
             re_show_form(r, res, url: "/pack_material/config/pack_material_products/#{id}/pack_material_product_variants/new") do
               PackMaterial::Config::PmProductVariant::New.call(id,

@@ -107,4 +107,5 @@ namespace :deploy do
     invoke 'migrate'
     invoke 'precompile'
   end
+  # TODO: if there is a job Que, restart it!
 end

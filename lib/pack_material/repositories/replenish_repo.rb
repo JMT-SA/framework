@@ -220,64 +220,54 @@ module PackMaterialApp
       MrDeliveryItemBatch.new(hash)
     end
 
-    def verify_mr_delivery(id) # rubocop:disable Metrics/AbcSize
-      item_ids = DB[:mr_delivery_items].where(mr_delivery_id: id).select_map(:id).sort
-      batch_item_ids = DB[:mr_delivery_item_batches].select_map(:mr_delivery_item_id).uniq.sort
-      if item_ids == batch_item_ids
-        delivery = DB[:mr_deliveries].where(id: id)
-        delivery.update(verified: true)
-        log_status('mr_deliveries', id, 'VERIFIED')
-        # SKUInventoryTransactions.new.create_skus(id)
-        success_response("Verified delivery #{delivery.select(:delivery_number).single_value}")
-      else
-        failed_response('Failed to verify the delivery, please ensure batch numbers for all delivery items.')
-      end
+    def verify_mr_delivery(id)
+      update(:mr_deliveries, id, verified: true)
     end
 
     def mr_delivery_items(mr_delivery_id)
       DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:id)
     end
 
-    def mr_delivery_has_items_without_batches(mr_delivery_id)
-      item_ids = mr_delivery_items(mr_delivery_id)
-      batch_item_id_count = DB[:mr_delivery_item_batches].distinct.where(mr_delivery_item_id: item_ids).count
-      item_ids.count != batch_item_id_count
+    def delivery_has_items_without_batches(mr_delivery_id)
+      DB['SELECT id FROM mr_delivery_items WHERE NOT EXISTS(
+            SELECT id FROM mr_delivery_item_batches WHERE mr_delivery_item_id = mr_delivery_items.id
+      ) AND mr_delivery_items.mr_delivery_id = ?', mr_delivery_id].all
     end
 
-    def create_skus_for_delivery(delivery_id) # rubocop:disable Metrics/AbcSize
-      query = <<~SQL
-        SELECT  mr_delivery_item_batches.id,
-                mr_delivery_item_batches.mr_internal_batch_number_id,
-                mr_internal_batch_numbers.batch_number,
-                mr_delivery_item_batches.client_batch_number,
-                mr_delivery_item_batches.quantity_received,
-                mr_purchase_order_items.mr_product_variant_id,
-                mr_delivery_terms.is_consignment_stock,
-                mr_purchase_orders.supplier_party_role_id
-        FROM mr_delivery_item_batches
-          JOIN mr_internal_batch_numbers ON mr_delivery_item_batches.mr_internal_batch_number_id = mr_internal_batch_numbers.id
-          JOIN mr_delivery_items ON mr_delivery_item_batches.mr_delivery_item_id = mr_delivery_items.id
-          JOIN mr_purchase_order_items ON mr_delivery_items.mr_purchase_order_item_id = mr_purchase_order_items.id
-          JOIN mr_purchase_orders ON mr_purchase_order_items.mr_purchase_order_id = mr_purchase_orders.id
-          JOIN mr_delivery_terms ON mr_purchase_orders.mr_delivery_term_id = mr_delivery_terms.id
-        WHERE mr_delivery_items.mr_delivery_id = ?
-      SQL
-      records = DB[query, delivery_id].all
-      sku_ids = []
-      records.each do |r|
-        party_repo = MasterfilesApp::PartyRepo.new
-        owner_party_role_id = r[:is_consignment_stock] ? r[:supplier_party_role_id] : party_repo.implementation_owner_party_role.id
-        sku_ids << DB[:mr_skus].insert(
-          mr_product_variant_id: r[:mr_product_variant_id],
-          owner_party_role_id: owner_party_role_id,
-          mr_delivery_item_batch_id: r[:id],
-          batch_number: r[:mr_internal_batch_number_id] ? r[:batch_number] : r[:client_batch_number],
-          is_consignment_stock: r[:is_consignment_stock],
-          initial_quantity: r[:quantity_received]
-        )
+    def delivery_item_batches(mr_delivery_item_id)
+      where(:mr_delivery_item_batches, MrDeliveryItemBatch, mr_delivery_item_id: mr_delivery_item_id)
+    end
+
+    def delivery_items_fulfilled(mr_delivery_id)
+      item_quantities(mr_delivery_id) == batch_quantities(mr_delivery_id)
+    end
+
+    def item_quantities(mr_delivery_id)
+      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:quantity_received).sum
+    end
+
+    def batch_quantities(mr_delivery_id)
+      item_ids = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:id)
+      DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_ids).select_map(:quantity_received).sum
+    end
+
+    def delete_mr_delivery_item(mr_delivery_item_id)
+      DB[:mr_delivery_item_batches].where(mr_delivery_item_id: mr_delivery_item_id).delete
+      delete(:mr_delivery_items, mr_delivery_item_id)
+    end
+
+    def find_or_create_sku_location_ids(sku_ids, to_location_id)
+      result = []
+      sku_ids.each do |sku_id|
+        sku_location_id = DB[:mr_sku_locations].where(location_id: to_location_id, mr_sku_id: sku_id).select(:id).single_value
+        sku_location_id ||= create(:mr_sku_locations, location_id: to_location_id, mr_sku_id: sku_id)
+
+        find_hash(:mr_skus, sku_id)
+        DB[:mr_sku_locations].update(:quantity, Sequel.function(sum, :quantity))
+
+        result << { sku_id: sku_id, sku_location_id: sku_location_id }
       end
-      log_status('mr_deliveries', delivery_id, 'SKUS_CREATED')
-      sku_ids
+      result
     end
 
     def sku_for_barcode(id)

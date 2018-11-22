@@ -38,8 +38,8 @@ module UiRules
         mr_delivery_item_id: { renderer: :hidden },
         mr_internal_batch_number_id: { renderer: :select, options: @repo.for_select_mr_internal_batch_numbers, caption: 'Internal Batch Number', prompt: true },
         client_batch_number: {},
-        quantity_on_note: { renderer: :hidden },
-        quantity_received: { renderer: :hidden }
+        quantity_on_note: { renderer: :numeric, required: true },
+        quantity_received: { renderer: :numeric, required: true }
       }
     end
 

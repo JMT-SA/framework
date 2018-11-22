@@ -5,7 +5,8 @@ Dir["#{root_dir}/pack_material/entities/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/interactors/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/jobs/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/repositories/*.rb"].each { |f| require f }
-# Dir["#{root_dir}/pack_material/services/*.rb"].each { |f| require f }
+Dir["#{root_dir}/pack_material/services/*.rb"].each { |f| require f }
+Dir["#{root_dir}/pack_material/task_permission_checks/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/ui_rules/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/validations/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/views/**/*.rb"].each { |f| require f }

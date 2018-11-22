@@ -12,5 +12,6 @@ module PackMaterialApp
     attribute :delivery_number, Types::Integer
     attribute :vehicle_registration, Types::String
     attribute :supplier_invoice_ref_number, Types::String
+    attribute :verified, Types::Bool
   end
 end

@@ -338,7 +338,7 @@ Sequel.migration do
       foreign_key :mr_sku_id, :mr_skus, key: [:id]
       foreign_key :location_id, :locations, key: [:id]
 
-      BigDecimal :quantity, size: [7, 2]
+      BigDecimal :quantity, size: [7, 2], default: 0
 
       index [:mr_sku_id, :location_id], name: :fki_mr_sku_locations, unique: true
     end
@@ -441,7 +441,6 @@ Sequel.migration do
     drop_trigger(:mr_sku_locations, :audit_trigger_stm)
     drop_table(:mr_sku_locations)
 
-    run 'DROP SEQUENCE doc_seqs_sku_number;'
     drop_trigger(:mr_skus, :audit_trigger_row)
     drop_trigger(:mr_skus, :audit_trigger_stm)
     drop_trigger(:mr_skus, :set_created_at)
@@ -449,6 +448,7 @@ Sequel.migration do
     drop_trigger(:mr_skus, :set_updated_at)
     drop_function(:mr_skus_set_updated_at)
     drop_table(:mr_skus)
+    run 'DROP SEQUENCE doc_seqs_sku_number;'
 
     drop_trigger(:mr_delivery_item_batches, :audit_trigger_row)
     drop_trigger(:mr_delivery_item_batches, :audit_trigger_stm)
@@ -480,15 +480,6 @@ Sequel.migration do
     drop_table(:mr_inventory_transactions)
     drop_table(:mr_inventory_transaction_types)
 
-    # drop_trigger(:user_defined_batches, :audit_trigger_row)
-    # drop_trigger(:user_defined_batches, :audit_trigger_stm)
-    # drop_trigger(:user_defined_batches, :set_created_at)
-    # drop_function(:user_defined_batches_set_created_at)
-    # drop_trigger(:user_defined_batches, :set_updated_at)
-    # drop_function(:user_defined_batches_set_updated_at)
-    # drop_table(:user_defined_batches)
-
-    run 'DROP SEQUENCE doc_seqs_mr_batch_number;'
     drop_trigger(:mr_internal_batch_numbers, :audit_trigger_row)
     drop_trigger(:mr_internal_batch_numbers, :audit_trigger_stm)
     drop_trigger(:mr_internal_batch_numbers, :set_created_at)
@@ -496,6 +487,7 @@ Sequel.migration do
     drop_trigger(:mr_internal_batch_numbers, :set_updated_at)
     drop_function(:mr_internal_batch_numbers_set_updated_at)
     drop_table(:mr_internal_batch_numbers)
+    run 'DROP SEQUENCE doc_seqs_mr_batch_number;'
 
     drop_trigger(:mr_purchase_order_items, :audit_trigger_row)
     drop_trigger(:mr_purchase_order_items, :audit_trigger_stm)
@@ -509,7 +501,6 @@ Sequel.migration do
     drop_trigger(:mr_purchase_order_costs, :audit_trigger_stm)
     drop_table(:mr_purchase_order_costs)
 
-    run 'DROP SEQUENCE doc_seqs_po_number;'
     drop_trigger(:mr_purchase_orders, :audit_trigger_row)
     drop_trigger(:mr_purchase_orders, :audit_trigger_stm)
     drop_trigger(:mr_purchase_orders, :set_created_at)
@@ -517,6 +508,7 @@ Sequel.migration do
     drop_trigger(:mr_purchase_orders, :set_updated_at)
     drop_function(:mr_purchase_orders_set_updated_at)
     drop_table(:mr_purchase_orders)
+    run 'DROP SEQUENCE doc_seqs_po_number;'
 
     drop_table(:mr_cost_types)
     drop_table(:mr_delivery_terms)

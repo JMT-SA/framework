@@ -19,6 +19,11 @@
       :is_delete: true
       :popup: true
       :hide_if_true: verified
+    - :url: /development/statuses/show/mr_deliveries/$:delivery_id$
+      :text: status
+      :icon: information-solid
+      :title: Status
+      :popup: true
 - :submenu:
     :text: Delivery Header
     :items:
@@ -71,7 +76,7 @@
       :title: New Delivery Item Batch
       :popup: true
       :hide_if_true: verified
-      :hide_if_present: id
+      :hide_if_null: delivery_item_id
     - :url: "/pack_material/replenish/mr_delivery_item_batches/$:id$"
       :text: view
       :icon: view-show

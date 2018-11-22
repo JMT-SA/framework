@@ -40,13 +40,20 @@ module PackMaterialApp
       success_response("Updated delivery #{instance.delivery_number}", instance)
     end
 
-    def verify_mr_delivery(id)
-      res = nil
-      repo.transaction do
-        res = repo.verify_mr_delivery(id)
-        log_transaction
+    def verify_mr_delivery(id) # rubocop:disable Metrics/AbcSize
+      can_verify = TaskPermissionCheck::MrDelivery.call(:verify, id)
+      if can_verify.success
+        repo.transaction do
+          repo.verify_mr_delivery(id)
+          log_transaction
+          log_status('mr_deliveries', id, 'VERIFIED')
+          PackMaterialApp::CreateSKUS.call(id)
+          instance = mr_delivery(id)
+          success_response("Verified delivery #{instance.delivery_number}", instance)
+        end
+      else
+        failed_response(can_verify.message)
       end
-      res
     end
 
     def delete_mr_delivery(id)

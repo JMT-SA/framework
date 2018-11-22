@@ -6,4 +6,8 @@ class BaseService
       new(*args).call
     end
   end
+
+  def all_ok
+    success_response 'Permission ok'
+  end
 end

@@ -45,3 +45,6 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Pack Material')),
          'Deliveries', '/list/mr_deliveries', 2);
+
+INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('CREATE STOCK');
+INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('DELIVERIES');

@@ -3,43 +3,7 @@
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
 
-require 'bundler'
-Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
-
-require 'base64'
-require 'pstore'
-require './config/app_const'
-require './lib/types_for_dry'
-require './lib/crossbeams_responses'
-require './lib/base_repo'
-require './lib/base_repo_association_finder'
-require './lib/base_interactor'
-require './lib/base_service'
-require './lib/base_step'
-require './lib/document_sequence'
-require './lib/local_store' # Will only work for processes running from one dir.
-require './lib/ui_rules'
-require './lib/library_versions'
-require './lib/dataminer_connections'
-Dir['./helpers/**/*.rb'].each { |f| require f }
-Dir['./lib/applets/*.rb'].each { |f| require f }
-
-ENV['ROOT'] = File.dirname(__FILE__)
-ENV['VERSION'] = File.read('VERSION')
-ENV['GRID_QUERIES_LOCATION'] ||= File.expand_path('grid_definitions/dataminer_queries', __dir__)
-
-DM_CONNECTIONS = DataminerConnections.new
-
-module Crossbeams
-  class FrameworkError < StandardError
-  end
-
-  class AuthorizationError < StandardError
-  end
-
-  class TaskNotPermittedError < StandardError
-  end
-end
+require './app_loader'
 
 class Framework < Roda
   include CommonHelpers
@@ -97,7 +61,7 @@ class Framework < Roda
     r.assets unless ENV['RACK_ENV'] == 'production'
     r.public
 
-    p request.ip
+    ### p request.ip
     # Routes that must work without authentication
     # --------------------------------------------
     r.on 'webquery', String do |id|
@@ -234,25 +198,27 @@ class Framework < Roda
     end
 
     r.is 'test' do
-      # Need to design a "query-able version of this query (join locn + tree so user can select type, ancestor etc...
-      qry = <<~SQL
-        SELECT
-        (SELECT array_agg(cc.location_code) as path
-         FROM (SELECT c.location_code
-         FROM location_tests AS c
-         JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
-         WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_array,
-        (SELECT string_agg(cc.location_code, ',') as path
-         FROM (SELECT c.location_code
-         FROM location_tests AS c
-         JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
-         WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_string,
-        l.location_code, l.location_type, l.has_single_container, l.is_virtual,
-        (SELECT MAX(path_length) FROM location_tree_paths WHERE descendant_location_id = l.id) + 1 AS level
-        FROM location_tests l
-      SQL
-      @rows = DB[qry].all.to_json
-      view('test_view')
+      # # Need to design a "query-able version of this query (join locn + tree so user can select type, ancestor etc...
+      # qry = <<~SQL
+      #   SELECT
+      #   (SELECT array_agg(cc.location_code) as path
+      #    FROM (SELECT c.location_code
+      #    FROM location_tests AS c
+      #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
+      #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_array,
+      #   (SELECT string_agg(cc.location_code, ',') as path
+      #    FROM (SELECT c.location_code
+      #    FROM location_tests AS c
+      #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
+      #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_string,
+      #   l.location_code, l.location_type, l.has_single_container, l.is_virtual,
+      #   (SELECT MAX(path_length) FROM location_tree_paths WHERE descendant_location_id = l.id) + 1 AS level
+      #   FROM location_tests l
+      # SQL
+      # @rows = DB[qry].all.to_json
+      # view('test_view')
+      res = PackMaterialApp::TestJob.enqueue(current_user.id, time: Time.now)
+      view(inline: "Added job: #{res.inspect}<p>Que stats: #{Que.job_stats.inspect}</p>")
     end
 
     r.is 'logout' do

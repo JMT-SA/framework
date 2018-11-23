@@ -573,6 +573,20 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Build a query string from an object of data
+   * (c) 2018 Chris Ferdinandi, MIT License, https://gomakethings.com
+   * @param  {Object} data The data to turn into a query string
+   * @return {String}      The query string
+   */
+  buildQueryString: function buildQueryString(data) {
+    if (typeof (data) === 'string') return data;
+    const query = [];
+    Object.keys(data).forEach((key) => {
+      query.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+    });
+    return query.join('&');
+  },
+  /**
    * Creates a url for observeChange behaviour.
    * @param {element} select - Select that has changed.
    * @param {string} option - the option of the DOM select that has become selected.
@@ -580,16 +594,16 @@ const crossbeamsUtils = {
    */
   buildObserveChangeUrl: function buildObserveChangeUrl(element, option) {
     const optVal = option ? option.value : '';
-    let queryParam = `?changed_value=${optVal}`;
+    const queryParam = { changed_value: optVal };
     element.param_keys.forEach((key) => {
       let val = element.param_values[key];
       if (val === undefined) {
         const e = document.getElementById(key);
         val = e.value;
       }
-      queryParam += `&${key}=${val}`;
+      queryParam[key] = val;
     });
-    return `${element.url}${queryParam}`;
+    return `${element.url}?${crossbeamsUtils.buildQueryString(queryParam)}`;
   },
 
   /**

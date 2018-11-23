@@ -1,0 +1,88 @@
+= Jobs
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Jobs
+
+The framework uses the link:https://github.com/chanks/que[Que] gem to manage a job queue in postgres.
+
+Jobs are ruby files that live in the `jobs` dir under an applet's dir.
+
+The queue name for an app instalation is stored in the environment variable `QUEUE_NAME`.
+
+=== Description
+
+E.g. `lib/pack_material/jobs/test_job.rb`
+[source,ruby]
+----
+# frozen_string_literal: true
+
+module PackMaterialApp           # <1>
+  class TestJob < BaseQueJob     # <2>
+    def single_instance_job      # <3>
+      'jobone'
+    end
+
+    def run(user_id, time:)      # <4>
+      repo = DevelopmentApp::UserRepo.new
+      user = repo.find_user(user_id)
+
+      repo.transaction do        # <5>
+        File.open('atest.txt', 'a') do |f|
+          f << "\nUser: #{user.login_name} : #{time}"
+        end
+        finish                   # <6>
+      end
+    end
+  end
+end
+----
+<1> Part of an applet module.
+<2> Must inherit from `BaseQueJob`.
+<3> Optional method -- see below.
+<4> Here is where the actual work is coded. Method params are defined according to the job's needs.
+<5> Any database updates/inserts **must** take place in a transaction which must be kept as _short_ as possible.
+<6> Required: call `finish` or `destroy` here. `destroy` will remove the job's history. This must be inside the transaction.
+
+=== Single instance jobs
+
+These are jobs that must run on their own. For example a `PS` stock EDI in transformation. If two PS jobs ran at the same time, you could end up with the earlier PS finishng after thlater one and both change the same pallet. The earlier one could "reset" data on a pallet.
+
+If you define a job as a `single instance`, at start it will write a lock file (in `tmp/job_locks`) which will be deleted at the end.
+At start it will also set a retry for 30 seconds if the lock file exists.
+
+=== Adding a job to the queue
+
+Jobs should be added to the queue within a transaction (so that if other work fails and the transaction rolls back, the job will also be removed from the queue.
+[source,ruby]
+----
+repo.transcation do
+  repo.create_the_thing(params)
+  PackMaterialApp::TestJob.enqueue(current_user.id, time: Time.now)
+end
+----
+
+Note that if another app uses the same database, it can enque a job to be run by this app by using a String to refer to the job instead of the actual class:
+[source,ruby]
+----
+repo.transcation do
+  repo.create_the_thing(params)
+  Que.enqueue current_user.id, time: Time.now, job_class: 'PackMaterialApp::TestJob', queue: 'packmat'
+end
+----
+
+=== Running the Que CLI process
+
+Run this in the root:
+[source,bash]
+----
+RACK_ENV=production bundle exec que -q packmat ./app_loader.rb
+----
+`que` is the commandline app.
+
+`-q packmat` tells it to dish out work from the `packmat` queue.
+
+`./app_loader.rb` is the file that loads the app wihout the webapp routing.
+
+Run `bundle exec que -h` to see what other options are available.

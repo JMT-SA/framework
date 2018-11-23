@@ -1,4 +1,5 @@
 require 'dotenv'
+require 'que'
 
 if ENV.fetch('RACK_ENV') == 'test'
   Dotenv.load('.env.test', '.env')
@@ -22,3 +23,13 @@ DB.extension :pg_array
 DB.extension :pg_json
 DB.extension :pg_hstore
 DB.extension :pg_inet
+
+Que.connection = DB
+Que.job_middleware.push(
+  ->(job, &block) {
+    job.lock_single_instance
+    block.call
+    job.clear_single_instance
+    nil # Doesn't matter what's returned.
+  }
+)

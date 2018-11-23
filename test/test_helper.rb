@@ -7,26 +7,9 @@ require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
 require 'minitest/rg'
 
-require 'bundler'
-Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
-
-require './config/environment'
-
-require './config/app_const'
-require './lib/types_for_dry'
-require './lib/crossbeams_responses'
-require './lib/document_sequence'
-require './lib/base_repo'
-require './lib/base_repo_association_finder'
+require './app_loader'
 
 root_dir = File.expand_path('../..', __FILE__)
-
-Dir["#{root_dir}/helpers/**/*.rb"].each { |f| require f }
-require './lib/base_service'
-require './lib/base_interactor'
-require './lib/ui_rules'
-
-Dir["#{root_dir}/lib/applets/*.rb"].each { |f| require f }
 
 # Database seeds - called in `around_all` hook of MiniTestWithHooks
 # Each seed file must reopen the MiniTestSeeds module.

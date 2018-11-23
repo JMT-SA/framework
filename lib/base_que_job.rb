@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class BaseQueJob < Que::Job
+  self.queue = AppConst::QUEUE_NAME
+
   Que.error_notifier = proc do |error, job|
     # Hand off to mailer...
-    p ">>> ERROR FOR JOB #{job[:id]}"
+    p ">>> ERROR FOR JOB #{job}"
     p error.message
 
     # Do whatever you want with the error object or job row here. Note that the
@@ -52,5 +54,32 @@ class BaseQueJob < Que::Job
       # # This is fine, don't bother logging at all.
       # false
     end
+  end
+
+  # For some jobs, it is crucial that instances follow one another
+  # and they do not run in parallel with themselves.
+  # They can run in parallel with other jobs, though.
+  #
+  # To make a job run "one-at-a-time", override this method and return
+  # a string to be used as the lock file.
+  def single_instance_job
+    nil
+  end
+
+  def lock_file
+    @lock_file ||= File.join(ENV['ROOT'], 'tmp', 'job_locks', ".#{single_instance_job}.lck")
+  end
+
+  # Before a job executes, check if onother instance of the same job is busy.
+  def lock_single_instance
+    return if single_instance_job.nil?
+    retry_in(30) if File.exist?(lock_file)
+    FileUtils.touch(lock_file)
+  end
+
+  # After a job executes, remove the lock file if it exists.
+  def clear_single_instance
+    return if single_instance_job.nil?
+    File.delete(lock_file) if File.exist?(lock_file)
   end
 end

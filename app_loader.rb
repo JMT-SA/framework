@@ -49,3 +49,6 @@ module Crossbeams
   class TaskNotPermittedError < StandardError
   end
 end
+
+# Ensure the locks dir exists for Que jobs
+FileUtils.mkdir_p(File.join(__dir__, 'tmp', 'job_locks'))

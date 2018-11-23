@@ -29,6 +29,7 @@ The following special environment variables are available when running the app:
 * link:/developer_documentation/json_rendering.adoc[JSON rendering]
 * link:/developer_documentation/icons.adoc[Icons]
 * link:/developer_documentation/utility_functions.adoc[Utility functions]
+* link:/developer_documentation/jobs.adoc[Jobs (Que)]
 
 === Tutorials
 

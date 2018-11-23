@@ -2,6 +2,10 @@
 
 module PackMaterialApp
   class TestJob < BaseQueJob
+    # def single_instance_job
+    #   'jobone'
+    # end
+
     def run(user_id, time:)
       repo = DevelopmentApp::UserRepo.new
       user = repo.find_user(user_id)

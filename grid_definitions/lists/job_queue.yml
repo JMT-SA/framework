@@ -1,0 +1,14 @@
+---
+:dataminer_definition: que_jobs
+:actions:
+- :url: "/development/logging/que_jobs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/development/logging/que_jobs/status"
+  :text: Job Queue Status
+  :style: :button
+  :behaviour: :popup

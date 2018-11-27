@@ -29,6 +29,10 @@ module PackMaterialApp
     optional(:grade, Types::StrippedString).maybe(:str?)
     optional(:language, Types::StrippedString).maybe(:str?)
     optional(:other, Types::StrippedString).maybe(:str?)
+    optional(:analysis_code, Types::StrippedString).maybe(:str?)
+    optional(:season_year_use, Types::StrippedString).maybe(:str?)
+    optional(:party, Types::StrippedString).maybe(:str?)
+    optional(:specification_reference, Types::StrippedString).maybe(:str?)
   end
 
   ClonePmProductVariantSchema = Dry::Validation.Params do
@@ -57,6 +61,10 @@ module PackMaterialApp
     optional(:grade, Types::StrippedString).maybe(:str?)
     optional(:language, Types::StrippedString).maybe(:str?)
     optional(:other, Types::StrippedString).maybe(:str?)
+    optional(:analysis_code, Types::StrippedString).maybe(:str?)
+    optional(:season_year_use, Types::StrippedString).maybe(:str?)
+    optional(:party, Types::StrippedString).maybe(:str?)
+    optional(:specification_reference, Types::StrippedString).maybe(:str?)
   end
 
   CompletedPmProductVariantSchema = Dry::Validation.Params do

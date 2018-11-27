@@ -49,6 +49,9 @@ module UiRules
       fields[:grade] = { renderer: :label }
       fields[:language] = { renderer: :label }
       fields[:other] = { renderer: :label }
+      fields[:analysis_code] = { renderer: :label }
+      fields[:season_year_use] = { renderer: :label }
+      fields[:party] = { renderer: :label }
     end
 
     def preselect_fields
@@ -117,6 +120,9 @@ module UiRules
                                     grade: nil,
                                     language: nil,
                                     other: nil,
+                                    analysis_code: nil,
+                                    season_year_use: nil,
+                                    party: nil,
                                     reference_dimension: nil)
     end
 

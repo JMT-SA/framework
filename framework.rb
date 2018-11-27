@@ -217,8 +217,18 @@ class Framework < Roda
       # SQL
       # @rows = DB[qry].all.to_json
       # view('test_view')
-      res = PackMaterialApp::TestJob.enqueue(current_user.id, time: Time.now)
+      # res = PackMaterialApp::TestJob.enqueue(current_user.id, time: Time.now)
+      # res = DevelopmentApp::SendMailJob.enqueue(from: 'jamessil@telkomsa.net', to: 'james@nosoft.biz', subject: 'Test mail job', body: "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames", cc: 'jamesmelanie@telkomsa.net')
+      res = DevelopmentApp::SendMailJob.enqueue(to: 'james@nosoft.biz', subject: 'Test mail job', body: "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames", cc: 'jamesmelanie@telkomsa.net')
       view(inline: "Added job: #{res.inspect}<p>Que stats: #{Que.job_stats.inspect}</p>")
+      # mail = Mail.new do
+      #   from    'jamessil@telkomsa.net'
+      #   to      'james@nosoft.biz'
+      #   subject 'Test Mail from framework'
+      #   body    "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames"
+      # end
+      # res = mail.deliver
+      # view(inline: "Sent mail?: #{res}")
     end
 
     r.is 'logout' do

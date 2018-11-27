@@ -6,7 +6,7 @@
 # TCPServer:
 #   ruby tcp_serv.rb
 # Que CLI job server:
-#   bundle exec que ./app_loader.rb
+#   bundle exec que -q packmat ./app_loader.rb
 
 ENV['RACK_ENV'] ||= 'development'
 require 'bundler'
@@ -17,6 +17,7 @@ require_relative 'config/environment'
 require 'base64'
 require 'pstore'
 require './config/app_const'
+require './config/mail_settings'
 require './lib/types_for_dry'
 require './lib/crossbeams_responses'
 require './lib/base_que_job'

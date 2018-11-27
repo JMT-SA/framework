@@ -21,4 +21,7 @@ class AppConst
 
   # Que
   QUEUE_NAME = ENV.fetch('QUEUE_NAME', 'default')
+
+  # Mail
+  SYSTEM_MAIL_SENDER = ENV.fetch('SYSTEM_MAIL_SENDER')
 end

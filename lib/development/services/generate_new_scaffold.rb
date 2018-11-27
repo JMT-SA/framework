@@ -1336,6 +1336,7 @@ class GenerateNewScaffold < BaseService
         root_dir = File.expand_path('..', __dir__)
         Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].each { |f| require f }
+        # Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }
         # Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
         Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }

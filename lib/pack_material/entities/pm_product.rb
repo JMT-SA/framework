@@ -29,5 +29,8 @@ module PackMaterialApp
     attribute :grade, Types::String
     attribute :language, Types::String
     attribute :other, Types::String
+    attribute :analysis_code, Types::String
+    attribute :season_year_use, Types::String
+    attribute :party, Types::String
   end
 end

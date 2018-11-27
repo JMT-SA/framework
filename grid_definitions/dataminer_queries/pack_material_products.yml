@@ -10,6 +10,7 @@
   \"pack_material_products\".\"reference_number\",\r\n\"pack_material_products\".\"market\",
   \"pack_material_products\".\"marking\", \"pack_material_products\".\"model\",\r\n\"pack_material_products\".\"pm_class\",
   \"pack_material_products\".\"grade\", \"pack_material_products\".\"language\",\r\n\"pack_material_products\".\"other\",
+  \"pack_material_products\".\"analysis_code\", \"pack_material_products\".\"season_year_use\",\r\n\"pack_material_products\".\"party\",
   \"pack_material_products\".\"created_at\",\r\n\"pack_material_products\".\"updated_at\",
   \"commodities\".\"code\", \"material_resource_sub_types\".\"sub_type_name\",\r\n\"marketing_varieties\".\"marketing_variety_code\",
   exists(select id from pack_material_product_variants\r\nwhere pack_material_product_id
@@ -427,9 +428,54 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  analysis_code:
+    :name: analysis_code
+    :sequence_no: 30
+    :caption: Analysis code
+    :namespaced_name: pack_material_products.analysis_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_year_use:
+    :name: season_year_use
+    :sequence_no: 31
+    :caption: Season year use
+    :namespaced_name: pack_material_products.season_year_use
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party:
+    :name: party
+    :sequence_no: 32
+    :caption: Party
+    :namespaced_name: pack_material_products.party
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 30
+    :sequence_no: 33
     :caption: Created at
     :namespaced_name: pack_material_products.created_at
     :data_type: :datetime
@@ -444,7 +490,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 31
+    :sequence_no: 34
     :caption: Updated at
     :namespaced_name: pack_material_products.updated_at
     :data_type: :datetime
@@ -474,7 +520,7 @@
     :group_max: false
   sub_type_name:
     :name: sub_type_name
-    :sequence_no: 32
+    :sequence_no: 35
     :caption: Sub type name
     :namespaced_name: material_resource_sub_types.sub_type_name
     :data_type: :string
@@ -504,7 +550,7 @@
     :group_max: false
   has_variants:
     :name: has_variants
-    :sequence_no: 33
+    :sequence_no: 36
     :caption: Has variants
     :namespaced_name:
     :data_type: :string

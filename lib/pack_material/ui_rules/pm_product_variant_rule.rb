@@ -49,6 +49,10 @@ module UiRules
       fields[:grade] = { renderer: :label }
       fields[:language] = { renderer: :label }
       fields[:other] = { renderer: :label }
+      fields[:analysis_code] = { renderer: :label }
+      fields[:season_year_use] = { renderer: :label }
+      fields[:party] = { renderer: :label }
+      fields[:specification_reference] = { renderer: :label }
     end
 
     def common_fields
@@ -56,7 +60,8 @@ module UiRules
       x = {
         pack_material_product: { renderer: :label, with_value: pm_product_id_label, caption: 'Product', readonly: true },
         pack_material_product_id: { renderer: :hidden, with_value: product_id },
-        product_variant_number: {}
+        product_variant_number: {},
+        specification_reference: {}
       }
 
       product_column_set.each do |col_name|
@@ -123,6 +128,10 @@ module UiRules
                                     pm_class: nil,
                                     grade: nil,
                                     language: nil,
+                                    analysis_code: nil,
+                                    season_year_use: nil,
+                                    party: nil,
+                                    specification_reference: nil,
                                     other: nil)
     end
   end

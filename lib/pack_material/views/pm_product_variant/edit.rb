@@ -27,6 +27,8 @@ module PackMaterial
               set.each do |item|
                 form.add_field item
               end
+
+              form.add_field :specification_reference
             end
           end
 

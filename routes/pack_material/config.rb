@@ -329,6 +329,9 @@ class Framework < Roda
               style
               unit
               marketing_variety_id
+              analysis_code
+              season_year_use
+              party
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -442,6 +445,10 @@ class Framework < Roda
               grade
               language
               other
+              analysis_code
+              season_year_use
+              party
+              specification_reference
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

@@ -7,7 +7,29 @@ require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
 require 'minitest/rg'
 
+require 'dotenv'
+Dotenv.load('.env.local', '.env')
+
 require './app_loader'
+
+# Re-define Que::Job so it can be used for testing.
+module Que
+  class Job
+    attr_reader :enqueued, :job
+    def initialize
+      @enqueued = nil
+    end
+
+    def enqueue(*args)
+      @job = self.class
+      @enqueued = args
+    end
+
+    def finish; end
+
+    def destroy; end
+  end
+end
 
 root_dir = File.expand_path('../..', __FILE__)
 

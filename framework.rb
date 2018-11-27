@@ -219,7 +219,12 @@ class Framework < Roda
       # view('test_view')
       # res = PackMaterialApp::TestJob.enqueue(current_user.id, time: Time.now)
       # res = DevelopmentApp::SendMailJob.enqueue(from: 'jamessil@telkomsa.net', to: 'james@nosoft.biz', subject: 'Test mail job', body: "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames", cc: 'jamesmelanie@telkomsa.net')
-      res = DevelopmentApp::SendMailJob.enqueue(to: 'james@nosoft.biz', subject: 'Test mail job', body: "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames", cc: 'jamesmelanie@telkomsa.net')
+      res = DevelopmentApp::SendMailJob.enqueue(to: 'james@nosoft.biz',
+                                                subject: 'Test mail job',
+                                                body: "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames",
+                                                cc: 'jamesmelanie@telkomsa.net',
+                                                attachments: [{ path: '/home/james/ra/crossbeams/framework/CHANGELOG.md' },
+                                                              { filename: 'some_text.txt', content: File.read('tcp_serv.rb') }])
       view(inline: "Added job: #{res.inspect}<p>Que stats: #{Que.job_stats.inspect}</p>")
       # mail = Mail.new do
       #   from    'jamessil@telkomsa.net'

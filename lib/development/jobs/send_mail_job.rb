@@ -2,20 +2,55 @@
 
 module DevelopmentApp
   class SendMailJob < BaseQueJob
-    # from, to, cc, subj, body, attachments: [{ file: xxx, name: xxx, mime: xx}, {...}]
-    # def run(from: ENV['SYSTEM_MAIL_FROM'], to:, subject:, body:, options: {})
-    def run(options = {})
+    def run(options = {}) # rubocop:disable Metrics/AbcSize
       mail = Mail.new do
-        from    options.fetch(:from, ENV['SYSTEM_MAIL_SENDER'])
+        from    options.fetch(:from, AppConst::SYSTEM_MAIL_SENDER)
         to      options.fetch(:to)
         subject options.fetch(:subject)
         body    options.fetch(:body)
       end
+
       mail['cc'] = options[:cc] if options[:cc]
-      # ...and attachments
-      # add_file '/full/path/to/somefile.png'
+
+      # Validate and add attachments
+      (options[:attachments] || []).each do |rule|
+        assert_attachment_ok!(rule)
+        if rule[:path]
+          mail.add_file(rule[:path])
+          next
+        end
+
+        next unless rule[:filename]
+        config = { filename: rule[:filename], content: rule[:content] }
+        config[:mime_type] = rule[:mime_type] if rule[:mime_type]
+        mail.add_file(config)
+      end
+
       mail.deliver!
       finish
+    end
+
+    private
+
+    def assert_attachment_ok!(rule)
+      keys = rule.keys.dup
+      if keys.include?(:path)
+        check_path!(keys)
+      else
+        check_filename!(keys)
+      end
+    end
+
+    def check_path!(keys)
+      _ = keys.delete(:path)
+      raise ArgumentError, 'Mail attachment with file path cannot include other options' unless keys.empty?
+    end
+
+    def check_filename!(keys)
+      keys.each do |key|
+        raise ArgumentError, "Mail attachment has invalid option: #{key}" unless %i[filename content mime_type].include?(key)
+      end
+      raise ArgumentError, 'Mail attachment must have filename and content options' unless keys.include?(:filename) && keys.include?(:content)
     end
   end
 end

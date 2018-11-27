@@ -7,6 +7,8 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- Job queues using Que gem.
+- Send email using the `Mail` gem. `config/mail_settings.rb` must be set up and a default sender address must be set up in the `.env.local` file for `SYSTEM_MAIL_SENDER`.
 ### Changed
 - Roda::DataGrid update to the way list grids are defined (using Crossbeams::DataGrid::ListGridDefinition instead of calling layout's grid renderer).
 - All fetch requests expect JSON responses. This mostly affects dialog-building responses which were returning HTML text. All `return_json_response` calls replaced by one in the main route.

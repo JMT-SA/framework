@@ -1,0 +1,55 @@
+= How to send a basic email
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to send a basic email
+
+The `DevelopmentApp::SendMailJob` job is geared up to send plain text emails. The sender defaults to `AppConst::SYSTEM_MAIL_SENDER`, and `cc` and `attachments` are optional.
+
+=== Config
+
+Config for all emailing is in `config/mail_settings.rb`. There is a file named `config/mail_settings.rb.example` with some commented-out config options. `mail_settings.rb` is not checked into source code management, so the file must be created per installation.
+
+Make sure the logic for `RACK_ENV=test` is in place, and for development you usually want delivery of mails to be logged, not sent out. However the 4th and 5th lines below can be briefly commented out to test sending emails - just be careful not to send emails to "real people"!
+
+e.g.
+[source,ruby,lines]
+----
+Mail.defaults do
+  if ENV['RACK_ENV'] == 'test'
+    delivery_method :test
+  elsif ENV['RACK_ENV'] == 'development'
+    delivery_method :logger
+  else
+    delivery_method :smtp,
+                    address: 'something',
+                    port: 25
+  end
+end
+----
+
+=== Enqueue the email job
+
+Emails should be sent via the job queue so that the process that needs to send the email does not have to wait for a successful send.
+
+From your code (within a transaction if part of a process that modifies the database), enqueue the email:
+[source,ruby]
+----
+DevelopmentApp::SendMailJob.enqueue(to: 'recipient@someplace.com',
+                                    from: 'Abc Jones <abc@def.com>',                      # <1>
+                                    subject: 'Test mail job',
+                                    body: "Hi there\n\nCheck this out.\n\nJoe Soap",
+                                    cc: 'another@someplace.com',                          # <2>
+                                    attachments: [{ path: '/home/user/place/a_file.pdf' },# <3>
+                                                  { filename: 'invoice_costs.xlsx',       # <4>
+                                                    content: File.read('costs.xlsx') }])
+----
+<1> The `from` is not required - it defaults to the `AppConst::SYSTEM_MAIL_SENDER`.
+<2> `cc` is optional.
+<3> An attachment can point to a file on disk.
+<4> An attachment can be provided as `content` with a `filename`. The `mime_type` can be provided, but the `Mail` gem will ususally do a good job of working it out.
+
+NOTE: The `to` and `cc` values can be arrays if there is more than one recipient.
+
+NOTE: All email addresses can include names -- like: `Fred Bloggs <fred@someplace.com>`.

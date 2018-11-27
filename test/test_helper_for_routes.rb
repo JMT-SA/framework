@@ -5,6 +5,9 @@ require 'mocha/minitest'
 require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
 
+require 'dotenv'
+Dotenv.load('.env.local', '.env')
+
 OUTER_APP = Rack::Builder.parse_file('config.ru').first
 
 class RouteTester < Minitest::Test

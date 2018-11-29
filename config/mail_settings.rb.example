@@ -1,6 +1,6 @@
 Mail.defaults do
   if ENV['RACK_ENV'] == 'test'
-    delivery_method :logger
+    delivery_method :test
   elsif ENV['RACK_ENV'] == 'development'
     delivery_method :logger
   else

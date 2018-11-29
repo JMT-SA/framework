@@ -14,5 +14,6 @@ module MasterfilesApp
     attribute :assignment_code, Types::String
     attribute :storage_type_code, Types::String
     attribute :location_type_code, Types::String
+    attribute :legacy_barcode, Types::String
   end
 end

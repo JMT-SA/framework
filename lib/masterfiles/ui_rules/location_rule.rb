@@ -31,6 +31,7 @@ module UiRules
       fields[:primary_assignment_id] = { renderer: :label, with_value: primary_assignment_id_label, caption: 'Primary Assignment' }
       fields[:location_code] = { renderer: :label, caption: 'Code' }
       fields[:location_description] = { renderer: :label, caption: 'Description' }
+      fields[:legacy_barcode] = { renderer: :label }
       fields[:has_single_container] = { renderer: :label, as_boolean: true }
       fields[:virtual_location] = { renderer: :label, as_boolean: true }
       fields[:consumption_area] = { renderer: :label, as_boolean: true }
@@ -53,6 +54,7 @@ module UiRules
         primary_assignment_id: { renderer: :select, options: location_assignments, caption: 'Primary Assignment', required: true },
         location_code: { required: true, caption: 'Code' },
         location_description: { required: true, caption: 'Description' },
+        legacy_barcode: {},
         has_single_container: { renderer: :checkbox },
         virtual_location: { renderer: :checkbox },
         consumption_area: { renderer: :checkbox }
@@ -74,6 +76,7 @@ module UiRules
                                     primary_assignment_id: initial_assignment(parent),
                                     location_code: initial_code(parent),
                                     location_description: nil,
+                                    legacy_barcode: nil,
                                     has_single_container: nil,
                                     virtual_location: nil,
                                     consumption_area: nil)

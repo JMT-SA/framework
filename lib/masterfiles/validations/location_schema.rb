@@ -10,6 +10,7 @@ module MasterfilesApp
     required(:primary_assignment_id, :integer).filled(:int?)
     required(:location_code, Types::StrippedString).filled(:str?)
     required(:location_description, Types::StrippedString).filled(:str?)
+    required(:legacy_barcode, Types::StrippedString).filled(:str?)
     required(:has_single_container, :bool).maybe(:bool?)
     required(:virtual_location, :bool).maybe(:bool?)
     required(:consumption_area, :bool).maybe(:bool?)

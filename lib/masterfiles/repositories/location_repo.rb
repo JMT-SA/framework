@@ -36,7 +36,7 @@ module MasterfilesApp
     crud_calls_for :location_storage_types, name: :location_storage_type, wrapper: LocationStorageType
     crud_calls_for :location_types, name: :location_type, wrapper: LocationType
 
-    def find_location(id) # rubocop:disable Metrics/AbcSize
+    def find_location_by(key, val) # rubocop:disable Metrics/AbcSize
       hash = DB[:locations]
              .join(:location_storage_types, id: :primary_storage_type_id)
              .join(:location_types, id: Sequel[:locations][:location_type_id])
@@ -45,9 +45,21 @@ module MasterfilesApp
                      Sequel[:location_storage_types][:storage_type_code],
                      Sequel[:location_types][:location_type_code],
                      Sequel[:location_assignments][:assignment_code])
-             .where(Sequel[:locations][:id] => id).first
+             .where(Sequel[:locations][key] => val).first
       return nil if hash.nil?
       Location.new(hash)
+    end
+
+    def find_location(id)
+      find_location_by(:id, id)
+    end
+
+    def find_location_by_location_code(code)
+      find_location_by(:location_code, code)
+    end
+
+    def find_location_by_legacy_barcode(barcode)
+      find_location_by(:legacy_barcode, barcode)
     end
 
     def create_root_location(params)

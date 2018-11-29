@@ -14,6 +14,7 @@ module PackMaterialApp
     attribute :shape, Types::String
     attribute :reference_size, Types::String
     attribute :reference_dimension, Types::String
+    attribute :reference_dimension_2, Types::String
     attribute :reference_quantity, Types::String
     attribute :brand_1, Types::String
     attribute :brand_2, Types::String

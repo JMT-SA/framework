@@ -222,6 +222,7 @@ module PackMaterialApp
         shape
         reference_size
         reference_dimension
+        reference_dimension_2
         reference_quantity
         brand_1
         brand_2
@@ -286,6 +287,7 @@ module PackMaterialApp
         shape
         reference_size
         reference_dimension
+        reference_dimension_2
         reference_quantity
         brand_1
         brand_2
@@ -371,6 +373,7 @@ module PackMaterialApp
         shape
         reference_size
         reference_dimension
+        reference_dimension_2
         reference_quantity
         brand_1
         brand_2
@@ -419,6 +422,7 @@ module PackMaterialApp
         shape
         reference_size
         reference_dimension
+        reference_dimension_2
         reference_quantity
         brand_1
         brand_2
@@ -492,6 +496,7 @@ module PackMaterialApp
         product_code: 'product_code',
         product_number: 11_223_333_444,
         reference_dimension: 'reference_dimension',
+        reference_dimension_2: 'reference_dimension_2',
         reference_mass: 'reference_mass',
         reference_number: 'reference_number',
         reference_quantity: 'reference_quantity',
@@ -536,6 +541,7 @@ module PackMaterialApp
         product_code: 'product_code',
         product_variant_number: 11_223_333_444,
         reference_dimension: 'reference_dimension',
+        reference_dimension_2: 'reference_dimension_2',
         reference_mass: 'reference_mass',
         reference_number: 'reference_number',
         reference_quantity: 'reference_quantity',

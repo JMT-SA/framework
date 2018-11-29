@@ -321,6 +321,7 @@ class Framework < Roda
               product_code
               product_number
               reference_dimension
+              reference_dimension_2
               reference_mass
               reference_number
               reference_quantity
@@ -430,6 +431,7 @@ class Framework < Roda
               shape
               reference_size
               reference_dimension
+              reference_dimension_2
               reference_quantity
               brand_1
               brand_2

@@ -195,6 +195,22 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     end
   end
 
+  # Store the referer URL so it can be redirected to using redirect_back later.
+  # The URL is stored in +last_referer_url+ in the session.
+  #
+  # @return [void]
+  def record_last_referer_url
+    session[:last_referer_url] = request.referer
+  end
+
+  # Redirect to the session-stored last_referer_url.
+  #
+  # @param route [Roda::Route] the current route.
+  # @return [void]
+  def redirect_back(route)
+    route.redirect session[:last_referer_url] if session
+  end
+
   def redirect_via_json_to_last_grid
     redirect_via_json(session[:last_grid_url])
   end

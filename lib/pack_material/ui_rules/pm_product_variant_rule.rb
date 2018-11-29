@@ -34,6 +34,7 @@ module UiRules
       fields[:shape] = { renderer: :label }
       fields[:reference_size] = { renderer: :label }
       fields[:reference_dimension] = { renderer: :label }
+      fields[:reference_dimension_2] = { renderer: :label }
       fields[:reference_quantity] = { renderer: :label }
       fields[:brand_1] = { renderer: :label }
       fields[:brand_2] = { renderer: :label }
@@ -114,6 +115,7 @@ module UiRules
                                     shape: nil,
                                     reference_size: nil,
                                     reference_dimension: nil,
+                                    reference_dimension_2: nil,
                                     reference_quantity: nil,
                                     brand_1: nil,
                                     brand_2: nil,

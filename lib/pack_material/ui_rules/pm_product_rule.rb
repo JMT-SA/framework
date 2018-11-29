@@ -34,6 +34,7 @@ module UiRules
       fields[:shape] = { renderer: :label, caption: 'Shape' }
       fields[:reference_size] = { renderer: :label }
       fields[:reference_dimension] = { renderer: :label }
+      fields[:reference_dimension_2] = { renderer: :label }
       fields[:reference_quantity] = { renderer: :label }
       fields[:brand_1] = { renderer: :label }
       fields[:brand_2] = { renderer: :label }
@@ -123,7 +124,8 @@ module UiRules
                                     analysis_code: nil,
                                     season_year_use: nil,
                                     party: nil,
-                                    reference_dimension: nil)
+                                    reference_dimension: nil,
+                                    reference_dimension_2: nil)
     end
 
     def product_column_set

@@ -1,0 +1,22 @@
+doc_seqs_po_number:
+  db_sequence_name: doc_seqs_po_number
+  data_type: :integer
+  table: mr_purchase_orders
+  column: purchase_order_number
+doc_seqs_delivery_number:
+  db_sequence_name: doc_seqs_delivery_number
+  data_type: :integer
+  table: mr_deliveries
+  column: delivery_number
+doc_seqs_sku_number:
+  db_sequence_name: doc_seqs_sku_number
+  data_type: :integer
+  table: mr_skus
+  column: sku_number
+dummy_invoice:
+  db_sequence_name: doc_seqs_inv
+  data_type: :string
+  prefix: INV
+  digit_length: 7
+  table: invoices
+  column: invoice_ref

@@ -58,8 +58,8 @@ module PackMaterialApp
       }
       actual = repo.create_pm_product_variant(attrs)
       assert actual
-      assert repo.exists?(:pack_material_product_variants, id: actual)
-      variant = repo.find_hash(:pack_material_product_variants, actual)
+      assert repo.exists?(:pack_material_product_variants, id: actual.instance)
+      variant = repo.find_hash(:pack_material_product_variants, actual.instance)
       mr_variant = repo.where_hash(:material_resource_product_variants, product_variant_id: variant[:id])
       assert mr_variant
       assert_equal variant[:product_variant_number], mr_variant[:product_variant_number]

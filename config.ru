@@ -1,4 +1,3 @@
-require_relative 'config/environment'
 require './framework.rb'
 
 # EXAMPLE of quick+dirty debug middleware:

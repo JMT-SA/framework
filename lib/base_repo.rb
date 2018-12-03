@@ -133,6 +133,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # Optional keys:
   # columns: Array of Symbols - one for each desired column. If not present, all columns are returned
   # flatten_columns: Hash of Symbol => Symbol - key is the column in the parent and value is the new name to be used on the entity.
+  # foreign_key: Symbol - name of the foreign key in the table that joins to the parent table's id column.
   #
   # examples:
   #     find_with_association(:programs, prog_id, parent_tables: [{ parent_table: :functional_areas, columns: [:functional_area_name] }])
@@ -303,6 +304,19 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
                  comment: comment }
     end
     DB[Sequel[:audit][:status_logs]].multi_insert(items)
+  end
+
+  # Update a row with the next document sequence number.
+  #
+  # Gets DocumentSequence to return the update SQL to run.
+  #
+  # @param document_name [string] the document name (key to document sequence hash)
+  # @param id [integer] the id of the row to be updated.
+  # @return [void]
+  def update_with_document_number(document_name, id)
+    doc_seq = DocumentSequence.new(document_name)
+    # check SQL from DS - is doc non-null????
+    DB[doc_seq.next_sequence_update_sql(id)].update
   end
 
   def self.inherited(klass)

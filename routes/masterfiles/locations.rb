@@ -79,6 +79,21 @@ class Framework < Roda
         check_auth!('locations', 'edit')
         show_partial { Masterfiles::Locations::Location::Edit.call(id) }
       end
+
+      r.on 'print_barcode' do # BARCODE
+        r.get do
+          show_partial { Masterfiles::Locations::Location::PrintBarcode.call(id) }
+        end
+        r.patch do
+          res = interactor.print_location_barcode(id, params[:location])
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Locations::Location::PrintBarcode.call(id, form_values: params[:location], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'add_child' do   # NEW CHILD
         r.on 'location_type_changed' do
           res = interactor.location_code_suggestion(id, params[:changed_value])

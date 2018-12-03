@@ -54,6 +54,17 @@ module SecurityApp
       DB[query].map { |rec| [rec[:program_function_name], rec[:id]] }
     end
 
+    def program_functions_for_rmd_select
+      query = <<~SQL
+        SELECT program_functions.id, programs.program_name, program_function_name
+        FROM program_functions
+        JOIN programs ON programs.id = program_functions.program_id
+        WHERE programs.functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'rmd')
+        ORDER BY programs.program_name, program_function_name
+      SQL
+      DB[query].map { |rec| ["#{rec[:program_name]} : #{rec[:program_function_name]}", rec[:id]] }
+    end
+
     def functional_area_id_for_name(functional_area_name)
       DB[:functional_areas].where(functional_area_name: functional_area_name).first[:id]
     end
@@ -145,6 +156,39 @@ module SecurityApp
             AND f.active
             AND p.active
             AND pf.active
+            AND NOT f.rmd_menu
+        ORDER BY f.functional_area_name, p.program_sequence, p.program_name,
+        CASE WHEN pf.group_name IS NULL THEN
+          pf.program_function_sequence
+        ELSE
+          (SELECT MIN(program_function_sequence)
+           FROM program_functions
+           WHERE program_id = pf.program_id
+             AND group_name = pf.group_name)
+        END,
+        pf.group_name, pf.program_function_sequence
+      SQL
+      DB[query].all
+    end
+
+    def rmd_menu_for_user(user, webapp)
+      query = <<~SQL
+        SELECT f.id AS functional_area_id, p.id AS program_id, pf.id,
+        f.functional_area_name, p.program_sequence, p.program_name, pf.group_name,
+        pf.program_function_name, pf.url, pf.program_function_sequence, pf.show_in_iframe
+        FROM program_functions pf
+        JOIN programs p ON p.id = pf.program_id
+        JOIN programs_users pu ON pu.program_id = pf.program_id
+        JOIN programs_webapps pw ON pw.program_id = pf.program_id AND pw.webapp = '#{webapp}'
+        JOIN functional_areas f ON f.id = p.functional_area_id
+        WHERE pu.user_id = #{user.id}
+          AND (NOT pf.restricted_user_access OR EXISTS(SELECT user_id FROM program_functions_users
+          WHERE program_function_id = pf.id
+            AND user_id = #{user.id}))
+            AND f.active
+            AND p.active
+            AND pf.active
+            AND f.rmd_menu
         ORDER BY f.functional_area_name, p.program_sequence, p.program_name,
         CASE WHEN pf.group_name IS NULL THEN
           pf.program_function_sequence

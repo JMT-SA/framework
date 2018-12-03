@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  SUPPLIER_ROLE = 'SUPPLIER'
-
   class Supplier < Dry::Struct
     attribute :id, Types::Integer
     attribute :party_role_id, Types::Integer

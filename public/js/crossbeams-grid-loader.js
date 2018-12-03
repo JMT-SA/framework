@@ -189,11 +189,23 @@ const crossbeamsGridEvents = {
               if (action.replace_input_value) {
                 crossbeamsUtils.replaceInputValue(action);
               }
+              if (action.replace_inner_html) {
+                crossbeamsUtils.replaceInnerHtml(action);
+              }
               if (action.replace_list_items) {
                 crossbeamsUtils.replaceListItems(action);
               }
               if (action.clear_form_validation) {
                 crossbeamsUtils.clearFormValidation(action);
+              }
+              if (action.addRowToGrid) {
+                crossbeamsUtils.addGridRow(action);
+              }
+              if (action.updateGridInPlace) {
+                crossbeamsUtils.updateGridRow(action);
+              }
+              if (action.removeGridRowInPlace) {
+                crossbeamsUtils.deleteGridRow(action);
               }
             });
           } else if (data.replaceDialog) {
@@ -322,24 +334,10 @@ const crossbeamsGridEvents = {
         colKeys.push(col.colId);
       }
     });
-    // for (i = 0, len = visibleCols.length; i < len; i++) {
-    //   if (visibleCols[i].colDef.suppressCsvExport &&
-    //   visibleCols[i].colDef.suppressCsvExport === true) {
-    //   } else {
-    //     colKeys.push(visibleCols[i].colId);
-    //   }
-    // }
 
     params = {
       fileName,
       columnKeys: colKeys, // Visible, non-suppressed columns.
-      // skipHeader: true,
-      // skipFooters: true,
-      // skipGroups: true,
-      // allColumns: true,
-      // suppressQuotes: true,
-      // onlySelected: true,
-      // columnSeparator: ';'
     };
 
     // Ensure long numbers are exported as strings.
@@ -551,6 +549,7 @@ const crossbeamsGridFormatters = {
       title_field: titleValue,
       icon: item.icon,
       popup: item.popup,
+      loading_window: item.loading_window,
     };
   },
 
@@ -1067,6 +1066,29 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     let treeConfig = {};
     const grid = document.getElementById(gridId);
 
+    const frame = document.getElementById(`${gridId}-frame`);
+    const sideBar = {
+      toolPanels: [
+        {
+          id: 'columns',
+          labelDefault: 'Columns',
+          labelKey: 'columns',
+          iconKey: 'columns',
+          toolPanel: 'agColumnsToolPanel',
+        },
+      ],
+    };
+
+    if ((parseInt(frame.style.height, 10) || '100') > 10) {
+      sideBar.toolPanels.push({
+        id: 'filters',
+        labelDefault: 'Filters',
+        labelKey: 'filters',
+        iconKey: 'filter',
+        toolPanel: 'agFiltersToolPanel',
+      });
+    }
+
     forPrint = grid.dataset.gridPrint;
     multisel = grid.dataset.gridMulti;
     tree = grid.dataset.gridTree !== undefined;
@@ -1083,7 +1105,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         enableSorting: true,
         enableFilter: true,
         enableRangeSelection: true,
-        enableStatusBar: true,
+        // enableStatusBar: true,
+        sideBar,
         suppressAggFuncInHeader: true,
         isFullWidthCell: function isFullWidthCell(rowNode) {
           return rowNode.level === 1;
@@ -1123,7 +1146,16 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         enableFilter: true,
         rowSelection: 'single',
         enableRangeSelection: true,
-        enableStatusBar: true,
+        // enableStatusBar: true,
+        statusBar: {
+          statusPanels: [
+            // { statusPanel: 'agTotalRowCountComponent', align: 'left' },
+            // { statusPanel: 'agFilteredRowCountComponent' }, - these two include group rows.
+            // { statusPanel: 'agSelectedRowCountComponent' },
+            { statusPanel: 'agAggregationComponent' },
+          ],
+        },
+        sideBar,
         suppressAggFuncInHeader: true,
         getRowClass(params) {
           if (params.data) {
@@ -1164,7 +1196,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
 
     if (forPrint) {
       gridOptions.forPrint = true;
-      gridOptions.enableStatusBar = false;
+      // gridOptions.enableStatusBar = false;
     }
 
     if (tree) {
@@ -1263,6 +1295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             is_separator: item.is_separator,
             is_submenu: item.is_submenu,
             popup: item.popup,
+            loading_window: item.loading_window,
             domGridId: gridId,
           };
           if (item.is_submenu) {
@@ -1280,6 +1313,8 @@ document.addEventListener('DOMContentLoaded', () => {
               if (item.popup) {
                 crossbeamsUtils.recordGridIdForPopup(item.domGridId);
                 crossbeamsUtils.popupDialog(item.title_field, item.url);
+              } else if (item.loading_window) {
+                crossbeamsUtils.loadingWindow(item.url);
               } else {
                 window.location = item.url;
               }
@@ -1319,6 +1354,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                   } else if (data.addRowToGrid) {
                     crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
+                  } else if (data.actions) {
+                    data.actions.forEach((action) => {
+                      if (action.replace_options) {
+                        crossbeamsUtils.replaceSelectrOptions(action);
+                      }
+                      if (action.replace_multi_options) {
+                        crossbeamsUtils.replaceMultiOptions(action);
+                      }
+                      if (action.replace_input_value) {
+                        crossbeamsUtils.replaceInputValue(action);
+                      }
+                      if (action.replace_inner_html) {
+                        crossbeamsUtils.replaceInnerHtml(action);
+                      }
+                      if (action.replace_list_items) {
+                        crossbeamsUtils.replaceListItems(action);
+                      }
+                      if (action.clear_form_validation) {
+                        crossbeamsUtils.clearFormValidation(action);
+                      }
+                      if (action.addRowToGrid) {
+                        crossbeamsUtils.addGridRow(action);
+                      }
+                      if (action.updateGridInPlace) {
+                        crossbeamsUtils.updateGridRow(action);
+                      }
+                      if (action.removeGridRowInPlace) {
+                        crossbeamsUtils.deleteGridRow(action);
+                      }
+                    });
                   } else {
                     console.log('Not sure what to do with this:', data);
                   }

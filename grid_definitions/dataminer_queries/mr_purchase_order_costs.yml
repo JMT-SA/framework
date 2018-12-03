@@ -1,0 +1,96 @@
+---
+:caption: Purchase Order Costs
+:sql: "SELECT \"mr_purchase_order_costs\".\"id\", \"mr_purchase_order_costs\".\"mr_cost_type_id\",
+  \"mr_purchase_order_costs\".\"mr_purchase_order_id\", \"mr_purchase_order_costs\".\"amount\",
+  \"mr_cost_types\".\"cost_code_string\"\r\nFROM \"mr_purchase_order_costs\" LEFT
+  JOIN \"mr_cost_types\" ON \"mr_cost_types\".\"id\" = \"mr_purchase_order_costs\".\"mr_cost_type_id\"
+  \r\nLEFT JOIN \"mr_purchase_orders\" ON \"mr_purchase_orders\".\"id\" = \"mr_purchase_order_costs\".\"mr_purchase_order_id\""
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_purchase_order_costs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_cost_type_id:
+    :name: mr_cost_type_id
+    :sequence_no: 2
+    :caption: Cost type
+    :namespaced_name: mr_purchase_order_costs.mr_cost_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_purchase_order_id:
+    :name: mr_purchase_order_id
+    :sequence_no: 3
+    :caption: Purchase order
+    :namespaced_name: mr_purchase_order_costs.mr_purchase_order_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  amount:
+    :name: amount
+    :sequence_no: 4
+    :caption: Amount
+    :namespaced_name: mr_purchase_order_costs.amount
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cost_code_string:
+    :name: cost_code_string
+    :sequence_no: 5
+    :caption: Cost code string
+    :namespaced_name: mr_cost_types.cost_code_string
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_purchase_order_costs.mr_purchase_order_id
+  :caption: purchase_order_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

@@ -4,6 +4,7 @@ module MasterfilesApp
   class PartyRole < Dry::Struct
     attribute :id, Types::Integer
     attribute :party_id, Types::Integer
+    attribute :party_name, Types::String
     attribute :role_id, Types::Integer
     attribute :organization_id, Types::Integer
     attribute :person_id, Types::Integer

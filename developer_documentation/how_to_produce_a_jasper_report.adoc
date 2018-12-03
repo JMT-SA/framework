@@ -1,0 +1,77 @@
+= How to produce a Jasper report
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to produce a Jasper report
+
+=== Installation config
+
+At installation there are two environment variables that need to be set up: `JASPER_REPORTING_ENGINE_PATH` and `JASPER_REPORTS_PATH`.
+
+* `JASPER_REPORTING_ENGINE_PATH` is a fully qualified path that points to the directory where the `JasperReportPrinter.jar` is installed.
+* `JASPER_REPORTS_PATH` is a fully qualified path that points to the directory containing the designed jasper report files.
+
+=== UI link to load report in a new window
+
+To load the report in a new window, the link must include `data-loading-window="true"`.
+
+e.g.
+[source, ruby]
+----
+page.section do |section|
+  section.add_control(control_type: :link,
+                      text: 'Load Jasper report',
+                      url: '/render_jasper',
+                      loading_window: true,
+                      style: :button)
+end
+----
+
+=== Generating a report
+
+Use the `CreateJasperReport` service to create a pdf report.
+The service returns a success/failure response object. A successful response has the name of the generated file as the instance value for `GENERATE` mode, or nil for `PRINT` mode..
+
+NOTE: To show a pdf in a loading window, return a JSON hash with the key `location` and the value set to the generated file.
+[source, ruby]
+----
+# Interactor:
+def create_report
+  CreateJasperReport.call(report_name: 'abc',
+                          user: current_user.login_name,
+                          file: output_file_name_to_be_saved_without_extension_or_path,
+                          params: hash_of_report_parameters)
+end
+
+# Route
+res = interactor.create_report
+
+if res.success
+  # show_json_notice('Sent to printer') # For PRINT MODE
+  change_window_location_via_json(res.instance, request.path)
+else
+  show_error(res.message, fetch?(r))
+end
+----
+
+If params includes `keep_file: true`, the script that runs the report will be saved in the tmp dir below the root.
+
+The report is generated with the following default parameters which can be overridden by including them in the `params` hash (Note the **case** of the keys is important)):
+
+- MODE: `GENERATE`. Generate will create a file, PRINT will send the report directly to the printer.
+- printer: `no_printer`. In PRINT mode, this MUST be provided.
+- OUT_FILE_TYPE: `PDF`. This can be PDF, CSV, XLS, RTF. Ignored in PRINT mode.
+- top_level_dir: `''`. Use this if the report is stored in a subdir of the report dir.
+
+[NOTE]
+====
+If a report parameter sent to Jasper has to be a boolean value, it must be expressed like this:
+[source, ruby]
+----
+param_name: 'false|boolean' # Jasper gets param_name: false
+
+# The following will not work correctly:
+param_name: false           # Jasper gets param_name: 'false'
+----
+====

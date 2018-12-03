@@ -11,15 +11,21 @@ module DevelopmentApp
     end
 
     def find_with_logs(table_name, id) # rubocop:disable Metrics/AbcSize
-      status = where_hash(Sequel[:audit][:current_statuses], table_name: table_name.to_s, row_data_id: id)
+      status = DB[Sequel[:audit][:current_statuses]]
+               .where(table_name: table_name.to_s, row_data_id: id)
+               .select(Sequel.lit('*'), Sequel.function(:concat_ws, ' ', :status, :comment).as('status'))
+               .first
       return { status: 'No current status' } if status.nil?
 
       status[:other_recs] = DB[Sequel[:audit][:current_statuses]]
+                            .select(Sequel.lit('*'), Sequel.function(:concat_ws, ' ', :status, :comment).as('status'))
                             .where(transaction_id: status[:transaction_id]).all
                             .reject { |r| r[:id] == status[:id] }
                             .map { |r| r.merge(link: "<a href='/development/statuses/show/#{r[:table_name]}/#{r[:row_data_id]}'>view</a>") }
 
-      status[:logs] = DB[Sequel[:audit][:status_logs]].where(table_name: table_name.to_s, row_data_id: id).all
+      status[:logs] = DB[Sequel[:audit][:status_logs]]
+                      .where(table_name: table_name.to_s, row_data_id: id)
+                      .select(Sequel.lit('*'), Sequel.function(:concat_ws, ' ', :status, :comment).as('status')).all
       log = DB[Sequel[:audit][:logged_actions]].where(transaction_id: status[:transaction_id],
                                                       table_name: table_name.to_s,
                                                       row_data_id: id).select(:event_id).first

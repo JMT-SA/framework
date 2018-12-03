@@ -56,6 +56,16 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |`String`.
 |n/a
 
+|options - :prompt
+|Prompt user with a confirm message. Only continue if user chooses to go ahead.
+|`String` or `true`/`false`. If `true` or `Y`, prompt will be "Are you sure?" -- otherwise the prompt will be the provided string.
+|n/a
+
+|options - :loading_window
+|Load the link in a new window that shows a loading animation while waiting for the action to return a new url.
+|`true` or `false`.
+|n/a
+
 |===
 
 === Text
@@ -322,6 +332,11 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |options - :header_captions
 |A Hash of options
 |Provide captions for headers to override the default text (which is the header key capitalised with underscores changed to spaces).
+|None.
+
+|options - :pivot
+|Boolean
+|If true, pivot the table so that columns become rows. NB. the table **must** have columns specified.
 |None.
 
 |===

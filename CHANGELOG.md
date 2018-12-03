@@ -8,11 +8,27 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+### Fixed
+
+## [0.5.0] - 2018-12-03
+### Added
+- Job queues using Que gem.
+- Send email using the `Mail` gem. `config/mail_settings.rb` must be set up and a default sender address must be set up in the `.env.local` file for `SYSTEM_MAIL_SENDER`.
+- Japser reports can be launched from the framework.
+- Purchase Orders.
+- Deliveries.
+- Calculated columns for grids.
+- RMD (Registered Mobile Devices) functionality for scanning on Android hardware.
+- Log status functionality.
+- Implementation Owner party.
+- Document sequence rules for creating document serial numbers.
+### Changed
 - Roda::DataGrid update to the way list grids are defined (using Crossbeams::DataGrid::ListGridDefinition instead of calling layout's grid renderer).
 - All fetch requests expect JSON responses. This mostly affects dialog-building responses which were returning HTML text. All `return_json_response` calls replaced by one in the main route.
 - Grid rows can be coloured simply by providing a class in a column named `colour_rule`.
 - Capture locations.
-### Fixed
+- AG Grid upgraded to 1.19.2.
+- AppLoader for bootstrapping (the code was moved from framework.rb)
 
 ## [0.4.0] - 2018-08-10
 ### Changed

@@ -15,7 +15,8 @@
 .sass-cache/
 lib/applets/.sass-cache/
 public/assets/*.*
-# public/js/ag-enterprise-activation.js
+public/downloads/jasper/*.*
+public/js/ag-enterprise-activation.js
 # public/js/ag-grid-*.*
 # public/js/jackbox*.*
 # public/css/jackbox*.*
@@ -52,5 +53,6 @@ tags
 prestyle.css
 
 # Client-specific config.
+config/mail_settings.rb
 config/dataminer_connections.yml
 prepared_reports/*.yml

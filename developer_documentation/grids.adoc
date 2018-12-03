@@ -99,6 +99,28 @@ This example will display an anchor (`<a>`) styled as a button that will render 
   :hide_if_sql_returns_true: SELECT EXISTS(SELECT id FROM locations)
 ----
 
+=== Calculated columns
+
+Columns can be specified to be calculated by the grid. This is especailly useful a column value is changed and any calculations that uses its value can adjust automatically.
+
+[source,yaml]
+----
+:calculated_columns:                            # <1>
+  - :name: total_price                          # <2>
+    :caption: Total price                       # <3>
+    :data_type: :number                         # <4>
+    :format: :delimited_1000                    # <5>
+    :expression: quantity_required * unit_price # <6>
+    :position: 9                                # <7>
+----
+<1> There can be any number of calculated columns in the array.
+<2> `name` must be unique amongst all columns of the grid.
+<3> `caption` - the column header.
+<4> `data_type` - usually `:numeric`. Can be `:integer`.
+<5> `format` is optional.
+<6> `expression` - this is the calculation - use a combination of column names and `*, /, + or -`.
+<7> `position` - the position to place the calculated column in the list of columns. Note that hidden columns also have position.
+
 === Display a tree
 
 A query can be displayed as a tree grid if each row returns an array column that contains the row's ancestors.

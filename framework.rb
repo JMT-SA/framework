@@ -3,35 +3,7 @@
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
 
-require 'bundler'
-Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
-
-require 'base64'
-require 'pstore'
-require './lib/types_for_dry'
-require './lib/crossbeams_responses'
-require './lib/base_repo'
-require './lib/base_repo_association_finder'
-require './lib/base_interactor'
-require './lib/base_service'
-require './lib/base_step'
-require './lib/local_store' # Will only work for processes running from one dir.
-require './lib/ui_rules'
-require './lib/library_versions'
-require './lib/dataminer_connections'
-Dir['./helpers/**/*.rb'].each { |f| require f }
-Dir['./lib/applets/*.rb'].each { |f| require f }
-
-ENV['ROOT'] = File.dirname(__FILE__)
-ENV['VERSION'] = File.read('VERSION')
-ENV['GRID_QUERIES_LOCATION'] ||= File.expand_path('grid_definitions/dataminer_queries', __dir__)
-
-DM_CONNECTIONS = DataminerConnections.new
-
-module Crossbeams
-  class AuthorizationError < StandardError
-  end
-end
+require './app_loader'
 
 class Framework < Roda
   include CommonHelpers
@@ -89,6 +61,7 @@ class Framework < Roda
     r.assets unless ENV['RACK_ENV'] == 'production'
     r.public
 
+    ### p request.ip
     # Routes that must work without authentication
     # --------------------------------------------
     r.on 'webquery', String do |id|
@@ -108,13 +81,56 @@ class Framework < Roda
     # Do the same as XML?
     # --------------------------------------------
 
+    r.on 'loading_window' do
+      view(inline: 'Loading...', layout: 'layout_loading')
+    end
+
+    r.on 'test_jasper' do
+      @layout = Crossbeams::Layout::Page.build do |page, _|
+        page.section do |section|
+          section.add_text('Test a Jasper report', wrapper: :h2)
+          section.add_control(control_type: :link, text: 'Load Jasper report', url: '/render_jasper_test', loading_window: true, style: :button)
+        end
+      end
+      view('crossbeams_layout_page')
+    end
+
+    r.on 'render_jasper_test' do
+      res = CreateJasperReport.call(report_name: 'test_framework',
+                                    user: current_user.login_name,
+                                    file: 'testj_rpt',
+                                    params: { invoice_id: 1,
+                                              invoice_type: 'CUSTOMER',
+                                              keep_file: true })
+      if res.success
+        # show_json_notice('Sent to printer')
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
+    # OVERRIDE RodAuth's Login form:
+    r.get 'login' do
+      if @registered_mobile_device
+        @no_logout = true
+        view(:login, layout: 'layout_rmd')
+      else
+        view(:login)
+      end
+    end
+
     r.rodauth
     rodauth.require_authentication
     r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
 
     r.root do
       # TODO: Config this, and maybe set it up per user.
-      r.redirect '/pack_material/summary'
+      if @registered_mobile_device
+        r.redirect @rmd_start_page || '/rmd/home'
+      else
+        r.redirect '/pack_material/summary'
+      end
     end
 
     r.on 'developer_documentation', String do |file|
@@ -182,25 +198,42 @@ class Framework < Roda
     end
 
     r.is 'test' do
-      # Need to design a "query-able version of this query (join locn + tree so user can select type, ancestor etc...
-      qry = <<~SQL
-        SELECT
-        (SELECT array_agg(cc.location_code) as path
-         FROM (SELECT c.location_code
-         FROM location_tests AS c
-         JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
-         WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_array,
-        (SELECT string_agg(cc.location_code, ',') as path
-         FROM (SELECT c.location_code
-         FROM location_tests AS c
-         JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
-         WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_string,
-        l.location_code, l.location_type, l.has_single_container, l.is_virtual,
-        (SELECT MAX(path_length) FROM location_tree_paths WHERE descendant_location_id = l.id) + 1 AS level
-        FROM location_tests l
-      SQL
-      @rows = DB[qry].all.to_json
-      view('test_view')
+      # # Need to design a "query-able version of this query (join locn + tree so user can select type, ancestor etc...
+      # qry = <<~SQL
+      #   SELECT
+      #   (SELECT array_agg(cc.location_code) as path
+      #    FROM (SELECT c.location_code
+      #    FROM location_tests AS c
+      #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
+      #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_array,
+      #   (SELECT string_agg(cc.location_code, ',') as path
+      #    FROM (SELECT c.location_code
+      #    FROM location_tests AS c
+      #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
+      #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_string,
+      #   l.location_code, l.location_type, l.has_single_container, l.is_virtual,
+      #   (SELECT MAX(path_length) FROM location_tree_paths WHERE descendant_location_id = l.id) + 1 AS level
+      #   FROM location_tests l
+      # SQL
+      # @rows = DB[qry].all.to_json
+      # view('test_view')
+      # res = PackMaterialApp::TestJob.enqueue(current_user.id, time: Time.now)
+      # res = DevelopmentApp::SendMailJob.enqueue(from: 'jamessil@telkomsa.net', to: 'james@nosoft.biz', subject: 'Test mail job', body: "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames", cc: 'jamesmelanie@telkomsa.net')
+      res = DevelopmentApp::SendMailJob.enqueue(to: 'james@nosoft.biz',
+                                                subject: 'Test mail job',
+                                                body: "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames",
+                                                cc: 'jamesmelanie@telkomsa.net',
+                                                attachments: [{ path: '/home/james/ra/crossbeams/framework/CHANGELOG.md' },
+                                                              { filename: 'some_text.txt', content: File.read('tcp_serv.rb') }])
+      view(inline: "Added job: #{res.inspect}<p>Que stats: #{Que.job_stats.inspect}</p>")
+      # mail = Mail.new do
+      #   from    'jamessil@telkomsa.net'
+      #   to      'james@nosoft.biz'
+      #   subject 'Test Mail from framework'
+      #   body    "Hi me\n\nTrying to test sending mail.\nThis using the SendMailJob.\n\nReg\nJames"
+      # end
+      # res = mail.deliver
+      # view(inline: "Sent mail?: #{res}")
     end
 
     r.is 'logout' do

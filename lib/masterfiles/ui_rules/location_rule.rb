@@ -12,8 +12,9 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
+      set_print_fields if @mode == :print_barcode
 
-      add_behaviour if @options[:id]
+      add_behaviours if @options[:id]
 
       form_name 'location'
     end
@@ -30,11 +31,20 @@ module UiRules
       fields[:primary_assignment_id] = { renderer: :label, with_value: primary_assignment_id_label, caption: 'Primary Assignment' }
       fields[:location_code] = { renderer: :label, caption: 'Code' }
       fields[:location_description] = { renderer: :label, caption: 'Description' }
+      fields[:legacy_barcode] = { renderer: :label }
       fields[:has_single_container] = { renderer: :label, as_boolean: true }
       fields[:virtual_location] = { renderer: :label, as_boolean: true }
       fields[:consumption_area] = { renderer: :label, as_boolean: true }
       fields[:storage_types] = { renderer: :list, items: storage_types }
       fields[:assignments] = { renderer: :list, items: location_assignments }
+    end
+
+    def set_print_fields
+      printers = [['Label Designer', 'PRN-01']] # @repo.for_select_location_types # FIXME: hard-coded list...
+      fields[:location_code] = { renderer: :label, caption: 'Code' }
+      fields[:location_description] = { renderer: :label, caption: 'Description' }
+      fields[:printer] = { renderer: :select, options: printers, required: true }
+      fields[:no_of_prints] = { renderer: :integer, required: true }
     end
 
     def common_fields
@@ -44,6 +54,7 @@ module UiRules
         primary_assignment_id: { renderer: :select, options: location_assignments, caption: 'Primary Assignment', required: true },
         location_code: { required: true, caption: 'Code' },
         location_description: { required: true, caption: 'Description' },
+        legacy_barcode: {},
         has_single_container: { renderer: :checkbox },
         virtual_location: { renderer: :checkbox },
         consumption_area: { renderer: :checkbox }
@@ -54,14 +65,18 @@ module UiRules
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_location(@options[:id])
+      @form_object = OpenStruct.new(@form_object.to_h.merge(printer: nil, no_of_prints: 1)) if @mode == :print_barcode
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(@options[:id]),
+      parent = @options[:id].nil? ? nil : @repo.find_location(@options[:id])
+
+      @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(parent),
                                     location_type_id: nil,
-                                    primary_assignment_id: initial_assignment(@options[:id]),
-                                    location_code: initial_code(@options[:id]),
+                                    primary_assignment_id: initial_assignment(parent),
+                                    location_code: initial_code(parent),
                                     location_description: nil,
+                                    legacy_barcode: nil,
                                     has_single_container: nil,
                                     virtual_location: nil,
                                     consumption_area: nil)
@@ -83,30 +98,30 @@ module UiRules
       end
     end
 
-    def add_behaviour
+    def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :location_type_id, notify: [{ url: "/masterfiles/locations/locations/#{@options[:id]}/add_child/location_type_changed" }]
       end
     end
 
-    def initial_code(parent_id)
-      return nil if parent_id.nil?
+    def initial_code(parent)
+      return nil if parent.nil?
 
       location_type_id = @repo.for_select_location_types.first.last
-      res = @repo.location_code_suggestion(parent_id, location_type_id)
+      res = @repo.location_code_suggestion(parent.id, location_type_id)
       res.success ? res.instance : nil
     end
 
-    def initial_storage_type(parent_id)
-      return nil if parent_id.nil?
+    def initial_storage_type(parent)
+      return nil if parent.nil?
 
-      @repo.find_location(parent_id).primary_storage_type_id
+      parent.primary_storage_type_id
     end
 
-    def initial_assignment(parent_id)
-      return nil if parent_id.nil?
+    def initial_assignment(parent)
+      return nil if parent.nil?
 
-      @repo.find_location(parent_id).primary_assignment_id
+      parent.primary_assignment_id
     end
   end
 end

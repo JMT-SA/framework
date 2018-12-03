@@ -284,11 +284,11 @@ module PackMaterialApp
       assert_equal 'Customer already exists', result.errors[:base][0]
     end
 
-    def test_find_party_role
+    def test_find_product_variant_party_role
       customer = create_customer
-      role_link = create_matres_product_variant_party_role(MasterfilesApp::CUSTOMER_ROLE, customer_id: customer[:id])
+      role_link = create_matres_product_variant_party_role(AppConst::ROLE_CUSTOMER, customer_id: customer[:id])
 
-      full_party_role = repo.find_party_role(role_link[:id])
+      full_party_role = repo.find_product_variant_party_role(role_link[:id])
       assert full_party_role.is_a?(MatresProductVariantPartyRole)
       refute full_party_role.supplier?
 

@@ -17,6 +17,7 @@ module Masterfiles
               form.add_field :primary_assignment_id
               form.add_field :location_code
               form.add_field :location_description
+              form.add_field :legacy_barcode
               form.add_field :has_single_container
               form.add_field :virtual_location
               form.add_field :consumption_area

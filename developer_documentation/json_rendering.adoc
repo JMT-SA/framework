@@ -21,6 +21,13 @@ Replaces the current dialog's content with the response from `url`.
 
     load_via_json(url, notice: nil)
 
+==== Change the contents of a window by loading another URL
+
+Replaces the current window's content with the response from `url`.
+This should be used in the response to a link loaded in a "loading_window" (see Link: `loading_window` option).
+
+    change_window_location_via_json(new_location, log_url = nil)
+
 ==== Redirect to the last grid
 
 This uses a redirect to load the page that rendered the last grid.
@@ -32,6 +39,22 @@ This uses a redirect to load the page that rendered the last grid.
 Pass the URL and the app will redirect to it.
 
   redirect_via_json(url)
+
+==== Redirect to either a grid or page (using stored referer)
+
+Sometimes a page can be launched from a grid or from one or more other pages and after some action has been taken, you want to redirect to the appropriate page.
+
+To do this, from the _launched_ page route, call:
+
+  store_last_referer_url(key)
+
+This will store the referer URL (the page that launched this page/dialog) in local storage.
+
+Then when you want to redirect back, call:
+
+  redirect_via_json_to_stored_referer(key)
+
+NOTE: `key` in both cases is a `Symbol`.
 
 ==== Reload the dialog that opened the current dialog
 
@@ -81,12 +104,22 @@ json_actions([OpenStruct.new(type: :replace_multi_options,
 
 ===== Replace the value of an input element
 
-Works on `input` elements (including hidden ones).
+Works on `input` elements (including hidden or disabled ones).
 
 type: `:replace_input_value`.
 
 dom_id: the value of the `id` attribute of the input element in the page. This is usually a combination of the `form_name` and `field_name`.
 e.g. if a form named `users` has a field named `surname`, then the dom_id will be `users_surname`.
+
+value: the value you want to change it to.
+
+===== Replace the inner HTML of a DOM element
+
+Works on DOM elements (usually for label text).
+
+type: `:replace_inner_html`.
+
+dom_id: the value of the `id` attribute of the element in the page.
 
 value: the value you want to change it to.
 
@@ -129,6 +162,27 @@ type: `:clear_form_validation`.
 
 dom_id: the `id` of the `<form>`. (Use `form.form_id 'abc'` in the view to set this value)
 
+===== Add a row to a grid
+
+As part of a set of actions, adds a row to a grid.
+
+type: `:add_grid_row`.
+attrs: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+
+===== Update a grid row
+
+As part of a set of actions, updates the columns of a row or rows in a grid.
+
+type: `:update_grid_row`.
+
+ids: the id (or Array of ids) of the row(s) to change.
+changes: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+
+===== Delete a grid row
+
+type: `:delete_grid_row`.
+
+id: the id of the row to delete.
 
 ==== Single actions
 

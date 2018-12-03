@@ -32,5 +32,23 @@ class Framework < Roda
         show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
       end
     end
+
+    # QUE JOBS
+    # --------------------------------------------------------------------------
+    r.on 'que_jobs', Integer do |id|
+      r.is do
+        r.get do       # SHOW
+          check_auth!('logging', 'read')
+          show_partial { Development::Logging::QueJob::Show.call(id) }
+        end
+      end
+    end
+
+    r.on 'que_jobs' do
+      r.on 'status' do
+        check_auth!('logging', 'read')
+        show_partial_or_page(r) { Development::Logging::QueJob::Status.call }
+      end
+    end
   end
 end

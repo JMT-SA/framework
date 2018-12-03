@@ -1,0 +1,207 @@
+---
+:caption: Que Jobs
+:sql: SELECT "que_jobs"."priority", "que_jobs"."run_at", "que_jobs"."id", "que_jobs"."job_class",
+  "que_jobs"."error_count", "que_jobs"."last_error_message", "que_jobs"."queue", "que_jobs"."last_error_backtrace",
+  "que_jobs"."finished_at", "que_jobs"."expired_at", "que_jobs"."args", "que_jobs"."data"
+  FROM "que_jobs"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  priority:
+    :name: priority
+    :sequence_no: 1
+    :caption: Priority
+    :namespaced_name: que_jobs.priority
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  run_at:
+    :name: run_at
+    :sequence_no: 2
+    :caption: Run at
+    :namespaced_name: que_jobs.run_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 3
+    :caption: Id
+    :namespaced_name: que_jobs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  job_class:
+    :name: job_class
+    :sequence_no: 4
+    :caption: Job class
+    :namespaced_name: que_jobs.job_class
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  error_count:
+    :name: error_count
+    :sequence_no: 5
+    :caption: Error count
+    :namespaced_name: que_jobs.error_count
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  last_error_message:
+    :name: last_error_message
+    :sequence_no: 6
+    :caption: Last error message
+    :namespaced_name: que_jobs.last_error_message
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  queue:
+    :name: queue
+    :sequence_no: 7
+    :caption: Queue
+    :namespaced_name: que_jobs.queue
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  last_error_backtrace:
+    :name: last_error_backtrace
+    :sequence_no: 8
+    :caption: Last error backtrace
+    :namespaced_name: que_jobs.last_error_backtrace
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  finished_at:
+    :name: finished_at
+    :sequence_no: 9
+    :caption: Finished at
+    :namespaced_name: que_jobs.finished_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  expired_at:
+    :name: expired_at
+    :sequence_no: 10
+    :caption: Expired at
+    :namespaced_name: que_jobs.expired_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  args:
+    :name: args
+    :sequence_no: 11
+    :caption: Args
+    :namespaced_name: que_jobs.args
+    :data_type: :jsonb
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  data:
+    :name: data
+    :sequence_no: 12
+    :caption: Data
+    :namespaced_name: que_jobs.data
+    :data_type: :jsonb
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: que_jobs.args
+  :caption: Args
+  :data_type: :jsonb
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: que_jobs.data
+  :caption: Data
+  :data_type: :jsonb
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

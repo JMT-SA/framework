@@ -10,18 +10,12 @@ module Development
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
-            page.form do |form| # rubocop:disable Metrics/BlockLength
+            page.form do |form|
               form.view_only!
               form.no_submit! unless remote
-              form.row do |row| # rubocop:disable Metrics/BlockLength
+              form.row do |row|
                 row.column do |col|
-                  col.add_field :status
-                  col.add_field :user_name
-                  col.add_field :route_url
-                  col.add_field :action_tstamp_tx
-                  col.add_field :table_name
-                  col.add_field :row_data_id
-                  col.add_field :context
+                  col.add_table(rules[:rows], rules[:cols], pivot: true, header_captions: rules[:header_captions])
                   unless ui_rule.form_object[:diff_id].nil?
                     col.add_control(control_type: :link,
                                     text: 'View changes',
@@ -29,11 +23,13 @@ module Development
                                     behaviour: :popup,
                                     style: :button)
                   end
+                  cnt = %i[route_url table_name row_data_id].map { |k| "<tr class='hover-row'><th>#{k}</th><td>#{ui_rule.form_object[k]}</td></tr>" }.join
+                  col.add_text "<table class='thinbordertable'><tbody>#{cnt}</tbody></table>", toggle_button: true, toggle_caption: 'Details'
                   col.add_text '<h3>Status history</h3>'
                   col.add_table(rules[:details], rules[:headers], header_captions: rules[:header_captions])
-                  col.add_text '<h3>Other status changes</h3>'
+                  col.add_text '<h3>Other status changes</h3>' unless rules[:other_details]&.empty?
                   if remote
-                    col.add_table(rules[:other_details].map do |a|
+                    col.add_table((rules[:other_details] || []).map do |a|
                       a[:link] = a[:link].sub('<a', '<a data-replace-dialog="y" ')
                       a
                     end, rules[:other_headers], header_captions: rules[:other_header_captions])

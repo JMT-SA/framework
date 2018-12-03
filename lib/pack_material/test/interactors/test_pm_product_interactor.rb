@@ -6,7 +6,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 # rubocop#:disable Metrics/AbcSize
 
 module PackMaterialApp
-  class TestPmProductInteractor < Minitest::Test
+  class TestPmProductInteractor < MiniTestInteractors
     def test_repo
       repo = interactor.send(:repo)
       assert repo.is_a?(PackMaterialApp::PmProductRepo)
@@ -149,7 +149,7 @@ module PackMaterialApp
     end
 
     def test_pm_product_variant_create
-      PmProductRepo.any_instance.stubs(:create_pm_product_variant).returns(nil)
+      PmProductRepo.any_instance.stubs(:create_pm_product_variant).returns(success_response('Created product variant', fake_pm_product))
       PmProductRepo.any_instance.stubs(:find_pm_product_variant).returns(fake_pm_product)
 
       x = interactor.send(:pm_product_variant_create, {})
@@ -161,7 +161,7 @@ module PackMaterialApp
       x = interactor.send(:pm_product_variant_create, {})
       refute x.success
       assert_equal('Validation error', x.message)
-      assert_equal(['This product variant already exists'], x.errors[:unit])
+      assert_equal(['This product variant already exists'], x.errors[:base])
     end
 
     def test_update_pm_product_variant

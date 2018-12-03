@@ -20,4 +20,3 @@ class BaseStep
     write(read.merge(opts))
   end
 end
-

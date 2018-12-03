@@ -45,4 +45,10 @@ class TestLocalStore < Minitest::Test
     @store.delete(:a)
     assert_nil @store.read(:a)
   end
+
+  def test_dup
+    @store.write(:a, 'b')
+    @store.write(:a, 'c')
+    assert_equal 'c', @store.read(:a)
+  end
 end

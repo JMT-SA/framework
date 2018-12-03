@@ -5,6 +5,9 @@ require 'mocha/minitest'
 require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
 
+require 'dotenv'
+Dotenv.load('.env.local', '.env')
+
 OUTER_APP = Rack::Builder.parse_file('config.ru').first
 
 class RouteTester < Minitest::Test
@@ -15,6 +18,7 @@ class RouteTester < Minitest::Test
   DEFAULT_LAST_GRID_URL = '/list/users'
 
   def around
+    Faker::UniqueGenerator.clear
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
       super
     end

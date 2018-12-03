@@ -54,7 +54,7 @@ module PackMaterialApp
     end
 
     def matres_product_variant_party_role(id)
-      repo.find_party_role(id)
+      repo.find_product_variant_party_role(id)
     end
 
     def validate_matres_product_variant_party_role_params(params)

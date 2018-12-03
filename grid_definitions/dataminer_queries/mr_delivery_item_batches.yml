@@ -1,0 +1,180 @@
+---
+:caption: Mr Delivery Item Batches
+:sql: SELECT "mr_delivery_item_batches"."id", "mr_delivery_item_batches"."mr_delivery_item_id",
+  "mr_delivery_item_batches"."mr_internal_batch_number_id", "mr_delivery_item_batches"."client_batch_number",
+  "mr_delivery_item_batches"."quantity_on_note", "mr_delivery_item_batches"."quantity_received",
+  "mr_delivery_item_batches"."created_at", "mr_delivery_item_batches"."updated_at",
+  "mr_delivery_items"."remarks", "mr_internal_batch_numbers"."description" FROM "mr_delivery_item_batches"
+  JOIN "mr_delivery_items" ON "mr_delivery_items"."id" = "mr_delivery_item_batches"."mr_delivery_item_id"
+  LEFT JOIN "mr_internal_batch_numbers" ON "mr_internal_batch_numbers"."id" = "mr_delivery_item_batches"."mr_internal_batch_number_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_delivery_item_batches.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_delivery_item_id:
+    :name: mr_delivery_item_id
+    :sequence_no: 2
+    :caption: Mr delivery item
+    :namespaced_name: mr_delivery_item_batches.mr_delivery_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_internal_batch_number_id:
+    :name: mr_internal_batch_number_id
+    :sequence_no: 3
+    :caption: Mr internal batch number
+    :namespaced_name: mr_delivery_item_batches.mr_internal_batch_number_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  client_batch_number:
+    :name: client_batch_number
+    :sequence_no: 4
+    :caption: Client batch number
+    :namespaced_name: mr_delivery_item_batches.client_batch_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_on_note:
+    :name: quantity_on_note
+    :sequence_no: 5
+    :caption: Quantity on note
+    :namespaced_name: mr_delivery_item_batches.quantity_on_note
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_received:
+    :name: quantity_received
+    :sequence_no: 6
+    :caption: Quantity received
+    :namespaced_name: mr_delivery_item_batches.quantity_received
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: mr_delivery_item_batches.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: mr_delivery_item_batches.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 9
+    :caption: Remarks
+    :namespaced_name: mr_delivery_items.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 10
+    :caption: Description
+    :namespaced_name: mr_internal_batch_numbers.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_delivery_item_batches.mr_delivery_item_id
+  :caption: Mr delivery item
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT remarks, id FROM mr_delivery_items ORDER BY remarks
+- :column: mr_delivery_item_batches.mr_internal_batch_number_id
+  :caption: Mr internal batch number
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT description, id FROM mr_internal_batch_numbers ORDER BY description

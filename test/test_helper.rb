@@ -7,23 +7,31 @@ require 'minitest/stub_any_instance'
 require 'minitest/hooks/test'
 require 'minitest/rg'
 
-require 'bundler'
-Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
+require 'dotenv'
+Dotenv.load('.env.local', '.env')
 
-require './config/environment'
+require './app_loader'
 
-require './lib/types_for_dry'
-require './lib/crossbeams_responses'
-require './lib/base_repo'
+# Re-define Que::Job so it can be used for testing.
+module Que
+  class Job
+    attr_reader :enqueued, :job
+    def initialize
+      @enqueued = nil
+    end
+
+    def enqueue(*args)
+      @job = self.class
+      @enqueued = args
+    end
+
+    def finish; end
+
+    def destroy; end
+  end
+end
 
 root_dir = File.expand_path('../..', __FILE__)
-
-Dir["#{root_dir}/helpers/**/*.rb"].each { |f| require f }
-require './lib/base_service'
-require './lib/base_interactor'
-require './lib/ui_rules'
-
-Dir["#{root_dir}/lib/applets/*.rb"].each { |f| require f }
 
 # Database seeds - called in `around_all` hook of MiniTestWithHooks
 # Each seed file must reopen the MiniTestSeeds module.
@@ -39,8 +47,18 @@ Dir["#{root_dir}/lib/*/test/factories/*.rb"].each { |f| require f }
 class MiniTestWithHooks < Minitest::Test
   include Minitest::Hooks
   include MiniTestSeeds
+  include Crossbeams::Responses
+
+  def ok_response(message: nil, instance: nil)
+    success_response((message || 'OK'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
+
+  def bad_response(message: nil, instance: nil)
+    failed_response((message || 'FAILED'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
 
   def around
+    Faker::UniqueGenerator.clear
     DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true) do
       super
     end
@@ -56,6 +74,22 @@ class MiniTestWithHooks < Minitest::Test
   rescue StandardError => e
     p e
     raise "Display possible around errors"
+  end
+end
+
+class MiniTestInteractors < Minitest::Test
+  include Crossbeams::Responses
+
+  def ok_response(message: nil, instance: nil)
+    success_response((message || 'OK'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
+
+  def bad_response(message: nil, instance: nil)
+    failed_response((message || 'FAILED'), instance.nil? ? nil : OpenStruct.new(instance))
+  end
+
+  def around
+    Faker::UniqueGenerator.clear
   end
 end
 

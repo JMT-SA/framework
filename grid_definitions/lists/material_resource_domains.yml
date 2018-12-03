@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/development/masterfiles/material_resource_domains/new"
-  :text: New MR Domain
+  :text: New Domain
   :style: :button
   :behaviour: :popup

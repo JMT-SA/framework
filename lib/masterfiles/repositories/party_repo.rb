@@ -51,6 +51,12 @@ module MasterfilesApp
       Party.new(hash)
     end
 
+    def find_party_role(id)
+      hash = DB['SELECT party_roles.* , fn_party_role_name(?) AS party_name FROM party_roles WHERE party_roles.id = ?', id, id].first
+      return nil if hash.nil?
+      PartyRole.new(hash)
+    end
+
     def create_organization(attrs)
       params = attrs.to_h
       role_ids = params.delete(:role_ids)
@@ -168,10 +174,11 @@ module MasterfilesApp
       end
     end
 
-    def addresses_for_party(party_id: nil, organization_id: nil, person_id: nil)
+    def addresses_for_party(party_id: nil, organization_id: nil, person_id: nil, party_role_id: nil, address_type: nil)
       id = party_id unless party_id.nil?
       id = party_id_from_organization(organization_id) unless organization_id.nil?
       id = party_id_from_person(person_id) unless person_id.nil?
+      id = party_id_from_party_role(party_role_id) unless party_role_id.nil?
 
       query = <<~SQL
         SELECT addresses.*, address_types.address_type
@@ -180,7 +187,24 @@ module MasterfilesApp
         JOIN address_types ON address_types.id = addresses.address_type_id
         WHERE party_addresses.party_id = #{id}
       SQL
-      DB[query].map { |r| Address.new(r) }
+
+      addresses = DB[query].all
+      addresses = addresses.select { |r| r[:address_type] == address_type } if address_type
+      addresses.map { |r| MasterfilesApp::Address.new(r) }
+    end
+
+    def for_select_addresses_for_party(party_id: nil, organization_id: nil, person_id: nil, party_role_id: nil, address_type: nil)
+      addresses = addresses_for_party(party_id: party_id, organization_id: organization_id, person_id: person_id, party_role_id: party_role_id, address_type: address_type)
+      syms = %i[address_line_1 address_line_2 address_line_3 postal_code city country]
+      address_descriptions = []
+      addresses.each do |addr|
+        set = []
+        syms.each do |sym|
+          set << addr[sym] if addr[sym]
+        end
+        address_descriptions << [set.join(', '), addr[:id]]
+      end
+      address_descriptions
     end
 
     def contact_methods_for_party(party_id: nil, organization_id: nil, person_id: nil)
@@ -206,6 +230,10 @@ module MasterfilesApp
       DB[:people].where(id: id).select(:party_id).single_value
     end
 
+    def party_id_from_party_role(id)
+      DB[:party_roles].where(id: id).select(:party_id).single_value
+    end
+
     def party_address_ids(party_id)
       DB[:party_addresses].where(party_id: party_id).select_map(:address_id).sort
     end
@@ -218,29 +246,85 @@ module MasterfilesApp
       DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
     end
 
+    # Find the party role for the implementation owner.
+    # Requires that the ENV variable "IMPLEMENTATION_OWNER" has been correctly set.
+    #
+    # @return [MasterfilesApp::PartyRole] the party role entity.
+    def implementation_owner_party_role
+      query = <<~SQL
+        SELECT pr.id, pr.party_id, role_id, organization_id, person_id, pr.active, fn_party_role_name(pr.id) AS party_name
+        FROM public.party_roles pr
+        JOIN roles r ON r.id = pr.role_id
+        LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
+        LEFT OUTER JOIN people p ON p.id = pr.person_id
+        WHERE r.name = ?
+          AND COALESCE(o.short_description, p.first_name || ' ' || p.surname) = ?
+          AND pr.active
+      SQL
+      hash = DB[query, AppConst::ROLE_IMPLEMENTATION_OWNER, ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]].first
+      raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]}\" is not defined/active" if hash.nil?
+      MasterfilesApp::PartyRole.new(hash)
+    end
+
     def assign_roles(id, role_ids, type = 'O')
       return { error: 'Choose at least one role' } if role_ids.empty?
-      organization_id = person_id = nil
-      if type == 'O'
-        party = find_organization(id)
-        DB[:party_roles].where(organization_id: id).delete
-        organization_id = id
-      else
-        party = find_person(id)
-        DB[:party_roles].where(person_id: id).delete
-        person_id = id
-      end
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: party.party_id,
-                                organization_id: organization_id,
-                                person_id: person_id,
-                                role_id: r_id)
+      party_details = party_details_by_type(id, type)
+      current_role_ids = party_details[:party_roles].select_map(:role_id)
+
+      removed_role_ids = current_role_ids - role_ids
+      party_details[:party_roles].where(role_id: removed_role_ids).delete
+
+      new_role_ids = role_ids - current_role_ids
+      new_role_ids.each do |r_id|
+        DB[:party_roles].insert(
+          party_id: party_details[:party_id],
+          organization_id: party_details[:organization_id],
+          person_id: party_details[:person_id],
+          role_id: r_id
+        )
       end
     end
 
+    def party_details_by_type(id, type)
+      details = { organization_id: nil, person_id: nil }
+      if type == 'O'
+        details[:party_id] = find_organization(id).party_id
+        details[:party_roles] = DB[:party_roles].where(organization_id: id)
+        details[:organization_id] = id
+      else
+        details[:party_id] = find_person(id).party_id
+        details[:party_roles] = DB[:party_roles].where(person_id: id)
+        details[:person_id] = id
+      end
+      details
+    end
+
+    def for_select_party_roles(role = 'TRANSPORTER')
+      DB[:party_roles].where(
+        role_id: DB[:roles].where(name: role).select(:id)
+      ).select(
+        :id,
+        Sequel.function(:fn_party_role_name, :id)
+      ).map { |r| [r[:fn_party_role_name], r[:id]] }
+    end
+
     # Customers & Suppliers
-    def for_select_parties
-      DB[:parties].select_map(:id).map { |id| [DB['SELECT fn_party_name(?)', id].single_value, id] }
+    def for_select_supplier_parties
+      parties_except_for_role(MasterfilesApp::SUPPLIER_ROLE)
+    end
+
+    def for_select_customer_parties
+      parties_except_for_role(MasterfilesApp::CUSTOMER_ROLE)
+    end
+
+    def parties_except_for_role(role)
+      query = <<~SQL
+        SELECT fn_party_name(p.id), p.id
+        FROM parties p
+        WHERE NOT EXISTS(SELECT id FROM party_roles WHERE party_id = p.id AND role_id = (SELECT id FROM roles WHERE name = '#{role}'))
+        AND p.active = true
+      SQL
+      DB[query].all.map { |r| [r[:fn_party_name] || 'Unknown party name', r[:id]] }
     end
 
     def create_customer(attrs)
@@ -249,7 +333,7 @@ module MasterfilesApp
       return { error: { customer_type_ids: ['You did not choose any customer types'] } } if customer_type_ids.empty?
 
       party_id = params.delete(:party_id)
-      party_role_id = create_party_role(party_id, MasterfilesApp::CUSTOMER_ROLE)[:id]
+      party_role_id = create_party_role(party_id, AppConst::ROLE_CUSTOMER)[:id]
       return { error: { base: ['You already have this party set up as a customer'] } } if party_role_id.nil?
 
       customer_id = create(:customers, params.merge(party_role_id: party_role_id))
@@ -291,7 +375,7 @@ module MasterfilesApp
       return { error: { supplier_type_ids: ['You did not choose any supplier types'] } } if supplier_type_ids.empty?
 
       party_id = params.delete(:party_id)
-      party_role_id = create_party_role(party_id, SUPPLIER_ROLE)[:id]
+      party_role_id = create_party_role(party_id, AppConst::ROLE_SUPPLIER)[:id]
       return { error: { base: ['You already have this party set up as a supplier'] } } if party_role_id.nil?
 
       supplier_id = create(:suppliers, params.merge(party_role_id: party_role_id))
@@ -370,8 +454,9 @@ module MasterfilesApp
       DB[:customer_types].where(id: customer_type_ids).select_map(:type_code)
     end
 
-    def find_supplier(id)
-      hash = find_hash(:suppliers, id)
+    def find_supplier(id, by_party_role: false)
+      opt = by_party_role ? { party_role_id: id } : { id: id }
+      hash = where_hash(:suppliers, opt)
       return nil if hash.nil?
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
       hash[:supplier_type_ids] = suppliers_supplier_type_ids(id)

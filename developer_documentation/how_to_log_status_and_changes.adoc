@@ -1,0 +1,96 @@
+= How to log status and data changes
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to log status and data changes
+
+=== 1. Log a status
+
+Status is typically logged by using a method defined on base interactor: `log_status(table_name, id, status, comment: nil)`.
+
+One status can be written to multiple records in a table at the same time using: `log_multiple_statuses(table_name, ids, status, comment: nil)`.
+
+These methods should be called inside a transaction after the actual table update.
+
+The `comment` parameter is optional, but when it is present, the status will be displayed as a concatenation of the two fields.
+e.g. 
+
+* Status = 'CREATED' and comment = nil will display as `'CREATED'`.
+* Status = 'APPROVED' and comment = 'by Paul' will display as `'APPROVED by Paul'`.
+
+e.g.
+[source, ruby]
+----
+  repo.transaction do
+    repo.update_security_group(id, attrs)
+    repo.log_transaction
+    repo.log_status('security_groups', id, 'SOMETHING_CHANGED')
+  end
+----
+
+NOTE: statuses are logged to two tables in the database within the `audit` schema. -- `audit.current_statuses` (just the current status of a record) and `audit.status_logs` (history of all statuses for a record).
+
+=== 2. Display the current status
+
+The current status can be returned from the database like this:
+[source, ruby]
+----
+DB[Sequel.function(:fn_current_status, 'security_groups', 68)].single_value
+----
+
+Or it can be returned using `find_with_association`.
+[source, ruby]
+----
+find_with_association(:security_groups, 123, lookup_functions: [{ function: :fn_current_status, args: ['security_groups', :id], col_name: :status }])
+----
+
+The current status can also be returned in a query -- usually used in a grid query definition:
+[source, sql]
+----
+SELECT id, security_group, fn_current_status('security_groups', id) AS status
+FROM security_groups;
+----
+
+=== 3. Show the status of a record from an action in a grid
+
+There is a standard URL to call that displays the current status of a record as well as historical statuses. When possible, the display links to the data that changed during the transaction.
+
+Add the URL `/development/statuses/show/security_groups/$:id$` to the yml file:
+[source, yml]
+----
+- :url: /development/statuses/show/security_groups/$:id$
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+----
+
+=== 4. Log data changes
+
+Data changes are stored in two tables in the `audit` schema -- `audit.logged_actions` and `audit.logged_action_details`.
+
+Changes are logged to `logged_actions` automatically if a migration was run that created triggers to log changes to the table -- e.g.:
+[source, ruby]
+----
+run "SELECT audit.audit_table('security_groups', true, true,'{updated_at}'::text[]);"
+----
+
+Logging to the `logged_action_details` table is done manually. This table stores the user name and the webapp route and optionally other context. This data can be joined to the actual changes in the `logged_actions` table via the `transaction_id` value.
+
+To log details, do the following in a route and an interactor:
+[source, ruby]
+----
+  # In a route - set the route_url (context can be left out):
+  interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {},
+                { route_url: request.path,
+                  context: 'Something that might be useful' }, {})
+
+  # In an interactor:
+  repo.transaction do
+    repo.update_security_group(id, attrs)
+    repo.log_transaction
+  end
+----
+
+NOTE: If a table has been set up (via the triggers) to log data changes, your code _should_ also call `log_transaction` so that the audit trail of which user and URL were involved in a particular change can be retrieved.

@@ -335,6 +335,12 @@ class TestBaseRepo < MiniTestWithHooks
                                                                            flatten_columns: { functional_area_name: :funcname } }])
     assert_equal 'F-TEST1', res[:funcname]
 
+    # # Parent association - non-matching foreign key.
+    # res = repo.find_with_association(:programs, dummy_id, parent_tables: [{ parent_table: :security_groups, columns: [:security_group_name],
+    #                                                                         flatten_columns: { security_group_name: :secname },
+    #                                                                         foreign_key: :functional_area_id }])
+    # assert_equal 'SG-TEST1', res[:secname]
+
     # Function lookup
     res = repo.find_with_association(:programs, prog_id, lookup_functions: [{ function: :fn_party_role_name, args: [:functional_area_id], col_name: :customer_name }])
     assert res.keys.include?(:customer_name)

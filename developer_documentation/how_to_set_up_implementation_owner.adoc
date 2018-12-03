@@ -1,0 +1,46 @@
+= How to set up the implementation owner
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to set up the implementation owner
+
+=== 1. Add the party role
+
+Add the role "IMPLEMENTATION_OWNER" to a party.
+
+=== 2. Set the default owner
+
+In the `.env` file add a line like this:
+
+[source,bash]
+----
+IMPLEMENTATION_OWNER=KROMCO (PTY) LTD
+----
+
+NOTE: The value of implementation owner must exactly match the name of the organization in the database.
+
+=== 3. Override the default owner on site
+
+If the site needs to use a different owner from the default one, add a line like this to the `.env.local` file:
+
+[source,bash]
+----
+IMPLEMENTATION_OWNER=SOMEONE ELSE
+----
+
+Again, the name must match the database value exactly.
+
+=== 4. Override the owner via environment
+
+Usually for a temporary test -- set the environment variable `IMPLEMENTATION_OWNER` to a relevant value before starting the app.
+
+=== 5. Get the implementation owner in code
+
+Call the `implementation_owner_party_role` method in `MasterfilesApp::PartyRepo`. This returns a `MasterfilesApp::PartyRole` entity.
+
+[source, ruby]
+----
+repo = MasterfilesApp::PartyRepo.new
+party_role = repo.implementation_owner_party_role
+----

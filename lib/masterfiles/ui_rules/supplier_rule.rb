@@ -32,7 +32,7 @@ module UiRules
 
     def preselect_fields
       {
-        party_id: { renderer: :select, options: @repo.for_select_parties, caption: 'Please select existing party', required: true }
+        party_id: { renderer: :select, options: @repo.for_select_supplier_parties, caption: 'Please select existing party', required: true }
       }
     end
 

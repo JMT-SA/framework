@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_metatag %>
+
+    <title><%= ENV['APP_CAPTION'] %></title>
+
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"-->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="/css/jackbox.css">
+    <link rel="stylesheet" href="/css/tachyons.min.css">
+    <link rel="stylesheet" href="/css/sweetalert2.min.css">
+    <!--
+    <link rel="stylesheet" href="/css/jquery.contextMenu.min.css">
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="/css/skin.css">
+    -->
+    <link rel="stylesheet" href="/css/selectr.min.css">
+    <link rel="stylesheet" href="/css/multi.min.css">
+    <%#= assets(:css) %>
+
+    <style>
+      .cbl-icon {
+        display: inline-block;
+        height: 1em;
+        width: 1em;
+        fill: currentColor;
+        position: relative;
+        top: .125em;
+      }
+      input:required {
+        border-right: thick solid orange;
+      }
+      .disableClick{
+        pointer-events: none;
+      }
+    </style>
+    <%= content_for :late_head %>
+  </head>
+  <body class="site" data-utf-8-ensurer="О">
+    <div id="rmd-offline-status" class="navy bg-washed-blue ba b--light-blue pa3 mw6 br3" style="display:none">
+      <p class="ma0"><svg class="w2 h2 mr2" width="2048" height="1792" viewBox="0 0 2048 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1024 1523q-20 0-93-73.5t-73-93.5q0-32 62.5-54t103.5-22 103.5 22 62.5 54q0 20-73 93.5t-93 73.5zm270-271q-2 0-40-25t-101.5-50-128.5-25-128.5 25-101 50-40.5 25q-18 0-93.5-75t-75.5-93q0-13 10-23 78-77 196-121t233-44 233 44 196 121q10 10 10 23 0 18-75.5 93t-93.5 75zm273-272q-11 0-23-8-136-105-252-154.5t-268-49.5q-85 0-170.5 22t-149 53-113.5 62-79 53-31 22q-17 0-92-75t-75-93q0-12 10-22 132-132 320-205t380-73 380 73 320 205q10 10 10 22 0 18-75 93t-92 75zm271-271q-11 0-22-9-179-157-371.5-236.5t-420.5-79.5-420.5 79.5-371.5 236.5q-11 9-22 9-17 0-92.5-75t-75.5-93q0-13 10-23 187-186 445-288t527-102 527 102 445 288q10 10 10 23 0 18-75.5 93t-92.5 75z"/></svg>
+      <strong>Offline</strong><br>You are currently offline. Please check network settings and re-connect.</p>
+    </div>
+    <% unless @no_menu %>
+      <%= render_rmd_menu %>
+    <% end %>
+    <% unless @no_logout %>
+      <a href="/logout" id="logout" class="f6 link dim br2 ph3 pv2 dib white bg-silver" title="Logout">logout</a>
+    <% end %>
+    <div id="container" class="container ma2">
+      <%= yield %>
+    </div>
+    <!--
+    <script src="/js/lodash.js" type="text/javascript"></script>
+    <script src="/js/ag-grid-enterprise.min.js" type="text/javascript"></script>
+    <script src="/js/ag-enterprise-activation.js" type="text/javascript"></script>
+    <script src="/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.ui.position.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.contextMenu.min.js" type="text/javascript"></script>
+    <script src="/js/Sortable.min.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-local-storage.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-utils.js?seq=5" type="text/javascript"></script>
+    <script src="/js/crossbeams-layout.js?seq=6" type="text/javascript"></script>
+    <script src="/js/crossbeams-grid-loader.js?seq=7" type="text/javascript"></script>
+    <script src="/js/crossbeams-data-miner-params.js" type="text/javascript"></script>
+    <script src="/js/crossbeams-menu-builder.js?seq=1" type="text/javascript"></script>
+    <script src="/js/multi.min.js" type="text/javascript"></script>
+    <script src="/js/a11y-dialog-cbeam.js" type="text/javascript"></script>
+    -->
+    <script src="/js/rmd_scan.js?seq=4" type="text/javascript"></script>
+    <script src="/js/jackbox.min.js" type="text/javascript"></script>
+    <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
+    <script src="/js/selectr.min.js" type="text/javascript"></script>
+    <script>
+      window.addEventListener('load', function() {
+        const menu = document.getElementById("rmd_menu");
+        const logout = document.getElementById("logout");
+        const offlineStatus = document.getElementById("rmd-offline-status");
+        const txtShow = document.getElementById("txtShow");
+
+        function updateOnlineStatus(event) {
+          if (navigator.onLine) {
+            offlineStatus.style.display = 'none';
+            menu.disabled = false;
+            logout.classList.remove('disableClick');
+            document.querySelectorAll('[data-rmd-btn]').forEach((node) => {
+              node.disabled = false;
+            });
+            if (txtShow !== null) {
+              txtShow.value += 'Online: network connection restored\n';
+            }
+          } else {
+            offlineStatus.style.display = '';
+            menu.disabled = true;
+            logout.classList.add('disableClick');
+            document.querySelectorAll('[data-rmd-btn]').forEach((node) => {
+              node.disabled = true;
+            });
+            if (txtShow !== null) {
+              txtShow.value += 'Offline: network connection lost\n';
+            }
+          }
+          // To log to a div...
+          // log.insertAdjacentHTML("beforeend", "Event: " + event.type + "; Status: " + condition);
+        }
+
+        window.addEventListener('online',  updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+      });
+
+      Jackbox.init();
+      <% if flash[:notice] %>
+        Jackbox.success('<%= flash[:notice].tr("'", "`") %>');
+      <% end %>
+      <% if flash[:error] %>
+        Jackbox.error('<%= flash[:error].tr("'", "`") %>', { time: 20 });
+      <% end %>
+
+    </script>
+    <%= content_for :late_javascript %>
+  </body>
+</html>

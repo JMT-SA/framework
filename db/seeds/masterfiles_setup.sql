@@ -1,3 +1,5 @@
+INSERT INTO roles (name) VALUES ('IMPLEMENTATION_OWNER');
+INSERT INTO roles (name) VALUES ('TRANSPORTER');
 
 INSERT INTO functional_areas (functional_area_name)
 VALUES ('Masterfiles');

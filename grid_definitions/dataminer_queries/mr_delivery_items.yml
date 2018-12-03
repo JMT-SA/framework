@@ -1,0 +1,246 @@
+---
+:caption: Delivery Items
+:sql: SELECT "mr_delivery_items"."id", "mr_delivery_items"."mr_delivery_id", "mr_delivery_items"."mr_purchase_order_item_id",
+  "mr_delivery_items"."mr_product_variant_id", "mr_delivery_items"."quantity_on_note",
+  "mr_delivery_items"."quantity_over_supplied", "mr_delivery_items"."quantity_under_supplied",
+  "mr_delivery_items"."quantity_received", "mr_delivery_items"."invoiced_unit_price",
+  "mr_delivery_items"."remarks", "mr_deliveries"."driver_name" AS mr_delivery_driver_name,
+  "material_resource_product_variants"."product_variant_table_name" AS mr_product_variant_product_variant_table_name,
+  "mr_purchase_order_items"."id" AS mr_purchase_order_items_id FROM "mr_delivery_items"
+  LEFT JOIN "mr_deliveries" ON "mr_deliveries"."id" = "mr_delivery_items"."mr_delivery_id"
+  LEFT JOIN "material_resource_product_variants" ON "material_resource_product_variants"."id"
+  = "mr_delivery_items"."mr_product_variant_id" JOIN "mr_purchase_order_items" ON
+  "mr_purchase_order_items"."id" = "mr_delivery_items"."mr_purchase_order_item_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_delivery_items.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_delivery_id:
+    :name: mr_delivery_id
+    :sequence_no: 2
+    :caption: delivery
+    :namespaced_name: mr_delivery_items.mr_delivery_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_purchase_order_item_id:
+    :name: mr_purchase_order_item_id
+    :sequence_no: 3
+    :caption: Purchase order item
+    :namespaced_name: mr_delivery_items.mr_purchase_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_product_variant_id:
+    :name: mr_product_variant_id
+    :sequence_no: 4
+    :caption: Product variant
+    :namespaced_name: mr_delivery_items.mr_product_variant_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_on_note:
+    :name: quantity_on_note
+    :sequence_no: 5
+    :caption: Quantity on note
+    :namespaced_name: mr_delivery_items.quantity_on_note
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_over_supplied:
+    :name: quantity_over_supplied
+    :sequence_no: 6
+    :caption: Quantity over supplied
+    :namespaced_name: mr_delivery_items.quantity_over_supplied
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_under_supplied:
+    :name: quantity_under_supplied
+    :sequence_no: 7
+    :caption: Quantity under supplied
+    :namespaced_name: mr_delivery_items.quantity_under_supplied
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_received:
+    :name: quantity_received
+    :sequence_no: 8
+    :caption: Quantity received
+    :namespaced_name: mr_delivery_items.quantity_received
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  invoiced_unit_price:
+    :name: invoiced_unit_price
+    :sequence_no: 9
+    :caption: Invoiced unit price
+    :namespaced_name: mr_delivery_items.invoiced_unit_price
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 10
+    :caption: Remarks
+    :namespaced_name: mr_delivery_items.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_delivery_driver_name:
+    :name: mr_delivery_driver_name
+    :sequence_no: 11
+    :caption: delivery driver name
+    :namespaced_name: mr_deliveries.driver_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_product_variant_product_variant_table_name:
+    :name: mr_product_variant_product_variant_table_name
+    :sequence_no: 12
+    :caption: Product variant table name
+    :namespaced_name: material_resource_product_variants.product_variant_table_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_purchase_order_items_id:
+    :name: mr_purchase_order_items_id
+    :sequence_no: 13
+    :caption: Purchase order items
+    :namespaced_name: mr_purchase_order_items.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_delivery_items.mr_delivery_id
+  :caption: delivery
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT driver_name, id FROM mr_deliveries ORDER BY driver_name
+- :column: mr_delivery_items.mr_purchase_order_item_id
+  :caption: Purchase order item
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM mr_purchase_order_items ORDER BY id
+- :column: mr_delivery_items.mr_product_variant_id
+  :caption: Product variant
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT product_variant_table_name, id FROM material_resource_product_variants
+    ORDER BY product_variant_table_name
+- :column: mr_purchase_order_items.id
+  :caption: Purchase order items
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

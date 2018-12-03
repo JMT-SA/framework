@@ -1,0 +1,24 @@
+---
+:dataminer_definition: mr_delivery_terms
+:actions:
+- :url: "/pack_material/replenish/mr_delivery_terms/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/pack_material/replenish/mr_delivery_terms/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/pack_material/replenish/mr_delivery_terms/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/replenish/mr_delivery_terms/new"
+  :text: New Delivery Term
+  :style: :button
+  :behaviour: :popup

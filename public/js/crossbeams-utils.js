@@ -216,6 +216,14 @@ const crossbeamsUtils = {
           document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">Error</span>';
         }
         crossbeamsUtils.setDialogContent(data.flash.error);
+        if (data.exception) {
+          if (data.backtrace) {
+            console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+            console.info('==Backend Backtrace==');
+            console.info(data.backtrace.join('\n'));
+            console.groupEnd();
+          }
+        }
       } else if (data.replaceDialog) {
         crossbeamsUtils.setDialogContent(data.replaceDialog.content);
       }
@@ -245,6 +253,23 @@ const crossbeamsUtils = {
     document.getElementById(this.nextDialogTitle()).innerHTML = title;
     document.getElementById(this.nextDialogContent()).innerHTML = text;
     this.nextDialog().show();
+  },
+
+  /**
+   * Load a URL in a new browser window with a "Loading" animation.
+   * @param {string} url - the URL to load.
+   * @returns {void}
+   */
+  loadingWindow: function loadingWindow(url) {
+    crossbeamsLocalStorage.setItem('load_in_new_window', url);
+    const windowReturn = window.open('/loading_window', '_blank', 'titlebar=no,location=no,status');
+    if (windowReturn === null) {
+      crossbeamsUtils.alert({
+        prompt: 'Perhaps the browser is blocking popup windows and you just need to change the setting.',
+        title: 'The window did not seem to load',
+        type: 'warning',
+      });
+    }
   },
 
   /**
@@ -395,6 +420,23 @@ const crossbeamsUtils = {
     elem.value = action.replace_input_value.value;
   },
   /**
+   * Replace the contents of a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceInnerHtml: function replaceInnerHtml(action) {
+    const elem = document.getElementById(action.replace_inner_html.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_inner_html.id}"`,
+        title: 'Replace inner html: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    elem.innerHTML = action.replace_inner_html.value;
+  },
+  /**
    * Replace the items of a List element.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
@@ -442,6 +484,20 @@ const crossbeamsUtils = {
     });
   },
 
+  addGridRow: function addGridRow(action) {
+    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes);
+  },
+
+  updateGridRow: function updateGridRow(action) {
+    action.updateGridInPlace.forEach((gridRow) => {
+      crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
+    });
+  },
+
+  deleteGridRow: function deleteGridRow(action) {
+    crossbeamsGridEvents.removeGridRowInPlace(action.removeGridRowInPlace.id);
+  },
+
   /**
    * Calls all urls for observeChange behaviour and applies changes to the DOM as required..
    * @param {string} url - the url to be called.
@@ -473,11 +529,23 @@ const crossbeamsUtils = {
           if (action.replace_input_value) {
             this.replaceInputValue(action);
           }
+          if (action.replace_inner_html) {
+            this.replaceInnerHtml(action);
+          }
           if (action.replace_list_items) {
             this.replaceListItems(action);
           }
           if (action.clear_form_validation) {
             this.clearFormValidation(action);
+          }
+          if (action.addRowToGrid) {
+            this.addGridRow(action);
+          }
+          if (action.updateGridInPlace) {
+            this.updateGridRow(action);
+          }
+          if (action.removeGridRowInPlace) {
+            this.deleteGridRow(action);
           }
         });
       }
@@ -489,8 +557,10 @@ const crossbeamsUtils = {
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.log('==Backend Backtrace==');
+              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+              console.info('==Backend Backtrace==');
               console.info(data.backtrace.join('\n'));
+              console.groupEnd();
             }
           } else {
             Jackbox.error(data.flash.error);
@@ -503,6 +573,20 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Build a query string from an object of data
+   * (c) 2018 Chris Ferdinandi, MIT License, https://gomakethings.com
+   * @param  {Object} data The data to turn into a query string
+   * @return {String}      The query string
+   */
+  buildQueryString: function buildQueryString(data) {
+    if (typeof (data) === 'string') return data;
+    const query = [];
+    Object.keys(data).forEach((key) => {
+      query.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+    });
+    return query.join('&');
+  },
+  /**
    * Creates a url for observeChange behaviour.
    * @param {element} select - Select that has changed.
    * @param {string} option - the option of the DOM select that has become selected.
@@ -510,16 +594,16 @@ const crossbeamsUtils = {
    */
   buildObserveChangeUrl: function buildObserveChangeUrl(element, option) {
     const optVal = option ? option.value : '';
-    let queryParam = `?changed_value=${optVal}`;
+    const queryParam = { changed_value: optVal };
     element.param_keys.forEach((key) => {
       let val = element.param_values[key];
       if (val === undefined) {
         const e = document.getElementById(key);
         val = e.value;
       }
-      queryParam += `&${key}=${val}`;
+      queryParam[key] = val;
     });
-    return `${element.url}${queryParam}`;
+    return `${element.url}?${crossbeamsUtils.buildQueryString(queryParam)}`;
   },
 
   /**
@@ -774,9 +858,10 @@ const crossbeamsUtils = {
         if (body.flash.error) {
           if (body.exception) {
             if (body.backtrace) {
-              console.log('EXCEPTION:', body.exception, body.flash.error);
-              console.log('==Backend Backtrace==');
+              console.groupCollapsed('EXCEPTION:', body.exception, body.flash.error);
+              console.info('==Backend Backtrace==');
               console.info(body.backtrace.join('\n'));
+              console.groupEnd();
             }
           } else {
             Jackbox.error(body.flash.error);
@@ -835,9 +920,10 @@ const crossbeamsUtils = {
             if (data.exception) {
               Jackbox.error(data.flash.error, { time: 20 });
               if (data.backtrace) {
-                console.log('EXCEPTION:', data.exception, data.flash.error);
-                console.log('==Backend Backtrace==');
+                console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+                console.info('==Backend Backtrace==');
                 console.info(data.backtrace.join('\n'));
+                console.groupEnd();
               }
             } else {
               Jackbox.error(data.flash.error);
@@ -905,8 +991,10 @@ const crossbeamsUtils = {
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.log('==Backend Backtrace==');
+              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+              console.info('==Backend Backtrace==');
               console.info(data.backtrace.join('\n'));
+              console.groupEnd();
             }
           } else {
             Jackbox.error(data.flash.error);

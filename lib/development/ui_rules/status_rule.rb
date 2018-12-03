@@ -10,6 +10,7 @@ module UiRules
       common_values_for_fields select_fields
 
       set_show_fields if @mode == :show
+      rules[:rows] = [@form_object.to_h] if @mode == :show
 
       form_name 'status'
     end
@@ -23,12 +24,13 @@ module UiRules
       fields[:user_name] = { renderer: :label }
       fields[:route_url] = { renderer: :label }
       fields[:context] = { renderer: :label }
-      rules[:headers] = %i[action_tstamp_tx status comment user_name]
+      rules[:headers] = %i[status user_name action_tstamp_tx]
       rules[:details] = @form_object[:logs]
       rules[:header_captions] = { action_tstamp_tx: 'Time' }
-      rules[:other_headers] = %i[link table_name row_data_id status comment user_name]
+      rules[:other_headers] = %i[link table_name row_data_id status user_name action_tstamp_tx]
       rules[:other_details] = @form_object[:other_recs]
-      rules[:other_header_captions] = { row_data_id: 'ID', link: 'View' }
+      rules[:other_header_captions] = { row_data_id: 'ID', link: 'View', action_tstamp_tx: 'Time' }
+      rules[:cols] = %i[status user_name action_tstamp_tx] # comment route_url table_name row_data_id] -- can show under a toggle btn
     end
 
     def select_fields

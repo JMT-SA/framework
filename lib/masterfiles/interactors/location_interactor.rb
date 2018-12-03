@@ -179,6 +179,16 @@ module MasterfilesApp
       success_response('See location code suggestion', res.instance)
     end
 
+    def print_location_barcode(id, params)
+      instance = location(id)
+      # NOTE: we don't know for sure that F1 will be code and F2 will be desc...
+      #       - so we need to get those position/variable links from the label...
+      #       - ALSO: LD needs to change to allow for different variable sets...
+      vars = { F1: instance.location_code, F2: instance.location_description }
+      mes_repo = MesserverApp::MesserverRepo.new
+      mes_repo.print_label(AppConst::LABEL_LOCATION_BARCODE, vars, params[:quantity], params[:printer])
+    end
+
     private
 
     def repo

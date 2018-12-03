@@ -136,6 +136,25 @@
       if (event.target.dataset && event.target.dataset.brieflyDisableWith) {
         preventMultipleSubmitsBriefly(event.target);
       }
+      // Open the href in a new window and show a loading animation.
+      if (event.target.dataset && event.target.dataset.loadingWindow) {
+        event.stopPropagation();
+        event.preventDefault();
+        crossbeamsUtils.loadingWindow(event.target.href);
+      }
+      // Prompt for confirmation
+      if (event.target.dataset && event.target.dataset.prompt) {
+        event.stopPropagation();
+        event.preventDefault();
+        crossbeamsUtils.confirm({
+          prompt: event.target.dataset.prompt,
+          okFunc: () => {
+            // console.log('to call HREF', event.target.href); // TODO: is this a fetch/std call?
+            // SHOULD actually be a POST, not a GET?
+            window.location = event.target.href;
+          },
+        });
+      }
       // Open modal dialog
       if (event.target.dataset && event.target.dataset.popupDialog) {
         if (event.target.dataset.gridId) {
@@ -230,11 +249,23 @@
                 if (action.replace_input_value) {
                   crossbeamsUtils.replaceInputValue(action);
                 }
+                if (action.replace_inner_html) {
+                  crossbeamsUtils.replaceInnerHtml(action);
+                }
                 if (action.replace_list_items) {
                   crossbeamsUtils.replaceListItems(action);
                 }
                 if (action.clear_form_validation) {
                   crossbeamsUtils.clearFormValidation(action);
+                }
+                if (action.addRowToGrid) {
+                  crossbeamsUtils.addGridRow(action);
+                }
+                if (action.updateGridInPlace) {
+                  crossbeamsUtils.updateGridRow(action);
+                }
+                if (action.removeGridRowInPlace) {
+                  crossbeamsUtils.deleteGridRow(action);
                 }
               });
             } else if (data.replaceDialog) {

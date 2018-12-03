@@ -280,5 +280,17 @@ module PackMaterialApp
       SQL
       DB[query, id].first
     end
+
+    def location_id_from_legacy_barcode(value)
+      DB[:locations].where(legacy_barcode: value).get(:id)
+    end
+
+    def location_id_from_location_code(value)
+      DB[:locations].where(location_code: value).get(:id)
+    end
+
+    def sku_ids_from_numbers(values)
+      DB[:mr_skus].where(sku_number: values).map(:id)
+    end
   end
 end

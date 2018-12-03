@@ -214,6 +214,16 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     route.redirect url
   end
 
+  # Redirect via JSON to the last_referer_url in local storage.
+  #
+  # @param route [Roda.route] the current route.
+  # @param key [symbol] a key to identify the stored url.
+  # @return [void]
+  def redirect_via_json_to_stored_referer(key)
+    url = retrieve_from_local_store("last_referer_url_#{key}".to_sym)
+    redirect_via_json(url)
+  end
+
   def redirect_via_json_to_last_grid
     redirect_via_json(session[:last_grid_url])
   end

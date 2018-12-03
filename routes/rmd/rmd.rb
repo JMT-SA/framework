@@ -21,10 +21,10 @@ class Framework < Roda
       for_scan = options[:scan] ? 'Scan ' : ''
       data_type = options[:data_type] || 'text'
       required = options[:required].nil? || options[:required] ? ' required' : ''
-      autofocus = @fields.empty? ? ' autofocus' : ''
+      autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{name}" type="#{data_type}" name="#{name}" placeholder="#{for_scan}#{label}"#{scan_opts(name, options)} value="#{form_state[name]}"#{required}#{autofocus}>
+        <td><input class="pa2#{field_error_class}" id="#{name}" type="#{data_type}" name="#{name}" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}>
         </td></tr>
       HTML
     end
@@ -52,6 +52,19 @@ class Framework < Roda
 
     private
 
+    # Set autofocus on fields in error, or else on the first field.
+    def autofocus_for_field(name)
+      if @form_state[:errors]
+        if @form_state[:errors].key?(name)
+          ' autofocus'
+        else
+          ''
+        end
+      else
+        @fields.empty? ? ' autofocus' : ''
+      end
+    end
+
     def field_renders
       <<~HTML
         <table><tbody>
@@ -60,9 +73,9 @@ class Framework < Roda
       HTML
     end
 
-    def scan_opts(name, options)
+    def scan_opts(options)
       if options[:scan]
-        %( data-scanner="#{options[:scan]}" data-scan-rule="#{name}" autocomplete="off")
+        %( data-scanner="#{options[:scan]}" data-scan-rule="#{options[:scan_type]}" autocomplete="off")
       else
         ''
       end
@@ -151,8 +164,8 @@ class Framework < Roda
                            caption: 'Delivery putaway',
                            action: '/rmd/deliveries/putaways',
                            button_caption: 'Putaway')
-        form.add_field(:location, 'Location', scan: 'key248_all')
-        form.add_field(:sku, 'SKU', scan: 'key248_all')
+        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location)
+        form.add_field(:sku, 'SKU', scan: 'key248_all', scan_type: :sku)
         form.add_field(:quantity, 'Quantity', data_type: 'number')
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)

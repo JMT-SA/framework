@@ -40,6 +40,22 @@ Pass the URL and the app will redirect to it.
 
   redirect_via_json(url)
 
+==== Redirect to either a grid or page (using stored referer)
+
+Sometimes a page can be launched from a grid or from one or more other pages and after some action has been taken, you want to redirect to the appropriate page.
+
+To do this, from the _launched_ page route, call:
+
+  store_last_referer_url(key)
+
+This will store the referer URL (the page that launched this page/dialog) in local storage.
+
+Then when you want to redirect back, call:
+
+  redirect_via_json_to_stored_referer(key)
+
+NOTE: `key` in both cases is a `Symbol`.
+
 ==== Reload the dialog that opened the current dialog
 
 When a dialog opens another dialog, you might want to close the second dialog and then reload (refresh) the first dialog with the response from the original or another URL.

@@ -34,10 +34,12 @@ A11Y Modal Dialog:: Popup dialog (special version that blocks "close with ESC") 
 
 Tachyons:: functional css - link:https://tachyons.io/[Tachyons]
 
-Most classes in code should be tachyons classes (e.g. `class="b blue br3"` means `font-weight: bold`, `color: blue` `border-radius: .5rem`).
+Most classes in code should be tachyons classes (e.g. `class="b blue br3"` (read: bold, blue, border-radius 3) means `font-weight: bold`, `color: blue` `border-radius: .5rem`).
 Custom css should only be written if tachyons does not cover the desired outcome.
 
 === Ruby code
+
+Use link:https://github.com/postmodern/chruby[chruby] to run the correct version of Ruby for the project.
 
 Use link:http://batsov.com/rubocop/[rubocop] to lint code.
 
@@ -49,8 +51,9 @@ Running rubocop (ideally integrate it in your IDE/editor so it runs in real-time
 [source,bash]
 ----
 bundle exec rake rubocop
+
 # This will fix "fixable" violations, but check the changed code carefully
-# as it may not always be 100% correct.
+# as it may not always be 100% correct:
 bundle exec rake rubocop:auto_correct
 
 # To check a particular set of directories or files:
@@ -91,12 +94,26 @@ Other useful git tools:
 
 === Aliases
 
-`checkp` - searches source code for debugging `p` or `puts` statements.
+These aliases can be useful during development.
+
+==== checkp
+
+Searches source code for debugging `p` or `puts` statements.
 
 [source,bash]
 alias checkp="ag '\s(p|puts)\s' lib helpers routes test"
 
-`gitfiles` - lists files that have not been committed. Zip them with `gitfiles | zip afile.zip -@` or open all in vim with `vim $(gitfiles)`.
+NOTE: There will be some false positives (e.g. in `error_helpers.rb` -- where we want to log an error and in `menu_repo.rb` -- where some SQL code includes `p` as an alias).
+
+==== gitfiles
+
+Lists files that have not been committed. Zip them with `gitfiles | zip afile.zip -@` or open all in vim with `vim $(gitfiles)`.
 [source,bash]
 alias gitfiles="git status -su | awk '{sub(/^(R.*-> )|[ M?]+/,\"\")};1' | awk '!/^D/'"
+
+==== testfile
+
+Run the tests defined in one file only. Run: `testfile test/test_base_repo.rb`.
+[source,bash]
+alias testfile="bundle exec ruby -Ilib:test $1"
 

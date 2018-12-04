@@ -109,7 +109,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   publicAPIs.logit = (...args) => {
     console.info(...args);
     if (txtShow !== null) {
-      txtShow.value += `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}\n`;
+      txtShow.insertAdjacentHTML('beforeend', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
     }
   };
 

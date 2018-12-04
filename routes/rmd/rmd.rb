@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class Framework < Roda
-  class RMDForm
-    attr_reader :form_state, :progress, :notes, :scan_with_camera, :caption, :action, :button_caption, :csrf_tag
+  class RMDForm # rubocop:disable Metrics/ClassLength
+    attr_reader :form_state, :form_name, :progress, :notes, :scan_with_camera,
+                :caption, :action, :button_caption, :csrf_tag
 
     def initialize(form_state, options)
       @form_state = form_state
+      @form_name = options.fetch(:form_name)
       @progress = options[:progress]
       @notes = options[:notes]
       @scan_with_camera = options[:scan_with_camera] == true
@@ -24,7 +26,7 @@ class Framework < Roda
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{name}" type="#{data_type}" name="#{name}" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}>
+        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}" name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}>
         </td></tr>
       HTML
     end
@@ -42,7 +44,7 @@ class Framework < Roda
           #{submit_section}
         </form>
         #{progress_section}
-        <textarea id="txtShow" class="navy bg-light-blue" rows="20", cols="35" readonly></textarea>
+        <div id="txtShow" class="navy bg-light-blue mw6 pa2"></div>
       HTML
     end
 
@@ -158,6 +160,7 @@ class Framework < Roda
         # check auth...
         details = retrieve_from_local_store(:delivery_putaway) || {}
         form = RMDForm.new(details,
+                           form_name: :putaway,
                            progress: details[:delivery_id] ? details[:progress] : nil, # 'Delivery 123: 3 of 5 items complete' : nil,
                            notes: 'Scan the location, then the SKU and enter the quantity.',
                            scan_with_camera: @rmd_scan_with_camera,
@@ -174,6 +177,7 @@ class Framework < Roda
       r.post do        # CREATE
         # res = interactor.create_putaway...
         # Simulate interactor call:
+        these_params = params[:putaway]
         instance = { delivery_id: 123 }
         res = if Time.now.sec > 40
                 OpenStruct.new(success: false,
@@ -182,7 +186,7 @@ class Framework < Roda
                                message: 'Validation problem')
               else
                 OpenStruct.new(success: true,
-                               instance: instance.merge(progress: "Delivery 123: 3 of 5 items.<br>Last scan: LOC: #{params[:location]} / SKU: #{params[:sku]}"),
+                               instance: instance.merge(progress: "Delivery 123: 3 of 5 items.<br>Last scan: LOC: #{these_params[:location]} / SKU: #{these_params[:sku]}"),
                                errors: {},
                                message: 'Successful putaway')
               end
@@ -190,7 +194,7 @@ class Framework < Roda
         unless res.success
           payload[:error_message] = res.message
           payload[:errors] = res.errors
-          payload.merge!(location: params[:location], sku: params[:sku], quantity: params[:quantity])
+          payload.merge!(location: these_params[:location], sku: these_params[:sku], quantity: these_params[:quantity])
         end
         store_locally(:delivery_putaway, payload)
         r.redirect '/rmd/deliveries/putaways/new'

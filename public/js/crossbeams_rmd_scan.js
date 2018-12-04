@@ -74,6 +74,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
         matches.push(rule.type);
         res.value = RegExp.lastParen;
         res.scanType = rule.type;
+        res.scanField = rule.field;
       }
     });
     if (matches.length !== 1) {
@@ -116,11 +117,12 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
         scannableInputs.forEach((e) => {
           if (e.value === '' && cnt === 0 && e.dataset.scanRule === scanPack.scanType) {
             e.value = scanPack.value;
+            const field = document.getElementById(`${e.id}_scan_field`);
+            field.value = scanPack.scanField;
             cnt += 1;
           }
         });
       }
-      // publicAPIs.logit('Raw msg:', event.data);
       console.info('Raw msg:', event.data);
     };
   };

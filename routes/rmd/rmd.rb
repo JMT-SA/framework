@@ -26,7 +26,7 @@ class Framework < Roda
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}" name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}>
+        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}" name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}>#{hidden_scan_type(name, options)}
         </td></tr>
       HTML
     end
@@ -65,6 +65,13 @@ class Framework < Roda
       else
         @fields.empty? ? ' autofocus' : ''
       end
+    end
+
+    def hidden_scan_type(name, options)
+      return '' unless options[:scan]
+      <<~HTML
+        <input id="#{form_name}_#{name}_scan_field" type="hidden" name="#{form_name}[#{name}_scan_field]" value="#{form_state["#{name}_scan_field".to_sym]}">
+      HTML
     end
 
     def field_renders
@@ -194,7 +201,8 @@ class Framework < Roda
         unless res.success
           payload[:error_message] = res.message
           payload[:errors] = res.errors
-          payload.merge!(location: these_params[:location], sku: these_params[:sku], quantity: these_params[:quantity])
+          payload.merge!(location: these_params[:location], sku: these_params[:sku], quantity: these_params[:quantity],
+                         location_scan_field: these_params[:location_scan_field], sku_scan_field: these_params[:sku_scan_field])
         end
         store_locally(:delivery_putaway, payload)
         r.redirect '/rmd/deliveries/putaways/new'

@@ -22,10 +22,10 @@ class AppConst
   # These will need to be configured per installation...
   BARCODE_PRINT_RULES = [].freeze
   BARCODE_SCAN_RULES = [
-    { regex: '^LC(\\d+)$', type: 'location' },
-    { regex: '^(\\D\\D\\D)$', type: 'location' },
-    { regex: '^(\\D\\D\\D)$', type: 'dummy' },
-    { regex: '^SK(\\d+)', type: 'sku' }
+    { regex: '^LC(\\d+)$', type: 'location', field: 'id' },
+    { regex: '^(\\D\\D\\D)$', type: 'location', field: 'legacy_barcode' },
+    { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
+    { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' }
   ].freeze
 
   # Que

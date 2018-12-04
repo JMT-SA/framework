@@ -11,9 +11,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   const scannableInputs = document.querySelectorAll('[data-scanner]');
   const cameraScan = document.getElementById('cameraScan');
   let webSocket;
-  // publicAPIs.rules = {};
-  // let expectedScanTypes;
-  // let rules;
 
   //
   // Methods
@@ -42,6 +39,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
     }
   };
 
+  /**
+   * Event listeners for the RMD page.
+   */
   const setupListeners = () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
@@ -57,7 +57,37 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
     }
   };
 
-  const startScanner = function startScanner() {
+  /**
+   * Apply scan rules to the scanned value
+   * to dig out the actual value and type.
+   *
+   * @param {string} val - the scanned value.
+   * @returns {object} success: boolean, value: the value, scanType: the type, error: string.
+   */
+  const unpackScanValue = (val) => {
+    const res = { success: false };
+    const matches = [];
+    let rxp;
+    this.rules.filter(r => this.expectedScanTypes.indexOf(r.type) !== -1).forEach((rule) => {
+      rxp = RegExp(rule.regex);
+      if (rxp.test(val)) {
+        matches.push(rule.type);
+        res.value = RegExp.lastParen;
+        res.scanType = rule.type;
+      }
+    });
+    if (matches.length !== 1) {
+      res.error = matches.length === 0 ? `${val} does not match any scannable rules` : 'Too many rules match';
+    } else {
+      res.success = true;
+    }
+    return res;
+  };
+
+  /**
+   * startScanner - set up the websocket connection and its callbacks.
+   */
+  const startScanner = () => {
     const wsUrl = 'ws://127.0.0.1:2115';
 
     if (webSocket !== undefined && webSocket.readyState !== WebSocket.CLOSED) { return; }
@@ -76,35 +106,33 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
     };
 
     webSocket.onmessage = function onmessage(event) {
-      if (event.data.includes('Scans=')) {
-        publicAPIs.logit('scan', event.data, 'END');
-      } else if (event.data.includes('Flashlight=')) {
-        publicAPIs.logit('flash', event.data, 'END');
-      } else {
-        if (event.data.includes('[SCAN]')) {
-          const scanValue = event.data.split(',')[0].replace('[SCAN]', '');
-          // const scanPack = unpackScanValue(event.data.split(',')[0].replace('[SCAN]', ''));
-          // if scanPAck.error, publicAPIs.logit(scanPack.error)
-          // else... alloc according to type
-          // List of scan targets
-          // check each to see if empty & if data-scan-rule matches value,
-          // place in available slot - OR show message (locked until button pressed...)
-          // scanTarget.value = scanValue;
-          let cnt = 0;
-          scannableInputs.forEach((e) => {
-            if (e.value === '' && cnt === 0) {
-              e.value = scanValue;
-              cnt += 1;
-            }
-          });
+      if (event.data.includes('[SCAN]')) {
+        const scanPack = unpackScanValue(event.data.split(',')[0].replace('[SCAN]', ''));
+        if (!scanPack.success) {
+          publicAPIs.logit(scanPack.error);
+          return;
         }
-        publicAPIs.logit(event.data);
+        let cnt = 0;
+        scannableInputs.forEach((e) => {
+          if (e.value === '' && cnt === 0 && e.dataset.scanRule === scanPack.scanType) {
+            e.value = scanPack.value;
+            cnt += 1;
+          }
+        });
       }
+      // publicAPIs.logit('Raw msg:', event.data);
+      console.info('Raw msg:', event.data);
     };
   };
 
+  //
+  // PUBLIC Methods
+  //
+
   /**
-   * A public method
+   * Log to screen and console.
+   *
+   * @param {Array} args.
    */
   publicAPIs.logit = (...args) => {
     console.info(...args);
@@ -113,26 +141,35 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
     }
   };
 
-  publicAPIs.showme = () => this.rules;
+  /**
+   * show settings in use for this page.
+   */
+  publicAPIs.showSettings = () => ({
+    expectedScanTypes: this.expectedScanTypes,
+    rules: this.rules,
+    rulesForThisPage: this.rules.filter(r => this.expectedScanTypes.indexOf(r.type) !== -1),
+  });
 
   /**
-   * Another public method
+   * Init
+   * Find the possible scan types in the page.
+   * Call setupListeners to set up listeners for the page.
+   * Call startScanner to make the websocket connection.
+   *
+   * @param {object} rules - the rules for identifying scan values.
    */
-  publicAPIs.init = (options) => {
-    // TODO: get expected scan types, set up rules, interpret scans...
-    // & decide where scanned value goes.
-    console.log(options);
-    this.rules = options.rules;
+  publicAPIs.init = (rules) => {
+    this.rules = rules;
     this.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
     this.expectedScanTypes = this.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
+
     setupListeners();
+
     startScanner();
   };
-
 
   //
   // Return the Public APIs
   //
-
   return publicAPIs;
 }());

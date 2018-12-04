@@ -19,6 +19,15 @@ class AppConst
   LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
   LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 
+  # These will need to be configured per installation...
+  BARCODE_PRINT_RULES = [].freeze
+  BARCODE_SCAN_RULES = [
+    { regex: '^LC(\\d+)$', type: 'location' },
+    { regex: '^(\\D\\D\\D)$', type: 'location' },
+    { regex: '^(\\D\\D\\D)$', type: 'dummy' },
+    { regex: '^SK(\\d+)', type: 'sku' }
+  ].freeze
+
   # Que
   QUEUE_NAME = ENV.fetch('QUEUE_NAME', 'default')
 

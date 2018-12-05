@@ -184,7 +184,21 @@ module MasterfilesApp
       # NOTE: we don't know for sure that F1 will be code and F2 will be desc...
       #       - so we need to get those position/variable links from the label...
       #       - ALSO: LD needs to change to allow for different variable sets...
-      vars = { F1: instance.location_code, F2: instance.location_description }
+
+      # This is an approximation of something we might get from the label variables:
+      lbl_required = [{ f_no: 1, field: 'location_barcode' }, # This is a field used in the label, not the table...
+                      { f_no: 2, field: 'location_description' },
+                      { f_no: 3, field: 'location_code' },
+                      { f_no: 4, field: 'legacy_barcode' }]
+      vars = {}
+      bcp = BarcodeProcessing.new
+      lbl_required.each do |var|
+        vars["F#{var[:f_no]}".to_sym] = if var[:field].end_with?('_barcode') && !instance.respond_to?(var[:field])
+                                          bcp.make_barcode(instance, var[:field].delete_suffix('_barcode'))
+                                        else
+                                          instance[var[:field].to_sym]
+                                        end
+      end
       mes_repo = MesserverApp::MesserverRepo.new
       mes_repo.print_label(AppConst::LABEL_LOCATION_BARCODE, vars, params[:quantity], params[:printer])
     end

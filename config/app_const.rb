@@ -20,7 +20,11 @@ class AppConst
   LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 
   # These will need to be configured per installation...
-  BARCODE_PRINT_RULES = [].freeze
+  BARCODE_PRINT_RULES = {
+    location: { format: 'LC%d', fields: [:id] },
+    sku: { format: 'SK%d', fields: [:sku_number] }
+  }.freeze
+
   BARCODE_SCAN_RULES = [
     { regex: '^LC(\\d+)$', type: 'location', field: 'id' },
     { regex: '^(\\D\\D\\D)$', type: 'location', field: 'legacy_barcode' },

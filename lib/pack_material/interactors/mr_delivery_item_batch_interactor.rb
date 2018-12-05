@@ -57,7 +57,20 @@ module PackMaterialApp
       # NOTE: we don't know for sure what the order of F1, F2 etc will always be...
       #       - so we need to get those position/variable links from the label...
       #       - ALSO: LD needs to change to allow for different variable sets...
-      vars = { F1: "SKU-#{instance[:sku_number]}", F2: instance[:sku_number], F3: instance[:product_variant_code], F4: instance[:batch_number] }
+      # vars = { F1: "SKU-#{instance[:sku_number]}", F2: instance[:sku_number], F3: instance[:product_variant_code], F4: instance[:batch_number] }
+      lbl_required = [{ f_no: 1, field: 'sku_barcode' }, # This is a field used in the label, not the table...
+                      { f_no: 2, field: 'sku_number' },
+                      { f_no: 3, field: 'product_variant_code' },
+                      { f_no: 4, field: 'batch_number' }]
+      vars = {}
+      bcp = BarcodeProcessing.new
+      lbl_required.each do |var|
+        vars["F#{var[:f_no]}".to_sym] = if var[:field].end_with?('_barcode') && !instance.key?(var[:field])
+                                          bcp.make_barcode(instance, var[:field].delete_suffix('_barcode').to_sym)
+                                        else
+                                          instance[var[:field].to_sym]
+                                        end
+      end
       mes_repo = MesserverApp::MesserverRepo.new
       mes_repo.print_label(AppConst::LABEL_SKU_BARCODE, vars, params[:no_of_prints], params[:printer])
     end

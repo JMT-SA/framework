@@ -32,5 +32,23 @@ class Framework < Roda
         json_replace_input_value('scaffold_short_name', params[:changed_value])
       end
     end
+
+    # GENERAL
+    # --------------------------------------------------------------------------
+    r.on 'email_test' do
+      r.get do
+        show_page { Development::Generators::General::Email.call }
+      end
+      r.post do
+        opts = {
+          to: params[:mail][:to],
+          subject: params[:mail][:subject],
+          body: params[:mail][:body]
+        }
+        opts[:cc] = params[:mail][:cc] if params[:mail][:cc]
+        DevelopmentApp::SendMailJob.enqueue(opts)
+        show_page_success('Added email-sending job to the queue')
+      end
+    end
   end
 end

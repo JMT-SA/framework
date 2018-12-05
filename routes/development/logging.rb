@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Framework < Roda
-  route 'logging', 'development' do |r|
+  route 'logging', 'development' do |r| # rubocop:disable Metrics/BlockLength
     #
     # LOGGED ACTION DETAILS
     # --------------------------------------------------------------------------

@@ -29,6 +29,8 @@ Mail.defaults do
 end
 ----
 
+You can test the config is OK by sending a test email from link:/development/generators/email_test[/development/generators/email_test]
+
 === Enqueue the email job
 
 Emails should be sent via the job queue so that the process that needs to send the email does not have to wait for a successful send.

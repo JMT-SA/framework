@@ -275,6 +275,7 @@ const crossbeamsUtils = {
   /**
    * Take selected options from a multiselect and return them in a sequence
    * that matches an array of selected ids.
+   *
    * @param {node} sel - a select DOM node;
    * @param {array} sortedIds - a list of ids in a particular sequence.
    * @returns {array} out - the sorted options.
@@ -308,6 +309,18 @@ const crossbeamsUtils = {
         non_selected_header: 'Options',
         selected_header: 'Selected',
       }); // multi select with two panes...
+
+      // observeChange behaviour - call specified urls on change of selection.
+      if (sel.dataset && sel.dataset.observeChange) {
+        sel.addEventListener('change', () => {
+          const s = sel.dataset.observeChange;
+          const j = JSON.parse(s);
+          const option = Array.from(sel.selectedOptions).map(opt => opt.value).join(',');
+          const urls = j.map(el => this.buildObserveChangeUrl(el, option));
+
+          urls.forEach(url => this.fetchDropdownChanges(url));
+        });
+      }
 
       // observeSelected behaviour - get rules from select element and
       // add selected options to a sortable element.
@@ -588,12 +601,18 @@ const crossbeamsUtils = {
   },
   /**
    * Creates a url for observeChange behaviour.
+   *
    * @param {element} select - Select that has changed.
    * @param {string} option - the option of the DOM select that has become selected.
    * @returns {string} the url.
    */
   buildObserveChangeUrl: function buildObserveChangeUrl(element, option) {
-    const optVal = option ? option.value : '';
+    let optVal;
+    if (option === null || option === undefined) {
+      optVal = '';
+    } else {
+      optVal = typeof option === 'string' ? option : option.value;
+    }
     const queryParam = { changed_value: optVal };
     element.param_keys.forEach((key) => {
       let val = element.param_values[key];

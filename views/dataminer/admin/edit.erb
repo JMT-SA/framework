@@ -136,13 +136,11 @@
           keyColumn: 'name',
           domGridId: 'grd1'
               },
-                enableColResize: true,
-                enableSorting: true,
-                enableFilter: true,
-                enableRangeSelection: true,
-                enableStatusBar: true,
-                suppressAggFuncInHeader: true,
-        toolPanelSuppressPivotMode: true,
+        enableColResize: true,
+        enableSorting: true,
+        enableFilter: true,
+        enableRangeSelection: true,
+        suppressAggFuncInHeader: true,
         onCellValueChanged: function(event) {
           if(event.oldValue === event.newValue) {
             console.log('NOCHANGE!');
@@ -214,13 +212,11 @@
       gridOptions = {
         columnDefs: colDefs,
         rowData: rowDefs,
-                enableColResize: true,
-                enableSorting: true,
-                enableFilter: true,
-                enableRangeSelection: true,
-                enableStatusBar: true,
+        enableColResize: true,
+        enableSorting: true,
+        enableFilter: true,
+        enableRangeSelection: true,
         suppressAggFuncInHeader: true,
-        toolPanelSuppressPivotMode: true
               };
 
       new agGrid.Grid(grid, gridOptions);

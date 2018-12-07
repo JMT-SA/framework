@@ -281,13 +281,6 @@ module MasterfilesApp
       assert party_role_created
     end
 
-    def test_for_select_parties
-      5.times do
-        create_party
-      end
-      assert_equal 5, repo.for_select_parties.count
-    end
-
     def test_create_customer
       party_id = create_party
       attrs = {

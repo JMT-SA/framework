@@ -32,13 +32,6 @@ module PackMaterialApp
       crud_call_for('matres_product_variant_party_role')
     end
 
-    def test_product_code_column_subset
-      ConfigRepo.any_instance
-                .stubs(:for_select_material_resource_product_columns)
-                .returns([['a', 1], ['a', 2], ['a', 3], ['a', 5], ['a', 6]])
-      assert_equal [['a', 1], ['a', 2], ['a', 3]], repo.product_code_column_subset([1, 2, 3])
-    end
-
     def test_for_select_configured_sub_types
       # First Type: one configured, one invalid sub type
       type_id1 = create_matres_type(short_code: 'T1')
@@ -155,28 +148,6 @@ module PackMaterialApp
       assert_nil repo.find_matres_sub_type(first[:matres_sub_type_id])
     end
 
-    def test_product_variant_columns
-      id1 = create_product_column
-      id2 = create_product_column
-      id3 = create_product_column
-      other_dom_id = create_other_domain
-      create_product_column(
-        material_resource_domain_id: other_dom_id
-      )
-      sub_id = create_sub_type(
-        product_code_ids: "{#{id1}}",
-        product_column_ids: "{#{id1},#{id2},#{id3}}"
-      )
-
-      variant_columns = repo.product_variant_columns(sub_id)
-      assert(variant_columns.none? { |r| r.last == id1 })
-      assert(variant_columns.any? { |r| r.last == id2 })
-      assert(variant_columns.any? { |r| r.last == id3 })
-
-      DB[:material_resource_sub_types].where(id: sub_id).delete
-      assert_raises(NoMethodError) { repo.product_variant_columns(sub_id) }
-    end
-
     def test_product_code_columns
       id1 = create_product_column
       id2 = create_product_column
@@ -193,12 +164,12 @@ module PackMaterialApp
 
     def test_update_product_code_configuration
       sub_id = create_sub_type
-      test_res = { chosen_column_ids: [77, 78, 79], columncodes_sorted_ids: [78, 79, 77] }
+      test_res = { chosen_column_ids: [77, 78, 79, 1], columncodes_sorted_ids: [78, 79, 77], variant_product_code_column_ids: [1] }
       x = repo.update_product_code_configuration(sub_id, test_res)
       assert_equal(true, x.success)
 
       matres_sub_type = repo.find_matres_sub_type(sub_id)
-      assert_equal(matres_sub_type.product_column_ids.join(','), '77,78,79')
+      assert_equal(matres_sub_type.product_column_ids.join(','), '77,78,79,1')
       assert_equal(matres_sub_type.product_code_ids.join(','), '78,79,77')
     end
 

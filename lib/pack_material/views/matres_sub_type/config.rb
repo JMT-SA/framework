@@ -55,6 +55,12 @@ module PackMaterial
                     col.add_sortable_list('columncodes', product_code_column_name_list, caption: 'Drag columns to set order for first part of code')
                   end
                 end
+
+                form.row do |row|
+                  row.column do |col|
+                    col.add_field :variant_product_code_column_ids
+                  end
+                end
               end
             end
           end

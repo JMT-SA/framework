@@ -179,6 +179,21 @@ class Framework < Roda
           end
         end
       end
+      r.on 'product_code_columns_selected' do
+        interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+        res = interactor.chosen_product_columns(id, params[:changed_value])
+        json_replace_multi_options('product_code_columns_variant_product_code_column_ids', res.instance[:variant])
+      end
+      r.on 'link_product_columns' do
+        r.post do
+          interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+          ids = multiselect_grid_choices(params)
+          res = interactor.link_product_columns(id, ids)
+          json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_product_code_column_ids', options_array: res.instance[:code]),
+                        OpenStruct.new(type: :replace_input_value, dom_id: 'product_code_columns_chosen_column_ids', value: ids.join(','))],
+                       'Re-assigned product columns')
+        end
+      end
       r.is do
         r.get do
           check_auth!('configuration', 'read')
@@ -231,16 +246,6 @@ class Framework < Roda
                                                           remote: fetch?(r))
           end
         end
-      end
-    end
-    r.on 'link_product_columns' do
-      r.post do
-        interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
-        ids = multiselect_grid_choices(params)
-        res = interactor.chosen_product_columns(ids)
-        json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_product_code_column_ids', options_array: res.instance[:code]),
-                      OpenStruct.new(type: :replace_input_value, dom_id: 'product_code_columns_chosen_column_ids', value: ids.join(','))],
-                     'Re-assigned product columns')
       end
     end
 

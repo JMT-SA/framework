@@ -17,5 +17,6 @@ module PackMaterialApp
 
     required(:chosen_column_ids, Types::ArrayFromString).filled { each(:int?) }
     required(:columncodes_sorted_ids, Types::ArrayFromString).filled(:array?) { each(:int?) }
+    required(:variant_product_code_column_ids, Types::Array).filled(:array?)
   end
 end

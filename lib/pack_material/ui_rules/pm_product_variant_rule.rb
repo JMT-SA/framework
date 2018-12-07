@@ -14,6 +14,11 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @sub_type_id = sub_type_id
+      rules[:product_variant_column_set] = product_variant_column_set
+      rules[:opt_product_variant_column_set] = opt_product_variant_column_set
+      rules[:pm_product_id] = product_id
+
       common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
@@ -65,7 +70,8 @@ module UiRules
         specification_reference: {}
       }
 
-      product_column_set.each do |col_name|
+      all_fields = product_variant_column_set.map { |r| [r, true] } + opt_product_variant_column_set.map { |r| [r, false] }
+      all_fields.each do |col_name, req|
         list = master_list_items(col_name.to_s)
         list = @commodity_repo.for_select_commodities if col_name == :commodity_id
         list = @variety_repo.for_select_marketing_varieties if col_name == :marketing_variety_id
@@ -73,7 +79,7 @@ module UiRules
         caption = col_name.to_s.gsub('_id', '').gsub('pm_', '').tr('_', ' ').capitalize
         caption = 'Variety' if col_name == :marketing_variety_id
 
-        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: true } : { required: true, caption: caption }
+        x[col_name] = list.any? ? { renderer: :select, options: list, caption: caption, required: req } : { required: req, caption: caption }
       end
       x
     end
@@ -82,14 +88,21 @@ module UiRules
       @form_object.pack_material_product_id || @options[:parent_id]
     end
 
-    def product_column_set
+    def sub_type_id
       product = @repo.find_pm_product(product_id)
-      @config_repo.product_variant_columns(product.material_resource_sub_type_id).map { |r| r[0].to_sym }
+      product.material_resource_sub_type_id
+    end
+
+    def product_variant_column_set
+      @config_repo.product_variant_code_columns(@sub_type_id).map { |r| r[0].to_sym }
+    end
+
+    def opt_product_variant_column_set
+      @config_repo.optional_product_variant_code_columns(@sub_type_id).map { |r| r[0].to_sym }
     end
 
     def master_list_items(product_column)
-      product = @repo.find_pm_product(product_id)
-      @config_repo.for_select_sub_type_master_list_items(product.material_resource_sub_type_id, product_column)
+      @config_repo.for_select_sub_type_master_list_items(@sub_type_id, product_column)
     end
 
     def variety_id_label

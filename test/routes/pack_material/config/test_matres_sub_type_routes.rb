@@ -342,8 +342,8 @@ class TestMatresSubTypeRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
 
-    INTERACTOR.any_instance.stubs(:chosen_product_columns).returns(ok_response(instance: OpenStruct.new(code: [1,2,3])))
-    post_as_fetch 'pack_material/config/link_product_columns', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    INTERACTOR.any_instance.stubs(:link_product_columns).returns(ok_response(instance: OpenStruct.new(code: [1,2,3])))
+    post_as_fetch 'pack_material/config/material_resource_sub_types/1/link_product_columns', { selection: { list: '1,2,3' } }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_response
     assert last_response.ok?
     assert last_response.body.include?('actions')

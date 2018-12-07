@@ -49,11 +49,12 @@ module PackMaterialApp
       prod_code_ids = prod_col_ids[0..2]
       default = {
         material_resource_type_id: @fixed_table_set[:matres_types][:sc][:id],
-        sub_type_name: Faker::Company.name.to_s,
-        short_code: Faker::Lorem.unique.word,
-        active: true,
-        product_code_ids: "{#{prod_code_ids.join(',')}}",
-        product_column_ids: "{#{prod_col_ids.join(',')}}"
+        sub_type_name:             Faker::Company.name.to_s,
+        short_code:                Faker::Lorem.unique.word,
+        active:                    true,
+        product_code_ids:          "{#{prod_code_ids.join(',')}}",
+        product_column_ids:        "{#{prod_col_ids.join(',')}}",
+        product_variant_code_ids:  '{1}'
       }
       DB[:material_resource_sub_types].insert(default.merge(opts))
     end

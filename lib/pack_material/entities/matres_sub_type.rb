@@ -13,6 +13,8 @@ module PackMaterialApp
     attribute :active, Types::Bool
     attribute :product_column_ids, Types::Array
     attribute :product_code_ids, Types::Array
+    attribute :product_variant_code_ids, Types::Array
+    attribute :optional_product_variant_code_ids, Types::Array
     attribute :internal_seq, Types::Integer
   end
 end

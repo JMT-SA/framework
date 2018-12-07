@@ -101,7 +101,8 @@ module PackMaterialApp
       optgroup_array(DB["SELECT mrst.sub_type_name, mrst.id, mrt.short_code as type_name from material_resource_sub_types mrst
       LEFT JOIN material_resource_types mrt on mrst.material_resource_type_id = mrt.id
       LEFT JOIN material_resource_domains dom on mrt.material_resource_domain_id = dom.id
-      WHERE dom.domain_name = '#{domain_name}' AND mrst.active IS true AND mrst.product_code_ids IS NOT null;"].all, :type_name, :sub_type_name, :id)
+      WHERE dom.domain_name = '#{domain_name}' AND mrst.active IS true
+      AND mrst.product_code_ids IS NOT null AND mrst.product_variant_code_ids IS NOT null;"].all, :type_name, :sub_type_name, :id)
     end
 
     # TYPES
@@ -164,13 +165,6 @@ module PackMaterialApp
       all_hash(:"#{table_name}", material_resource_sub_type_id: id).map { |r| r[:id] }
     end
 
-    def product_variant_columns(sub_type_id)
-      sub_type = DB[:material_resource_sub_types].where(id: sub_type_id).first
-      product_variant_column_ids = (sub_type[:product_column_ids] || []) - (sub_type[:product_code_ids] || [])
-      DB[:material_resource_product_columns].where(id: product_variant_column_ids)
-                                            .map { |rec| [rec[:column_name], rec[:id]] }
-    end
-
     def product_code_columns(sub_type_id)
       query = <<~SQL
         SELECT pc.column_name, pc.id
@@ -181,8 +175,35 @@ module PackMaterialApp
       DB[query].map { |rec| [rec[:column_name], rec[:id]] }
     end
 
-    def product_code_column_subset(ids)
-      for_select_material_resource_product_columns.select { |i| ids.include?(i[1]) }
+    def product_variant_code_columns(sub_type_id)
+      query = <<~SQL
+        SELECT pc.column_name, pc.id
+        FROM unnest((SELECT st.product_variant_code_ids FROM material_resource_sub_types st WHERE st.id = #{sub_type_id})) WITH ORDINALITY t(id, ord)
+        LEFT JOIN material_resource_product_columns pc on pc.id = t.id
+        ORDER BY t.ord
+      SQL
+      DB[query].map { |rec| [rec[:column_name], rec[:id]] }
+    end
+
+    def optional_product_variant_code_columns(sub_type_id)
+      query = <<~SQL
+        SELECT pc.column_name, pc.id
+        FROM unnest((SELECT st.optional_product_variant_code_ids FROM material_resource_sub_types st WHERE st.id = #{sub_type_id})) WITH ORDINALITY t(id, ord)
+        LEFT JOIN material_resource_product_columns pc on pc.id = t.id
+        ORDER BY t.ord
+      SQL
+      DB[query].map { |rec| [rec[:column_name], rec[:id]] }
+    end
+
+    def product_code_column_options(sub_type_id, ids)
+      sub_type = find_matres_sub_type(sub_type_id)
+      return [[], []] unless sub_type.product_column_ids
+      all_product_columns = for_select_material_resource_product_columns
+      product_code_options = all_product_columns.select { |i| sub_type.product_column_ids.map(&:to_i).include?(i[1]) }
+
+      selected_option_ids = (ids.is_a?(String) ? ids.split(',') : ids) || sub_type.product_code_ids || []
+      variant_options = product_code_options.reject { |i| selected_option_ids.map(&:to_i).include?(i[1]) }
+      [product_code_options, variant_options]
     end
 
     def product_columns(sub_type_id)
@@ -192,15 +213,23 @@ module PackMaterialApp
     end
 
     def update_product_code_configuration(config_id, res)
+      var_ids = res[:variant_product_code_column_ids].map(&:to_i)
+      optional_ids = res[:chosen_column_ids] - res[:columncodes_sorted_ids] - var_ids
       changes = <<~SQL
         UPDATE material_resource_sub_types
            SET product_column_ids = '{#{res[:chosen_column_ids].join(',')}}',
-               product_code_ids = '{#{res[:columncodes_sorted_ids].join(',')}}'
+               product_code_ids = '{#{res[:columncodes_sorted_ids].join(',')}}',
+               product_variant_code_ids = '{#{var_ids.join(',')}}',
+               optional_product_variant_code_ids = '{#{optional_ids.join(',')}}'
         WHERE id = #{config_id};
       SQL
 
       DB[changes].update
       success_response('ok')
+    end
+
+    def update_product_column_ids(sub_type_id, ids)
+      DB["UPDATE material_resource_sub_types SET product_column_ids = '{#{ids.join(',')}}' WHERE id = #{sub_type_id}"].update
     end
 
     def for_select_sub_type_master_list_items(sub_type_id, product_column_name)

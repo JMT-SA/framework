@@ -2,7 +2,7 @@
 :dataminer_definition: material_resource_product_columns
 :multiselect:
   :material_resource_type_configs:
-    :url: '/pack_material/config/link_product_columns/$:id$'
+    :url: '/pack_material/config/material_resource_sub_types/$:id$/link_product_columns'
     :preselect: "SELECT unnest(product_column_ids) FROM material_resource_sub_types WHERE id = $:id$"
     :section_caption: "Select product columns"
     :grid_caption: Assign product columns

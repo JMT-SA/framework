@@ -71,9 +71,14 @@ module PackMaterialApp
       success_response('Updated the config')
     end
 
-    def chosen_product_columns(ids)
-      code_items = repo.product_code_column_subset(ids)
-      success_response('got_items', code: code_items)
+    def chosen_product_columns(sub_type_id, ids)
+      code_items, var_items = repo.product_code_column_options(sub_type_id, ids)
+      success_response('got_items', code: code_items, variant: var_items)
+    end
+
+    def link_product_columns(sub_type_id, ids)
+      repo.update_product_column_ids(sub_type_id, ids)
+      chosen_product_columns(sub_type_id, [])
     end
 
     def update_product_code_configuration(id, params)

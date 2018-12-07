@@ -22,7 +22,7 @@
   :icon: list
   :hide_if_true: has_products
 - :url: "/pack_material/config/material_resource_sub_types/$:id$/product_columns"
-  :text: product columns
+  :text: master lists
   :icon: list
   :hide_if_null: product_column_ids
 :page_controls:

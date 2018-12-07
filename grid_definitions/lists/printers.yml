@@ -1,0 +1,14 @@
+---
+:dataminer_definition: printers
+:actions:
+- :url: "/labels/printers/printers/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/labels/printers/printers/refresh"
+  :text: Refresh printer list
+  :style: :button
+  :behaviour: :default

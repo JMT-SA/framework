@@ -1,0 +1,148 @@
+---
+:caption: Printer Application
+:sql: "SELECT \"printer_applications\".\"id\", \"printer_applications\".\"printer_id\",
+  \"printer_applications\".\"application\", \"printer_applications\".\"active\",
+  \"printer_applications\".\"created_at\", \"printer_applications\".\"updated_at\",
+  \"printers\".\"printer_code\", \"printers\".\"printer_name\"\r\nFROM \"printer_applications\"\r\nJOIN
+  \"printers\" ON \"printers\".\"id\" = \"printer_applications\".\"printer_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: printer_applications.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_id:
+    :name: printer_id
+    :sequence_no: 2
+    :caption: Printer
+    :namespaced_name: printer_applications.printer_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  application:
+    :name: application
+    :sequence_no: 3
+    :caption: application
+    :namespaced_name: printer_applications.application
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 4
+    :caption: Active
+    :namespaced_name: printer_applications.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 5
+    :caption: Created at
+    :namespaced_name: printer_applications.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 6
+    :caption: Updated at
+    :namespaced_name: printer_applications.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_code:
+    :name: printer_code
+    :sequence_no: 7
+    :caption: Printer code
+    :namespaced_name: printers.printer_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_name:
+    :name: printer_name
+    :sequence_no: 8
+    :caption: Printer name
+    :namespaced_name: printers.printer_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: printer_applications.printer_id
+  :caption: Printer
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT printer_code, id FROM printers ORDER BY printer_code
+- :column: printer_applications.application
+  :caption: application
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

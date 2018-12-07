@@ -7,6 +7,8 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- Maintain printers.
+- Maintain printer applications and use them for selecting printers for barcode prints.
 ### Changed
 ### Fixed
 

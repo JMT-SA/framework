@@ -200,7 +200,8 @@ module MasterfilesApp
                                         end
       end
       mes_repo = MesserverApp::MesserverRepo.new
-      mes_repo.print_label(AppConst::LABEL_LOCATION_BARCODE, vars, params[:quantity], params[:printer])
+      printer = repo.find_hash(:printers, params[:printer])
+      mes_repo.print_label(AppConst::LABEL_LOCATION_BARCODE, vars, params[:quantity], printer[:printer_code])
     end
 
     private

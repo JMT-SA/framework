@@ -25,11 +25,13 @@ module UiRules
     end
 
     def set_print_fields
-      printers = [['Label Designer', 'PRN-01']] # @repo.for_select_label_printers # FIXME: hard-coded list...
+      repo = LabelApp::PrinterRepo.new
       fields[:sku_number] = { renderer: :label }
       fields[:product_variant_code] = { renderer: :label }
       fields[:batch_number] = { renderer: :label }
-      fields[:printer] = { renderer: :select, options: printers, required: true }
+      fields[:printer] = { renderer: :select,
+                           options: repo.select_printers_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE),
+                           required: true }
       fields[:no_of_prints] = { renderer: :integer, required: true }
     end
 

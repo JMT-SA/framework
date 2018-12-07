@@ -14,7 +14,7 @@ module PackMaterialApp
       MrDeliveryItemBatchSchema.call(params)
     end
 
-    def create_mr_delivery_item_batch(parent_id, params)
+    def create_mr_delivery_item_batch(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_delivery_item_id] = parent_id
       res = validate_mr_delivery_item_batch_params(params)
       res.messages[:base] = res.messages[:internal_or_client_batch_number] if res.messages && res.messages[:internal_or_client_batch_number]
@@ -52,7 +52,7 @@ module PackMaterialApp
       success_response("Deleted delivery item batch assignment to #{batch_number}")
     end
 
-    def print_sku_barcode(id, params)
+    def print_sku_barcode(id, params) # rubocop:disable Metrics/AbcSize
       instance = repo.sku_for_barcode(id)
       # NOTE: we don't know for sure what the order of F1, F2 etc will always be...
       #       - so we need to get those position/variable links from the label...
@@ -72,7 +72,8 @@ module PackMaterialApp
                                         end
       end
       mes_repo = MesserverApp::MesserverRepo.new
-      mes_repo.print_label(AppConst::LABEL_SKU_BARCODE, vars, params[:no_of_prints], params[:printer])
+      printer = repo.find_hash(:printers, params[:printer])
+      mes_repo.print_label(AppConst::LABEL_SKU_BARCODE, vars, params[:no_of_prints], printer[:printer_code])
     end
   end
 end

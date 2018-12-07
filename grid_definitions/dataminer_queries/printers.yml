@@ -1,0 +1,129 @@
+---
+:caption: Printers
+:sql: SELECT "printers"."id", "printers"."printer_code", "printers"."printer_name",
+  "printers"."printer_type", "printers"."pixels_per_mm", "printers"."printer_language",
+  "printers"."created_at", "printers"."updated_at" FROM "printers"
+:limit: 
+:offset: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: printers.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_code:
+    :name: printer_code
+    :sequence_no: 2
+    :caption: Printer code
+    :namespaced_name: printers.printer_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_name:
+    :name: printer_name
+    :sequence_no: 3
+    :caption: Printer name
+    :namespaced_name: printers.printer_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_type:
+    :name: printer_type
+    :sequence_no: 4
+    :caption: Printer type
+    :namespaced_name: printers.printer_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pixels_per_mm:
+    :name: pixels_per_mm
+    :sequence_no: 5
+    :caption: Pixels per mm
+    :namespaced_name: printers.pixels_per_mm
+    :data_type: :integer
+    :width: 130
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_language:
+    :name: printer_language
+    :sequence_no: 6
+    :caption: Printer language
+    :namespaced_name: printers.printer_language
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: printers.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: printers.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

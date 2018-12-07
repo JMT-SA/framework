@@ -19,6 +19,15 @@ class AppConst
   LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
   LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 
+  # Printers
+  PRINT_APP_LOCATION = 'Location'
+  PRINT_APP_MR_SKU_BARCODE = 'Material Resource SKU Barcode'
+
+  PRINTER_APPLICATIONS = [
+    PRINT_APP_LOCATION,
+    PRINT_APP_MR_SKU_BARCODE
+  ].freeze
+
   # These will need to be configured per installation...
   BARCODE_PRINT_RULES = {
     location: { format: 'LC%d', fields: [:id] },

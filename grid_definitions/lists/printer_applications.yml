@@ -1,0 +1,24 @@
+---
+:dataminer_definition: printer_applications
+:actions:
+- :url: "/labels/printers/printer_applications/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/labels/printers/printer_applications/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/labels/printers/printer_applications/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/labels/printers/printer_applications/new"
+  :text: New Printer Application
+  :style: :button
+  :behaviour: :popup

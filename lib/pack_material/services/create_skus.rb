@@ -13,7 +13,7 @@ module PackMaterialApp
       business_process_id = @repo.delivery_process_id
 
       # TODO: location_code should be selected on the delivery
-      CreateMrStock.call(sku_ids, business_process_id, location_code: 'RECEIVING BAY', delivery_id: @id)
+      CreateMrStock.call(sku_ids, business_process_id, location_code: DEFAULT_RECEIVING_BAY_NAME, delivery_id: @id)
     end
   end
 end

@@ -47,4 +47,9 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
          'Deliveries', '/list/mr_deliveries', 2);
 
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('CREATE STOCK');
+INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('PUTAWAY');
+INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('ADHOC MOVE');
+
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('DELIVERIES');
+INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('VEHICLE JOBS');
+INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('ADHOC TRANSACTIONS');

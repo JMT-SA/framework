@@ -49,20 +49,24 @@ module PackMaterialApp
 
     def create_pm_product_variant(attrs)
       sub_type_id = DB[:pack_material_products].where(id: attrs[:pack_material_product_id]).first[:material_resource_sub_type_id]
-      return validation_failed_response(OpenStruct.new(messages: { base: ['This product variant already exists'] })) if where_hash(:pack_material_product_variants, get_unique_attrs(sub_type_id, attrs))
+      return validation_failed_response(OpenStruct.new(messages: { base: ['This product variant already exists'] })) if where_hash(:pack_material_product_variants, variant_defining_values(sub_type_id, attrs))
 
       variant_id = create(:pack_material_product_variants, attrs)
       create_matres_product_variant(sub_type_id, variant_id)
       success_response('ok', variant_id)
     end
 
-    def get_unique_attrs(sub_type_id, attrs)
-      unique_attr_set = ConfigRepo.new.product_variant_code_columns(sub_type_id).map { |r| r[0].to_sym }
-      unique_attrs = {}
-      unique_attr_set.each do |k|
-        unique_attrs[k] = attrs[k]
-      end
-      unique_attrs
+    # Select the variant-defining columns with their values from a set of attributes.
+    # There should only ever be one variant with this set of values for a product.
+    # For this reason, the result includes the +pack_material_product_id+.
+    #
+    # @param sub_type_id [integer] - the MaterialResourceSubType.id
+    # @param attrs [hash, dry-type] - the attributes and values to filter down to a variant-defining set.
+    # @return [hash] just the attribute values that have to be unique for a product.
+    def variant_defining_values(sub_type_id, attrs)
+      var_code_cols = ConfigRepo.new.product_variant_code_columns(sub_type_id).map { |r| r.first.to_sym }
+      var_code_cols.push(:pack_material_product_id)
+      attrs.to_h.select { |a| var_code_cols.include?(a) }
     end
 
     def create_matres_product_variant(sub_type_id, variant_id)
@@ -71,8 +75,7 @@ module PackMaterialApp
                                                   product_variant_id: variant_id,
                                                   product_variant_table_name: 'pack_material_product_variants',
                                                   product_variant_number: variant[:product_variant_number],
-                                                  product_variant_code: variant[:product_variant_code]
-      )
+                                                  product_variant_code: variant[:product_variant_code])
     end
 
     def delete_pm_product_variant(id)

@@ -8,14 +8,13 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
-      @rules[:can_approve] = @repo.can_approve_purchase_order?(@form_object.id) unless @mode == :new || @mode == :preselect
-      # @rules[:show] = @repo.find_mr_purchase_order(@form_object.id)&.approved unless @mode == :new
+      rules[:can_approve] = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder.call(:approve, @options[:id]) unless @mode == :new || @mode == :preselect
+      rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
+      rules[:show_only] = @form_object.approved if @mode == :edit
 
       common_values_for_fields case @mode
                                when :edit
-                                 edit_fields
-                                 # @rules[:show] ? show_fields : edit_fields
+                                 rules[:show_only] ? show_fields : edit_fields
                                when :new
                                  new_fields
                                when :preselect

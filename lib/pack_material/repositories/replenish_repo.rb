@@ -135,7 +135,7 @@ module PackMaterialApp
     def for_select_mr_purchase_order_items(purchase_order_id)
       for_select_raw_mr_purchase_order_items(
         where: { mr_purchase_order_id: purchase_order_id }
-      ).map { |r| [DB[:material_resource_product_variants].where(id: r[0]).select(:product_variant_code).single_value, r[1]] }
+      ).map { |r| [DB[:material_resource_product_variants].where(id: r[0]).get(:product_variant_code), r[1]] }
     end
 
     def for_select_remaining_purchase_order_items(purchase_order_id, delivery_id)
@@ -148,7 +148,7 @@ module PackMaterialApp
         id: DB[:mr_delivery_items].where(
           id: mr_delivery_item_id
         ).select(:mr_purchase_order_item_id)
-      ).select(:mr_purchase_order_id).single_value
+      ).get(:mr_purchase_order_id)
     end
 
     def sub_totals(id)
@@ -177,29 +177,8 @@ module PackMaterialApp
       subtotal * factor
     end
 
-    # Purchase Order States/Statuses
-
-    # If Purchase Order has_items && is not approved
-    #
-    # @return [Bool]
-    def can_approve_purchase_order?(purchase_order_id)
-      po = find_with_association(:mr_purchase_orders, purchase_order_id,
-                                 sub_tables: [{ sub_table: :mr_purchase_order_items }])
-      po && po[:mr_purchase_order_items].any? && (po[:purchase_order_number].nil? || !po[:approved])
-    end
-
-    # def can_reopen_purchase_order?(purchase_order_id)
-    #   approved = find_hash(:mr_purchase_orders, purchase_order_id)[:approved]
-    #   receiving_deliveries = DB['SELECT']
-    #   approved && !receiving_deliveries
-    #   # approved && not currently receiving deliveries
-    # end
-
-    def approve_purchase_order!(purchase_order_id)
-      po = find_hash(:mr_purchase_orders, purchase_order_id)
-      log_status('mr_purchase_orders', purchase_order_id, 'APPROVED')
-      update(:mr_purchase_orders, purchase_order_id, approved: true)
-      update_with_document_number('doc_seqs_po_number', purchase_order_id) unless po[:purchase_order_number]
+    def mr_purchase_order_items(mr_purchase_order_id)
+      DB[:mr_purchase_order_items].where(mr_purchase_order_id: mr_purchase_order_id).select_map(:id)
     end
 
     def find_mr_delivery(id)
@@ -259,7 +238,7 @@ module PackMaterialApp
     def find_or_create_sku_location_ids(sku_ids, to_location_id)
       result = []
       sku_ids.each do |sku_id|
-        sku_location_id = DB[:mr_sku_locations].where(location_id: to_location_id, mr_sku_id: sku_id).select(:id).single_value
+        sku_location_id = DB[:mr_sku_locations].where(location_id: to_location_id, mr_sku_id: sku_id).get(:id)
         sku_location_id ||= create(:mr_sku_locations, location_id: to_location_id, mr_sku_id: sku_id)
 
         find_hash(:mr_skus, sku_id)

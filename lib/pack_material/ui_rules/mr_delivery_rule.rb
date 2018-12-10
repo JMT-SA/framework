@@ -8,24 +8,33 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
-
-      set_show_fields if @mode == :show
+      rules[:can_verify] = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:verify, @options[:id]) unless @mode == :new
+      rules[:show_only] = @form_object.verified if @mode == :edit
+      common_values_for_fields case @mode
+                               when :edit
+                                 rules[:show_only] ? show_fields : common_fields
+                               else
+                                 common_fields
+                               end
 
       form_name 'mr_delivery'
     end
 
-    def set_show_fields
-      fields[:transporter] = { renderer: :label }
-      fields[:driver_name] = { renderer: :label }
-      fields[:client_delivery_ref_number] = { renderer: :label }
-      fields[:delivery_number] = { renderer: :label }
-      fields[:vehicle_registration] = { renderer: :label }
-      fields[:supplier_invoice_ref_number] = { renderer: :label }
+    def show_fields
+      {
+        transporter: { renderer: :label },
+        transporter_party_role_id: { renderer: :hidden },
+        driver_name: { renderer: :label },
+        client_delivery_ref_number: { renderer: :label },
+        delivery_number: { renderer: :label },
+        vehicle_registration: { renderer: :label },
+        supplier_invoice_ref_number: { renderer: :label }
+      }
     end
 
     def common_fields
       {
+        transporter: { renderer: :hidden },
         transporter_party_role_id: { renderer: :select, options: @party_repo.for_select_party_roles(AppConst::ROLE_TRANSPORTER), caption: 'Transporter' },
         delivery_number: { renderer: :label, with_value: @form_object.delivery_number },
         driver_name: { required: true },

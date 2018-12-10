@@ -4,15 +4,14 @@
 - :submenu:
     :text: Delivery
     :items:
-    - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$"
-      :text: view
-      :icon: view-show
-      :title: View
-      :popup: true
     - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$/verify"
       :text: verify
       :icon: check-square
       :hide_if_true: verified
+    - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$/edit"
+      :text: edit
+      :icon: edit
+      :title: Edit
     - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$"
       :text: delete
       :icon: delete
@@ -25,26 +24,12 @@
       :title: Status
       :popup: true
 - :submenu:
-    :text: Delivery Header
-    :items:
-    - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$"
-      :text: view
-      :icon: view-show
-      :title: View
-      :popup: true
-    - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$/edit"
-      :text: edit
-      :icon: edit
-      :title: Edit
-      :popup: true
-      :hide_if_true: verified
-- :submenu:
     :text: Delivery Items
     :items:
     - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$/mr_delivery_items/preselect"
       :text: New Delivery Item
       :icon: add-solid
-      :title: Please select Purchase Order Item
+      :title: New Delivery Item
       :popup: true
       :hide_if_true: verified
     - :url: "/pack_material/replenish/mr_delivery_items/$:delivery_item_id$"

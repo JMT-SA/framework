@@ -338,6 +338,7 @@ class Framework < Roda
         item_interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'preselect' do
           check_auth!('replenish', 'new')
+          store_last_referer_url(:delivery_items)
           show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItem::Preselect.call(id, purchase_order_id: flash[:purchase_order_id]) }
         end
         r.on 'purchase_order_changed' do
@@ -345,7 +346,7 @@ class Framework < Roda
           json_replace_select_options('mr_delivery_item_mr_purchase_order_item_id', options_array, message: nil, keep_dialog_open: true)
         end
         r.on 'done' do
-          redirect_to_last_grid(r)
+          redirect_to_stored_referer(r, :delivery_items)
         end
         r.on 'new', Integer do |item_id|
           check_auth!('replenish', 'new')
@@ -361,7 +362,7 @@ class Framework < Roda
               end
             else
               flash[:error] = 'No Purchase Order Item was selected'
-              redirect_to_last_grid(r)
+              redirect_to_stored_referer(r, :delivery_items)
             end
           end
         end
@@ -382,29 +383,33 @@ class Framework < Roda
       end
       r.on 'verify' do   # EDIT
         check_auth!('replenish', 'edit')
+        store_last_referer_url(:delivery_verify)
         res = interactor.verify_mr_delivery(id)
         if res.success
           flash[:notice] = res.message
         else
           flash[:error] = res.message
         end
-        redirect_to_last_grid(r)
+        redirect_to_stored_referer(r, :delivery_verify)
       end
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
-        show_partial { PackMaterial::Replenish::MrDelivery::Edit.call(id) }
+        show_page { PackMaterial::Replenish::MrDelivery::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
           check_auth!('replenish', 'read')
-          show_partial { PackMaterial::Replenish::MrDelivery::Show.call(id) }
+          show_page { PackMaterial::Replenish::MrDelivery::Edit.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_mr_delivery(id, params[:mr_delivery])
           if res.success
-            redirect_to_last_grid(r)
+            flash[:notice] = res.message
+            r.redirect("/pack_material/replenish/mr_deliveries/#{id}/edit")
           else
-            re_show_form(r, res) { PackMaterial::Replenish::MrDelivery::Edit.call(id, form_values: params[:mr_delivery], form_errors: res.errors) }
+            re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/edit") do
+              PackMaterial::Replenish::MrDelivery::Edit.call(id, form_values: params[:mr_delivery], form_errors: res.errors)
+            end
           end
         end
         r.delete do    # DELETE
@@ -422,14 +427,13 @@ class Framework < Roda
       interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         check_auth!('replenish', 'new')
-        set_last_grid_url('/list/mr_deliveries', r)
         show_partial_or_page(r) { PackMaterial::Replenish::MrDelivery::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_mr_delivery(params[:mr_delivery])
         if res.success
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          r.redirect("/pack_material/replenish/mr_deliveries/#{res.instance.id}/edit")
         else
           re_show_form(r, res, url: '/pack_material/replenish/mr_deliveries/new') do
             PackMaterial::Replenish::MrDelivery::New.call(form_values: params[:mr_delivery],
@@ -454,13 +458,14 @@ class Framework < Roda
         interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
           check_auth!('replenish', 'new')
+          store_last_referer_url(:delivery_item_batch)
           show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItemBatch::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_mr_delivery_item_batch(id, params[:mr_delivery_item_batch])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json_to_stored_referer(:delivery_item_batch)
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_delivery_items/#{id}/mr_delivery_item_batches/new") do
               PackMaterial::Replenish::MrDeliveryItemBatch::New.call(id,
@@ -473,6 +478,7 @@ class Framework < Roda
       end
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
+        store_last_referer_url(:delivery_items)
         show_partial { PackMaterial::Replenish::MrDeliveryItem::Edit.call(id) }
       end
 
@@ -484,16 +490,17 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_mr_delivery_item(id, params[:mr_delivery_item])
           if res.success
-            redirect_to_last_grid(r)
+            redirect_via_json_to_stored_referer(:delivery_items)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItem::Edit.call(id, form_values: params[:mr_delivery_item], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
           check_auth!('replenish', 'delete')
+          store_last_referer_url(:delivery_item_delete)
           res = interactor.delete_mr_delivery_item(id)
           if res.success
-            redirect_to_last_grid(r)
+            redirect_via_json_to_stored_referer(:delivery_item_delete)
           else
             show_json_error(res.message, status: 200)
           end
@@ -513,6 +520,7 @@ class Framework < Roda
 
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
+        store_last_referer_url(:delivery_item_batch)
         show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::Edit.call(id) }
       end
 
@@ -541,17 +549,18 @@ class Framework < Roda
           res = interactor.update_mr_delivery_item_batch(id, params[:mr_delivery_item_batch])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json_to_stored_referer(:delivery_item_batch)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItemBatch::Edit.call(id, form_values: params[:mr_delivery_item_batch], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
           check_auth!('replenish', 'delete')
+          store_last_referer_url(:delivery_item_batch_delete)
           res = interactor.delete_mr_delivery_item_batch(id)
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json_to_stored_referer(:delivery_item_batch_delete)
           else
             show_json_error(res.message, status: 200)
           end

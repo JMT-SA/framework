@@ -4,7 +4,7 @@ module PackMaterialApp
   module TaskPermissionCheck
     class MrDeliveryItem < BaseService
       attr_reader :task, :entity
-      def initialize(task, delivery_id, delivery_item_id = nil)
+      def initialize(task, delivery_item_id = nil, delivery_id: nil)
         @task = task
         @repo = ReplenishRepo.new
         @id = delivery_item_id
@@ -35,20 +35,14 @@ module PackMaterialApp
 
       def update?
         return failed_response 'Record not found' unless @entity
-        return failed_response 'Invalid Delivery' unless valid_delivery?
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
         all_ok
       end
 
       def destroy?
         return failed_response 'Record not found' unless @entity
-        return failed_response 'Invalid Delivery' unless valid_delivery?
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
         all_ok
-      end
-
-      def valid_delivery?
-        @entity.mr_delivery_id == @delivery_id
       end
 
       def delivery_verified?
@@ -56,11 +50,7 @@ module PackMaterialApp
       end
 
       def delivery
-        @repo.find_mr_delivery(@delivery_id)
-      end
-
-      def delivery_item_has_batch?
-        @repo.delivery_item_batches(@id).any?
+        @repo.find_mr_delivery(@delivery_id || @entity.mr_delivery_id)
       end
     end
   end

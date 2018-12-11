@@ -20,6 +20,9 @@ class AppConst
   LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 
   # Printers
+  PRINTER_USE_INDUSTRIAL = 'INDUSTRIAL'
+  PRINTER_USE_OFFICE = 'OFFICE'
+
   PRINT_APP_LOCATION = 'Location'
   PRINT_APP_MR_SKU_BARCODE = 'Material Resource SKU Barcode'
 

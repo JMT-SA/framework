@@ -17,6 +17,8 @@ module Labels
               form.add_field :printer_type
               form.add_field :pixels_per_mm
               form.add_field :printer_language
+              form.add_field :server_ip
+              form.add_field :printer_use
             end
           end
 

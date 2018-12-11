@@ -20,6 +20,8 @@ module UiRules
       fields[:printer_type] = { renderer: :label }
       fields[:pixels_per_mm] = { renderer: :label }
       fields[:printer_language] = { renderer: :label }
+      fields[:server_ip] = { renderer: :label }
+      fields[:printer_use] = { renderer: :label }
     end
 
     def common_fields
@@ -28,7 +30,9 @@ module UiRules
         printer_name: {},
         printer_type: {},
         pixels_per_mm: {},
-        printer_language: {}
+        printer_language: {},
+        server_ip: { pattern: :ipv4_address },
+        printer_use: { renderer: :select, options: [AppConst::PRINTER_USE_INDUSTRIAL, AppConst::PRINTER_USE_OFFICE] }
       }
     end
 
@@ -43,7 +47,9 @@ module UiRules
                                     printer_name: nil,
                                     printer_type: nil,
                                     pixels_per_mm: nil,
-                                    printer_language: nil)
+                                    printer_language: nil,
+                                    server_ip: nil,
+                                    printer_use: nil)
     end
   end
 end

@@ -52,7 +52,7 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_printer_application(id, params[:printer_application])
           if res.success
-            update_grid_row(id, changes: { printer_id: res.instance[:printer_id], application: res.instance[:application] },
+            update_grid_row(id, changes: { printer_id: res.instance[:printer_id], application: res.instance[:application], default_printer: res.instance[:default_printer] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Labels::Printers::PrinterApplication::Edit.call(id, form_values: params[:printer_application], form_errors: res.errors) }
@@ -86,6 +86,7 @@ class Framework < Roda
             printer_code
             printer_name
             active
+            default_printer
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

@@ -1,10 +1,12 @@
 ---
 :caption: Printers
-:sql: SELECT "printers"."id", "printers"."printer_code", "printers"."printer_name",
-  "printers"."printer_type", "printers"."pixels_per_mm", "printers"."printer_language",
-  "printers"."created_at", "printers"."updated_at" FROM "printers"
+:sql: "SELECT \"printers\".\"id\", \"printers\".\"printer_code\", \"printers\".\"printer_name\",
+  \"printers\".\"server_ip\", \"printers\".\"printer_use\",\r\n\"printers\".\"printer_type\",\r\n\"printers\".\"pixels_per_mm\",
+  \"printers\".\"printer_language\", \"printers\".\"active\",\r\n\"printers\".\"created_at\",
+  \"printers\".\"updated_at\"\r\nFROM \"printers\""
 :limit: 
 :offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -51,9 +53,39 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  server_ip:
+    :name: server_ip
+    :sequence_no: 4
+    :caption: Server ip
+    :namespaced_name: printers.server_ip
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_use:
+    :name: printer_use
+    :sequence_no: 5
+    :caption: Printer use
+    :namespaced_name: printers.printer_use
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   printer_type:
     :name: printer_type
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Printer type
     :namespaced_name: printers.printer_type
     :data_type: :string
@@ -68,7 +100,7 @@
     :group_max: false
   pixels_per_mm:
     :name: pixels_per_mm
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Pixels per mm
     :namespaced_name: printers.pixels_per_mm
     :data_type: :integer
@@ -83,7 +115,7 @@
     :group_max: false
   printer_language:
     :name: printer_language
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Printer language
     :namespaced_name: printers.printer_language
     :data_type: :string
@@ -96,9 +128,24 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  active:
+    :name: active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: printers.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 10
     :caption: Created at
     :namespaced_name: printers.created_at
     :data_type: :datetime
@@ -113,7 +160,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 11
     :caption: Updated at
     :namespaced_name: printers.updated_at
     :data_type: :datetime

@@ -17,6 +17,7 @@ module Labels
               form.remote! if remote
               form.add_field :printer_id
               form.add_field :application
+              form.add_field :default_printer
             end
           end
 

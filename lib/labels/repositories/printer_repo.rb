@@ -5,7 +5,6 @@ module LabelApp
     build_for_select :printers,
                      label: %i[printer_name printer_type],
                      value: :id,
-                     no_active_check: true,
                      order_by: :printer_name
 
     build_for_select :printer_applications,
@@ -21,9 +20,14 @@ module LabelApp
 
     crud_calls_for :printer_applications, name: :printer_application, wrapper: PrinterApplication
 
-    def delete_and_add_printers(printer_list)
-      DB.transaction do
-        DB[:printers].delete
+    def refresh_and_add_printers(ip_or_address, printer_list) # rubocop:disable Metrics/AbcSize
+      uri = URI.parse(ip_or_address)
+      server_ip = uri.host || uri.to_s
+      printer_codes = printer_list.map { |a| a['Code'] }
+      qry = "UPDATE printers SET active = false WHERE server_ip = '#{server_ip}' AND printer_code NOT IN ('#{printer_codes.join("', '")}');"
+      DB.transaction do # rubocop:disable Metrics/BlockLength
+        # DB[:printers].delete
+        DB.execute(qry)
         printer_list.each do |printer|
           rec = {
             printer_code: printer['Code'],
@@ -32,9 +36,29 @@ module LabelApp
             pixels_per_mm: printer['PixelMM'].to_i,
             printer_language: printer['Language']
           }
-          create_printer(rec)
+          # create_printer(rec) # Change to UPSERT...
+          DB[:printers].insert_conflict(target: %i[server_ip printer_code],
+                                        update: {
+                                          printer_name: Sequel[:excluded][:printer_name],
+                                          printer_type: Sequel[:excluded][:printer_type],
+                                          pixels_per_mm: Sequel[:excluded][:pixels_per_mm],
+                                          printer_language: Sequel[:excluded][:printer_language],
+                                          server_ip: server_ip,
+                                          active: true,
+                                          printer_use: AppConst::PRINTER_USE_INDUSTRIAL
+                                        }).insert(printer_code: rec[:printer_code],
+                                                  printer_name: rec[:printer_name],
+                                                  printer_type: rec[:printer_type],
+                                                  pixels_per_mm: rec[:pixels_per_mm],
+                                                  printer_language: rec[:printer_language],
+                                                  server_ip: server_ip,
+                                                  printer_use: AppConst::PRINTER_USE_INDUSTRIAL)
         end
       end
+    end
+
+    def unset_default_printer(id, res)
+      DB[:printer_applications].where(application: res.to_h[:application]).exclude(id: id).update(default_printer: false)
     end
 
     def distinct_px_mm

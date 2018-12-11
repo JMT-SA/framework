@@ -10,7 +10,7 @@ module LabelApp
       mes_repo = MesserverApp::MesserverRepo.new
       res = mes_repo.printer_list
       if res.success
-        repo.delete_and_add_printers(res.instance)
+        repo.refresh_and_add_printers(AppConst::LABEL_SERVER_URI, res.instance)
         success_response('Refreshed printers')
       else
         failed_response(res.message)
@@ -31,6 +31,7 @@ module LabelApp
       id = nil
       repo.transaction do
         id = repo.create_printer_application(res)
+        repo.unset_default_printer(id, res) if res.to_h[:default_printer]
         log_status('printer_applications', id, 'CREATED')
         log_transaction
       end
@@ -46,6 +47,7 @@ module LabelApp
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
         repo.update_printer_application(id, res)
+        repo.unset_default_printer(id, res) if res.to_h[:default_printer]
         log_transaction
       end
       instance = printer_application(id)

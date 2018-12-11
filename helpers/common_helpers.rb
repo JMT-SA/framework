@@ -22,9 +22,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @layout.render
   end
 
-  def show_partial(&block)
+  def show_partial(notice: nil, error: nil, &block)
     content = render_partial(&block)
-    update_dialog_content(content: content)
+    update_dialog_content(content: content, notice: notice, error: error)
   end
 
   def show_partial_or_page(route, &block)

@@ -152,8 +152,8 @@ class GenerateNewScaffold < BaseService
       float: '(:float?)',
       decimal: '(:decimal?)',
       jsonb: '(:hash?)',
-      integer_array: nil, # ' { each(:int?) }',
-      string_array: nil # ' { each(:str?) }'
+      integer_array: '(:array?)', # nil, # ' { each(:int?) }',
+      string_array: '(:array?)' # nil # ' { each(:str?) }'
     }.freeze
 
     VALIDATION_TYPE_LOOKUP = {
@@ -409,6 +409,7 @@ class GenerateNewScaffold < BaseService
         fill_opt = detail[:allow_null] ? 'maybe' : 'filled'
         max = detail[:max_length] && detail[:max_length] < 200 ? "max_size?: #{detail[:max_length]}" : nil
         rules = [opts.table_meta.column_dry_validation_expect_type(col), max, opts.table_meta.column_dry_validation_array_extra(col)].compact.join(', ')
+        rules = rules.sub(/,\s+{/, ' {')
         attr << if col == :id
                   "optional(:#{col}, #{opts.table_meta.column_dry_validation_type(col)}).#{fill_opt}#{rules}"
                 else

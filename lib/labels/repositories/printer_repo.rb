@@ -21,8 +21,7 @@ module LabelApp
     crud_calls_for :printer_applications, name: :printer_application, wrapper: PrinterApplication
 
     def refresh_and_add_printers(ip_or_address, printer_list) # rubocop:disable Metrics/AbcSize
-      uri = URI.parse(ip_or_address)
-      server_ip = uri.host || uri.to_s
+      server_ip = UtilityFunctions.ip_from_uri(ip_or_address)
       printer_codes = printer_list.map { |a| a['Code'] }
       qry = "UPDATE printers SET active = false WHERE server_ip = '#{server_ip}' AND printer_code NOT IN ('#{printer_codes.join("', '")}');"
       DB.transaction do # rubocop:disable Metrics/BlockLength

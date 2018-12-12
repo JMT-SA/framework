@@ -42,7 +42,7 @@ module LabelApp
       validation_failed_response(OpenStruct.new(messages: { application: ['This printer application already exists'] }))
     end
 
-    def update_printer_application(id, params)
+    def update_printer_application(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_printer_application_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do

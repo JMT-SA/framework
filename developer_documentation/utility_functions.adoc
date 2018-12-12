@@ -19,3 +19,12 @@ UtilityFunctions.weeks_since(Date.today, 3) # => Date - three weeks after Date.t
 UtilityFunctions.days_ago(Date.today, 3)    # => Date - three days before Date.today.
 UtilityFunctions.days_since(Date.today, 3)  # => Date - three days after Date.today.
 ----
+
+=== Miscellaneous
+
+Get an ip address from a string that could be an ip address or could contain an ip address as part of a URI.
+[source,ruby]
+----
+UtilityFunctions.ip_from_uri('192.168.0.1')                # => '192.168.0.1'.
+UtilityFunctions.ip_from_uri('http://192.168.0.1:8080/')   # => '192.168.0.1'.
+----

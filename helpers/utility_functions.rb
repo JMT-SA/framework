@@ -49,6 +49,11 @@ module UtilityFunctions
     end
   end
 
+  def ip_from_uri(ip_or_address)
+    uri = URI.parse(ip_or_address)
+    uri.host || uri.to_s
+  end
+
   def newline_and_spaces(count)
     "\n#{' ' * count}"
   end

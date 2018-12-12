@@ -6,6 +6,7 @@ module UiRules
   class LocationRule < Base
     def generate_rules
       @repo = MasterfilesApp::LocationRepo.new
+      @print_repo = LabelApp::PrinterRepo.new
       make_form_object
       apply_form_values
 
@@ -40,11 +41,10 @@ module UiRules
     end
 
     def set_print_fields
-      repo = LabelApp::PrinterRepo.new
       fields[:location_code] = { renderer: :label, caption: 'Code' }
       fields[:location_description] = { renderer: :label, caption: 'Description' }
       fields[:printer] = { renderer: :select,
-                           options: repo.select_printers_for_application(AppConst::PRINT_APP_LOCATION),
+                           options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_LOCATION),
                            required: true }
       fields[:no_of_prints] = { renderer: :integer, required: true }
     end
@@ -67,7 +67,7 @@ module UiRules
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_location(@options[:id])
-      @form_object = OpenStruct.new(@form_object.to_h.merge(printer: nil, no_of_prints: 1)) if @mode == :print_barcode
+      @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_LOCATION), no_of_prints: 1)) if @mode == :print_barcode
     end
 
     def make_new_form_object

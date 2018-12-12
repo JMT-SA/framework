@@ -4,6 +4,7 @@ module UiRules
   class MrDeliveryItemBatchRule < Base
     def generate_rules
       @repo = PackMaterialApp::ReplenishRepo.new
+      @print_repo = LabelApp::PrinterRepo.new
       make_form_object
       apply_form_values
 
@@ -25,12 +26,11 @@ module UiRules
     end
 
     def set_print_fields
-      repo = LabelApp::PrinterRepo.new
       fields[:sku_number] = { renderer: :label }
       fields[:product_variant_code] = { renderer: :label }
       fields[:batch_number] = { renderer: :label }
       fields[:printer] = { renderer: :select,
-                           options: repo.select_printers_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE),
+                           options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE),
                            required: true }
       fields[:no_of_prints] = { renderer: :integer, required: true }
     end
@@ -54,7 +54,7 @@ module UiRules
 
     def form_object_for_barcode_print
       rec = @repo.sku_for_barcode(@options[:id])
-      @form_object = OpenStruct.new(rec.merge(printer: nil))
+      @form_object = OpenStruct.new(rec.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE)))
     end
 
     def make_new_form_object

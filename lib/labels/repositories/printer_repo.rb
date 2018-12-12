@@ -85,5 +85,9 @@ module LabelApp
                    .order(:printer_name)
                    .map { |p| [p[:printer_name], p[:id]] }
     end
+
+    def default_printer_for_application(application)
+      DB[:printer_applications].where(application: application, default_printer: true).get(:printer_id)
+    end
   end
 end

@@ -17,6 +17,12 @@ module LabelApp
       end
     end
 
+    def refresh_server_printers(ip_address)
+      printer_codes = `lpstat -a | cut -f1 -d ' '`.chomp.split("\n")
+      repo.refresh_and_add_server_printers(ip_address, printer_codes)
+      success_response('Refreshed printers')
+    end
+
     def printer_application(id)
       repo.find_printer_application(id)
     end

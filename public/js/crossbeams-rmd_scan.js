@@ -22,7 +22,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   const updateOnlineStatus = () => {
     if (navigator.onLine) {
       offlineStatus.style.display = 'none';
-      menu.disabled = false;
+      if (menu) {
+        menu.disabled = false;
+      }
       logout.classList.remove('disableClick');
       document.querySelectorAll('[data-rmd-btn]').forEach((node) => {
         node.disabled = false;
@@ -30,7 +32,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
       publicAPIs.logit('Online: network connection restored');
     } else {
       offlineStatus.style.display = '';
-      menu.disabled = true;
+      if (menu) {
+        menu.disabled = true;
+      }
       logout.classList.add('disableClick');
       document.querySelectorAll('[data-rmd-btn]').forEach((node) => {
         node.disabled = true;
@@ -45,11 +49,13 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   const setupListeners = () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
-    menu.addEventListener('change', (event) => {
-      if (event.target.value !== '') {
-        window.location = event.target.value;
-      }
-    });
+    if (menu) {
+      menu.addEventListener('change', (event) => {
+        if (event.target.value !== '') {
+          window.location = event.target.value;
+        }
+      });
+    }
     if (cameraScan) {
       cameraScan.addEventListener('click', () => {
         webSocket.send('Type=key248_all');

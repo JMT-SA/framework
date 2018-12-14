@@ -297,6 +297,13 @@ module PackMaterialApp
         DB[:co_use_material_resource_product_variants].insert(material_resource_product_variant_id: variant_id, co_use_id: prog_id)
       end
     end
+
+    def matres_type_and_sub_type_description(id)
+      DB[:material_resource_sub_types]
+        .join(:material_resource_types, id: :material_resource_type_id)
+        .where(Sequel[:material_resource_sub_types][:id] => id)
+        .get(%i[type_name sub_type_name])
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength

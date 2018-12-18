@@ -29,6 +29,12 @@
       .disableClick{
         pointer-events: none;
       }
+      .focusLabel {
+        color: darkcyan;
+      }
+      th {
+        font-weight: normal;
+      }
     </style>
     <%= content_for :late_head %>
   </head>
@@ -49,7 +55,22 @@
     <script src="/js/crossbeams-rmd_scan.js" type="text/javascript"></script>
     <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
     <script>
+      // Highlight label text for inputs that have focus.
+      document.addEventListener('focus', function (event) {
+        const prev = event.target.parentNode && event.target.parentNode.previousElementSibling;
+        if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
+      }, true);
+      document.addEventListener('blur', function (event) {
+        const prev = event.target.parentNode && event.target.parentNode.previousElementSibling;
+        if (prev instanceof HTMLTableCellElement) { prev.classList.remove('focusLabel'); }
+      }, true);
+
       window.addEventListener('DOMContentLoaded', function() {
+        // Highlight label text for the input that gets autofocus.
+        const afi = document.querySelector('input[autofocus]');
+        const prev = afi && afi.parentNode && afi.parentNode.previousElementSibling;
+        if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
+
         crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>);
       });
     </script>

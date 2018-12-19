@@ -193,7 +193,7 @@ module MasterfilesApp
       vars = {}
       bcp = BarcodeProcessing.new
       lbl_required.each do |var|
-        vars["F#{var[:f_no]}".to_sym] = if var[:field].end_with?('_barcode') && !instance.respond_to?(var[:field])
+        vars["F#{var[:f_no]}".to_sym] = if barcode_field?(instance, var[:field])
                                           bcp.make_barcode(instance, var[:field].delete_suffix('_barcode'))
                                         else
                                           instance[var[:field].to_sym]
@@ -240,6 +240,10 @@ module MasterfilesApp
 
     def validate_location_storage_type_params(params)
       LocationStorageTypeSchema.call(params)
+    end
+
+    def barcode_field?(instance, field)
+      field.end_with?('_barcode') && !instance.key?(field)
     end
   end
 end

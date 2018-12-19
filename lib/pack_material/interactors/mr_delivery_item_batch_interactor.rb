@@ -80,7 +80,7 @@ module PackMaterialApp
       vars = {}
       bcp = BarcodeProcessing.new
       lbl_required.each do |var|
-        vars["F#{var[:f_no]}".to_sym] = if var[:field].end_with?('_barcode') && !instance.key?(var[:field])
+        vars["F#{var[:f_no]}".to_sym] = if barcode_field?(instance, var[:field])
                                           bcp.make_barcode(instance, var[:field].delete_suffix('_barcode').to_sym)
                                         else
                                           instance[var[:field].to_sym]
@@ -89,6 +89,12 @@ module PackMaterialApp
       mes_repo = MesserverApp::MesserverRepo.new
       printer = repo.find_hash(:printers, params[:printer])
       mes_repo.print_label(AppConst::LABEL_SKU_BARCODE, vars, params[:no_of_prints], printer[:printer_code])
+    end
+
+    private
+
+    def barcode_field?(instance, field)
+      field.end_with?('_barcode') && !instance.key?(field)
     end
   end
 end

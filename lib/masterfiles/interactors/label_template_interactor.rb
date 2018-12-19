@@ -59,6 +59,9 @@ module MasterfilesApp
       return failed_response('This is not an NSLD label definition') if doc.css('nsld_schema').empty?
 
       var_list = doc.css('variable_type').map(&:text)
+      res = validate_variable_names(label_template(id), var_list)
+      return res unless res.success
+
       package = { variables: var_list.empty? ? nil : Sequel.pg_array(var_list) }
 
       repo.transaction do
@@ -68,6 +71,37 @@ module MasterfilesApp
       end
       instance = label_template(id)
       success_response('Variables stored', instance)
+    end
+
+    private
+
+    def validate_variable_names(instance, var_list)
+      messages = check_variables(instance, var_list)
+      if messages.empty?
+        success_response('ok')
+      else
+        validation_failed_response(OpenStruct.new(messages: { base: messages }))
+      end
+    end
+
+    def shared_label_config
+      @shared_label_config ||= begin
+                                 config_repo = LabelApp::SharedConfigRepo.new
+                                 config_repo.packmat_labels_config
+                               end
+    end
+
+    def check_variables(instance, var_list)
+      messages = []
+      var_list.each do |varname|
+        settings = shared_label_config[varname]
+        if settings.nil?
+          messages << "There is no configuration for variable \"#{varname}\""
+        else
+          messages << "Variable \"#{varname}\" is not available for application \"#{instance.application}\"" unless settings[:applications].include?(instance.application)
+        end
+      end
+      messages
     end
   end
 end

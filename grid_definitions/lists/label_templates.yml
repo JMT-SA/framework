@@ -21,6 +21,11 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :url: /development/statuses/show/label_templates/$:id$
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/config/label_templates/new"

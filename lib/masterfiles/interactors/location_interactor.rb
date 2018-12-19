@@ -181,27 +181,8 @@ module MasterfilesApp
 
     def print_location_barcode(id, params)
       instance = location(id)
-      # NOTE: we don't know for sure that F1 will be code and F2 will be desc...
-      #       - so we need to get those position/variable links from the label...
-      #       - ALSO: LD needs to change to allow for different variable sets...
-
-      # This is an approximation of something we might get from the label variables:
-      lbl_required = [{ f_no: 1, field: 'location_barcode' }, # This is a field used in the label, not the table...
-                      { f_no: 2, field: 'location_description' },
-                      { f_no: 3, field: 'location_code' },
-                      { f_no: 4, field: 'legacy_barcode' }]
-      vars = {}
-      bcp = BarcodeProcessing.new
-      lbl_required.each do |var|
-        vars["F#{var[:f_no]}".to_sym] = if barcode_field?(instance, var[:field])
-                                          bcp.make_barcode(instance, var[:field].delete_suffix('_barcode'))
-                                        else
-                                          instance[var[:field].to_sym]
-                                        end
-      end
-      mes_repo = MesserverApp::MesserverRepo.new
-      printer = repo.find_hash(:printers, params[:printer])
-      mes_repo.print_label(AppConst::LABEL_LOCATION_BARCODE, vars, params[:quantity], printer[:printer_code])
+      interactor = LabelPrintingApp::LabelPrintingInteractor.new(@user, @client_settings, @context, @logger)
+      interactor.print_label(AppConst::LABEL_LOCATION_BARCODE, instance, params)
     end
 
     private
@@ -240,10 +221,6 @@ module MasterfilesApp
 
     def validate_location_storage_type_params(params)
       LocationStorageTypeSchema.call(params)
-    end
-
-    def barcode_field?(instance, field)
-      field.end_with?('_barcode') && !instance.key?(field)
     end
   end
 end

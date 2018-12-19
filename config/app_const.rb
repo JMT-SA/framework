@@ -16,6 +16,7 @@ class AppConst
   POST_FORM_BOUNDARY = 'AaB03x'
 
   # Labels
+  SHARED_CONFIG_HOST_PORT = ENV.fetch('SHARED_CONFIG_HOST_PORT')
   LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
   LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 

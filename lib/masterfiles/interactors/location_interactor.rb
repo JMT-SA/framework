@@ -181,8 +181,7 @@ module MasterfilesApp
 
     def print_location_barcode(id, params)
       instance = location(id)
-      interactor = LabelPrintingApp::LabelPrintingInteractor.new(@user, @client_settings, @context, @logger)
-      interactor.print_label(AppConst::LABEL_LOCATION_BARCODE, instance, params)
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_LOCATION_BARCODE, instance, params)
     end
 
     private

@@ -69,8 +69,7 @@ module PackMaterialApp
 
     def print_sku_barcode(id, params)
       instance = repo.sku_for_barcode(id)
-      interactor = LabelPrintingApp::LabelPrintingInteractor.new(@user, @client_settings, @context, @logger)
-      interactor.print_label(AppConst::LABEL_SKU_BARCODE, instance, params)
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, params)
     end
   end
 end

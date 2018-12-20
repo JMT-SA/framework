@@ -82,6 +82,8 @@ module MasterfilesApp
       else
         validation_failed_response(OpenStruct.new(messages: { base: messages }))
       end
+    rescue Crossbeams::FrameworkError => e
+      failed_response(e.message)
     end
 
     def shared_label_config
@@ -94,6 +96,7 @@ module MasterfilesApp
     def check_variables(instance, var_list)
       messages = []
       var_list.each do |varname|
+        next if varname.start_with?('CMP:')
         settings = shared_label_config[varname]
         if settings.nil?
           messages << "There is no configuration for variable \"#{varname}\""

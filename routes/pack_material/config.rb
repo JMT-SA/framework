@@ -99,6 +99,7 @@ class Framework < Roda
               material_resource_master_list_id
               short_code
               long_name
+              active
               description
             ]
             update_grid_row(item_id, changes: select_attributes(res.instance, row_keys), notice: res.message)

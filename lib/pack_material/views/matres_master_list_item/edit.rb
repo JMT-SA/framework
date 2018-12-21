@@ -25,6 +25,7 @@ module PackMaterial
               # form.add_field :short_code
               form.add_field :long_name
               form.add_field :description
+              form.add_field :active
             end
           end
 

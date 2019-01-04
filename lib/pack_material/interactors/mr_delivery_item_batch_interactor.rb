@@ -19,7 +19,6 @@ module PackMaterialApp
       can_create = TaskPermissionCheck::MrDeliveryItemBatch.call(:create, delivery_item_id: parent_id)
       if can_create.success
         res = validate_mr_delivery_item_batch_params(params)
-        res.messages[:base] = res.messages[:internal_or_client_batch_number] if res.messages && res.messages[:internal_or_client_batch_number]
         return validation_failed_response(res) unless res.messages.empty?
         id = nil
         repo.transaction do
@@ -28,7 +27,7 @@ module PackMaterialApp
           log_transaction
         end
         instance = mr_delivery_item_batch(id)
-        success_response("Created mr delivery item batch #{instance.batch_number}", instance)
+        success_response("Created mr delivery item batch #{instance.client_batch_number}", instance)
       else
         failed_response(can_create.message)
       end
@@ -55,7 +54,7 @@ module PackMaterialApp
     def delete_mr_delivery_item_batch(id)
       can_delete = TaskPermissionCheck::MrDeliveryItemBatch.call(:delete, id)
       if can_delete.success
-        batch_number = mr_delivery_item_batch(id).batch_number
+        batch_number = mr_delivery_item_batch(id).client_batch_number
         repo.transaction do
           repo.delete_mr_delivery_item_batch(id)
           log_status('mr_delivery_item_batches', id, 'DELETED')

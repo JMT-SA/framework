@@ -44,10 +44,6 @@ class Framework < Roda
         end
       end
       r.is do
-        r.get do       # SHOW
-          check_auth!('material_resource', 'read')
-          show_partial { PackMaterial::MaterialResource::MatresProductVariant::Show.call(id) }
-        end
         r.patch do     # UPDATE
           res = interactor.update_matres_product_variant(id, params[:matres_product_variant])
           if res.success
@@ -99,6 +95,7 @@ class Framework < Roda
               party_stock_code
               supplier_lead_time
               is_preferred_supplier
+
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

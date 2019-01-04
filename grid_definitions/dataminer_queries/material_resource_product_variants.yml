@@ -1,11 +1,14 @@
 ---
 :caption: Material Resource Product Variants
-:sql: SELECT "material_resource_product_variants"."id", "material_resource_product_variants"."sub_type_id",
-  "material_resource_product_variants"."product_variant_id", "material_resource_product_variants"."product_variant_table_name",
-  "material_resource_product_variants"."product_variant_number", "material_resource_product_variants"."old_product_code",
-  "material_resource_product_variants"."supplier_lead_time", "material_resource_product_variants"."minimum_stock_level",
-  "material_resource_product_variants"."re_order_stock_level", "material_resource_product_variants"."created_at",
-  "material_resource_product_variants"."updated_at" FROM "material_resource_product_variants"
+:sql: "SELECT \"material_resource_product_variants\".\"id\", \r\n\"material_resource_product_variants\".\"sub_type_id\",
+  \r\n\"material_resource_product_variants\".\"product_variant_id\", \r\n\"material_resource_product_variants\".\"product_variant_table_name\",
+  \r\n\"material_resource_product_variants\".\"product_variant_number\", \r\n\"material_resource_product_variants\".\"old_product_code\",
+  \r\n\"material_resource_product_variants\".\"supplier_lead_time\", \r\n\"material_resource_product_variants\".\"minimum_stock_level\",
+  \r\n\"material_resource_product_variants\".\"re_order_stock_level\", \r\n\"material_resource_product_variants\".\"use_fixed_batch_number\",
+  \r\n\"material_resource_product_variants\".\"mr_internal_batch_number_id\", \r\n\"material_resource_product_variants\".\"created_at\",
+  \r\n\"material_resource_product_variants\".\"updated_at\"\r\nFROM \"material_resource_product_variants\"\r\nJOIN
+  \"mr_internal_batch_numbers\" ON \"material_resource_product_variants\".\"mr_internal_batch_number_id\"
+  = \"mr_internal_batch_numbers\".\"id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -145,9 +148,39 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  use_fixed_batch_number:
+    :name: use_fixed_batch_number
+    :sequence_no: 10
+    :caption: Use fixed batch number
+    :namespaced_name: material_resource_product_variants.use_fixed_batch_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_internal_batch_number_id:
+    :name: mr_internal_batch_number_id
+    :sequence_no: 11
+    :caption: Fixed batch number
+    :namespaced_name: material_resource_product_variants.mr_internal_batch_number_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Created at
     :namespaced_name: material_resource_product_variants.created_at
     :data_type: :datetime
@@ -162,7 +195,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Updated at
     :namespaced_name: material_resource_product_variants.updated_at
     :data_type: :datetime

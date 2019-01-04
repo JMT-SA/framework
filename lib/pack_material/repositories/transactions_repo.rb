@@ -27,10 +27,10 @@ module PackMaterialApp
     crud_calls_for :mr_inventory_transaction_items, name: :mr_inventory_transaction_item, wrapper: MrInventoryTransactionItem
 
     build_for_select :mr_skus,
-                     label: :batch_number,
+                     label: :sku_number,
                      value: :id,
                      no_active_check: true,
-                     order_by: :batch_number
+                     order_by: :sku_number
 
     crud_calls_for :mr_skus, name: :mr_sku, wrapper: MrSku
 

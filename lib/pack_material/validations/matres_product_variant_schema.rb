@@ -12,5 +12,7 @@ module PackMaterialApp
     required(:supplier_lead_time, :integer).maybe(:int?)
     required(:minimum_stock_level, :integer).maybe(:int?)
     required(:re_order_stock_level, :integer).maybe(:int?)
+    required(:use_fixed_batch_number, :bool).maybe(:bool?)
+    required(:mr_internal_batch_number_id, :integer).maybe(:int?)
   end
 end

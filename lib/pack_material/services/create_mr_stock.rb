@@ -52,7 +52,7 @@ module PackMaterialApp
             mr_inventory_transaction_id: @parent_transaction_id,
             mr_sku_id: sku[:id],
             inventory_uom_id: uom_id,
-            quantity: sku[:initial_quantity]
+            quantity: 0 # TODO: this needs to be sent in per MRProduct Variant
           )
         end
       else

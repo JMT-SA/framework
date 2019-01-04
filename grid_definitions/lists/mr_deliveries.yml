@@ -60,7 +60,7 @@
       :icon: add-solid
       :title: New Delivery Item Batch
       :popup: true
-      :hide_if_true: verified
+      :hide_if_true: new_batch_not_allowed
       :hide_if_null: delivery_item_id
     - :url: "/pack_material/replenish/mr_delivery_item_batches/$:id$"
       :text: view

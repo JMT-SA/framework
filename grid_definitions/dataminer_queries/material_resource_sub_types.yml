@@ -6,7 +6,8 @@
   \"material_resource_sub_types\".\"updated_at\",\r\n\"material_resource_sub_types\".\"product_code_separator\",
   \"material_resource_sub_types\".\"has_suppliers\",\r\n  \"material_resource_sub_types\".\"has_marketers\",
   \"material_resource_sub_types\".\"has_retailers\",\r\n  \"material_resource_sub_types\".\"product_column_ids\",
-  \"material_resource_sub_types\".\"product_code_ids\",\r\n  \"material_resource_sub_types\".\"material_resource_type_id\",\r\n
+  \"material_resource_sub_types\".\"product_code_ids\",\r\n\"material_resource_sub_types\".\"product_variant_code_ids\",
+  \"material_resource_sub_types\".\"optional_product_variant_code_ids\",\r\n  \"material_resource_sub_types\".\"material_resource_type_id\",\r\n
   \ exists(select id from pack_material_products\r\n  where material_resource_sub_type_id
   = material_resource_sub_types.id) as has_products\r\nFROM \"material_resource_sub_types\"\r\nJOIN
   \"material_resource_types\" ON \"material_resource_types\".\"id\" =\r\n\"material_resource_sub_types\".\"material_resource_type_id\"\r\nORDER
@@ -210,9 +211,39 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  product_variant_code_ids:
+    :name: product_variant_code_ids
+    :sequence_no: 14
+    :caption: Product variant code ids
+    :namespaced_name: material_resource_sub_types.product_variant_code_ids
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  optional_product_variant_code_ids:
+    :name: optional_product_variant_code_ids
+    :sequence_no: 15
+    :caption: Optional product variant code ids
+    :namespaced_name: material_resource_sub_types.optional_product_variant_code_ids
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   material_resource_type_id:
     :name: material_resource_type_id
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Material resource type
     :namespaced_name: material_resource_sub_types.material_resource_type_id
     :data_type: :integer
@@ -227,7 +258,7 @@
     :group_max: false
   has_products:
     :name: has_products
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Has products
     :namespaced_name: 
     :data_type: :string

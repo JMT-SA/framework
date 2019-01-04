@@ -41,6 +41,12 @@ module PackMaterialApp
                      no_active_check: true,
                      order_by: :party_stock_code
 
+    build_for_select :mr_internal_batch_numbers,
+                     label: :batch_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :batch_number
+
     crud_calls_for :material_resource_types, name: :matres_type, wrapper: MatresType
     crud_calls_for :material_resource_sub_types, name: :matres_sub_type, wrapper: MatresSubType
     crud_calls_for :pack_material_products, name: :pm_product, wrapper: PmProduct
@@ -48,6 +54,7 @@ module PackMaterialApp
     crud_calls_for :material_resource_master_lists, name: :matres_master_list, wrapper: MatresMasterList
     crud_calls_for :material_resource_product_variants, name: :matres_product_variant, wrapper: MatresProductVariant
     crud_calls_for :material_resource_product_variant_party_roles, name: :matres_product_variant_party_role, wrapper: MatresProductVariantPartyRole
+    crud_calls_for :mr_internal_batch_numbers, name: :mr_internal_batch_number, wrapper: MrInternalBatchNumber
 
     def create_matres_product_variant_party_role(attrs)
       message = nil
@@ -303,6 +310,12 @@ module PackMaterialApp
         .join(:material_resource_types, id: :material_resource_type_id)
         .where(Sequel[:material_resource_sub_types][:id] => id)
         .get(%i[type_name sub_type_name])
+    end
+
+    def find_matres_product_variant(id)
+      find_with_association(:material_resource_product_variants, id,
+                            parent_tables: [{ parent_table: :mr_internal_batch_numbers, flatten_columns: { batch_number: :internal_batch_number } }],
+                            wrapper: MatresProductVariant)
     end
   end
 end

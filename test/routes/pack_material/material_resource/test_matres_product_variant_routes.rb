@@ -22,23 +22,6 @@ class TestMatresProductVariantRoutes < RouteTester
     expect_permission_error
   end
 
-  def test_show
-    authorise_pass!
-    ensure_exists!(INTERACTOR)
-    PackMaterial::MaterialResource::MatresProductVariant::Show.stub(:call, bland_page) do
-      get 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1 }
-    end
-    expect_bland_page
-  end
-
-  def test_show_fail
-    authorise_fail!
-    ensure_exists!(INTERACTOR)
-    get 'pack_material/material_resource/material_resource_product_variants/1', {}, 'rack.session' => { user_id: 1 }
-    refute last_response.ok?
-    assert_match(/permission/i, last_response.body)
-  end
-
   def test_update
     authorise_pass!
     ensure_exists!(INTERACTOR)

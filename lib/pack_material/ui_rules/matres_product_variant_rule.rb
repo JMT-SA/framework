@@ -9,19 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if @mode == :show
-
       form_name 'matres_product_variant'
-    end
-
-    def set_show_fields
-      fields[:product_variant_id] = { renderer: :label }
-      fields[:product_variant_table_name] = { renderer: :label }
-      fields[:product_variant_number] = { renderer: :label }
-      fields[:old_product_code] = { renderer: :label }
-      fields[:supplier_lead_time] = { renderer: :label }
-      fields[:minimum_stock_level] = { renderer: :label }
-      fields[:re_order_stock_level] = { renderer: :label }
     end
 
     def common_fields
@@ -32,24 +20,14 @@ module UiRules
         old_product_code: {},
         supplier_lead_time: { renderer: :integer, caption: 'Lead Time (days)' },
         minimum_stock_level: { renderer: :integer },
-        re_order_stock_level: { renderer: :integer }
+        re_order_stock_level: { renderer: :integer },
+        use_fixed_batch_number: { renderer: :checkbox },
+        mr_internal_batch_number_id: { renderer: :select, options: @repo.for_select_mr_internal_batch_numbers, caption: 'Internal Batch Number', prompt: true }
       }
     end
 
     def make_form_object
-      make_new_form_object && return if @mode == :new
-
       @form_object = @repo.find_matres_product_variant(@options[:id])
-    end
-
-    def make_new_form_object
-      @form_object = OpenStruct.new(product_variant_id: nil,
-                                    product_variant_table_name: nil,
-                                    product_variant_number: nil,
-                                    old_product_code: nil,
-                                    supplier_lead_time: nil,
-                                    minimum_stock_level: nil,
-                                    re_order_stock_level: nil)
     end
   end
 end

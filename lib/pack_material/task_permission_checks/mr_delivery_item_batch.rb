@@ -30,6 +30,8 @@ module PackMaterialApp
 
       def create?
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
+        return failed_response 'No Delivery Line Item given' unless @delivery_item_id
+        return failed_response 'This Product Variant has a fixed batch number' if fixed_batch_number?
         all_ok
       end
 
@@ -51,6 +53,10 @@ module PackMaterialApp
 
       def delivery
         @repo.find_mr_delivery(@repo.find_mr_delivery_item(@delivery_item_id || @entity.mr_delivery_item_id).mr_delivery_id)
+      end
+
+      def fixed_batch_number?
+        @repo.item_has_fixed_batch(@delivery_item_id)
       end
     end
   end

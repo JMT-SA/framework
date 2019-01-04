@@ -29,7 +29,7 @@ module PackMaterialApp
       # update quantities for existing sku locations
       existing_sku_locations.each do |loc|
         sku = find_hash(:mr_skus, loc[:mr_sku_id])
-        sku_qty = sku[:initial_quantity]
+        sku_qty = 0 # TODO: this needs to be sent in per MRProduct Variant
 
         qty = loc[:quantity] + sku_qty
         update(:mr_sku_locations, loc[:id], quantity: qty)
@@ -42,7 +42,8 @@ module PackMaterialApp
       new_sku_ids = sku_ids - existing_sku_ids
       new_sku_ids.each do |sku_id|
         sku = find_hash(:mr_skus, sku_id)
-        qty = sku[:initial_quantity]
+        # qty = sku[:initial_quantity]
+        qty = 0 # TODO: this needs to be sent in per MRProduct Variant
         instance[:skus] << sku
 
         sku_loc_id = create(:mr_sku_locations, location_id: to_location_id, quantity: qty, mr_sku_id: sku_id)

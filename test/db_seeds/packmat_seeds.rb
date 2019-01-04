@@ -1,4 +1,9 @@
 module MiniTestSeeds
+  def db_create_processes
+    # processes
+    @fixed_table_set[:processes] = { delivery_process_id: DB[:business_processes].insert(process: 'DELIVERIES') }
+  end
+
   def db_create_roles
     # roles
     cus_id = DB[:roles].insert(name: AppConst::ROLE_CUSTOMER)

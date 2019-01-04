@@ -433,7 +433,7 @@ class Framework < Roda
         res = interactor.create_mr_delivery(params[:mr_delivery])
         if res.success
           flash[:notice] = res.message
-          r.redirect("/pack_material/replenish/mr_deliveries/#{res.instance.id}/edit")
+          redirect_via_json("/pack_material/replenish/mr_deliveries/#{res.instance.id}/edit")
         else
           re_show_form(r, res, url: '/pack_material/replenish/mr_deliveries/new') do
             PackMaterial::Replenish::MrDelivery::New.call(form_values: params[:mr_delivery],

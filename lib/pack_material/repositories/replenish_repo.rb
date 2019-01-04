@@ -75,14 +75,6 @@ module PackMaterialApp
 
     crud_calls_for :mr_delivery_item_batches, name: :mr_delivery_item_batch, wrapper: MrDeliveryItemBatch
 
-    build_for_select :mr_internal_batch_numbers,
-                     label: :batch_number,
-                     value: :id,
-                     no_active_check: true,
-                     order_by: :batch_number
-
-    crud_calls_for :mr_internal_batch_numbers, name: :mr_internal_batch_number, wrapper: MrInternalBatchNumber
-
     def find_mr_purchase_order_cost(id)
       find_with_association(:mr_purchase_order_costs, id,
                             parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_code_string: :cost_type } }],
@@ -189,16 +181,6 @@ module PackMaterialApp
                             wrapper: MrDelivery)
     end
 
-    def find_mr_delivery_item_batch(id)
-      hash = find_with_association(:mr_delivery_item_batches, id,
-                                   parent_tables: [{
-                                     parent_table: :mr_internal_batch_numbers,
-                                     flatten_columns: { batch_number: :internal_batch_number }
-                                   }])
-      hash[:batch_number] = hash[:client_batch_number] || hash[:internal_batch_number]
-      MrDeliveryItemBatch.new(hash)
-    end
-
     def verify_mr_delivery(id)
       update(:mr_deliveries, id, verified: true)
     end
@@ -207,27 +189,51 @@ module PackMaterialApp
       DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:id)
     end
 
-    def delivery_has_items_without_batches(mr_delivery_id)
-      DB['SELECT id FROM mr_delivery_items WHERE NOT EXISTS(
-            SELECT id FROM mr_delivery_item_batches WHERE mr_delivery_item_id = mr_delivery_items.id
-      ) AND mr_delivery_items.mr_delivery_id = ?', mr_delivery_id].all
+    def items_without_batches(mr_delivery_id)
+      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map(:id).each do |item_id|
+        next if item_has_fixed_batch(item_id)
+        has_batch = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_id).get(:id)
+        return true unless has_batch
+      end
+      false
+    end
+
+    def item_has_fixed_batch(delivery_item_id)
+      DB[:material_resource_product_variants].where(
+        id: DB[:mr_delivery_items].where(
+          id: delivery_item_id
+        ).get(:mr_product_variant_id)
+      ).get(:use_fixed_batch_number)
     end
 
     def delivery_item_batches(mr_delivery_item_id)
       where(:mr_delivery_item_batches, MrDeliveryItemBatch, mr_delivery_item_id: mr_delivery_item_id)
     end
 
-    def delivery_items_fulfilled(mr_delivery_id)
-      item_quantities(mr_delivery_id) == batch_quantities(mr_delivery_id)
+    def batch_quantities_match(mr_delivery_id)
+      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).all.each do |item|
+        next if item_has_fixed_batch(item[:id])
+        batch_quantities = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id]).sum(:quantity_on_note)
+        quantities_match = item[:quantity_on_note] == batch_quantities
+        return false unless quantities_match
+      end
+      true
     end
 
-    def item_quantities(mr_delivery_id)
+    def delivery_items_fulfilled(mr_delivery_id)
+      sum_of_quantity_received(mr_delivery_id) == sum_of_quantity_on_note(mr_delivery_id)
+    end
+
+    # @param [Integer] mr_delivery_id
+    # @return [Numeric] sum of 'quantity received' for delivery items
+    def sum_of_quantity_received(mr_delivery_id)
       DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:quantity_received).sum
     end
 
-    def batch_quantities(mr_delivery_id)
-      item_ids = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:id)
-      DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_ids).select_map(:quantity_received).sum
+    # @param [Integer] mr_delivery_id
+    # @return [Numeric] sum of 'quantity on note' for delivery items
+    def sum_of_quantity_on_note(mr_delivery_id)
+      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:quantity_on_note).sum
     end
 
     def delete_mr_delivery_item(mr_delivery_item_id)
@@ -235,29 +241,29 @@ module PackMaterialApp
       delete(:mr_delivery_items, mr_delivery_item_id)
     end
 
-    def find_or_create_sku_location_ids(sku_ids, to_location_id)
-      result = []
-      sku_ids.each do |sku_id|
-        sku_location_id = DB[:mr_sku_locations].where(location_id: to_location_id, mr_sku_id: sku_id).get(:id)
-        sku_location_id ||= create(:mr_sku_locations, location_id: to_location_id, mr_sku_id: sku_id)
-
-        find_hash(:mr_skus, sku_id)
-        DB[:mr_sku_locations].update(:quantity, Sequel.function(sum, :quantity))
-
-        result << { sku_id: sku_id, sku_location_id: sku_location_id }
-      end
-      result
-    end
-
     def sku_for_barcode(id)
-      query = <<~SQL
-        SELECT sku_number, pv.product_variant_code, db.quantity_received AS no_of_prints, batch_number
-        FROM public.mr_skus
-        join material_resource_product_variants pv ON pv.id = mr_product_variant_id
-        JOIN mr_delivery_item_batches db ON db.id = mr_skus.mr_delivery_item_batch_id
-        WHERE mr_skus.mr_delivery_item_batch_id = ?
-      SQL
-      DB[query, id].first
+      sku = DB[:mr_skus].where(id: id).first
+      int_batch_id = sku[:mr_internal_batch_number_id]
+      batch_number = int_batch_id ? DB[:mr_internal_batch_numbers].where(id: int_batch_id).get(:batch_number) : nil
+
+      no_of_prints = nil
+      if (del_batch_id = sku[:mr_delivery_item_batch_id])
+        delivery_batch = DB[:mr_delivery_item_batches].where(id: del_batch_id)
+        batch_number = delivery_batch.get(:client_batch_number)
+
+        mr_delivery_id = DB[:mr_delivery_items].where(id: delivery_batch.get(:mr_delivery_item_id)).get(:mr_delivery_id)
+        no_of_prints = sum_of_quantity_received(mr_delivery_id)
+      end
+
+      pv_code = DB[:material_resource_product_variants].where(
+        id: sku[:mr_product_variant_id]
+      ).get(:product_variant_code)
+      {
+        sku_number: sku[:sku_number],
+        product_variant_code: pv_code,
+        no_of_prints: no_of_prints,
+        batch_number: batch_number
+      }
     end
 
     def location_id_from_legacy_barcode(value)

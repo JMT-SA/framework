@@ -261,6 +261,7 @@ module MasterfilesApp
           AND COALESCE(o.short_description, p.first_name || ' ' || p.surname) = ?
           AND pr.active
       SQL
+
       hash = DB[query, AppConst::ROLE_IMPLEMENTATION_OWNER, ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]].first
       raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]}\" is not defined/active" if hash.nil?
       MasterfilesApp::PartyRole.new(hash)

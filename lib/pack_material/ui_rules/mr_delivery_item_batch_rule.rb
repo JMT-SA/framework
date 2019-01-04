@@ -19,7 +19,6 @@ module UiRules
     private
 
     def set_show_fields
-      fields[:internal_batch_number] = { renderer: :label }
       fields[:client_batch_number] = { renderer: :label }
       fields[:quantity_on_note] = { renderer: :label }
       fields[:quantity_received] = { renderer: :label }
@@ -38,7 +37,6 @@ module UiRules
     def common_fields
       {
         mr_delivery_item_id: { renderer: :hidden },
-        mr_internal_batch_number_id: { renderer: :select, options: @repo.for_select_mr_internal_batch_numbers, caption: 'Internal Batch Number', prompt: true },
         client_batch_number: {},
         quantity_on_note: { renderer: :numeric, required: true },
         quantity_received: { renderer: :numeric, required: true }
@@ -60,7 +58,6 @@ module UiRules
     def make_new_form_object
       item = mr_delivery_item
       @form_object = OpenStruct.new(mr_delivery_item_id: item.id,
-                                    mr_internal_batch_number_id: nil,
                                     client_batch_number: nil,
                                     quantity_on_note: item.quantity_on_note,
                                     quantity_received: item.quantity_received)

@@ -13,7 +13,7 @@ module LabelApp
     def remote_object_packmat_config
       DRb.start_service
       remote_object = DRbObject.new_with_uri("druby://#{AppConst::SHARED_CONFIG_HOST_PORT}")
-      remote_object.config_for(:packmat)
+      remote_object.config_for('Pack Material')
     rescue DRb::DRbConnError => e
       msg = if e.cause
               e.cause.message

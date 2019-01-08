@@ -50,7 +50,7 @@ module MesserverApp
 
     def publish_part_of_body(printer_type, targets)
       post_body = []
-      post_body << "--#{AppConst::POST_FORM_AppConst::POST_FORM_BOUNDARY}\r\n"
+      post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
       post_body << "Content-Disposition: form-data; name=\"printertype\"\r\n"
       post_body << "\r\n#{printer_type}"
       post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"

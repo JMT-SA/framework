@@ -24,7 +24,7 @@ The actions are rendered as a context menu that can include submenu groupings.
       :function: function_name
       :program: program_name
       :permission: required_permission
-    :hide_if_null: another_field_id
+    :hide_if_null: another_field_id,further_field
   - :separator: true
   - submenu:
      :text: Submenu caption
@@ -96,20 +96,20 @@ e.g. `A dialog for grade $:grade$ fruit` would render as `A dialog for grade 1X 
 |The value in the named field of the selected grid row will be used as the popup dialog title.
 
 |:hide_if_null
-|Name of a field in the grid.
-|The item will not appear if the named field's value is null.
+|Name(s) of field(s) in the grid. Separated by commas - no spaces.
+|The item will not appear if any of the named fields' values is null.
 
 |:hide_if_present
-|Name of a field in the grid.
-|The item will not appear if the named field's value is NOT null.
+|Name(s) of field(s) in the grid. Separated by commas - no spaces.
+|The item will not appear if any of the named fields' values is NOT null.
 
 |:hide_if_true
-|Name of a field in the grid.
-|The item will not appear if the named field's value is `true`.
+|Name(s) of field(s) in the grid. Separated by commas - no spaces.
+|The item will not appear if any of the named fields' values is `true`.
 
 |:hide_if_false
-|Name of a field in the grid.
-|The item will not appear if the named field's value is `false`.
+|Name(s) of field(s) in the grid. Separated by commas - no spaces.
+|The item will not appear if any of the named fields' values is `false`.
 
 |:is_delete
 |`true` or `false`

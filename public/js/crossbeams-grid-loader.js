@@ -487,6 +487,27 @@ const crossbeamsGridFormatters = {
     let subPrefix = '';
     let subnode;
     let titleValue;
+    const checkBooleans = (checks, boolVal, data) => {
+      let ok = false;
+      checks.split(',').forEach((field) => {
+        if (data[field] === boolVal) {
+          ok = true;
+        }
+      });
+      return ok;
+    };
+    const checkNulls = (checks, nullPresent, data) => {
+      let ok = false;
+      checks.split(',').forEach((field) => {
+        if (nullPresent && data[field] === null) {
+          ok = true;
+        }
+        if (!nullPresent && data[field] !== null) {
+          ok = true;
+        }
+      });
+      return ok;
+    };
     if (item.title_field) {
       titleValue = params.data[item.title_field];
     } else {
@@ -500,16 +521,16 @@ const crossbeamsGridFormatters = {
         return { key: `${prefix}${key}`, name: item.text, value: '---' };
       }
       return null;
-    } else if (item.hide_if_null && params.data[item.hide_if_null] === null) {
+    } else if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_present && params.data[item.hide_if_present] !== null) {
+    } else if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_true && params.data[item.hide_if_true] === true) {
+    } else if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_false && params.data[item.hide_if_false] === false) {
+    } else if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
       // No show of item
       return null;
     } else if (item.is_submenu) {

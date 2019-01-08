@@ -206,6 +206,8 @@ module MesserverApp
     def format_response(response)
       if response.code == '200'
         success_response(response.code, response)
+      elsif response.code == '503' # The printer is unavailable
+        failed_response(response.body, response.code)
       else
         msg = response.code.start_with?('5') ? 'The destination server encountered an error.' : 'The request was not successful.'
         failed_response("#{msg} The response code is #{response.code}", response.code)

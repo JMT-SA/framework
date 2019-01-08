@@ -46,6 +46,22 @@ class BaseInteractor
     repo.log_status(table_name, id, status, user_name: @user.user_name, comment: comment)
   end
 
+  # Add a created_by key to a changeset and set its value to the current user.
+  #
+  # @param changeset [Hash, DryStruct] the changeset.
+  # @return [Hash] the augmented changeset.
+  def include_created_by_in_changeset(changeset)
+    changeset.to_h.merge(created_by: @user.user_name)
+  end
+
+  # Add an updated_by key to a changeset and set its value to the current user.
+  #
+  # @param changeset [Hash, DryStruct] the changeset.
+  # @return [Hash] the augmented changeset.
+  def include_updated_by_in_changeset(changeset)
+    changeset.to_h.merge(updated_by: @user.user_name)
+  end
+
   # Log the status of multiple records. Uses the context passed to the Interactor constructor.
   #
   # The statuses are written to `audit.current_statuses` and appended to `audit.status_logs`.

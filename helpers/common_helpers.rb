@@ -60,6 +60,54 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     end
   end
 
+  # Display content in a Crossbeams::Layout::CallbackSection.
+  #
+  # @param content [nil, string] the content. Ignored if a block is provided.
+  # @param content_style [nil, symbol] optional styling for content [:info, :success, :warning, :error]
+  # @param notice [nil, string] an optional flash notice.
+  # @param error [nil, string] an optional flash error.
+  # @param block [block] a block that yields ERB string to be passed to render_partial.
+  # @return [JSON] formatted to be interpreted by javascript to replace a callback section.
+  def show_in_callback(content: nil, content_style: nil, notice: nil, error: nil, &block)
+    raise ArgumentError, 'Invalid content style' unless [nil, :info, :success, :warning, :error].include?(content_style)
+    res = {}
+    res[:content] = if block_given?
+                      render_partial(&block)
+                    else
+                      # content
+                      wrap_content_in_style(content, content_style)
+                    end
+    res[:flash] = { notice: notice } if notice
+    res[:flash] = { error: error } if error
+    res.to_json
+  end
+
+  CONTENT_STYLE_HEAD = {
+    info: 'Note:',
+    success: 'Success:',
+    warning: 'Warning:',
+    error: 'Error:'
+  }.freeze
+
+  # Wrap content in styling (a heading div and content).
+  # Example
+  #   wrap_content_in_style('A note', :info) #=>
+  #   "< div class="crossbeams-info-note" >
+  #     < p >< strong >Note:< /strong>< /p >
+  #     < p >A note< /p >
+  #   < /div >"
+  #
+  # @param content [string] the content to be rendered.
+  # @param content_style [symbol] if nil, the content is returned unwrapped. [:info, :success, :warning, :error] are styled appropriately.
+  # @param caption [string] optional caption to override the default which is based on the style.
+  # @return [HTML]
+  def wrap_content_in_style(content, content_style, caption: nil)
+    return content if content_style.nil?
+    css = "crossbeams-#{content_style}-note"
+    head = CONTENT_STYLE_HEAD[content_style]
+    "<div class='#{css}'><p><strong>#{caption || head}</strong></p><p>#{content}</p></div>"
+  end
+
   # Add validation errors that are not linked to a field in a form.
   #
   # @param messages [Hash] the current hash of validation messages.

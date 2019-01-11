@@ -94,6 +94,8 @@ module MesserverApp
       post_body += shared_part_of_body(fname, binary_data)
 
       http = Net::HTTP.new(uri.host, uri.port)
+      http.open_timeout = 5
+      http.read_timeout = 10
       request = Net::HTTP::Post.new(uri.request_uri)
       request.body = post_body.join
       request['Content-Type'] = "multipart/form-data, boundary=#{AppConst::POST_FORM_BOUNDARY}"
@@ -101,9 +103,9 @@ module MesserverApp
       response = http.request(request)
       format_response(response)
     rescue Timeout::Error
-      failed_response('The call to the server timed out.')
+      failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
-      failed_response('The connection was refused. Perhaps the server is not running.')
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
       failed_response("There was an error: #{e.message}")
     end
@@ -113,6 +115,8 @@ module MesserverApp
       post_body += shared_part_of_body(fname, binary_data)
 
       http = Net::HTTP.new(uri.host, uri.port)
+      http.open_timeout = 5
+      http.read_timeout = 10
       request = Net::HTTP::Post.new(uri.request_uri)
       request.body = post_body.join
       request['Content-Type'] = "multipart/form-data, boundary=#{AppConst::POST_FORM_BOUNDARY}"
@@ -120,9 +124,9 @@ module MesserverApp
       response = http.request(request)
       format_response(response)
     rescue Timeout::Error
-      failed_response('The call to the server timed out.')
+      failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
-      failed_response('The connection was refused. Perhaps the server is not running.')
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
       failed_response("There was an error: #{e.message}")
     end
@@ -175,15 +179,17 @@ module MesserverApp
 
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
+      http.open_timeout = 5
+      http.read_timeout = 10
       request.body = post_body.join
       request['Content-Type'] = "multipart/form-data, boundary=#{AppConst::POST_FORM_BOUNDARY}"
 
       response = http.request(request)
       format_response(response)
     rescue Timeout::Error
-      failed_response('The call to the server timed out.')
+      failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
-      failed_response('The connection was refused. Perhaps the server is not running.')
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
       # return success_response(200, OpenStruct.new(body: 'sommer something')) if e.message.include?('Connection reset by peer') # FIXME: kludge for demo...
       failed_response("There was an error: #{e.message}")
@@ -191,14 +197,16 @@ module MesserverApp
 
     def request_uri(uri)
       http = Net::HTTP.new(uri.host, uri.port)
+      http.open_timeout = 5
+      http.read_timeout = 10
       request = Net::HTTP::Get.new(uri.request_uri)
       response = http.request(request)
 
       format_response(response)
     rescue Timeout::Error
-      failed_response('The call to the server timed out.')
+      failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
-      failed_response('The connection was refused. Perhaps the server is not running.')
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
       failed_response("There was an error: #{e.message}")
     end

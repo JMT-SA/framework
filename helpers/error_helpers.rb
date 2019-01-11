@@ -48,7 +48,7 @@ module ErrorHelpers
   # @return [String] the HTML containing an error message.
   def show_unauthorised
     response.status = 403
-    view(inline: "<div class='crossbeams-warning-note'><strong>Warning</strong><br>You do not have permission for this task</div>", layout: appropriate_layout)
+    view(inline: wrap_content_in_style('You do not have permission for this task', :warning), layout: appropriate_layout)
   end
 
   # Route the task not permitted error-display for page/fetch calls.
@@ -66,7 +66,7 @@ module ErrorHelpers
   # @return [String] the HTML containing an error message.
   def show_task_not_permitted(err)
     response.status = 403
-    view(inline: "<div class='crossbeams-warning-note'><strong>Task is not permitted</strong><br>#{err.message || 'The task may be performed at this time.'}</div>", layout: appropriate_layout)
+    view(inline: wrap_content_in_style(err.message || 'The task may be performed at this time.', :warning, caption: 'Task is not permitted'), layout: appropriate_layout)
   end
 
   # Show an informational message page.
@@ -74,7 +74,7 @@ module ErrorHelpers
   # @param message [String] the information messge.
   # @return [String] the HTML containing the message.
   def show_page_info(message)
-    view(inline: "<div class='crossbeams-info-note'><p><strong>Note:</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
+    view(inline: wrap_content_in_style(message, :info), layout: appropriate_layout)
   end
 
   # Show a warning message page.
@@ -82,7 +82,7 @@ module ErrorHelpers
   # @param message [String] the warning messge.
   # @return [String] the HTML containing the message.
   def show_page_warning(message)
-    view(inline: "<div class='crossbeams-warning-note'><p><strong>Warning:</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
+    view(inline: wrap_content_in_style(message, :warning), layout: appropriate_layout)
   end
 
   # Show a success message page.
@@ -90,7 +90,7 @@ module ErrorHelpers
   # @param message [String] the messge.
   # @return [String] the HTML containing the message.
   def show_page_success(message)
-    view(inline: "<div class='crossbeams-success-note'><p><strong>Success:</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
+    view(inline: wrap_content_in_style(message, :success), layout: appropriate_layout)
   end
 
   # Show an error message page. Also logs the error.
@@ -100,7 +100,7 @@ module ErrorHelpers
   def show_page_error(err)
     message = err.respond_to?(:message) ? err.message : err.to_s
     puts err.full_message if err.respond_to?(:full_message) # Log the error too
-    view(inline: "<div class='crossbeams-error-note'><p><strong>Error</strong></p><p>#{message}</p></div>", layout: appropriate_layout)
+    view(inline: wrap_content_in_style(message, :error), layout: appropriate_layout)
   end
 
   # Show a message as a notice in JSON.

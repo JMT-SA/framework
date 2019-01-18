@@ -35,14 +35,16 @@ class AppConst
   # These will need to be configured per installation...
   BARCODE_PRINT_RULES = {
     location: { format: 'LC%d', fields: [:id] },
-    sku: { format: 'SK%d', fields: [:sku_number] }
+    sku: { format: 'SK%d', fields: [:sku_number] },
+    delivery: { format: 'DN%d', fields: [:delivery_number] }
   }.freeze
 
   BARCODE_SCAN_RULES = [
     { regex: '^LC(\\d+)$', type: 'location', field: 'id' },
     { regex: '^(\\D\\D\\D)$', type: 'location', field: 'legacy_barcode' },
     { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
-    { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' }
+    { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
+    { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' }
   ].freeze
 
   # Que

@@ -47,6 +47,7 @@ The following special environment variables are available when running the app:
 * How to link:/developer_documentation/how_to_log_status_and_changes.adoc[log status and data changes] (Audit).
 * How to link:/developer_documentation/how_to_produce_a_jasper_report.adoc[produce a jasper report].
 * How to link:/developer_documentation/how_to_send_a_basic_email.adoc[send a basic email via the send mail job].
+* How to link:/developer_documentation/how_to_attach_observers_to_a_service.adoc[attach observers to a service].
 * How to disable/enable a field based on the value of another field.
 * How to layout a multi-column form.
 * How to layout a page to include a form and a grid.

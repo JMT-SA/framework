@@ -35,8 +35,18 @@ module LabelPrintingApp
       fmt_str = AppConst::BARCODE_PRINT_RULES[field.to_sym][:format]
       raise Crossbeams::FrameworkError, "There is no BARCODE PRINT RULE for #{field}" if fmt_str.nil?
 
-      vals = AppConst::BARCODE_PRINT_RULES[field.to_sym][:fields].map { |f| instance[f] }
+      fields = AppConst::BARCODE_PRINT_RULES[field.to_sym][:fields]
+      vals = fields.map { |f| instance[f] }
+      assert_no_nil_fields!(vals, fields)
+
       format(fmt_str, *vals)
+    end
+
+    def assert_no_nil_fields!(vals, fields)
+      return unless vals.any?(&:nil?)
+      in_err = vals.zip(fields).select { |v, _| v.nil? }.map(&:last)
+
+      raise Crossbeams::FrameworkError, "Make barcode: instance does not have a value for: #{in_err.join(', ')}"
     end
 
     def values_from(lbl_required)

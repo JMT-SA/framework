@@ -311,11 +311,11 @@ module MasterfilesApp
 
     # Customers & Suppliers
     def for_select_supplier_parties
-      parties_except_for_role(MasterfilesApp::SUPPLIER_ROLE)
+      parties_except_for_role(AppConst::ROLE_SUPPLIER)
     end
 
     def for_select_customer_parties
-      parties_except_for_role(MasterfilesApp::CUSTOMER_ROLE)
+      parties_except_for_role(AppConst::ROLE_CUSTOMER)
     end
 
     def parties_except_for_role(role)

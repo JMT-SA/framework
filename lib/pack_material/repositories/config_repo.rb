@@ -315,6 +315,7 @@ module PackMaterialApp
     def find_matres_product_variant(id)
       find_with_association(:material_resource_product_variants, id,
                             parent_tables: [{ parent_table: :mr_internal_batch_numbers, flatten_columns: { batch_number: :internal_batch_number } }],
+                            lookup_functions: [{ function: :fn_formatted_product_variant_number, args: [:product_variant_number], col_name: :product_variant_number }],
                             wrapper: MatresProductVariant)
     end
   end

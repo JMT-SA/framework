@@ -8,7 +8,6 @@ module PackMaterialApp
     def create_matres_product_variant_party_role(parent_id, params)
       params[:material_resource_product_variant_id] = parent_id
       res = validate_matres_product_variant_party_role_params(params)
-      res.messages[:base] = res.messages[:customer_or_supplier] if res.messages && res.messages[:customer_or_supplier]
       return validation_failed_response(res) unless res.messages.empty?
       result = nil
       DB.transaction do

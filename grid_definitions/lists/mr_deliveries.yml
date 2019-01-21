@@ -8,6 +8,7 @@
       :text: verify
       :icon: check-square
       :hide_if_true: verified
+      :prompt: Are you sure you want to verify this delivery?
     - :url: "/pack_material/replenish/mr_deliveries/$:delivery_id$/edit"
       :text: edit
       :icon: edit

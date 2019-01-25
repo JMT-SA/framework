@@ -94,6 +94,14 @@ These are the methods used in building a page layout.
 |grid_id (String), url (String), options (Hash)
 |Add a grid to the page.
 
+|add_text
+|text (String), options (Hash)
+|Add a block of Text to the page.
+
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the page.
+
 |render
 |
 |Renders all nodes in the page.
@@ -124,6 +132,10 @@ These are the methods used in building a page layout.
 |add_text
 |text (String), options (Hash)
 |Add a block of Text to the section.
+
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the section.
 
 |add_control
 |page_control_definition (Hash)
@@ -174,6 +186,10 @@ These are the methods used in building a page layout.
 |add_text
 |text (String), options (Hash)
 |Add a block of Text to the column.
+
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the column.
 
 |add_grid
 |grid_id (String), url (String), options (Hash)
@@ -253,6 +269,10 @@ These are the methods used in building a page layout.
 |add_text
 |text (String), options (Hash)
 |Add a block of Text to the form.
+
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the form.
 
 |add_sortable_list
 |prefix (String), items (Array), options (Hash)

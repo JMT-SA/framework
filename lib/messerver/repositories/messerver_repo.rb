@@ -74,11 +74,11 @@ module MesserverApp
       post_body
     end
 
-    def shared_part_of_body(fname, binary_data)
+    def shared_part_of_body(fname, binary_data, unitfolder: 'ldesign')
       post_body = []
       post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
       post_body << "Content-Disposition: form-data; name=\"unitfolder\"\r\n"
-      post_body << "\r\nldesign"
+      post_body << "\r\n#{unitfolder}"
       post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
       post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
       post_body << "Content-Disposition: form-data; name=\"datafile\"; filename=\"#{fname}.zip\"\r\n"
@@ -99,6 +99,7 @@ module MesserverApp
       request = Net::HTTP::Post.new(uri.request_uri)
       request.body = post_body.join
       request['Content-Type'] = "multipart/form-data, boundary=#{AppConst::POST_FORM_BOUNDARY}"
+      log_request(request)
 
       response = http.request(request)
       format_response(response)
@@ -112,7 +113,7 @@ module MesserverApp
 
     def post_package(uri, printer_type, targets, fname, binary_data) # rubocop:disable Metrics/AbcSize
       post_body = publish_part_of_body(printer_type, targets)
-      post_body += shared_part_of_body(fname, binary_data)
+      post_body += shared_part_of_body(fname, binary_data, unitfolder: 'production')
 
       http = Net::HTTP.new(uri.host, uri.port)
       http.open_timeout = 5
@@ -120,6 +121,7 @@ module MesserverApp
       request = Net::HTTP::Post.new(uri.request_uri)
       request.body = post_body.join
       request['Content-Type'] = "multipart/form-data, boundary=#{AppConst::POST_FORM_BOUNDARY}"
+      log_request(request)
 
       response = http.request(request)
       format_response(response)
@@ -159,30 +161,14 @@ module MesserverApp
       post_body << "Content-Disposition: form-data; name=\"eof\"\r\n"
       post_body << "\r\neof"
       post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
-      # p post_body
-
-      # # <input type="hidden" name="printdata"
-      # #               value="printername=PRN-01 & labeltemplate=KRM_Carton_Lbl_PU & labeltype=nsld & quantity=1 & F1=Fred&F2=Piet&F3=Hans" >
-      # # f_vars = vars.each_with_index.map { |v, i| "F#{i + 1}=#{v}" }.join('&')
-      # f_vars = vars.map { |k, v| "#{k}=#{v}" }.join('&')
-      # print_string = "printername=#{printer} & labeltemplate=#{label_template_name} & labeltype=nsld & quantity=#{quantity} & #{f_vars}"
-      # p print_string
-      # post_body = []
-      # post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
-      # post_body << "Content-Disposition: form-data; name=\"printdata\"\r\n"
-      # post_body << "\r\n#{print_string}"
-      # post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
-      # post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
-      # post_body << "Content-Disposition: form-data; name=\"eof\"\r\n"
-      # post_body << "\r\neof"
-      # post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
 
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       http.open_timeout = 5
       http.read_timeout = 10
       request.body = post_body.join
-      request['Content-Type'] = "multipart/form-data, boundary=#{AppConst::POST_FORM_BOUNDARY}"
+      request['Content-Type'] = "boundary=#{AppConst::POST_FORM_BOUNDARY}"
+      log_request(request)
 
       response = http.request(request)
       format_response(response)
@@ -200,6 +186,7 @@ module MesserverApp
       http.open_timeout = 5
       http.read_timeout = 10
       request = Net::HTTP::Get.new(uri.request_uri)
+      log_request(request)
       response = http.request(request)
 
       format_response(response)
@@ -235,7 +222,7 @@ module MesserverApp
     end
 
     def publish_status_uri(printer_type, filename)
-      URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetPublishFileStatus&ListType=yaml&Name=#{filename}&PrinterType=#{printer_type}")
+      URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetPublishFileStatus&ListType=yaml&Name=#{filename}&PrinterType=#{printer_type}&Unit=production")
     end
 
     def preview_uri
@@ -244,6 +231,14 @@ module MesserverApp
 
     def print_label_uri
       URI.parse("#{AppConst::LABEL_SERVER_URI}LabelPrint")
+    end
+
+    def log_request(request)
+      if request.method == 'GET'
+        puts ">>> MesServer call: #{request.method} >> #{request.path}"
+      else
+        puts ">>> MesServer call: #{request.method} >> #{request.path} > #{request.body[0, 300]}"
+      end
     end
   end
 end

@@ -6,7 +6,7 @@ Sequel.migration do
       add_column :active, :boolean, default: true
 
       add_index [:server_ip, :printer_code], name: :printers_ip_code, unique: true
-      drop_index :printers_unique_code
+      drop_index :printer_code, name: :printers_unique_code
     end
 
 

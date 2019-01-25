@@ -648,6 +648,7 @@ const crossbeamsUtils = {
           // multiple: true,     // should configure via data...
           allowDeselect: false,
           clearable: true,       // should configure via data...
+          width: 'notset',       // stop Selectr from setting width to 100%
         }); // select that can be searched.
         // Store a reference on the DOM node.
         sel.selectr = holdSel;

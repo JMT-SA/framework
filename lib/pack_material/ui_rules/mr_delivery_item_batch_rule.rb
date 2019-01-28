@@ -5,6 +5,7 @@ module UiRules
     def generate_rules
       @repo = PackMaterialApp::ReplenishRepo.new
       @print_repo = LabelApp::PrinterRepo.new
+
       make_form_object
       apply_form_values
 
@@ -50,8 +51,11 @@ module UiRules
       @form_object = @repo.find_mr_delivery_item_batch(@options[:id])
     end
 
-    def form_object_for_barcode_print
-      rec = @repo.sku_for_barcode(@options[:id])
+    def form_object_for_barcode_print # rubocop:disable Metrics/AbcSize
+      @rules[:mr_delivery_item_batch_id] = @options[:type] == 'item_batch' ? @options[:id] : nil
+      @rules[:delivery_item_id] = @options[:type] == 'internal_batch' ? @options[:id] : nil
+
+      rec = @options[:type] == 'item_batch' ? @repo.sku_info_from_batch_id(@options[:id]) : @repo.sku_info_from_item_id(@options[:id])
       @form_object = OpenStruct.new(rec.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE)))
     end
 

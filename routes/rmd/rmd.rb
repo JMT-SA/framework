@@ -169,41 +169,39 @@ class Framework < Roda
         form = RMDForm.new(details,
                            form_name: :putaway,
                            progress: details[:delivery_id] ? details[:progress] : nil, # 'Delivery 123: 3 of 5 items complete' : nil,
-                           notes: 'Scan the location, then the SKU and enter the quantity.',
+                           notes: 'Please scan the Delivery number and the SKU number, then scan the Location and enter the quantity to be putaway.',
                            scan_with_camera: @rmd_scan_with_camera,
                            caption: 'Delivery putaway',
                            action: '/rmd/deliveries/putaways',
                            button_caption: 'Putaway')
+        form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
+        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
         form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location)
-        form.add_field(:sku, 'SKU', scan: 'key248_all', scan_type: :sku)
         form.add_field(:quantity, 'Quantity', data_type: 'number')
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
 
       r.post do        # CREATE
-        # res = interactor.create_putaway...
-        # Simulate interactor call:
-        these_params = params[:putaway]
-        instance = { delivery_id: 123 }
-        res = if Time.now.sec > 40
-                OpenStruct.new(success: false,
-                               instance: instance.merge(progress: 'Delivery 123: 2 of 5 items.'),
-                               errors: { sku: ['is not correct'] },
-                               message: 'Validation problem')
-              else
-                OpenStruct.new(success: true,
-                               instance: instance.merge(progress: "Delivery 123: 3 of 5 items.<br>Last scan: LOC: #{these_params[:location]} / SKU: #{these_params[:sku]}"),
-                               errors: {},
-                               message: 'Successful putaway')
-              end
-        payload = { delivery_id: 123, progress: res.instance[:progress] }
-        unless res.success
+        interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+        res = interactor.putaway_delivery(params[:putaway])
+        payload = { progress: nil }
+        if res.success
+          payload[:delivery_id] = res.instance[:delivery_id]
+          payload[:progress] = interactor.html_progress_report(res.instance)
+        else
+          these_params = params[:putaway]
           payload[:error_message] = res.message
           payload[:errors] = res.errors
-          payload.merge!(location: these_params[:location], sku: these_params[:sku], quantity: these_params[:quantity],
-                         location_scan_field: these_params[:location_scan_field], sku_scan_field: these_params[:sku_scan_field])
+          payload.merge!(location: these_params[:location],
+                         location_scan_field: these_params[:location_scan_field],
+                         sku_number: these_params[:sku_number],
+                         sku_number_scan_field: these_params[:sku_number_scan_field],
+                         delivery_number: these_params[:delivery_number],
+                         delivery_number_scan_field: these_params[:delivery_number_scan_field],
+                         quantity: these_params[:quantity])
         end
+
         store_locally(:delivery_putaway, payload)
         r.redirect '/rmd/deliveries/putaways/new'
       end

@@ -7,5 +7,6 @@ module PackMaterialApp
     attribute :client_batch_number, Types::String
     attribute :quantity_on_note, Types::Decimal
     attribute :quantity_received, Types::Decimal
+    attribute :putaway_completed, Types::Bool
   end
 end

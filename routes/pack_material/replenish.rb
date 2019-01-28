@@ -433,7 +433,11 @@ class Framework < Roda
         res = interactor.create_mr_delivery(params[:mr_delivery])
         if res.success
           flash[:notice] = res.message
-          redirect_via_json("/pack_material/replenish/mr_deliveries/#{res.instance.id}/edit")
+          if fetch?(r)
+            redirect_via_json("/pack_material/replenish/mr_deliveries/#{res.instance.id}/edit")
+          else
+            r.redirect("/pack_material/replenish/mr_deliveries/#{res.instance.id}/edit")
+          end
         else
           re_show_form(r, res, url: '/pack_material/replenish/mr_deliveries/new') do
             PackMaterial::Replenish::MrDelivery::New.call(form_values: params[:mr_delivery],
@@ -524,22 +528,6 @@ class Framework < Roda
         show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::Edit.call(id) }
       end
 
-      r.on 'print_barcode' do # BARCODE
-        r.get do
-          show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(id) }
-        end
-        r.patch do
-          res = interactor.print_sku_barcode(id, params[:mr_delivery_item_batch])
-          if res.success
-            show_json_notice(res.message)
-          else
-            re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(id, form_values: params[:mr_delivery_item_batch], form_errors: res.errors) }
-          end
-          # call messerver... KR_PM_SKU, sku, sku, prod variant, batch no...
-          # show_json_notice('Pretend: label has been sent to printer')
-        end
-      end
-
       r.is do
         r.get do       # SHOW
           check_auth!('replenish', 'read')
@@ -564,6 +552,25 @@ class Framework < Roda
           else
             show_json_error(res.message, status: 200)
           end
+        end
+      end
+    end
+
+    # BARCODE
+    # --------------------------------------------------------------------------
+    r.on 'print_sku_barcode' do
+      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.get do
+        attrs = interactor.resolve_print_sku_barcode_params(params)
+        show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(attrs[:id], type: attrs[:type]) }
+      end
+      r.patch do
+        res = interactor.print_sku_barcode(params)
+        if res.success
+          show_json_notice(res.message)
+        else
+          attrs = interactor.resolve_print_sku_barcode_params(params)
+          re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(attrs[:id], form_values: params[:mr_delivery_item_batch], form_errors: res.errors, type: attrs[:type]) }
         end
       end
     end

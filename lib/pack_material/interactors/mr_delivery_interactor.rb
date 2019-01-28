@@ -2,18 +2,6 @@
 
 module PackMaterialApp
   class MrDeliveryInteractor < BaseInteractor
-    def repo
-      @repo ||= ReplenishRepo.new
-    end
-
-    def mr_delivery(id)
-      repo.find_mr_delivery(id)
-    end
-
-    def validate_mr_delivery_params(params)
-      MrDeliverySchema.call(params)
-    end
-
     def create_mr_delivery(params)
       can_create = TaskPermissionCheck::MrDelivery.call(:create)
       if can_create.success
@@ -57,7 +45,7 @@ module PackMaterialApp
           repo.verify_mr_delivery(id)
           log_transaction
           log_status('mr_deliveries', id, 'VERIFIED')
-          PackMaterialApp::CreateSKUS.call(id)
+          PackMaterialApp::CreateDeliverySKUS.call(id, @user.user_name)
           instance = mr_delivery(id)
           success_response("Verified delivery #{instance.delivery_number}", instance)
         end
@@ -79,6 +67,64 @@ module PackMaterialApp
       else
         failed_response(can_delete.message)
       end
+    end
+
+    def putaway_delivery(attrs)
+      delivery_id = repo.delivery_id_from_number(attrs[:delivery_number])
+      can_putaway = TaskPermissionCheck::MrDelivery.call(:putaway, delivery_id)
+      if can_putaway.success
+        res = validate_mr_delivery_putaway_params(attrs)
+        return validation_failed_response(res) unless res.messages.empty?
+
+        sku_ids = repo.sku_ids_from_numbers(attrs[:sku_number])
+        sku_id = sku_ids[0]
+        qty = Integer(attrs[:quantity])
+
+        to_location_id = repo.resolve_location_id_from_scan(attrs[:location], attrs[:location_scan_field])
+        to_location_id = Integer(to_location_id)
+
+        opts = { user_name: @user.user_name, delivery_id: delivery_id }
+
+        repo.transaction do
+          log_transaction
+
+          res1 = PackMaterialApp::MoveMrStock.call(sku_id, to_location_id, qty, opts)
+          return res1 unless res1.success
+
+          res2 = PackMaterialApp::DeliveryPutawayStatusCheck.call(sku_id, qty, delivery_id)
+          return res2 unless res2.success
+
+          log_status('mr_deliveries', delivery_id, 'PUTAWAY REGISTERED')
+          success_response('Successful putaway', delivery_id: delivery_id, sku_id: sku_id, to_location_id: to_location_id)
+        end
+      else
+        failed_response(can_putaway.message)
+      end
+    end
+
+    def html_progress_report(delivery_id: nil, sku_id: nil, to_location_id: nil)
+      message = []
+      message << repo.html_delivery_progress_report(delivery_id) if delivery_id
+      message << repo.html_last_scan_report(sku_id, to_location_id) if sku_id && to_location_id
+      message.join('<br>')
+    end
+
+    private
+
+    def repo
+      @repo ||= ReplenishRepo.new
+    end
+
+    def mr_delivery(id)
+      repo.find_mr_delivery(id)
+    end
+
+    def validate_mr_delivery_params(params)
+      MrDeliverySchema.call(params)
+    end
+
+    def validate_mr_delivery_putaway_params(params)
+      MrDeliveryPutawaySchema.call(params)
     end
   end
 end

@@ -2,18 +2,6 @@
 
 module PackMaterialApp
   class MrDeliveryItemBatchInteractor < BaseInteractor
-    def repo
-      @repo ||= ReplenishRepo.new
-    end
-
-    def mr_delivery_item_batch(id)
-      repo.find_mr_delivery_item_batch(id)
-    end
-
-    def validate_mr_delivery_item_batch_params(params)
-      MrDeliveryItemBatchSchema.call(params)
-    end
-
     def create_mr_delivery_item_batch(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_delivery_item_id] = parent_id
       can_create = TaskPermissionCheck::MrDeliveryItemBatch.call(:create, delivery_item_id: parent_id)
@@ -66,9 +54,46 @@ module PackMaterialApp
       end
     end
 
-    def print_sku_barcode(id, params)
-      instance = repo.sku_for_barcode(id)
-      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, params)
+    def print_sku_barcode(params)
+      instance = repo.sku_for_barcode(mr_delivery_item_id: params[:mr_delivery_item_id], mr_delivery_item_batch_id: params[:mr_delivery_item_batch_id])
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, params[:mr_delivery_item_batch])
+    end
+
+    def resolve_print_sku_barcode_params(params)
+      res = validate_print_sku_barcode_params(params)
+      return nil unless res.messages.empty?
+
+      type = params[:mr_delivery_item_batch_id] ? 'item_batch' : 'internal_batch'
+      id = type == 'item_batch' ? params[:mr_delivery_item_batch_id] : params[:mr_delivery_item_id]
+      sku_id = nil
+      if params[:mr_delivery_item_batch_id]
+        sku_id = repo.sku_id_for_delivery_item_batch(params[:mr_delivery_item_batch_id])
+      elsif params[:mr_delivery_item_id]
+        sku_id = repo.sku_id_for_delivery_item(params[:mr_delivery_item_id])
+      end
+      {
+        type: type,
+        id: id,
+        sku_id: sku_id
+      }
+    end
+
+    private
+
+    def repo
+      @repo ||= ReplenishRepo.new
+    end
+
+    def mr_delivery_item_batch(id)
+      repo.find_mr_delivery_item_batch(id)
+    end
+
+    def validate_mr_delivery_item_batch_params(params)
+      MrDeliveryItemBatchSchema.call(params)
+    end
+
+    def validate_print_sku_barcode_params(params)
+      PrintSKUBarcodeSchema.call(params)
     end
   end
 end

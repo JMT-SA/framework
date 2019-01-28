@@ -12,5 +12,6 @@ module PackMaterialApp
     attribute :quantity_received, Types::Decimal
     attribute :invoiced_unit_price, Types::Decimal
     attribute :remarks, Types::String
+    attribute :putaway_completed, Types::Bool
   end
 end

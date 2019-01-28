@@ -220,20 +220,12 @@ module PackMaterialApp
       true
     end
 
-    def delivery_items_fulfilled(mr_delivery_id)
-      sum_of_quantity_received(mr_delivery_id) == sum_of_quantity_on_note(mr_delivery_id)
-    end
-
-    # @param [Integer] mr_delivery_id
-    # @return [Numeric] sum of 'quantity received' for delivery items
-    def sum_of_quantity_received(mr_delivery_id)
-      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:quantity_received).sum
-    end
-
-    # @param [Integer] mr_delivery_id
-    # @return [Numeric] sum of 'quantity on note' for delivery items
-    def sum_of_quantity_on_note(mr_delivery_id)
-      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:quantity_on_note).sum
+    def delete_mr_delivery(mr_delivery_id)
+      item_ids = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:id)
+      item_ids.each do |item_id|
+        delete_mr_delivery_item(item_id)
+      end
+      delete(:mr_deliveries, mr_delivery_id)
     end
 
     def delete_mr_delivery_item(mr_delivery_item_id)
@@ -241,29 +233,112 @@ module PackMaterialApp
       delete(:mr_delivery_items, mr_delivery_item_id)
     end
 
-    def sku_for_barcode(id)
-      sku = DB[:mr_skus].where(id: id).first
-      int_batch_id = sku[:mr_internal_batch_number_id]
-      batch_number = int_batch_id ? DB[:mr_internal_batch_numbers].where(id: int_batch_id).get(:batch_number) : nil
+    def sku_id_for_delivery_item_batch(mr_delivery_item_batch_id)
+      DB[:mr_skus].where(mr_delivery_item_batch_id: mr_delivery_item_batch_id).get(:id)
+    end
 
-      no_of_prints = nil
-      if (del_batch_id = sku[:mr_delivery_item_batch_id])
-        delivery_batch = DB[:mr_delivery_item_batches].where(id: del_batch_id)
-        batch_number = delivery_batch.get(:client_batch_number)
+    def sku_id_for_delivery_item(delivery_item_id)
+      item_batches = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: delivery_item_id).all
+      return nil if item_batches.any?
+      pv_id = DB[:mr_delivery_items].where(id: delivery_item_id).get(:mr_product_variant_id)
+      int_batch_id = DB[:material_resource_product_variants].where(id: pv_id).get(:mr_internal_batch_number_id)
+      DB[:mr_skus].where(
+        mr_internal_batch_number_id: int_batch_id,
+        mr_product_variant_id: pv_id
+      ).get(:id)
+    end
 
-        mr_delivery_id = DB[:mr_delivery_items].where(id: delivery_batch.get(:mr_delivery_item_id)).get(:mr_delivery_id)
-        no_of_prints = sum_of_quantity_received(mr_delivery_id)
-      end
+    def sku_for_barcode(sku_id: nil, mr_delivery_item_id: nil, mr_delivery_item_batch_id: nil)
+      return nil unless (sku_id || mr_delivery_item_id || mr_delivery_item_batch_id)
+      info = nil
+      info = sku_info_from_batch_id(mr_delivery_item_batch_id) if mr_delivery_item_batch_id
+      info = sku_info_from_item_id(mr_delivery_item_id) if mr_delivery_item_id
+      info = sku_info_from_sku_id(sku_id) if sku_id
+      info
+    end
 
-      pv_code = DB[:material_resource_product_variants].where(
-        id: sku[:mr_product_variant_id]
-      ).get(:product_variant_code)
+    def sku_info_from_batch_id(mr_delivery_item_batch_id)
+      batch = DB[:mr_delivery_item_batches].where(id: mr_delivery_item_batch_id)
+      batch_number = batch.get(:client_batch_number)
+
+      item_id = batch.get(:mr_delivery_item_id)
+      item = DB[:mr_delivery_items].where(id: item_id)
+
+      pv = DB[:material_resource_product_variants].where(id: item.get(:mr_product_variant_id))
+      pv_code = pv.get(:product_variant_code)
+
+      sku = DB[:mr_skus].where(mr_delivery_item_batch_id: mr_delivery_item_batch_id,
+                               mr_product_variant_id: item.get(:mr_product_variant_id))
+      sku_number = sku.get(:sku_number)
+      delivery_number = DB[:mr_deliveries].where(id: item.get(:mr_delivery_id)).get(:delivery_number)
+      no_of_prints = batch.get(:quantity_received) - batch.get(:quantity_putaway)
+      no_of_prints = 1 if no_of_prints.zero? || no_of_prints.negative?
       {
-        sku_number: sku[:sku_number],
+        sku_number: sku_number,
         product_variant_code: pv_code,
+        batch_number: batch_number,
         no_of_prints: no_of_prints,
-        batch_number: batch_number
+        delivery_number: delivery_number
       }
+    end
+
+    def sku_info_from_item_id(mr_delivery_item_id)
+      item = DB[:mr_delivery_items].where(id: mr_delivery_item_id)
+
+      pv = DB[:material_resource_product_variants].where(id: item.get(:mr_product_variant_id))
+      pv_code = pv.get(:product_variant_code)
+
+      batch_number = DB[:mr_internal_batch_numbers].where(id: pv.get(:mr_internal_batch_number_id)).get(:batch_number)
+
+      sku = DB[:mr_skus].where(mr_internal_batch_number_id: pv.get(:mr_internal_batch_number_id),
+                               mr_product_variant_id: item.get(:mr_product_variant_id))
+      sku_number = sku.get(:sku_number)
+      delivery_number = DB[:mr_deliveries].where(id: item.get(:mr_delivery_id)).get(:delivery_number)
+      no_of_prints = item.get(:quantity_received) - item.get(:quantity_putaway)
+      no_of_prints = 1 if no_of_prints.zero? || no_of_prints.negative?
+      {
+        sku_number: sku_number,
+        product_variant_code: pv_code,
+        batch_number: batch_number,
+        no_of_prints: no_of_prints,
+        delivery_number: delivery_number
+      }
+    end
+
+    def sku_info_from_sku_id(sku_id)
+      sku = DB[:mr_skus].where(id: sku_id).first
+      no_of_prints = 0
+      delivery_number = nil
+      if (item_batch_id = sku[:mr_delivery_item_batch_id])
+        batch = DB[:mr_delivery_item_batches].where(id: item_batch_id)
+        item = DB[:mr_delivery_items].where(id: batch.get(:mr_delivery_item_id))
+        delivery_number = DB[:mr_deliveries].where(id: item.get(:mr_delivery_id)).get(:delivery_number)
+        batch_number = DB[:mr_delivery_item_batches].where(id: item_batch_id).get(:client_batch_number)
+        no_of_prints = batch.get(:quantity_received) - batch.get(:quantity_putaway)
+      else
+        batch_number = DB[:mr_internal_batch_numbers].where(id: sku[:mr_internal_batch_number_id]).get(:batch_number)
+      end
+      pv_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
+      sku_number = sku[:sku_number]
+      no_of_prints = 1 if no_of_prints.zero? || no_of_prints.negative?
+      {
+        sku_number: sku_number,
+        product_variant_code: pv_code,
+        batch_number: batch_number,
+        no_of_prints: no_of_prints,
+        delivery_number: delivery_number
+      }
+    end
+
+    def resolve_location_id_from_scan(val, scan_field)
+      case scan_field
+      when 'location_code'
+        location_id_from_location_code(val)
+      when 'location_legacy_barcode'
+        location_id_from_legacy_barcode(val)
+      else
+        val
+      end
     end
 
     def location_id_from_legacy_barcode(value)
@@ -274,8 +349,128 @@ module PackMaterialApp
       DB[:locations].where(location_code: value).get(:id)
     end
 
+    def location_code_from_location_id(location_id)
+      DB[:locations].where(id: location_id).get(:location_code)
+    end
+
     def sku_ids_from_numbers(values)
       DB[:mr_skus].where(sku_number: values).map(:id)
+    end
+
+    def delivery_id_from_number(delivery_number)
+      DB[:mr_deliveries].where(delivery_number: delivery_number).get(:id)
+    end
+
+    def delivery_number_from_id(delivery_id)
+      DB[:mr_deliveries].where(id: delivery_id).get(:delivery_number)
+    end
+
+    def sku_number_from_id(sku_id)
+      DB[:mr_skus].where(id: sku_id).get(:sku_number)
+    end
+
+    def delivery_putaway_reaction_job(sku_id, quantity, delivery_id)
+      res = update_delivery_putaway_quantity(sku_id, quantity, delivery_id)
+      return res unless res.success
+      update_delivery_putaway_statuses(delivery_id)
+      sku = DB[:mr_skus].where(id: sku_id)
+      po_item_id = DB[:mr_delivery_items].where(
+        mr_product_variant_id: sku.get(:mr_product_variant_id),
+        mr_delivery_id: delivery_id
+      ).get(:mr_purchase_order_item_id)
+      update_purchase_order_statuses(po_item_id)
+      success_response('ok')
+    end
+
+    def update_delivery_putaway_quantity(sku_id, quantity, delivery_id)
+      sku = DB[:mr_skus].where(id: sku_id)
+      pv_id = sku.get(:mr_product_variant_id)
+      item = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id, mr_product_variant_id: pv_id)
+      return failed_response('SKU does not belong to delivery') unless item.first
+
+      fixed = DB[:material_resource_product_variants].where(id: pv_id).get(:use_fixed_batch_number)
+      unless fixed
+        batch_id = sku.get(:mr_delivery_item_batch_id)
+        batch = DB[:mr_delivery_item_batches].where(id: batch_id) if batch_id
+        batch_qty = batch.get(:quantity_putaway)
+        batch_qty += quantity
+        batch.update(quantity_putaway: batch_qty)
+
+        if batch.get(:quantity_received) <= batch_qty
+          batch.update(putaway_completed: true)
+          log_status('mr_delivery_item_batches', batch_id, 'PUTAWAY_COMPLETED')
+        end
+      end
+
+      item = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id, mr_product_variant_id: pv_id)
+      qty = item.get(:quantity_putaway)
+      qty += quantity
+      item.update(quantity_putaway: qty)
+
+      if item.get(:quantity_received) <= qty
+        item.update(putaway_completed: true)
+        log_status('mr_delivery_items', item.get(:id), 'PUTAWAY_COMPLETED')
+      end
+      success_response('ok')
+    end
+
+    def update_delivery_putaway_statuses(delivery_id)
+      putaway_completed = DB[:mr_deliveries].where(id: delivery_id).get(:putaway_completed)
+      return failed_response('ERROR: Delivery putaway already completed') if putaway_completed
+
+      items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id)
+      statuses = items.map do |r|
+        DB[Sequel.function(:fn_current_status, 'mr_delivery_items', r[:id])].single_value
+      end
+
+      if statuses.all?('PUTAWAY_COMPLETED')
+        DB[:mr_deliveries].where(id: delivery_id).update(putaway_completed: true)
+        log_status('mr_deliveries', delivery_id, 'DELIVERY_OFFLOADED')
+      else
+        log_status('mr_deliveries', delivery_id, 'OFFLOADING_DELIVERY')
+      end
+      success_response('ok')
+    end
+
+    def update_purchase_order_statuses(po_item_id)
+      po_item = DB[:mr_purchase_order_items].where(id: po_item_id)
+      qty_required = po_item.get(:quantity_required)
+      items = DB[:mr_delivery_items].where(mr_purchase_order_item_id: po_item_id)
+      po = DB[:mr_purchase_orders].where(id: po_item.get(:mr_purchase_order_id)).first
+
+      if items.sum(:quantity_putaway) >= qty_required
+        log_status('mr_purchase_order_items', po_item_id, 'PO_ITEM_RECEIVED')
+        po_items = DB[:mr_purchase_order_items].where(mr_purchase_order_id: po[:id])
+        po_item_statuses = po_items.map do |r|
+          DB[Sequel.function(:fn_current_status, 'mr_purchase_order_items', r[:id])].single_value
+        end
+
+        if po_item_statuses.all?('PO_ITEM_RECEIVED')
+          log_status('mr_purchase_orders', po[:id], 'PURCHASE_ORDER_CLOSED')
+        else
+          log_status('mr_purchase_orders', po[:id], 'RECEIVING_DELIVERIES')
+        end
+      else
+        log_status('mr_purchase_order_items', po_item_id, 'PO_ITEM_RECEIVING')
+        log_status('mr_purchase_orders', po[:id], 'RECEIVING_DELIVERIES')
+      end
+    end
+
+    def html_delivery_progress_report(delivery_id)
+      putaway_items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).select_map(:quantity_putaway).sum
+      received_items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).select_map(:quantity_received).sum
+      <<~HTML
+        Delivery (#{delivery_number_from_id(delivery_id)}):<br>
+        #{putaway_items.to_i} of #{received_items.to_i} items.
+      HTML
+    end
+
+    def html_last_scan_report(sku_id, to_location_id)
+      <<~HTML
+        Last scan:<br>
+        LOC: #{location_code_from_location_id(to_location_id)}<br>
+        SKU: #{sku_number_from_id(sku_id)}
+      HTML
     end
   end
 end

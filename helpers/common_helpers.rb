@@ -152,7 +152,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def move_validation_errors_to_base(messages, keys, highlights: {}) # rubocop:disable Metrics/AbcSize
     interim = messages || {}
     Array(keys).each do |key|
-      raise ArgumentError, "Move validation errors - key not present: #{key}" unless interim.key?(key)
+      # raise ArgumentError, "Move validation errors - key not present: #{key}" unless interim.key?(key)
+      next unless interim.key?(key) # Note: It only needs to move error message to base if it exists in the first place
       if highlights.key?(key)
         interim[:base_with_highlights] ||= { messages: [], highlights: [] }
         interim[:base_with_highlights][:messages] +=  Array(interim.delete(key))

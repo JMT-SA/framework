@@ -20,6 +20,8 @@ module PackMaterialApp
           mutable_check
         when :verify
           verify_check
+        when :putaway
+          putaway_check
         else
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}"
         end
@@ -42,6 +44,15 @@ module PackMaterialApp
         return failed_response('Delivery has items without batches') if items_without_batches?
         return failed_response('Delivery batch quantities do not equate to item quantities where applicable') if item_quantities_ignored?
         all_ok
+      end
+
+      def putaway_check
+        return failed_response('Delivery Putaway has already been completed') if putaway_completed?
+        all_ok
+      end
+
+      def putaway_completed?
+        @entity.putaway_completed
       end
 
       def verified?

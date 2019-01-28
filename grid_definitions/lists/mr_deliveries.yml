@@ -84,11 +84,18 @@
       :hide_if_null: id
       :hide_if_true: verified
 - :separator: true
-- :url: "/pack_material/replenish/mr_delivery_item_batches/$:id$/print_barcode"
+- :url: "/pack_material/replenish/print_sku_barcode?mr_delivery_item_batch_id=$:id$"
   :text: Print SKU barcode
   :icon: printer
   :title: Print SKU barcode
   :hide_if_null: id
+  :hide_if_false: verified
+  :popup: true
+- :url: "/pack_material/replenish/print_sku_barcode?mr_delivery_item_id=$:delivery_item_id$"
+  :text: Print SKU barcode
+  :icon: printer
+  :title: Print SKU barcode
+  :hide_if_present: id
   :hide_if_false: verified
   :popup: true
 :page_controls:

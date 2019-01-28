@@ -19,7 +19,10 @@
   \ \"mr_delivery_item_batches\".id,\r\n  \"mr_delivery_item_batches\".client_batch_number,\r\n
   \ \"mr_internal_batch_numbers\".\"batch_number\" AS internal_batch_number,\r\n  \"mr_delivery_item_batches\".quantity_on_note
   AS batch_quantity_on_note,\r\n  \"mr_delivery_item_batches\".quantity_received AS
-  batch_quantity_received\r\nFROM \"mr_deliveries\"\r\n  LEFT JOIN \"mr_delivery_items\"
+  batch_quantity_received,\r\n  case\r\n  when mr_deliveries.putaway_completed then
+  'ok'\r\n  when mr_delivery_items.putaway_completed then 'ok'\r\n  when mr_delivery_item_batches.putaway_completed
+  then 'ok'\r\n  when mr_deliveries.verified then 'inprogress'\r\n  else null\r\n
+  \ end as colour_rule\r\nFROM \"mr_deliveries\"\r\n  LEFT JOIN \"mr_delivery_items\"
   ON \"mr_delivery_items\".\"mr_delivery_id\" = \"mr_deliveries\".\"id\"\r\n  LEFT
   JOIN \"mr_delivery_item_batches\" ON \"mr_delivery_item_batches\".\"mr_delivery_item_id\"
   = \"mr_delivery_items\".\"id\"\r\n  LEFT JOIN \"material_resource_product_variants\"
@@ -41,6 +44,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -56,6 +60,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -71,6 +76,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -86,6 +92,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -101,6 +108,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -116,6 +124,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -131,6 +140,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: '1'
     :group_sum: false
@@ -146,6 +156,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -161,6 +172,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -176,6 +188,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -191,6 +204,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -206,6 +220,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -221,6 +236,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -236,6 +252,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -251,6 +268,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -266,6 +284,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -281,6 +300,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -296,6 +316,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -311,6 +332,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -326,6 +348,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -341,6 +364,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -356,6 +380,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -371,6 +396,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -386,6 +412,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -401,6 +428,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -416,6 +444,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -431,6 +460,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -446,6 +476,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -461,6 +492,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -476,6 +508,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -491,6 +524,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -506,6 +540,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -521,6 +556,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -536,6 +572,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -551,6 +588,23 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 36
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

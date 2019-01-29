@@ -21,6 +21,9 @@ class BaseService
     Crossbeams::Config::ObserversList::OBSERVERS_LIST[self.class.to_s]
   end
 
+  # Helper to return a basic SuccessResponse.
+  #
+  # @return [SuccessResponse]
   def all_ok
     success_response 'Permission ok'
   end

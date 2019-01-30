@@ -1188,6 +1188,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
                   return 'orange';
                 case 'inactive':
                   return 'gray i';
+                case 'ready':
+                  return 'blue';
                 case 'ok':
                   return 'green';
                 case 'inprogress':

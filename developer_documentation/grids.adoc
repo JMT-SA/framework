@@ -217,6 +217,9 @@ Some useful Tachyons (and built-in) classes:
 |warning
 |pass:[<span class="orange">Example text colour as if in a grid row</span>]
 
+|ready
+|pass:[<span class="blue">Example text colour as if in a grid row</span>]
+
 |ok
 |pass:[<span class="green">Example text colour as if in a grid row</span>]
 

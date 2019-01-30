@@ -1,0 +1,7 @@
+---
+:dataminer_definition: sku_locations
+:tree:
+  :tree_column: path_array
+  :tree_caption: Location/SKU Hierarchy
+  :suppress_node_counts: false
+  :groupDefaultExpanded: 2

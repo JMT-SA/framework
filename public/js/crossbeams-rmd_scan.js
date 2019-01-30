@@ -44,6 +44,30 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   };
 
   /**
+   * Disable a button and change its caption.
+   * @param {element} button the button to disable.
+   * @param {string} disabledText the text to use to replace the caption.
+   * @returns {void}
+   */
+  const disableButton = (button, disabledText) => {
+    button.dataset.enableWith = button.value;
+    button.value = disabledText;
+    button.classList.remove('dim');
+    button.classList.add('o-50');
+  };
+
+  /**
+   * Prevent multiple clicks of submit buttons.
+   * @returns {void}
+   */
+  const preventMultipleSubmits = (element) => {
+    disableButton(element, element.dataset.disableWith);
+    window.setTimeout(() => {
+      element.disabled = true;
+    }, 0); // Disable the button with a delay so the form still submits...
+  };
+
+  /**
    * Event listeners for the RMD page.
    */
   const setupListeners = () => {
@@ -56,6 +80,12 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
         }
       });
     }
+    document.body.addEventListener('click', (event) => {
+      // Disable a button on click
+      if (event.target.dataset && event.target.dataset.disableWith) {
+        preventMultipleSubmits(event.target);
+      }
+    });
     if (cameraScan) {
       cameraScan.addEventListener('click', () => {
         webSocket.send('Type=key248_all');

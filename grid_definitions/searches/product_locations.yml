@@ -1,0 +1,7 @@
+---
+:dataminer_definition: product_locations
+:tree:
+  :tree_column: path_array
+  :tree_caption: Location Hierarchy
+  :suppress_node_counts: false
+  :groupDefaultExpanded: -1

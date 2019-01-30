@@ -13,6 +13,7 @@ module PackMaterial
             page.form do |form|
               form.view_only!
               form.add_field :delivery_number
+              form.add_field :status
               form.add_field :transporter
               form.add_field :driver_name
               form.add_field :client_delivery_ref_number

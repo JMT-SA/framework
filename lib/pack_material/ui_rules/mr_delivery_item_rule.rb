@@ -44,7 +44,7 @@ module UiRules
       {
         purchase_order_id: {
           renderer: :select,
-          options: @repo.for_select_purchase_orders_with_supplier,
+          options: @repo.for_select_purchase_orders_with_supplier(purchase_order_id: @options[:purchase_order_id]),
           selected: @options[:purchase_order_id],
           caption: 'Purchase Order',
           required: true,

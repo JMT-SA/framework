@@ -22,6 +22,7 @@ module UiRules
 
     def show_fields
       {
+        status: { renderer: :label },
         transporter: { renderer: :label },
         transporter_party_role_id: { renderer: :hidden },
         driver_name: { renderer: :label },
@@ -34,6 +35,7 @@ module UiRules
 
     def common_fields
       {
+        status: { renderer: :hidden },
         transporter: { renderer: :hidden },
         transporter_party_role_id: { renderer: :select, options: @party_repo.for_select_party_roles(AppConst::ROLE_TRANSPORTER), caption: 'Transporter' },
         delivery_number: { renderer: :label, with_value: @form_object.delivery_number },

@@ -1,49 +1,92 @@
 ---
 :caption: Deliveries
-:sql: "SELECT\r\n  \"mr_deliveries\".\"id\" as delivery_id,\r\n  \"mr_deliveries\".\"receipt_transaction_id\",\r\n
+:sql: "SELECT\r\n  \"mr_deliveries\".\"id\" as id,\r\nfn_current_status('mr_deliveries',
+  id) AS status,\r\n  \"mr_deliveries\".\"delivery_number\",\r\n\"mr_deliveries\".\"verified\",\r\n
+  \ \"mr_deliveries\".\"putaway_completed\",\r\n  \"mr_deliveries\".\"receipt_transaction_id\",\r\n
   \ \"mr_deliveries\".\"putaway_transaction_id\",\r\n  \"mr_deliveries\".\"transporter_party_role_id\",\r\n
-  \ \"mr_delivery_items\".\"id\" AS delivery_item_id,\r\n  \"mr_delivery_items\".\"mr_product_variant_id\",\r\n
-  \ \"mr_deliveries\".\"delivery_number\",\r\n  \"material_resource_product_variants\".\"product_variant_code\",\r\n
-  \ \"material_resource_product_variants\".\"product_variant_number\",\r\n  \"material_resource_product_variants\".\"use_fixed_batch_number\",\r\n(\"mr_deliveries\".\"verified\"
-  OR \"material_resource_product_variants\".\"use_fixed_batch_number\") AS new_batch_not_allowed,\r\n
-  \ \"mr_delivery_items\".\"quantity_on_note\",\r\n  \"mr_delivery_items\".\"quantity_over_supplied\",\r\n
-  \ \"mr_delivery_items\".\"quantity_under_supplied\",\r\n  \"mr_delivery_items\".\"quantity_received\",\r\n
-  \ \"mr_delivery_items\".\"mr_purchase_order_item_id\",\r\n  \"mr_purchase_orders\".\"purchase_order_number\",\r\n
-  \ fn_party_role_name(\"mr_purchase_orders\".\"supplier_party_role_id\") AS supplier,\r\n
-  \ \"mr_purchase_order_items\".\"quantity_required\",\r\n  \"mr_purchase_order_items\".\"unit_price\"
-  AS ord_unit_price,\r\n  \"mr_delivery_items\".\"invoiced_unit_price\" AS inv_unit_price,\r\n
+  \ fn_party_role_name(\"mr_deliveries\".\"transporter_party_role_id\") AS transporter,\r\n
   \ \"mr_deliveries\".\"supplier_invoice_ref_number\",\r\n  \"mr_deliveries\".\"client_delivery_ref_number\",\r\n
-  \ \"mr_delivery_items\".\"remarks\",\r\n  fn_party_role_name(\"mr_deliveries\".\"transporter_party_role_id\")
-  AS transporter,\r\n  \"mr_deliveries\".\"driver_name\",\r\n  \"mr_deliveries\".\"vehicle_registration\",\r\n
-  \ \"mr_deliveries\".\"created_at\",\r\n  \"mr_deliveries\".\"updated_at\",\r\n  \"mr_deliveries\".\"verified\",\r\n
-  \ \"mr_delivery_item_batches\".id,\r\n  \"mr_delivery_item_batches\".client_batch_number,\r\n
-  \ \"mr_internal_batch_numbers\".\"batch_number\" AS internal_batch_number,\r\n  \"mr_delivery_item_batches\".quantity_on_note
-  AS batch_quantity_on_note,\r\n  \"mr_delivery_item_batches\".quantity_received AS
-  batch_quantity_received,\r\n  case\r\n  when mr_deliveries.putaway_completed then
-  'ok'\r\n  when mr_delivery_items.putaway_completed then 'ok'\r\n  when mr_delivery_item_batches.putaway_completed
-  then 'ok'\r\n  when mr_deliveries.verified then 'inprogress'\r\n  else null\r\n
-  \ end as colour_rule\r\nFROM \"mr_deliveries\"\r\n  LEFT JOIN \"mr_delivery_items\"
-  ON \"mr_delivery_items\".\"mr_delivery_id\" = \"mr_deliveries\".\"id\"\r\n  LEFT
-  JOIN \"mr_delivery_item_batches\" ON \"mr_delivery_item_batches\".\"mr_delivery_item_id\"
-  = \"mr_delivery_items\".\"id\"\r\n  LEFT JOIN \"material_resource_product_variants\"
-  ON \"material_resource_product_variants\".\"id\" = \"mr_delivery_items\".\"mr_product_variant_id\"\r\n
-  \ LEFT JOIN mr_internal_batch_numbers ON \"material_resource_product_variants\".\"mr_internal_batch_number_id\"
-  = mr_internal_batch_numbers.id\r\n  LEFT JOIN \"mr_purchase_order_items\" ON \"mr_purchase_order_items\".\"id\"
-  = \"mr_delivery_items\".\"mr_purchase_order_item_id\"\r\n  LEFT JOIN \"mr_purchase_orders\"
-  ON \"mr_purchase_orders\".\"id\" = \"mr_purchase_order_items\".\"mr_purchase_order_id\""
+  \ \"mr_deliveries\".\"driver_name\",\r\n  \"mr_deliveries\".\"vehicle_registration\",\r\n
+  \ \"mr_deliveries\".\"created_at\",\r\n  \"mr_deliveries\".\"updated_at\",\r\n  case\r\n
+  \ when (mr_deliveries.verified and not mr_deliveries.putaway_completed) then 'inprogress'\r\n
+  \ else null\r\n  end as colour_rule\r\nFROM \"mr_deliveries\""
 :limit: 
 :offset: 
 :external_settings: {}
 :columns:
-  delivery_id:
-    :name: delivery_id
+  id:
+    :name: id
     :sequence_no: 1
-    :caption: Delivery
+    :caption: Id
     :namespaced_name: mr_deliveries.id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 2
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_number:
+    :name: delivery_number
+    :sequence_no: 3
+    :caption: Delivery number
+    :namespaced_name: mr_deliveries.delivery_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified:
+    :name: verified
+    :sequence_no: 4
+    :caption: Verified
+    :namespaced_name: mr_deliveries.verified
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  putaway_completed:
+    :name: putaway_completed
+    :sequence_no: 5
+    :caption: Putaway completed
+    :namespaced_name: mr_deliveries.putaway_completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -53,7 +96,7 @@
     :group_max: false
   receipt_transaction_id:
     :name: receipt_transaction_id
-    :sequence_no: 2
+    :sequence_no: 6
     :caption: Receipt transaction
     :namespaced_name: mr_deliveries.receipt_transaction_id
     :data_type: :integer
@@ -69,7 +112,7 @@
     :group_max: false
   putaway_transaction_id:
     :name: putaway_transaction_id
-    :sequence_no: 3
+    :sequence_no: 7
     :caption: Putaway transaction
     :namespaced_name: mr_deliveries.putaway_transaction_id
     :data_type: :integer
@@ -85,7 +128,7 @@
     :group_max: false
   transporter_party_role_id:
     :name: transporter_party_role_id
-    :sequence_no: 4
+    :sequence_no: 8
     :caption: Transporter party role
     :namespaced_name: mr_deliveries.transporter_party_role_id
     :data_type: :integer
@@ -99,267 +142,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  delivery_item_id:
-    :name: delivery_item_id
-    :sequence_no: 5
-    :caption: Delivery item
-    :namespaced_name: mr_delivery_items.id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  mr_product_variant_id:
-    :name: mr_product_variant_id
-    :sequence_no: 6
-    :caption: Mr product variant
-    :namespaced_name: mr_delivery_items.mr_product_variant_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  delivery_number:
-    :name: delivery_number
-    :sequence_no: 7
-    :caption: Delivery number
-    :namespaced_name: mr_deliveries.delivery_number
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: '1'
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  product_variant_code:
-    :name: product_variant_code
-    :sequence_no: 8
-    :caption: Product variant code
-    :namespaced_name: material_resource_product_variants.product_variant_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  product_variant_number:
-    :name: product_variant_number
+  transporter:
+    :name: transporter
     :sequence_no: 9
-    :caption: Product variant number
-    :namespaced_name: material_resource_product_variants.product_variant_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  use_fixed_batch_number:
-    :name: use_fixed_batch_number
-    :sequence_no: 10
-    :caption: Use fixed batch number
-    :namespaced_name: material_resource_product_variants.use_fixed_batch_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  new_batch_not_allowed:
-    :name: new_batch_not_allowed
-    :sequence_no: 11
-    :caption: New batch not allowed
+    :caption: Transporter
     :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  quantity_on_note:
-    :name: quantity_on_note
-    :sequence_no: 12
-    :caption: Quantity on note
-    :namespaced_name: mr_delivery_items.quantity_on_note
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  quantity_over_supplied:
-    :name: quantity_over_supplied
-    :sequence_no: 13
-    :caption: Quantity over supplied
-    :namespaced_name: mr_delivery_items.quantity_over_supplied
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  quantity_under_supplied:
-    :name: quantity_under_supplied
-    :sequence_no: 14
-    :caption: Quantity under supplied
-    :namespaced_name: mr_delivery_items.quantity_under_supplied
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  quantity_received:
-    :name: quantity_received
-    :sequence_no: 15
-    :caption: Quantity received
-    :namespaced_name: mr_delivery_items.quantity_received
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  mr_purchase_order_item_id:
-    :name: mr_purchase_order_item_id
-    :sequence_no: 16
-    :caption: Mr purchase order item
-    :namespaced_name: mr_delivery_items.mr_purchase_order_item_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  purchase_order_number:
-    :name: purchase_order_number
-    :sequence_no: 17
-    :caption: Purchase order number
-    :namespaced_name: mr_purchase_orders.purchase_order_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  supplier:
-    :name: supplier
-    :sequence_no: 18
-    :caption: Supplier
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  quantity_required:
-    :name: quantity_required
-    :sequence_no: 19
-    :caption: Quantity required
-    :namespaced_name: mr_purchase_order_items.quantity_required
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  ord_unit_price:
-    :name: ord_unit_price
-    :sequence_no: 20
-    :caption: Ord unit price
-    :namespaced_name: mr_purchase_order_items.unit_price
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  inv_unit_price:
-    :name: inv_unit_price
-    :sequence_no: 21
-    :caption: Inv unit price
-    :namespaced_name: mr_delivery_items.invoiced_unit_price
     :data_type: :string
     :width: 
     :format: 
@@ -373,7 +160,7 @@
     :group_max: false
   supplier_invoice_ref_number:
     :name: supplier_invoice_ref_number
-    :sequence_no: 22
+    :sequence_no: 10
     :caption: Supplier invoice ref number
     :namespaced_name: mr_deliveries.supplier_invoice_ref_number
     :data_type: :string
@@ -389,7 +176,7 @@
     :group_max: false
   client_delivery_ref_number:
     :name: client_delivery_ref_number
-    :sequence_no: 23
+    :sequence_no: 11
     :caption: Client delivery ref number
     :namespaced_name: mr_deliveries.client_delivery_ref_number
     :data_type: :string
@@ -403,41 +190,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  remarks:
-    :name: remarks
-    :sequence_no: 24
-    :caption: Remarks
-    :namespaced_name: mr_delivery_items.remarks
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  transporter:
-    :name: transporter
-    :sequence_no: 25
-    :caption: Transporter
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   driver_name:
     :name: driver_name
-    :sequence_no: 26
+    :sequence_no: 12
     :caption: Driver name
     :namespaced_name: mr_deliveries.driver_name
     :data_type: :string
@@ -453,7 +208,7 @@
     :group_max: false
   vehicle_registration:
     :name: vehicle_registration
-    :sequence_no: 27
+    :sequence_no: 13
     :caption: Vehicle registration
     :namespaced_name: mr_deliveries.vehicle_registration
     :data_type: :string
@@ -469,14 +224,14 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 28
+    :sequence_no: 14
     :caption: Created at
     :namespaced_name: mr_deliveries.created_at
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: true
-    :pinned: 
+    :hide: false
+    :pinned: left
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -485,7 +240,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 29
+    :sequence_no: 15
     :caption: Updated at
     :namespaced_name: mr_deliveries.updated_at
     :data_type: :datetime
@@ -499,105 +254,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  verified:
-    :name: verified
-    :sequence_no: 30
-    :caption: Verified
-    :namespaced_name: mr_deliveries.verified
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  id:
-    :name: id
-    :sequence_no: 31
-    :caption: Id
-    :namespaced_name: mr_delivery_item_batches.id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  client_batch_number:
-    :name: client_batch_number
-    :sequence_no: 32
-    :caption: Client batch number
-    :namespaced_name: mr_delivery_item_batches.client_batch_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  internal_batch_number:
-    :name: internal_batch_number
-    :sequence_no: 33
-    :caption: Internal batch number
-    :namespaced_name: mr_internal_batch_numbers.batch_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  batch_quantity_on_note:
-    :name: batch_quantity_on_note
-    :sequence_no: 34
-    :caption: Batch quantity on note
-    :namespaced_name: mr_delivery_item_batches.quantity_on_note
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  batch_quantity_received:
-    :name: batch_quantity_received
-    :sequence_no: 35
-    :caption: Batch quantity received
-    :namespaced_name: mr_delivery_item_batches.quantity_received
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 36
+    :sequence_no: 16
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

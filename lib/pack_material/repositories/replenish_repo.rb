@@ -75,6 +75,14 @@ module PackMaterialApp
 
     crud_calls_for :mr_delivery_item_batches, name: :mr_delivery_item_batch, wrapper: MrDeliveryItemBatch
 
+    def find_mr_purchase_order(id)
+      find_with_association(:mr_purchase_orders, id,
+                            lookup_functions: [{ function: :fn_current_status,
+                                                 args: ['mr_purchase_orders', :id],
+                                                 col_name: :status }],
+                            wrapper: MrPurchaseOrder)
+    end
+
     def find_mr_purchase_order_cost(id)
       find_with_association(:mr_purchase_order_costs, id,
                             parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_code_string: :cost_type } }],
@@ -113,10 +121,14 @@ module PackMaterialApp
     end
 
     # @return [Array] ['Purchase Order Number - from: Supplier Party Name', :id]
-    def for_select_purchase_orders_with_supplier
-      DB[:mr_purchase_orders].where(
-        approved: true
-      ).select(
+    def for_select_purchase_orders_with_supplier(purchase_order_id: nil)
+      if purchase_order_id
+        supplier_id = DB[:mr_purchase_orders].where(id: purchase_order_id).get(:supplier_party_role_id)
+        purchase_orders = DB[:mr_purchase_orders].where(approved: true, supplier_party_role_id: supplier_id)
+      else
+        purchase_orders = DB[:mr_purchase_orders].where(approved: true)
+      end
+      purchase_orders.select(
         :id,
         :purchase_order_number,
         Sequel.function(:fn_party_role_name, :supplier_party_role_id)
@@ -177,7 +189,10 @@ module PackMaterialApp
       find_with_association(:mr_deliveries, id,
                             lookup_functions: [{ function: :fn_party_role_name,
                                                  args: [:transporter_party_role_id],
-                                                 col_name: :transporter }],
+                                                 col_name: :transporter },
+                                               { function: :fn_current_status,
+                                                 args: ['mr_deliveries', :id],
+                                                 col_name: :status }],
                             wrapper: MrDelivery)
     end
 
@@ -446,6 +461,7 @@ module PackMaterialApp
         end
 
         if po_item_statuses.all?('PO_ITEM_RECEIVED')
+          DB[:mr_purchase_orders].where(id: po[:id]).update(deliveries_received: true)
           log_status('mr_purchase_orders', po[:id], 'PURCHASE_ORDER_CLOSED')
         else
           log_status('mr_purchase_orders', po[:id], 'RECEIVING_DELIVERIES')
@@ -456,20 +472,19 @@ module PackMaterialApp
       end
     end
 
-    def html_delivery_progress_report(delivery_id)
-      putaway_items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).select_map(:quantity_putaway).sum
-      received_items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).select_map(:quantity_received).sum
+    def html_delivery_progress_report(delivery_id, sku_id, to_location_id)
+      return nil unless delivery_id && sku_id && to_location_id
+      total_items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).all
+      done = total_items.select { |r| r[:quantity_putaway].to_f >= r[:quantity_received].to_f }.count
+      sku = DB[:mr_skus].where(id: sku_id).first
+      product_variant_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
+      item = DB[:mr_delivery_items].where(mr_product_variant_id: sku[:mr_product_variant_id], mr_delivery_id: delivery_id)
       <<~HTML
-        Delivery (#{delivery_number_from_id(delivery_id)}):<br>
-        #{putaway_items.to_i} of #{received_items.to_i} items.
-      HTML
-    end
-
-    def html_last_scan_report(sku_id, to_location_id)
-      <<~HTML
+        Delivery (#{delivery_number_from_id(delivery_id)}): #{done} of #{total_items.count} items.<br>
         Last scan:<br>
         LOC: #{location_code_from_location_id(to_location_id)}<br>
-        SKU: #{sku_number_from_id(sku_id)}
+        SKU (#{sku_number_from_id(sku_id)}): #{product_variant_code}<br>
+        #{item.get(:quantity_putaway).to_i} of #{item.get(:quantity_received).to_i} items.<br>
       HTML
     end
   end

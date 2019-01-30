@@ -32,7 +32,8 @@
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -48,6 +49,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -63,6 +65,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -78,6 +81,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -93,6 +97,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -108,6 +113,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -123,6 +129,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -138,6 +145,7 @@
     :width: 
     :format: :delimited_1000
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -153,6 +161,7 @@
     :width: 
     :format: :delimited_1000
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -168,6 +177,7 @@
     :width: 
     :format: :delimited_1000
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -183,6 +193,7 @@
     :width: 
     :format: :delimited_1000
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -198,6 +209,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -213,6 +225,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -228,6 +241,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -243,6 +257,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -258,6 +273,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -273,6 +289,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -288,6 +305,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -303,6 +321,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -318,6 +337,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -333,6 +353,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -348,6 +369,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -363,6 +385,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

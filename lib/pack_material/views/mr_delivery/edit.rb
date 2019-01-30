@@ -38,6 +38,7 @@ module PackMaterial
                   row.column do |col|
                     col.add_field :delivery_number
                     col.add_field :transporter
+                    col.add_field :status
                     col.add_field :transporter_party_role_id
                     col.add_field :driver_name
                   end

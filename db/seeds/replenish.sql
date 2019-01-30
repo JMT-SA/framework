@@ -11,40 +11,52 @@ INSERT INTO programs_webapps(program_id, webapp) VALUES (
   'Framework');
 
 -- Purchase Orders
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'New Purchase Order', '/pack_material/replenish/mr_purchase_orders/preselect', 1);
+        'New Purchase Order', 'Purchase Orders', '/pack_material/replenish/mr_purchase_orders/preselect', 1);
 
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'Purchase Orders', '/list/mr_purchase_orders', 2);
+        'Purchase Orders', 'Purchase Orders', '/list/mr_purchase_orders', 2);
+
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
+                                       AND functional_area_id = (SELECT id FROM functional_areas
+WHERE functional_area_name = 'Pack Material')),
+        'Search Purchase Orders', 'Purchase Orders', '/search/mr_purchase_orders', 2);
 
 INSERT INTO address_types (address_type) VALUES ('Delivery Address');
 
 
 -- Delivery Terms
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'Delivery Terms', '/list/mr_delivery_terms', 2);
+        'Delivery Terms', 'Purchase Orders', '/list/mr_delivery_terms', 2);
 
 -- Deliveries
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'New Delivery', '/pack_material/replenish/mr_deliveries/new', 1);
+        'New Delivery', 'Deliveries', '/pack_material/replenish/mr_deliveries/new', 1);
 
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Pack Material')),
-         'Deliveries', '/list/mr_deliveries', 2);
+         'Deliveries', 'Deliveries', '/list/mr_deliveries', 2);
+
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
+                                       AND functional_area_id = (SELECT id FROM functional_areas
+WHERE functional_area_name = 'Pack Material')),
+        'Delivery Items/Batches', 'Deliveries', '/list/mr_delivery_items_batches', 2);
 
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('CREATE STOCK');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('PUTAWAY');

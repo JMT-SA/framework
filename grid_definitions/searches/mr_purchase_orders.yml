@@ -1,0 +1,22 @@
+---
+:dataminer_definition: mr_purchase_orders
+:actions:
+- :url: "/pack_material/replenish/mr_purchase_orders/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+- :url: "/pack_material/replenish/mr_purchase_orders/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: /development/statuses/show/mr_purchase_orders/$:id$
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/replenish/mr_purchase_orders/preselect"
+  :text: New Purchase Order
+  :style: :button

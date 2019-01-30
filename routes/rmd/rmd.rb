@@ -188,7 +188,7 @@ class Framework < Roda
         payload = { progress: nil }
         if res.success
           payload[:delivery_id] = res.instance[:delivery_id]
-          payload[:progress] = interactor.html_progress_report(res.instance)
+          payload[:progress] = res.instance[:report]
         else
           these_params = params[:putaway]
           payload[:error_message] = res.message

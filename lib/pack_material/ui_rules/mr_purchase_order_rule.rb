@@ -27,6 +27,7 @@ module UiRules
     def show_fields
       sup = supplier
       {
+        status: { renderer: :label },
         mr_delivery_term_id: {
           renderer: :label,
           with_value: @repo.find_mr_delivery_term(@form_object.mr_delivery_term_id)&.delivery_term_code,
@@ -82,6 +83,7 @@ module UiRules
     def edit_fields
       sup = supplier
       fields = {
+        status: { renderer: :hidden },
         supplier_name: { renderer: :label, with_value: sup.party_name },
         supplier_erp_number: { renderer: :label, with_value: sup.erp_supplier_number },
         supplier_party_role_id: { renderer: :hidden },

@@ -95,18 +95,16 @@ module PackMaterialApp
           return res2 unless res2.success
 
           log_status('mr_deliveries', delivery_id, 'PUTAWAY REGISTERED')
-          success_response('Successful putaway', delivery_id: delivery_id, sku_id: sku_id, to_location_id: to_location_id)
+          html_report = repo.html_delivery_progress_report(delivery_id, sku_id, to_location_id)
+          success_response('Successful putaway', OpenStruct.new(delivery_id: delivery_id, report: html_report))
         end
       else
         failed_response(can_putaway.message)
       end
     end
 
-    def html_progress_report(delivery_id: nil, sku_id: nil, to_location_id: nil)
-      message = []
-      message << repo.html_delivery_progress_report(delivery_id) if delivery_id
-      message << repo.html_last_scan_report(sku_id, to_location_id) if sku_id && to_location_id
-      message.join('<br>')
+    def html_progress_report(delivery_id, sku_id, to_location_id)
+      repo.html_delivery_progress_report(delivery_id, sku_id, to_location_id)
     end
 
     private

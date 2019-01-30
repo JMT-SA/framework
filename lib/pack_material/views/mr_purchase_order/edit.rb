@@ -43,6 +43,7 @@ module PackMaterial
                 form.row do |row|
                   row.column do |col|
                     col.add_field :purchase_order_number
+                    col.add_field :status
                     col.add_field :supplier_party_role_id
                     col.add_field :supplier_name
                     col.add_field :supplier_erp_number

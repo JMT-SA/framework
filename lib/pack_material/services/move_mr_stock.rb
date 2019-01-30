@@ -53,6 +53,7 @@ module PackMaterialApp
         inventory_uom_id: @repo.sku_uom_id(@sku_id),
         quantity: @quantity
       )
+      success_response('ok')
     end
   end
 end

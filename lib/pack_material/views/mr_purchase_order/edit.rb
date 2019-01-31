@@ -35,6 +35,7 @@ module PackMaterial
 
             page.section do |section|
               section.show_border!
+              section.add_caption 'Purchase Order'
               section.form do |form|
                 form.action "/pack_material/replenish/mr_purchase_orders/#{id}"
                 form.method :update unless rules[:show_only]

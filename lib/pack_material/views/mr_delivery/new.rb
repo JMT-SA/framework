@@ -13,6 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
+              form.caption 'New Delivery'
               form.action '/pack_material/replenish/mr_deliveries'
               form.remote! if remote
               form.add_field :transporter_party_role_id

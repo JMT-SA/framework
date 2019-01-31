@@ -29,6 +29,7 @@ module PackMaterial
 
             page.section do |section|
               section.show_border!
+              section.add_caption 'Delivery'
               section.form do |form|
                 form.action "/pack_material/replenish/mr_deliveries/#{id}"
                 form.method :update unless rules[:show_only]

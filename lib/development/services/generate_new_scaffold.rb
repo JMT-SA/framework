@@ -1096,7 +1096,7 @@ module DevelopmentApp
                       page.form_values form_values
                       page.form_errors form_errors
                       page.form do |form|
-                        form.caption 'New #{opts.text_name}', level: 2
+                        form.caption 'New #{opts.text_name}'
                         form.action #{new_form_url}
                         form.remote! if remote
                         #{form_fields}
@@ -1129,7 +1129,7 @@ module DevelopmentApp
                       page.form_values form_values
                       page.form_errors form_errors
                       page.form do |form|
-                        form.caption 'Edit #{opts.text_name}', level: 2
+                        form.caption 'Edit #{opts.text_name}'
                         form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}"
                         form.remote!
                         form.method :update
@@ -1161,7 +1161,7 @@ module DevelopmentApp
                     layout = Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form do |form|
-                        # form.caption '#{opts.text_name}', level: 2
+                        # form.caption '#{opts.text_name}'
                         form.view_only!
                         #{form_fields(true)}
                       end

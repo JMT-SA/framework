@@ -15,6 +15,7 @@ module Development
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
+              form.caption 'Generate a new scaffold', level: 2
               form.action '/development/generators/scaffolds'
               form.form_id 'gen_form'
               form.row do |row|

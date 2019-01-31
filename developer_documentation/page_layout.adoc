@@ -230,6 +230,10 @@ These are the methods used in building a page layout.
 |tag
 |Adds a csrf tag to the form.
 
+|caption
+|String and optionally level number. e.g. `form.caption 'New thing', level: 2`.
+|Render a caption above the form (hidden for remote forms). The level can be 1..4 to render within h1..h4 tags. Default level is 1.
+
 |remote!
 |
 |Make this a remote form that will be submitted via a javascript `fetch`.

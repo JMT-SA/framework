@@ -10,13 +10,14 @@ module DevelopmentApp
     class ScaffoldConfig
       attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
                   :table_meta, :label_field, :short_name, :has_short_name, :program_text,
-                  :nested_route, :new_from_menu
+                  :nested_route, :new_from_menu, :text_name
 
       def initialize(params, roda_class_name)
         @roda_class_name  = roda_class_name
         @inflector        = Dry::Inflector.new
         @table            = params[:table]
         @singlename       = @inflector.singularize(params[:short_name])
+        @text_name        = @singlename.split('_').map { |n| @inflector.camelize(n) }.join(' ')
         @has_short_name   = params[:short_name] != params[:table]
         @applet           = params[:applet]
         @new_applet       = @applet == 'other'
@@ -1095,6 +1096,7 @@ module DevelopmentApp
                       page.form_values form_values
                       page.form_errors form_errors
                       page.form do |form|
+                        form.caption 'New #{opts.text_name}', level: 2
                         form.action #{new_form_url}
                         form.remote! if remote
                         #{form_fields}
@@ -1127,6 +1129,7 @@ module DevelopmentApp
                       page.form_values form_values
                       page.form_errors form_errors
                       page.form do |form|
+                        form.caption 'Edit #{opts.text_name}', level: 2
                         form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}"
                         form.remote!
                         form.method :update
@@ -1158,6 +1161,7 @@ module DevelopmentApp
                     layout = Crossbeams::Layout::Page.build(rules) do |page|
                       page.form_object ui_rule.form_object
                       page.form do |form|
+                        # form.caption '#{opts.text_name}', level: 2
                         form.view_only!
                         #{form_fields(true)}
                       end

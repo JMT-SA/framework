@@ -97,6 +97,19 @@ module Development
                   Adjust it and edit the Dataminer Query.
                 </p>
               HTML
+              section.add_text(<<~HTML, syntax: :sql)
+                -- Example of colouring some rows:
+                SELECT id,
+                  CASE WHEN complete THEN 'ready'       -- blue
+                       WHEN approved THEN 'ok'          -- green
+                       WHEN failed   THEN 'error'       -- red
+                       WHEN archived THEN 'inactive'    -- grey, italic
+                       WHEN busy     THEN 'inprogress'  -- purple
+                       WHEN claimed  THEN 'warning'     -- orange
+                  ELSE NULL                             -- black
+                  END AS colour_rule
+                FROM table
+              HTML
               section.add_text(results[:query], syntax: :sql)
             end
             page.section do |section|

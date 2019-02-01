@@ -25,7 +25,7 @@
       :is_delete: true
       :popup: true
       :hide_if_true: verified
-    - :url: /development/statuses/show/mr_deliveries/$:delivery_id$
+    - :url: /development/statuses/list/mr_deliveries/$:delivery_id$
       :text: status
       :icon: information-solid
       :title: Status

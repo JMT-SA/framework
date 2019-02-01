@@ -30,8 +30,12 @@ module DevelopmentApp
       }.to_json
     end
 
-    def diff_action(id)
-      logged_action = repo.find_logged_action_hash(id)
+    def diff_action(id, from_status_log: false)
+      logged_action = if from_status_log
+                        repo.find_logged_action_hash_from_status_log(id)
+                      else
+                        repo.find_logged_action_hash(id)
+                      end
       left = Sequel.hstore(logged_action[:row_data]).to_hash
       right = changed_fields_for_right(logged_action)
       [left, right]

@@ -14,7 +14,7 @@ One status can be written to multiple records in a table at the same time using:
 These methods should be called inside a transaction after the actual table update.
 
 The `comment` parameter is optional, but when it is present, the status will be displayed as a concatenation of the two fields.
-e.g. 
+e.g.
 
 * Status = 'CREATED' and comment = nil will display as `'CREATED'`.
 * Status = 'APPROVED' and comment = 'by Paul' will display as `'APPROVED by Paul'`.
@@ -59,14 +59,39 @@ There is a standard URL to call that displays the current status of a record as 
 Add the URL `/development/statuses/show/security_groups/$:id$` to the yml file:
 [source, yml]
 ----
-- :url: /development/statuses/show/security_groups/$:id$
+- :url: /development/statuses/list/security_groups/$:id$
   :text: status
   :icon: information-solid
   :title: Status
   :popup: true
 ----
 
-=== 4. Log data changes
+=== 4. Customise the header display for a status object
+
+The form that shows status history can optionally display header information for a resource at the top of the form.
+
+To get something displayed there, modify `config/status_header_definitions.rb` to specify a query to be run.
+
+e.g.
+[source, ruby]
+----
+HEADER_DEF = {
+  mr_deliveries: {                                                       #<1>
+    query: 'SELECT delivery_number, FROM mr_deliveries WHERE id = ?',    #<2>
+    headers: { delivery_number: 'Delivery' },                            #<3>
+    caption: 'Delivery'                                                  #<4>
+  },
+  security_groups: {
+    query: 'SELECT security_group_name FROM security_groups WHERE id = ?'
+  }
+}.freeze
+----
+<1> The key is the table name as a Symbol
+<2> The query must be present and the WHERE clause **must** be `WHERE id = ?`.
+<3> `:headers` is optional. Use this for any table columns that aren't suitable for a header.
+<4> `:caption` is optional.
+
+=== 5. Log data changes
 
 Data changes are stored in two tables in the `audit` schema -- `audit.logged_actions` and `audit.logged_action_details`.
 

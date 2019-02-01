@@ -3,9 +3,29 @@
 module DevelopmentApp
   class StatusRepo < BaseRepo
     crud_calls_for :current_statuses, name: :status, wrapper: Status, schema: :audit, exclude: %i[create update delete]
+    crud_calls_for :status_logs, name: :status_log, wrapper: Status, schema: :audit, exclude: %i[create update delete]
 
     def find_by_table_and_id(table_name, id)
       res = where_hash(Sequel[:audit][:current_statuses], table_name: table_name.to_s, row_data_id: id)
+      return nil if res.nil?
+      Status.new(res)
+    end
+
+    def find_status_log_with_details(id) # rubocop:disable Metrics/AbcSize
+      res = DB[Sequel[:audit][:status_logs]]
+            .left_outer_join(Sequel[:audit][:logged_action_details], transaction_id: :transaction_id)
+            .where(Sequel[:status_logs][:id] => id)
+            .select(Sequel[:status_logs][:id],
+                    Sequel[:status_logs][:transaction_id],
+                    Sequel[:status_logs][:action_tstamp_tx],
+                    Sequel[:status_logs][:table_name],
+                    Sequel[:status_logs][:row_data_id],
+                    Sequel[:status_logs][:comment],
+                    Sequel[:status_logs][:user_name],
+                    Sequel[:logged_action_details][:context],
+                    Sequel[:logged_action_details][:route_url],
+                    Sequel.function(:concat_ws, ' ', :status, :comment).as('status'))
+            .first
       return nil if res.nil?
       Status.new(res)
     end
@@ -36,6 +56,18 @@ module DevelopmentApp
         status[:context] = log_det[:context]
       end
       status
+    end
+
+    def list_statuses(table_name, id)
+      DB[Sequel[:audit][:status_logs]]
+        .where(table_name: table_name.to_s, row_data_id: id)
+        .select(:id,
+                :transaction_id,
+                Sequel.function(:date_trunc, 'second', :action_tstamp_tx).as('action_time'),
+                Sequel.function(:concat_ws, ' ', :status, :comment).as('status'),
+                :user_name)
+        .order(:action_tstamp_tx)
+        .all
     end
   end
 end

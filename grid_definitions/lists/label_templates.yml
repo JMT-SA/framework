@@ -21,7 +21,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
-- :url: /development/statuses/show/label_templates/$:id$
+- :url: /development/statuses/list/label_templates/$:id$
   :text: status
   :icon: information-solid
   :title: Status

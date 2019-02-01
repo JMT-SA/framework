@@ -333,6 +333,16 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[doc_seq.next_sequence_update_sql(id)].update
   end
 
+  # Run a query returning an array of column names and an array of data.
+  # - useful for quickly passing to a Table renderer.
+  #
+  # @param query [string] the SQL query (with '?' placeholders for parameters)
+  # @param args [nil, array] any parameters to apply to the query.
+  def cols_and_rows_from_query(query, *args)
+    dataset = DB[query, *args]
+    [dataset.columns, dataset.all]
+  end
+
   def self.inherited(klass)
     klass.extend(MethodBuilder)
   end

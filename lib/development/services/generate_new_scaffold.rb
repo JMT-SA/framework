@@ -446,6 +446,11 @@ module DevelopmentApp
                             icon: 'delete',
                             is_delete: true,
                             popup: true }
+        list[:actions] << { url: "/development/statuses/list/#{opts.table}/$:id$",
+                            text: 'status',
+                            icon: 'information-solid',
+                            title: 'Status',
+                            popup: true }
         list[:page_controls] = []
         list[:page_controls] << { control_type: :link,
                                   url: "/#{opts.applet}/#{opts.program}/#{opts.table}/new",

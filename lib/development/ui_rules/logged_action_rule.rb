@@ -35,10 +35,6 @@ module UiRules
     def diff_fields
       {
         logged_action: {
-          # left_caption: 'diff.rb',
-          # right_caption: 'show.rb',
-          # left_file: '/home/james/ra/crossbeams/framework/lib/development/views/logged_action/diff.rb',
-          # right_file: '/home/james/ra/crossbeams/framework/lib/development/views/logged_action/show.rb'
           left_caption: 'Before',
           right_caption: 'After',
           left_record: @options[:left],
@@ -48,7 +44,7 @@ module UiRules
     end
 
     def make_form_object
-      make_new_form_object && return if @mode == :new
+      make_new_form_object && return if @mode == :new || @mode == :diff
 
       @form_object = @repo.find_logged_action(@options[:id])
     end

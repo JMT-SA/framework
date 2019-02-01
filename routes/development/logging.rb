@@ -31,6 +31,11 @@ class Framework < Roda
         left, right = interactor.diff_action(id)
         show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
       end
+
+      r.on 'diff_from_status' do
+        left, right = interactor.diff_action(id, from_status_log: true)
+        show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
+      end
     end
 
     # QUE JOBS

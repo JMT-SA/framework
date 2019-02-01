@@ -10,5 +10,14 @@ module DevelopmentApp
     attribute :status, Types::String
     attribute :comment, Types::String
     attribute :user_name, Types::String
+    attribute? :route_url, Types::String
+  end
+
+  class StatusSummary < Dry::Struct
+    attribute :id, Types::Integer
+    attribute :transaction_id, Types::Integer
+    attribute :action_time, Types::DateTime
+    attribute :status, Types::String
+    attribute :user_name, Types::String
   end
 end

@@ -2,7 +2,7 @@
 
 module UiRules
   class StatusRule < Base
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @dev_repo = DevelopmentApp::DevelopmentRepo.new
       @repo = DevelopmentApp::StatusRepo.new
       make_form_object
@@ -10,7 +10,32 @@ module UiRules
       common_values_for_fields select_fields
 
       set_show_fields if @mode == :show
-      rules[:rows] = [@form_object.to_h] if @mode == :show
+      set_detail_fields if @mode == :detail
+      rules[:rows] = [@form_object.to_h] if @mode == :show || @mode == :detail
+
+      if @mode == :list
+        header_def = Crossbeams::Config::StatusHeaderDefinitions::HEADER_DEF[@options[:table_name].to_sym]
+        unless header_def.nil?
+          query = header_def[:query]
+          rules[:detail_cols], rules[:detail_rows] = @repo.cols_and_rows_from_query(query, @options[:id])
+          rules[:detail_caption] = header_def[:caption]
+          rules[:detail_headers] = header_def[:headers]
+        end
+
+        rules[:cols] = %i[detail diff action_time status user_name]
+        rules[:header_captions] = { action_time: 'Time', row_data_id: 'ID' }
+        rules[:rows] = @repo.list_statuses(@options[:table_name], @options[:id]).map do |rec|
+          { id: rec[:id], action_time: rec[:action_time], status: rec[:status], user_name: rec[:user_name],
+            detail: Crossbeams::Layout::Link.new(text: 'view',
+                                                 url: "/development/statuses/detail/#{rec[:id]}",
+                                                 behaviour: :popup,
+                                                 style: :small_button).render,
+            diff: Crossbeams::Layout::Link.new(text: 'view',
+                                               url: "/development/logging/logged_actions/#{rec[:id]}/diff_from_status",
+                                               behaviour: :popup,
+                                               style: :small_button).render }
+        end
+      end
 
       form_name 'status'
     end
@@ -30,7 +55,12 @@ module UiRules
       rules[:other_headers] = %i[link table_name row_data_id status user_name action_tstamp_tx]
       rules[:other_details] = @form_object[:other_recs]
       rules[:other_header_captions] = { row_data_id: 'ID', link: 'View', action_tstamp_tx: 'Time' }
-      rules[:cols] = %i[status user_name action_tstamp_tx] # comment route_url table_name row_data_id] -- can show under a toggle btn
+      rules[:cols] = %i[status user_name action_tstamp_tx]
+    end
+
+    def set_detail_fields
+      rules[:cols] = %i[status user_name action_tstamp_tx comment route_url table_name row_data_id]
+      rules[:header_captions] = { action_tstamp_tx: 'Time', row_data_id: 'ID' }
     end
 
     def select_fields
@@ -42,8 +72,13 @@ module UiRules
 
     def make_form_object
       make_new_form_object && return if @mode == :select
+      make_detail_form_object && return if @mode == :detail
 
       @form_object = @repo.find_with_logs(@options[:table_name], @options[:id])
+    end
+
+    def make_detail_form_object
+      @form_object = @repo.find_status_log_with_details(@options[:id])
     end
 
     def make_new_form_object

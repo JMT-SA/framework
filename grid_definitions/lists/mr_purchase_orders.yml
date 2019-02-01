@@ -10,7 +10,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
-- :url: /development/statuses/show/mr_purchase_orders/$:id$
+- :url: /development/statuses/list/mr_purchase_orders/$:id$
   :text: status
   :icon: information-solid
   :title: Status

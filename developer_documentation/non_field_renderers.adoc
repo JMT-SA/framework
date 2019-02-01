@@ -44,7 +44,7 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 
 |options - :style
 |How the link is styled - as a normal link, or to look like a button. A back button renders in blue with a left-pointing arrow glyph.
-|`:link`, `:button` or `:back_button`.
+|`:link`, `:button`, `:small_button` or `:back_button`.
 |`:link`
 
 |options - :behaviour
@@ -330,6 +330,11 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |`cell_classes: { col: [callable] }`. The hash should only contain columns where you wish to apply logic to determine the css class. The value for each column must be something that responds to `call` - see example above using a lambda. NB. it is crucial to guard agains `nil` values for the column.
 |None.
 
+|options - :caption
+|String
+|Provide an optional caption to appear above the table.
+|None.
+
 |options - :header_captions
 |A Hash of options
 |Provide captions for headers to override the default text (which is the header key capitalised with underscores changed to spaces).
@@ -338,6 +343,11 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |options - :pivot
 |Boolean
 |If true, pivot the table so that columns become rows. NB. the table **must** have columns specified.
+|None.
+
+|options - :top_margin
+|Integer, 0 to 7.
+|Provide a margin above the table. Use 0 for no margin and 7 for the most space.
 |None.
 
 |===

@@ -1,23 +1,36 @@
 ---
 :caption: SKU locations
-:sql: "SELECT COALESCE(\"mr_sku_locations\".\"id\", \"locations\".\"id\") AS id, \"locations\".\"primary_storage_type_id\", \"locations\".\"location_type_id\",\r\n\"locations\".\"primary_assignment_id\",
-  \"locations\".\"location_code\", \"locations\".\"location_description\", (SELECT\r\nCASE WHEN mr_skus.sku_number IS NULL THEN array_agg(\"cc\".\"location_code\") ELSE array_append(array_agg(\"cc\".\"location_code\"), mr_skus.sku_number::varchar) END
-  AS path\r\nFROM (SELECT \"c\".\"location_code\"\r\nFROM \"locations\" c\r\nJOIN
-  \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\nWHERE
-  \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER BY \"t1\".\"path_length\"
-  DESC) cc) AS path_array, \"mr_skus\".\"sku_number\",\r\n\"material_resource_product_variants\".\"product_variant_number\",\r\n\"material_resource_product_variants\".\"product_variant_code\",
-  \"mr_sku_locations\".\"quantity\"\r\nFROM \"locations\"\r\nJOIN \"location_types\"
-  ON \"location_types\".\"id\" = \"locations\".\"location_type_id\"\r\nJOIN \"location_assignments\"
-  ON \"location_assignments\".\"id\" = \"locations\".\"primary_assignment_id\"\r\nJOIN
-  \"location_storage_types\" ON \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\n
-  JOIN \"mr_sku_locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\n
-  JOIN \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
-  JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"id\"
-  =\r\n\"mr_skus\".\"mr_product_variant_id\"\r\nWHERE \"locations\".\"active\"\r\nORDER
-  BY (SELECT string_agg(\"cc\".\"location_code\", ';') AS path\r\nFROM (SELECT \"c\".\"location_code\"\r\nFROM
-  \"locations\" c\r\nJOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
-  = \"c\".\"id\"\r\nWHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER
-  BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
+:sql: "SELECT COALESCE(\"mr_sku_locations\".\"id\", \"locations\".\"id\") AS id,\r\n
+  \ \"locations\".\"primary_storage_type_id\",\r\n  \"locations\".\"location_type_id\",\r\n
+  \ \"locations\".\"primary_assignment_id\",\r\n  \"locations\".\"location_code\",\r\n
+  \ \"locations\".\"location_description\",\r\n  (SELECT\r\n     CASE\r\n     WHEN
+  mr_skus.sku_number IS NULL THEN array_agg(\"cc\".\"location_code\")\r\n     ELSE
+  array_append(array_agg(\"cc\".\"location_code\"), mr_skus.sku_number::varchar)\r\n
+  \    END AS path\r\n     FROM (SELECT \"c\".\"location_code\"\r\n        FROM \"locations\"
+  c\r\n        JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n
+  \       WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n        ORDER
+  BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n
+  \ \"material_resource_product_variants\".\"product_variant_number\",\r\n  \"material_resource_product_variants\".\"product_variant_code\",\r\n
+  \ \"mr_sku_locations\".\"quantity\",\r\n  \"mr_deliveries\".delivery_number,\r\n
+  \ COALESCE(mr_internal_batch_numbers.\"batch_number\"::text, mr_delivery_item_batches.client_batch_number)
+  AS batch_number\r\nFROM \"locations\"\r\n  JOIN \"location_types\" ON \"location_types\".\"id\"
+  = \"locations\".\"location_type_id\"\r\n  JOIN \"location_assignments\" ON \"location_assignments\".\"id\"
+  = \"locations\".\"primary_assignment_id\"\r\n  JOIN \"location_storage_types\" ON
+  \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\n
+  \ JOIN \"mr_sku_locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\n
+  \ JOIN \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
+  \ JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"id\"
+  =\r\n                                               \"mr_skus\".\"mr_product_variant_id\"\r\n
+  \ LEFT JOIN mr_delivery_item_batches on mr_skus.mr_delivery_item_batch_id = mr_delivery_item_batches.id\r\n
+  \ LEFT JOIN mr_delivery_items on mr_delivery_item_batches.mr_delivery_item_id =
+  mr_delivery_items.id\r\n  LEFT JOIN mr_deliveries on mr_delivery_items.mr_delivery_id
+  = mr_deliveries.id\r\n  LEFT JOIN mr_internal_batch_numbers on mr_skus.mr_internal_batch_number_id
+  = mr_internal_batch_numbers.id\r\nWHERE \"locations\".\"active\"\r\nORDER BY (SELECT
+  string_agg(\"cc\".\"location_code\", ';') AS path\r\n          FROM (SELECT \"c\".\"location_code\"\r\n
+  \               FROM \"locations\" c\r\n                  JOIN \"tree_locations\"
+  t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\"
+  = \"locations\".\"id\"\r\n                ORDER BY \"t1\".\"path_length\" DESC)
+  cc), \"material_resource_product_variants\".\"product_variant_code\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -26,7 +39,7 @@
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: locations.id
+    :namespaced_name: 
     :data_type: :integer
     :width: 
     :format: 
@@ -193,6 +206,38 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_number:
+    :name: delivery_number
+    :sequence_no: 12
+    :caption: Delivery number
+    :namespaced_name: mr_deliveries.delivery_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  batch_number:
+    :name: batch_number
+    :sequence_no: 13
+    :caption: Batch number
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

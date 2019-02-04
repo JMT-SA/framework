@@ -1,35 +1,32 @@
 ---
 :dataminer_definition: mr_deliveries
 :actions:
-- :submenu:
-    :text: Delivery
-    :items:
-    - :url: "/pack_material/replenish/mr_deliveries/$:id$/verify"
-      :text: verify
-      :icon: check-square
-      :hide_if_true: verified
-      :prompt: Are you sure you want to verify this delivery?
-    - :url: "/pack_material/replenish/mr_deliveries/$:id$/edit"
-      :text: edit
-      :icon: edit
-      :title: Edit
-      :hide_if_true: verified
-    - :url: "/pack_material/replenish/mr_deliveries/$:id$/edit"
-      :text: show
-      :icon: view-show
-      :title: Show
-      :hide_if_false: verified
-    - :url: "/pack_material/replenish/mr_deliveries/$:id$"
-      :text: delete
-      :icon: delete
-      :is_delete: true
-      :popup: true
-      :hide_if_true: verified
-    - :url: /development/statuses/list/mr_deliveries/$:id$
-      :text: status
-      :icon: information-solid
-      :title: Status
-      :popup: true
+- :url: "/pack_material/replenish/mr_deliveries/$:id$/verify"
+  :text: verify
+  :icon: check-square
+  :hide_if_true: verified
+  :prompt: Are you sure you want to verify this delivery?
+- :url: "/pack_material/replenish/mr_deliveries/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_true: verified
+- :url: "/pack_material/replenish/mr_deliveries/$:id$/edit"
+  :text: show
+  :icon: view-show
+  :title: Show
+  :hide_if_false: verified
+- :url: "/pack_material/replenish/mr_deliveries/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: verified
+- :url: /development/statuses/list/mr_deliveries/$:id$
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/replenish/mr_deliveries/new"

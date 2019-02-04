@@ -9,7 +9,8 @@
   \ \"mr_deliveries\".\"driver_name\",\r\n  \"mr_deliveries\".\"vehicle_registration\",\r\n
   \ \"mr_deliveries\".\"created_at\",\r\n  \"mr_deliveries\".\"updated_at\",\r\n  case\r\n
   \ when (mr_deliveries.verified and not mr_deliveries.putaway_completed) then 'inprogress'\r\n
-  \ else null\r\n  end as colour_rule\r\nFROM \"mr_deliveries\""
+  \ else null\r\n  end as colour_rule\r\nFROM \"mr_deliveries\"\r\nORDER BY \"mr_deliveries\".\"delivery_number\"
+  desc"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -230,8 +231,8 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
-    :pinned: left
+    :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

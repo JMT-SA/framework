@@ -65,3 +65,11 @@ INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('ADHOC MOVE');
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('DELIVERIES');
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('VEHICLE JOBS');
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('ADHOC TRANSACTIONS');
+
+
+-- SKU Locations grid
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
+                                       AND functional_area_id = (SELECT id FROM functional_areas
+WHERE functional_area_name = 'Pack Material')),
+        'SKU Locations', '/list/sku_locations', 2);

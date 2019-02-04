@@ -49,7 +49,7 @@ module MasterfilesApp
       instance = location(id)
       success_response("Created location #{instance.location_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists: Legacy Barcode and Location Code must be Unique'] }))
     end
 
     def create_location(parent_id, params)
@@ -63,7 +63,7 @@ module MasterfilesApp
       instance = location(id)
       success_response("Created location #{instance.location_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists: Legacy Barcode and Location Code must be Unique'] }))
     end
 
     def update_location(id, params)

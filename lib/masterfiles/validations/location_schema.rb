@@ -14,5 +14,6 @@ module MasterfilesApp
     required(:has_single_container, :bool).maybe(:bool?)
     required(:virtual_location, :bool).maybe(:bool?)
     required(:consumption_area, :bool).maybe(:bool?)
+    optional(:can_be_moved, :bool).maybe(:bool?)
   end
 end

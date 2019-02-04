@@ -25,6 +25,7 @@ module Masterfiles
               form.add_field :has_single_container
               form.add_field :virtual_location
               form.add_field :consumption_area
+              form.add_field :can_be_moved
             end
           end
 

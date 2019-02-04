@@ -157,6 +157,10 @@ module MasterfilesApp
     def location_is_root?(id)
       DB[:tree_locations].where(descendant_location_id: id).count == 1
     end
+
+    def can_be_moved_location_type_ids
+      DB[:location_types].where(can_be_moved: true).select_map(:id)
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength

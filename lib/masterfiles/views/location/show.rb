@@ -23,6 +23,7 @@ module Masterfiles
               form.add_field :consumption_area
               form.add_field :storage_types
               form.add_field :assignments
+              form.add_field :can_be_moved
             end
           end
 

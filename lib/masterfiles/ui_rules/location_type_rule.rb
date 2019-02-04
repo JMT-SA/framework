@@ -17,12 +17,14 @@ module UiRules
     def set_show_fields
       fields[:location_type_code] = { renderer: :label }
       fields[:short_code] = { renderer: :label }
+      fields[:can_be_moved] = { renderer: :checkbox }
     end
 
     def common_fields
       {
         location_type_code: { required: true },
-        short_code: { required: true }
+        short_code: { required: true },
+        can_be_moved: { renderer: :checkbox }
       }
     end
 
@@ -34,7 +36,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(location_type_code: nil,
-                                    short_code: nil)
+                                    short_code: nil,
+                                    can_be_moved: false)
     end
   end
 end

@@ -16,6 +16,7 @@ module UiRules
       set_print_fields if @mode == :print_barcode
 
       add_behaviours if @options[:id]
+      disable_can_be_moved
 
       form_name 'location'
     end
@@ -38,6 +39,7 @@ module UiRules
       fields[:consumption_area] = { renderer: :label, as_boolean: true }
       fields[:storage_types] = { renderer: :list, items: storage_types }
       fields[:assignments] = { renderer: :list, items: location_assignments }
+      fields[:can_be_moved] = { renderer: :label, as_boolean: true }
     end
 
     def set_print_fields
@@ -56,10 +58,11 @@ module UiRules
         primary_assignment_id: { renderer: :select, options: location_assignments, caption: 'Primary Assignment', required: true },
         location_code: { required: true, caption: 'Code' },
         location_description: { required: true, caption: 'Description' },
-        legacy_barcode: {},
+        legacy_barcode: { required: true },
         has_single_container: { renderer: :checkbox },
         virtual_location: { renderer: :checkbox },
-        consumption_area: { renderer: :checkbox }
+        consumption_area: { renderer: :checkbox },
+        can_be_moved: { renderer: :checkbox }
       }
     end
 
@@ -74,7 +77,7 @@ module UiRules
       parent = @options[:id].nil? ? nil : @repo.find_location(@options[:id])
 
       @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(parent),
-                                    location_type_id: nil,
+                                    location_type_id: @repo.for_select_location_types.first.last,
                                     primary_assignment_id: initial_assignment(parent),
                                     location_code: initial_code(parent),
                                     location_description: nil,
@@ -102,6 +105,7 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
+        behaviour.enable :can_be_moved, when: :location_type_id, changes_to: can_be_moved_location_type_ids
         behaviour.dropdown_change :location_type_id, notify: [{ url: "/masterfiles/locations/locations/#{@options[:id]}/add_child/location_type_changed" }]
       end
     end
@@ -124,6 +128,19 @@ module UiRules
       return nil if parent.nil?
 
       parent.primary_assignment_id
+    end
+
+    def disable_can_be_moved
+      fields[:can_be_moved][:disabled] = true unless location_type_can_be_moved?
+    end
+
+    def location_type_can_be_moved?
+      loc_type_id = @form_object.location_type_id
+      can_be_moved_location_type_ids.include?(loc_type_id)
+    end
+
+    def can_be_moved_location_type_ids
+      @repo.can_be_moved_location_type_ids
     end
   end
 end

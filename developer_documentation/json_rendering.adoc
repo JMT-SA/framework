@@ -153,6 +153,27 @@ dom_id: as for `:replace_input_value`.
 
 items: An array of `Strings`.
 
+===== Hide a DOM element
+
+Works on any DOM element with an id.
+
+type: `:hide_element`.
+
+dom_id: the value of the `id` attribute of the element in the page. This will typically be the id of the field_wrapper of an input. (See note below).
+
+reclaim_space: (optional, defaults to false) - if true, the page will repaint to use the hidden area. If not, the hidden element will become a blank area in the page. This is generally better in order to stop inputs from moving around on the page too much.
+
+===== Show a DOM element
+
+Works on any DOM element with an id.
+
+type: `:show_element`.
+
+dom_id: the value of the `id` attribute of the element in the page. This will typically be the id of the field_wrapper of an input. (See note below).
+
+reclaim_space: (optional, defaults to false) - if true, the page will rearange to accomodate the shown area. If not, the element will become visible in the already-blank area in the page. This is generally better in order to stop inputs from moving around on the page too much.
+
+NOTE: _wrapper_id_ : If a field is named `name` in a form named `users`, the input field's id will be `users_name` and the div surrounding the input and label will have the id `users_name_field_wrapper`.
 
 ===== Clear validation error messages from a form
 

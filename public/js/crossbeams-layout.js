@@ -255,6 +255,12 @@
                 if (action.replace_list_items) {
                   crossbeamsUtils.replaceListItems(action);
                 }
+                if (action.hide_element) {
+                  crossbeamsUtils.hideElement(action);
+                }
+                if (action.show_element) {
+                  crossbeamsUtils.showElement(action);
+                }
                 if (action.clear_form_validation) {
                   crossbeamsUtils.clearFormValidation(action);
                 }

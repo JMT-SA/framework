@@ -450,6 +450,48 @@ const crossbeamsUtils = {
     elem.innerHTML = action.replace_inner_html.value;
   },
   /**
+   * Hide a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  hideElement: function hideElement(action) {
+    const elem = document.getElementById(action.hide_element.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.hide_element.id}"`,
+        title: 'Hide element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.hide_element.reclaim_space) {
+      elem.style.display = 'none';
+    } else {
+      elem.style.visibility = 'hidden';
+    }
+  },
+  /**
+   * Show a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  showElement: function showElement(action) {
+    const elem = document.getElementById(action.show_element.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.show_element.id}"`,
+        title: 'Show element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.show_element.reclaim_space) {
+      elem.style.display = 'block'; // OR inline / inline-block????
+    } else {
+      elem.style.visibility = 'visible';
+    }
+  },
+  /**
    * Replace the items of a List element.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
@@ -547,6 +589,12 @@ const crossbeamsUtils = {
           }
           if (action.replace_list_items) {
             this.replaceListItems(action);
+          }
+          if (action.hide_element) {
+            this.hideElement(action);
+          }
+          if (action.show_element) {
+            this.showElement(action);
           }
           if (action.clear_form_validation) {
             this.clearFormValidation(action);

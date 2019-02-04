@@ -92,6 +92,22 @@ class TestCommonHelpers < Minitest::Test
     expect = { replace_list_items: { id: 'html_dom_tag_id', items: ['1', '2'] } }
     assert_equal expect, res
 
+    res = build_json_action(OpenStruct.new(type: :hide_element, dom_id: 'html_dom_tag_id'))
+    expect = { hide_element: { id: 'html_dom_tag_id', reclaim_space: false } }
+    assert_equal expect, res
+
+    res = build_json_action(OpenStruct.new(type: :hide_element, dom_id: 'html_dom_tag_id', reclaim_space: true))
+    expect = { hide_element: { id: 'html_dom_tag_id', reclaim_space: true } }
+    assert_equal expect, res
+
+    res = build_json_action(OpenStruct.new(type: :show_element, dom_id: 'html_dom_tag_id'))
+    expect = { show_element: { id: 'html_dom_tag_id', reclaim_space: false } }
+    assert_equal expect, res
+
+    res = build_json_action(OpenStruct.new(type: :show_element, dom_id: 'html_dom_tag_id', reclaim_space: true))
+    expect = { show_element: { id: 'html_dom_tag_id', reclaim_space: true } }
+    assert_equal expect, res
+
     res = build_json_action(OpenStruct.new(type: :clear_form_validation, dom_id: 'html_dom_tag_id'))
     expect = { clear_form_validation: { form_id: 'html_dom_tag_id' } }
     assert_equal expect, res
@@ -108,10 +124,12 @@ class TestCommonHelpers < Minitest::Test
 
     res = json_actions([
       OpenStruct.new(type: :replace_input_value, dom_id: 'html_dom_tag_id', value: 'TEST'),
-      OpenStruct.new(type: :clear_form_validation, dom_id: 'html_dom_tag_id')
+      OpenStruct.new(type: :clear_form_validation, dom_id: 'html_dom_tag_id'),
+      OpenStruct.new(type: :hide_element, dom_id: 'html_dom_tag_id')
     ])
     expect = { actions: [{ replace_input_value: { id: 'html_dom_tag_id', value: 'TEST' } },
-                         { clear_form_validation: { form_id: 'html_dom_tag_id' } }] }.to_json
+                         { clear_form_validation: { form_id: 'html_dom_tag_id' } },
+                         { hide_element: { id: 'html_dom_tag_id', reclaim_space: false } }] }.to_json
     assert_equal expect, res
   end
 end

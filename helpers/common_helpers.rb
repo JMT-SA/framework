@@ -400,6 +400,14 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :replace_list_items, dom_id: dom_id, items: Array(items)), message, keep_dialog_open: keep_dialog_open)
   end
 
+  def json_hide_element(dom_id, reclaim_space: false, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :hide_element, dom_id: dom_id, reclaim_space: reclaim_space), message, keep_dialog_open: keep_dialog_open)
+  end
+
+  def json_show_element(dom_id, reclaim_space: false, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :show_element, dom_id: dom_id, reclaim_space: reclaim_space), message, keep_dialog_open: keep_dialog_open)
+  end
+
   def json_clear_form_validation(dom_id, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :clear_form_validation, dom_id: dom_id), message, keep_dialog_open: keep_dialog_open)
   end
@@ -411,6 +419,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       replace_select_options: ->(act) { action_replace_select_options(act) },
       replace_multi_options:  ->(act) { action_replace_multi_options(act) },
       replace_list_items:     ->(act) { action_replace_list_items(act) },
+      hide_element:           ->(act) { action_hide_element(act) },
+      show_element:           ->(act) { action_show_element(act) },
       add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs) },
       update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes) },
       delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
@@ -436,6 +446,14 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
 
   def action_replace_list_items(action)
     { replace_list_items: { id: action.dom_id, items: action.items } }
+  end
+
+  def action_hide_element(action)
+    { hide_element: { id: action.dom_id, reclaim_space: action.reclaim_space || false } }
+  end
+
+  def action_show_element(action)
+    { show_element: { id: action.dom_id, reclaim_space: action.reclaim_space || false } }
   end
 
   def action_clear_form_validation(action)

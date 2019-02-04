@@ -209,6 +209,11 @@ The checkbox will be unchecked if the field value is `false`, `f` or `0`. Otherw
 |The field name with underscores converted to spaces
 and all words start with initial capital letter.
 
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -299,6 +304,11 @@ and all words start with initial capital letter.
 |true or false
 |false
 
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
+
 |:options
 |Options for selecting.
 |an array of values.
@@ -361,6 +371,16 @@ To display `optgroup` elements, use a Hash and the format must be: `{ group => [
 |Pre-selected item.
 |any value matching one of the options.
 |The value of the column in the record for this field.
+
+|:required
+|HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will not complain if the user does not chooses an option, but the element will be styled as "required".
+|true or false
+|false
+
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
 
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.

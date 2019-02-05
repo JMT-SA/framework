@@ -9,9 +9,9 @@ class Framework < Roda
       interactor = DevelopmentApp::LoggingInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
-      # r.on !interactor.exists?(Sequel[:audit][:logged_actions], id) do
-      #   handle_not_found(r)
-      # end
+      r.on !interactor.exists?(Sequel[:audit][:logged_actions], id) do
+        handle_not_found(r)
+      end
 
       r.is do
         r.get do       # SHOW
@@ -30,17 +30,6 @@ class Framework < Roda
       r.on 'diff' do
         left, right = interactor.diff_action(id)
         show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
-      end
-
-      # Move to status route, but use this interactor...
-      r.on 'diff_from_status' do
-        left, right = interactor.diff_action(id, from_status_log: true)
-        # OR return res with nil & view sorts it out
-        # if left.nil?
-        #   update_dialog_content(content: 'not found')
-        # else
-          show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
-        # end
       end
     end
 

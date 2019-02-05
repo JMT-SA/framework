@@ -31,7 +31,7 @@ module UiRules
                                                  behaviour: :popup,
                                                  style: :small_button).render,
             diff: Crossbeams::Layout::Link.new(text: 'view',
-                                               url: "/development/logging/logged_actions/#{rec[:id]}/diff_from_status",
+                                               url: "/development/statuses/diff/#{rec[:id]}",
                                                behaviour: :popup,
                                                style: :small_button).render }
         end

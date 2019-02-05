@@ -150,30 +150,51 @@ class Framework < Roda
     end
 
     r.on 'search_developer_documentation' do
-      r.redirect '/developer_documentation/start.adoc' if params[:search_term].strip.empty?
-      term = params[:search_term]
-      res = `ag -C 2 --nonumber #{term} developer_documentation/`
+      # Requires ag (Silver Searcher) to be installed..
       out = {}
-      curr = nil
-      res.split("\n").each do |t|
-        if t == '--'
-          out[curr] << '<b>---</b>'
-        else
-          fn, = t.split(':')
-          str = t.delete_prefix("#{fn}:")
-          if fn != curr
-            curr = fn
-            out[curr] = []
+      if params[:search_term].strip.empty?
+        term = ''
+      else
+        term = params[:search_term]
+        res = `ag -C 2 --nonumber #{term} developer_documentation/`
+        curr = nil
+        res.split("\n").each do |t|
+          next if t.strip.empty?
+          if t == '--'
+            out[curr] << '<hr class="light-green mb0">' unless curr.nil?
+          else
+            fn, = t.split(':')
+            str = t.delete_prefix("#{fn}:")
+            if fn != curr
+              curr = fn
+              out[curr] = []
+            end
+            out[curr] << (str || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow pa1">\1</span>')
           end
-          out[curr] << (str || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow pa1">\1</span>')
         end
       end
+      got_res = out.empty? ? 'No s' : 'S'
       @documentation_page = true
+
       view(inline: <<~HTML)
-        <div class="db f2 mt5">Search results for "<b>#{term}</b>":</div>
+        <div class="db f2 mt5">
+          #{got_res}earch results for "<b>#{term}</b>"
+        </div>
+        <p>
+          <a href="/developer_documentation/start.adoc">Back to documentation home</a>
+        </p>
         <div class="db">
-          #{out.map { |k, v| "<div class=\"mt3\"><a href=\"/#{k}\" class=\"f3\">#{k}</a><br>#{v.join('<br>')}" }.join('<hr></div>')}
-          <hr></div>
+          #{out.map do |k, v|
+            <<~STR
+              <div class=\"mt3\">
+                <a href=\"/#{k}\" class=\"f3 link dim br2 ph3 pv2 dib white bg-dark-blue\">
+                  #{Crossbeams::Layout::Icon.render(:back)} #{k.delete_prefix('developer_documentation/').delete_suffix('.adoc').tr('_', ' ')}
+                </a>
+                <br>
+                #{v.join('<br>')}
+            STR
+          end.join('<hr class="blue"></div>')}
+          <hr class="blue"></div>
         </div>
       HTML
     end

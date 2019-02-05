@@ -377,6 +377,7 @@ module DevelopmentApp
         opts.table_meta.columns_without(%i[created_at updated_at active]).each do |col|
           attr << "attribute :#{col}, #{opts.table_meta.column_dry_type(col)}"
         end
+        attr << 'attribute? :active, Types::Bool' if opts.table_meta.active_column_present?
         attr
       end
     end

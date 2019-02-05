@@ -1,6 +1,8 @@
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
 /* Remove comment around @import statement below when using as a custom stylesheet */
+/*
 @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";
+*/
   
 article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary {
   display:block;
@@ -18,12 +20,12 @@ audio:not([controls]) {
 script {
   display:none!important;
 }
-/*
+
 html {
   font-family:sans-serif;
   -ms-text-size-adjust:100%;
   -webkit-text-size-adjust:100%;
-} */
+}
 #asciidoc-content a {
   background:transparent;
 }
@@ -154,7 +156,7 @@ body {
   color:rgba(0,0,0,.8);
   padding:0;
   margin:0;
-  font-family:"Noto Serif","DejaVu Serif",serif;
+  /* font-family:"Noto Serif","DejaVu Serif",serif; */
   font-weight:400;
   font-style:normal;
   line-height:1;

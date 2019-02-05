@@ -36,6 +36,7 @@ module DevelopmentApp
                       else
                         repo.find_logged_action_hash(id)
                       end
+      return [] if logged_action.nil?
       left = Sequel.hstore(logged_action[:row_data]).to_hash
       right = changed_fields_for_right(logged_action)
       [left, right]

@@ -9,7 +9,11 @@ module Development
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
-            page.add_diff :logged_action
+            if left.nil?
+              page.add_notice 'There is no record of the changes that took place at this point', caption: 'Unable to show difference'
+            else
+              page.add_diff :logged_action
+            end
           end
 
           layout

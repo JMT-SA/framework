@@ -138,12 +138,42 @@ class Framework < Roda
       # Docs are in developer_documentation in asciidoc format named file.adoc.
       # Guide to writing docs: http://asciidoctor.org/docs/asciidoc-writers-guide
       content = File.read(File.join(File.dirname(__FILE__), 'developer_documentation', "#{file.chomp('.adoc')}.adoc"))
+      @documentation_page = true
       view(inline: <<~HTML)
         <% content_for :late_head do %>
           <link rel="stylesheet" href="/css/asciidoc.css">
         <% end %>
         <div id="asciidoc-content">
           #{Asciidoctor.convert(content, safe: :safe, attributes: { 'source-highlighter' => 'coderay', 'coderay-css' => 'style' })}
+        </div>
+      HTML
+    end
+
+    r.on 'search_developer_documentation' do
+      r.redirect '/developer_documentation/start.adoc' if params[:search_term].strip.empty?
+      term = params[:search_term]
+      res = `ag -C 2 --nonumber #{term} developer_documentation/`
+      out = {}
+      curr = nil
+      res.split("\n").each do |t|
+        if t == '--'
+          out[curr] << '<b>---</b>'
+        else
+          fn, = t.split(':')
+          str = t.delete_prefix("#{fn}:")
+          if fn != curr
+            curr = fn
+            out[curr] = []
+          end
+          out[curr] << (str || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow pa1">\1</span>')
+        end
+      end
+      @documentation_page = true
+      view(inline: <<~HTML)
+        <div class="db f2 mt5">Search results for "<b>#{term}</b>":</div>
+        <div class="db">
+          #{out.map { |k, v| "<div class=\"mt3\"><a href=\"/#{k}\" class=\"f3\">#{k}</a><br>#{v.join('<br>')}" }.join('<hr></div>')}
+          <hr></div>
         </div>
       HTML
     end
@@ -157,7 +187,7 @@ class Framework < Roda
       mds = YARD::Registry.all(:method)
       toc = []
       out = []
-      mds.each do |m|
+      mds.sort_by(&:name).each do |m|
         next if m.visibility == :private
         toc << m.name
         parms = m.tags.select { |tag| tag.tag_name == 'param' }.map do |tag|
@@ -186,6 +216,7 @@ class Framework < Roda
         HTML
       end
 
+      @documentation_page = true
       view(inline: <<~HTML)
         <% content_for :late_head do %>
           <link rel="stylesheet" href="/css/asciidoc.css">

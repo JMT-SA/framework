@@ -52,6 +52,11 @@
     <%= partial 'menu' %>
 </header>
     <div id="container" class="container">
+      <% if @documentation_page %>
+        <form action="/search_developer_documentation" class="absolute">
+          <input id="search_term" type="search" name="search_term" placeholder="Search documentation" />
+        </form>
+      <% end %>
       <%= yield %>
     </div>
 

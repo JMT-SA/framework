@@ -42,9 +42,3 @@
   :text: New User
   :style: :button
   :behaviour: :popup
-:multiselect:
-  :progfunc_users:
-    :url: "/security/functional_areas/program_functions/link_users/$:id$"
-    :preselect: "SELECT user_id AS id FROM program_functions_users WHERE program_function_id = $:id$"
-    :section_caption: "SELECT 'Assign users to ' || program_function_name FROM program_functions WHERE id = $:id$"
-    :can_be_cleared: true

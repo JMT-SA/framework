@@ -52,6 +52,7 @@ class AppConst
 
   # Mail
   SYSTEM_MAIL_SENDER = ENV.fetch('SYSTEM_MAIL_SENDER')
+  USER_EMAIL_GROUPS = [].freeze
 
   # Business Processes
   PROCESS_DELIVERIES = 'DELIVERIES'

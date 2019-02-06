@@ -78,6 +78,12 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Users', '/list/users', 1);
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Development')),
+         'User_email_groups', '/list/user_email_groups', 2);
+
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Contact Method Types', '/list/contact_method_types', 1);
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)

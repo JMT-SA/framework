@@ -263,6 +263,8 @@ module DevelopmentApp
                                  instance)
               rescue Sequel::UniqueConstraintViolation
                 validation_failed_response(OpenStruct.new(messages: { #{opts.label_field}: ['This #{opts.classnames[:text_name].downcase} already exists'] }))
+              rescue Crossbeams::InfoError => e
+                failed_response(e.message)
               end
 
               def update_#{opts.singlename}(id, params)
@@ -275,6 +277,8 @@ module DevelopmentApp
                 instance = #{opts.singlename}(id)
                 success_response("Updated #{opts.classnames[:text_name].downcase} \#{instance.#{opts.label_field}}",
                                  instance)
+              rescue Crossbeams::InfoError => e
+                failed_response(e.message)
               end
 
               def delete_#{opts.singlename}(id)
@@ -285,6 +289,8 @@ module DevelopmentApp
                   log_transaction
                 end
                 success_response("Deleted #{opts.classnames[:text_name].downcase} \#{name}")
+              rescue Crossbeams::InfoError => e
+                failed_response(e.message)
               end
             end
           end

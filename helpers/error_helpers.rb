@@ -66,7 +66,7 @@ module ErrorHelpers
   # @return [String] the HTML containing an error message.
   def show_task_not_permitted(err)
     response.status = 403
-    view(inline: wrap_content_in_style(err.message || 'The task may be performed at this time.', :warning, caption: 'Task is not permitted'), layout: appropriate_layout)
+    view(inline: wrap_content_in_style(err.message || 'The task may not be performed at this time.', :warning, caption: 'Task is not permitted'), layout: appropriate_layout)
   end
 
   # Show an informational message page.
@@ -125,7 +125,7 @@ module ErrorHelpers
   # @return [JSON] the message formatted for javascript to handle.
   def show_json_task_not_permitted_error(err)
     response.status = 403
-    { flash: { error: "Task is not permitted - #{err.message || 'The task may be performed at this time.'}", type: 'permission' } }.to_json
+    { flash: { error: "Task is not permitted - #{err.message || 'The task may not be performed at this time.'}", type: 'permission' } }.to_json
   end
 
   # Show an error message in JSON.

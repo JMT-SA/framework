@@ -42,7 +42,14 @@ module MesserverApp
 
     def print_label(label_template_name, vars, quantity, printer)
       res = post_print(print_label_uri, label_template_name, vars, quantity, printer)
-      return res unless res.success
+      unless res.success
+        res = if res.instance == '404'
+                failed_response('The label was not found. Has it been published yet?')
+              else
+                res
+              end
+        return res
+      end
       success_response('Printed label', res.instance.body)
     end
 

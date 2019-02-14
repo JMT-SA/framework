@@ -7,6 +7,8 @@
 #   ruby tcp_serv.rb
 # Que CLI job server:
 #   bundle exec que -q packmat ./app_loader.rb
+#   OR (in cron)
+#   cd /home/nsld/pack_materal/current && screen -dmS pmque bash -c 'source /usr/local/share/chruby/chruby.sh && chruby ruby-2.5.0 && RACK_ENV=production bundle exec que -q packmat ./app_loader.rb'
 
 ENV['RACK_ENV'] ||= 'development'
 require 'bundler'

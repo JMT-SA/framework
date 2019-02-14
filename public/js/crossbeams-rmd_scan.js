@@ -2,7 +2,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   //
   // Variables
   //
-  const publicAPIs = {};
+  const publicAPIs = { bypassRules: false };
 
   const txtShow = document.getElementById('txtShow');
   const menu = document.getElementById('rmd_menu');
@@ -102,6 +102,14 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
    */
   const unpackScanValue = (val) => {
     const res = { success: false };
+    // If we can scan any barcode, return whatever was scanned:
+    if (publicAPIs.bypassRules) {
+      res.success = true;
+      res.value = val;
+      res.scanType = 'any';
+      res.scanField = 'any';
+      return res;
+    }
     const matches = [];
     let rxp;
     this.rules.filter(r => this.expectedScanTypes.indexOf(r.type) !== -1).forEach((rule) => {
@@ -151,7 +159,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
         }
         let cnt = 0;
         scannableInputs.forEach((e) => {
-          if (e.value === '' && cnt === 0 && e.dataset.scanRule === scanPack.scanType) {
+          if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType)) {
             e.value = scanPack.value;
             const field = document.getElementById(`${e.id}_scan_field`);
             field.value = scanPack.scanField;
@@ -195,9 +203,11 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
    * Call startScanner to make the websocket connection.
    *
    * @param {object} rules - the rules for identifying scan values.
+   * @param {boolean} bypassRules - should the rules be ignores (scan any barcode).
    */
-  publicAPIs.init = (rules) => {
+  publicAPIs.init = (rules, bypassRules) => {
     this.rules = rules;
+    publicAPIs.bypassRules = bypassRules;
     this.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
     this.expectedScanTypes = this.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
 

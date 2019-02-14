@@ -12,7 +12,7 @@
  * Licensed under
  *   MIT License http://www.opensource.org/licenses/mit-license
  *
- * Date: 2019-01-29T08:43:52.552Z
+ * Date: 2019-02-13T09:27:06.266Z
  */
 @-webkit-keyframes cm-spin {
   0% {
@@ -54,8 +54,8 @@
   font-style: normal; 
   font-weight: normal;
 
-  src: url("font/context-menu-icons.eot?3uqdy");
-  src: url("font/context-menu-icons.eot?3uqdy#iefix") format("embedded-opentype"), url("font/context-menu-icons.woff2?3uqdy") format("woff2"), url("font/context-menu-icons.woff?3uqdy") format("woff"), url("font/context-menu-icons.ttf?3uqdy") format("truetype");
+  src: url("font/context-menu-icons.eot?2mpyv");
+  src: url("font/context-menu-icons.eot?2mpyv#iefix") format("embedded-opentype"), url("font/context-menu-icons.woff2?2mpyv") format("woff2"), url("font/context-menu-icons.woff?2mpyv") format("woff"), url("font/context-menu-icons.ttf?2mpyv") format("truetype");
 }
 
 .context-menu-icon-add-outline:before {
@@ -134,88 +134,92 @@
   content: "\EA13";
 }
 
-.context-menu-icon-excel:before {
+.context-menu-icon-envelope:before {
   content: "\EA14";
 }
 
-.context-menu-icon-gavel:before {
+.context-menu-icon-excel:before {
   content: "\EA15";
 }
 
-.context-menu-icon-information-solid:before {
+.context-menu-icon-gavel:before {
   content: "\EA16";
 }
 
-.context-menu-icon-link:before {
+.context-menu-icon-information-solid:before {
   content: "\EA17";
 }
 
-.context-menu-icon-list:before {
+.context-menu-icon-link:before {
   content: "\EA18";
 }
 
-.context-menu-icon-loading:before {
+.context-menu-icon-list:before {
   content: "\EA19";
 }
 
-.context-menu-icon-lock-closed:before {
+.context-menu-icon-loading:before {
   content: "\EA1A";
 }
 
-.context-menu-icon-minus-outline:before {
+.context-menu-icon-lock-closed:before {
   content: "\EA1B";
 }
 
-.context-menu-icon-minus-solid:before {
+.context-menu-icon-minus-outline:before {
   content: "\EA1C";
 }
 
-.context-menu-icon-paste:before {
+.context-menu-icon-minus-solid:before {
   content: "\EA1D";
 }
 
-.context-menu-icon-photo:before {
+.context-menu-icon-paste:before {
   content: "\EA1E";
 }
 
-.context-menu-icon-play:before {
+.context-menu-icon-photo:before {
   content: "\EA1F";
 }
 
-.context-menu-icon-printer:before {
+.context-menu-icon-play:before {
   content: "\EA20";
 }
 
-.context-menu-icon-quit:before {
+.context-menu-icon-printer:before {
   content: "\EA21";
 }
 
-.context-menu-icon-save-disk:before {
+.context-menu-icon-quit:before {
   content: "\EA22";
 }
 
-.context-menu-icon-sort:before {
+.context-menu-icon-save-disk:before {
   content: "\EA23";
 }
 
-.context-menu-icon-toggle-off:before {
+.context-menu-icon-sort:before {
   content: "\EA24";
 }
 
-.context-menu-icon-toggle-on:before {
+.context-menu-icon-toggle-off:before {
   content: "\EA25";
 }
 
-.context-menu-icon-trash:before {
+.context-menu-icon-toggle-on:before {
   content: "\EA26";
 }
 
-.context-menu-icon-view-column:before {
+.context-menu-icon-trash:before {
   content: "\EA27";
 }
 
-.context-menu-icon-view-show:before {
+.context-menu-icon-view-column:before {
   content: "\EA28";
+}
+
+.context-menu-icon-view-show:before {
+  content: "\EA29";
 }
 
 .context-menu-icon::before {

@@ -61,6 +61,7 @@ WHERE functional_area_name = 'Pack Material')),
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('CREATE STOCK');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('PUTAWAY');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('ADHOC MOVE');
+INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('REMOVE STOCK');
 
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('DELIVERIES');
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('VEHICLE JOBS');

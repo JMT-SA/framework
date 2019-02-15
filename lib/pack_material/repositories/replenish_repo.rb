@@ -364,6 +364,10 @@ module PackMaterialApp
       DB[:locations].where(location_code: value).get(:id)
     end
 
+    def location_id_from_sku_location_id(sku_location_id)
+      DB[:mr_sku_locations].where(id: sku_location_id).get(:location_id)
+    end
+
     def location_code_from_location_id(location_id)
       DB[:locations].where(id: location_id).get(:location_code)
     end

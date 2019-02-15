@@ -2,6 +2,11 @@
 
 module PackMaterialApp
   class MrStockRepo < BaseRepo
+    build_for_select :business_processes, label: :process,
+                                          value: :id,
+                                          no_active_check: true,
+                                          order_by: :process
+    
     def delivery_process_id
       DB[:business_processes].where(process: 'DELIVERIES').select(:id).single_value
     end
@@ -94,6 +99,8 @@ module PackMaterialApp
                     TRANSACTION_TYPE_CREATE_STOCK
                   when 'adhoc'
                     TRANSACTION_TYPE_ADHOC_MOVE
+                  when 'destroy'
+                    TRANSACTION_TYPE_REMOVE_STOCK
                   else # when 'putaway'
                     TRANSACTION_TYPE_PUTAWAY
                   end
@@ -102,6 +109,10 @@ module PackMaterialApp
 
     def update_delivery_receipt_id(id, receipt_id)
       update(:mr_deliveries, id, receipt_transaction_id: receipt_id)
+    end
+
+    def update_delivery_putaway_id(id, putaway_id)
+      update(:mr_deliveries, id, putaway_transaction_id: putaway_id)
     end
 
     def delivery_receipt_id(id)
@@ -154,18 +165,23 @@ module PackMaterialApp
         );
       SQL
       DB[query, to_location_id, sku_ids, to_location_id].insert
+      success_response('ok')
     end
 
+    # @param [Object] sku_quantity_groups qty should be a float
     def add_sku_location_quantities(sku_quantity_groups, to_location_id)
       sku_quantity_groups.each do |grp|
         location = DB[:mr_sku_locations].where(mr_sku_id: grp[:sku_id], location_id: to_location_id)
+        return failed_response('No SKUs at location') unless location.first
         qty = location.get(:quantity) + grp[:qty]
         location.update(quantity: qty)
       end
+      success_response('ok')
     end
 
     def update_sku_location_quantity(sku_id, qty, location_id, add: true)
       location = DB[:mr_sku_locations].where(mr_sku_id: sku_id, location_id: location_id)
+      return failed_response('No SKUs at location') unless location.first
       existing_qty = location.get(:quantity)
       qty = add ? (existing_qty + qty) : (existing_qty - qty)
       if qty.positive?

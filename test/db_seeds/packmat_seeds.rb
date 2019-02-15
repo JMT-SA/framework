@@ -130,13 +130,15 @@ module MiniTestSeeds
   end
 
   def db_create_inventory_transaction_types
+    remove_id = DB[:mr_inventory_transaction_types].insert(type_name: 'REMOVE STOCK')
     create_id = DB[:mr_inventory_transaction_types].insert(type_name: 'CREATE STOCK')
     putaway_id = DB[:mr_inventory_transaction_types].insert(type_name: 'PUTAWAY')
     adhoc_id = DB[:mr_inventory_transaction_types].insert(type_name: 'ADHOC MOVE')
     @fixed_table_set[:inventory_transaction_types] = {
       create_stock_id: create_id,
       putaway_id: putaway_id,
-      adhoc_move_id: adhoc_id
+      adhoc_move_id: adhoc_id,
+      remove_stock_id: remove_id
     }
   end
 end

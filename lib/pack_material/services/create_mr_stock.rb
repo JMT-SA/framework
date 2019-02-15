@@ -27,6 +27,10 @@ module PackMaterialApp
     def call
       return failed_response 'Stock can not be created without sku_ids' unless @sku_ids.any?
 
+      res = @repo.create_sku_location_ids(@sku_ids, @to_location_id)
+      res = @repo.add_sku_location_quantities(@quantities, @to_location_id) if res.success
+      return res unless res.success
+
       unless @parent_transaction_id
         type_id = @repo.transaction_type_id_for('create')
         attrs = {
@@ -45,9 +49,6 @@ module PackMaterialApp
         @quantities = @repo.get_delivery_sku_quantities(@delivery_id)
       end
 
-      @repo.create_sku_location_ids(@sku_ids, @to_location_id)
-      @repo.add_sku_location_quantities(@quantities, @to_location_id)
-
       @quantities.each do |hsh|
         @transaction_repo.create_mr_inventory_transaction_item(
           mr_inventory_transaction_id: @parent_transaction_id,
@@ -56,6 +57,7 @@ module PackMaterialApp
           quantity: hsh[:qty]
         )
       end
+      success_response('ok')
     end
   end
 end

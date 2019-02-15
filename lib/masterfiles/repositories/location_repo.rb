@@ -161,6 +161,10 @@ module MasterfilesApp
     def can_be_moved_location_type_ids
       DB[:location_types].where(can_be_moved: true).select_map(:id)
     end
+
+    def descendants_for_ancestor_id(ancestor_id)
+      DB[:tree_locations].where(ancestor_location_id: ancestor_id).select_map(:descendant_location_id)
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength

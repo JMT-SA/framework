@@ -1,22 +1,22 @@
 ---
 :caption: SKU locations
 :sql: "SELECT COALESCE(\"mr_sku_locations\".\"id\", \"locations\".\"id\") AS id,\r\n
-  \ \"locations\".\"primary_storage_type_id\",\r\n  \"locations\".\"location_type_id\",\r\n
-  \ \"locations\".\"primary_assignment_id\",\r\n  \"locations\".\"location_code\",\r\n
-  \ \"locations\".\"location_description\",\r\n  (SELECT\r\n     CASE\r\n     WHEN
-  mr_skus.sku_number IS NULL THEN array_agg(\"cc\".\"location_code\")\r\n     ELSE
-  array_append(array_agg(\"cc\".\"location_code\"), mr_skus.sku_number::varchar)\r\n
-  \    END AS path\r\n     FROM (SELECT \"c\".\"location_code\"\r\n        FROM \"locations\"
-  c\r\n        JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n
-  \       WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n        ORDER
-  BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n
-  \ \"material_resource_product_variants\".\"product_variant_number\",\r\n  \"material_resource_product_variants\".\"product_variant_code\",\r\n
-  \ \"mr_sku_locations\".\"quantity\",\r\n  \"mr_deliveries\".delivery_number,\r\n
-  \ COALESCE(mr_internal_batch_numbers.\"batch_number\"::text, mr_delivery_item_batches.client_batch_number)
-  AS batch_number\r\nFROM \"locations\"\r\n  JOIN \"location_types\" ON \"location_types\".\"id\"
-  = \"locations\".\"location_type_id\"\r\n  JOIN \"location_assignments\" ON \"location_assignments\".\"id\"
-  = \"locations\".\"primary_assignment_id\"\r\n  JOIN \"location_storage_types\" ON
-  \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\n
+  \ \"locations\".\"primary_storage_type_id\",\r\n  \"locations\".\"location_code\",\r\n
+  \      (SELECT\r\n          CASE\r\n          WHEN mr_skus.sku_number IS NULL THEN
+  array_agg(\"cc\".\"location_code\")\r\n          ELSE array_append(array_agg(\"cc\".\"location_code\"),
+  mr_skus.sku_number::varchar)\r\n          END AS path\r\n        FROM (SELECT \"c\".\"location_code\"\r\n
+  \             FROM \"locations\" c\r\n                JOIN \"tree_locations\" t1
+  ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n              WHERE \"t1\".\"descendant_location_id\"
+  = \"locations\".\"id\"\r\n              ORDER BY \"t1\".\"path_length\" DESC) cc)
+  AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n  \"material_resource_product_variants\".\"product_variant_number\",\r\n
+  \ \"material_resource_product_variants\".\"product_variant_code\",\r\n  \"mr_sku_locations\".\"quantity\",\r\n
+  \ \"mr_deliveries\".delivery_number,\r\n       COALESCE(mr_internal_batch_numbers.\"batch_number\"::text,
+  mr_delivery_item_batches.client_batch_number) AS batch_number,\r\n  \"locations\".\"has_single_container\",\r\n\"locations\".\"location_type_id\",\r\n
+  \ \"location_types\".\"location_type_code\",\r\n  \"locations\".\"primary_assignment_id\",\r\n
+  \ \"location_assignments\".\"assignment_code\",\r\n  \"locations\".\"location_description\"\r\nFROM
+  \"locations\"\r\n  JOIN \"location_types\" ON \"location_types\".\"id\" = \"locations\".\"location_type_id\"\r\n
+  \ JOIN \"location_assignments\" ON \"location_assignments\".\"id\" = \"locations\".\"primary_assignment_id\"\r\n
+  \ JOIN \"location_storage_types\" ON \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\n
   \ JOIN \"mr_sku_locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\n
   \ JOIN \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
   \ JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"id\"
@@ -25,12 +25,12 @@
   \ LEFT JOIN mr_delivery_items on mr_delivery_item_batches.mr_delivery_item_id =
   mr_delivery_items.id\r\n  LEFT JOIN mr_deliveries on mr_delivery_items.mr_delivery_id
   = mr_deliveries.id\r\n  LEFT JOIN mr_internal_batch_numbers on mr_skus.mr_internal_batch_number_id
-  = mr_internal_batch_numbers.id\r\nWHERE \"locations\".\"active\"\r\nORDER BY (SELECT
-  string_agg(\"cc\".\"location_code\", ';') AS path\r\n          FROM (SELECT \"c\".\"location_code\"\r\n
-  \               FROM \"locations\" c\r\n                  JOIN \"tree_locations\"
-  t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\"
-  = \"locations\".\"id\"\r\n                ORDER BY \"t1\".\"path_length\" DESC)
-  cc), \"material_resource_product_variants\".\"product_variant_code\""
+  = mr_internal_batch_numbers.id\r\nWHERE \"locations\".\"active\" AND\r\n      \"location_storage_types\".\"storage_type_code\"
+  = 'Pack Material'\r\nORDER BY (SELECT string_agg(\"cc\".\"location_code\", ';')
+  AS path\r\n          FROM (SELECT \"c\".\"location_code\"\r\n                FROM
+  \"locations\" c\r\n                  JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
+  \               ORDER BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -67,41 +67,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  location_type_id:
-    :name: location_type_id
-    :sequence_no: 3
-    :caption: Location type
-    :namespaced_name: locations.location_type_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  primary_assignment_id:
-    :name: primary_assignment_id
-    :sequence_no: 4
-    :caption: Primary assignment
-    :namespaced_name: locations.primary_assignment_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   location_code:
     :name: location_code
-    :sequence_no: 5
+    :sequence_no: 3
     :caption: Location code
     :namespaced_name: locations.location_code
     :data_type: :string
@@ -115,25 +83,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  location_description:
-    :name: location_description
-    :sequence_no: 6
-    :caption: Location description
-    :namespaced_name: locations.location_description
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   path_array:
     :name: path_array
-    :sequence_no: 7
+    :sequence_no: 4
     :caption: Path array
     :namespaced_name: 
     :data_type: :string
@@ -149,7 +101,7 @@
     :group_max: false
   sku_number:
     :name: sku_number
-    :sequence_no: 8
+    :sequence_no: 5
     :caption: Sku number
     :namespaced_name: mr_skus.sku_number
     :data_type: :integer
@@ -165,7 +117,7 @@
     :group_max: false
   product_variant_number:
     :name: product_variant_number
-    :sequence_no: 9
+    :sequence_no: 6
     :caption: Product variant number
     :namespaced_name: material_resource_product_variants.product_variant_number
     :data_type: :integer
@@ -181,7 +133,7 @@
     :group_max: false
   product_variant_code:
     :name: product_variant_code
-    :sequence_no: 10
+    :sequence_no: 7
     :caption: Product variant code
     :namespaced_name: material_resource_product_variants.product_variant_code
     :data_type: :string
@@ -197,7 +149,7 @@
     :group_max: false
   quantity:
     :name: quantity
-    :sequence_no: 11
+    :sequence_no: 8
     :caption: Quantity
     :namespaced_name: mr_sku_locations.quantity
     :data_type: :number
@@ -213,7 +165,7 @@
     :group_max: false
   delivery_number:
     :name: delivery_number
-    :sequence_no: 12
+    :sequence_no: 9
     :caption: Delivery number
     :namespaced_name: mr_deliveries.delivery_number
     :data_type: :string
@@ -229,7 +181,7 @@
     :group_max: false
   batch_number:
     :name: batch_number
-    :sequence_no: 13
+    :sequence_no: 10
     :caption: Batch number
     :namespaced_name: 
     :data_type: :string
@@ -238,6 +190,102 @@
     :hide: false
     :pinned: 
     :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_single_container:
+    :name: has_single_container
+    :sequence_no: 11
+    :caption: Has single container
+    :namespaced_name: locations.has_single_container
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_type_id:
+    :name: location_type_id
+    :sequence_no: 12
+    :caption: Location type
+    :namespaced_name: locations.location_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_type_code:
+    :name: location_type_code
+    :sequence_no: 13
+    :caption: Location type code
+    :namespaced_name: location_types.location_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  primary_assignment_id:
+    :name: primary_assignment_id
+    :sequence_no: 14
+    :caption: Primary assignment
+    :namespaced_name: locations.primary_assignment_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  assignment_code:
+    :name: assignment_code
+    :sequence_no: 15
+    :caption: Assignment code
+    :namespaced_name: location_assignments.assignment_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_description:
+    :name: location_description
+    :sequence_no: 16
+    :caption: Location description
+    :namespaced_name: locations.location_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -270,6 +318,46 @@
   :list_def: SELECT assignment_code, id FROM location_assignments ORDER BY assignment_code
 - :column: locations.location_code
   :caption: Location code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: location_types.location_type_code
+  :caption: Location Type Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: material_resource_product_variants.product_variant_number
+  :caption: Product Variant Number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: material_resource_product_variants.product_variant_code
+  :caption: Product Variant Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: mr_skus.sku_number
+  :caption: SKU Number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: mr_deliveries.delivery_number
+  :caption: Delivery Number
   :data_type: :string
   :control_type: :text
   :default_value: 

@@ -87,12 +87,11 @@ module PackMaterialApp
 
         repo.transaction do
           log_transaction
-
           res1 = PackMaterialApp::MoveMrStock.call(sku_id, to_location_id, qty, opts)
-          return res1 unless res1.success
+          raise Crossbeams::InfoError, res1.message unless res1.success
 
           res2 = PackMaterialApp::DeliveryPutawayStatusCheck.call(sku_id, qty, delivery_id)
-          return res2 unless res2.success
+          raise Crossbeams::InfoError, res2.message unless res2.success
 
           log_status('mr_deliveries', delivery_id, 'PUTAWAY REGISTERED')
           html_report = repo.html_delivery_progress_report(delivery_id, sku_id, to_location_id)
@@ -101,6 +100,8 @@ module PackMaterialApp
       else
         failed_response(can_putaway.message)
       end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def html_progress_report(delivery_id, sku_id, to_location_id)

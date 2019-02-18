@@ -65,6 +65,7 @@ module DevelopmentApp
           search: "grid_definitions/searches/#{@table}.yml",
           repo: "lib/#{@applet}/repositories/#{repofile}_repo.rb",
           inter: "lib/#{@applet}/interactors/#{@singlename}_interactor.rb",
+          permission: "lib/#{@applet}/task_permission_checks/#{@singlename}.rb",
           entity: "lib/#{@applet}/entities/#{@singlename}.rb",
           validation: "lib/#{@applet}/validations/#{@singlename}_schema.rb",
           route: "routes/#{@applet}/#{@program}.rb",
@@ -72,10 +73,14 @@ module DevelopmentApp
           view: {
             new: "lib/#{@applet}/views/#{@singlename}/new.rb",
             edit: "lib/#{@applet}/views/#{@singlename}/edit.rb",
-            show: "lib/#{@applet}/views/#{@singlename}/show.rb"
+            show: "lib/#{@applet}/views/#{@singlename}/show.rb",
+            complete: "lib/#{@applet}/views/#{@singlename}/complete.rb",
+            approve: "lib/#{@applet}/views/#{@singlename}/approve.rb",
+            reopen: "lib/#{@applet}/views/#{@singlename}/reopen.rb"
           },
           test: {
             interactor: "lib/#{@applet}/test/interactors/test_#{@singlename}_interactor.rb",
+            permission: "lib/#{@applet}/test/task_permission_checks/test_#{@singlename}.rb",
             repo: "lib/#{@applet}/test/repositories/test_#{repofile}_repo.rb",
             route: "test/routes/#{@applet}/#{@program}/test_#{@singlename}_routes.rb"
           }
@@ -105,6 +110,7 @@ module DevelopmentApp
       sources[:repo]       = RepoMaker.call(opts)
       sources[:entity]     = EntityMaker.call(opts)
       sources[:inter]      = InteractorMaker.call(opts)
+      sources[:permission] = PermissionMaker.call(opts)
       sources[:validation] = ValidationMaker.call(opts)
       sources[:uirule]     = UiRuleMaker.call(opts)
       sources[:view]       = ViewMaker.call(opts)
@@ -142,6 +148,19 @@ module DevelopmentApp
         integer_array: 'Types::Array',
         string_array: 'Types::Array',
         jsonb: 'Types::Hash'
+      }.freeze
+
+      DUMMY_DATA_LOOKUP = {
+        integer: '1',
+        string: "'ABC'",
+        boolean: 'false',
+        float: '1.0',
+        datetime: '2010-01-01 12:00',
+        date: '2010-01-01',
+        decimal: '1.0',
+        integer_array: '[1, 2, 3]',
+        string_array: "['A', 'B', 'C']",
+        jsonb: '{}'
       }.freeze
 
       VALIDATION_EXPECT_LOOKUP = {
@@ -208,6 +227,10 @@ module DevelopmentApp
         DRY_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
       end
 
+      def column_dummy_data(column)
+        DUMMY_DATA_LOOKUP[@col_lookup[column][:type]] || "'??? (#{@col_lookup[column][:type]})'"
+      end
+
       def column_dry_validation_type(column)
         VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
       end
@@ -223,9 +246,17 @@ module DevelopmentApp
       def active_column_present?
         @column_names.include?(:active)
       end
+
+      def completed_column_present?
+        @column_names.include?(:completed)
+      end
+
+      def approved_column_present?
+        @column_names.include?(:approved)
+      end
     end
 
-    class InteractorMaker < BaseService
+    class InteractorMaker < BaseService # rubocop:disable Metrics/ClassLength
       attr_reader :opts
       def initialize(opts)
         @opts = opts
@@ -292,6 +323,42 @@ module DevelopmentApp
               rescue Crossbeams::InfoError => e
                 failed_response(e.message)
               end
+
+              def complete_a_#{opts.singlename}(id, params)
+                res = complete_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+                if res.success
+                  success_response(res.message, #{opts.singlename}(id))
+                else
+                  failed_response(res.message, #{opts.singlename}(id))
+                end
+              end
+
+              def reopen_a_#{opts.singlename}(id, params)
+                res = reopen_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+                if res.success
+                  success_response(res.message, #{opts.singlename}(id))
+                else
+                  failed_response(res.message, #{opts.singlename}(id))
+                end
+              end
+
+              def approve_or_reject_a_#{opts.singlename}(id, params)
+                res = if params[:approve_action] == 'a'
+                        approve_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+                      else
+                        reject_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+                      end
+                if res.success
+                  success_response(res.message, #{opts.singlename}(id))
+                else
+                  failed_response(res.message, #{opts.singlename}(id))
+                end
+              end
+
+              def assert_permission!(task, id = nil)
+                res = TaskPermissionCheck::#{opts.classnames[:class]}.call(task, id)
+                raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+              end
             end
           end
         RUBY
@@ -306,6 +373,91 @@ module DevelopmentApp
       def add_parent_to_params
         parent_id_name = opts.inflector.foreign_key(opts.inflector.singularize(opts.nested_route)) if opts.nested_route
         opts.nested_route ? "\n      params[:#{parent_id_name}] = parent_id" : ''
+      end
+    end
+
+    class PermissionMaker < BaseService
+      attr_reader :opts
+      def initialize(opts)
+        @opts = opts
+      end
+
+      def call
+        <<~RUBY
+          # frozen_string_literal: true
+
+          module #{opts.classnames[:module]}
+            module TaskPermissionCheck
+              class #{opts.classnames[:class]} < BaseService
+                attr_reader :task, :entity
+                def initialize(task, #{opts.singlename}_id = nil)
+                  @task = task
+                  @repo = #{opts.classnames[:repo]}.new
+                  @id = #{opts.singlename}_id
+                  @entity = @id ? @repo.find_#{opts.singlename}(@id) : nil
+                end
+
+                CHECKS = {
+                  create: :create_check,
+                  edit: :edit_check,
+                  delete: :delete_check,
+                  complete: :complete_check,
+                  approve: :approve_check,
+                  reopen: :reopen_check
+                }.freeze
+
+                def call
+                  return failed_response 'Record not found' unless @entity || task == :create
+
+                  check = CHECKS[task]
+                  raise ArgumentError, "Task \\"\#{task}\\" is unknown for \#{self.class}" if check.nil?
+
+                  send(check)
+                end
+
+                private
+
+                def create_check
+                  all_ok
+                end
+
+                def edit_check
+                  return failed_response '#{opts.classnames[:class]} has been completed' if completed?
+                  all_ok
+                end
+
+                def delete_check
+                  return failed_response '#{opts.classnames[:class]} has been completed' if completed?
+                  all_ok
+                end
+
+                def complete_check
+                  return failed_response '#{opts.classnames[:class]} has already been completed' if completed?
+                  all_ok
+                end
+
+                def approve_check
+                  return failed_response '#{opts.classnames[:class]} has not been completed' unless completed?
+                  return failed_response '#{opts.classnames[:class]} has already been approved' if approved?
+                  all_ok
+                end
+
+                def reopen_check
+                  return failed_response '#{opts.classnames[:class]} has not been approved' unless approved?
+                  all_ok
+                end
+
+                def completed?
+                  @entity.completed
+                end
+
+                def approved?
+                  @entity.approved
+                end
+              end
+            end
+          end
+        RUBY
       end
     end
 
@@ -453,6 +605,38 @@ module DevelopmentApp
                             icon: 'delete',
                             is_delete: true,
                             popup: true }
+        list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/complete",
+                            text: 'Complete',
+                            icon: 'toggle-on',
+                            popup: true,
+                            hide_if_true: 'completed',
+                            auth: {
+                              function: opts.applet,
+                              program: opts.program,
+                              permission: 'edit'
+                            } }
+        list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/approve",
+                            text: 'Approve/Reject',
+                            icon: 'gavel',
+                            popup: true,
+                            hide_if_false: 'completed',
+                            hide_if_true: 'approved',
+                            auth: {
+                              function: opts.applet,
+                              program: opts.program,
+                              permission: 'approve'
+                            } }
+        list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/reopen",
+                            text: 'Re-open for editing',
+                            icon: 'toggle-off',
+                            popup: true,
+                            hide_if_false: 'approved',
+                            auth: {
+                              function: opts.applet,
+                              program: opts.program,
+                              permission: 'edit'
+                            } }
+        list[:actions] << { separator: true }
         list[:actions] << { url: "/development/statuses/list/#{opts.table}/$:id$",
                             text: 'status',
                             icon: 'information-solid',
@@ -529,8 +713,64 @@ module DevelopmentApp
 
                 r.on 'edit' do   # EDIT
                   check_auth!('#{opts.program_text}', 'edit')
+                  interactor.assert_permission!(:edit, id)
                   show_partial { #{opts.classnames[:view_prefix]}::Edit.call(id) }
                 end
+
+                # r.on 'complete' do
+                #   r.get do
+                #     check_auth!('#{opts.program_text}', 'edit')
+                #     interactor.assert_permission!(:complete, id)
+                #     show_partial { #{opts.classnames[:view_prefix]}::Complete.call(id) }
+                #   end
+
+                #   r.post do
+                #     res = interactor.complete_a_#{opts.singlename}(id, params[:#{opts.singlename}])
+                #     if res.success
+                #       flash[:notice] = res.message
+                #       redirect_to_last_grid(r)
+                #     else
+                #       re_show_form(r, res) { #{opts.classnames[:view_prefix]}::Complete.call(id, params[:#{opts.singlename}], res.errors) }
+                #     end
+                #   end
+                # end
+
+                # r.on 'approve' do
+                #   r.get do
+                #     check_auth!('#{opts.program_text}', 'approve')
+                #     interactor.assert_permission!(:approve, id)
+                #     show_partial { #{opts.classnames[:view_prefix]}::Approve.call(id) }
+                #   end
+
+                #   r.post do
+                #     res = interactor.approve_or_reject_a_#{opts.singlename}(id, params[:#{opts.singlename}])
+                #     if res.success
+                #       flash[:notice] = res.message
+                #       redirect_to_last_grid(r)
+                #     else
+                #       re_show_form(r, res) { #{opts.classnames[:view_prefix]}::Approve.call(id, params[:#{opts.singlename}], res.errors) }
+                #     end
+                #   end
+                # end
+
+                # r.on 'reopen' do
+                #   r.get do
+                #     check_auth!('#{opts.program_text}', 'edit')
+                #     interactor.assert_permission!(:reopen, id)
+                #     show_partial { #{opts.classnames[:view_prefix]}::Reopen.call(id) }
+                #   end
+
+                #   r.post do
+                #     res = interactor.reopen_a_#{opts.singlename}(id, params[:#{opts.singlename}])
+                #     if res.success
+                #       flash[:notice] = res.message
+                #       redirect_to_last_grid(r)
+                #     else
+                #       re_show_form(r, res) { #{opts.classnames[:view_prefix]}::Reopen.call(id, params[:#{opts.singlename}], res.errors) }
+                #     end
+                #   end
+                # end
+
                 r.is do
                   r.get do       # SHOW
                     check_auth!('#{opts.program_text}', 'read')
@@ -546,6 +786,7 @@ module DevelopmentApp
                   end
                   r.delete do    # DELETE
                     check_auth!('#{opts.program_text}', 'delete')
+                    interactor.assert_permission!(:delete, id)
                     res = interactor.delete_#{opts.singlename}(id)
                     if res.success
                       delete_grid_row(id, notice: res.message)
@@ -707,13 +948,29 @@ module DevelopmentApp
 
                 common_values_for_fields common_fields
 
-                set_show_fields if @mode == :show
+                set_show_fields if %i[show reopen].include? @mode
+                set_complete_fields if @mode == :complete
+                set_approve_fields if @mode == :approve
+
+                add_approve_behaviours if @mode == :approve
 
                 form_name '#{opts.singlename}'
               end
 
               def set_show_fields
                 #{show_fields.join(UtilityFunctions.newline_and_spaces(6))}
+              end
+
+              def set_approve_fields
+                set_show_fields
+                fields[:approve_action] = { renderer: :select, options: [%w[Approve a], %w[Reject r]], required: true }
+                fields[:reject_reason] = { renderer: :textarea, disabled: true }
+              end
+
+              def set_complete_fields
+                set_show_fields
+                user_repo = DevelopmentApp::UserRepo.new
+                fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_#{opts.singlename.upcase}_APPROVERS), caption: 'Email address of person to notify', required: true }
               end
 
               def common_fields
@@ -730,6 +987,14 @@ module DevelopmentApp
 
               def make_new_form_object
                 @form_object = OpenStruct.new(#{struct_fields.join(UtilityFunctions.comma_newline_and_spaces(36))})
+              end
+
+              private
+
+              def add_approve_behaviours
+                behaviours do |behaviour|
+                  behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
+                end
               end
             end
           end
@@ -835,12 +1100,22 @@ module DevelopmentApp
       def call
         {
           interactor: test_interactor,
+          permission: test_permission,
           repo: test_repo,
           route: test_route
         }
       end
 
       private
+
+      def columnise
+        attr = []
+        opts.table_meta.columns_without(%i[created_at updated_at active]).each do |col|
+          attr << "#{col}: #{opts.table_meta.column_dummy_data(col)}"
+        end
+        attr << 'active: true' if opts.table_meta.active_column_present?
+        attr
+      end
 
       def test_repo
         <<~RUBY
@@ -900,6 +1175,88 @@ module DevelopmentApp
           end
           # rubocop:enable Metrics/ClassLength
           # rubocop:enable Metrics/AbcSize
+        RUBY
+      end
+
+      def test_permission
+        perm_check = "#{opts.classnames[:module]}::TaskPermissionCheck::#{opts.classnames[:class]}"
+        ent = columnise.join(",\n        ")
+        <<~RUBY
+          # frozen_string_literal: true
+
+          require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
+
+          module #{opts.classnames[:module]}
+            class Test#{opts.classnames[:class]}Permission < Minitest::Test
+              include Crossbeams::Responses
+
+              def entity(attrs = {})
+                base_attrs = {
+                  #{ent}
+                }
+                #{opts.classnames[:module]}::#{opts.classnames[:class]}.new(base_attrs.merge(attrs))
+              end
+
+              def test_create
+                res = #{perm_check}.call(:create)
+                assert res.success, 'Should always be able to create a #{opts.singlename}'
+              end
+
+              def test_edit
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+                res = #{perm_check}.call(:edit, 1)
+                assert res.success, 'Should be able to edit a #{opts.singlename}'
+
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
+                res = #{perm_check}.call(:edit, 1)
+                refute res.success, 'Should not be able to edit a completed #{opts.singlename}'
+              end
+
+              def test_delete
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+                res = #{perm_check}.call(:delete, 1)
+                assert res.success, 'Should be able to delete a #{opts.singlename}'
+
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
+                res = #{perm_check}.call(:delete, 1)
+                refute res.success, 'Should not be able to delete a completed #{opts.singlename}'
+              end
+
+              def test_complete
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+                res = #{perm_check}.call(:complete, 1)
+                assert res.success, 'Should be able to complete a #{opts.singlename}'
+
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
+                res = #{perm_check}.call(:complete, 1)
+                refute res.success, 'Should not be able to complete an already completed #{opts.singlename}'
+              end
+
+              def test_approve
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: false))
+                res = #{perm_check}.call(:approve, 1)
+                assert res.success, 'Should be able to approve a completed #{opts.singlename}'
+
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+                res = #{perm_check}.call(:approve, 1)
+                refute res.success, 'Should not be able to approve a non-completed #{opts.singlename}'
+
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: true))
+                res = #{perm_check}.call(:approve, 1)
+                refute res.success, 'Should not be able to approve an already approved #{opts.singlename}'
+              end
+
+              def test_reopen
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+                res = #{perm_check}.call(:reopen, 1)
+                refute res.success, 'Should not be able to reopen a #{opts.singlename} that has not been approved'
+
+                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: true))
+                res = #{perm_check}.call(:reopen, 1)
+                assert res.success, 'Should be able to reopen an approved #{opts.singlename}'
+              end
+            end
+          end
         RUBY
       end
 
@@ -1060,7 +1417,10 @@ module DevelopmentApp
         {
           new: new_view,
           edit: edit_view,
-          show: show_view
+          show: show_view,
+          complete: complete_view,
+          approve: approve_view,
+          reopen: reopen_view
         }
       end
 
@@ -1187,6 +1547,106 @@ module DevelopmentApp
           end
         RUBY
       end
+
+      def complete_view
+        <<~RUBY
+          # frozen_string_literal: true
+
+          module #{opts.classnames[:applet]}
+            module #{opts.classnames[:program]}
+              module #{opts.classnames[:class]}
+                class Complete
+                  def self.call(id)
+                    ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :complete, id: id)
+                    rules   = ui_rule.compile
+
+                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                      page.form_object ui_rule.form_object
+                      page.form do |form|
+                        form.caption 'Complete #{opts.text_name}'
+                        form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}/complete"
+                        form.remote!
+                        form.submit_captions 'Complete'
+                        form.add_text 'Are you sure you want to complete this #{opts.singlename}?', wrapper: :h3
+                        form.add_field :to
+                        #{form_fields(true)}
+                      end
+                    end
+
+                    layout
+                  end
+                end
+              end
+            end
+          end
+        RUBY
+      end
+
+      def approve_view
+        <<~RUBY
+          # frozen_string_literal: true
+
+          module #{opts.classnames[:applet]}
+            module #{opts.classnames[:program]}
+              module #{opts.classnames[:class]}
+                class Complete
+                  def self.call(id)
+                    ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :approve, id: id)
+                    rules   = ui_rule.compile
+
+                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                      page.form_object ui_rule.form_object
+                      page.form do |form|
+                        form.caption 'Approve or Reject #{opts.text_name}'
+                        form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}/approve"
+                        form.remote!
+                        form.submit_captions 'Approve or Reject'
+                        form.add_field :approve_action
+                        #{form_fields(true)}
+                      end
+                    end
+
+                    layout
+                  end
+                end
+              end
+            end
+          end
+        RUBY
+      end
+
+      def reopen_view
+        <<~RUBY
+          # frozen_string_literal: true
+
+          module #{opts.classnames[:applet]}
+            module #{opts.classnames[:program]}
+              module #{opts.classnames[:class]}
+                class Complete
+                  def self.call(id)
+                    ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :reopen, id: id)
+                    rules   = ui_rule.compile
+
+                    layout = Crossbeams::Layout::Page.build(rules) do |page|
+                      page.form_object ui_rule.form_object
+                      page.form do |form|
+                        form.caption 'Reopen #{opts.text_name}'
+                        form.action "/#{opts.applet}/#{opts.program}/#{opts.table}/\#{id}/reopen"
+                        form.remote!
+                        form.submit_captions 'Reopen'
+                        form.add_text 'Are you sure you want to reopen this #{opts.singlename} for editing?', wrapper: :h3
+                        #{form_fields(true)}
+                      end
+                    end
+
+                    layout
+                  end
+                end
+              end
+            end
+          end
+        RUBY
+      end
     end
 
     class QueryMaker < BaseService
@@ -1199,7 +1659,7 @@ module DevelopmentApp
 
       def call
         @base_sql = <<~SQL
-          SELECT #{columns}
+          SELECT #{columns}, fn_current_status('#{opts.table}') AS status
           FROM #{opts.table}
           #{make_joins}
         SQL
@@ -1357,6 +1817,7 @@ module DevelopmentApp
           # Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }
           # Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
+          # Dir["\#{root_dir}/#{opts.applet}/task_permission_checks/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].each { |f| require f }

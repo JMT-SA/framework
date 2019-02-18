@@ -406,6 +406,9 @@ input.cbl-input {
 .crossbeams-form input:checked ~ label {
   font-weight: bold;
 }
+textarea[disabled] {
+  background-color: #ddd;
+}
 input[readonly] {
   background-color: #ddd;
 }

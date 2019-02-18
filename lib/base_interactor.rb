@@ -68,48 +68,48 @@ class BaseInteractor
   # @param id [integer] the record id.
   # @param enqueue_job [true, false] should an alert job be enqueued? Default true.
   # @return [SuccessResponse]
-  def complete_a_record(table_name, id, enqueue_job: true)
+  def complete_a_record(table_name, id, opts)
     update_table_with_status(table_name,
                              id,
                              :completed,
                              field_changes: { completed: true },
-                             enqueue_job: enqueue_job)
+                             params: opts)
   end
 
   # Mark an entity as rejected.
   #
   # @param (see #complete_a_record)
   # @return (see #complete_a_record)
-  def reject_a_record(table_name, id, enqueue_job: true)
+  def reject_a_record(table_name, id, opts)
     update_table_with_status(table_name,
                              id,
                              :rejected,
                              field_changes: { completed: false },
-                             enqueue_job: enqueue_job)
+                             params: opts)
   end
 
   # Mark an entity as approved.
   #
   # @param (see #complete_a_record)
   # @return (see #complete_a_record)
-  def approve_a_record(table_name, id, enqueue_job: true)
+  def approve_a_record(table_name, id, opts)
     update_table_with_status(table_name,
                              id,
                              :approved,
                              field_changes: { approved: true },
-                             enqueue_job: enqueue_job)
+                             params: opts)
   end
 
   # Mark an entity as reopened.
   #
   # @param (see #complete_a_record)
   # @return (see #complete_a_record)
-  def reopen_a_record(table_name, id, enqueue_job: true)
+  def reopen_a_record(table_name, id, opts)
     update_table_with_status(table_name,
                              id,
                              :reopened,
                              field_changes: { approved: false, completed: false },
-                             enqueue_job: enqueue_job)
+                             params: opts)
   end
 
   # Update the status of a record and log the status change and transaction.
@@ -126,10 +126,9 @@ class BaseInteractor
     # ValidateStateChangeService.call(table_name, id, status_change, @user)
     repo.transaction do
       repo.update(table_name, id, opts[:field_changes])
-      log_status(opts[:status_text] || status_change.to_s.upcase)
+      log_status(table_name, id, opts[:status_text] || status_change.to_s.upcase)
       log_transaction
-      # observer/service...
-      # DevelopmentApp::AlertStateChangeJob.enqueue(@user.id, table_name, id, status_change) if opts[:enqueue_job]
+      DevelopmentApp::ProcessStateChangeEvent.call(id, table_name, status_change, @user.user_name, opts[:params])
     end
     success_response((opts[:status_text] || status_change.to_s).capitalize)
   end

@@ -380,6 +380,14 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
+  def dialog_error(content, notice: nil, error: nil)
+    update_dialog_content(content: wrap_content_in_style(content, :error), notice: notice, error: error)
+  end
+
+  def dialog_warning(content, notice: nil, error: nil)
+    update_dialog_content(content: wrap_content_in_style(content, :warning), notice: notice, error: error)
+  end
+
   def json_replace_select_options(dom_id, options_array, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :replace_select_options, dom_id: dom_id, options_array: options_array), message, keep_dialog_open: keep_dialog_open)
   end

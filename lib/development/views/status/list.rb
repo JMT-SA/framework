@@ -19,8 +19,6 @@ module Development
                   if rules[:detail_rows] && !rules[:detail_rows].empty?
                     col.add_table(rules[:detail_rows], rules[:detail_cols], header_captions: rules[:detail_headers], caption: rules[:detail_caption], top_margin: 2)
                   end
-                  p rules[:cols]
-                  p rules[:header_captions]
                   col.add_table(rules[:rows], rules[:cols], header_captions: rules[:header_captions], top_margin: 3)
 
                   if rules[:rows].empty?

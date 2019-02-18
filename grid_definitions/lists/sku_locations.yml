@@ -21,12 +21,6 @@
   :icon: view-column
   :title: Transaction History
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/pack_material/transactions/mr_deliveries/new"
-  :text: New Delivery
-  :style: :button
-  :behaviour: :popup
 :tree:
   :tree_column: path_array
   :tree_caption: Location/SKU Hierarchy

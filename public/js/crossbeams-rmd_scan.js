@@ -162,8 +162,13 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
           if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType)) {
             e.value = scanPack.value;
             const field = document.getElementById(`${e.id}_scan_field`);
-            field.value = scanPack.scanField;
+            if (field) {
+              field.value = scanPack.scanField;
+            }
             cnt += 1;
+            if (e.dataset.submitForm) {
+              e.form.submit();
+            }
           }
         });
       }

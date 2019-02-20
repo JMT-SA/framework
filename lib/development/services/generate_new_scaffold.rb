@@ -1659,7 +1659,7 @@ module DevelopmentApp
 
       def call
         @base_sql = <<~SQL
-          SELECT #{columns}, fn_current_status('#{opts.table}') AS status
+          SELECT #{columns}, fn_current_status('#{opts.table}', #{opts.table}.id) AS status
           FROM #{opts.table}
           #{make_joins}
         SQL

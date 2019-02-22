@@ -88,8 +88,8 @@ Sequel.migration do
   end
 
   down do
-    # drop_table(:mr_bulk_stock_adjustments_locations)
-    # drop_table(:mr_bulk_stock_adjustments_sku_numbers)
+    drop_table(:mr_bulk_stock_adjustments_locations)
+    drop_table(:mr_bulk_stock_adjustments_sku_numbers)
 
     drop_trigger(:mr_bulk_stock_adjustment_items, :set_created_at)
     drop_function(:mr_bulk_stock_adjustment_items_set_created_at)

@@ -33,11 +33,12 @@ Sequel.migration do
   end
 
   down do
+    drop_table(:user_email_groups_users)
+    
     drop_trigger(:user_email_groups, :set_created_at)
     drop_function(:user_email_groups_set_created_at)
     drop_trigger(:user_email_groups, :set_updated_at)
     drop_function(:user_email_groups_set_updated_at)
     drop_table(:user_email_groups)
-    drop_table(:user_email_groups_users)
   end
 end

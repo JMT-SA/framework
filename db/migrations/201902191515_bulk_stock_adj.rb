@@ -6,17 +6,15 @@ Sequel.migration do
     run 'CREATE SEQUENCE doc_seqs_stock_adjustment_number;'
     create_table(:mr_bulk_stock_adjustments, ignore_index_errors: true) do
       primary_key :id
+      foreign_key :mr_inventory_transaction_id, :mr_inventory_transactions, null: false, key: [:id]
       Integer :stock_adjustment_number, null: false, default: Sequel.function(:nextval, 'doc_seqs_stock_adjustment_number')
       column :sku_numbers, 'integer[]'
-      String :location_codes #StringArray
+      column :location_ids, 'integer[]'
       TrueClass :active, default: true
       TrueClass :is_stock_take, default: false
 
-      String :approved_by
-      DateTime :approved_on
-
-      DateTime :completed
-      DateTime :uncompleted_on
+      TrueClass :completed, default: false
+      TrueClass :approved, default: false
 
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
@@ -35,6 +33,7 @@ Sequel.migration do
     create_table(:mr_bulk_stock_adjustment_items, ignore_index_errors: true) do
       primary_key :id
       foreign_key :mr_bulk_stock_adjustment_id, :mr_bulk_stock_adjustments, null: false, key: [:id]
+      foreign_key :mr_inventory_transaction_item_id, :mr_inventory_transaction_items, null: false, key: [:id]
       foreign_key :mr_sku_location_id, :mr_sku_locations, null: false, key: [:id]
       Integer :sku_number, null: false
       Integer :product_variant_number
@@ -70,9 +69,28 @@ Sequel.migration do
                    :updated_at,
                    function_name: :mr_bulk_stock_adjustment_items_set_updated_at,
                    trigger_name: :set_updated_at)
+
+    create_table(:mr_bulk_stock_adjustments_sku_numbers, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :mr_bulk_stock_adjustment_id, :mr_bulk_stock_adjustments, type: :integer, null: false
+      foreign_key :mr_sku_id, :mr_skus, type: :integer, null: false
+
+      index [:mr_bulk_stock_adjustment_id], name: :fki_bulk_stock_adjustments_sku_numbers_mr_bulk_stock_adjustment_id
+    end
+
+    create_table(:mr_bulk_stock_adjustments_locations, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :mr_bulk_stock_adjustment_id, :mr_bulk_stock_adjustments, type: :integer, null: false
+      foreign_key :location_id, :locations, type: :integer, null: false
+
+      index [:mr_bulk_stock_adjustment_id], name: :fki_bulk_stock_adjustments_sku_numbers_mr_bulk_stock_adjustment_id
+    end
   end
 
   down do
+    # drop_table(:mr_bulk_stock_adjustments_locations)
+    # drop_table(:mr_bulk_stock_adjustments_sku_numbers)
+
     drop_trigger(:mr_bulk_stock_adjustment_items, :set_created_at)
     drop_function(:mr_bulk_stock_adjustment_items_set_created_at)
     drop_trigger(:mr_bulk_stock_adjustment_items, :set_updated_at)

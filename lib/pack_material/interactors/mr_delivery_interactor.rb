@@ -45,13 +45,16 @@ module PackMaterialApp
           repo.verify_mr_delivery(id)
           log_transaction
           log_status('mr_deliveries', id, 'VERIFIED')
-          PackMaterialApp::CreateDeliverySKUS.call(id, @user.user_name)
+          res = PackMaterialApp::CreateDeliverySKUS.call(id, @user.user_name)
+          raise Crossbeams::InfoError, res.message unless res.success
           instance = mr_delivery(id)
           success_response("Verified delivery #{instance.delivery_number}", instance)
         end
       else
         failed_response(can_verify.message)
       end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_mr_delivery(id)

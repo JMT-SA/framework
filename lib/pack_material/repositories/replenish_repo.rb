@@ -124,9 +124,9 @@ module PackMaterialApp
     def for_select_purchase_orders_with_supplier(purchase_order_id: nil)
       if purchase_order_id
         supplier_id = DB[:mr_purchase_orders].where(id: purchase_order_id).get(:supplier_party_role_id)
-        purchase_orders = DB[:mr_purchase_orders].where(approved: true, supplier_party_role_id: supplier_id)
+        purchase_orders = DB[:mr_purchase_orders].where(approved: true, supplier_party_role_id: supplier_id, deliveries_received: false)
       else
-        purchase_orders = DB[:mr_purchase_orders].where(approved: true)
+        purchase_orders = DB[:mr_purchase_orders].where(approved: true, deliveries_received: false)
       end
       purchase_orders.select(
         :id,

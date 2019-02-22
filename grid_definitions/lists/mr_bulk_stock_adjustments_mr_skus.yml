@@ -1,0 +1,8 @@
+---
+:dataminer_definition: mr_skus
+:multiselect:
+  :mr_bulk_stock_adjustments:
+    :url: "/pack_material/transactions/mr_bulk_stock_adjustments/link_mr_skus/$:id$"
+    :preselect: "SELECT mr_sku_id AS id FROM mr_bulk_stock_adjustments_sku_numbers WHERE mr_bulk_stock_adjustment_id = $:id$"
+    :section_caption: Link SKU Numbers
+    :can_be_cleared: true

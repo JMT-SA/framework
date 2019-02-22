@@ -1,20 +1,21 @@
 ---
 :caption: SKU Transaction History
-:sql: "\r\nSELECT\r\n  mr_skus.id,\r\n  mr_skus.sku_number,\r\n  \"mr_inventory_transaction_items\".id
+:sql: "SELECT\r\n  mr_skus.id,\r\n  mr_skus.sku_number,\r\n  \"mr_inventory_transaction_items\".id
   as item_id,\r\n  \"mr_inventory_transaction_items\".quantity,\r\n  \"mr_inventory_transaction_items\".inventory_uom_id,\r\n
   \ uoms.uom_code,\r\n  \"mr_inventory_transaction_items\".from_location_id,\r\n  \"mr_inventory_transactions\".\"to_location_id\",\r\n
   \ from_locations.\"location_code\" as from_location_code,\r\n  to_locations.\"location_code\"
   as to_location_code,\r\n  \"mr_inventory_transactions\".\"ref_no\",\r\n  \"mr_inventory_transactions\".\"id\"
   as transaction_id,\r\n  \"mr_inventory_transactions\".\"created_by\",\r\n  \"mr_inventory_transactions\".\"mr_inventory_transaction_type_id\",\r\n
   \ \"mr_inventory_transaction_types\".\"type_name\",\r\n  \"mr_inventory_transactions\".\"is_adhoc\",\r\n
-  \ \"business_processes\".\"process\",\r\n  \"mr_inventory_transactions\".\"created_at\",\r\n
-  \ \"mr_inventory_transactions\".\"updated_at\"\r\nFROM mr_skus\r\n  LEFT JOIN mr_sku_locations
-  ON mr_sku_locations.mr_sku_id = mr_skus.id\r\n  LEFT JOIN mr_inventory_transaction_items
-  ON mr_skus.id = mr_inventory_transaction_items.mr_sku_id\r\n  LEFT JOIN mr_inventory_transactions
-  ON mr_inventory_transaction_items.mr_inventory_transaction_id = mr_inventory_transactions.id\r\n
-  \ LEFT JOIN locations from_locations on from_locations.id = \"mr_inventory_transaction_items\".from_location_id\r\n
-  \ LEFT JOIN locations to_locations on to_locations.id = \"mr_inventory_transactions\".\"to_location_id\"\r\n
-  \ LEFT JOIN \"business_processes\" ON \"business_processes\".\"id\" = \"mr_inventory_transactions\".\"business_process_id\"\r\n
+  \ \"business_processes\".\"process\",\r\n  \"mr_inventory_transactions\".\"active\",\r\n
+  \ \"mr_inventory_transactions\".\"created_at\",\r\n  \"mr_inventory_transactions\".\"updated_at\"\r\nFROM
+  mr_skus\r\n  LEFT JOIN mr_sku_locations ON mr_sku_locations.mr_sku_id = mr_skus.id\r\n
+  \ LEFT JOIN mr_inventory_transaction_items ON mr_skus.id = mr_inventory_transaction_items.mr_sku_id\r\n
+  \ LEFT JOIN mr_inventory_transactions ON mr_inventory_transaction_items.mr_inventory_transaction_id
+  = mr_inventory_transactions.id\r\n  LEFT JOIN locations from_locations on from_locations.id
+  = \"mr_inventory_transaction_items\".from_location_id\r\n  LEFT JOIN locations to_locations
+  on to_locations.id = \"mr_inventory_transactions\".\"to_location_id\"\r\n  LEFT
+  JOIN \"business_processes\" ON \"business_processes\".\"id\" = \"mr_inventory_transactions\".\"business_process_id\"\r\n
   \ LEFT JOIN \"mr_inventory_transaction_types\" ON \"mr_inventory_transaction_types\".\"id\"
   = \"mr_inventory_transactions\".\"mr_inventory_transaction_type_id\"\r\n  LEFT JOIN
   uoms ON uoms.id = \"mr_inventory_transaction_items\".inventory_uom_id"
@@ -295,9 +296,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  active:
+    :name: active
+    :sequence_no: 18
+    :caption: Active
+    :namespaced_name: mr_inventory_transactions.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Created at
     :namespaced_name: mr_inventory_transactions.created_at
     :data_type: :datetime
@@ -313,7 +330,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Updated at
     :namespaced_name: mr_inventory_transactions.updated_at
     :data_type: :datetime

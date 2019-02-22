@@ -1,0 +1,191 @@
+---
+:caption: SKUs
+:sql: "SELECT  mr_skus.id,\r\n  mr_skus.sku_number,\r\n  m2.product_variant_code,\r\n
+  \ m2.product_variant_number,\r\n  coalesce(number.batch_number::text, batch.client_batch_number::text)
+  as batch_number,\r\n  mr_skus.owner_party_role_id,\r\n  mr_skus.mr_delivery_item_batch_id,\r\n
+  \ mr_skus.is_consignment_stock,\r\n  mr_skus.created_at,\r\n  mr_skus.updated_at,\r\n
+  \ mr_skus.mr_internal_batch_number_id\r\nfrom mr_skus\r\nleft join material_resource_product_variants
+  m2 on mr_skus.mr_product_variant_id = m2.id\r\nleft join mr_internal_batch_numbers
+  number on m2.mr_internal_batch_number_id = number.id\r\nleft join mr_delivery_item_batches
+  batch on mr_skus.mr_delivery_item_batch_id = batch.id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_skus.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sku_number:
+    :name: sku_number
+    :sequence_no: 2
+    :caption: Sku number
+    :namespaced_name: mr_skus.sku_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_code:
+    :name: product_variant_code
+    :sequence_no: 3
+    :caption: Product variant code
+    :namespaced_name: m2.product_variant_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_number:
+    :name: product_variant_number
+    :sequence_no: 4
+    :caption: Product variant number
+    :namespaced_name: m2.product_variant_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  batch_number:
+    :name: batch_number
+    :sequence_no: 5
+    :caption: Batch number
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  owner_party_role_id:
+    :name: owner_party_role_id
+    :sequence_no: 6
+    :caption: Owner party role
+    :namespaced_name: mr_skus.owner_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_delivery_item_batch_id:
+    :name: mr_delivery_item_batch_id
+    :sequence_no: 7
+    :caption: Mr delivery item batch
+    :namespaced_name: mr_skus.mr_delivery_item_batch_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_consignment_stock:
+    :name: is_consignment_stock
+    :sequence_no: 8
+    :caption: Is consignment stock
+    :namespaced_name: mr_skus.is_consignment_stock
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: mr_skus.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: mr_skus.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_internal_batch_number_id:
+    :name: mr_internal_batch_number_id
+    :sequence_no: 11
+    :caption: Mr internal batch number
+    :namespaced_name: mr_skus.mr_internal_batch_number_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

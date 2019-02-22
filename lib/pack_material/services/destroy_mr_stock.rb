@@ -25,12 +25,15 @@ module PackMaterialApp
       res = @repo.update_sku_location_quantity(@sku_id, @quantity, @location_id, add: false)
       return res unless res.success
 
-      unless @parent_transaction_id
+      if @parent_transaction_id
+        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+      else
         attrs = {
           mr_inventory_transaction_type_id: @repo.transaction_type_id_for('destroy'),
           to_location_id: nil,
           business_process_id: @business_process_id,
           ref_no: @opts[:ref_no],
+          active: true,
           is_adhoc: (@opts[:is_adhoc] || false),
           created_by: @opts[:user_name]
         }

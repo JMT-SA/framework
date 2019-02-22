@@ -32,13 +32,16 @@ module PackMaterialApp
       res = @repo.update_sku_location_quantity(@sku_id, @quantity, @to_location_id, add: true) if res.success
       return res unless res.success
 
-      unless @parent_transaction_id
+      if @parent_transaction_id
+        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+      else
         type_id = @opts[:is_adhoc] ? @repo.transaction_type_id_for('adhoc') : @repo.transaction_type_id_for('putaway')
         attrs = {
           mr_inventory_transaction_type_id: type_id,
           to_location_id: @to_location_id,
           business_process_id: @business_process_id,
           ref_no: @opts[:ref_no],
+          active: true,
           is_adhoc: (@opts[:is_adhoc] || false),
           created_by: @opts[:user_name]
         }
@@ -51,6 +54,7 @@ module PackMaterialApp
       @transaction_repo.create_mr_inventory_transaction_item(
         mr_inventory_transaction_id: @parent_transaction_id,
         from_location_id: @from_location_id,
+        to_location_id: @to_location_id,
         mr_sku_id: @sku_id,
         inventory_uom_id: @repo.sku_uom_id(@sku_id),
         quantity: @quantity

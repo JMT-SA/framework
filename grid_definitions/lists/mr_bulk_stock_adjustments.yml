@@ -1,0 +1,65 @@
+---
+:dataminer_definition: mr_bulk_stock_adjustments
+:actions:
+- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$/edit_header"
+  :text: edit header
+  :icon: edit-pencil
+  :title: Edit Header
+  :popup: true
+- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+- :url: "/list/mr_bulk_stock_adjustments_mr_skus/multi?key=mr_bulk_stock_adjustments&id=$:id$"
+  :text: SKU Numbers
+  :icon: list
+- :url: "/list/mr_bulk_stock_adjustments_locations/multi?key=mr_bulk_stock_adjustments&id=$:id$"
+  :text: Locations
+  :icon: list
+- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :prompt: Are you sure you want to delete this Bulk Stock Adjustment?
+  :hide_if_true: completed
+- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$/complete"
+  :text: Complete
+  :icon: toggle-on
+  :popup: true
+  :hide_if_true: completed
+  :auth:
+    :function: pack material
+    :program: transactions
+    :permission: edit
+- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$/approve"
+  :text: Approve/Reject
+  :icon: gavel
+  :popup: true
+  :hide_if_false: completed
+  :hide_if_true: approved
+  :auth:
+    :function: pack material
+    :program: transactions
+    :permission: approve
+- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$/reopen"
+  :text: Re-open for editing
+  :icon: toggle-off
+  :popup: true
+  :hide_if_false: approved
+  :auth:
+    :function: pack material
+    :program: transactions
+    :permission: edit
+- :separator: true
+- :url: "/development/statuses/list/mr_bulk_stock_adjustments/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/transactions/mr_bulk_stock_adjustments/new"
+  :text: New Bulk Stock Adjustment
+  :style: :button
+  :behaviour: :popup

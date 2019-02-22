@@ -206,5 +206,9 @@ module PackMaterialApp
         ).select(:mr_purchase_order_item_id)
       ).select_map(:inventory_uom_id).first
     end
+
+    def activate_mr_inventory_transaction(parent_transaction_id)
+      DB[:mr_inventory_transactions].where(id: parent_transaction_id).update(active: true)
+    end
   end
 end

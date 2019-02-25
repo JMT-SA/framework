@@ -37,6 +37,9 @@ The following renderers are available to a page:
 |:list
 |<<Renderer::List>>
 
+|:lookup
+|<<Renderer::Lookup>>
+
 |:multi
 |<<Renderer::Multi>>
 
@@ -273,6 +276,59 @@ and all words start with initial capital letter.
 |The list of items to display. If a two-dimensional array is provided, just the first element is displayed.
 |a one-dimensional or two-diemnsional array
 |None. Required.
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
+
+|===
+
+=== Renderer::Lookup
+
+A button to lookup a row from a grid. See link:/developer_documentation/how_to_use_lookup_grid.adoc[How to set up a lookup grid]
+
+This is tied to a lookup yml file with the same name as the `:lookup_name` attribute.
+The lookup file defines which query to run, what parameters to apply and which URL to call once a selection is made from the grid which is displayed in a dialog.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The button text
+|any text
+|The word `Lookup` followed by the field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:lookup_name
+|The name of the lookup yml file.
+|String
+|None. Required.
+
+|:lookup_key
+|The key to use in the lookup file which defines query parameters etc.
+|String
+|None. Required.
+
+|:param_keys
+|A list of DOM ids that will be passed to the lookup along with their values as parameters.
+|Array
+|None. Optional.
+
+|:param_values
+|A list of parameter keys and their fixed values to be passed to the lookup query.
+|Hash
+|None. Optional.
+
+|:show_field
+|A readonly field to be rendered next to the button to optionally display the result of the lookup.
+|A single String/Symbol.
+|None. Optional.
+
+|:hidden_fields
+|The list of field names. Each will be rendered as a hidden input.
+|A single String/Symbol or an Array of Strings/Symbols.
+|None. Optional.
 
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.

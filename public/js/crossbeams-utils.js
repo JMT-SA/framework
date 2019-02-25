@@ -271,6 +271,33 @@ const crossbeamsUtils = {
       });
     }
   },
+  /**
+   * On button click, unpack rules from the button element and use a fetch
+   * request to show a grid in a dialog where the user can choose a row.
+   *
+   * @param {node} element - a button element.
+   * @returns {void}
+   */
+  showLookupGrid: function showLookupGrid(element) {
+    const lkpName = element.dataset.lookupName;
+    const lkpKey = element.dataset.lookupKey;
+    const paramKeys = JSON.parse(element.dataset.paramKeys);
+    const paramValues = JSON.parse(element.dataset.paramValues);
+    // console.log(lkpName, lkpKey, paramKeys, paramValues);
+    const queryParam = {};
+    paramKeys.forEach((key) => {
+      let val = paramValues[key];
+      if (val === undefined) {
+        const e = document.getElementById(key);
+        val = e.value;
+      }
+      queryParam[key] = val;
+    });
+    // Could be no params...
+    const url = `/lookups/${lkpName}/${lkpKey}?${crossbeamsUtils.buildQueryString(queryParam)}`;
+    // console.log('URL:', url);
+    crossbeamsUtils.popupDialog(element.textContent, url);
+  },
 
   /**
    * Take selected options from a multiselect and return them in a sequence
@@ -554,6 +581,49 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Goes through a set of actions and processes them.
+   * @param {array} actions - the actions to be executed.
+   * @returns {void}
+   */
+  processActions: function processActions(actions) {
+    actions.forEach((action) => {
+      if (action.replace_options) {
+        crossbeamsUtils.replaceSelectrOptions(action);
+      }
+      if (action.replace_multi_options) {
+        crossbeamsUtils.replaceMultiOptions(action);
+      }
+      if (action.replace_input_value) {
+        crossbeamsUtils.replaceInputValue(action);
+      }
+      if (action.replace_inner_html) {
+        crossbeamsUtils.replaceInnerHtml(action);
+      }
+      if (action.replace_list_items) {
+        crossbeamsUtils.replaceListItems(action);
+      }
+      if (action.hide_element) {
+        crossbeamsUtils.hideElement(action);
+      }
+      if (action.show_element) {
+        crossbeamsUtils.showElement(action);
+      }
+      if (action.clear_form_validation) {
+        crossbeamsUtils.clearFormValidation(action);
+      }
+      if (action.addRowToGrid) {
+        crossbeamsUtils.addGridRow(action);
+      }
+      if (action.updateGridInPlace) {
+        crossbeamsUtils.updateGridRow(action);
+      }
+      if (action.removeGridRowInPlace) {
+        crossbeamsUtils.deleteGridRow(action);
+      }
+    });
+  },
+
+  /**
    * Calls all urls for observeChange behaviour and applies changes to the DOM as required..
    * @param {string} url - the url to be called.
    * @returns {void}
@@ -574,41 +644,7 @@ const crossbeamsUtils = {
     })
     .then((data) => {
       if (data.actions) {
-        data.actions.forEach((action) => {
-          if (action.replace_options) {
-            this.replaceSelectrOptions(action);
-          }
-          if (action.replace_multi_options) {
-            this.replaceMultiOptions(action);
-          }
-          if (action.replace_input_value) {
-            this.replaceInputValue(action);
-          }
-          if (action.replace_inner_html) {
-            this.replaceInnerHtml(action);
-          }
-          if (action.replace_list_items) {
-            this.replaceListItems(action);
-          }
-          if (action.hide_element) {
-            this.hideElement(action);
-          }
-          if (action.show_element) {
-            this.showElement(action);
-          }
-          if (action.clear_form_validation) {
-            this.clearFormValidation(action);
-          }
-          if (action.addRowToGrid) {
-            this.addGridRow(action);
-          }
-          if (action.updateGridInPlace) {
-            this.updateGridRow(action);
-          }
-          if (action.removeGridRowInPlace) {
-            this.deleteGridRow(action);
-          }
-        });
+        this.processActions(data.actions);
       }
       if (data.flash) {
         if (data.flash.notice) {

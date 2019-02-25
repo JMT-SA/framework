@@ -85,6 +85,44 @@
     });
   }
 
+  function fetchRemoteLink(url) {
+    fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+    })
+    .then(response => response.json())
+    .then((data) => {
+      if (data.actions) {
+        if (!data.exception) {
+          crossbeamsUtils.closePopupDialog();
+        }
+        crossbeamsUtils.processActions(data.actions);
+      }
+      if (data.flash) {
+        if (data.flash.notice) {
+          Jackbox.success(data.flash.notice);
+        }
+        if (data.flash.error) {
+          if (data.exception) {
+            Jackbox.error(data.flash.error, { time: 20 });
+            if (data.backtrace) {
+              console.log('EXCEPTION:', data.exception, data.flash.error);
+              console.log('==Backend Backtrace==');
+              console.info(data.backtrace.join('\n'));
+            }
+          } else {
+            Jackbox.error(data.flash.error);
+          }
+        }
+      }
+    }).catch((data) => {
+      crossbeamsUtils.fetchErrorHandler(data);
+    });
+  }
+
   /**
    * When an input is invalid according to HTML5 rules and
    * the submit button has been disabled, we need to re-enable it
@@ -142,6 +180,12 @@
         event.preventDefault();
         crossbeamsUtils.loadingWindow(event.target.href);
       }
+      // Perform a lookup function in a dialog.
+      if (event.target.dataset && event.target.dataset.lookupName) {
+        event.stopPropagation();
+        event.preventDefault();
+        crossbeamsUtils.showLookupGrid(event.target);
+      }
       // Prompt for confirmation
       if (event.target.dataset && event.target.dataset.prompt) {
         event.stopPropagation();
@@ -167,6 +211,12 @@
       // Replace modal dialog
       if (event.target.dataset && event.target.dataset.replaceDialog) {
         loadDialogContent(event.target.href);
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      // Remote fetch link
+      if (event.target.dataset && event.target.dataset.remoteLink) {
+        fetchRemoteLink(event.target.href);
         event.stopPropagation();
         event.preventDefault();
       }
@@ -239,41 +289,7 @@
               if (data.keep_dialog_open) {
                 closeDialog = false;
               }
-              data.actions.forEach((action) => {
-                if (action.replace_options) {
-                  crossbeamsUtils.replaceSelectrOptions(action);
-                }
-                if (action.replace_multi_options) {
-                  crossbeamsUtils.replaceMultiOptions(action);
-                }
-                if (action.replace_input_value) {
-                  crossbeamsUtils.replaceInputValue(action);
-                }
-                if (action.replace_inner_html) {
-                  crossbeamsUtils.replaceInnerHtml(action);
-                }
-                if (action.replace_list_items) {
-                  crossbeamsUtils.replaceListItems(action);
-                }
-                if (action.hide_element) {
-                  crossbeamsUtils.hideElement(action);
-                }
-                if (action.show_element) {
-                  crossbeamsUtils.showElement(action);
-                }
-                if (action.clear_form_validation) {
-                  crossbeamsUtils.clearFormValidation(action);
-                }
-                if (action.addRowToGrid) {
-                  crossbeamsUtils.addGridRow(action);
-                }
-                if (action.updateGridInPlace) {
-                  crossbeamsUtils.updateGridRow(action);
-                }
-                if (action.removeGridRowInPlace) {
-                  crossbeamsUtils.deleteGridRow(action);
-                }
-              });
+              crossbeamsUtils.processActions(data.actions);
             } else if (data.replaceDialog) {
               closeDialog = false;
               const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());

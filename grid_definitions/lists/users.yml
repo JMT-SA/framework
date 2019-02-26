@@ -11,31 +11,55 @@
   :icon: edit
   :title: Edit
   :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_maintenance
 - :url: "/development/masterfiles/users/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_maintenance
 - :separator: true
 - :url: "/list/programs/multi?key=program_users&id=$:id$"
   :text: select programs
   :icon: list
   :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_permissions
 - :url: "/list/user_program_permissions/with_params?key=standard&id=$:id$"
   :text: program permissions
   :title: Edit security group name for programs
   :icon: check-square
   :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_permissions
 - :url: "/list/user_program_permissions/multi?key=set_group&id=$:id$"
   :text: multiselect program permissions
   :icon: list
   :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_permissions
 - :separator: true
 - :url: "/development/masterfiles/users/$:id$/change_password"
   :text: Change password
   :icon: lock-closed
   :title: Change password
   :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_maintenance
 :page_controls:
 - :control_type: :link
   :url: "/development/masterfiles/users/new"

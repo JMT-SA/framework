@@ -435,7 +435,7 @@ const crossbeamsDataMinerParams = {
                 : qp.default_value)}" ${inputType} />
             <input name="qp_value_to" id="qp_value_to" ${inputType} />`;
         } else {
-          valInput = `<input name="qp_value" id="qp_value" value="${
+          valInput = `<input name="qp_value" id="qp_value" style="width:90%" value="${
           (qp.default_value === null
             ? ''
               : qp.default_value)}" ${inputType} />
@@ -444,13 +444,13 @@ const crossbeamsDataMinerParams = {
         qpForm.innerHTML = `<form id="dForm" action="">
           <input type="hidden" id="qp_column" value="${qp.column}" />
           ${crossbeamsUtils.makeSelect('qp_operator', qp.operator)}
-          <div id="qp_value_wrapper" style="display:inline-block">${valInput}</div>
+          <div id="qp_value_wrapper" style="display:inline-block;min-width:20em;">${valInput}</div>
           <button type="button" class="dark-blue"
           onclick="crossbeamsDataMinerParams.addQpFormParam()">
           <svg class="cbl-icon" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1600 736v192q0 40-28 68t-68 28h-416v416q0 40-28 68t-68 28h-192q-40 0-68-28t-28-68v-416h-416q-40 0-68-28t-28-68v-192q0-40 28-68t68-28h416v-416q0-40 28-68t68-28h192q40 0 68 28t28 68v416h416q40 0 68 28t28 68z"/></svg></button></form>`;
         if (qp.control_type === 'list') {
           sel = document.getElementById('qp_value');
-          if (sel !== null) { new Selectr(sel); }
+          if (sel !== null) { new Selectr(sel, { width: 'notset' }); }
         }
       }
       // event.stopPropagation();

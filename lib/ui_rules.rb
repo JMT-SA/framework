@@ -75,10 +75,13 @@ module UiRules
     end
 
     def enable(field_to_enable, conditions = {})
+      targets = Array(field_to_enable)
       observer = conditions[:when] || raise(ArgumentError, 'Enable behaviour requires `when`.')
       change_values = conditions[:changes_to]
-      @rules << { observer => { change_affects: field_to_enable } }
-      @rules << { field_to_enable => { enable_on_change: change_values } }
+      @rules << { observer => { change_affects: targets.join(';') } }
+      targets.each do |target|
+        @rules << { target => { enable_on_change: change_values } }
+      end
     end
 
     def dropdown_change(field_name, conditions = {})

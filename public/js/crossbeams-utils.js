@@ -464,7 +464,7 @@ const crossbeamsUtils = {
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
    */
-  changeSelectInputValue: function changeSelectInputValue(action) {
+  changeSelectValue: function changeSelectValue(action) {
     const elem = document.getElementById(action.change_select_value.id);
     if (elem === null) {
       this.alert({

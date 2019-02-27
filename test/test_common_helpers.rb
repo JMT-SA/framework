@@ -76,6 +76,10 @@ class TestCommonHelpers < Minitest::Test
     expect = { replace_input_value: { id: 'html_dom_tag_id', value: 'TEST' } }
     assert_equal expect, res
 
+    res = build_json_action(OpenStruct.new(type: :change_select_value, dom_id: 'html_dom_tag_id', value: 'TEST'))
+    expect = { change_select_value: { id: 'html_dom_tag_id', value: 'TEST' } }
+    assert_equal expect, res
+
     res = build_json_action(OpenStruct.new(type: :replace_inner_html, dom_id: 'html_dom_tag_id', value: 'TEST'))
     expect = { replace_inner_html: { id: 'html_dom_tag_id', value: 'TEST' } }
     assert_equal expect, res

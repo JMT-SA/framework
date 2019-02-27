@@ -113,6 +113,17 @@ e.g. if a form named `users` has a field named `surname`, then the dom_id will b
 
 value: the value you want to change it to.
 
+===== Change the value of a select element
+
+Works on `select` elements.
+
+type: `:change_select_value`.
+
+dom_id: the value of the `id` attribute of the select element in the page. This is usually a combination of the `form_name` and `field_name`.
+e.g. if a form named `users` has a field named `surname`, then the dom_id will be `users_surname`.
+
+value: the value of the option you want to be selected.
+
 ===== Replace the inner HTML of a DOM element
 
 Works on DOM elements (usually for label text).

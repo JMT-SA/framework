@@ -182,7 +182,7 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('masterfiles', 'edit')
+        check_auth!('masterfiles', 'user_maintenance')
         show_partial { Development::Masterfiles::User::Edit.call(id) }
       end
       r.on 'details' do
@@ -205,7 +205,7 @@ class Framework < Roda
       end
       r.on 'change_password' do
         r.get do
-          check_auth!('masterfiles', 'edit')
+          check_auth!('masterfiles', 'user_maintenance')
           show_partial { Development::Masterfiles::User::ChangePassword.call(id) }
         end
         r.patch do
@@ -240,7 +240,7 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          check_auth!('masterfiles', 'delete')
+          check_auth!('masterfiles', 'user_maintenance')
           res = interactor.delete_user(id)
           delete_grid_row(id, notice: res.message)
         end
@@ -249,13 +249,13 @@ class Framework < Roda
     r.on 'users' do
       interactor = DevelopmentApp::UserInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
-        check_auth!('masterfiles', 'new')
+        check_auth!('masterfiles', 'user_maintenance')
         show_partial_or_page(r) { Development::Masterfiles::User::New.call(remote: fetch?(r)) }
       end
 
       r.on 'set_permissions', Integer do |id|
         r.get do
-          check_auth!('masterfiles', 'edit')
+          check_auth!('masterfiles', 'user_permissions')
           ids = multiselect_grid_choices(params)
           show_partial { Development::Masterfiles::User::ApplySecurityGroupToProgram.call(id, ids) }
         end

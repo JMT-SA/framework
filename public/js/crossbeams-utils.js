@@ -475,7 +475,7 @@ const crossbeamsUtils = {
       return;
     }
     if (elem.selectr) {
-      if (elem.value !== action.change_select_value.value) {
+      if (String(elem.value) !== String(action.change_select_value.value)) {
         elem.selectr.setValue(action.change_select_value.value);
       }
     } else {

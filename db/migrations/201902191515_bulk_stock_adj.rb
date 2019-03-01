@@ -36,8 +36,8 @@ Sequel.migration do
       foreign_key :mr_sku_id, :mr_skus, key: [:id], null: false
       foreign_key :location_id, :locations, key: [:id], null: false
       Integer :sku_number, null: false
-      String :product_variant_number
-      String :product_number
+      Bignum :product_variant_number
+      Bignum :product_number
 
       String :mr_type_name, null: false
       String :mr_sub_type_name, null: false

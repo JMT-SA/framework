@@ -232,6 +232,11 @@ module MesserverApp
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetPublishFileStatus&ListType=yaml&Name=#{filename}&PrinterType=#{printer_type}&Unit=production")
     end
 
+    # http://192.168.50.21:2080/?Type=GetLabelFileXml&unit=production&nsld=&printerType=Zebra&File=KR_PM_LOCATION.xml
+    def label_variables_uri(printer_type, filename)
+      URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetLabelFileXml&unit=production&nsld=&printerType=#{printer_type}&File=#{filename}.xml")
+    end
+
     def preview_uri
       URI.parse("#{AppConst::LABEL_SERVER_URI}LabelFileUpload")
     end

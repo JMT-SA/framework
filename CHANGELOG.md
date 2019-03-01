@@ -9,7 +9,14 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Added
 - Maintain printers.
 - Maintain printer applications and use them for selecting printers for barcode prints.
+- Lookup control to select a row from a agrid for modifying input values in a form.
+- FoldUp control for collapsing sections of a page.
+- Complete/Approve etc state changes.
+- Observers for Services.
+- Shared label config - also used by Label designer.
+- Label templates for printing labels.
 ### Changed
+-Locations: location code became long_code, legacy_barcode became short_code and print_code was added.
 ### Fixed
 
 ## [0.5.0] - 2018-12-03

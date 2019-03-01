@@ -18,14 +18,9 @@ module PackMaterial
               form.add_text 'Are you sure you want to complete this mr_bulk_stock_adjustment?', wrapper: :h3
               form.add_field :to
               form.add_field :stock_adjustment_number
-              form.add_field :sku_numbers
-              form.add_field :location_long_codes
               form.add_field :active
               form.add_field :is_stock_take
-              form.add_field :approved_by
-              form.add_field :approved_on
               form.add_field :completed
-              form.add_field :uncompleted_on
               form.add_field :approved
             end
           end

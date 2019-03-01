@@ -134,26 +134,7 @@ class Framework < Roda
         r.post do        # CREATE
           res = interactor.create_mr_bulk_stock_adjustment_item(id, params[:mr_bulk_stock_adjustment_item])
           if res.success
-            row_keys = %i[
-            id
-            mr_bulk_stock_adjustment_id
-            mr_sku_location_id
-            sku_number
-            product_variant_number
-            product_number
-            mr_type_name
-            mr_sub_type_name
-            product_variant_code
-            product_code
-            location_long_code
-            inventory_uom_code
-            scan_to_location_code
-            system_quantity
-            actual_quantity
-            stock_take_complete
-          ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            r.redirect "/pack_material/transactions/mr_bulk_stock_adjustment_items/#{res.instance.id}/edit"
           else
             re_show_form(r, res, url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/mr_bulk_stock_adjustment_items/new") do
               PackMaterial::Transactions::MrBulkStockAdjustmentItem::New.call(id,
@@ -175,8 +156,6 @@ class Framework < Roda
           if res.success
             row_keys = %i[
               stock_adjustment_number
-              sku_numbers
-              location_ids
               active
               is_stock_take
               completed
@@ -202,6 +181,16 @@ class Framework < Roda
 
     r.on 'mr_bulk_stock_adjustments' do
       interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'sku_location_lookup_result', Integer do |sku_location_id|
+        result_hash = interactor.get_sku_location_info_ids(sku_location_id)
+        json_actions([OpenStruct.new(type: :change_select_value,
+                                     dom_id: 'mr_bulk_stock_adjustment_item_mr_sku_id',
+                                     value: result_hash[:sku_id]),
+                      OpenStruct.new(type: :change_select_value,
+                                     dom_id: 'mr_bulk_stock_adjustment_item_location_id',
+                                     value: result_hash[:location_id])],
+                     'Selected a SKU Location')
+      end
       r.on 'new' do    # NEW
         check_auth!('transactions', 'new')
         show_partial_or_page(r) { PackMaterial::Transactions::MrBulkStockAdjustment::New.call(remote: fetch?(r)) }
@@ -234,8 +223,6 @@ class Framework < Roda
           row_keys = %i[
             id
             stock_adjustment_number
-            sku_numbers
-            location_ids
             active
             is_stock_take
             completed
@@ -343,7 +330,7 @@ class Framework < Roda
               product_code
               location_long_code
               inventory_uom_code
-              scan_to_location_code
+              scan_to_location_long_code
               system_quantity
               actual_quantity
               stock_take_complete

@@ -36,28 +36,28 @@ module PackMaterialApp
       end
 
       def edit_check
-        return failed_response 'MrBulkStockAdjustmentItem has been completed' if completed?
+        return failed_response 'BulkStockAdjustmentItem has been completed' if completed?
         all_ok
       end
 
       def delete_check
-        return failed_response 'MrBulkStockAdjustmentItem has been completed' if completed?
+        return failed_response 'BulkStockAdjustmentItem has been completed' if completed?
         all_ok
       end
 
       def complete_check
-        return failed_response 'MrBulkStockAdjustmentItem has already been completed' if completed?
+        return failed_response 'BulkStockAdjustmentItem has already been completed' if completed?
         all_ok
       end
 
       def approve_check
-        return failed_response 'MrBulkStockAdjustmentItem has not been completed' unless completed?
-        return failed_response 'MrBulkStockAdjustmentItem has already been approved' if approved?
+        return failed_response 'BulkStockAdjustmentItem has not been completed' unless completed?
+        return failed_response 'BulkStockAdjustmentItem has already been approved' if approved?
         all_ok
       end
 
       def reopen_check
-        return failed_response 'MrBulkStockAdjustmentItem has not been approved' unless approved?
+        return failed_response 'BulkStockAdjustmentItem has not been approved' unless approved?
         all_ok
       end
 

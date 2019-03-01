@@ -56,7 +56,7 @@ module PackMaterial
                   else
                     col.add_control(control_type: :link,
                                     text: 'New Item',
-                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/mr_bulk_stock_adjustment_items/preselect",
+                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/mr_bulk_stock_adjustment_items/new",
                                     style: :button,
                                     behaviour: :popup,
                                     grid_id: 'blk_stck_adj_items',

@@ -71,6 +71,10 @@ module PackMaterialApp
       success_response('Locations linked successfully')
     end
 
+    def get_sku_location_info_ids(sku_location_id)
+      repo.get_sku_location_info_ids(sku_location_id)
+    end
+
     def complete_a_mr_bulk_stock_adjustment(id, params)
       res = complete_a_record(:mr_bulk_stock_adjustments, id, params.merge(enqueue_job: false))
       if res.success

@@ -7,12 +7,12 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields @mode == :new ? new_fields : common_fields
 
       set_show_fields if %i[show reopen].include? @mode
       set_complete_fields if @mode == :complete
-      set_approve_fields if @mode == :approve
 
+      set_approve_fields if @mode == :approve
       add_approve_behaviours if @mode == :approve
 
       form_name 'mr_bulk_stock_adjustment_item'
@@ -23,8 +23,8 @@ module UiRules
       mr_bulk_stock_adjustment_id_label = @repo.find(:mr_bulk_stock_adjustments, PackMaterialApp::MrBulkStockAdjustment, @form_object.mr_bulk_stock_adjustment_id)&.location_long_codes
       # mr_sku_location_id_label = PackMaterialApp::MrSkuLocationRepo.new.find_mr_sku_location(@form_object.mr_sku_location_id)&.id
       mr_sku_location_id_label = @repo.find(:mr_sku_locations, PackMaterialApp::MrSkuLocation, @form_object.mr_sku_location_id)&.id
-      fields[:mr_bulk_stock_adjustment_id] = { renderer: :label, with_value: mr_bulk_stock_adjustment_id_label, caption: 'Mr Bulk Stock Adjustment' }
-      fields[:mr_sku_location_id] = { renderer: :label, with_value: mr_sku_location_id_label, caption: 'Mr Sku Location' }
+      fields[:mr_bulk_stock_adjustment_id] = { renderer: :label, with_value: mr_bulk_stock_adjustment_id_label, caption: 'Bulk Stock Adjustment' }
+      fields[:mr_sku_location_id] = { renderer: :label, with_value: mr_sku_location_id_label, caption: 'SKU Location' }
       fields[:sku_number] = { renderer: :label }
       fields[:product_variant_number] = { renderer: :label }
       fields[:product_number] = { renderer: :label }
@@ -55,21 +55,38 @@ module UiRules
 
     def common_fields
       {
-        mr_bulk_stock_adjustment_id: { renderer: :select, options: PackMaterialApp::MrBulkStockAdjustmentRepo.new.for_select_mr_bulk_stock_adjustments, disabled_options: PackMaterialApp::MrBulkStockAdjustmentRepo.new.for_inactive_select_mr_bulk_stock_adjustments, caption: 'mr_bulk_stock_adjustment', required: true },
-        mr_sku_location_id: { renderer: :select, options: PackMaterialApp::MrSkuLocationRepo.new.for_select_mr_sku_locations, caption: 'Mr Sku Location', required: true },
-        sku_number: { required: true },
-        product_variant_number: {},
-        product_number: {},
-        mr_type_name: { required: true },
-        mr_sub_type_name: { required: true },
-        product_variant_code: { required: true },
-        product_code: { required: true },
-        location_long_code: {},
-        inventory_uom_code: {},
-        scan_to_location_long_code: {},
+        mr_bulk_stock_adjustment_id: { renderer: :hidden },
+        mr_sku_location_id: { renderer: :hidden },
+        sku_number: { renderer: :label },
+        location_long_code: { renderer: :label },
+        scan_to_location_long_code: {}, # ???
+        product_variant_number: { renderer: :label },
+        product_number: { renderer: :label },
+        mr_type_name: { required: true, caption: 'Type Name', renderer: :label },
+        mr_sub_type_name: { required: true, caption: 'Sub Type Name', renderer: :label },
+        product_variant_code: { required: true, renderer: :label },
+        product_code: { required: true, renderer: :label },
+        inventory_uom_code: { caption: 'UOM Code' },
         system_quantity: {},
         actual_quantity: {},
         stock_take_complete: { renderer: :checkbox }
+      }
+    end
+
+    def new_fields
+      {
+        mr_bulk_stock_adjustment_id: { renderer: :hidden },
+        sku_location_lookup: { renderer: :lookup,
+                               lookup_name: :sku_locations,
+                               lookup_key: :standard,
+                               caption: 'Select SKU Location',
+                               param_values: {
+                                 allowed_sku_numbers: sku_number_options.map { |r| r[0] },
+                                 allowed_locations: location_options.map { |r| r[1] }
+                               }
+        },
+        mr_sku_id: { renderer: :select, options: sku_number_options, caption: 'SKU Number' },
+        location_id: { renderer: :select, options: location_options, caption: 'Location Code' }
       }
     end
 
@@ -80,21 +97,27 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(mr_bulk_stock_adjustment_id: nil,
+      @form_object = OpenStruct.new(mr_bulk_stock_adjustment_id: @options[:parent_id],
                                     mr_sku_location_id: nil,
-                                    sku_number: nil,
-                                    product_variant_number: nil,
-                                    product_number: nil,
-                                    mr_type_name: nil,
-                                    mr_sub_type_name: nil,
-                                    product_variant_code: nil,
-                                    product_code: nil,
-                                    location_long_code: nil,
-                                    inventory_uom_code: nil,
-                                    scan_to_location_long_code: nil,
-                                    system_quantity: nil,
-                                    actual_quantity: nil,
-                                    stock_take_complete: nil)
+                                    sku_number: sku_number_options.first,
+                                    location_long_code: location_options.first)
+    end
+
+    def bulk_stock_adjustment_id
+      @options[:parent_id] || @form_object.mr_bulk_stock_adjustment_id
+    end
+
+    def mr_sku_location_options
+      options = @repo.for_select_mr_sku_locations(where: { mr_sku_id: @repo.bulk_stock_adjustment_sku_ids(bulk_stock_adjustment_id) })
+      ['none'] + options
+    end
+
+    def sku_number_options
+      @repo.bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
+    end
+
+    def location_options
+      @repo.bulk_stock_adjustment_locations(bulk_stock_adjustment_id)
     end
 
     private

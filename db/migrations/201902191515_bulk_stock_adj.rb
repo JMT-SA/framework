@@ -8,8 +8,6 @@ Sequel.migration do
       primary_key :id
       foreign_key :mr_inventory_transaction_id, :mr_inventory_transactions, null: false, key: [:id]
       Integer :stock_adjustment_number, null: false, default: Sequel.function(:nextval, 'doc_seqs_stock_adjustment_number')
-      column :sku_numbers, 'integer[]'
-      column :location_ids, 'integer[]'
       TrueClass :active, default: true
       TrueClass :is_stock_take, default: false
 
@@ -33,19 +31,21 @@ Sequel.migration do
     create_table(:mr_bulk_stock_adjustment_items, ignore_index_errors: true) do
       primary_key :id
       foreign_key :mr_bulk_stock_adjustment_id, :mr_bulk_stock_adjustments, null: false, key: [:id]
-      foreign_key :mr_inventory_transaction_item_id, :mr_inventory_transaction_items, null: false, key: [:id]
-      foreign_key :mr_sku_location_id, :mr_sku_locations, null: false, key: [:id]
+      foreign_key :mr_inventory_transaction_item_id, :mr_inventory_transaction_items, key: [:id]
+      foreign_key :mr_sku_location_id, :mr_sku_locations, key: [:id]
+      foreign_key :mr_sku_id, :mr_skus, key: [:id], null: false
+      foreign_key :location_id, :locations, key: [:id], null: false
       Integer :sku_number, null: false
-      Integer :product_variant_number
-      Integer :product_number
+      String :product_variant_number
+      String :product_number
 
       String :mr_type_name, null: false
       String :mr_sub_type_name, null: false
       String :product_variant_code, null: false
-      String :product_code, null: false
-      String :location_code
+      String :product_code
+      String :location_long_code
       String :inventory_uom_code
-      String :scan_to_location_code
+      String :scan_to_location_long_code
 
       BigDecimal :system_quantity, size: [7, 2]
       BigDecimal :actual_quantity, size: [7, 2]
@@ -58,6 +58,7 @@ Sequel.migration do
 
       index [:mr_bulk_stock_adjustment_id], name: :fki_mr_bulk_stock_adjustment_items_mr_bulk_stock_adjustments
       index [:mr_sku_location_id], name: :fki_mr_bulk_stock_adjustment_items_mr_sku_locations
+      unique [:mr_bulk_stock_adjustment_id, :mr_sku_id, :location_id], name: :unique_mr_bulk_stock_adjustment_items_sku_location_pair
     end
     run "SELECT audit.audit_table('mr_bulk_stock_adjustment_items', true, true,'{updated_at}'::text[]);"
     pgt_created_at(:mr_bulk_stock_adjustment_items,

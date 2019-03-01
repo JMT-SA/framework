@@ -64,8 +64,8 @@ module UiRules
         approved: { renderer: :hidden },
         business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
         ref_no: { required: true },
-        sku_numbers_list: { renderer: :list, items: @object.sku_numbers, caption: 'SKU Numbers' },
-        location_list: { renderer: :list, items: @repo.location_long_codes_list(Array(@object.location_ids)), caption: 'Location Codes' }
+        sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
+        location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
       }
     end
 
@@ -89,6 +89,14 @@ module UiRules
                                     is_stock_take: nil,
                                     business_process_id: nil,
                                     ref_no: nil)
+    end
+
+    def sku_numbers
+      @options[:id] ? @repo.bulk_stock_adjustment_sku_numbers(@options[:id]) : []
+    end
+
+    def locations
+      @options[:id] ? @repo.bulk_stock_adjustment_locations(@options[:id]) : []
     end
 
     private

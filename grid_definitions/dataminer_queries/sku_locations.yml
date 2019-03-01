@@ -364,3 +364,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: mr_sku_locations.location_id
+  :caption: Location ID
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

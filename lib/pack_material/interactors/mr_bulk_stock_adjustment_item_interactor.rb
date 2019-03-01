@@ -11,7 +11,11 @@ module PackMaterialApp
     end
 
     def validate_mr_bulk_stock_adjustment_item_params(params)
-      MrBulkStockAdjustmentItemSchema.call(params)
+      NewMrBulkStockAdjustmentItemSchema.call(params)
+    end
+
+    def validate_mr_bulk_stock_adjustment_item_update_params(params)
+      UpdateMrBulkStockAdjustmentItemSchema.call(params)
     end
 
     def create_mr_bulk_stock_adjustment_item(parent_id, params)
@@ -25,30 +29,29 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_bulk_stock_adjustment_item(id)
-      success_response("Created bulk stock adjustment item #{instance.mr_type_name}",
-                       instance)
+      success_response("Created bulk stock adjustment item, SKU Number: #{instance.sku_number}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { mr_type_name: ['This bulk stock adjustment item already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { sku_number: ['This bulk stock adjustment item already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def update_mr_bulk_stock_adjustment_item(id, params)
-      res = validate_mr_bulk_stock_adjustment_item_params(params)
+      res = validate_mr_bulk_stock_adjustment_item_update_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       repo.transaction do
         repo.update_mr_bulk_stock_adjustment_item(id, res)
         log_transaction
       end
       instance = mr_bulk_stock_adjustment_item(id)
-      success_response("Updated bulk stock adjustment item #{instance.mr_type_name}",
+      success_response("Updated bulk stock adjustment item #{instance.sku_number}",
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_mr_bulk_stock_adjustment_item(id)
-      name = mr_bulk_stock_adjustment_item(id).mr_type_name
+      name = mr_bulk_stock_adjustment_item(id).sku_number
       repo.transaction do
         repo.delete_mr_bulk_stock_adjustment_item(id)
         log_status('mr_bulk_stock_adjustment_items', id, 'DELETED')

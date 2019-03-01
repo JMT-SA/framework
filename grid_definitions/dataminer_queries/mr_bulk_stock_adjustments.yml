@@ -3,10 +3,10 @@
 :sql: "SELECT \"mr_bulk_stock_adjustments\".\"id\",\r\n  \"mr_bulk_stock_adjustments\".\"stock_adjustment_number\",\r\n
   \ \"mr_bulk_stock_adjustments\".\"is_stock_take\",\r\n  \"mr_bulk_stock_adjustments\".\"completed\",\r\n
   \ \"mr_bulk_stock_adjustments\".\"approved\",\r\n  \"mr_bulk_stock_adjustments\".\"active\",\r\n
-  \ \"mr_bulk_stock_adjustments\".\"sku_numbers\",\r\n  \"mr_bulk_stock_adjustments\".\"location_ids\",\r\n
-  \ \"mr_bulk_stock_adjustments\".\"created_at\",\r\n  \"mr_bulk_stock_adjustments\".\"updated_at\",\r\n
-  \ fn_current_status('mr_bulk_stock_adjustments', \"mr_bulk_stock_adjustments\".\"id\")
-  AS status\r\nFROM \"mr_bulk_stock_adjustments\"\r\n"
+  \ \"mr_bulk_stock_adjustments\".\"created_at\",\r\n  \"mr_bulk_stock_adjustments\".\"updated_at\",\r\n(SELECT
+  id from crossbeams_framework.public.location_storage_types where storage_type_code
+  = 'Pack Material') as storage_type_id,\r\n  fn_current_status('mr_bulk_stock_adjustments',
+  \"mr_bulk_stock_adjustments\".\"id\") AS status\r\nFROM \"mr_bulk_stock_adjustments\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -107,41 +107,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  sku_numbers:
-    :name: sku_numbers
-    :sequence_no: 7
-    :caption: Sku numbers
-    :namespaced_name: mr_bulk_stock_adjustments.sku_numbers
-    :data_type: :integer_array
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  location_ids:
-    :name: location_ids
-    :sequence_no: 8
-    :caption: Location ids
-    :namespaced_name: mr_bulk_stock_adjustments.location_ids
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 9
+    :sequence_no: 7
     :caption: Created at
     :namespaced_name: mr_bulk_stock_adjustments.created_at
     :data_type: :datetime
@@ -157,7 +125,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 10
+    :sequence_no: 8
     :caption: Updated at
     :namespaced_name: mr_bulk_stock_adjustments.updated_at
     :data_type: :datetime
@@ -171,9 +139,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  storage_type_id:
+    :name: storage_type_id
+    :sequence_no: 9
+    :caption: Storage type
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   status:
     :name: status
-    :sequence_no: 11
+    :sequence_no: 10
     :caption: Status
     :namespaced_name: 
     :data_type: :string

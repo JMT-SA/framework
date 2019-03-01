@@ -14,8 +14,6 @@ module PackMaterial
               # form.caption 'Mr Bulk Stock Adjustment'
               form.view_only!
               form.add_field :stock_adjustment_number
-              form.add_field :sku_numbers
-              form.add_field :location_long_codes
               form.add_field :is_stock_take
               form.add_field :completed
               form.add_field :approved

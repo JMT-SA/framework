@@ -13,9 +13,11 @@
 - :url: "/list/mr_bulk_stock_adjustments_mr_skus/multi?key=mr_bulk_stock_adjustments&id=$:id$"
   :text: SKU Numbers
   :icon: list
-- :url: "/list/mr_bulk_stock_adjustments_locations/multi?key=mr_bulk_stock_adjustments&id=$:id$"
+  :popup: true
+- :url: "/list/mr_bulk_stock_adjustments_locations/multi?key=mr_bulk_stock_adjustments&id=$:id$&storage_type_id=$:storage_type_id$"
   :text: Locations
   :icon: list
+  :popup: true
 - :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$"
   :text: delete
   :icon: delete

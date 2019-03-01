@@ -45,6 +45,7 @@ class Framework < Roda
     login_column :login_name
     accounts_table :vw_active_users # Only active users can login.
     account_password_hash_column :password_hash
+    template_opts(layout_opts: { path: 'views/layout_auth.erb' })
   end
   unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
     plugin :error_handler do |e|
@@ -56,10 +57,10 @@ class Framework < Roda
   Dir['./routes/*.rb'].each { |f| require f }
 
   route do |r|
-    initialize_route_instance_vars
-
     r.assets unless ENV['RACK_ENV'] == 'production'
     r.public
+
+    initialize_route_instance_vars
 
     ### p request.ip
     # Routes that must work without authentication
@@ -111,14 +112,14 @@ class Framework < Roda
     end
 
     # OVERRIDE RodAuth's Login form:
-    r.get 'login' do
-      if @registered_mobile_device
-        @no_logout = true
-        view(:login, layout: 'layout_rmd')
-      else
-        view(:login)
-      end
-    end
+    # r.get 'login' do
+    #   if @registered_mobile_device
+    #     @no_logout = true
+    #     view(:login, layout: 'layout_rmd')
+    #   else
+    #     view(:login)
+    #   end
+    # end
 
     r.rodauth
     rodauth.require_authentication
@@ -137,12 +138,63 @@ class Framework < Roda
       # Docs are in developer_documentation in asciidoc format named file.adoc.
       # Guide to writing docs: http://asciidoctor.org/docs/asciidoc-writers-guide
       content = File.read(File.join(File.dirname(__FILE__), 'developer_documentation', "#{file.chomp('.adoc')}.adoc"))
+      @documentation_page = true
       view(inline: <<~HTML)
         <% content_for :late_head do %>
           <link rel="stylesheet" href="/css/asciidoc.css">
         <% end %>
         <div id="asciidoc-content">
           #{Asciidoctor.convert(content, safe: :safe, attributes: { 'source-highlighter' => 'coderay', 'coderay-css' => 'style' })}
+        </div>
+      HTML
+    end
+
+    r.on 'search_developer_documentation' do
+      # Requires ag (Silver Searcher) to be installed..
+      out = {}
+      if params[:search_term].strip.empty?
+        term = ''
+      else
+        term = params[:search_term]
+        res = `ag -C 2 --nonumber #{term} developer_documentation/`
+        curr = nil
+        res.split("\n").each do |t|
+          next if t.strip.empty?
+          if t == '--'
+            out[curr] << '<hr class="light-green mb0">' unless curr.nil?
+          else
+            fn, = t.split(':')
+            str = t.delete_prefix("#{fn}:")
+            if fn != curr
+              curr = fn
+              out[curr] = []
+            end
+            out[curr] << (str || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow pa1">\1</span>')
+          end
+        end
+      end
+      got_res = out.empty? ? 'No s' : 'S'
+      @documentation_page = true
+
+      view(inline: <<~HTML)
+        <div class="db f2 mt5">
+          #{got_res}earch results for "<b>#{term}</b>"
+        </div>
+        <p>
+          <a href="/developer_documentation/start.adoc">Back to documentation home</a>
+        </p>
+        <div class="db">
+          #{out.map do |k, v|
+            <<~STR
+              <div class=\"mt3\">
+                <a href=\"/#{k}\" class=\"f3 link dim br2 ph3 pv2 dib white bg-dark-blue\">
+                  #{Crossbeams::Layout::Icon.render(:back)} #{k.delete_prefix('developer_documentation/').delete_suffix('.adoc').tr('_', ' ')}
+                </a>
+                <br>
+                #{v.join('<br>')}
+            STR
+          end.join('<hr class="blue"></div>')}
+          <hr class="blue"></div>
         </div>
       HTML
     end
@@ -156,11 +208,24 @@ class Framework < Roda
       mds = YARD::Registry.all(:method)
       toc = []
       out = []
-      mds.each do |m|
+      mds.sort_by(&:name).each do |m|
         next if m.visibility == :private
         toc << m.name
-        parms = m.tags.select { |t| t.tag_name == 'param' }.map { |t| "#{t.name} (#{t.types.join(', ')}): #{t.text}" }
-        rets = m.tags.select { |t| t.tag_name == 'return' }.map(&:text)
+        parms = m.tags.select { |tag| tag.tag_name == 'param' }.map do |tag|
+          opts = m.tags.select { |opt| opt.tag_name == 'option' && opt.name == tag.name }.map do |opt|
+            "#{opt.pair.name} (#{opt.pair.types.join(', ')}): #{opt.pair.text}"
+          end
+          if opts.empty?
+            "#{tag.name} (#{tag.types.join(', ')}): #{tag.text}"
+          else
+            <<~HTML
+              #{tag.name} (#{tag.types.join(', ')}): #{tag.text}
+              <ul><li>#{opts.join('</li><li>')}
+            HTML
+          end
+        end
+
+        rets = m.tags.select { |t| t.tag_name == 'return' }.map { |t| [t.types.join(','), t.text].compact.join(': ').strip }
         out << <<~HTML
           <a id="#{m.name}"></a><h2>#{m.name}</h2>
           <table>
@@ -172,6 +237,7 @@ class Framework < Roda
         HTML
       end
 
+      @documentation_page = true
       view(inline: <<~HTML)
         <% content_for :late_head do %>
           <link rel="stylesheet" href="/css/asciidoc.css">
@@ -201,17 +267,17 @@ class Framework < Roda
       # # Need to design a "query-able version of this query (join locn + tree so user can select type, ancestor etc...
       # qry = <<~SQL
       #   SELECT
-      #   (SELECT array_agg(cc.location_code) as path
-      #    FROM (SELECT c.location_code
+      #   (SELECT array_agg(cc.location_long_code) as path
+      #    FROM (SELECT c.location_long_code
       #    FROM location_tests AS c
       #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
       #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_array,
-      #   (SELECT string_agg(cc.location_code, ',') as path
-      #    FROM (SELECT c.location_code
+      #   (SELECT string_agg(cc.location_long_code, ',') as path
+      #    FROM (SELECT c.location_long_code
       #    FROM location_tests AS c
       #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
       #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_string,
-      #   l.location_code, l.location_type, l.has_single_container, l.is_virtual,
+      #   l.location_long_code, l.location_type, l.has_single_container, l.is_virtual,
       #   (SELECT MAX(path_length) FROM location_tree_paths WHERE descendant_location_id = l.id) + 1 AS level
       #   FROM location_tests l
       # SQL

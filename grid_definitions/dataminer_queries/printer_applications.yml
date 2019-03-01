@@ -1,10 +1,11 @@
 ---
 :caption: Printer Application
 :sql: "SELECT \"printer_applications\".\"id\", \"printer_applications\".\"printer_id\",
-  \"printer_applications\".\"application\", \"printer_applications\".\"active\",
-  \"printer_applications\".\"created_at\", \"printer_applications\".\"updated_at\",
-  \"printers\".\"printer_code\", \"printers\".\"printer_name\"\r\nFROM \"printer_applications\"\r\nJOIN
-  \"printers\" ON \"printers\".\"id\" = \"printer_applications\".\"printer_id\""
+  \"printer_applications\".\"application\", \"printer_applications\".\"active\", \"printer_applications\".\"created_at\",
+  \"printer_applications\".\"updated_at\", \"printers\".\"printer_code\", \"printers\".\"printer_name\",
+  \"printer_applications\".\"default_printer\"\r\nFROM \"printer_applications\"\r\nJOIN
+  \"printers\" ON \"printers\".\"id\" = \"printer_applications\".\"printer_id\"\r\nORDER
+  BY \"printer_applications\".\"application\", \"printers\".\"printer_code\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -42,7 +43,7 @@
   application:
     :name: application
     :sequence_no: 3
-    :caption: application
+    :caption: Application
     :namespaced_name: printer_applications.application
     :data_type: :string
     :width: 
@@ -124,6 +125,21 @@
     :format: 
     :hide: false
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  default_printer:
+    :name: default_printer
+    :sequence_no: 9
+    :caption: Default printer
+    :namespaced_name: printer_applications.default_printer
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

@@ -1,0 +1,13 @@
+---
+:dataminer_definition: users
+:multiselect:
+  :progfunc_users:
+    :url: "/security/functional_areas/program_functions/link_users/$:id$"
+    :preselect: "SELECT user_id AS id FROM program_functions_users WHERE program_function_id = $:id$"
+    :section_caption: "SELECT 'Assign users to ' || program_function_name FROM program_functions WHERE id = $:id$"
+    :can_be_cleared: true
+  :email_group_users:
+    :url: "/development/masterfiles/user_email_groups/link_users/$:id$"
+    :preselect: "SELECT user_id AS id FROM user_email_groups_users WHERE user_email_group_id = $:id$"
+    :section_caption: "SELECT 'Assign users to ' || mail_group FROM user_email_groups WHERE id = $:id$"
+    :can_be_cleared: true

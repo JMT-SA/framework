@@ -1,0 +1,34 @@
+---
+:dataminer_definition: label_templates
+:actions:
+- :url: "/masterfiles/config/label_templates/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/config/label_templates/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/config/label_templates/$:id$/get_variables"
+  :text: get variables
+  :icon: list
+  :title: Get Variables
+  :popup: true
+- :url: "/masterfiles/config/label_templates/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: /development/statuses/list/label_templates/$:id$
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/config/label_templates/new"
+  :text: New Label Template
+  :style: :button
+  :behaviour: :popup

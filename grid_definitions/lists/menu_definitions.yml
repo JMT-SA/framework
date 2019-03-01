@@ -84,11 +84,12 @@
         :is_delete: true
         :popup: true
         :hide_if_null: :id
-      - :url: "/list/users/multi?key=progfunc_users&id=$:id$"
+      - :url: "/list/users_for_select/multi?key=progfunc_users&id=$:id$"
         :text: restrict program function to specific users
         :icon: lock-closed
         :hide_if_null: :id
         :hide_if_false: :restricted_user_access
+        :popup: true
       - :separator: true
       - :url: /security/functional_areas/program_functions/$:id$/sql
         :text: SQL for Program function

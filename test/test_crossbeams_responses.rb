@@ -12,7 +12,7 @@ class TestCrossbeamsResponses < Minitest::Test
     assert res.success
     assert_equal 'OK', res.message
     assert_empty res.errors
-    assert_nil res.instance
+    assert_equal({}, res.instance)
   end
 
   def test_success_response_with_instance
@@ -30,7 +30,7 @@ class TestCrossbeamsResponses < Minitest::Test
     refute res.success
     assert_equal 'OHNO', res.message
     assert_empty res.errors
-    assert_nil res.instance
+    assert_equal({}, res.instance)
   end
 
   def test_failed_response_with_instance

@@ -19,6 +19,7 @@ module PackMaterial
               form.add_field :mr_delivery_id
               form.add_field :mr_purchase_order_item_id
               form.add_field :mr_product_variant_id
+              form.add_field :product_variant_code
               form.add_field :quantity_on_note
               form.add_field :quantity_over_supplied
               form.add_field :quantity_under_supplied

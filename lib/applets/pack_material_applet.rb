@@ -13,4 +13,13 @@ Dir["#{root_dir}/pack_material/views/**/*.rb"].each { |f| require f }
 
 module PackMaterialApp
   DOMAIN_NAME = 'Pack Material'
+
+  DEFAULT_RECEIVING_BAY_NAME = 'RECEIVING BAY'
+  # LABEL_RECEIVING_BAY_NAME = 'LABEL RECEIVING BAY'
+  # NOTE: This needs to be physically set up
+
+  TRANSACTION_TYPE_CREATE_STOCK = 'CREATE STOCK'
+  TRANSACTION_TYPE_PUTAWAY = 'PUTAWAY'
+  TRANSACTION_TYPE_ADHOC_MOVE = 'ADHOC MOVE'
+  TRANSACTION_TYPE_REMOVE_STOCK = 'REMOVE STOCK'
 end

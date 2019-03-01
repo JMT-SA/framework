@@ -1,0 +1,162 @@
+= How to set up a lookup grid
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to set up a lookup grid
+
+A lookup is used to choose a single row from a popup grid to modify values in a form.
+
+The form control includes a button which when clicked, displays a grid in a dialog. This grid's query can optionally be filtered by values in the form and in the lookup control. The grid has one link per row named `select`. When clicked, a provided URL will be called and code in the route is responsible for modifying the form with data based on the id of the selected row.
+
+=== An example
+
+This (made-up) example looks up a `program_function`. The form includes a dropdown to select a `program`.
+The query that is run to show program functions is filtered by the chosen `program_id`.
+It is also filtered by parameters in the lookup for `active` and `restricted_user_access`.
+
+==== Form
+
+View:
+[source, ruby]
+----
+# ..
+form.add_field :program_id
+form.add_field :lookup_pf
+----
+
+Rules:
+[source, ruby]
+----
+form_name 'program'
+
+# ..
+
+program_id: { renderer: :select, options: [['prg1', 1], ['prg2', 2], ['prg3', 3]],
+              required: true },
+lookup_pf: { renderer: :lookup,
+             lookup_name: :program_functions,
+             lookup_key: :standard,
+             caption: 'Select PF',
+             param_keys: :program_program_id,
+             param_values: { active: true, restricted_user_access: false },
+             hidden_fields: %i[program_function_id],
+             show_field: :program_function_name }
+----
+
+==== Grid
+
+Here we assume a dataminer_query named `program_functions.yml` with parameter definitions for `program_id`, `active` and `restricted_user_access`.
+
+In `grid_definitions/lookups/program_functions.yml`:
+[source, yaml]
+----
+---
+:dataminer_definition: program_functions
+:lookups:
+  :standard:
+    :url: /security/functional_areas/program_functions/$:id$/lookup_result/
+    :section_caption: Select a program function
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: program_functions.program_id
+      :op: =
+      :val: $:program_program_id$
+    - :col: program_functions.active
+      :op: =
+      :val: $:active$
+    - :col: program_functions.restricted_user_access
+      :op: =
+      :val: $:restricted_user_access$
+----
+
+==== Route
+
+[source, ruby]
+----
+r.on 'program_functions', Integer do |id|
+  # ..
+
+  r.on 'lookup_result' do
+    res = interactor.find_pf(id)
+    json_actions([OpenStruct.new(type: :replace_input_value,
+                                 dom_id: 'program_program_function_id',
+                                 value: res.instance.id),
+                  OpenStruct.new(type: :replace_input_value,
+                                 dom_id: 'program_program_function_name',
+                                 value: res.instance.program_function_name)],
+                 'Selected a program function')
+  end
+end
+----
+
+=== Lookup control in a form - rules
+
+1. Basic
+
+[source, ruby]
+----
+field_name: { renderer: :lookup,
+              lookup_name: :yaml_file_name,
+              lookup_key: :key_in_yaml_file }
+----
+This will display a button in the form with caption 'Lookup Field Name' and the query referenced in `yaml_file_name.yml` will run without any parameters.
+
+2. Advanced
+
+[source, ruby]
+----
+field_name: { renderer: :lookup,
+              lookup_name: :yaml_file_name,
+              lookup_key: :key_in_yaml_file,
+              caption: 'Press me!',                               #<1>
+              param_keys: %i[form_name_field_1 form_name_field2], #<2>
+              param_values: { p1: 12, p2: 'two' },                #<3>
+              hidden_fields: %i[h_field_1 h_field_2],             #<4>
+              show_field: :display_field }                        #<5>
+----
+1. The default caption for the form button has been overridden.
+2. _Symbol_ or Array of _Symbols_: Param keys are DOM ids from the form (form_name_field_name). The values in these elements at the time the button is pressed will be available for filtering the query.
+3. _Hash_: Param values - the key/value combinations given will be available for filtering the query.
+4. _Symbol_ or Array of _Symbols_: Hidden fields (prefixed with the form name) will be added to the form and the route will be able to set their values.
+5. _Symbol_: A read-only field named `form_name_display_field` will be added to the form and the route will be able to set the value.
+
+This will display a button in the form with caption 'Press me!'.
+
+=== Lookup grid yml file
+
+Definition files are YAML files stored in `grid_definitions/lookups/`.
+
+[source, yaml]
+----
+---
+:dataminer_definition: dm_query   #<1>
+:lookups:
+  :standard:                      #<2>
+    :url: /path/to/route/action   #<3>
+    :section_caption: Lookup      #<4>
+    :conditions: standard         #<5>
+:conditions:
+  :standard:
+    - :col: query_param_name
+      :op: =
+      :val: $:lookup_param_name$
+----
+1. Just like list and search definitions, this points to a YAML query definition in `grid_definitions/dataminer_queries/` (in this case, `dm_query.yml`).
+2. Key that matches the value of `:lookup_key` in the Lookup control.
+3. URL to be called when the user has selected a row in the lookup grid. The URL can be formatted in two ways:
+   * With no token ('/function/program/lookup_result') the id value of the chosen row will be added to the end: '/function/program/lookup_result/99'.
+   * With token ('/function/program/$:id$/lookup_result') the id value will replace '$:id$': '/function/program/99/lookup_result'
+4. Optional. The caption can be fixed or it can be a snippet of SQL to be run.
+   * Fixed: just provide any string.
+   * SQL: Must start with SELECT and include a parameter replacement ($:token$). e.g. `SELECT 'For ' || user_name FROM users WHERE id = %:user_id$`
+5. Optional. Key that matches an entry under the `:conditions:` section.
+
+=== Route
+
+The route action is called when the user selects a row and it receives an id (as part of the URL).
+
+The action must return JSON using one of the link:/developer_documentation/json_rendering.adoc[JSON rendering] action methods.
+
+The typical process would be to locate the relevant record with matching id and then show a text representation of the record in the `:show_field` read-only input and update a hidden field with the chosen id value.

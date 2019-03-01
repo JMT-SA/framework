@@ -18,12 +18,13 @@ module PackMaterial
                                   text: 'Back to Purchase Orders',
                                   url: '/list/mr_purchase_orders',
                                   style: :back_button)
+              cost_url = rules[:show_only] ? '/list/mr_purchase_order_costs_show' : '/list/mr_purchase_order_costs'
               section.add_control(control_type: :link,
                                   text: 'Manage Costs',
-                                  url: "/list/mr_purchase_order_costs/with_params?key=standard&purchase_order_id=#{id}",
+                                  url: cost_url + "/with_params?key=standard&purchase_order_id=#{id}",
                                   style: :button,
                                   behaviour: :popup)
-              if rules[:can_approve]
+              if rules[:can_approve] && !rules[:show_only]
                 section.add_control(control_type: :link,
                                     text: 'Approve Purchase Order',
                                     url: "/pack_material/replenish/mr_purchase_orders/#{id}/approve_purchase_order",
@@ -34,12 +35,16 @@ module PackMaterial
 
             page.section do |section|
               section.show_border!
+              section.add_caption 'Purchase Order'
               section.form do |form|
                 form.action "/pack_material/replenish/mr_purchase_orders/#{id}"
-                form.method :update
+                form.method :update unless rules[:show_only]
+                form.view_only! if rules[:show_only]
+                form.no_submit!
                 form.row do |row|
                   row.column do |col|
                     col.add_field :purchase_order_number
+                    col.add_field :status
                     col.add_field :supplier_party_role_id
                     col.add_field :supplier_name
                     col.add_field :supplier_erp_number
@@ -62,24 +67,24 @@ module PackMaterial
               section.show_border!
               section.row do |row|
                 row.column do |col|
-                  # if rules[:show]
-                  #   col.add_grid('po_items',
-                  #                "/list/mr_purchase_order_items_show/grid?key=standard&purchase_order_id=#{id}",
-                  #                height: 8,
-                  #                caption: 'Purchase Order Line Items')
-                  # else
-                  col.add_control(control_type: :link,
-                                  text: 'New Item',
-                                  url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new",
-                                  style: :button,
-                                  behaviour: :popup,
-                                  grid_id: 'po_items',
-                                  css_class: 'mb1')
-                  col.add_grid('po_items',
-                               "/list/mr_purchase_order_items/grid?key=standard&purchase_order_id=#{id}",
-                               height: 8,
-                               caption: 'Purchase Order Line Items')
-                  # end
+                  if rules[:show_only]
+                    col.add_grid('po_items',
+                                 "/list/mr_purchase_order_items_show/grid?key=standard&purchase_order_id=#{id}",
+                                 height: 8,
+                                 caption: 'Purchase Order Line Items')
+                  else
+                    col.add_control(control_type: :link,
+                                    text: 'New Item',
+                                    url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new",
+                                    style: :button,
+                                    behaviour: :popup,
+                                    grid_id: 'po_items',
+                                    css_class: 'mb1')
+                    col.add_grid('po_items',
+                                 "/list/mr_purchase_order_items/grid?key=standard&purchase_order_id=#{id}",
+                                 height: 8,
+                                 caption: 'Purchase Order Line Items')
+                  end
                 end
               end
             end

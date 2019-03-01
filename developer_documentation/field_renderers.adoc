@@ -37,6 +37,9 @@ The following renderers are available to a page:
 |:list
 |<<Renderer::List>>
 
+|:lookup
+|<<Renderer::Lookup>>
+
 |:multi
 |<<Renderer::Multi>>
 
@@ -209,6 +212,11 @@ The checkbox will be unchecked if the field value is `false`, `f` or `0`. Otherw
 |The field name with underscores converted to spaces
 and all words start with initial capital letter.
 
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -276,6 +284,59 @@ and all words start with initial capital letter.
 
 |===
 
+=== Renderer::Lookup
+
+A button to lookup a row from a grid. See link:/developer_documentation/how_to_use_lookup_grid.adoc[How to set up a lookup grid]
+
+This is tied to a lookup yml file with the same name as the `:lookup_name` attribute.
+The lookup file defines which query to run, what parameters to apply and which URL to call once a selection is made from the grid which is displayed in a dialog.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The button text
+|any text
+|The word `Lookup` followed by the field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:lookup_name
+|The name of the lookup yml file.
+|String
+|None. Required.
+
+|:lookup_key
+|The key to use in the lookup file which defines query parameters etc.
+|String
+|None. Required.
+
+|:param_keys
+|A list of DOM ids that will be passed to the lookup along with their values as parameters.
+|Array
+|None. Optional.
+
+|:param_values
+|A list of parameter keys and their fixed values to be passed to the lookup query.
+|Hash
+|None. Optional.
+
+|:show_field
+|A readonly field to be rendered next to the button to optionally display the result of the lookup.
+|A single String/Symbol.
+|None. Optional.
+
+|:hidden_fields
+|The list of field names. Each will be rendered as a hidden input.
+|A single String/Symbol or an Array of Strings/Symbols.
+|None. Optional.
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
+
+|===
+
 === Renderer::Multi
 
 A javascript-rich multiselect control that allows selecting/deselecting using two lists.
@@ -296,6 +357,11 @@ and all words start with initial capital letter.
 
 |:required
 |HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain unless the user chooses at least one option.
+|true or false
+|false
+
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
 |true or false
 |false
 
@@ -361,6 +427,16 @@ To display `optgroup` elements, use a Hash and the format must be: `{ group => [
 |Pre-selected item.
 |any value matching one of the options.
 |The value of the column in the record for this field.
+
+|:required
+|HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will not complain if the user does not chooses an option, but the element will be styled as "required".
+|true or false
+|false
+
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
 
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.

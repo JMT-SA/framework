@@ -3,6 +3,7 @@
 module PackMaterialApp
   class MatresProductVariantInteractor < BaseInteractor
     def update_matres_product_variant(id, params)
+      params.delete(:product_variant_number)
       res = validate_matres_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       DB.transaction do

@@ -17,7 +17,6 @@ module PackMaterial
               form.remote!
               form.method :update
               form.add_field :mr_delivery_item_id
-              form.add_field :mr_internal_batch_number_id
               form.add_field :client_batch_number
               form.add_field :quantity_on_note
               form.add_field :quantity_received

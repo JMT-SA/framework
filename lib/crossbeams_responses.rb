@@ -25,7 +25,7 @@ module Crossbeams
     # Create a failed response object.
     # Returns:
     #   - success: false.
-    #   - instance: the passed-in instance. Can be nil.
+    #   - instance: the passed-in instance. Can be an empty Hash.
     #   - errors: an empty hash.
     #   - message: the passed-in message.
     #
@@ -35,15 +35,15 @@ module Crossbeams
     # @return [OpenStruct] the response object.
     def failed_response(message, instance = nil)
       OpenStruct.new(success: false,
-                     instance: instance,
+                     instance: instance || {},
                      errors: {},
                      message: message)
     end
 
-    # Create a failed response object.
+    # Create a success response object.
     # Returns:
     #   - success: true.
-    #   - instance: the passed-in instance. Can be nil.
+    #   - instance: the passed-in instance. Can be an empty Hash.
     #   - errors: an empty hash.
     #   - message: the passed-in message.
     #
@@ -53,7 +53,7 @@ module Crossbeams
     # @return [OpenStruct] the response object.
     def success_response(message, instance = nil)
       OpenStruct.new(success: true,
-                     instance: instance,
+                     instance: instance || {},
                      errors: {},
                      message: message)
     end

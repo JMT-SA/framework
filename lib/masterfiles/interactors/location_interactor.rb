@@ -47,9 +47,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = location(id)
-      success_response("Created location #{instance.location_code}", instance)
+      success_response("Created location #{instance.location_long_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { location_long_code: ['This location already exists: Location Long and Short codes must be Unique'] }))
     end
 
     def create_location(parent_id, params)
@@ -61,9 +61,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = location(id)
-      success_response("Created location #{instance.location_code}", instance)
+      success_response("Created location #{instance.location_long_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { location_long_code: ['This location already exists: Location Long and Short codes must be Unique'] }))
     end
 
     def update_location(id, params)
@@ -74,12 +74,12 @@ module MasterfilesApp
         log_transaction
       end
       instance = location(id)
-      success_response("Updated location #{instance.location_code}", instance)
+      success_response("Updated location #{instance.location_long_code}", instance)
     end
 
     def delete_location(id)
       return failed_response('Cannot delete this location - it has sub-locations') if repo.location_has_children(id)
-      name = location(id).location_code
+      name = location(id).location_long_code
       repo.transaction do
         repo.delete_location(id)
         log_transaction
@@ -173,35 +173,15 @@ module MasterfilesApp
       success_response('Storage types linked successfully')
     end
 
-    def location_code_suggestion(parent_id, location_type_id)
-      res = repo.location_code_suggestion(parent_id, location_type_id)
+    def location_long_code_suggestion(parent_id, location_type_id)
+      res = repo.location_long_code_suggestion(parent_id, location_type_id)
       return res unless res.success
       success_response('See location code suggestion', res.instance)
     end
 
     def print_location_barcode(id, params)
       instance = location(id)
-      # NOTE: we don't know for sure that F1 will be code and F2 will be desc...
-      #       - so we need to get those position/variable links from the label...
-      #       - ALSO: LD needs to change to allow for different variable sets...
-
-      # This is an approximation of something we might get from the label variables:
-      lbl_required = [{ f_no: 1, field: 'location_barcode' }, # This is a field used in the label, not the table...
-                      { f_no: 2, field: 'location_description' },
-                      { f_no: 3, field: 'location_code' },
-                      { f_no: 4, field: 'legacy_barcode' }]
-      vars = {}
-      bcp = BarcodeProcessing.new
-      lbl_required.each do |var|
-        vars["F#{var[:f_no]}".to_sym] = if var[:field].end_with?('_barcode') && !instance.respond_to?(var[:field])
-                                          bcp.make_barcode(instance, var[:field].delete_suffix('_barcode'))
-                                        else
-                                          instance[var[:field].to_sym]
-                                        end
-      end
-      mes_repo = MesserverApp::MesserverRepo.new
-      printer = repo.find_hash(:printers, params[:printer])
-      mes_repo.print_label(AppConst::LABEL_LOCATION_BARCODE, vars, params[:quantity], printer[:printer_code])
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_LOCATION_BARCODE, instance, params)
     end
 
     private

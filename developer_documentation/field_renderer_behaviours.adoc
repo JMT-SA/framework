@@ -88,13 +88,13 @@ end
 
 Description:
 
-This behaviour attaches to a source field and enables/disables a target field based on the value of the source field.
+This behaviour attaches to a source field and enables/disables a target field(s) based on the value of the source field.
 
 Format:
 
-`enable(target_field, conditions = {})`
+`enable(target_fields, conditions = {})`
 
-`target_field` is the name of the field to be enabled/disabled.
+`target_fields` is the name of the field (or an Array of field names) to be enabled/disabled.
 
 Conditions:
 
@@ -109,7 +109,7 @@ Example:
 [source,ruby]
 ----
 behaviours do |behaviour|
-  behaviour.enable :more_info, when: :refferred_by, changes_to: ['unknown', 'other']
+  behaviour.enable %i[more_info reason], when: :referred_by, changes_to: ['unknown', 'other']
 end
 ----
 

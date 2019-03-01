@@ -14,4 +14,16 @@ module PackMaterialApp
     required(:vehicle_registration, Types::StrippedString).filled(:str?)
     required(:supplier_invoice_ref_number, Types::StrippedString).maybe(:str?)
   end
+
+  MrDeliveryPutawaySchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:delivery_number, :integer).filled(:int?)
+    required(:delivery_number_scan_field, Types::StrippedString).maybe(:str?)
+    required(:location, Types::StrippedString).filled(:str?)
+    required(:location_scan_field, Types::StrippedString).maybe(:str?)
+    required(:sku_number, :integer).filled(:int?)
+    required(:sku_number_scan_field, Types::StrippedString).maybe(:str?)
+    required(:quantity, :integer).filled(:int?)
+  end
 end

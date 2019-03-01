@@ -1,0 +1,7 @@
+---
+:dataminer_definition: sku_transaction_history
+:conditions:
+  :standard:
+    - :col: mr_skus.sku_number
+      :op: =
+      :val: $:sku_number$

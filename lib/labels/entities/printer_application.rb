@@ -8,5 +8,6 @@ module LabelApp
     attribute :active, Types::Bool
     attribute :printer_code, Types::String
     attribute :printer_name, Types::String
+    attribute :default_printer, Types::Bool
   end
 end

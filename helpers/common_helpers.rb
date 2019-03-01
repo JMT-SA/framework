@@ -22,9 +22,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @layout.render
   end
 
-  def show_partial(&block)
+  def show_partial(notice: nil, error: nil, &block)
     content = render_partial(&block)
-    update_dialog_content(content: content)
+    update_dialog_content(content: content, notice: notice, error: error)
   end
 
   def show_partial_or_page(route, &block)
@@ -58,6 +58,54 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       flash[:notice] = res.message
       show_page(&block)
     end
+  end
+
+  # Display content in a Crossbeams::Layout::CallbackSection.
+  #
+  # @param content [nil, string] the content. Ignored if a block is provided.
+  # @param content_style [nil, symbol] optional styling for content [:info, :success, :warning, :error]
+  # @param notice [nil, string] an optional flash notice.
+  # @param error [nil, string] an optional flash error.
+  # @param block [block] a block that yields ERB string to be passed to render_partial.
+  # @return [JSON] formatted to be interpreted by javascript to replace a callback section.
+  def show_in_callback(content: nil, content_style: nil, notice: nil, error: nil, &block)
+    raise ArgumentError, 'Invalid content style' unless [nil, :info, :success, :warning, :error].include?(content_style)
+    res = {}
+    res[:content] = if block_given?
+                      render_partial(&block)
+                    else
+                      # content
+                      wrap_content_in_style(content, content_style)
+                    end
+    res[:flash] = { notice: notice } if notice
+    res[:flash] = { error: error } if error
+    res.to_json
+  end
+
+  CONTENT_STYLE_HEAD = {
+    info: 'Note:',
+    success: 'Success:',
+    warning: 'Warning:',
+    error: 'Error:'
+  }.freeze
+
+  # Wrap content in styling (a heading div and content).
+  # Example
+  #   wrap_content_in_style('A note', :info) #=>
+  #   "< div class="crossbeams-info-note" >
+  #     < p >< strong >Note:< /strong>< /p >
+  #     < p >A note< /p >
+  #   < /div >"
+  #
+  # @param content [string] the content to be rendered.
+  # @param content_style [symbol] if nil, the content is returned unwrapped. [:info, :success, :warning, :error] are styled appropriately.
+  # @param caption [string] optional caption to override the default which is based on the style.
+  # @return [HTML]
+  def wrap_content_in_style(content, content_style, caption: nil)
+    return content if content_style.nil?
+    css = "crossbeams-#{content_style}-note"
+    head = CONTENT_STYLE_HEAD[content_style]
+    "<div class='#{css}'><p><strong>#{caption || head}</strong></p><p>#{content}</p></div>"
   end
 
   # Add validation errors that are not linked to a field in a form.
@@ -104,7 +152,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def move_validation_errors_to_base(messages, keys, highlights: {}) # rubocop:disable Metrics/AbcSize
     interim = messages || {}
     Array(keys).each do |key|
-      raise ArgumentError, "Move validation errors - key not present: #{key}" unless interim.key?(key)
+      # raise ArgumentError, "Move validation errors - key not present: #{key}" unless interim.key?(key)
+      next unless interim.key?(key) # Note: It only needs to move error message to base if it exists in the first place
       if highlights.key?(key)
         interim[:base_with_highlights] ||= { messages: [], highlights: [] }
         interim[:base_with_highlights][:messages] +=  Array(interim.delete(key))
@@ -331,6 +380,14 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
+  def dialog_error(content, notice: nil, error: nil)
+    update_dialog_content(content: wrap_content_in_style(content, :error), notice: notice, error: error)
+  end
+
+  def dialog_warning(content, notice: nil, error: nil)
+    update_dialog_content(content: wrap_content_in_style(content, :warning), notice: notice, error: error)
+  end
+
   def json_replace_select_options(dom_id, options_array, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :replace_select_options, dom_id: dom_id, options_array: options_array), message, keep_dialog_open: keep_dialog_open)
   end
@@ -343,12 +400,24 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :replace_input_value, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
   end
 
+  def json_change_select_value(dom_id, value, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :change_select_value, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
+  end
+
   def json_replace_inner_html(dom_id, value, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :replace_inner_html, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
   end
 
   def json_replace_list_items(dom_id, items, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :replace_list_items, dom_id: dom_id, items: Array(items)), message, keep_dialog_open: keep_dialog_open)
+  end
+
+  def json_hide_element(dom_id, reclaim_space: false, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :hide_element, dom_id: dom_id, reclaim_space: reclaim_space), message, keep_dialog_open: keep_dialog_open)
+  end
+
+  def json_show_element(dom_id, reclaim_space: false, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :show_element, dom_id: dom_id, reclaim_space: reclaim_space), message, keep_dialog_open: keep_dialog_open)
   end
 
   def json_clear_form_validation(dom_id, message: nil, keep_dialog_open: false)
@@ -358,10 +427,13 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def build_json_action(action) # rubocop:disable Metrics/AbcSize
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
+      change_select_value:    ->(act) { action_change_select_value(act) },
       replace_inner_html:     ->(act) { action_replace_inner_html(act) },
       replace_select_options: ->(act) { action_replace_select_options(act) },
       replace_multi_options:  ->(act) { action_replace_multi_options(act) },
       replace_list_items:     ->(act) { action_replace_list_items(act) },
+      hide_element:           ->(act) { action_hide_element(act) },
+      show_element:           ->(act) { action_show_element(act) },
       add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs) },
       update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes) },
       delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
@@ -381,12 +453,24 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     { replace_input_value: { id: action.dom_id, value: action.value } }
   end
 
+  def action_change_select_value(action)
+    { change_select_value: { id: action.dom_id, value: action.value } }
+  end
+
   def action_replace_inner_html(action)
     { replace_inner_html: { id: action.dom_id, value: action.value } }
   end
 
   def action_replace_list_items(action)
     { replace_list_items: { id: action.dom_id, items: action.items } }
+  end
+
+  def action_hide_element(action)
+    { hide_element: { id: action.dom_id, reclaim_space: action.reclaim_space || false } }
+  end
+
+  def action_show_element(action)
+    { show_element: { id: action.dom_id, reclaim_space: action.reclaim_space || false } }
   end
 
   def action_clear_form_validation(action)

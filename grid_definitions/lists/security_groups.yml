@@ -22,7 +22,7 @@
     :icon: list
     :title: Assign Permissions
     :popup: true
-  - :url: /development/statuses/show/security_groups/$:id$
+  - :url: /development/statuses/list/security_groups/$:id$
     :text: status
     :icon: information-solid
     :title: Status

@@ -8,7 +8,7 @@ module PackMaterialApp
         @task = task
         @repo = ReplenishRepo.new
         @id = delivery_id
-        @entity = @id ? @repo.find_mr_delivery(delivery_id) : nil
+        @entity = @id ? @repo.find_mr_delivery(@id) : nil
       end
 
       def call
@@ -20,6 +20,8 @@ module PackMaterialApp
           mutable_check
         when :verify
           verify_check
+        when :putaway
+          putaway_check
         else
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}"
         end
@@ -40,8 +42,17 @@ module PackMaterialApp
         return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery has no items') if no_items?
         return failed_response('Delivery has items without batches') if items_without_batches?
-        return failed_response('Delivery batch quantities do not equate to item quantities') if item_quantities_ignored?
+        return failed_response('Delivery batch quantities do not equate to item quantities where applicable') if item_quantities_ignored?
         all_ok
+      end
+
+      def putaway_check
+        return failed_response('Delivery Putaway has already been completed') if putaway_completed?
+        all_ok
+      end
+
+      def putaway_completed?
+        @entity.putaway_completed
       end
 
       def verified?
@@ -53,11 +64,11 @@ module PackMaterialApp
       end
 
       def items_without_batches?
-        @repo.delivery_has_items_without_batches(@id).any?
+        @repo.items_without_batches(@id)
       end
 
       def item_quantities_ignored?
-        !@repo.delivery_items_fulfilled(@id)
+        !@repo.batch_quantities_match(@id)
       end
     end
   end

@@ -2,7 +2,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   //
   // Variables
   //
-  const publicAPIs = {};
+  const publicAPIs = { bypassRules: false };
 
   const txtShow = document.getElementById('txtShow');
   const menu = document.getElementById('rmd_menu');
@@ -22,7 +22,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   const updateOnlineStatus = () => {
     if (navigator.onLine) {
       offlineStatus.style.display = 'none';
-      menu.disabled = false;
+      if (menu) {
+        menu.disabled = false;
+      }
       logout.classList.remove('disableClick');
       document.querySelectorAll('[data-rmd-btn]').forEach((node) => {
         node.disabled = false;
@@ -30,7 +32,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
       publicAPIs.logit('Online: network connection restored');
     } else {
       offlineStatus.style.display = '';
-      menu.disabled = true;
+      if (menu) {
+        menu.disabled = true;
+      }
       logout.classList.add('disableClick');
       document.querySelectorAll('[data-rmd-btn]').forEach((node) => {
         node.disabled = true;
@@ -40,14 +44,46 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   };
 
   /**
+   * Disable a button and change its caption.
+   * @param {element} button the button to disable.
+   * @param {string} disabledText the text to use to replace the caption.
+   * @returns {void}
+   */
+  const disableButton = (button, disabledText) => {
+    button.dataset.enableWith = button.value;
+    button.value = disabledText;
+    button.classList.remove('dim');
+    button.classList.add('o-50');
+  };
+
+  /**
+   * Prevent multiple clicks of submit buttons.
+   * @returns {void}
+   */
+  const preventMultipleSubmits = (element) => {
+    disableButton(element, element.dataset.disableWith);
+    window.setTimeout(() => {
+      element.disabled = true;
+    }, 0); // Disable the button with a delay so the form still submits...
+  };
+
+  /**
    * Event listeners for the RMD page.
    */
   const setupListeners = () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
-    menu.addEventListener('change', (event) => {
-      if (event.target.value !== '') {
-        window.location = event.target.value;
+    if (menu) {
+      menu.addEventListener('change', (event) => {
+        if (event.target.value !== '') {
+          window.location = event.target.value;
+        }
+      });
+    }
+    document.body.addEventListener('click', (event) => {
+      // Disable a button on click
+      if (event.target.dataset && event.target.dataset.disableWith) {
+        preventMultipleSubmits(event.target);
       }
     });
     if (cameraScan) {
@@ -66,6 +102,14 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
    */
   const unpackScanValue = (val) => {
     const res = { success: false };
+    // If we can scan any barcode, return whatever was scanned:
+    if (publicAPIs.bypassRules) {
+      res.success = true;
+      res.value = val;
+      res.scanType = 'any';
+      res.scanField = 'any';
+      return res;
+    }
     const matches = [];
     let rxp;
     this.rules.filter(r => this.expectedScanTypes.indexOf(r.type) !== -1).forEach((rule) => {
@@ -115,11 +159,16 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
         }
         let cnt = 0;
         scannableInputs.forEach((e) => {
-          if (e.value === '' && cnt === 0 && e.dataset.scanRule === scanPack.scanType) {
+          if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType)) {
             e.value = scanPack.value;
             const field = document.getElementById(`${e.id}_scan_field`);
-            field.value = scanPack.scanField;
+            if (field) {
+              field.value = scanPack.scanField;
+            }
             cnt += 1;
+            if (e.dataset.submitForm) {
+              e.form.submit();
+            }
           }
         });
       }
@@ -159,9 +208,11 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
    * Call startScanner to make the websocket connection.
    *
    * @param {object} rules - the rules for identifying scan values.
+   * @param {boolean} bypassRules - should the rules be ignores (scan any barcode).
    */
-  publicAPIs.init = (rules) => {
+  publicAPIs.init = (rules, bypassRules) => {
     this.rules = rules;
+    publicAPIs.bypassRules = bypassRules;
     this.expectedScanTypes = Array.from(document.querySelectorAll('[data-scan-rule]')).map(a => a.dataset.scanRule);
     this.expectedScanTypes = this.expectedScanTypes.filter((it, i, ar) => ar.indexOf(it) === i);
 

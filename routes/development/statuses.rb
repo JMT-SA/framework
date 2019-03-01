@@ -17,5 +17,20 @@ class Framework < Roda
         show_partial_or_page(r) { Development::Statuses::Status::Show.call(table, id, remote: fetch?(r)) }
       end
     end
+
+    r.on 'list', String, Integer do |table, id|
+      show_partial_or_page(r) { Development::Statuses::Status::List.call(table, id, remote: fetch?(r)) }
+    end
+
+    r.on 'detail', Integer do |id|
+      show_partial_or_page(r) { Development::Statuses::Status::Detail.call(id, remote: fetch?(r)) }
+    end
+
+    r.on 'diff', Integer do |id|
+      # Use LoggingInteractor for doing diffs from logged actions.
+      interactor = DevelopmentApp::LoggingInteractor.new(current_user, {}, { route_url: request.path }, {})
+      left, right = interactor.diff_action(id, from_status_log: true)
+      show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
+    end
   end
 end

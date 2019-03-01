@@ -17,6 +17,7 @@ The following renderers that do not bind to fields in a form are available:
 * <<Diff>>
 * <<ProgressStep>>
 * <<RepeatingRequest>>
+* <<Notice>>
 
 === Link
 
@@ -43,7 +44,7 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 
 |options - :style
 |How the link is styled - as a normal link, or to look like a button. A back button renders in blue with a left-pointing arrow glyph.
-|`:link`, `:button` or `:back_button`.
+|`:link`, `:button`, `:small_button` or `:back_button`.
 |`:link`
 
 |options - :behaviour
@@ -329,6 +330,11 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |`cell_classes: { col: [callable] }`. The hash should only contain columns where you wish to apply logic to determine the css class. The value for each column must be something that responds to `call` - see example above using a lambda. NB. it is crucial to guard agains `nil` values for the column.
 |None.
 
+|options - :caption
+|String
+|Provide an optional caption to appear above the table.
+|None.
+
 |options - :header_captions
 |A Hash of options
 |Provide captions for headers to override the default text (which is the header key capitalised with underscores changed to spaces).
@@ -337,6 +343,11 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |options - :pivot
 |Boolean
 |If true, pivot the table so that columns become rows. NB. the table **must** have columns specified.
+|None.
+
+|options - :top_margin
+|Integer, 0 to 7.
+|Provide a margin above the table. Use 0 for no margin and 7 for the most space.
 |None.
 
 |===
@@ -525,3 +536,43 @@ Optional: to change the state of a step in a ProgressStep control to finalised, 
 { updateMessage: { content: 'New content', finaliseProgressStep: 'cbl-current-step' } }.to_json
 ----
 NOTE: `continuePolling` can be set to false or can be omitted to stop the repeats.
+
+=== Notice
+
+This page control places the given text in a div highlighted as `info, success, warning or error`.
+
+e.g.
+[source,ruby]
+----
+page.add_notice('Some text', notice_type: :warning)
+----
+
+|===
+|attribute |description |possible values |default
+
+|text
+|The text to be displayed.
+|`String`. Can contain HTML.
+|None. Required.
+
+|options - :notice_type
+|Governs the styling of the text.
+|`:info`, `:success`, `:warning` or `:error`.
+|`:info`
+
+|options - :caption
+|The caption to show in bold above the text.
+|`String`.
+|The notice_type, capitalised.
+
+|options - :show_caption
+|The caption can be hidden.
+|`true` or `false`.
+|`true`.
+
+|options - :within_field
+|Display the text within a crossbeams-field div or not. This can affect the width of the display.
+|`true` or `false`.
+|`true`
+
+|===

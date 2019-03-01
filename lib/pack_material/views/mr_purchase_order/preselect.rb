@@ -13,6 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
+              form.caption 'New Purchase Order'
               form.action '/pack_material/replenish/mr_purchase_orders/new'
               form.add_field :supplier_id
             end

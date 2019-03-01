@@ -1,0 +1,20 @@
+---
+:dataminer_definition: sku_locations
+#:tree:
+#  :tree_column: path_array
+#  :tree_caption: Location/SKU Hierarchy
+#  :suppress_node_counts: false
+#  :groupDefaultExpanded: 2
+:lookups:
+  :standard:
+    :url: /pack_material/transactions/mr_bulk_stock_adjustments/sku_location_lookup_result/$:id$
+    :section_caption: Select a SKU Location Pair
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: mr_skus.sku_number
+      :op: in
+      :val: $:allowed_sku_numbers$
+    - :col: mr_sku_locations.location_id
+      :op: in
+      :val: $:allowed_locations$

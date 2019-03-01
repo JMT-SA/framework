@@ -19,13 +19,15 @@ module UiRules
       printer_id_label = @repo.find(:printers, LabelApp::Printer, @form_object.printer_id)&.printer_code
       fields[:printer_id] = { renderer: :label, with_value: printer_id_label, caption: 'Printer' }
       fields[:application] = { renderer: :label }
+      fields[:default_printer] = { renderer: :label, as_boolean: true, caption: 'Default printer for application' }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
         printer_id: { renderer: :select, options: LabelApp::PrinterRepo.new.for_select_printers, caption: 'Printer', required: true },
-        application: { renderer: :select, options: AppConst::PRINTER_APPLICATIONS, required: true }
+        application: { renderer: :select, options: AppConst::PRINTER_APPLICATIONS, required: true },
+        default_printer: { renderer: :checkbox, caption: 'Default printer for application' }
       }
     end
 
@@ -37,7 +39,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(printer_id: nil,
-                                    application: nil)
+                                    application: nil,
+                                    default_printer: false)
     end
   end
 end

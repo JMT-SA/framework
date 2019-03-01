@@ -5,13 +5,13 @@
 module MasterfilesApp
   class LocationRepo < BaseRepo
     build_for_select :locations,
-                     label: :location_code,
+                     label: :location_long_code,
                      value: :id,
-                     order_by: :location_code
+                     order_by: :location_long_code
     build_inactive_select :locations,
-                          label: :location_code,
+                          label: :location_long_code,
                           value: :id,
-                          order_by: :location_code
+                          order_by: :location_long_code
 
     build_for_select :location_assignments,
                      label: :assignment_code,
@@ -54,12 +54,12 @@ module MasterfilesApp
       find_location_by(:id, id)
     end
 
-    def find_location_by_location_code(code)
-      find_location_by(:location_code, code)
+    def find_location_by_location_long_code(code)
+      find_location_by(:location_long_code, code)
     end
 
-    def find_location_by_legacy_barcode(barcode)
-      find_location_by(:legacy_barcode, barcode)
+    def find_location_by_location_short_code(barcode)
+      find_location_by(:location_short_code, barcode)
     end
 
     def create_root_location(params)
@@ -142,10 +142,10 @@ module MasterfilesApp
       success_response('ok')
     end
 
-    def location_code_suggestion(ancestor_id, location_type_id)
+    def location_long_code_suggestion(ancestor_id, location_type_id)
       sibling_count = DB[:tree_locations].where(path_length: 1).where(ancestor_location_id: ancestor_id).count
       code = ''
-      code += "#{find_hash(:locations, ancestor_id)[:location_code]}_" unless location_is_root?(ancestor_id)
+      code += "#{find_hash(:locations, ancestor_id)[:location_long_code]}_" unless location_is_root?(ancestor_id)
       code += type_abbreviation(location_type_id) + (sibling_count + 1).to_s
       success_response('ok', code)
     end
@@ -156,6 +156,14 @@ module MasterfilesApp
 
     def location_is_root?(id)
       DB[:tree_locations].where(descendant_location_id: id).count == 1
+    end
+
+    def can_be_moved_location_type_ids
+      DB[:location_types].where(can_be_moved: true).select_map(:id)
+    end
+
+    def descendants_for_ancestor_id(ancestor_id)
+      DB[:tree_locations].where(ancestor_location_id: ancestor_id).select_map(:descendant_location_id)
     end
   end
 end

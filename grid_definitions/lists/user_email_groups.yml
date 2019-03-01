@@ -1,0 +1,23 @@
+---
+:dataminer_definition: user_email_groups
+:actions:
+- :url: "/development/masterfiles/user_email_groups/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/development/masterfiles/user_email_groups/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/list/users_for_select/multi?key=email_group_users&id=$:id$"
+  :text: Users in email group
+  :icon: list
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/development/masterfiles/user_email_groups/new"
+  :text: New User Email Group
+  :style: :button
+  :behaviour: :popup

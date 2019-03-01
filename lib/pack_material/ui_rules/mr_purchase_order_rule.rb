@@ -8,14 +8,13 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
-      @rules[:can_approve] = @repo.can_approve_purchase_order?(@form_object.id) unless @mode == :new || @mode == :preselect
-      # @rules[:show] = @repo.find_mr_purchase_order(@form_object.id)&.approved unless @mode == :new
+      rules[:can_approve] = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder.call(:approve, @options[:id]) unless @mode == :new || @mode == :preselect
+      rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
+      rules[:show_only] = @form_object.approved if @mode == :edit
 
       common_values_for_fields case @mode
                                when :edit
-                                 edit_fields
-                                 # @rules[:show] ? show_fields : edit_fields
+                                 rules[:show_only] ? show_fields : edit_fields
                                when :new
                                  new_fields
                                when :preselect
@@ -28,6 +27,7 @@ module UiRules
     def show_fields
       sup = supplier
       {
+        status: { renderer: :label },
         mr_delivery_term_id: {
           renderer: :label,
           with_value: @repo.find_mr_delivery_term(@form_object.mr_delivery_term_id)&.delivery_term_code,
@@ -83,6 +83,7 @@ module UiRules
     def edit_fields
       sup = supplier
       fields = {
+        status: { renderer: :hidden },
         supplier_name: { renderer: :label, with_value: sup.party_name },
         supplier_erp_number: { renderer: :label, with_value: sup.erp_supplier_number },
         supplier_party_role_id: { renderer: :hidden },

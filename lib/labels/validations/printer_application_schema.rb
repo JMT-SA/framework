@@ -7,5 +7,6 @@ module LabelApp
     optional(:id, :integer).filled(:int?)
     required(:printer_id, :integer).filled(:int?)
     required(:application, Types::StrippedString).filled(:str?)
+    required(:default_printer, :bool).filled
   end
 end

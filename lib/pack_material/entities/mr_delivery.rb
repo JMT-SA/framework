@@ -13,5 +13,7 @@ module PackMaterialApp
     attribute :vehicle_registration, Types::String
     attribute :supplier_invoice_ref_number, Types::String
     attribute :verified, Types::Bool
+    attribute :putaway_completed, Types::Bool
+    attribute :status, Types::String
   end
 end

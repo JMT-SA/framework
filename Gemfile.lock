@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: c79eb1d2d45376b601e606ebb196237aec59bacb
+  revision: e8171418afce013c19a29179129eca6f40e51d85
   specs:
-    crossbeams-dataminer (0.1.5)
+    crossbeams-dataminer (0.1.6)
       pg_query (= 1.0.2)
 
 GIT
@@ -16,9 +16,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: a4ec06cbf4a15c5806c53fb986d00438025aa707
+  revision: 8543f387d4d3542091fa63dfffdce8d01f229264
   specs:
-    crossbeams-layout (0.1.13)
+    crossbeams-layout (0.2.0)
       diffy
       rouge
 
@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: e9dd8b9d79bc5683c257719db405a6fc63e324d4
+  revision: dc16373f1e30ad5e434ccc6d526ba6ce4846a475
   specs:
-    roda-data_grid (0.1.10)
+    roda-data_grid (0.1.11)
       axlsx
       crossbeams-dataminer
       crossbeams-layout
@@ -69,9 +69,9 @@ GEM
       capistrano (~> 3.0)
     clipboard (1.1.1)
     coderay (1.1.2)
-    concurrent-ruby (1.0.5)
+    concurrent-ruby (1.1.4)
     daemons (1.2.6)
-    diffy (3.2.1)
+    diffy (3.3.0)
     dotenv (2.5.0)
     dry-configurable (0.7.0)
       concurrent-ruby (~> 1.0)
@@ -82,29 +82,29 @@ GEM
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.2.1)
     dry-inflector (0.1.2)
-    dry-logic (0.4.2)
+    dry-logic (0.5.0)
       dry-container (~> 0.2, >= 0.2.6)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
-    dry-struct (0.5.1)
+    dry-struct (0.6.0)
       dry-core (~> 0.4, >= 0.4.3)
       dry-equalizer (~> 0.2)
       dry-types (~> 0.13)
       ice_nine (~> 0.11)
-    dry-types (0.13.2)
+    dry-types (0.14.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer (~> 0.2)
       dry-inflector (~> 0.1, >= 0.1.2)
-      dry-logic (~> 0.4, >= 0.4.2)
-    dry-validation (0.12.2)
+      dry-logic (~> 0.5, >= 0.5)
+    dry-validation (0.13.0)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.1, >= 0.1.3)
       dry-core (~> 0.2, >= 0.2.1)
       dry-equalizer (~> 0.2)
-      dry-logic (~> 0.4, >= 0.4.0)
-      dry-types (~> 0.13.1)
+      dry-logic (~> 0.5, >= 0.5.0)
+      dry-types (~> 0.14, >= 0.14)
     erubi (1.7.1)
     erubis (2.7.0)
     eventmachine (1.2.5)
@@ -126,7 +126,7 @@ GEM
     metaclass (0.0.4)
     method_source (0.9.0)
     mini_mime (1.0.1)
-    mini_portile2 (2.3.0)
+    mini_portile2 (2.4.0)
     minitest (5.11.3)
     minitest-hooks (1.4.2)
     minitest-rg (5.2.0)
@@ -137,8 +137,8 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (5.0.2)
-    nokogiri (1.8.5)
-      mini_portile2 (~> 2.3.0)
+    nokogiri (1.10.1)
+      mini_portile2 (~> 2.4.0)
     parallel (1.12.1)
     parser (2.5.1.0)
       ast (~> 2.4.0)
@@ -173,7 +173,7 @@ GEM
       ffi (>= 0.5.0, < 2)
     rerun (0.13.0)
       listen (~> 3.0)
-    roda (3.14.0)
+    roda (3.17.0)
       rack
     roda-symbolized_params (0.0.2)
     rodauth (1.16.0)

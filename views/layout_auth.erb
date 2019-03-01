@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_metatag %>
+
+    <title><%= ENV['APP_CAPTION'] %></title>
+
+    <link rel="stylesheet" href="/css/tachyons.min.css">
+
+    <style>
+      .rodauth {
+        padding: 2em;
+      }
+
+      .rodauth input[type="submit"] {
+        margin-top: 1em;
+        padding: 1rem;
+        background-color: #19a974;
+        color: #fff;
+        border-radius: .25rem;
+        border-color: #f4f4f4;
+        border-style: solid;
+        border-width: 1px;
+      }
+
+      form.rodauth div.form-group {
+        margin-top: 0.5em;
+      }
+      input {
+        font-size: 1em;
+        padding: 2px 5px 4px;
+        /*  border: 0 none; */
+      }
+      input {
+        line-height: 1.4em;
+        border-radius: 0.25em;
+        border: 1px solid #999;
+      }
+      #error_flash {
+        margin: 0.5em;
+        padding: 0.2em;
+        border: thin solid brown;
+        color: brown;
+        background-color: #fee;
+      }
+      #notice_flash {
+        margin: 0.5em;
+        padding: 0.3em;
+        border: thin solid blue;
+        color: #fff;
+        background-color: #0288D1;
+      }
+    </style>
+  </head>
+  <body class="site" data-utf-8-ensurer="О">
+    <div class="pt3 pl3 f5 f4-ns fw6 mt2 ml2 dark-green">
+        <%= ENV['APP_CAPTION'] %>
+    </div>
+    <div id="container">
+      <% if flash[:error] %>
+        <div id='error_flash'><%=flash[:error] %></div>
+      <% end %>
+      <% if flash[:notice] %>
+        <div id='notice_flash'><%=flash[:notice] %></div>
+      <% end %>
+
+      <%= yield %>
+    </div>
+    <!--script src="/js/crossbeams-rmd_scan.js" type="text/javascript"></script-->
+    <!--script src="/js/sweetalert2.min.js" type="text/javascript"></script-->
+    <!-- script>
+      // Highlight label text for inputs that have focus.
+      document.addEventListener('focus', function (event) {
+        const prev = event.target.parentNode && event.target.parentNode.previousElementSibling;
+        if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
+      }, true);
+      document.addEventListener('blur', function (event) {
+        const prev = event.target.parentNode && event.target.parentNode.previousElementSibling;
+        if (prev instanceof HTMLTableCellElement) { prev.classList.remove('focusLabel'); }
+      }, true);
+
+      window.addEventListener('DOMContentLoaded', function() {
+        // Highlight label text for the input that gets autofocus.
+        const afi = document.querySelector('input[autofocus]');
+        const prev = afi && afi.parentNode && afi.parentNode.previousElementSibling;
+        if (prev instanceof HTMLTableCellElement) { prev.classList.add('focusLabel'); }
+
+        crossbeamsRmdScan.init(<%= AppConst::BARCODE_SCAN_RULES.to_json %>);
+      });
+    </script -->
+    <%#= content_for :late_javascript %>
+  </body>
+</html>

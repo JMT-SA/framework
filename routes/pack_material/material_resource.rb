@@ -33,21 +33,18 @@ class Framework < Roda
           if res.success
             reload_previous_dialog_via_json("/list/material_resource_product_variant_party_roles/with_params?key=standard&matres_variant_id=#{id}", notice: res.message)
           else
+            form_errors = move_validation_errors_to_base(res.errors, :customer_or_supplier)
             re_show_form(r, res, url: "/pack_material/material_resource/material_resource_product_variants/#{id}/material_resource_product_variant_party_roles/new?type=#{type}") do
               PackMaterial::MaterialResource::MatresProductVariantPartyRole::New.call(id,
                                                                                       type,
                                                                                       form_values: params[:matres_product_variant_party_role],
-                                                                                      form_errors: res.errors,
+                                                                                      form_errors: form_errors,
                                                                                       remote: fetch?(r))
             end
           end
         end
       end
       r.is do
-        r.get do       # SHOW
-          check_auth!('material_resource', 'read')
-          show_partial { PackMaterial::MaterialResource::MatresProductVariant::Show.call(id) }
-        end
         r.patch do     # UPDATE
           res = interactor.update_matres_product_variant(id, params[:matres_product_variant])
           if res.success
@@ -60,7 +57,8 @@ class Framework < Roda
             parent_variant_id = res.instance[:product_variant_id]
             update_grid_row(parent_variant_id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { PackMaterial::MaterialResource::MatresProductVariant::Edit.call(id, form_values: params[:matres_product_variant], form_errors: res.errors) }
+            form_errors = move_validation_errors_to_base(res.errors, :base_batch_number_required)
+            re_show_form(r, res) { PackMaterial::MaterialResource::MatresProductVariant::Edit.call(id, form_values: params[:matres_product_variant], form_errors: form_errors) }
           end
         end
         # r.delete do    # DELETE
@@ -99,6 +97,7 @@ class Framework < Roda
               party_stock_code
               supplier_lead_time
               is_preferred_supplier
+
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

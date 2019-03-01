@@ -1,0 +1,112 @@
+= How to attach observers to a service
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to attach observers to a service
+
+Services can be written so that at a certain point(s) any registered observers can take action - and possibly even affect the outcome of the service itself.
+
+The framework uses a list of observers that are to be notified during the execution of a service.
+
+These observers are only instantiated when the service is initialised and get all their context from the service via parameters.
+
+=== Config
+
+A list of observers is set up in `config/observers_list.rb`. This is in the form of a Hash like:
+
+[source,ruby]
+----
+{ 'ServiceClass' => ['ObserverClass1', 'ObserverClass2'] }
+
+# e.g.
+{ 'DevelopmentApp::GenerateNewScaffold' => ['DevelopmentApp::TestObserver'] }
+----
+
+NOTE: This could later be extended so that certain implementations could use different lists, turn observers off, or even supply their own observers.
+
+=== Activating observers in a service
+
+The service **must** call `load_observers` in the initialize method.
+
+Then anytime it wishes to fire an event it must call `changed` followed by `notify_observers`.
+These two methods can be called more than once, and each time all observers will be notified and receive whatever parameters are provided to `notify_observers`.
+
+If an observer needs to communicate with a service (e.g. to tell the service to abort and display a message), pass `self` to `notify_observers` and check the relevant attributes on the service after the call. The observer can then alter the relevant attributes as required.
+
+=== Coding an observer
+
+An observer is a PORO that implements a method named `update` which receives the parameter(s) passed from the service's `notify_observers` call.
+
+This is the only requirement placed on the observer.
+
+=== An example
+
+[source, ruby]
+----
+# SERVICE
+# -------
+module DevelopmentApp
+  class DoSomeWork < BaseService
+    attr_accessor :everything_ok
+
+    def initialize(params)
+      @everything_ok = true
+      load_observers
+    end
+
+    def call
+      # ..do some work..
+      changed
+      notify_observers(self, 1)
+      p 'We have a problem with 1' unless everything_ok
+
+      # ..do some work..
+      changed
+      notify_observers(self, 2)
+      p 'We have a problem with 2' unless everything_ok
+
+      # ..do some work..
+      changed
+      notify_observers(self, 3)
+      p 'We have a problem with 3' unless everything_ok
+
+      # ..finish up the work..
+    end
+  end
+end
+
+# OBSERVER
+# --------
+module DevelopmentApp
+  class TestObserver
+    def initialize
+      @cnt = 0
+    end
+
+    def update(serv, step)
+      @cnt += 1
+      p "Observer called: #{@cnt}"
+      case step
+      when 1
+        break # This type of call does not need to be handled by this observer
+      when 2
+        p 'Observer happy and has done some work'
+      else
+        p 'Observer is not happy with its input and told the Service so'
+        serv.everything_ok = false
+      end
+    end
+  end
+end
+
+# RESULTS
+# -------
+
+#=> Observer called: 1
+#=> Observer called: 2
+#=> Observer happy and has done some work
+#=> Observer called: 3
+#=> Observer is not happy with its input and told the Service so
+#=> We have a problem with 3
+----

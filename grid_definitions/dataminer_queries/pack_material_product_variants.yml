@@ -27,17 +27,20 @@
   \ \"material_resource_product_variants\".\"product_variant_table_name\",\r\n  \"material_resource_product_variants\".\"product_variant_number\"
   AS mr_product_variant_number,\r\n  \"material_resource_product_variants\".\"minimum_stock_level\",\r\n
   \ \"material_resource_product_variants\".\"old_product_code\",\r\n  \"material_resource_product_variants\".\"re_order_stock_level\",\r\n
-  \ \"material_resource_product_variants\".\"supplier_lead_time\",\r\n  \"material_resource_product_variants\".\"created_at\"
-  AS mr_created_at,\r\n  \"material_resource_product_variants\".\"updated_at\" AS
-  mr_updated_at\r\nFROM \"pack_material_products\"\r\n  LEFT JOIN \"pack_material_product_variants\"
+  \ \"material_resource_product_variants\".\"supplier_lead_time\",\r\n  \"material_resource_product_variants\".\"use_fixed_batch_number\",\r\n
+  \ \"material_resource_product_variants\".\"mr_internal_batch_number_id\",\r\n  \"mr_internal_batch_numbers\".\"batch_number\",\r\n
+  \ \"material_resource_product_variants\".\"created_at\" AS mr_created_at,\r\n  \"material_resource_product_variants\".\"updated_at\"
+  AS mr_updated_at\r\nFROM \"pack_material_products\"\r\n  LEFT JOIN \"pack_material_product_variants\"
   ON \"pack_material_product_variants\".\"pack_material_product_id\" =\r\n                                                \"pack_material_products\".\"id\"\r\n
   \ LEFT JOIN \"commodities\" ON \"commodities\".\"id\" = \"pack_material_product_variants\".\"commodity_id\"\r\n
   \ LEFT JOIN \"marketing_varieties\" ON \"marketing_varieties\".\"id\" = \"pack_material_product_variants\".\"marketing_variety_id\"\r\n
   \ LEFT JOIN \"material_resource_sub_types\" ON \"pack_material_products\".\"material_resource_sub_type_id\"
   =\r\n                                             \"material_resource_sub_types\".\"id\"\r\nLEFT
   JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"product_variant_id\"
-  = \"pack_material_product_variants\".\"id\"\r\n                                            AND
-  \"material_resource_product_variants\".\"id\" IN (select id\r\n                                                                                          from
+  = \"pack_material_product_variants\".\"id\"\r\nLEFT JOIN \"mr_internal_batch_numbers\"
+  ON \"material_resource_product_variants\".\"mr_internal_batch_number_id\" = \"mr_internal_batch_numbers\".\"id\"\r\n
+  \                                           AND \"material_resource_product_variants\".\"id\"
+  IN (select id\r\n                                                                                          from
   \"material_resource_product_variants\"\r\n                                                                                          where
   product_variant_table_name = 'pack_material_product_variants')\r\n ORDER BY \"material_resource_sub_types\".\"short_code\",
   \"pack_material_product_variants\".\"product_variant_code\""
@@ -796,9 +799,54 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  use_fixed_batch_number:
+    :name: use_fixed_batch_number
+    :sequence_no: 51
+    :caption: Use fixed batch number
+    :namespaced_name: material_resource_product_variants.use_fixed_batch_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_internal_batch_number_id:
+    :name: mr_internal_batch_number_id
+    :sequence_no: 52
+    :caption: Mr internal batch number
+    :namespaced_name: material_resource_product_variants.mr_internal_batch_number_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  batch_number:
+    :name: batch_number
+    :sequence_no: 53
+    :caption: Batch number
+    :namespaced_name: mr_internal_batch_numbers.batch_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   mr_created_at:
     :name: mr_created_at
-    :sequence_no: 51
+    :sequence_no: 54
     :caption: Mr created at
     :namespaced_name: material_resource_product_variants.created_at
     :data_type: :string
@@ -813,7 +861,7 @@
     :group_max: false
   mr_updated_at:
     :name: mr_updated_at
-    :sequence_no: 52
+    :sequence_no: 55
     :caption: Mr updated at
     :namespaced_name: material_resource_product_variants.updated_at
     :data_type: :string

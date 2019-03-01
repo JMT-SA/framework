@@ -23,6 +23,8 @@ module PackMaterial
               form.add_field :supplier_lead_time
               form.add_field :minimum_stock_level
               form.add_field :re_order_stock_level
+              form.add_field :use_fixed_batch_number
+              form.add_field :mr_internal_batch_number_id
             end
           end
 

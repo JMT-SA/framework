@@ -8,6 +8,7 @@ module UiRules
       @repo = PackMaterialApp::ConfigRepo.new
       make_form_object
       apply_form_values
+      @rules[:sub_type_text] = @repo.matres_type_and_sub_type_description(@options[:id]).join(' / ') if @mode == :config
 
       common_values_for_fields common_fields
 

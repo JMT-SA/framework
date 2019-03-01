@@ -223,15 +223,15 @@ module MasterfilesApp
     end
 
     def party_id_from_organization(id)
-      DB[:organizations].where(id: id).select(:party_id).single_value
+      DB[:organizations].where(id: id).get(:party_id)
     end
 
     def party_id_from_person(id)
-      DB[:people].where(id: id).select(:party_id).single_value
+      DB[:people].where(id: id).get(:party_id)
     end
 
     def party_id_from_party_role(id)
-      DB[:party_roles].where(id: id).select(:party_id).single_value
+      DB[:party_roles].where(id: id).get(:party_id)
     end
 
     def party_address_ids(party_id)
@@ -261,6 +261,7 @@ module MasterfilesApp
           AND COALESCE(o.short_description, p.first_name || ' ' || p.surname) = ?
           AND pr.active
       SQL
+
       hash = DB[query, AppConst::ROLE_IMPLEMENTATION_OWNER, ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]].first
       raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{ENV[AppConst::ROLE_IMPLEMENTATION_OWNER]}\" is not defined/active" if hash.nil?
       MasterfilesApp::PartyRole.new(hash)
@@ -310,11 +311,11 @@ module MasterfilesApp
 
     # Customers & Suppliers
     def for_select_supplier_parties
-      parties_except_for_role(MasterfilesApp::SUPPLIER_ROLE)
+      parties_except_for_role(AppConst::ROLE_SUPPLIER)
     end
 
     def for_select_customer_parties
-      parties_except_for_role(MasterfilesApp::CUSTOMER_ROLE)
+      parties_except_for_role(AppConst::ROLE_CUSTOMER)
     end
 
     def parties_except_for_role(role)
@@ -415,12 +416,12 @@ module MasterfilesApp
       role_id = DB[:roles].where(name: role_name).first[:id]
       return { success: false, error: { party_role: 'already exists' } } if exists?(:party_roles, party_id: party_id, role_id: role_id)
 
-      org_type = DB[:parties].where(id: party_id).select(:party_type).single_value == 'O'
-      respective_id = DB[org_type ? :organizations : :people].where(party_id: party_id).select(:id).single_value
+      org_type = DB[:parties].where(id: party_id).get(:party_type) == 'O'
+      respective_id = DB[org_type ? :organizations : :people].where(party_id: party_id).get(:id)
 
       party_role_id = DB[:party_roles].insert(
         party_id: party_id,
-        role_id: DB[:roles].where(name: role_name).select(:id).single_value,
+        role_id: DB[:roles].where(name: role_name).get(:id),
         organization_id: (org_type ? respective_id : nil),
         person_id: (org_type ? nil : respective_id)
       )

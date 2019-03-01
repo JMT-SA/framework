@@ -71,6 +71,21 @@ class Framework < Roda
     end
   end
 
+  # Lookup grids
+  route('lookups') do |r|
+    r.on String, String do |id, key|
+      r.is do
+        show_partial { render_data_grid_page_lookup(id, key, params) }
+      end
+
+      r.on 'grid' do
+        render_data_grid_lookup_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, key, params)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+    end
+  end
+
   route('print_grid') do
     @layout = Crossbeams::Layout::Page.build(grid_url: params[:grid_url]) do |page, _|
       page.add_grid('crossbeamsPrintGrid', params[:grid_url], caption: 'Print', for_print: true)

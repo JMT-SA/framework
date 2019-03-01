@@ -78,6 +78,12 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Users', '/list/users', 1);
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Development')),
+         'User_email_groups', '/list/user_email_groups', 2);
+
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Development')), 'Contact Method Types', '/list/contact_method_types', 1);
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
@@ -89,3 +95,46 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Masterfiles' AND function
 -- Registered Mobile Devices menu:
 INSERT INTO functional_areas (functional_area_name, rmd_menu)
 VALUES ('RMD', true);
+
+-- PROGRAM: Home
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Home', 1,
+        (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs
+                   WHERE program_name = 'Home'
+                     AND functional_area_id = (SELECT id
+                                               FROM functional_areas
+                                               WHERE functional_area_name = 'RMD')),
+                                               'Framework');
+
+
+-- PROGRAM FUNCTION Menu
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Home'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'RMD')),
+        'Menu',
+        '/rmd/home',
+        1,
+        NULL,
+        false,
+        false);
+
+
+-- PROGRAM FUNCTION Check Barcodes
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Home'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'RMD')),
+        'Check Barcodes',
+        '/rmd/check_barcode',
+        2,
+        NULL,
+        false,
+        false);
+

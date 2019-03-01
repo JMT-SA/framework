@@ -52,8 +52,7 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_printer_application(id, params[:printer_application])
           if res.success
-            update_grid_row(id, changes: { printer_id: res.instance[:printer_id], application: res.instance[:application] },
-                                notice: res.message)
+            redirect_to_last_grid(r)
           else
             re_show_form(r, res) { Labels::Printers::PrinterApplication::Edit.call(id, form_values: params[:printer_application], form_errors: res.errors) }
           end
@@ -70,7 +69,7 @@ class Framework < Roda
       end
     end
 
-    r.on 'printer_applications' do # rubocop:disable Metrics/BlockLength
+    r.on 'printer_applications' do
       interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do    # NEW
         check_auth!('designs', 'new')
@@ -79,16 +78,7 @@ class Framework < Roda
       r.post do        # CREATE
         res = interactor.create_printer_application(params[:printer_application])
         if res.success
-          row_keys = %i[
-            id
-            printer_id
-            application
-            printer_code
-            printer_name
-            active
-          ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       notice: res.message)
+          redirect_to_last_grid(r)
         else
           re_show_form(r, res, url: '/labels/printers/printer_applications/new') do
             Labels::Printers::PrinterApplication::New.call(form_values: params[:printer_application],

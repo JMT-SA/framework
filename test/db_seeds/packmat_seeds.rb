@@ -1,4 +1,12 @@
 module MiniTestSeeds
+  def db_create_processes
+    # processes
+    @fixed_table_set[:processes] = { delivery_process_id: DB[:business_processes].insert(process: 'DELIVERIES'),
+                                     vehicle_job_process_id: DB[:business_processes].insert(process: 'VEHICLE JOBS'),
+                                     adhoc_transactions_process_id: DB[:business_processes].insert(process: 'ADHOC TRANSACTIONS')
+    }
+  end
+
   def db_create_roles
     # roles
     cus_id = DB[:roles].insert(name: AppConst::ROLE_CUSTOMER)
@@ -91,5 +99,46 @@ module MiniTestSeeds
             AS t(column_name, short_code, description, n)) sub ON sub.n = 1
         WHERE dom.domain_name = 'Pack Material';
     SQL
+  end
+
+  def db_create_locations
+    assignment_id = DB[:location_assignments].insert(assignment_code: 'Assignment Code')
+    storage_type_id = DB[:location_storage_types].insert(storage_type_code: 'Storage Type Code')
+    location_type_id = DB[:location_types].insert(location_type_code: 'Location Type Code', short_code: 'LT')
+    default_receiving_bay_id = DB[:locations].insert(
+      primary_storage_type_id: storage_type_id,
+      location_type_id: location_type_id,
+      primary_assignment_id: assignment_id,
+      location_description: 'Default Receiving Bay',
+      location_long_code: 'RECEIVING BAY',
+      location_short_code: 'RBY'
+    )
+    @fixed_table_set[:locations] = {
+      assignment_id: assignment_id,
+      storage_type_id: storage_type_id,
+      type_id: location_type_id,
+      default_receiving_bay_id: default_receiving_bay_id
+    }
+  end
+
+  def db_create_uoms
+    type_id = DB[:uom_types].insert(code: 'PM')
+    @fixed_table_set[:uoms] = {
+      uom_type_id: type_id,
+      uom_id: DB[:uoms].insert(uoms_type_id: type_id, uom_code: 'kg')
+    }
+  end
+
+  def db_create_inventory_transaction_types
+    remove_id = DB[:mr_inventory_transaction_types].insert(type_name: 'REMOVE STOCK')
+    create_id = DB[:mr_inventory_transaction_types].insert(type_name: 'CREATE STOCK')
+    putaway_id = DB[:mr_inventory_transaction_types].insert(type_name: 'PUTAWAY')
+    adhoc_id = DB[:mr_inventory_transaction_types].insert(type_name: 'ADHOC MOVE')
+    @fixed_table_set[:inventory_transaction_types] = {
+      create_stock_id: create_id,
+      putaway_id: putaway_id,
+      adhoc_move_id: adhoc_id,
+      remove_stock_id: remove_id
+    }
   end
 end

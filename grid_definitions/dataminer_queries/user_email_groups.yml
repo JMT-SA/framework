@@ -1,0 +1,116 @@
+---
+:caption: User Email Groups
+:sql: "SELECT \"user_email_groups\".\"id\", \"user_email_groups\".\"mail_group\",
+  \"user_email_groups\".\"active\",\r\n\"user_email_groups\".\"created_at\", \"user_email_groups\".\"updated_at\",\r\n(SELECT
+  string_agg(user_name, '; ')  FROM (SELECT u.user_name\r\n  FROM user_email_groups_users
+  e  JOIN users u\r\n  ON u.id = e.user_id  WHERE e.user_email_group_id = user_email_groups.id)\r\n
+  \ sub) AS members\r\nFROM \"user_email_groups\"\r\nORDER BY \"user_email_groups\".\"mail_group\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: user_email_groups.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mail_group:
+    :name: mail_group
+    :sequence_no: 2
+    :caption: Mail group
+    :namespaced_name: user_email_groups.mail_group
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 3
+    :caption: Active
+    :namespaced_name: user_email_groups.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: user_email_groups.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 5
+    :caption: Updated at
+    :namespaced_name: user_email_groups.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  members:
+    :name: members
+    :sequence_no: 6
+    :caption: Members
+    :namespaced_name: 
+    :data_type: :string
+    :width: 350
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: user_email_groups.mail_group
+  :caption: Mail group
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

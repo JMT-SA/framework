@@ -1,0 +1,232 @@
+---
+:caption: Product Locations
+:sql: "SELECT \"locations\".\"id\", \"locations\".\"primary_storage_type_id\",\r\n\"locations\".\"location_type_id\",
+  \"locations\".\"primary_assignment_id\", \"locations\".\"location_long_code\",\r\n\"locations\".\"location_description\",
+  \r\n(SELECT array_agg(\"cc\".\"location_long_code\") AS path\r\nFROM (SELECT \"c\".\"location_long_code\"\r\nFROM
+  \"locations\" c\r\nJOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\nWHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER
+  BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n\"material_resource_product_variants\".\"product_variant_number\",\r\n\"material_resource_product_variants\".\"product_variant_code\",\r\nSUM(\"mr_sku_locations\".\"quantity\")
+  AS quantity\r\nFROM \"locations\"\r\nJOIN \"location_types\" ON \"location_types\".\"id\"
+  = \"locations\".\"location_type_id\"\r\nJOIN \"location_assignments\" ON \"location_assignments\".\"id\"
+  = \"locations\".\"primary_assignment_id\"\r\nJOIN \"location_storage_types\" ON
+  \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\nJOIN
+  \"mr_sku_locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\nJOIN
+  \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\nJOIN \"material_resource_product_variants\"
+  ON \"material_resource_product_variants\".\"id\" =\r\n\"mr_skus\".\"mr_product_variant_id\"\r\nWHERE
+  \"locations\".\"active\"\r\nGROUP BY \"locations\".\"id\", \"locations\".\"primary_storage_type_id\",\r\n\"locations\".\"location_type_id\",
+  \"locations\".\"primary_assignment_id\", \"locations\".\"location_long_code\",\r\n\"locations\".\"location_description\",
+  \r\n(SELECT array_agg(\"cc\".\"location_long_code\") AS path\r\nFROM (SELECT \"c\".\"location_long_code\"\r\nFROM
+  \"locations\" c\r\nJOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\nWHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER
+  BY \"t1\".\"path_length\" DESC) cc),\r\n\"material_resource_product_variants\".\"product_variant_number\",\r\n\"material_resource_product_variants\".\"product_variant_code\"\r\nORDER
+  BY (SELECT string_agg(\"cc\".\"location_long_code\", ';') AS path\r\nFROM (SELECT \"c\".\"location_long_code\"\r\nFROM
+  \"locations\" c\r\nJOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\nWHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER
+  BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: locations.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  primary_storage_type_id:
+    :name: primary_storage_type_id
+    :sequence_no: 2
+    :caption: Primary storage type
+    :namespaced_name: locations.primary_storage_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_type_id:
+    :name: location_type_id
+    :sequence_no: 3
+    :caption: Location type
+    :namespaced_name: locations.location_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  primary_assignment_id:
+    :name: primary_assignment_id
+    :sequence_no: 4
+    :caption: Primary assignment
+    :namespaced_name: locations.primary_assignment_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_long_code:
+    :name: location_long_code
+    :sequence_no: 5
+    :caption: Location code
+    :namespaced_name: locations.location_long_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_description:
+    :name: location_description
+    :sequence_no: 6
+    :caption: Location description
+    :namespaced_name: locations.location_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  path_array:
+    :name: path_array
+    :sequence_no: 7
+    :caption: Path array
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_number:
+    :name: product_variant_number
+    :sequence_no: 8
+    :caption: Product variant number
+    :namespaced_name: material_resource_product_variants.product_variant_number
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_code:
+    :name: product_variant_code
+    :sequence_no: 9
+    :caption: Product variant code
+    :namespaced_name: material_resource_product_variants.product_variant_code
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity:
+    :name: quantity
+    :sequence_no: 10
+    :caption: Quantity
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: material_resource_product_variants.id
+  :caption: Product
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT product_variant_code, id FROM material_resource_product_variants
+    ORDER BY product_variant_code
+- :column: locations.primary_storage_type_id
+  :caption: Primary storage type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT storage_type_code, id FROM location_storage_types ORDER BY storage_type_code
+- :column: locations.location_type_id
+  :caption: Location type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT location_type_code, id FROM location_types ORDER BY location_type_code
+- :column: locations.primary_assignment_id
+  :caption: Primary assignment
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT assignment_code, id FROM location_assignments ORDER BY assignment_code
+- :column: locations.location_long_code
+  :caption: Location code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

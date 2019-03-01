@@ -12,7 +12,6 @@ module PackMaterial
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
-              form.add_field :internal_batch_number
               form.add_field :client_batch_number
               form.add_field :quantity_on_note
               form.add_field :quantity_received

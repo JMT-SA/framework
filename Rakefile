@@ -5,6 +5,10 @@ require 'yard'
 require 'rubocop/rake_task'
 
 Rake::TestTask.new(:test) do |t|
+  if ENV['TEST'] == 'test/**/*_test.rb'
+    ENV['TEST'] = nil
+    p 'Discarding TEST env var setting - using Rake task file list.'
+  end
   t.libs << 'test'
   t.warning = false
   t.test_files = FileList['test/**/test_*.rb', 'lib/**/test_*.rb']
@@ -42,7 +46,12 @@ namespace :db do
   task :add_user, %i[login_name password user_name] => [:dotenv_with_override] do |_, args|
     raise "\nLogin name cannot include spaces.\n\n" if args[:login_name].include?(' ')
     require 'sequel'
-    db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+              else
+                ENV.fetch('DATABASE_URL')
+              end
     db = Sequel.connect(db_name)
     id = db[:users].insert(login_name: args[:login_name], user_name: args[:user_name], password_hash: args[:password])
     puts "Created user with id #{id}"
@@ -52,7 +61,12 @@ namespace :db do
   task version: :dotenv_with_override do
     require 'sequel'
     Sequel.extension :migration
-    db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+              else
+                ENV.fetch('DATABASE_URL')
+              end
     db = Sequel.connect(db_name)
     version = if db.tables.include?(:schema_migrations)
                 db[:schema_migrations].reverse(:filename).first[:filename]
@@ -65,7 +79,12 @@ namespace :db do
   task recent_migrations: :dotenv_with_override do
     require 'sequel'
     Sequel.extension :migration
-    db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+              else
+                ENV.fetch('DATABASE_URL')
+              end
     db = Sequel.connect(db_name)
     migrations = if db.tables.include?(:schema_migrations)
                    db[:schema_migrations].reverse(:filename).first(10).map { |r| r[:filename] }
@@ -80,7 +99,12 @@ namespace :db do
   task :migrate, [:version] => :dotenv_with_override do |_, args|
     require 'sequel'
     Sequel.extension :migration
-    db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+              else
+                ENV.fetch('DATABASE_URL')
+              end
     db = Sequel.connect(db_name)
     if args[:version]
       puts "Migrating to version #{args[:version]}"

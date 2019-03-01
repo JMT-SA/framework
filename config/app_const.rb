@@ -16,10 +16,14 @@ class AppConst
   POST_FORM_BOUNDARY = 'AaB03x'
 
   # Labels
+  SHARED_CONFIG_HOST_PORT = ENV.fetch('SHARED_CONFIG_HOST_PORT')
   LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
   LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 
   # Printers
+  PRINTER_USE_INDUSTRIAL = 'INDUSTRIAL'
+  PRINTER_USE_OFFICE = 'OFFICE'
+
   PRINT_APP_LOCATION = 'Location'
   PRINT_APP_MR_SKU_BARCODE = 'Material Resource SKU Barcode'
 
@@ -31,14 +35,16 @@ class AppConst
   # These will need to be configured per installation...
   BARCODE_PRINT_RULES = {
     location: { format: 'LC%d', fields: [:id] },
-    sku: { format: 'SK%d', fields: [:sku_number] }
+    sku: { format: 'SK%d', fields: [:sku_number] },
+    delivery: { format: 'DN%d', fields: [:delivery_number] }
   }.freeze
 
   BARCODE_SCAN_RULES = [
     { regex: '^LC(\\d+)$', type: 'location', field: 'id' },
-    { regex: '^(\\D\\D\\D)$', type: 'location', field: 'legacy_barcode' },
+    { regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' },
     { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
-    { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' }
+    { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
+    { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' }
   ].freeze
 
   # Que
@@ -46,4 +52,10 @@ class AppConst
 
   # Mail
   SYSTEM_MAIL_SENDER = ENV.fetch('SYSTEM_MAIL_SENDER')
+  USER_EMAIL_GROUPS = [].freeze
+
+  # Business Processes
+  PROCESS_DELIVERIES = 'DELIVERIES'
+  PROCESS_VEHICLE_JOBS = 'VEHICLE JOBS'
+  PROCESS_ADHOC_TRANSACTIONS = 'ADHOC TRANSACTIONS'
 end

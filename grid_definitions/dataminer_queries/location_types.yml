@@ -1,7 +1,7 @@
 ---
 :caption: Location Types
-:sql: SELECT "location_types"."id", "location_types"."location_type_code", "location_types"."short_code",
-  "location_types"."created_at", "location_types"."updated_at" FROM "location_types"
+:sql: "SELECT \"location_types\".\"id\",\r\n\"location_types\".\"location_type_code\",\r\n\"location_types\".\"short_code\",\r\n\"location_types\".\"can_be_moved\",\r\n\"location_types\".\"created_at\",\r\n\"location_types\".\"updated_at\"
+  FROM \"location_types\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -15,6 +15,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -30,6 +31,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -45,6 +47,23 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  can_be_moved:
+    :name: can_be_moved
+    :sequence_no: 4
+    :caption: Can be moved
+    :namespaced_name: location_types.can_be_moved
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -53,13 +72,14 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Created at
     :namespaced_name: location_types.created_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -68,13 +88,14 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Updated at
     :namespaced_name: location_types.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

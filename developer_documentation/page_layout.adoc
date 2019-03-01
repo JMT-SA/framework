@@ -45,6 +45,10 @@ The called url is responsible for providing the content. This is a useful way of
 
 Using rows and columns, a page can display columns of information alongside each other. The responsive design will try to adapt the flow of columns to suit smaller/larger screens.
 
+== FoldUp
+
+A fold-up wraps a portion of the page and makes it collapsible. By default it renders collapsed and can be toggled open/closed by mouse.
+
 == DSL methods
 
 These are the methods used in building a page layout.
@@ -82,6 +86,10 @@ These are the methods used in building a page layout.
 |block
 |builds a Row using the block.
 
+|fold_up
+|block
+|builds a fold-up with the block as contents.
+
 |form
 |block
 |builds a form in the block.
@@ -93,6 +101,26 @@ These are the methods used in building a page layout.
 |add_grid
 |grid_id (String), url (String), options (Hash)
 |Add a grid to the page.
+
+|add_table
+|rows (Array), columns (Array), options (Hash)
+|Add a table to the page.
+
+|add_text
+|text (String), options (Hash)
+|Add a block of Text to the page.
+
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the page.
+
+|add_diff
+|key (Symbol)
+|Displays a diff of two texts contained in the page_config.
+
+|add_repeating_request
+|url (String), interval (Integer), content (String)
+|Adds a section to the page that will poll the server with url every interval seconds.
 
 |render
 |
@@ -113,6 +141,10 @@ These are the methods used in building a page layout.
 |block
 |builds a form in the block.
 
+|fold_up
+|block
+|builds a fold-up with the block as contents.
+
 |add_grid
 |grid_id (String), url (String), options (Hash)
 |Add a Grid to the section.
@@ -124,6 +156,34 @@ These are the methods used in building a page layout.
 |add_text
 |text (String), options (Hash)
 |Add a block of Text to the section.
+
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the section.
+
+|add_table
+|rows (Array), columns (Array), options (Hash)
+|Add a table to the page.
+
+|add_progress_step
+|steps (Array), options (Hash)
+|Displays a "breadcrumb" of steps taken and to be taken.
+
+|add_repeating_request
+|url (String), interval (Integer), content (String)
+|Adds a section to the page that will poll the server with url every interval seconds.
+
+|add_address
+|addresses (Array), opts (Hash)
+|Display a number of addresses.
+
+|add_contact_method
+|contact_methods (Array), opts (Hash)
+|Display a number of contact_methods.
+
+|add_diff
+|key (Symbol)
+|Displays a diff of two texts contained in the page_config.
 
 |add_control
 |page_control_definition (Hash)
@@ -167,21 +227,57 @@ These are the methods used in building a page layout.
 |column_size (Symbol) - optional -- :full/:half. Currently ignored.
 |Add a column within the row.
 
+|fold_up
+|block
+|builds a fold-up with the block as contents.
+
 |add_field
 |name (String), options (Hash)
 |Add a Field to the column.
+
+|add_list
+|items(Array), options (Hash)
+|Adds a list of items.
+
+|add_sortable_list
+|prefix (String), items (Array), options (Hash)
+|Add a sortable list control for sorting a list of ids using text values linked to the ids.
 
 |add_text
 |text (String), options (Hash)
 |Add a block of Text to the column.
 
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the column.
+
+|add_table
+|rows (Array), columns (Array), options (Hash)
+|Add a table to the page.
+
 |add_grid
 |grid_id (String), url (String), options (Hash)
 |Add a Grid to the column.
 
-|add_sortable_list
-|prefix (String), items (Array), options (Hash)
-|Add a sortable list control for sorting a list of ids using text values linked to the ids.
+|add_address
+|addresses (Array), opts (Hash)
+|Display a number of addresses.
+
+|add_contact_method
+|contact_methods (Array), opts (Hash)
+|Display a number of contact_methods.
+
+|add_diff
+|key (Symbol)
+|Displays a diff of two texts contained in the page_config.
+
+|add_repeating_request
+|url (String), interval (Integer), content (String)
+|Adds a section to the page that will poll the server with url every interval seconds.
+
+|add_control
+|page_control_definition (Hash)
+|Add a control (link / button) to the section.
 
 |render
 |
@@ -213,6 +309,10 @@ These are the methods used in building a page layout.
 |add_csrf_tag
 |tag
 |Adds a csrf tag to the form.
+
+|caption
+|String and optionally level number. e.g. `form.caption 'New thing', level: 3`.
+|Render a caption above the form (hidden for remote forms). The level can be 1..4 to render within h1..h4 tags. Default level is 2.
 
 |remote!
 |
@@ -246,6 +346,10 @@ These are the methods used in building a page layout.
 |block
 |builds a Row using the block.
 
+|fold_up
+|block
+|builds a fold-up with the block as contents.
+
 |add_field
 |name (String), options (Hash)
 |Add a Field to the form.
@@ -254,9 +358,25 @@ These are the methods used in building a page layout.
 |text (String), options (Hash)
 |Add a block of Text to the form.
 
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the form.
+
+|add_list
+|items(Array), options (Hash)
+|Adds a list of items.
+
 |add_sortable_list
 |prefix (String), items (Array), options (Hash)
 |Add a sortable list control for sorting a list of ids using text values linked to the ids.
+
+|add_address
+|addresses (Array), opts (Hash)
+|Display a number of addresses.
+
+|add_contact_method
+|contact_methods (Array), opts (Hash)
+|Display a number of contact_methods.
 
 |submit_captions
 |value (String), disabled_value (String), optional.
@@ -265,5 +385,68 @@ These are the methods used in building a page layout.
 |render
 |
 |Renders the form and all fields and other nodes within it.
+
+|===
+
+=== FoldUp
+
+|===
+|method |args |description
+
+|caption
+|caption_text (String)
+|Replaces the default text which is 'Details'.
+
+|open!
+|
+|Causes the control to render expanded. The default is to render collapsed.
+
+|add_csrf_tag
+|tag
+|Adds tags to all nodes in the control (only forms will actually apply the tag)
+
+|row
+|block
+|builds a Row using the block.
+
+|form
+|block
+|builds a form in the block.
+
+|add_grid
+|grid_id (String), url (String), options (Hash)
+|Add a grid to the page.
+
+|add_text
+|text (String), options (Hash)
+|Add a block of Text to the page.
+
+|add_notice
+|text (String), options (Hash)
+|Add a styled Notice to the page.
+
+|add_table
+|rows (Array), columns (Array), options (Hash)
+|Add a table to the page.
+
+|add_address
+|addresses (Array), opts (Hash)
+|Display a number of addresses.
+
+|add_contact_method
+|contact_methods (Array), opts (Hash)
+|Display a number of contact_methods.
+
+|add_diff
+|key (Symbol)
+|Displays a diff of two texts contained in the page_config.
+
+|add_field
+|name (String), options (Hash)
+|Add a Field to the fold-up inside a form.
+
+|render
+|
+|Renders all nodes in the fold-up.
 
 |===

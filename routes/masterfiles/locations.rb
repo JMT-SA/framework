@@ -27,9 +27,12 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_location_type(id, params[:location_type])
           if res.success
-            update_grid_row(id,
-                            changes: { location_type_code: res.instance[:location_type_code], short_code: res.instance[:short_code] },
-                            notice: res.message)
+            row_keys = %i[
+              location_type_code
+              short_code
+              can_be_moved
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Locations::LocationType::Edit.call(id, form_values: params[:location_type], form_errors: res.errors) }
           end
@@ -96,8 +99,8 @@ class Framework < Roda
 
       r.on 'add_child' do   # NEW CHILD
         r.on 'location_type_changed' do
-          res = interactor.location_code_suggestion(id, params[:changed_value])
-          json_replace_input_value('location_location_code', res.instance)
+          res = interactor.location_long_code_suggestion(id, params[:changed_value])
+          json_replace_input_value('location_location_long_code', res.instance)
         end
         r.get do
           check_auth!('locations', 'edit')
@@ -109,10 +112,11 @@ class Framework < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
+            form_errors = move_validation_errors_to_base(res.errors, :location_long_code, highlights: { location_long_code: %i[location_long_code location_short_code] })
             re_show_form(r, res, url: "/masterfiles/locations/locations/#{id}/add_child") do
               Masterfiles::Locations::Location::New.call(id: id,
                                                          form_values: params[:location],
-                                                         form_errors: res.errors,
+                                                         form_errors: form_errors,
                                                          remote: fetch?(r))
             end
           end
@@ -152,10 +156,12 @@ class Framework < Roda
               storage_type_code
               location_type_code
               assignment_code
-              location_code
+              location_long_code
               location_description
+              location_short_code
               has_single_container
               virtual_location
+              can_be_moved
               consumption_area
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -187,9 +193,10 @@ class Framework < Roda
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         else
+          form_errors = move_validation_errors_to_base(res.errors, :location_long_code, highlights: { location_long_code: %i[location_long_code location_short_code] })
           re_show_form(r, res, url: '/masterfiles/locations/locations/new') do
             Masterfiles::Locations::Location::New.call(form_values: params[:location],
-                                                       form_errors: res.errors,
+                                                       form_errors: form_errors,
                                                        remote: fetch?(r))
           end
         end

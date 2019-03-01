@@ -179,35 +179,7 @@ const crossbeamsGridEvents = {
             if (data.keep_dialog_open) {
               closeDialog = false;
             }
-            data.actions.forEach((action) => {
-              if (action.replace_options) {
-                crossbeamsUtils.replaceSelectrOptions(action);
-              }
-              if (action.replace_multi_options) {
-                crossbeamsUtils.replaceMultiOptions(action);
-              }
-              if (action.replace_input_value) {
-                crossbeamsUtils.replaceInputValue(action);
-              }
-              if (action.replace_inner_html) {
-                crossbeamsUtils.replaceInnerHtml(action);
-              }
-              if (action.replace_list_items) {
-                crossbeamsUtils.replaceListItems(action);
-              }
-              if (action.clear_form_validation) {
-                crossbeamsUtils.clearFormValidation(action);
-              }
-              if (action.addRowToGrid) {
-                crossbeamsUtils.addGridRow(action);
-              }
-              if (action.updateGridInPlace) {
-                crossbeamsUtils.updateGridRow(action);
-              }
-              if (action.removeGridRowInPlace) {
-                crossbeamsUtils.deleteGridRow(action);
-              }
-            });
+            crossbeamsUtils.processActions(data.actions);
           } else if (data.replaceDialog) {
             closeDialog = false;
             const dlgContent = document.getElementById(crossbeamsUtils.activeDialogContent());
@@ -487,6 +459,27 @@ const crossbeamsGridFormatters = {
     let subPrefix = '';
     let subnode;
     let titleValue;
+    const checkBooleans = (checks, boolVal, data) => {
+      let ok = false;
+      checks.split(',').forEach((field) => {
+        if (data[field] === boolVal) {
+          ok = true;
+        }
+      });
+      return ok;
+    };
+    const checkNulls = (checks, nullPresent, data) => {
+      let ok = false;
+      checks.split(',').forEach((field) => {
+        if (nullPresent && data[field] === null) {
+          ok = true;
+        }
+        if (!nullPresent && data[field] !== null) {
+          ok = true;
+        }
+      });
+      return ok;
+    };
     if (item.title_field) {
       titleValue = params.data[item.title_field];
     } else {
@@ -500,16 +493,16 @@ const crossbeamsGridFormatters = {
         return { key: `${prefix}${key}`, name: item.text, value: '---' };
       }
       return null;
-    } else if (item.hide_if_null && params.data[item.hide_if_null] === null) {
+    } else if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_present && params.data[item.hide_if_present] !== null) {
+    } else if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_true && params.data[item.hide_if_true] === true) {
+    } else if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_false && params.data[item.hide_if_false] === false) {
+    } else if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
       // No show of item
       return null;
     } else if (item.is_submenu) {
@@ -637,6 +630,11 @@ const crossbeamsGridFormatters = {
   hrefSimpleFormatter: function hrefSimpleFormatter(params) {
     const vals = params.value.split('|');
     return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href="${vals[0]}">${vals[1]}</a>`;
+  },
+
+  hrefSimpleFetchFormatter: function hrefSimpleFetchFormatter(params) {
+    const vals = params.value.split('|');
+    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" data-remote-link="true" href="${vals[0]}">${vals[1]}</a>`;
   },
 
   // Creates a link that when clicked prompts for a yes/no answer.
@@ -959,6 +957,9 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           if (col[attr] === 'crossbeamsGridFormatters.hrefSimpleFormatter') {
             newCol[attr] = crossbeamsGridFormatters.hrefSimpleFormatter;
           }
+          if (col[attr] === 'crossbeamsGridFormatters.hrefSimpleFetchFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.hrefSimpleFetchFormatter;
+          }
           if (col[attr] === 'crossbeamsGridFormatters.hrefPromptFormatter') {
             newCol[attr] = crossbeamsGridFormatters.hrefPromptFormatter;
           }
@@ -1167,6 +1168,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
                   return 'orange';
                 case 'inactive':
                   return 'gray i';
+                case 'ready':
+                  return 'blue';
                 case 'ok':
                   return 'green';
                 case 'inprogress':
@@ -1355,35 +1358,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   } else if (data.addRowToGrid) {
                     crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
                   } else if (data.actions) {
-                    data.actions.forEach((action) => {
-                      if (action.replace_options) {
-                        crossbeamsUtils.replaceSelectrOptions(action);
-                      }
-                      if (action.replace_multi_options) {
-                        crossbeamsUtils.replaceMultiOptions(action);
-                      }
-                      if (action.replace_input_value) {
-                        crossbeamsUtils.replaceInputValue(action);
-                      }
-                      if (action.replace_inner_html) {
-                        crossbeamsUtils.replaceInnerHtml(action);
-                      }
-                      if (action.replace_list_items) {
-                        crossbeamsUtils.replaceListItems(action);
-                      }
-                      if (action.clear_form_validation) {
-                        crossbeamsUtils.clearFormValidation(action);
-                      }
-                      if (action.addRowToGrid) {
-                        crossbeamsUtils.addGridRow(action);
-                      }
-                      if (action.updateGridInPlace) {
-                        crossbeamsUtils.updateGridRow(action);
-                      }
-                      if (action.removeGridRowInPlace) {
-                        crossbeamsUtils.deleteGridRow(action);
-                      }
-                    });
+                    crossbeamsUtils.processActions(data.actions);
                   } else {
                     console.log('Not sure what to do with this:', data);
                   }

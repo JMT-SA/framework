@@ -1,0 +1,14 @@
+---
+:dataminer_definition: locations
+:multiselect:
+  :mr_bulk_stock_adjustments:
+    :url: "/pack_material/transactions/mr_bulk_stock_adjustments/link_locations/$:id$"
+    :preselect: "SELECT location_id AS id FROM mr_bulk_stock_adjustments_locations WHERE mr_bulk_stock_adjustment_id = $:id$"
+    :section_caption: Link Locations
+    :can_be_cleared: true
+    :conditions: bulk_stock_adj_locations
+:conditions:
+  :bulk_stock_adj_locations:
+    - :col: locations.primary_storage_type_id
+      :op: =
+      :val: $:storage_type_id$

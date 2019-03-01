@@ -271,6 +271,33 @@ const crossbeamsUtils = {
       });
     }
   },
+  /**
+   * On button click, unpack rules from the button element and use a fetch
+   * request to show a grid in a dialog where the user can choose a row.
+   *
+   * @param {node} element - a button element.
+   * @returns {void}
+   */
+  showLookupGrid: function showLookupGrid(element) {
+    const lkpName = element.dataset.lookupName;
+    const lkpKey = element.dataset.lookupKey;
+    const paramKeys = JSON.parse(element.dataset.paramKeys);
+    const paramValues = JSON.parse(element.dataset.paramValues);
+    // console.log(lkpName, lkpKey, paramKeys, paramValues);
+    const queryParam = {};
+    paramKeys.forEach((key) => {
+      let val = paramValues[key];
+      if (val === undefined) {
+        const e = document.getElementById(key);
+        val = e.value;
+      }
+      queryParam[key] = val;
+    });
+    // Could be no params...
+    const url = `/lookups/${lkpName}/${lkpKey}?${crossbeamsUtils.buildQueryString(queryParam)}`;
+    // console.log('URL:', url);
+    crossbeamsUtils.popupDialog(element.textContent, url);
+  },
 
   /**
    * Take selected options from a multiselect and return them in a sequence
@@ -433,6 +460,29 @@ const crossbeamsUtils = {
     elem.value = action.replace_input_value.value;
   },
   /**
+   * Change the selected option of a Select element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  changeSelectValue: function changeSelectValue(action) {
+    const elem = document.getElementById(action.change_select_value.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.change_select_value.id}"`,
+        title: 'Change select: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (elem.selectr) {
+      if (String(elem.value) !== String(action.change_select_value.value)) {
+        elem.selectr.setValue(action.change_select_value.value);
+      }
+    } else {
+      elem.value = action.change_select_value.value;
+    }
+  },
+  /**
    * Replace the contents of a DOM element.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
@@ -448,6 +498,48 @@ const crossbeamsUtils = {
       return;
     }
     elem.innerHTML = action.replace_inner_html.value;
+  },
+  /**
+   * Hide a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  hideElement: function hideElement(action) {
+    const elem = document.getElementById(action.hide_element.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.hide_element.id}"`,
+        title: 'Hide element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.hide_element.reclaim_space) {
+      elem.style.display = 'none';
+    } else {
+      elem.style.visibility = 'hidden';
+    }
+  },
+  /**
+   * Show a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  showElement: function showElement(action) {
+    const elem = document.getElementById(action.show_element.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.show_element.id}"`,
+        title: 'Show element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.show_element.reclaim_space) {
+      elem.style.display = 'block'; // OR inline / inline-block????
+    } else {
+      elem.style.visibility = 'visible';
+    }
   },
   /**
    * Replace the items of a List element.
@@ -512,6 +604,52 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Goes through a set of actions and processes them.
+   * @param {array} actions - the actions to be executed.
+   * @returns {void}
+   */
+  processActions: function processActions(actions) {
+    actions.forEach((action) => {
+      if (action.replace_options) {
+        crossbeamsUtils.replaceSelectrOptions(action);
+      }
+      if (action.replace_multi_options) {
+        crossbeamsUtils.replaceMultiOptions(action);
+      }
+      if (action.replace_input_value) {
+        crossbeamsUtils.replaceInputValue(action);
+      }
+      if (action.change_select_value) {
+        crossbeamsUtils.changeSelectValue(action);
+      }
+      if (action.replace_inner_html) {
+        crossbeamsUtils.replaceInnerHtml(action);
+      }
+      if (action.replace_list_items) {
+        crossbeamsUtils.replaceListItems(action);
+      }
+      if (action.hide_element) {
+        crossbeamsUtils.hideElement(action);
+      }
+      if (action.show_element) {
+        crossbeamsUtils.showElement(action);
+      }
+      if (action.clear_form_validation) {
+        crossbeamsUtils.clearFormValidation(action);
+      }
+      if (action.addRowToGrid) {
+        crossbeamsUtils.addGridRow(action);
+      }
+      if (action.updateGridInPlace) {
+        crossbeamsUtils.updateGridRow(action);
+      }
+      if (action.removeGridRowInPlace) {
+        crossbeamsUtils.deleteGridRow(action);
+      }
+    });
+  },
+
+  /**
    * Calls all urls for observeChange behaviour and applies changes to the DOM as required..
    * @param {string} url - the url to be called.
    * @returns {void}
@@ -532,35 +670,7 @@ const crossbeamsUtils = {
     })
     .then((data) => {
       if (data.actions) {
-        data.actions.forEach((action) => {
-          if (action.replace_options) {
-            this.replaceSelectrOptions(action);
-          }
-          if (action.replace_multi_options) {
-            this.replaceMultiOptions(action);
-          }
-          if (action.replace_input_value) {
-            this.replaceInputValue(action);
-          }
-          if (action.replace_inner_html) {
-            this.replaceInnerHtml(action);
-          }
-          if (action.replace_list_items) {
-            this.replaceListItems(action);
-          }
-          if (action.clear_form_validation) {
-            this.clearFormValidation(action);
-          }
-          if (action.addRowToGrid) {
-            this.addGridRow(action);
-          }
-          if (action.updateGridInPlace) {
-            this.updateGridRow(action);
-          }
-          if (action.removeGridRowInPlace) {
-            this.deleteGridRow(action);
-          }
-        });
+        this.processActions(data.actions);
       }
       if (data.flash) {
         if (data.flash.notice) {
@@ -648,6 +758,8 @@ const crossbeamsUtils = {
           // multiple: true,     // should configure via data...
           allowDeselect: false,
           clearable: true,       // should configure via data...
+          disabled: sel.disabled,
+          width: 'notset',       // stop Selectr from setting width to 100%
         }); // select that can be searched.
         // Store a reference on the DOM node.
         sel.selectr = holdSel;
@@ -666,7 +778,11 @@ const crossbeamsUtils = {
                   target.disabled = true;
                 }
                 if (target.selectr) {
-                  target.selectr.disable(target.disabled === true);
+                  if (target.disabled) {
+                    target.selectr.disable();
+                  } else {
+                    target.selectr.enable();
+                  }
                 }
               }
             });

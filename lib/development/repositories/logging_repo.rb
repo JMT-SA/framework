@@ -8,6 +8,15 @@ module DevelopmentApp
       where_hash(Sequel[:audit][:logged_actions], event_id: id)
     end
 
+    def find_logged_action_hash_from_status_log(id)
+      status = where_hash(Sequel[:audit][:status_logs], id: id)
+      where_hash(Sequel[:audit][:logged_actions],
+                 table_name: status[:table_name],
+                 action_tstamp_tx: status[:action_tstamp_tx],
+                 row_data_id: status[:row_data_id],
+                 transaction_id: status[:transaction_id])
+    end
+
     def find_logged_action(id)
       hash = find_logged_action_hash(id)
       return nil if hash.nil?

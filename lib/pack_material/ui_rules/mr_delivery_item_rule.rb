@@ -44,7 +44,7 @@ module UiRules
       {
         purchase_order_id: {
           renderer: :select,
-          options: @repo.for_select_purchase_orders_with_supplier,
+          options: @repo.for_select_purchase_orders_with_supplier(purchase_order_id: @options[:purchase_order_id]),
           selected: @options[:purchase_order_id],
           caption: 'Purchase Order',
           required: true,
@@ -74,7 +74,7 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(mr_delivery_id: @options[:parent_id],
                                     mr_purchase_order_item_id: @options[:item_id],
-                                    mr_product_variant_id: @repo.find_mr_purchase_order_item(@options[:item_id])&.mr_product_variant_id,
+                                    mr_product_variant_id: product_variant_id,
                                     quantity_on_note: nil,
                                     quantity_over_supplied: nil,
                                     quantity_under_supplied: nil,
@@ -85,6 +85,10 @@ module UiRules
 
     def product_variant_code
       PackMaterialApp::ConfigRepo.new.find_matres_product_variant(@form_object.mr_product_variant_id)&.product_variant_code
+    end
+
+    def product_variant_id
+      @repo.find_mr_purchase_order_item(@options[:item_id])&.mr_product_variant_id
     end
 
     def available_purchase_order_items

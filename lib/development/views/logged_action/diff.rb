@@ -9,11 +9,11 @@ module Development
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
-            page.add_diff :logged_action
-            # page.callback_section do |section| # does not work: inline script is not fired in dialog...
-            #   section.caption = 'Test'
-            #   section.url = '/security/security_groups/2'
-            # end
+            if left.nil?
+              page.add_notice 'There is no record of the changes that took place at this point', caption: 'Unable to show difference'
+            else
+              page.add_diff :logged_action
+            end
           end
 
           layout

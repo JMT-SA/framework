@@ -18,6 +18,7 @@ module Labels
               form.method :update
               form.add_field :printer_id
               form.add_field :application
+              form.add_field :default_printer
             end
           end
 

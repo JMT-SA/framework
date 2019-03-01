@@ -2,17 +2,17 @@
 /*!
  * jQuery contextMenu - Plugin for simple contextMenu handling
  *
- * Version: v2.5.0
+ * Version: v2.7.0
  *
  * Authors: Björn Brala (SWIS.nl), Rodney Rehm, Addy Osmani (patches for FF)
  * Web: http://swisnl.github.io/jQuery-contextMenu/
  *
- * Copyright (c) 2011-2017 SWIS BV and contributors
+ * Copyright (c) 2011-2019 SWIS BV and contributors
  *
  * Licensed under
  *   MIT License http://www.opensource.org/licenses/mit-license
  *
- * Date: 2017-05-25T11:30:28.663Z
+ * Date: 2019-02-13T09:27:06.266Z
  */
 @-webkit-keyframes cm-spin {
   0% {
@@ -54,40 +54,172 @@
   font-style: normal; 
   font-weight: normal;
 
-  src: url("font/context-menu-icons.eot?4yg1f");
-  src: url("font/context-menu-icons.eot?4yg1f#iefix") format("embedded-opentype"), url("font/context-menu-icons.woff2?4yg1f") format("woff2"), url("font/context-menu-icons.woff?4yg1f") format("woff"), url("font/context-menu-icons.ttf?4yg1f") format("truetype");
+  src: url("font/context-menu-icons.eot?2mpyv");
+  src: url("font/context-menu-icons.eot?2mpyv#iefix") format("embedded-opentype"), url("font/context-menu-icons.woff2?2mpyv") format("woff2"), url("font/context-menu-icons.woff?2mpyv") format("woff"), url("font/context-menu-icons.ttf?2mpyv") format("truetype");
 }
 
-.context-menu-icon-add:before {
+.context-menu-icon-add-outline:before {
   content: "\EA01";
 }
 
-.context-menu-icon-copy:before {
+.context-menu-icon-add-solid:before {
   content: "\EA02";
 }
 
-.context-menu-icon-cut:before {
+.context-menu-icon-add:before {
   content: "\EA03";
 }
 
-.context-menu-icon-delete:before {
+.context-menu-icon-arrow-left:before {
   content: "\EA04";
 }
 
-.context-menu-icon-edit:before {
+.context-menu-icon-book-reference:before {
   content: "\EA05";
 }
 
-.context-menu-icon-loading:before {
+.context-menu-icon-bug:before {
   content: "\EA06";
 }
 
-.context-menu-icon-paste:before {
+.context-menu-icon-check-square:before {
   content: "\EA07";
 }
 
-.context-menu-icon-quit:before {
+.context-menu-icon-checkmark:before {
   content: "\EA08";
+}
+
+.context-menu-icon-cheveron-right:before {
+  content: "\EA09";
+}
+
+.context-menu-icon-close-outline:before {
+  content: "\EA0A";
+}
+
+.context-menu-icon-code:before {
+  content: "\EA0B";
+}
+
+.context-menu-icon-copy:before {
+  content: "\EA0C";
+}
+
+.context-menu-icon-cut:before {
+  content: "\EA0D";
+}
+
+.context-menu-icon-delete:before {
+  content: "\EA0E";
+}
+
+.context-menu-icon-document-add:before {
+  content: "\EA0F";
+}
+
+.context-menu-icon-download:before {
+  content: "\EA10";
+}
+
+.context-menu-icon-edit-copy:before {
+  content: "\EA11";
+}
+
+.context-menu-icon-edit-pencil:before {
+  content: "\EA12";
+}
+
+.context-menu-icon-edit:before {
+  content: "\EA13";
+}
+
+.context-menu-icon-envelope:before {
+  content: "\EA14";
+}
+
+.context-menu-icon-excel:before {
+  content: "\EA15";
+}
+
+.context-menu-icon-gavel:before {
+  content: "\EA16";
+}
+
+.context-menu-icon-information-solid:before {
+  content: "\EA17";
+}
+
+.context-menu-icon-link:before {
+  content: "\EA18";
+}
+
+.context-menu-icon-list:before {
+  content: "\EA19";
+}
+
+.context-menu-icon-loading:before {
+  content: "\EA1A";
+}
+
+.context-menu-icon-lock-closed:before {
+  content: "\EA1B";
+}
+
+.context-menu-icon-minus-outline:before {
+  content: "\EA1C";
+}
+
+.context-menu-icon-minus-solid:before {
+  content: "\EA1D";
+}
+
+.context-menu-icon-paste:before {
+  content: "\EA1E";
+}
+
+.context-menu-icon-photo:before {
+  content: "\EA1F";
+}
+
+.context-menu-icon-play:before {
+  content: "\EA20";
+}
+
+.context-menu-icon-printer:before {
+  content: "\EA21";
+}
+
+.context-menu-icon-quit:before {
+  content: "\EA22";
+}
+
+.context-menu-icon-save-disk:before {
+  content: "\EA23";
+}
+
+.context-menu-icon-sort:before {
+  content: "\EA24";
+}
+
+.context-menu-icon-toggle-off:before {
+  content: "\EA25";
+}
+
+.context-menu-icon-toggle-on:before {
+  content: "\EA26";
+}
+
+.context-menu-icon-trash:before {
+  content: "\EA27";
+}
+
+.context-menu-icon-view-column:before {
+  content: "\EA28";
+}
+
+.context-menu-icon-view-show:before {
+  content: "\EA29";
 }
 
 .context-menu-icon::before {
@@ -128,6 +260,7 @@
 .context-menu-icon.context-menu-icon--fa {
   display: list-item;
   font-family: inherit;
+  line-height: inherit;
 }
 .context-menu-icon.context-menu-icon--fa::before {
   position: absolute;
@@ -156,6 +289,24 @@
   color: #bbb;
 }
 
+.context-menu-icon.context-menu-icon--fa5 {
+  display: list-item;
+  font-family: inherit;
+  line-height: inherit;
+}
+.context-menu-icon.context-menu-icon--fa5 i, .context-menu-icon.context-menu-icon--fa5 svg {
+  position: absolute;
+  top: .3em; 
+  left: .5em;
+  color: #2980b9;
+}
+.context-menu-icon.context-menu-icon--fa5.context-menu-hover i, .context-menu-icon.context-menu-icon--fa5.context-menu-hover svg {
+  color: #fff;
+}
+.context-menu-icon.context-menu-icon--fa5.context-menu-disabled i, .context-menu-icon.context-menu-icon--fa5.context-menu-disabled svg {
+  color: #bbb;
+}
+
 .context-menu-list {
   position: absolute; 
   display: inline-block;
@@ -175,6 +326,9 @@
 
 .context-menu-item {
   position: relative;
+  -webkit-box-sizing: content-box;
+     -moz-box-sizing: content-box;
+          box-sizing: content-box;
   padding: .2em 2em;
   color: #2f2f2f;
   -webkit-user-select: none;

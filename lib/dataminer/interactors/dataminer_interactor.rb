@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DataminerApp
-  class DataminerInteractor < BaseInteractor
+  class DataminerInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def repo
       @repo ||= ReportRepo.new(@context[:for_grid_queries])
     end
@@ -240,6 +240,9 @@ module DataminerApp
         }
         mk.boolean 'groupable', 'Can group by?', editable: true, cellEditor: 'select', cellEditorParams: {
           values: [true, false]
+        }
+        mk.col 'pinned', nil, editable: true, cellEditor: 'select', cellEditorParams: {
+          values: ['', 'left', 'right']
         }
         mk.integer 'group_by_seq', 'Group Seq', tooltip: 'If the grid opens grouped, this is the grouping level', editable: true, cellEditor: 'NumericCellEditor'
         mk.boolean 'group_sum', 'Sum?', editable: true, cellEditor: 'select', cellEditorParams: {

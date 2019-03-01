@@ -6,8 +6,12 @@ if ENV.fetch('RACK_ENV') == 'test'
 else
   Dotenv.load('.env.local', '.env')
 end
-db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
-
+# db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
+db_name = if ENV.fetch('RACK_ENV') == 'test'
+            'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+          else
+            ENV.fetch('DATABASE_URL')
+          end
 require 'sequel'
 require 'logger'
 DB = Sequel.connect(db_name)

@@ -7,6 +7,11 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+### Changed
+### Fixed
+
+## [0.6.0] - 2019-02-01
+### Added
 - Maintain printers.
 - Maintain printer applications and use them for selecting printers for barcode prints.
 - Lookup control to select a row from a agrid for modifying input values in a form.
@@ -17,7 +22,6 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 - Label templates for printing labels.
 ### Changed
 -Locations: location code became long_code, legacy_barcode became short_code and print_code was added.
-### Fixed
 
 ## [0.5.0] - 2018-12-03
 ### Added

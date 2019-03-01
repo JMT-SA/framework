@@ -145,7 +145,7 @@ class Framework < Roda
             mr_sub_type_name
             product_variant_code
             product_code
-            location_code
+            location_long_code
             inventory_uom_code
             scan_to_location_code
             system_quantity
@@ -341,7 +341,7 @@ class Framework < Roda
               mr_sub_type_name
               product_variant_code
               product_code
-              location_code
+              location_long_code
               inventory_uom_code
               scan_to_location_code
               system_quantity

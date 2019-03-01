@@ -16,7 +16,7 @@ module Masterfiles
               form.action "/masterfiles/locations/locations/#{id}/print_barcode"
               form.remote!
               form.method :update
-              form.add_field :location_code
+              form.add_field :location_long_code
               form.add_field :location_description
               form.add_field :printer
               form.add_field :no_of_prints

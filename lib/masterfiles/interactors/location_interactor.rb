@@ -47,9 +47,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = location(id)
-      success_response("Created location #{instance.location_code}", instance)
+      success_response("Created location #{instance.location_long_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists: Legacy Barcode and Location Code must be Unique'] }))
+      validation_failed_response(OpenStruct.new(messages: { location_long_code: ['This location already exists: Location Long and Short codes must be Unique'] }))
     end
 
     def create_location(parent_id, params)
@@ -61,9 +61,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = location(id)
-      success_response("Created location #{instance.location_code}", instance)
+      success_response("Created location #{instance.location_long_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { location_code: ['This location already exists: Legacy Barcode and Location Code must be Unique'] }))
+      validation_failed_response(OpenStruct.new(messages: { location_long_code: ['This location already exists: Location Long and Short codes must be Unique'] }))
     end
 
     def update_location(id, params)
@@ -74,12 +74,12 @@ module MasterfilesApp
         log_transaction
       end
       instance = location(id)
-      success_response("Updated location #{instance.location_code}", instance)
+      success_response("Updated location #{instance.location_long_code}", instance)
     end
 
     def delete_location(id)
       return failed_response('Cannot delete this location - it has sub-locations') if repo.location_has_children(id)
-      name = location(id).location_code
+      name = location(id).location_long_code
       repo.transaction do
         repo.delete_location(id)
         log_transaction
@@ -173,8 +173,8 @@ module MasterfilesApp
       success_response('Storage types linked successfully')
     end
 
-    def location_code_suggestion(parent_id, location_type_id)
-      res = repo.location_code_suggestion(parent_id, location_type_id)
+    def location_long_code_suggestion(parent_id, location_type_id)
+      res = repo.location_long_code_suggestion(parent_id, location_type_id)
       return res unless res.success
       success_response('See location code suggestion', res.instance)
     end

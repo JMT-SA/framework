@@ -65,7 +65,7 @@ module UiRules
         business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
         ref_no: { required: true },
         sku_numbers_list: { renderer: :list, items: @object.sku_numbers, caption: 'SKU Numbers' },
-        location_list: { renderer: :list, items: @repo.location_codes_list(Array(@object.location_ids)), caption: 'Location Codes' }
+        location_list: { renderer: :list, items: @repo.location_long_codes_list(Array(@object.location_ids)), caption: 'Location Codes' }
       }
     end
 
@@ -85,7 +85,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(sku_numbers: nil,
-                                    location_codes: nil,
+                                    location_long_codes: nil,
                                     is_stock_take: nil,
                                     business_process_id: nil,
                                     ref_no: nil)

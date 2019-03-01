@@ -3,8 +3,8 @@
 :sql: "SELECT\r\n  mr_skus.id,\r\n  mr_skus.sku_number,\r\n  \"mr_inventory_transaction_items\".id
   as item_id,\r\n  \"mr_inventory_transaction_items\".quantity,\r\n  \"mr_inventory_transaction_items\".inventory_uom_id,\r\n
   \ uoms.uom_code,\r\n  \"mr_inventory_transaction_items\".from_location_id,\r\n  \"mr_inventory_transactions\".\"to_location_id\",\r\n
-  \ from_locations.\"location_code\" as from_location_code,\r\n  to_locations.\"location_code\"
-  as to_location_code,\r\n  \"mr_inventory_transactions\".\"ref_no\",\r\n  \"mr_inventory_transactions\".\"id\"
+  \ from_locations.\"location_long_code\" as from_location_long_code,\r\n  to_locations.\"location_long_code\"
+  as to_location_long_code,\r\n  \"mr_inventory_transactions\".\"ref_no\",\r\n  \"mr_inventory_transactions\".\"id\"
   as transaction_id,\r\n  \"mr_inventory_transactions\".\"created_by\",\r\n  \"mr_inventory_transactions\".\"mr_inventory_transaction_type_id\",\r\n
   \ \"mr_inventory_transaction_types\".\"type_name\",\r\n  \"mr_inventory_transactions\".\"is_adhoc\",\r\n
   \ \"business_processes\".\"process\",\r\n  \"mr_inventory_transactions\".\"active\",\r\n
@@ -152,11 +152,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  from_location_code:
-    :name: from_location_code
+  from_location_long_code:
+    :name: from_location_long_code
     :sequence_no: 9
     :caption: From location code
-    :namespaced_name: from_locations.location_code
+    :namespaced_name: from_locations.location_long_code
     :data_type: :string
     :width: 
     :format: 
@@ -168,11 +168,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  to_location_code:
-    :name: to_location_code
+  to_location_long_code:
+    :name: to_location_long_code
     :sequence_no: 10
     :caption: To location code
-    :namespaced_name: to_locations.location_code
+    :namespaced_name: to_locations.location_long_code
     :data_type: :string
     :width: 
     :format: 
@@ -360,7 +360,7 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT location_code, id FROM locations ORDER BY location_code
+  :list_def: SELECT location_long_code, id FROM locations ORDER BY location_long_code
 - :column: mr_inventory_transactions.business_process_id
   :caption: Business process
   :data_type: :integer

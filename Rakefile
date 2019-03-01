@@ -5,6 +5,10 @@ require 'yard'
 require 'rubocop/rake_task'
 
 Rake::TestTask.new(:test) do |t|
+  if ENV['TEST'] == 'test/**/*_test.rb'
+    ENV['TEST'] = nil
+    p 'Discarding TEST env var setting - using Rake task file list.'
+  end
   t.libs << 'test'
   t.warning = false
   t.test_files = FileList['test/**/test_*.rb', 'lib/**/test_*.rb']

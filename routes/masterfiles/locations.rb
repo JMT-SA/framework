@@ -99,8 +99,8 @@ class Framework < Roda
 
       r.on 'add_child' do   # NEW CHILD
         r.on 'location_type_changed' do
-          res = interactor.location_code_suggestion(id, params[:changed_value])
-          json_replace_input_value('location_location_code', res.instance)
+          res = interactor.location_long_code_suggestion(id, params[:changed_value])
+          json_replace_input_value('location_location_long_code', res.instance)
         end
         r.get do
           check_auth!('locations', 'edit')
@@ -112,7 +112,7 @@ class Framework < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            form_errors = move_validation_errors_to_base(res.errors, :location_code, highlights: { location_code: [:location_code, :legacy_barcode] })
+            form_errors = move_validation_errors_to_base(res.errors, :location_long_code, highlights: { location_long_code: %i[location_long_code location_short_code] })
             re_show_form(r, res, url: "/masterfiles/locations/locations/#{id}/add_child") do
               Masterfiles::Locations::Location::New.call(id: id,
                                                          form_values: params[:location],
@@ -156,8 +156,9 @@ class Framework < Roda
               storage_type_code
               location_type_code
               assignment_code
-              location_code
+              location_long_code
               location_description
+              location_short_code
               has_single_container
               virtual_location
               can_be_moved
@@ -192,7 +193,7 @@ class Framework < Roda
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         else
-          form_errors = move_validation_errors_to_base(res.errors, :location_code, highlights: { location_code: [:location_code, :legacy_barcode] })
+          form_errors = move_validation_errors_to_base(res.errors, :location_long_code, highlights: { location_long_code: %i[location_long_code location_short_code] })
           re_show_form(r, res, url: '/masterfiles/locations/locations/new') do
             Masterfiles::Locations::Location::New.call(form_values: params[:location],
                                                        form_errors: form_errors,

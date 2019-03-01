@@ -26,9 +26,9 @@ module PackMaterial
               form.add_field :mr_sub_type_name
               form.add_field :product_variant_code
               form.add_field :product_code
-              form.add_field :location_code
+              form.add_field :location_long_code
               form.add_field :inventory_uom_code
-              form.add_field :scan_to_location_code
+              form.add_field :scan_to_location_long_code
               form.add_field :system_quantity
               form.add_field :actual_quantity
               form.add_field :stock_take_complete

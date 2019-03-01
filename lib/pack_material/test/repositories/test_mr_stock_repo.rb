@@ -270,8 +270,8 @@ module PackMaterialApp
         location_type_id: @fixed_table_set[:locations][:type_id],
         primary_assignment_id: @fixed_table_set[:locations][:assignment_id],
         location_description: 'Pack Material Store',
-        location_code: 'PM STORE 1',
-        legacy_barcode: 'PM1'
+        location_long_code: 'PM STORE 1',
+        location_short_code: 'PM1'
       )
 
       pv = create_material_resource_product_variant[:id]
@@ -302,8 +302,8 @@ module PackMaterialApp
         location_type_id: @fixed_table_set[:locations][:type_id],
         primary_assignment_id: @fixed_table_set[:locations][:assignment_id],
         location_description: 'Pack Material Store',
-        location_code: 'PM STORE 1',
-        legacy_barcode: 'PM1'
+        location_long_code: 'PM STORE 1',
+        location_short_code: 'PM1'
       )
 
       pv = create_material_resource_product_variant[:id]

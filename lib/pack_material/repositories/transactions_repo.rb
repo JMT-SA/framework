@@ -87,9 +87,9 @@ module PackMaterialApp
       # hsh[:mr_sub_type_name] =
       # hsh[:product_variant_code] =
       # hsh[:product_code] =
-      # hsh[:location_code] =
+      # hsh[:location_long_code] =
       # hsh[:inventory_uom_code] =
-      # hsh[:scan_to_location_code] =
+      # hsh[:scan_to_location_long_code] =
       # hsh[:system_quantity] =
 
       create(:mr_bulk_stock_adjustment_items,
@@ -102,9 +102,9 @@ module PackMaterialApp
              mr_sub_type_name: attrs[:mr_sub_type_name],
              product_variant_code: attrs[:product_variant_code],
              product_code: attrs[:product_code],
-             location_code: attrs[:location_code],
+             location_long_code: attrs[:location_long_code],
              inventory_uom_code: attrs[:inventory_uom_code],
-             scan_to_location_code: attrs[:scan_to_location_code],
+             scan_to_location_long_code: attrs[:scan_to_location_long_code],
              system_quantity: attrs[:system_quantity],
              actual_quantity: attrs[:actual_quantity],
              stock_take_complete: attrs[:stock_take_complete])
@@ -129,15 +129,15 @@ module PackMaterialApp
     end
 
     def allowed_locations
-      ancestor_id = DB[:locations].where(location_code: 'PM').get(:id)
+      ancestor_id = DB[:locations].where(location_long_code: 'PM').get(:id)
       descendant_ids = location_repo.descendants_for_ancestor_id(ancestor_id) - [ancestor_id]
 
       type_id = DB[:location_storage_types].where(storage_type_code: PackMaterialApp::DOMAIN_NAME).get(:id)
-      DB[:locations].where(primary_storage_type_id: type_id, id: descendant_ids).map { |r| [r[:location_code], r[:id]] }
+      DB[:locations].where(primary_storage_type_id: type_id, id: descendant_ids).map { |r| [r[:location_long_code], r[:id]] }
     end
 
-    def location_codes_list(location_ids)
-      DB[:locations].where(id: location_ids).select_map(:location_code)
+    def location_long_codes_list(location_ids)
+      DB[:locations].where(id: location_ids).select_map(:location_long_code)
     end
 
     def location_repo

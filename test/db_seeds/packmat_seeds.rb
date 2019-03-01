@@ -110,8 +110,8 @@ module MiniTestSeeds
       location_type_id: location_type_id,
       primary_assignment_id: assignment_id,
       location_description: 'Default Receiving Bay',
-      location_code: 'RECEIVING BAY',
-      legacy_barcode: 'RBY'
+      location_long_code: 'RECEIVING BAY',
+      location_short_code: 'RBY'
     )
     @fixed_table_set[:locations] = {
       assignment_id: assignment_id,

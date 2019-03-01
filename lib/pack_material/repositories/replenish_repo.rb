@@ -346,30 +346,23 @@ module PackMaterialApp
     end
 
     def resolve_location_id_from_scan(val, scan_field)
-      case scan_field
-      when 'location_code'
-        location_id_from_location_code(val)
-      when 'location_legacy_barcode'
-        location_id_from_legacy_barcode(val)
+      if ['', 'location_short_code'].include?(scan_field)
+        location_id_from_location_short_code(val)
       else
         val
       end
     end
 
-    def location_id_from_legacy_barcode(value)
-      DB[:locations].where(legacy_barcode: value).get(:id)
-    end
-
-    def location_id_from_location_code(value)
-      DB[:locations].where(location_code: value).get(:id)
+    def location_id_from_location_short_code(value)
+      DB[:locations].where(location_short_code: value).get(:id)
     end
 
     def location_id_from_sku_location_id(sku_location_id)
       DB[:mr_sku_locations].where(id: sku_location_id).get(:location_id)
     end
 
-    def location_code_from_location_id(location_id)
-      DB[:locations].where(id: location_id).get(:location_code)
+    def location_long_code_from_location_id(location_id)
+      DB[:locations].where(id: location_id).get(:location_long_code)
     end
 
     def sku_ids_from_numbers(values)
@@ -486,7 +479,7 @@ module PackMaterialApp
       <<~HTML
         Delivery (#{delivery_number_from_id(delivery_id)}): #{done} of #{total_items.count} items.<br>
         Last scan:<br>
-        LOC: #{location_code_from_location_id(to_location_id)}<br>
+        LOC: #{location_long_code_from_location_id(to_location_id)}<br>
         SKU (#{sku_number_from_id(sku_id)}): #{product_variant_code}<br>
         #{item.get(:quantity_putaway).to_i} of #{item.get(:quantity_received).to_i} items.<br>
       HTML

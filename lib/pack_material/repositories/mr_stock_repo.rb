@@ -63,12 +63,12 @@ module PackMaterialApp
     end
 
     def default_receiving_bay_id
-      DB[:locations].where(location_code: DEFAULT_RECEIVING_BAY_NAME).get(:id)
+      DB[:locations].where(location_long_code: DEFAULT_RECEIVING_BAY_NAME).get(:id)
     end
 
-    def find_location_id_by_code(location_code)
-      return default_receiving_bay_id unless location_code
-      DB[:locations].where(location_code: location_code).get(:id)
+    def find_location_id_by_code(location_long_code)
+      return default_receiving_bay_id unless location_long_code
+      DB[:locations].where(location_long_code: location_long_code).get(:id)
     end
 
     def resolve_parent_transaction_id(opts)

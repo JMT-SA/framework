@@ -19,8 +19,8 @@ module UiRules
     end
 
     def set_show_fields
-      # mr_bulk_stock_adjustment_id_label = PackMaterialApp::MrBulkStockAdjustmentRepo.new.find_mr_bulk_stock_adjustment(@form_object.mr_bulk_stock_adjustment_id)&.location_codes
-      mr_bulk_stock_adjustment_id_label = @repo.find(:mr_bulk_stock_adjustments, PackMaterialApp::MrBulkStockAdjustment, @form_object.mr_bulk_stock_adjustment_id)&.location_codes
+      # mr_bulk_stock_adjustment_id_label = PackMaterialApp::MrBulkStockAdjustmentRepo.new.find_mr_bulk_stock_adjustment(@form_object.mr_bulk_stock_adjustment_id)&.location_long_codes
+      mr_bulk_stock_adjustment_id_label = @repo.find(:mr_bulk_stock_adjustments, PackMaterialApp::MrBulkStockAdjustment, @form_object.mr_bulk_stock_adjustment_id)&.location_long_codes
       # mr_sku_location_id_label = PackMaterialApp::MrSkuLocationRepo.new.find_mr_sku_location(@form_object.mr_sku_location_id)&.id
       mr_sku_location_id_label = @repo.find(:mr_sku_locations, PackMaterialApp::MrSkuLocation, @form_object.mr_sku_location_id)&.id
       fields[:mr_bulk_stock_adjustment_id] = { renderer: :label, with_value: mr_bulk_stock_adjustment_id_label, caption: 'Mr Bulk Stock Adjustment' }
@@ -32,9 +32,9 @@ module UiRules
       fields[:mr_sub_type_name] = { renderer: :label }
       fields[:product_variant_code] = { renderer: :label }
       fields[:product_code] = { renderer: :label }
-      fields[:location_code] = { renderer: :label }
+      fields[:location_long_code] = { renderer: :label }
       fields[:inventory_uom_code] = { renderer: :label }
-      fields[:scan_to_location_code] = { renderer: :label }
+      fields[:scan_to_location_long_code] = { renderer: :label }
       fields[:system_quantity] = { renderer: :label }
       fields[:actual_quantity] = { renderer: :label }
       fields[:stock_take_complete] = { renderer: :label, as_boolean: true }
@@ -64,9 +64,9 @@ module UiRules
         mr_sub_type_name: { required: true },
         product_variant_code: { required: true },
         product_code: { required: true },
-        location_code: {},
+        location_long_code: {},
         inventory_uom_code: {},
-        scan_to_location_code: {},
+        scan_to_location_long_code: {},
         system_quantity: {},
         actual_quantity: {},
         stock_take_complete: { renderer: :checkbox }
@@ -89,9 +89,9 @@ module UiRules
                                     mr_sub_type_name: nil,
                                     product_variant_code: nil,
                                     product_code: nil,
-                                    location_code: nil,
+                                    location_long_code: nil,
                                     inventory_uom_code: nil,
-                                    scan_to_location_code: nil,
+                                    scan_to_location_long_code: nil,
                                     system_quantity: nil,
                                     actual_quantity: nil,
                                     stock_take_complete: nil)

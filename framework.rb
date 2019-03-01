@@ -267,17 +267,17 @@ class Framework < Roda
       # # Need to design a "query-able version of this query (join locn + tree so user can select type, ancestor etc...
       # qry = <<~SQL
       #   SELECT
-      #   (SELECT array_agg(cc.location_code) as path
-      #    FROM (SELECT c.location_code
+      #   (SELECT array_agg(cc.location_long_code) as path
+      #    FROM (SELECT c.location_long_code
       #    FROM location_tests AS c
       #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
       #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_array,
-      #   (SELECT string_agg(cc.location_code, ',') as path
-      #    FROM (SELECT c.location_code
+      #   (SELECT string_agg(cc.location_long_code, ',') as path
+      #    FROM (SELECT c.location_long_code
       #    FROM location_tests AS c
       #    JOIN location_tree_paths AS t1 ON t1.ancestor_location_id = c.id
       #    WHERE t1.descendant_location_id = l.id ORDER BY t1.path_length DESC) AS cc) AS path_string,
-      #   l.location_code, l.location_type, l.has_single_container, l.is_virtual,
+      #   l.location_long_code, l.location_type, l.has_single_container, l.is_virtual,
       #   (SELECT MAX(path_length) FROM location_tree_paths WHERE descendant_location_id = l.id) + 1 AS level
       #   FROM location_tests l
       # SQL

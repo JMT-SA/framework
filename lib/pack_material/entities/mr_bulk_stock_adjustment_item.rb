@@ -12,9 +12,9 @@ module PackMaterialApp
     attribute :mr_sub_type_name, Types::String
     attribute :product_variant_code, Types::String
     attribute :product_code, Types::String
-    attribute :location_code, Types::String
+    attribute :location_long_code, Types::String
     attribute :inventory_uom_code, Types::String
-    attribute :scan_to_location_code, Types::String
+    attribute :scan_to_location_long_code, Types::String
     attribute :system_quantity, Types::Decimal
     attribute :actual_quantity, Types::Decimal
     attribute :stock_take_complete, Types::Bool

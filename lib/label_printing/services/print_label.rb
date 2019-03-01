@@ -75,7 +75,7 @@ module LabelPrintingApp
     end
 
     def make_composite(varname)
-      # Example: 'CMP:x:${Location Code} - ${Legacy Barcode} / ${FNC:some_function,Legacy Code}'
+      # Example: 'CMP:x:${Location Long Code} - ${Location Short Code} / ${FNC:some_function,Location Long Code}'
       tokens = varname.scan(/\$\{(.+?)\}/)
       output = varname
       tokens.flatten.each do |token|

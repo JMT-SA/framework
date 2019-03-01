@@ -6,7 +6,7 @@ module MasterfilesApp
     attribute :primary_storage_type_id, Types::Integer
     attribute :location_type_id, Types::Integer
     attribute :primary_assignment_id, Types::Integer
-    attribute :location_code, Types::String
+    attribute :location_long_code, Types::String
     attribute :location_description, Types::String
     attribute :has_single_container, Types::Bool
     attribute :virtual_location, Types::Bool
@@ -14,7 +14,8 @@ module MasterfilesApp
     attribute :assignment_code, Types::String
     attribute :storage_type_code, Types::String
     attribute :location_type_code, Types::String
-    attribute :legacy_barcode, Types::String
+    attribute :location_short_code, Types::String
+    attribute :print_code, Types::String
     attribute :can_be_moved, Types::Bool
   end
 end

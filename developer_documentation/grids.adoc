@@ -148,9 +148,9 @@ Also the list or search yml must provide some config values like the following:
 
 [source,sql]
 ----
-SELECT "locations"."id", "locations"."location_code", "locations"."location_description",
-(SELECT array_agg("sub"."location_code") AS path
-  FROM (SELECT "loc"."location_code"
+SELECT "locations"."id", "locations"."location_long_code", "locations"."location_description",
+(SELECT array_agg("sub"."location_long_code") AS path
+  FROM (SELECT "loc"."location_long_code"
           FROM "locations" loc
           JOIN "tree_locations" tree ON "tree"."ancestor_location_id" = "loc"."id"
           WHERE "tree"."descendant_location_id" = "locations"."id"
@@ -162,8 +162,8 @@ FROM "locations"
 JOIN "location_types" ON "location_types"."id" = "locations"."location_type_id"
 JOIN "location_assignments" ON "location_assignments"."id" = "locations"."primary_assignment_id"
 JOIN "location_storage_types" ON "location_storage_types"."id" = "locations"."primary_storage_type_id"
-ORDER BY (SELECT string_agg("sub"."location_code", ';') AS path
-            FROM (SELECT "loc"."location_code"
+ORDER BY (SELECT string_agg("sub"."location_long_code", ';') AS path
+            FROM (SELECT "loc"."location_long_code"
             FROM "locations" loc
             JOIN "tree_locations" tree ON "tree"."ancestor_location_id" = "loc"."id"
             WHERE "tree"."descendant_location_id" = "locations"."id"

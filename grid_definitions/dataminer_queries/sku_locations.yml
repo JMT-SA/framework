@@ -1,10 +1,10 @@
 ---
 :caption: SKU locations
 :sql: "SELECT COALESCE(\"mr_sku_locations\".\"id\", \"locations\".\"id\") AS id,\r\n
-  \ \"locations\".\"primary_storage_type_id\",\r\n  \"locations\".\"location_code\",\r\n
+  \ \"locations\".\"primary_storage_type_id\",\r\n  \"locations\".\"location_long_code\",\r\n
   \      (SELECT\r\n          CASE\r\n          WHEN mr_skus.sku_number IS NULL THEN
-  array_agg(\"cc\".\"location_code\")\r\n          ELSE array_append(array_agg(\"cc\".\"location_code\"),
-  mr_skus.sku_number::varchar)\r\n          END AS path\r\n        FROM (SELECT \"c\".\"location_code\"\r\n
+  array_agg(\"cc\".\"location_long_code\")\r\n          ELSE array_append(array_agg(\"cc\".\"location_long_code\"),
+  mr_skus.sku_number::varchar)\r\n          END AS path\r\n        FROM (SELECT \"c\".\"location_long_code\"\r\n
   \             FROM \"locations\" c\r\n                JOIN \"tree_locations\" t1
   ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n              WHERE \"t1\".\"descendant_location_id\"
   = \"locations\".\"id\"\r\n              ORDER BY \"t1\".\"path_length\" DESC) cc)
@@ -26,8 +26,8 @@
   mr_delivery_items.id\r\n  LEFT JOIN mr_deliveries on mr_delivery_items.mr_delivery_id
   = mr_deliveries.id\r\n  LEFT JOIN mr_internal_batch_numbers on mr_skus.mr_internal_batch_number_id
   = mr_internal_batch_numbers.id\r\nWHERE \"locations\".\"active\" AND\r\n      \"location_storage_types\".\"storage_type_code\"
-  = 'Pack Material'\r\nORDER BY (SELECT string_agg(\"cc\".\"location_code\", ';')
-  AS path\r\n          FROM (SELECT \"c\".\"location_code\"\r\n                FROM
+  = 'Pack Material'\r\nORDER BY (SELECT string_agg(\"cc\".\"location_long_code\", ';')
+  AS path\r\n          FROM (SELECT \"c\".\"location_long_code\"\r\n                FROM
   \"locations\" c\r\n                  JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
   = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
   \               ORDER BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
@@ -67,11 +67,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  location_code:
-    :name: location_code
+  location_long_code:
+    :name: location_long_code
     :sequence_no: 3
     :caption: Location code
-    :namespaced_name: locations.location_code
+    :namespaced_name: locations.location_long_code
     :data_type: :string
     :width: 
     :format: 
@@ -316,7 +316,7 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT assignment_code, id FROM location_assignments ORDER BY assignment_code
-- :column: locations.location_code
+- :column: locations.location_long_code
   :caption: Location code
   :data_type: :string
   :control_type: :text

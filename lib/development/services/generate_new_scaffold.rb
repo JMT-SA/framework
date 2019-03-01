@@ -134,7 +134,7 @@ module DevelopmentApp
       ar.map { |a| a.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n") }.join("\n")
     end
 
-    class TableMeta
+    class TableMeta # rubocop:disable Metrics/ClassLength
       attr_reader :columns, :column_names, :foreigns, :col_lookup, :fk_lookup, :indexed_columns
 
       DRY_TYPE_LOOKUP = {

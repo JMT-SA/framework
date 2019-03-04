@@ -52,18 +52,29 @@ module MasterfilesApp
       success_response("Deleted label template #{name}")
     end
 
-    def get_variables(id, params) # rubocop:disable Metrics/AbcSize
+    def label_variables_from_file(id, params)
       return failed_response('No file selected to import') unless params[:variables] && (tempfile = params[:variables][:tempfile])
 
-      doc = Nokogiri::XML(File.read(tempfile))
-      return failed_response('This is not an NSLD label definition') if doc.css('nsld_schema').empty?
-
-      var_list = doc.css('variable_type').map(&:text)
-      res = validate_variable_names(label_template(id), var_list)
+      res = variables_from_xml(id, File.read(tempfile))
       return res unless res.success
 
-      package = { variables: var_list.empty? ? nil : Sequel.pg_array(var_list) }
+      store_new_label_variables(id, res.instance)
+    end
 
+    def label_variables_from_server(id)
+      instance = label_template(id)
+      mes_repo = MesserverApp::MesserverRepo.new
+      res = mes_repo.label_variables('any', instance.label_template_name)
+      return res unless res.success
+
+      res = variables_from_xml(id, res.instance)
+      return res unless res.success
+      store_new_label_variables(id, res.instance)
+    end
+
+    private
+
+    def store_new_label_variables(id, package)
       repo.transaction do
         repo.update_label_template(id, package)
         log_transaction
@@ -73,7 +84,16 @@ module MasterfilesApp
       success_response('Variables stored', instance)
     end
 
-    private
+    def variables_from_xml(id, xml_string)
+      doc = Nokogiri::XML(xml_string)
+      return failed_response('This is not an NSLD label definition') if doc.css('nsld_schema').empty?
+
+      var_list = doc.css('variable_type').map(&:text)
+      res = validate_variable_names(label_template(id), var_list)
+      return res unless res.success
+
+      success_response('ok', variables: var_list.empty? ? nil : Sequel.pg_array(var_list))
+    end
 
     def validate_variable_names(instance, var_list)
       messages = check_variables(instance, var_list)

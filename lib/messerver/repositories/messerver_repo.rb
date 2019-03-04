@@ -34,6 +34,13 @@ module MesserverApp
       success_response('Status', yaml_list['Data'])
     end
 
+    def label_variables(printer_type, filename)
+      res = request_uri(label_variables_uri(printer_type, filename))
+      return res unless res.success
+
+      success_response('Label XML', res.instance.body)
+    end
+
     def preview_label(screen_or_print, vars, fname, binary_data)
       res = post_binary(preview_uri, vars, screen_or_print, fname, binary_data)
       return res unless res.success
@@ -232,7 +239,6 @@ module MesserverApp
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetPublishFileStatus&ListType=yaml&Name=#{filename}&PrinterType=#{printer_type}&Unit=production")
     end
 
-    # http://192.168.50.21:2080/?Type=GetLabelFileXml&unit=production&nsld=&printerType=Zebra&File=KR_PM_LOCATION.xml
     def label_variables_uri(printer_type, filename)
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetLabelFileXml&unit=production&nsld=&printerType=#{printer_type}&File=#{filename}.xml")
     end

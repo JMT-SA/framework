@@ -3,7 +3,7 @@
 module Masterfiles
   module Config
     module LabelTemplate
-      class Variables
+      class VariablesFromFile
         def self.call(id, source, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:label_template, :variables, id: id, form_values: form_values)
           rules   = ui_rule.compile
@@ -19,7 +19,8 @@ module Masterfiles
               form.method :update
               form.add_field :label_template_name
               form.add_field :description
-              form.submit_captions 'Fetch variables', 'Fetching variables'
+              form.add_field :variables
+              form.submit_captions 'Get variables'
             end
           end
 

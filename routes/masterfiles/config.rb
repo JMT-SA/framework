@@ -18,17 +18,27 @@ class Framework < Roda
         check_auth!('config', 'edit')
         show_partial { Masterfiles::Config::LabelTemplate::Edit.call(id) }
       end
-      r.on 'get_variables' do
+      r.on 'get_variables', String do |source|
         r.get do
           check_auth!('config', 'edit')
-          show_partial { Masterfiles::Config::LabelTemplate::Variables.call(id) }
+          if source == 'from_server'
+            show_partial { Masterfiles::Config::LabelTemplate::Variables.call(id, source) }
+          else
+            show_partial { Masterfiles::Config::LabelTemplate::VariablesFromFile.call(id, source) }
+          end
         end
         r.patch do
-          res = interactor.get_variables(id, params[:label_template])
+          res = if source == 'from_server'
+                  interactor.label_variables_from_server(id)
+                else
+                  interactor.label_variables_from_file(id, params[:label_template])
+                end
           if res.success
             show_partial(notice: res.message) { Masterfiles::Config::LabelTemplate::Show.call(id) }
+          elsif source == 'from_server'
+            re_show_form(r, res) { Masterfiles::Config::LabelTemplate::Variables.call(id, source, form_values: params[:label_template], form_errors: res.errors) }
           else
-            re_show_form(r, res) { Masterfiles::Config::LabelTemplate::Variables.call(id, form_values: params[:label_template], form_errors: res.errors) }
+            re_show_form(r, res) { Masterfiles::Config::LabelTemplate::VariablesFromFile.call(id, source, form_values: params[:label_template], form_errors: res.errors) }
           end
         end
       end

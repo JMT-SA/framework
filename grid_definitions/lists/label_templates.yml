@@ -11,11 +11,19 @@
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/masterfiles/config/label_templates/$:id$/get_variables"
-  :text: get variables
-  :icon: list
-  :title: Get Variables
-  :popup: true
+- :submenu:
+    :text: Get variables
+    :items:
+    - :url: "/masterfiles/config/label_templates/$:id$/get_variables/from_server"
+      :text: from server
+      :icon: download
+      :title: Get Variables from server
+      :popup: true
+    - :url: "/masterfiles/config/label_templates/$:id$/get_variables/from_file"
+      :text: from file
+      :icon: document-add
+      :title: Get Variables from file
+      :popup: true
 - :url: "/masterfiles/config/label_templates/$:id$"
   :text: delete
   :icon: delete

@@ -2,7 +2,7 @@
 
 module DevelopmentApp
   class SendMailJob < BaseQueJob
-    def run(options = {}) # rubocop:disable Metrics/AbcSize
+    def run(options = {})
       mail = Mail.new do
         from    options.fetch(:from, AppConst::SYSTEM_MAIL_SENDER)
         to      options.fetch(:to)
@@ -12,10 +12,19 @@ module DevelopmentApp
 
       mail['cc'] = options[:cc] if options[:cc]
 
-      # Validate and add attachments
+      process_attachments(mail, options)
+
+      mail.deliver!
+      finish
+    end
+
+    private
+
+    def process_attachments(mail, options) # rubocop:disable Metrics/AbcSize
       (options[:attachments] || []).each do |rule|
         assert_attachment_ok!(rule)
         if rule[:path]
+          raise "Unable to send mail with attachment \"#{rule[:path]}\" as it is not on disk" unless File.exist?(rule[:path])
           mail.add_file(rule[:path])
           next
         end
@@ -25,12 +34,7 @@ module DevelopmentApp
         config[:mime_type] = rule[:mime_type] if rule[:mime_type]
         mail.add_file(config)
       end
-
-      mail.deliver!
-      finish
     end
-
-    private
 
     def assert_attachment_ok!(rule)
       keys = rule.keys.dup

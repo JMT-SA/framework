@@ -60,6 +60,13 @@
     :function: development
     :program: masterfiles
     :permission: user_maintenance
+- :url: "/development/masterfiles/users/$:id$/act_as_user"
+  :text: Act as this user
+  :icon: link
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_maintenance
 :page_controls:
 - :control_type: :link
   :url: "/development/masterfiles/users/new"

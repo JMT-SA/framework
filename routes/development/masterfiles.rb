@@ -185,6 +185,12 @@ class Framework < Roda
         check_auth!('masterfiles', 'user_maintenance')
         show_partial { Development::Masterfiles::User::Edit.call(id) }
       end
+
+      r.on 'act_as_user' do
+        act_as_user(id)
+        r.redirect '/'
+      end
+
       r.on 'details' do
         r.get do
           show_partial { Development::Masterfiles::User::Details.call(id) }

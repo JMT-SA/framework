@@ -44,7 +44,11 @@
           <ul id="menuSearchResults">
           </ul>
           <!-- [current resource] -->
-          <a href="/development/masterfiles/users/<%= current_user.id %>/details" class="ml2 mr2 f6 link dim mb2 br2 ph3 pv2 dib white bg-silver" data-popup-dialog= "true"><%= current_user.user_name %></a>
+          <% if session[:act_as_user_id] %>
+            <span class="ml2 mr2 f6 link mb2 br2 ph3 pv2 dib white bg-silver"><%= actor_user.user_name %> acting as <strong><%= current_user.user_name %></strong></span>
+          <% else %>
+            <a href="/development/masterfiles/users/<%= current_user.id %>/details" class="ml2 mr2 f6 link dim mb2 br2 ph3 pv2 dib white bg-silver" data-popup-dialog= "true"><%= current_user.user_name %></a>
+        <% end %>
           <a href="/logout" id="logout" class="f6 fw6 hover-blue link black-70 ml3 mr2 mr3-m mr4-l dib" title="Logout">logout</a>
         <% end %>
       </div>

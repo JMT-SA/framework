@@ -303,9 +303,14 @@ class Framework < Roda
     end
 
     r.is 'logout' do
-      rodauth.logout
-      flash[:notice] = 'Logged out'
-      r.redirect('/login')
+      if session[:act_as_user_id]
+        revert_to_logged_in_user
+        r.redirect('/')
+      else
+        rodauth.logout
+        flash[:notice] = 'Logged out'
+        r.redirect('/login')
+      end
     end
 
     r.is 'versions' do

@@ -91,6 +91,9 @@ The value of `:hide_if_sql_returns_true` **must** be a valid snippet of SQL that
 The value of `:hide_for_key` **must** be an array of one or more strings. If any string matches the value of the `key=` parameter of the URL that loaded the page, the control will be hidden.
 
 This example will display an anchor (`<a>`) styled as a button that will render in a popup dialog when clicked.
+
+NOTE: The `grid_id` option will need to match the id of your grid if your action is going to call one of the helpers that add or update a grid's rows.
+
 [source,yaml]
 ----
 - :control_type: :link
@@ -98,6 +101,7 @@ This example will display an anchor (`<a>`) styled as a button that will render 
   :text: New Location
   :style: :button
   :behaviour: :popup
+  :grid_id: something
   :hide_if_sql_returns_true: SELECT EXISTS(SELECT id FROM locations)
   :hide_for_key:
     - inactive

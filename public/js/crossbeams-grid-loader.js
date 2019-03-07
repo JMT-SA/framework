@@ -77,6 +77,11 @@ const crossbeamsGridEvents = {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     const rowNode = gridOptions.api.getRowNode(id);
+    if (rowNode === undefined) {
+      Jackbox.error(`Could not find a grid with id "${id}".`, { time: 20 });
+      console.log('No grid with id:', id);
+      return;
+    }
     Object.keys(changes).forEach((k) => {
       rowNode.setDataValue(k, changes[k]);
     });

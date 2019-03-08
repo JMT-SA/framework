@@ -17,5 +17,11 @@ module MasterfilesApp
                      order_by: :uom_code
 
     crud_calls_for :uoms, name: :uom, wrapper: Uom
+
+    def find_uom(id)
+      find_with_association(:uoms, id,
+                            parent_tables: [{ parent_table: :uom_types, flatten_columns: { code: :uom_type_code } }],
+                            wrapper: MasterfilesApp::Uom)
+    end
   end
 end

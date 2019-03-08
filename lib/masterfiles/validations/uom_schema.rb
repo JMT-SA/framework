@@ -5,7 +5,7 @@ module MasterfilesApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:uoms_type_id, :integer).filled(:int?)
+    required(:uom_type_id, :integer).filled(:int?)
     required(:uom_code, Types::StrippedString).filled(:str?)
   end
 end

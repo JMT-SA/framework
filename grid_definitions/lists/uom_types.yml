@@ -1,0 +1,24 @@
+---
+:dataminer_definition: uom_types
+:actions:
+- :url: "/masterfiles/general/uom_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/general/uom_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/general/uom_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/general/uom_types/new"
+  :text: New UOM Type
+  :style: :button
+  :behaviour: :popup

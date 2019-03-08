@@ -125,7 +125,7 @@ module MiniTestSeeds
     type_id = DB[:uom_types].insert(code: 'PM')
     @fixed_table_set[:uoms] = {
       uom_type_id: type_id,
-      uom_id: DB[:uoms].insert(uoms_type_id: type_id, uom_code: 'kg')
+      uom_id: DB[:uoms].insert(uom_type_id: type_id, uom_code: 'kg')
     }
   end
 

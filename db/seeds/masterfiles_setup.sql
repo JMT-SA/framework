@@ -4,7 +4,25 @@ INSERT INTO roles (name) VALUES ('TRANSPORTER');
 INSERT INTO functional_areas (functional_area_name)
 VALUES ('Masterfiles');
 
+-- GENERAL
 
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('General', 1, (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles'));
+
+INSERT INTO programs_webapps(program_id, webapp)
+VALUES ((SELECT id FROM programs WHERE program_name = 'General' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles')), 'Framework');
+
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'General'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Masterfiles')),
+         'UOM Types', 'Units of Measure', '/list/uom_types', 2);
+
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'General'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Masterfiles')),
+         'UOMs', 'Units of Measure', '/list/uoms', 2);
 
 -- PARTIES
 INSERT INTO programs (program_name, program_sequence, functional_area_id)

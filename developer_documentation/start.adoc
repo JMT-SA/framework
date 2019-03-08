@@ -49,6 +49,7 @@ The following special environment variables are available when running the app:
 * How to link:/developer_documentation/how_to_send_a_basic_email.adoc[send a basic email via the send mail job].
 * How to link:/developer_documentation/how_to_attach_observers_to_a_service.adoc[attach observers to a service].
 * How to link:/developer_documentation/how_to_use_lookup_grid.adoc[set up a lookup grid]
+* How to link:/developer_documentation/how_to_share_data_between_requests.adoc[share data between requests]
 * How to disable/enable a field based on the value of another field.
 * How to layout a multi-column form.
 * How to layout a page to include a form and a grid.
@@ -60,16 +61,4 @@ The following special environment variables are available when running the app:
 * link:/yarddocthis/lib=base_repo.rb[BaseRepo methods]
 * link:/yarddocthis/lib=base_interactor.rb[BaseInteractor methods]
 * link:/yarddocthis/lib=crossbeams_responses.rb[Responses methods]
-
-=== Notes
-
-* UI Rules: renderers
-* Grids
-* Multiselect grids
-* List grids
-* Search grids
-* List grids with parameters (filtered list grids)
-
----
-
 

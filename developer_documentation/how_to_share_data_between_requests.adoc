@@ -1,0 +1,151 @@
+= How to share data between requests
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to share data between requests
+
+Sometimes you need an action to pick up some data from an earlier action without having to pass it via a url's queryparams or hidden fields.
+Rack::Session can be used to store the data, but this is discouraged so that the session can be kept as lean as possible.
+
+=== Basic - store a value and use it later
+
+Use the helpers `store_locally` and `retrieve_from _local_store`. On retrieval, the value is removed from the store and is no longer accessible.
+
+An example:
+[source,ruby]
+----
+r.on 'group_edit' do # NEW
+  store_locally(:sec_from, 'group')
+  # Display a form
+end
+r.on 'edit' do       # EDIT
+  store_locally(:sec_from, 'permission')
+  # Display a form
+end
+
+r.patch do         # UPDATE
+  # Update some data
+  key = retrieve_from_local_store(:sec_from)
+  r.redirect "/apath/#{key}"
+end
+----
+
+=== Return to an unknown URL
+
+Sometimes you need to redirect to one of two or more url options, but don't know what path was taken to get to your action.
+Use `store_last_referer` to store the URL that called the action and `redirect_to_stored_referer` to later redirect to that URL.
+
+Example: a `new` action can be called from grid_a or from grid_b:
+[source,ruby]
+----
+r.on 'new' do    # NEW - might be from a link on /examples or on /samples
+  store_last_referer_url(:an_example)
+  # Display a form
+end
+
+r.post do         # CREATE
+  # Update some data
+  redirect_to_stored_referer(r, :an_example) # will go to /examples or /samples
+end
+----
+
+=== Return to a grid
+
+Often the same action can be called from more than one grid (e.g. `/list/something` or `/search/something`).
+When the form from that action is submitted you want to reload the correct grid without knowing which one it was.
+
+Both `/list` and `/search` paths will set the last grid for you (but **only** if the grid is rendered in a page, not a dialog).
+You would need to set the grid yourself if you are rendering it yourself from code.
+
+In that case you will use `set_last_grid_url`.
+To return to the (unknown) grid, use `redirect_to_last_grid`.
+
+Example: a new form can be displayed from a '/list' page (in which case the last grid is automatically stored) -- or the new form can be displayed from a menu option -- in which case the last grid needs to be stored so that we can redirect to it after create.
+[source,ruby]
+----
+r.on 'new' do    # NEW
+  set_last_grid('/list/agrid', r)
+  # Display a form
+end
+
+r.post do         # CREATE
+  # Update some data
+  redirect_to_last_grid
+end
+----
+
+=== Stash a page
+
+This is used typically when a form is in error and you need to re-show it after a redirect. The `stash_page` command will store a rendered form and the `show_partial_or_page` helper will re-render it. 
+
+Example:
+[source, ruby]
+----
+r.on 'edit' do
+  # This will display the stashed page if present, else render the view.
+  show_partial_or_page(r) { SomeModule::Edit.call(id) }
+end
+
+r.on 'update' do
+  res = interactor.do_something
+  if res.success
+    # Do the usual happy path stuff...
+  else
+    flash[:error] = res.message
+    # This will render and save the view with error conditions.
+    stash_page(SomeModule::Edit.call(id, form_values: params[:whatever],
+                                         form_errors: res.errors))
+    r.redirect "/apath/#{id}/edit"
+  end
+end
+----
+
+=== Keeping track of steps (wizard)
+
+Sometimes a process can go over several requests - gathering data and user decisions before commiting a change or carrying out an action at the end. In this case you want to store a rich set of data in the backend as you go along and apply at the final stage.
+
+In the front end you might use a link:/developer_documentation/non_field_renderers.adoc#_progressstep[ProgressStep control], and at the backend you'd create a step class that inherits from BaseStep. The step class will typically be used in interactors and should be created in the appropriate interactors directory. It is basically a wrapper around a Hash stored uniquely for the current user and step identifier.
+
+An example step class:
+[source, ruby]
+----
+module SomeApp
+  class SomeStep < BaseStep
+    def initialize(user)
+      super(user, :some_steps) # The identifier of this step. Ket to user's local store.
+    end
+
+    def a_description
+      current_step = read      # Reads the stored data (a Hash)
+      "On step #{current_step[:step_no]} of #{current_step[:total_steps]}."
+    end
+  end
+end
+----
+
+And sample usage:
+[source, ruby]
+----
+# lib/some/interactors/some_interactor.rb
+def stepper
+  @stepper ||= SomeStep.new(@user)
+end
+
+# …
+stepper.write(step_no: 1, total_steps: 4)
+
+# …
+stepper.merge(some_data: 'what it is')
+
+# …
+vars = stepper.read
+vars[:step_no] = 2
+stepper.write(vars)
+
+# …
+vars = stepper.read
+p vars[:step_no]        # => 2
+p vars[:some_data]      # => "what it is"
+p stepper.a_description # => "On step 2 of 4."
+----

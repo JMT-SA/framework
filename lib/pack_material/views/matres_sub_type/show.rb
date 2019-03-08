@@ -16,6 +16,7 @@ module PackMaterial
               form.add_field :sub_type_name
               form.add_field :short_code
               form.add_field :internal_seq
+              form.add_field :inventory_uom_code
               form.add_field :product_code_separator
               form.add_field :has_suppliers
               form.add_field :has_marketers

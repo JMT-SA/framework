@@ -23,6 +23,7 @@ module UiRules
       fields[:sub_type_name] = { renderer: :label }
       fields[:short_code] = { renderer: :label }
       fields[:internal_seq] = { renderer: :label }
+      fields[:inventory_uom_code] = { renderer: :label, caption: 'Inventory UOM' }
       fields[:product_code_separator] = { renderer: :label }
       fields[:has_suppliers] = { renderer: :label, as_boolean: true }
       fields[:has_marketers] = { renderer: :label, as_boolean: true }
@@ -32,7 +33,8 @@ module UiRules
 
     def common_fields
       {
-        material_resource_type_id: { renderer: :select, options: @repo.for_select_matres_types, caption: 'Type' },
+        material_resource_type_id: { renderer: :select, options: @repo.for_select_matres_types, caption: 'Type', required: true },
+        inventory_uom_id: { renderer: :select, options: @repo.for_select_pack_material_uoms, caption: 'Inventory UOM', required: true },
         sub_type_name: { required: true },
         short_code: { required: true, force_uppercase: true },
         product_code_separator: { renderer: :label },

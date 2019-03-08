@@ -27,12 +27,10 @@ class Framework < Roda
               id
               mr_purchase_order_id
               mr_product_variant_id
-              purchasing_uom_id
               inventory_uom_id
               quantity_required
               unit_price
               product_variant_code
-              purchasing_uom_code
               inventory_uom_code
             ]
             sub_totals = interactor.po_sub_totals(id)
@@ -178,12 +176,10 @@ class Framework < Roda
             row_keys = %i[
               mr_purchase_order_id
               mr_product_variant_id
-              purchasing_uom_id
               inventory_uom_id
               quantity_required
               unit_price
               product_variant_code
-              purchasing_uom_code
               inventory_uom_code
             ]
             sub_totals = interactor.po_sub_totals(id)

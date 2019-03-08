@@ -92,7 +92,6 @@ module PackMaterialApp
     def find_mr_purchase_order_item(id)
       find_with_association(:mr_purchase_order_items, id,
                             parent_tables: [{ parent_table: :material_resource_product_variants, flatten_columns: { product_variant_code: :product_variant_code }, foreign_key: :mr_product_variant_id },
-                                            { parent_table: :uoms, flatten_columns: { uom_code: :purchasing_uom_code }, foreign_key: :purchasing_uom_id },
                                             { parent_table: :uoms, flatten_columns: { uom_code: :inventory_uom_code }, foreign_key: :inventory_uom_id }],
                             wrapper: MrPurchaseOrderItem)
     end

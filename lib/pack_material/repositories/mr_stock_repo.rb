@@ -196,15 +196,10 @@ module PackMaterialApp
     end
 
     def sku_uom_id(sku_id)
-      sku_batch_id = DB[:mr_skus].where(id: sku_id).get(:mr_delivery_item_batch_id)
-      return nil unless sku_batch_id
-      DB[:mr_purchase_order_items].where(
-        id: DB[:mr_delivery_items].where(
-          id: DB[:mr_delivery_item_batches].where(
-            id: sku_batch_id
-          ).select(:mr_delivery_item_id)
-        ).select(:mr_purchase_order_item_id)
-      ).select_map(:inventory_uom_id).first
+      variant_id = DB[:mr_skus].where(id: sku_id).get(:mr_product_variant_id)
+      return nil unless variant_id
+      st_id = DB[:material_resource_product_variants].where(id: variant_id).get(:sub_type_id)
+      DB[:material_resource_sub_types].where(id: st_id).get(:inventory_uom_id)
     end
 
     def activate_mr_inventory_transaction(parent_transaction_id)

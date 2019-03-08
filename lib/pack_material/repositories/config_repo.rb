@@ -56,6 +56,16 @@ module PackMaterialApp
     crud_calls_for :material_resource_product_variant_party_roles, name: :matres_product_variant_party_role, wrapper: MatresProductVariantPartyRole
     crud_calls_for :mr_internal_batch_numbers, name: :mr_internal_batch_number, wrapper: MrInternalBatchNumber
 
+    def find_matres_sub_type(id)
+      find_with_association(:material_resource_sub_types, id,
+                            parent_tables: [{ parent_table: :uoms, foreign_key: :inventory_uom_id, flatten_columns: { uom_code: :inventory_uom_code } }],
+                            wrapper: MatresSubType)
+    end
+
+    def for_select_pack_material_uoms
+      for_select_uoms(where: { uom_type_id: DB[:uom_types].where(code: PackMaterialApp::INVENTORY_UOM_TYPE).get(:id) })
+    end
+
     def create_matres_product_variant_party_role(attrs)
       message = nil
       message = 'Can not assign both customer and supplier' if attrs[:supplier_id] && attrs[:customer_id]

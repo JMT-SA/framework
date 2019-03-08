@@ -83,3 +83,5 @@ WHERE program_name = 'material_resource'
                                 FROM functional_areas
                                 WHERE functional_area_name = 'Pack Material')),
         'Framework');
+
+INSERT INTO uom_types (code) VALUES ('INVENTORY');

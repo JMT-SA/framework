@@ -206,6 +206,7 @@ class Framework < Roda
             update_grid_row(id, changes: {  material_resource_type_id: res.instance[:material_resource_type_id],
                                             sub_type_name: res.instance[:sub_type_name],
                                             short_code: res.instance[:short_code],
+                                            inventory_uom_code: res.instance[:inventory_uom_code],
                                             product_code_separator: res.instance[:product_code_separator],
                                             has_suppliers: res.instance[:has_suppliers],
                                             has_marketers: res.instance[:has_marketers],

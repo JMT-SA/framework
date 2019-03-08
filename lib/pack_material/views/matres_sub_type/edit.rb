@@ -17,6 +17,7 @@ module PackMaterial
               form.remote!
               form.method :update
               form.add_field :material_resource_type_id
+              form.add_field :inventory_uom_id
               form.add_field :sub_type_name
               form.add_field :short_code
               form.add_field :product_code_separator

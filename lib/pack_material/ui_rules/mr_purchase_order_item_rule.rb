@@ -21,9 +21,6 @@ module UiRules
       fields[:mr_product_variant_id] = { renderer: :label,
                                          with_value: product_variant_code,
                                          caption: 'Product Variant' }
-      fields[:purchasing_uom_id] = { renderer: :label,
-                                     with_value: @general_repo.find_uom(@form_object.purchasing_uom_id)&.uom_code,
-                                     caption: 'Purchasing Uom' }
       fields[:inventory_uom_id] = { renderer: :label,
                                     with_value: @general_repo.find_uom(@form_object.inventory_uom_id)&.uom_code,
                                     caption: 'Inventory Uom' }
@@ -35,7 +32,6 @@ module UiRules
       {
         mr_purchase_order_id: { renderer: :hidden, with_value: @options[:parent_id] },
         mr_product_variant_id: { renderer: :hidden },
-        purchasing_uom_id: { renderer: :select, options: @general_repo.for_select_uoms, caption: 'Purchasing Uom', required: true },
         inventory_uom_id: { renderer: :select, options: @general_repo.for_select_uoms, caption: 'Inventory Uom', required: true },
         quantity_required: { renderer: :numeric, required: true },
         unit_price: { renderer: :numeric, required: true }
@@ -73,7 +69,6 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(mr_purchase_order_id: nil,
                                     mr_product_variant_id: nil,
-                                    purchasing_uom_id: nil,
                                     inventory_uom_id: nil,
                                     quantity_required: nil,
                                     unit_price: nil)

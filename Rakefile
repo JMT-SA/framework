@@ -41,6 +41,18 @@ task :dotenv_with_override do
   Dotenv.load('.env.local', '.env')
 end
 
+namespace :jobs do
+  # Can be used in cron: @reboot sleep 60 &&  cd /home/nsld/pack_materials/current && chruby-exec 2.5.0 -- bundle exec rake jobs:restart_screen
+  desc 'Restart que process running in screen session'
+  task restart_screen: [:dotenv_with_override] do
+    ruby_ver = ENV.fetch('CHRUBY_STRING')
+    queue = ENV.fetch('QUEUE_NAME')
+    session_name = "#{queue}_que"
+    `screen -S #{session_name} -X quit`
+    `cd #{__dir__} && screen -dmS #{session_name} bash -c 'source /usr/local/share/chruby/chruby.sh && chruby #{ruby_ver} && RACK_ENV=production bundle exec que -q #{queue} ./app_loader.rb'`
+  end
+end
+
 namespace :db do
   desc 'Add a new user'
   task :add_user, %i[login_name password user_name] => [:dotenv_with_override] do |_, args|

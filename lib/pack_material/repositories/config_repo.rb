@@ -63,7 +63,8 @@ module PackMaterialApp
     end
 
     def for_select_pack_material_uoms
-      for_select_uoms(where: { uom_type_id: DB[:uom_types].where(code: PackMaterialApp::INVENTORY_UOM_TYPE).get(:id) })
+      general_repo = MasterfilesApp::GeneralRepo.new
+      general_repo.for_select_uoms(where: { uom_type_id: DB[:uom_types].where(code: PackMaterialApp::INVENTORY_UOM_TYPE).get(:id) })
     end
 
     def create_matres_product_variant_party_role(attrs)

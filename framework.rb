@@ -48,10 +48,17 @@ class Framework < Roda
     template_opts(layout_opts: { path: 'views/layout_auth.erb' })
   end
   unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
+    plugin :error_mail, to: AppConst::ERROR_MAIL_RECIPIENTS,
+                        from: AppConst::SYSTEM_MAIL_SENDER,
+                        prefix: "[Error #{AppConst::ERROR_MAIL_PREFIX}] "
     plugin :error_handler do |e|
+      error_mail(e) unless [Crossbeams::AuthorizationError,
+                            Crossbeams::TaskNotPermittedError,
+                            Crossbeams::InfoError,
+                            Sequel::UniqueConstraintViolation,
+                            Sequel::ForeignKeyConstraintViolation].any? { |o| e.is_a? o }
       show_error(e, request.has_header?('HTTP_X_CUSTOM_REQUEST_TYPE'))
       # = if prod and unexpected exception type, just display "something whent wrong" and log
-      # = use an exception library & email...
     end
   end
   Dir['./routes/*.rb'].each { |f| require f }

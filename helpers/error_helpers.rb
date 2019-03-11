@@ -136,6 +136,7 @@ module ErrorHelpers
   def show_json_error(err, status: 500)
     msg = err.respond_to?(:message) ? err.message : err.to_s
     response.status = status
+    puts err.full_message if err.respond_to?(:full_message) && status == 500 # Log the error too
     if err.respond_to?(:backtrace)
       { exception: err.class.name, flash: { error: "An error occurred: #{msg}" }, backtrace: err.backtrace }.to_json
     else

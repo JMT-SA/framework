@@ -68,7 +68,7 @@
   sku_number:
     :name: sku_number
     :sequence_no: 4
-    :caption: Sku number
+    :caption: SKU no
     :namespaced_name: mr_bulk_stock_adjustment_items.sku_number
     :data_type: :integer
     :width: 
@@ -196,13 +196,13 @@
   system_quantity:
     :name: system_quantity
     :sequence_no: 12
-    :caption: System quantity
+    :caption: System qty
     :namespaced_name: mr_bulk_stock_adjustment_items.system_quantity
     :data_type: :number
     :width: 
     :format: :delimited_1000
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -212,7 +212,7 @@
   actual_quantity:
     :name: actual_quantity
     :sequence_no: 13
-    :caption: Actual quantity
+    :caption: Actual qty
     :namespaced_name: mr_bulk_stock_adjustment_items.actual_quantity
     :data_type: :number
     :width: 

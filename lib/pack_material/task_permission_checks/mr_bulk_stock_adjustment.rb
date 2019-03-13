@@ -55,6 +55,7 @@ module PackMaterialApp
 
       def complete_check
         return failed_response 'Bulk Stock Adjustment has no items' if no_items?
+        return failed_response 'Bulk Stock Adjustment has items where the actual quantity has not been set.' if incomplete_items?
         return failed_response 'Bulk Stock Adjustment has already been completed' if completed?
         all_ok
       end
@@ -81,6 +82,10 @@ module PackMaterialApp
 
       def no_items?
         @repo.for_select_mr_bulk_stock_adjustment_items(where: { mr_bulk_stock_adjustment_id: @id }).none?
+      end
+
+      def incomplete_items?
+        @repo.for_select_mr_bulk_stock_adjustment_items(where: { mr_bulk_stock_adjustment_id: @id, actual_quantity: nil }).any?
       end
     end
   end

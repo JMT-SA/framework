@@ -757,6 +757,7 @@ NumericCellEditor.prototype.getGui = () => this.eInput;
 // focus and select can be done after the gui is attached
 NumericCellEditor.prototype.afterGuiAttached = () => {
   this.eInput.focus();
+  this.eInput.select();
 };
 
 // returns the new value after editing

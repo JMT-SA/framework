@@ -266,10 +266,11 @@ const crossbeamsGridEvents = {
   cellValueChanged: function cellValueChanged(gridId, event) {
     const url = event.context.fieldUpdateUrl.replace(/\$:id\$/, event.data.id);
     const errChanges = {};
-    errChanges[event.colDef.field] = event.oldValue;
-    // console.log('URL:', url);
-    crossbeamsUtils.recordGridIdForPopup(gridId);
     const form = new FormData();
+
+    errChanges[event.colDef.field] = event.oldValue;
+    crossbeamsUtils.recordGridIdForPopup(gridId);
+
     form.append('column_name', event.colDef.field);
     form.append('column_value', event.newValue);
     form.append('old_value', event.oldValue);
@@ -1118,7 +1119,6 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           }
           if (httpResult.fieldUpdateUrl) {
             gridOptions.context.fieldUpdateUrl = httpResult.fieldUpdateUrl;
-            console.log('CTX:', gridOptions.context);
           }
           crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
           // TODO: if the grid has no horizontal scrollbar, hide the scroll to column dropdown.
@@ -1230,8 +1230,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         enableFilter: true,
         rowSelection: 'single',
         enableRangeSelection: true,
-        singleClickEdit: true,
-        // enableStatusBar: true,
+        // singleClickEdit: true,
         statusBar: {
           statusPanels: [
             // { statusPanel: 'agTotalRowCountComponent', align: 'left' },
@@ -1286,14 +1285,13 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           evt.context.cellEdit = true;
         },
         onCellValueChanged(evt) {
-          // console.log('USR ED:', evt.context.cellEdit);
           if (evt.context.cellEdit) {
             // Reset the "user-initiated edit" flag
             evt.context.cellEdit = false;
           } else {
             return;
           }
-          if (String(evt.oldValue) === String(evt.newValue)) {
+          if (String(evt.oldValue) === String(evt.newValue) || (evt.oldValue === null && evt.newValue === '')) {
             // console.log('NOCHANGE!');
           } else {
             // console.log('Old value: ', evt.oldValue, 'New value: ', evt.newValue);

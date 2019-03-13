@@ -141,20 +141,20 @@ Every time an editable cell is changed, a URL will be called with the row id, th
 :edit_rules:
   :url: /path/to/$:id$/inline_save       # <1>
   :editable_fields:                      # <2>
-    :code:                               # <3>
-    :description:
+    code:                                # <3>
+    description:
       :editor: :textarea                 # <4>
-    :amount:
+    amount:
       :editor: :numeric                  # <5>
-    :condition:
+    condition:
       :editor: :select                   # <6>
       :values:                           # <7>
         - Ok
         - Fair
         - Poor
-    :role:
+    role:
       :editor: :select
-      :values_sql: SELECT code FROM roles # <8>
+      :value_sql: SELECT code FROM roles # <8>
 ----
 <1> This is required. The url should include `$:id$` which will be replaced with the row's id value.
 <2> This is required. `editable_fields` is a Hash of column names with options for editing.
@@ -164,6 +164,8 @@ Every time an editable cell is changed, a URL will be called with the row id, th
 <6> A select editor **must** have a `values` or `value_sql` setting.
 <7> `values` is an array of values.
 <8> `value_sql` must be a SELECT query. The first column of every row forms the select's options.
+
+NOTE: The field name keys for `editable_fields` are Strings, not Symbols, so they do not get a `:` in front.
 
 The route action can use any JSON actions to update the page (maybe update other columns in the grid row), or just display a JSON notice. This will be a POST request with the following parameters:
 [source,ruby]

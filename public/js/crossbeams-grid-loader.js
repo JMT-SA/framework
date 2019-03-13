@@ -82,6 +82,7 @@ const crossbeamsGridEvents = {
       console.log('No grid with id:', id);
       return;
     }
+    gridOptions.context.nonUserEdit = true;
     Object.keys(changes).forEach((k) => {
       rowNode.setDataValue(k, changes[k]);
     });
@@ -215,8 +216,10 @@ const crossbeamsGridEvents = {
               if (data.exception) {
                 Jackbox.error(data.flash.error, { time: 20 });
                 if (data.backtrace) {
-                  console.log('==Backend Backtrace==');
+                  console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+                  console.info('==Backend Backtrace==');
                   console.info(data.backtrace.join('\n'));
+                  console.groupEnd();
                 }
               } else {
                 Jackbox.error(data.flash.error);
@@ -254,10 +257,72 @@ const crossbeamsGridEvents = {
   displayRowCounts: function displayRowCounts(gridId, filterLength, rows) {
     const display = document.getElementById(`${gridId}_rowcount`);
     if (filterLength === rows) {
-      display.textContent = `(${rows} rows)`;
+      display.textContent = `(${rows} row${rows > 1 ? 's' : ''})`;
     } else {
-      display.textContent = `(${filterLength} of ${rows} rows)`;
+      display.textContent = `(${filterLength} of ${rows} row${rows > 1 ? 's' : ''})`;
     }
+  },
+
+  cellValueChanged: function cellValueChanged(gridId, event) {
+    const url = event.context.fieldUpdateUrl.replace(/\$:id\$/, event.data.id);
+    const errChanges = {};
+    errChanges[event.colDef.field] = event.oldValue;
+    // console.log('URL:', url);
+    crossbeamsUtils.recordGridIdForPopup(gridId);
+    const form = new FormData();
+    form.append('column_name', event.colDef.field);
+    form.append('column_value', event.newValue);
+    form.append('old_value', event.oldValue);
+    form.append('_csrf', document.querySelector('meta[name="_csrf"]').content);
+    fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+      body: form,
+    }).then((response) => {
+      if (response.status === 404) {
+        // revert value
+        crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
+        Jackbox.error('The requested resource was not found', { time: 20 });
+        return {};
+      }
+      return response.json();
+    })
+      .then((data) => {
+        if (data.redirect) {
+          window.location = data.redirect;
+        } else if (data.actions) {
+          crossbeamsUtils.processActions(data.actions);
+        } else {
+          console.log('Not sure what to do with this:', data);
+        }
+        // Only if not redirect...
+        if (data.flash) {
+          if (data.flash.notice) {
+            Jackbox.success(data.flash.notice);
+          }
+          if (data.flash.error) {
+            crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
+            if (data.exception) {
+              Jackbox.error(data.flash.error, { time: 20 });
+              if (data.backtrace) {
+                console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+                console.info('==Backend Backtrace==');
+                console.info(data.backtrace.join('\n'));
+                console.groupEnd();
+              }
+            } else {
+              Jackbox.error(data.flash.error);
+            }
+          }
+        }
+      }).catch((data) => {
+        // revert value
+        crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
+        crossbeamsUtils.fetchErrorHandler(data);
+      });
   },
 
   /**
@@ -583,6 +648,7 @@ const crossbeamsGridFormatters = {
   // Return a number with thousand separator and at least 2 digits after the decimal.
   numberWithCommas2: function numberWithCommas2(params) {
     if (!params.data) { return null; }
+    if (!params.value) { return null; }
 
     let x = params.value;
     let parts = [];
@@ -599,6 +665,7 @@ const crossbeamsGridFormatters = {
   // Return a number with thousand separator and at least 4 digits after the decimal.
   numberWithCommas4: function numberWithCommas4(params) {
     if (!params.data) { return null; }
+    if (!params.value) { return null; }
 
     let x = params.value;
     let parts = [];
@@ -716,7 +783,7 @@ NumericCellEditor.prototype.destroy = () => {
 
 // if true, then this editor will appear in a popup
   // and we could leave this method out also, false is the default
-NumericCellEditor.prototype.isPopup = () => false;
+NumericCellEditor.prototype.isPopup = () => true;
 
 // -------------------------------------------------------------------
 let midLevelColumnDefs;
@@ -976,13 +1043,18 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
             newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
           }
         } else if (attr === 'cellEditor') {
-          if (col[attr] === 'NumericCellEditor') {
-            newCol[attr] = NumericCellEditor;
+          if (['numericCellEditor',
+            'agPopupTextCellEditor',
+            'agPopupSelectCellEditor',
+            'agRichSelectCellEditor',
+            'agLargeTextCellEditor'].indexOf(col[attr]) > -1) {
+            newCol[attr] = col[attr];
           } else {
-            // Ignore other editor types for now
+            crossbeamsUtils.alert({ prompt: `${col[attr]} is not a recognised cellEditor`, type: 'error' });
           }
         } else if (attr === 'valueGetter') {
-          // This blankWhenNull valueGetter is written especially to help when grouping on a column that could have a null value.
+          // This blankWhenNull valueGetter is written especially to help when
+          // grouping on a column that could have a null value.
           // In that case, AG Grid will hide any rows below the null group.
           if (col[attr] === 'blankWhenNull') {
             newCol.valueGetter = function valueGetter(params) {
@@ -1018,8 +1090,10 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         if (httpResult.exception) {
           crossbeamsUtils.alert({ prompt: httpResult.flash.error, type: 'error' });
           if (httpResult.backtrace) {
-            console.log('==Backend Backtrace==');
+            console.groupCollapsed('EXCEPTION:', httpResult.exception, httpResult.flash.error);
+            console.info('==Backend Backtrace==');
             console.info(httpResult.backtrace.join('\n'));
+            console.groupEnd();
           }
           return null;
         }
@@ -1041,6 +1115,10 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
                 node.setSelected(true);
               }
             });
+          }
+          if (httpResult.fieldUpdateUrl) {
+            gridOptions.context.fieldUpdateUrl = httpResult.fieldUpdateUrl;
+            console.log('CTX:', gridOptions.context);
           }
           crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
           // TODO: if the grid has no horizontal scrollbar, hide the scroll to column dropdown.
@@ -1152,6 +1230,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         enableFilter: true,
         rowSelection: 'single',
         enableRangeSelection: true,
+        singleClickEdit: true,
         // enableStatusBar: true,
         statusBar: {
           statusPanels: [
@@ -1196,6 +1275,29 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
             this.api.forEachLeafNode(() => { rows += 1; });
             this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
             crossbeamsGridEvents.displayRowCounts(gridId, filterLength, rows);
+          }
+        },
+        components: {
+          numericCellEditor: NumericCellEditor,
+          // moodEditor: MoodEditor
+        },
+        onCellEditingStarted(evt) {
+          // Differentiate between User-initiated inline editing and API change of cell value.
+          evt.context.cellEdit = true;
+        },
+        onCellValueChanged(evt) {
+          // console.log('USR ED:', evt.context.cellEdit);
+          if (evt.context.cellEdit) {
+            // Reset the "user-initiated edit" flag
+            evt.context.cellEdit = false;
+          } else {
+            return;
+          }
+          if (String(evt.oldValue) === String(evt.newValue)) {
+            // console.log('NOCHANGE!');
+          } else {
+            // console.log('Old value: ', evt.oldValue, 'New value: ', evt.newValue);
+            crossbeamsGridEvents.cellValueChanged(gridId, evt);
           }
         },
         // suppressCopyRowsToClipboard: true
@@ -1376,8 +1478,10 @@ document.addEventListener('DOMContentLoaded', () => {
                       if (data.exception) {
                         Jackbox.error(data.flash.error, { time: 20 });
                         if (data.backtrace) {
-                          console.log('==Backend Backtrace==');
+                          console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+                          console.info('==Backend Backtrace==');
                           console.info(data.backtrace.join('\n'));
+                          console.groupEnd();
                         }
                       } else {
                         Jackbox.error(data.flash.error);

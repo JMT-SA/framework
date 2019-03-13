@@ -130,6 +130,70 @@ Columns can be specified to be calculated by the grid. This is especailly useful
 <6> `expression` - this is the calculation - use a combination of column names and `*, /, + or -`.
 <7> `position` - the position to place the calculated column in the list of columns. Note that hidden columns also have position.
 
+=== Inline editing rules
+
+You can specify columns that can be edited inline in a list yaml file.
+
+Every time an editable cell is changed, a URL will be called with the row id, the name of the changed field and the cell's old and new values.
+
+[source,yaml]
+----
+:edit_rules:
+  :url: /path/to/$:id$/inline_save       # <1>
+  :editable_fields:                      # <2>
+    :code:                               # <3>
+    :description:
+      :editor: :textarea                 # <4>
+    :amount:
+      :editor: :numeric                  # <5>
+    :condition:
+      :editor: :select                   # <6>
+      :values:                           # <7>
+        - Ok
+        - Fair
+        - Poor
+    :role:
+      :editor: :select
+      :values_sql: SELECT code FROM roles # <8>
+----
+<1> This is required. The url should include `$:id$` which will be replaced with the row's id value.
+<2> This is required. `editable_fields` is a Hash of column names with options for editing.
+<3> A column name key with no value will use the default text cell editor.
+<4> A textarea editor.
+<5> The numeric editor does not allow alphabetic characters.
+<6> A select editor **must** have a `values` or `value_sql` setting.
+<7> `values` is an array of values.
+<8> `value_sql` must be a SELECT query. The first column of every row forms the select's options.
+
+The route action can use any JSON actions to update the page (maybe update other columns in the grid row), or just display a JSON notice. This will be a POST request with the following parameters:
+[source,ruby]
+----
+params[:column_name]  # => The name of the updated field.
+params[:column_value] # => The new value of the updated field.
+params[:old_value]    # => The value before it was updated in the grid.
+----
+
+Here's a contrived example:
+[source,ruby]
+----
+r.on 'inline_save' do # COLUMN EDITED IN GRID
+  check_auth!('a_program', 'edit')
+  res = do_some_interactor_stuff
+  if res.success
+    json_actions([OpenStruct.new(type: :update_grid_row,
+                                 ids: id,
+                                 changes: { log: "Changed at #{Time.now}" })],
+                 "Changed #{params[:column_name]},
+                  from \"#{params[:old_value]}\"
+                  to \"#{params[:column_value]}\".")
+    # OR - if there is no need to provide feedback:
+    blank_json_response
+  else
+    show_json_error(res.message, status: 200)
+  end
+end
+----
+
 === Display a tree
 
 A query can be displayed as a tree grid if each row returns an array column that contains the row's ancestors.

@@ -57,7 +57,7 @@
     :caption: Length mm
     :namespaced_name: basic_pack_codes.length_mm
     :data_type: :integer
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :groupable: true
@@ -87,7 +87,7 @@
     :caption: Height mm
     :namespaced_name: basic_pack_codes.height_mm
     :data_type: :integer
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :groupable: true

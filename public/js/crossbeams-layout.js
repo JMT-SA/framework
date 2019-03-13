@@ -109,9 +109,10 @@
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.log('EXCEPTION:', data.exception, data.flash.error);
-              console.log('==Backend Backtrace==');
+              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+              console.info('==Backend Backtrace==');
               console.info(data.backtrace.join('\n'));
+              console.groupEnd();
             }
           } else {
             Jackbox.error(data.flash.error);
@@ -314,9 +315,10 @@
                 if (data.exception) {
                   Jackbox.error(data.flash.error, { time: 20 });
                   if (data.backtrace) {
-                    console.log('EXCEPTION:', data.exception, data.flash.error);
-                    console.log('==Backend Backtrace==');
+                    console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
+                    console.info('==Backend Backtrace==');
                     console.info(data.backtrace.join('\n'));
+                    console.groupEnd();
                   }
                 } else {
                   Jackbox.error(data.flash.error);

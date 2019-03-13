@@ -103,6 +103,13 @@ module ErrorHelpers
     view(inline: wrap_content_in_style(message, :error), layout: appropriate_layout)
   end
 
+  # Return a blank JSON response.
+  #
+  # @return [JSON] an empty object.
+  def blank_json_response
+    {}.to_json
+  end
+
   # Show a message as a notice in JSON.
   #
   # @param message [String] the notice.

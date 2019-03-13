@@ -9,15 +9,13 @@ module PackMaterialApp
         @repo = TransactionsRepo.new
         @id = mr_bulk_stock_adjustment_item_id
         @entity = @id ? @repo.find_mr_bulk_stock_adjustment_item(@id) : nil
+        @bulk_stock_adjustment = @repo.find_mr_bulk_stock_adjustment(@entity.mr_bulk_stock_adjustment_id) if @entity
       end
 
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
-        delete: :delete_check,
-        complete: :complete_check,
-        approve: :approve_check,
-        reopen: :reopen_check
+        delete: :delete_check
       }.freeze
 
       def call
@@ -32,41 +30,29 @@ module PackMaterialApp
       private
 
       def create_check
-        all_ok
+        parent_fail_check
       end
 
       def edit_check
-        return failed_response 'BulkStockAdjustmentItem has been completed' if completed?
-        all_ok
+        parent_fail_check
       end
 
       def delete_check
-        return failed_response 'BulkStockAdjustmentItem has been completed' if completed?
+        parent_fail_check
+      end
+
+      def parent_fail_check
+        return failed_response 'Bulk Stock Adjustment has been completed' if parent_completed?
+        return failed_response 'Bulk Stock Adjustment has been approved' if parent_approved?
         all_ok
       end
 
-      def complete_check
-        return failed_response 'BulkStockAdjustmentItem has already been completed' if completed?
-        all_ok
+      def parent_completed?
+        @bulk_stock_adjustment.completed
       end
 
-      def approve_check
-        return failed_response 'BulkStockAdjustmentItem has not been completed' unless completed?
-        return failed_response 'BulkStockAdjustmentItem has already been approved' if approved?
-        all_ok
-      end
-
-      def reopen_check
-        return failed_response 'BulkStockAdjustmentItem has not been approved' unless approved?
-        all_ok
-      end
-
-      def completed?
-        @entity.completed
-      end
-
-      def approved?
-        @entity.approved
+      def parent_approved?
+        @bulk_stock_adjustment.approved
       end
     end
   end

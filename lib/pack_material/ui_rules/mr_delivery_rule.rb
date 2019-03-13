@@ -8,7 +8,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      rules[:can_verify] = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:verify, @options[:id]) unless @mode == :new
+      rules[:can_verify] = can_verify unless @mode == :new
       rules[:show_only] = @form_object.verified if @mode == :edit
       common_values_for_fields case @mode
                                when :edit
@@ -58,6 +58,11 @@ module UiRules
                                     client_delivery_ref_number: nil,
                                     vehicle_registration: nil,
                                     supplier_invoice_ref_number: nil)
+    end
+
+    def can_verify
+      res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:verify, @options[:id])
+      res.success
     end
   end
 end

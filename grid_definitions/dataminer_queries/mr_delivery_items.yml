@@ -268,7 +268,7 @@
   uom_code:
     :name: uom_code
     :sequence_no: 16
-    :caption: Uom code
+    :caption: UOM code
     :namespaced_name: uoms.uom_code
     :data_type: :string
     :width: 

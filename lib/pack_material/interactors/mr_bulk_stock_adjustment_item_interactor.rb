@@ -31,7 +31,7 @@ module PackMaterialApp
       instance = mr_bulk_stock_adjustment_item(id)
       success_response("Created bulk stock adjustment item, SKU Number: #{instance.sku_number}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { sku_number: ['This bulk stock adjustment item already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { base: ['This bulk stock adjustment item already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -44,8 +44,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_bulk_stock_adjustment_item(id)
-      success_response("Updated bulk stock adjustment item #{instance.sku_number}",
-                       instance)
+      success_response("Updated bulk stock adjustment item #{instance.sku_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -60,37 +59,6 @@ module PackMaterialApp
       success_response("Deleted bulk stock adjustment item #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
-    end
-
-    def complete_a_mr_bulk_stock_adjustment_item(id, params)
-      res = complete_a_record(:mr_bulk_stock_adjustment_items, id, params.merge(enqueue_job: false))
-      if res.success
-        success_response(res.message, mr_bulk_stock_adjustment_item(id))
-      else
-        failed_response(res.message, mr_bulk_stock_adjustment_item(id))
-      end
-    end
-
-    def reopen_a_mr_bulk_stock_adjustment_item(id, params)
-      res = reopen_a_record(:mr_bulk_stock_adjustment_items, id, params.merge(enqueue_job: false))
-      if res.success
-        success_response(res.message, mr_bulk_stock_adjustment_item(id))
-      else
-        failed_response(res.message, mr_bulk_stock_adjustment_item(id))
-      end
-    end
-
-    def approve_or_reject_a_mr_bulk_stock_adjustment_item(id, params)
-      res = if params[:approve_action] == 'a'
-              approve_a_record(:mr_bulk_stock_adjustment_items, id, params.merge(enqueue_job: false))
-            else
-              reject_a_record(:mr_bulk_stock_adjustment_items, id, params.merge(enqueue_job: false))
-            end
-      if res.success
-        success_response(res.message, mr_bulk_stock_adjustment_item(id))
-      else
-        failed_response(res.message, mr_bulk_stock_adjustment_item(id))
-      end
     end
 
     def assert_permission!(task, id = nil)

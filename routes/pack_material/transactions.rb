@@ -59,6 +59,40 @@ class Framework < Roda
         handle_not_found(r)
       end
 
+      r.on 'complete' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:bulk_stock_adjustment_complete)
+        res = interactor.complete_bulk_stock_adjustment(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :bulk_stock_adjustment_complete)
+      end
+      r.on 'reopen' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:bulk_stock_adjustment_reopen)
+        res = interactor.reopen_bulk_stock_adjustment(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :bulk_stock_adjustment_reopen)
+      end
+      r.on 'approve' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:bulk_stock_adjustment_approve)
+        res = interactor.approve_bulk_stock_adjustment(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :bulk_stock_adjustment_approve)
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('transactions', 'edit')
         interactor.assert_permission!(:edit, id)
@@ -71,60 +105,6 @@ class Framework < Roda
         show_partial { PackMaterial::Transactions::MrBulkStockAdjustment::EditHeader.call(id) }
       end
 
-      r.on 'complete' do
-        r.get do
-          check_auth!('transactions', 'edit')
-          interactor.assert_permission!(:complete, id)
-          show_partial { PackMaterial::Transactions::MrBulkStockAdjustment::Complete.call(id) }
-        end
-
-        r.post do
-          res = interactor.complete_a_mr_bulk_stock_adjustment(id, params[:mr_bulk_stock_adjustment])
-          if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
-          else
-            re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustment::Complete.call(id, params[:mr_bulk_stock_adjustment], res.errors) }
-          end
-        end
-      end
-
-      # r.on 'approve' do
-      #   r.get do
-      #     check_auth!('transactions', 'approve')
-      #     interactor.assert_permission!(:approve, id)
-      #     show_partial { PackMaterial::Transactions::MrBulkStockAdjustment::Approve.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.approve_or_reject_a_mr_bulk_stock_adjustment(id, params[:mr_bulk_stock_adjustment])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustment::Approve.call(id, params[:mr_bulk_stock_adjustment], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'reopen' do
-      #   r.get do
-      #     check_auth!('transactions', 'edit')
-      #     interactor.assert_permission!(:reopen, id)
-      #     show_partial { PackMaterial::Transactions::MrBulkStockAdjustment::Reopen.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.reopen_a_mr_bulk_stock_adjustment(id, params[:mr_bulk_stock_adjustment])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustment::Reopen.call(id, params[:mr_bulk_stock_adjustment], res.errors) }
-      #     end
-      #   end
-      # end
-
       r.on 'mr_bulk_stock_adjustment_items' do
         interactor = PackMaterialApp::MrBulkStockAdjustmentItemInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
@@ -134,6 +114,7 @@ class Framework < Roda
         r.post do        # CREATE
           res = interactor.create_mr_bulk_stock_adjustment_item(id, params[:mr_bulk_stock_adjustment_item])
           if res.success
+            store_locally(:new_bulk_stock_adjustment_item, true)
             r.redirect "/pack_material/transactions/mr_bulk_stock_adjustment_items/#{res.instance.id}/edit"
           else
             re_show_form(r, res, url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/mr_bulk_stock_adjustment_items/new") do
@@ -256,60 +237,6 @@ class Framework < Roda
         show_partial { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Edit.call(id) }
       end
 
-      # r.on 'complete' do
-      #   r.get do
-      #     check_auth!('transactions', 'edit')
-      #     interactor.assert_permission!(:complete, id)
-      #     show_partial { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Complete.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.complete_a_mr_bulk_stock_adjustment_item(id, params[:mr_bulk_stock_adjustment_item])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Complete.call(id, params[:mr_bulk_stock_adjustment_item], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'approve' do
-      #   r.get do
-      #     check_auth!('transactions', 'approve')
-      #     interactor.assert_permission!(:approve, id)
-      #     show_partial { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Approve.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.approve_or_reject_a_mr_bulk_stock_adjustment_item(id, params[:mr_bulk_stock_adjustment_item])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Approve.call(id, params[:mr_bulk_stock_adjustment_item], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'reopen' do
-      #   r.get do
-      #     check_auth!('transactions', 'edit')
-      #     interactor.assert_permission!(:reopen, id)
-      #     show_partial { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Reopen.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.reopen_a_mr_bulk_stock_adjustment_item(id, params[:mr_bulk_stock_adjustment_item])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Reopen.call(id, params[:mr_bulk_stock_adjustment_item], res.errors) }
-      #     end
-      #   end
-      # end
-
       r.is do
         r.get do       # SHOW
           check_auth!('transactions', 'read')
@@ -335,7 +262,12 @@ class Framework < Roda
               actual_quantity
               stock_take_complete
             ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            if retrieve_from_local_store(:new_bulk_stock_adjustment_item)
+              row_keys << :id
+              add_grid_row(attrs: select_attributes(res.instance, row_keys), notice: res.message)
+            else
+              update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            end
           else
             re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Edit.call(id, form_values: params[:mr_bulk_stock_adjustment_item], form_errors: res.errors) }
           end

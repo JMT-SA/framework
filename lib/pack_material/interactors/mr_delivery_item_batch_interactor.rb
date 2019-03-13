@@ -15,12 +15,12 @@ module PackMaterialApp
           log_transaction
         end
         instance = mr_delivery_item_batch(id)
-        success_response("Created mr delivery item batch #{instance.client_batch_number}", instance)
+        success_response("Created delivery item batch #{instance.client_batch_number}", instance)
       else
         failed_response(can_create.message)
       end
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { client_batch_number: ['This mr delivery item batch already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { client_batch_number: ['This delivery item batch already exists'] }))
     end
 
     def update_mr_delivery_item_batch(id, params)

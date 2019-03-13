@@ -14,6 +14,7 @@ module PackMaterialApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
+        adjust_stock: :edit_header_check,
         edit_header: :edit_header_check,
         delete: :delete_check,
         complete: :complete_check,
@@ -37,33 +38,36 @@ module PackMaterialApp
       end
 
       def edit_header_check
-        return failed_response 'MrBulkStockAdjustment has been completed' if completed?
+        return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
+        return failed_response 'Bulk Stock Adjustment has been completed' if completed?
         all_ok
       end
 
       def edit_check
-        # return failed_response 'MrBulkStockAdjustment has been completed' if completed?
         all_ok
       end
 
       def delete_check
-        return failed_response 'MrBulkStockAdjustment has been completed' if completed?
+        return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
+        return failed_response 'Bulk Stock Adjustment has been completed, reopen to delete.' if completed?
         all_ok
       end
 
       def complete_check
-        return failed_response 'MrBulkStockAdjustment has already been completed' if completed?
+        return failed_response 'Bulk Stock Adjustment has no items' if no_items?
+        return failed_response 'Bulk Stock Adjustment has already been completed' if completed?
         all_ok
       end
 
       def approve_check
-        return failed_response 'MrBulkStockAdjustment has not been completed' unless completed?
-        return failed_response 'MrBulkStockAdjustment has already been approved' if approved?
+        return failed_response 'Bulk Stock Adjustment has not been completed yet' unless completed?
+        return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
         all_ok
       end
 
       def reopen_check
-        return failed_response 'MrBulkStockAdjustment has not been approved' unless approved?
+        return failed_response 'Bulk Stock Adjustment has not been completed' unless completed?
+        return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
         all_ok
       end
 
@@ -73,6 +77,10 @@ module PackMaterialApp
 
       def approved?
         @entity.approved
+      end
+
+      def no_items?
+        @repo.for_select_mr_bulk_stock_adjustment_items(where: { mr_bulk_stock_adjustment_id: @id }).none?
       end
     end
   end

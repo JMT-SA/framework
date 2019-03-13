@@ -73,15 +73,11 @@ module PackMaterialApp
     end
 
     def create_mr_bulk_stock_adjustment_item(attrs)
-      sku_location_id = DB[:mr_sku_locations].where(mr_sku_id: attrs[:mr_sku_id], location_id: attrs[:location_id]).get(:id)
-      sku_location_id ||= create(:mr_sku_locations, mr_sku_id: attrs[:mr_sku_id], location_id: attrs[:location_id], quantity: 0)
-
-      hash = { sku_location_id: sku_location_id }
-      hash[:mr_bulk_stock_adjustment_id] = attrs[:mr_bulk_stock_adjustment_id]
-
-      sku_location = DB[:mr_sku_locations].where(id: sku_location_id)
-      sku_id = sku_location.get(:mr_sku_id)
-      location_id = sku_location.get(:location_id)
+      sku_id = attrs[:mr_sku_id]
+      location_id = attrs[:location_id]
+      sku_location = DB[:mr_sku_locations].where(mr_sku_id: attrs[:mr_sku_id], location_id: attrs[:location_id])
+      sku_location_id = sku_location.get(:id)
+      system_qty = sku_location.get(:quantity) || 0
 
       mr_product_variant_id = DB[:mr_skus].where(id: sku_id).get(:mr_product_variant_id)
       variant = DB[:material_resource_product_variants].where(id: mr_product_variant_id)
@@ -93,7 +89,8 @@ module PackMaterialApp
       mr_sub_type_name = sub_type.get(:sub_type_name)
       mr_type_id = sub_type.get(:material_resource_type_id)
       mr_type_name = DB[:material_resource_types].where(id: mr_type_id).get(:type_name)
-      # inventory_uom_code
+      inventory_uom_id = sub_type.get(:inventory_uom_id)
+      inventory_uom_code = DB[:uoms].where(id: inventory_uom_id).get(:uom_code)
 
       create(:mr_bulk_stock_adjustment_items,
              mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
@@ -102,12 +99,12 @@ module PackMaterialApp
              mr_sku_id: sku_id,
              location_id: location_id,
              product_variant_number: product_variant_number,
-             # product_number: ,
              mr_type_name: mr_type_name,
              mr_sub_type_name: mr_sub_type_name,
              product_variant_code: product_variant_code,
-             # product_code: ,
-             # inventory_uom_code: ,
+             inventory_uom_id: inventory_uom_id,
+             inventory_uom_code: inventory_uom_code,
+             system_quantity: system_qty,
              location_long_code: DB[:locations].where(id: location_id).get(:location_long_code))
     end
 
@@ -143,6 +140,18 @@ module PackMaterialApp
       ).select_map(:mr_sku_id)
     end
 
+    def bulk_stock_adjustment_id_from_number(stock_adjustment_number)
+      DB[:mr_bulk_stock_adjustments].where(
+        stock_adjustment_number: stock_adjustment_number
+      ).get(:id)
+    end
+
+    def bulk_stock_adjustment_number_from_id(bulk_stock_adjustment_id)
+      DB[:mr_bulk_stock_adjustments].where(
+        id: bulk_stock_adjustment_id
+      ).get(:stock_adjustment_number)
+    end
+
     def link_mr_skus(bulk_stock_adjustment_id, mr_sku_ids)
       DB[:mr_bulk_stock_adjustments_sku_numbers].where(mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id).delete
       mr_sku_ids.each do |mr_sku_id|
@@ -171,6 +180,61 @@ module PackMaterialApp
 
     def location_repo
       MasterfilesApp::LocationRepo.new
+    end
+
+    def complete_mr_bulk_stock_adjustment(id)
+      update(:mr_bulk_stock_adjustments, id, completed: true)
+    end
+
+    def reopen_mr_bulk_stock_adjustment(id)
+      update(:mr_bulk_stock_adjustments, id, completed: false)
+    end
+
+    def approve_mr_bulk_stock_adjustment(id)
+      update(:mr_bulk_stock_adjustments, id, approved: true)
+    end
+
+    def find_mr_bulk_stock_adjustment_item(id)
+      find_with_association(:mr_bulk_stock_adjustment_items, id,
+                            parent_tables: [{ parent_table: :uoms,
+                                              foreign_key: :inventory_uom_id,
+                                              flatten_columns: { uom_code: :inventory_uom_code }
+                                            }],
+                            wrapper: PackMaterialApp::MrBulkStockAdjustmentItem)
+    end
+
+    def rmd_update_bulk_stock_adjustment_item(attrs)
+      item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
+                                                       mr_sku_id: attrs[:mr_sku_id],
+                                                       location_id: attrs[:location_id])
+      return failed_response('Item does not exist') unless item.first
+      item.update(actual_quantity: attrs[:actual_quantity])
+      success_response('ok', item.get(:id))
+    end
+
+    def html_stock_adjustment_progress_report(bulk_stock_adjustment_id, sku_id, location_id)
+      return nil unless bulk_stock_adjustment_id && sku_id && location_id
+
+      total_items = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id).all
+      done = total_items.reject { |r| r[:actual_quantity].nil? }.count
+      sku = DB[:mr_skus].where(id: sku_id).first
+      product_variant_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
+      item = DB[:mr_bulk_stock_adjustment_items].where(
+        mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id,
+        mr_sku_id: sku_id,
+        location_id: location_id
+      ).first
+      <<~HTML
+        Stock Adjustment (#{bulk_stock_adjustment_number_from_id(bulk_stock_adjustment_id)}): #{done} of #{total_items.count} items.<br>
+        Last scan:<br>
+        LOC: #{replenish_repo.location_long_code_from_location_id(location_id)}<br>
+        SKU (#{replenish_repo.sku_number_from_id(sku_id)}): #{product_variant_code}<br>
+        Qty: was #{UtilityFunctions.delimited_number(item[:system_quantity])} now #{UtilityFunctions.delimited_number(item[:actual_quantity])} (#{item[:inventory_uom_code]})<br>
+      HTML
+    end
+
+    def replenish_repo
+      ReplenishRepo.new
     end
   end
 end

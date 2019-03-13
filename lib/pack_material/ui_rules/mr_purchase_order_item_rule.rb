@@ -23,7 +23,7 @@ module UiRules
                                          caption: 'Product Variant' }
       fields[:inventory_uom_id] = { renderer: :label,
                                     with_value: @general_repo.find_uom(@form_object.inventory_uom_id)&.uom_code,
-                                    caption: 'Inventory Uom' }
+                                    caption: 'Inventory UOM' }
       fields[:quantity_required] = { renderer: :label }
       fields[:unit_price] = { renderer: :label }
     end
@@ -32,7 +32,7 @@ module UiRules
       {
         mr_purchase_order_id: { renderer: :hidden, with_value: @options[:parent_id] },
         mr_product_variant_id: { renderer: :hidden },
-        inventory_uom_id: { renderer: :select, options: @general_repo.for_select_uoms, caption: 'Inventory Uom', required: true },
+        inventory_uom_id: { renderer: :select, options: @general_repo.for_select_uoms, caption: 'Inventory UOM', required: true },
         quantity_required: { renderer: :numeric, required: true },
         unit_price: { renderer: :numeric, required: true }
       }

@@ -6,17 +6,6 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/pack_material/transactions/mr_bulk_stock_adjustment_items/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/pack_material/transactions/mr_bulk_stock_adjustment_items/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-- :separator: true
 - :url: "/development/statuses/list/mr_bulk_stock_adjustment_items/$:id$"
   :text: status
   :icon: information-solid

@@ -14,6 +14,10 @@ module PackMaterialApp
       NewBulkStockAdjustmentSchema.call(params)
     end
 
+    def validate_stock_item_adjust_params(params)
+      ItemAdjustMrBulkStockAdjustmentSchema.call(params)
+    end
+
     def create_mr_bulk_stock_adjustment(params)
       res = validate_mr_bulk_stock_adjustment_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -26,7 +30,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_bulk_stock_adjustment(id)
-      success_response("Created bulk stock adjustment", instance)
+      success_response('Created bulk stock adjustment', instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { base: ['This bulk stock adjustment already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -41,7 +45,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_bulk_stock_adjustment(id)
-      success_response("Updated bulk stock adjustment", instance)
+      success_response('Updated bulk stock adjustment', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -52,7 +56,7 @@ module PackMaterialApp
         log_status('mr_bulk_stock_adjustments', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted bulk stock adjustment")
+      success_response('Deleted bulk stock adjustment')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -75,35 +79,90 @@ module PackMaterialApp
       repo.get_sku_location_info_ids(sku_location_id)
     end
 
-    def complete_a_mr_bulk_stock_adjustment(id, params)
-      res = complete_a_record(:mr_bulk_stock_adjustments, id, params.merge(enqueue_job: false))
-      if res.success
-        success_response(res.message, mr_bulk_stock_adjustment(id))
-      else
-        failed_response(res.message, mr_bulk_stock_adjustment(id))
+    def complete_bulk_stock_adjustment(id)
+      assert_permission!(:complete, id)
+      repo.transaction do
+        repo.complete_mr_bulk_stock_adjustment(id)
+        log_transaction
+        log_status('mr_bulk_stock_adjustments', id, 'COMPLETED')
+        instance = mr_bulk_stock_adjustment(id)
+        success_response('Completed Bulk Stock Adjustment', instance)
       end
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
     end
-    #
-    # def reopen_a_mr_bulk_stock_adjustment(id, params)
-    #   res = reopen_a_record(:mr_bulk_stock_adjustments, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, mr_bulk_stock_adjustment(id))
-    #   else
-    #     failed_response(res.message, mr_bulk_stock_adjustment(id))
-    #   end
-    # end
 
-    def approve_or_reject_a_mr_bulk_stock_adjustment(id, params)
-      res = if params[:approve_action] == 'a'
-              approve_a_record(:mr_bulk_stock_adjustments, id, params.merge(enqueue_job: false))
-            else
-              reject_a_record(:mr_bulk_stock_adjustments, id, params.merge(enqueue_job: false))
-            end
-      if res.success
-        success_response(res.message, mr_bulk_stock_adjustment(id))
-      else
-        failed_response(res.message, mr_bulk_stock_adjustment(id))
+    def reopen_bulk_stock_adjustment(id)
+      assert_permission!(:reopen, id)
+      repo.transaction do
+        repo.reopen_mr_bulk_stock_adjustment(id)
+        log_transaction
+        log_status('mr_bulk_stock_adjustments', id, 'REOPENED')
+        instance = mr_bulk_stock_adjustment(id)
+        success_response('Reopened Bulk Stock Adjustment', instance)
       end
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    end
+
+    def approve_bulk_stock_adjustment(id)
+      assert_permission!(:approve, id)
+      repo.transaction do
+        repo.approve_bulk_stock_adjustment(id)
+        log_transaction
+
+        res = PackMaterialApp::BulkStockAdjustment.call(id, nil, user_name: @user.user_name)
+        raise Crossbeams::InfoError, res.message unless res.success
+
+        log_status('mr_bulk_stock_adjustments', id, 'APPROVED')
+        instance = mr_bulk_stock_adjustment(id)
+        success_response('Approved Bulk Stock Adjustment', instance)
+      end
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def stock_item_adjust(params)
+      bulk_stock_adjustment_id = repo.bulk_stock_adjustment_id_from_number(params[:stock_adjustment_number])
+      can_adjust_stock = TaskPermissionCheck::MrBulkStockAdjustment.call(:adjust_stock, bulk_stock_adjustment_id)
+      if can_adjust_stock.success
+        res = validate_stock_item_adjust_params(params)
+        return validation_failed_response(res) unless res.messages.empty?
+
+        sku_ids = replenish_repo.sku_ids_from_numbers(params[:sku_number])
+        sku_id = sku_ids[0]
+        qty = Integer(params[:quantity])
+
+        location_id = replenish_repo.resolve_location_id_from_scan(params[:location], params[:location_scan_field])
+        location_id = Integer(location_id)
+
+        opts = { user_name: @user.user_name, bulk_stock_adjustment_id: bulk_stock_adjustment_id }
+
+        repo.transaction do
+          log_transaction
+          res = repo.rmd_update_bulk_stock_adjustment_item(
+            mr_sku_id: sku_id,
+            actual_quantity: qty,
+            location_id: location_id,
+            mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id
+          )
+          raise Crossbeams::InfoError, res.message unless res.success
+
+          log_status('mr_bulk_stock_adjustments', bulk_stock_adjustment_id, 'ADJUSTMENT REGISTERED')
+          html_report = repo.html_stock_adjustment_progress_report(bulk_stock_adjustment_id, sku_id, location_id)
+          success_response('Successful stock adjustment', OpenStruct.new(bulk_stock_adjustment_id: bulk_stock_adjustment_id, report: html_report))
+        end
+      else
+        failed_response(can_adjust_stock.message)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def replenish_repo
+      ReplenishRepo.new
     end
 
     def assert_permission!(task, id = nil)

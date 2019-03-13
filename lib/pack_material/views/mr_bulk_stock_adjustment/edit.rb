@@ -25,6 +25,18 @@ module PackMaterial
                                     prompt: true,
                                     style: :button)
               end
+              if rules[:can_approve]
+                section.add_control(control_type: :link,
+                                    text: 'Reopen',
+                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/reopen",
+                                    prompt: true,
+                                    style: :button)
+                section.add_control(control_type: :link,
+                                    text: 'Approve',
+                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/approve",
+                                    prompt: true,
+                                    style: :button)
+              end
             end
             page.section do |section|
               section.show_border!
@@ -36,9 +48,12 @@ module PackMaterial
                 form.row do |row|
                   row.column do |col|
                     col.add_field :stock_adjustment_number
+                    col.add_field :mr_inventory_transaction_id
                   end
                   row.column do |col|
                     col.add_field :is_stock_take
+                    col.add_field :completed
+                    col.add_field :approved
                   end
                 end
               end
@@ -50,8 +65,7 @@ module PackMaterial
                 row.column do |col|
                   if rules[:show_only]
                     col.add_grid('blk_stck_adj_items',
-                                 "/list/mr_blk_stck_adj_items_show/grid?key=standard&mr_bulk_stock_adjustment_id=#{id}",
-                                 height: 8,
+                                 "/list/mr_bulk_stock_adjustment_items_show/grid?key=standard&mr_bulk_stock_adjustment_id=#{id}",
                                  caption: 'Bulk Stock Adjustment Items')
                   else
                     col.add_control(control_type: :link,
@@ -63,7 +77,6 @@ module PackMaterial
                                     css_class: 'mb1')
                     col.add_grid('blk_stck_adj_items',
                                  "/list/mr_bulk_stock_adjustment_items/grid?key=standard&mr_bulk_stock_adjustment_id=#{id}",
-                                 height: 8,
                                  caption: 'Bulk Stock Adjustment Items')
                   end
                 end

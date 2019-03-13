@@ -15,8 +15,7 @@ module PackMaterialApp
       @transaction_repo = PackMaterialApp::TransactionsRepo.new
       @sku_ids = sku_ids
       @business_process_id = business_process_id
-      @to_location_id = opts[:to_location_id]
-      @to_location_id ||= @repo.find_location_id_by_code(opts[:location_long_code])
+      @to_location_id = opts.fetch(:to_location_id)
       @delivery_id = opts[:delivery_id]
       @quantities = opts.fetch(:quantities) unless @delivery_id
       @ref_no = opts[:ref_no]
@@ -54,16 +53,21 @@ module PackMaterialApp
       res = @repo.add_sku_location_quantities(@quantities, @to_location_id)
       return res unless res.success
 
+      response_hash = {
+        parent_transaction_id: @parent_transaction_id,
+        transaction_item_ids: []
+      }
       @quantities.each do |hsh|
-        @transaction_repo.create_mr_inventory_transaction_item(
+        transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
           mr_inventory_transaction_id: @parent_transaction_id,
           mr_sku_id: hsh[:sku_id],
           inventory_uom_id: @repo.sku_uom_id(hsh[:sku_id]),
           to_location_id: @to_location_id,
           quantity: hsh[:qty]
         )
+        response_hash[:transaction_item_ids] << hsh.merge(transaction_item_id: transaction_item_id)
       end
-      success_response('ok')
+      success_response('ok', response_hash)
     end
   end
 end

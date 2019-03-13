@@ -27,12 +27,12 @@ module PackMaterialApp
           log_transaction
         end
         instance = mr_purchase_order_cost(id)
-        success_response("Created mr purchase order cost #{instance.id}", instance)
+        success_response("Created purchase order cost #{instance.id}", instance)
       else
         failed_response(can_create.message)
       end
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This mr purchase order cost already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { id: ['This purchase order cost already exists'] }))
     end
 
     def update_mr_purchase_order_cost(id, params)
@@ -45,7 +45,7 @@ module PackMaterialApp
           log_transaction
         end
         instance = mr_purchase_order_cost(id)
-        success_response("Updated mr purchase order cost #{instance.id}", instance)
+        success_response("Updated purchase order cost #{instance.id}", instance)
       else
         failed_response(can_update.message)
       end
@@ -60,7 +60,7 @@ module PackMaterialApp
           log_status('mr_purchase_order_costs', id, 'DELETED')
           log_transaction
         end
-        success_response("Deleted mr purchase order cost #{name}")
+        success_response("Deleted purchase order cost #{name}")
       else
         failed_response(can_delete)
       end

@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Uom Type'
+              form.caption 'Edit UOM Type'
               form.action "/masterfiles/general/uom_types/#{id}"
               form.remote!
               form.method :update

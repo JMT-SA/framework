@@ -6,7 +6,7 @@ module PackMaterialApp
                                           value: :id,
                                           no_active_check: true,
                                           order_by: :process
-    
+
     def delivery_process_id
       DB[:business_processes].where(process: 'DELIVERIES').select(:id).single_value
     end
@@ -189,7 +189,7 @@ module PackMaterialApp
         success_response('updated successfully')
       elsif qty.zero?
         location.delete
-        success_response('sku location removed')
+        success_response('SKU location removed')
       else
         failed_response('can not update with negative amount', qty)
       end

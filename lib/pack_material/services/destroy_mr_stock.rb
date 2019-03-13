@@ -40,14 +40,14 @@ module PackMaterialApp
         @parent_transaction_id = @transaction_repo.create_mr_inventory_transaction(attrs)
       end
 
-      @transaction_repo.create_mr_inventory_transaction_item(
+      transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
         mr_inventory_transaction_id: @parent_transaction_id,
         from_location_id: @location_id,
         mr_sku_id: @sku_id,
         inventory_uom_id: @repo.sku_uom_id(@sku_id),
         quantity: @quantity
       )
-      success_response('ok')
+      success_response('ok', transaction_item_id)
     end
   end
 end

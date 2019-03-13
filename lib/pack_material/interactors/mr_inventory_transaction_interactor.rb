@@ -45,9 +45,9 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_inventory_transaction(id)
-      success_response("Created mr inventory transaction #{instance.created_by}", instance)
+      success_response("Created inventory transaction #{instance.created_by}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { created_by: ['This mr inventory transaction already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { created_by: ['This inventory transaction already exists'] }))
     end
 
     def update_mr_inventory_transaction(id, params)
@@ -58,7 +58,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_inventory_transaction(id)
-      success_response("Updated mr inventory transaction #{instance.created_by}", instance)
+      success_response("Updated inventory transaction #{instance.created_by}", instance)
     end
 
     def delete_mr_inventory_transaction(id)
@@ -68,7 +68,7 @@ module PackMaterialApp
         log_status('mr_inventory_transactions', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted mr inventory transaction #{name}")
+      success_response("Deleted inventory transaction #{name}")
     end
 
     private

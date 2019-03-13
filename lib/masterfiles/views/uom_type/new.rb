@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Uom Type'
+              form.caption 'New UOM Type'
               form.action '/masterfiles/general/uom_types'
               form.remote! if remote
               form.add_field :code

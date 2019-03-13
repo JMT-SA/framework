@@ -237,6 +237,16 @@ class Framework < Roda
         show_partial { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Edit.call(id) }
       end
 
+      r.on 'inline_save' do
+        check_auth!('transactions', 'edit')
+        res = interactor.inline_update(id, params)
+        if res.success
+          show_json_notice(res.message)
+        else
+          show_json_error(res.message, status: 200)
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('transactions', 'read')

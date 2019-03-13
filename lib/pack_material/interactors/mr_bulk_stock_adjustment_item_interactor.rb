@@ -61,6 +61,17 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
+    def inline_update(id, params)
+      repo.transaction do
+        repo.inline_update_bulk_stock_adjustment_item(id, params)
+        log_status('mr_bulk_stock_adjustment_items', id, 'UPDATED')
+        log_transaction
+      end
+      success_response('Updated bulk stock adjustment item')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::MrBulkStockAdjustmentItem.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success

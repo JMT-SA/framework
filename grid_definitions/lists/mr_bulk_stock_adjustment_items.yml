@@ -27,3 +27,8 @@
     - :col: mr_bulk_stock_adjustments.id
       :op: =
       :val: $:mr_bulk_stock_adjustment_id$
+:edit_rules:
+  :url: "/pack_material/transactions/mr_bulk_stock_adjustment_items/$:id$/inline_save"
+  :editable_fields:
+    actual_quantity:
+      :editor: :numeric

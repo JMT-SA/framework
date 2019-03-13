@@ -233,6 +233,10 @@ module PackMaterialApp
       HTML
     end
 
+    def inline_update_bulk_stock_adjustment_item(id, attrs)
+      update(:mr_bulk_stock_adjustment_items, id, "#{attrs[:column_name]}": attrs[:column_value])
+    end
+
     def replenish_repo
       ReplenishRepo.new
     end

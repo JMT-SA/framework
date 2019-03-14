@@ -30,7 +30,6 @@ module UiRules
 
     def show_fields
       {
-        mr_inventory_transaction_id: { renderer: :label, caption: 'Inventory Transaction' },
         stock_adjustment_number: { renderer: :label },
         is_stock_take: { renderer: :label, as_boolean: true },
         completed: { renderer: :label, as_boolean: true },
@@ -42,7 +41,6 @@ module UiRules
       {
         stock_adjustment_number: { renderer: :label },
         is_stock_take: { renderer: :label, as_boolean: true },
-        mr_inventory_transaction_id: { renderer: :label, caption: 'Inventory Transaction' },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
       }
@@ -50,7 +48,8 @@ module UiRules
 
     def header_fields
       {
-        mr_inventory_transaction_id: { renderer: :label, caption: 'Inventory Transaction' },
+        create_transaction_id: { renderer: :label, caption: 'Create Transaction' },
+        destroy_transaction_id: { renderer: :label, caption: 'Destroy Transaction' },
         stock_adjustment_number: { renderer: :label },
         is_stock_take: { renderer: :checkbox },
         completed: { renderer: :hidden },

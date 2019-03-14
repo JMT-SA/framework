@@ -16,10 +16,17 @@ module PackMaterial
               form.caption 'New Bulk Stock Adjustment Item'
               form.action "/pack_material/transactions/mr_bulk_stock_adjustments/#{parent_id}/mr_bulk_stock_adjustment_items"
               form.remote! if remote
+              form.form_id 'new_bsa_item'
               form.add_field :mr_bulk_stock_adjustment_id
               form.add_field :sku_location_lookup
               form.add_field :mr_sku_id
               form.add_field :location_id
+              form.add_field :list_items
+
+              form.submit_captions 'Add', 'Adding'
+            end
+            page.section do |section|
+              section.add_control(control_type: :link, text: 'Done', url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{parent_id}/edit", style: :button)
             end
           end
 

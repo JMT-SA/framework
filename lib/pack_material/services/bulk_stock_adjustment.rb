@@ -21,10 +21,11 @@ module PackMaterialApp
 
       @ref_no = bulk_stock_adj[:ref_no]
 
-      destroy_stock_items = create_stock_items = []
-      items = DB[:bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: @bulk_stock_adjustment_id).all
+      destroy_stock_items = []
+      create_stock_items = []
+      items = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: @bulk_stock_adjustment_id).all
       items.each do |item|
-        if item[:system_quantity] > item[:actual_quantity]
+        if item[:system_quantity].to_f > item[:actual_quantity].to_f
           destroy_stock_items << item
         else
           create_stock_items << item
@@ -32,7 +33,7 @@ module PackMaterialApp
       end
 
       destroy_stock_items.each do |item|
-        qty = item[:system_quantity] - item[:actual_quantity]
+        qty = item[:system_quantity].to_f - item[:actual_quantity].to_f
         res = RemoveMrStock.call(item[:mr_sku_id],
                                  item[:location_id],
                                  qty,
@@ -41,11 +42,11 @@ module PackMaterialApp
                                  business_process_id: @business_process_id,
                                  user_name: @opts[:user_name])
         return failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to destroy stock failed - #{res.message}") unless res.success
-        DB[:bulk_stock_adjustment_items].where(id: item[:id]).update(mr_inventory_transaction_item_id: res.instance)
+        DB[:mr_bulk_stock_adjustment_items].where(id: item[:id]).update(mr_inventory_transaction_item_id: res.instance)
       end
 
       create_stock_items.each do |item|
-        qty = item[:actual_quantity] - item[:system_quantity]
+        qty = item[:actual_quantity].to_f - item[:system_quantity].to_f
         res = CreateMrStock.call([item[:mr_sku_id]],
                                  @business_process_id,
                                  to_location_id: item[:location_id],
@@ -55,7 +56,7 @@ module PackMaterialApp
                                  quantities: [{ sku_id: item[:mr_sku_id], qty: qty }])
         return failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to create stock failed - #{res.message}") unless res.success
         transaction_item_id = res.instance[:transaction_item_ids][0][:transaction_item_id]
-        DB[:bulk_stock_adjustment_items].where(id: item[:id]).update(mr_inventory_transaction_item_id: transaction_item_id)
+        DB[:mr_bulk_stock_adjustment_items].where(id: item[:id]).update(mr_inventory_transaction_item_id: transaction_item_id)
       end
 
       bulk_stock_adj = DB[:mr_bulk_stock_adjustments].where(id: @bulk_stock_adjustment_id)

@@ -72,11 +72,18 @@ module PackMaterialApp
              is_stock_take: attrs[:is_stock_take])
     end
 
+    def delete_mr_bulk_stock_adjustment(id)
+      DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: id).delete
+      DB[:mr_bulk_stock_adjustments_sku_numbers].where(mr_bulk_stock_adjustment_id: id).delete
+      DB[:mr_bulk_stock_adjustments_locations].where(mr_bulk_stock_adjustment_id: id).delete
+      DB[:mr_bulk_stock_adjustments].where(id: id).delete
+    end
+
     def create_mr_bulk_stock_adjustment_item(attrs)
       sku_id = attrs[:mr_sku_id]
       location_id = attrs[:location_id]
       sku_location = DB[:mr_sku_locations].where(mr_sku_id: attrs[:mr_sku_id], location_id: attrs[:location_id])
-      sku_location_id = sku_location.get(:id)
+      # sku_location_id = sku_location.get(:id)
       system_qty = sku_location.get(:quantity) || 0
 
       mr_product_variant_id = DB[:mr_skus].where(id: sku_id).get(:mr_product_variant_id)
@@ -94,7 +101,7 @@ module PackMaterialApp
 
       create(:mr_bulk_stock_adjustment_items,
              mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
-             mr_sku_location_id: sku_location_id,
+             # mr_sku_location_id: sku_location_id,
              sku_number: DB[:mr_skus].where(id: sku_id).get(:sku_number),
              mr_sku_id: sku_id,
              location_id: location_id,
@@ -239,6 +246,10 @@ module PackMaterialApp
 
     def replenish_repo
       ReplenishRepo.new
+    end
+
+    def bulk_stock_adjustment_list_items(bulk_stock_adjustment_id)
+      all(:mr_bulk_stock_adjustment_items, MrBulkStockAdjustmentItem, mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id)
     end
   end
 end

@@ -1,17 +1,16 @@
 ---
 :caption: Bulk Stock Adjustment Items
 :sql: "SELECT \"mr_bulk_stock_adjustment_items\".\"id\",\r\n  \"mr_bulk_stock_adjustment_items\".\"mr_bulk_stock_adjustment_id\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"mr_sku_location_id\",\r\n  \"mr_bulk_stock_adjustment_items\".\"sku_number\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"product_variant_number\",\r\n  \"mr_bulk_stock_adjustment_items\".\"mr_type_name\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"mr_sub_type_name\",\r\n  \"mr_bulk_stock_adjustment_items\".\"product_variant_code\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"location_long_code\",\r\n  \"mr_bulk_stock_adjustment_items\".\"inventory_uom_code\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"scan_to_location_long_code\",\r\n  \"mr_bulk_stock_adjustment_items\".\"system_quantity\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"actual_quantity\",\r\n  \"mr_bulk_stock_adjustment_items\".\"stock_take_complete\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"active\",\r\n  \"mr_bulk_stock_adjustment_items\".\"created_at\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"updated_at\",\r\n  fn_current_status('mr_bulk_stock_adjustment_items',
-  \"mr_bulk_stock_adjustment_items\".\"id\") AS status\r\nFROM \"mr_bulk_stock_adjustment_items\"\r\n
-  \ JOIN \"mr_bulk_stock_adjustments\" ON \"mr_bulk_stock_adjustments\".\"id\" = \"mr_bulk_stock_adjustment_items\".\"mr_bulk_stock_adjustment_id\"\r\n
-  \ LEFT JOIN \"mr_sku_locations\" ON \"mr_sku_locations\".\"id\" = \"mr_bulk_stock_adjustment_items\".\"mr_sku_location_id\""
+  \ \"mr_bulk_stock_adjustment_items\".\"sku_number\",\r\n  \"mr_bulk_stock_adjustment_items\".\"product_variant_number\",\r\n
+  \ \"mr_bulk_stock_adjustment_items\".\"mr_type_name\",\r\n  \"mr_bulk_stock_adjustment_items\".\"mr_sub_type_name\",\r\n
+  \ \"mr_bulk_stock_adjustment_items\".\"product_variant_code\",\r\n  \"mr_bulk_stock_adjustment_items\".\"location_long_code\",\r\n
+  \ \"mr_bulk_stock_adjustment_items\".\"inventory_uom_code\",\r\n  \"mr_bulk_stock_adjustment_items\".\"scan_to_location_long_code\",\r\n
+  \ \"mr_bulk_stock_adjustment_items\".\"system_quantity\",\r\n  \"mr_bulk_stock_adjustment_items\".\"actual_quantity\",\r\n
+  \ \"mr_bulk_stock_adjustment_items\".\"stock_take_complete\",\r\n  \"mr_bulk_stock_adjustment_items\".\"active\",\r\n
+  \ \"mr_bulk_stock_adjustment_items\".\"created_at\",\r\n  \"mr_bulk_stock_adjustment_items\".\"updated_at\",\r\n
+  \ fn_current_status('mr_bulk_stock_adjustment_items', \"mr_bulk_stock_adjustment_items\".\"id\")
+  AS status\r\nFROM \"mr_bulk_stock_adjustment_items\"\r\n  JOIN \"mr_bulk_stock_adjustments\"
+  ON \"mr_bulk_stock_adjustments\".\"id\" = \"mr_bulk_stock_adjustment_items\".\"mr_bulk_stock_adjustment_id\"\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -49,25 +48,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  mr_sku_location_id:
-    :name: mr_sku_location_id
-    :sequence_no: 3
-    :caption: SKU location
-    :namespaced_name: mr_bulk_stock_adjustment_items.mr_sku_location_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   sku_number:
     :name: sku_number
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: SKU no
     :namespaced_name: mr_bulk_stock_adjustment_items.sku_number
     :data_type: :integer
@@ -83,11 +66,11 @@
     :group_max: false
   product_variant_number:
     :name: product_variant_number
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Product variant number
     :namespaced_name: mr_bulk_stock_adjustment_items.product_variant_number
     :data_type: :integer
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -99,11 +82,11 @@
     :group_max: false
   mr_type_name:
     :name: mr_type_name
-    :sequence_no: 6
-    :caption: Type name
+    :sequence_no: 5
+    :caption: Type
     :namespaced_name: mr_bulk_stock_adjustment_items.mr_type_name
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -115,8 +98,8 @@
     :group_max: false
   mr_sub_type_name:
     :name: mr_sub_type_name
-    :sequence_no: 7
-    :caption: Sub type name
+    :sequence_no: 6
+    :caption: Sub type
     :namespaced_name: mr_bulk_stock_adjustment_items.mr_sub_type_name
     :data_type: :string
     :width: 
@@ -131,7 +114,7 @@
     :group_max: false
   product_variant_code:
     :name: product_variant_code
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Product variant code
     :namespaced_name: mr_bulk_stock_adjustment_items.product_variant_code
     :data_type: :string
@@ -147,7 +130,7 @@
     :group_max: false
   location_long_code:
     :name: location_long_code
-    :sequence_no: 9
+    :sequence_no: 8
     :caption: Location code
     :namespaced_name: mr_bulk_stock_adjustment_items.location_long_code
     :data_type: :string
@@ -163,8 +146,8 @@
     :group_max: false
   inventory_uom_code:
     :name: inventory_uom_code
-    :sequence_no: 10
-    :caption: Inventory uom code
+    :sequence_no: 9
+    :caption: UOM Code
     :namespaced_name: mr_bulk_stock_adjustment_items.inventory_uom_code
     :data_type: :string
     :width: 
@@ -179,7 +162,7 @@
     :group_max: false
   scan_to_location_long_code:
     :name: scan_to_location_long_code
-    :sequence_no: 11
+    :sequence_no: 10
     :caption: Scan to location code
     :namespaced_name: mr_bulk_stock_adjustment_items.scan_to_location_long_code
     :data_type: :string
@@ -195,7 +178,7 @@
     :group_max: false
   system_quantity:
     :name: system_quantity
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: System qty
     :namespaced_name: mr_bulk_stock_adjustment_items.system_quantity
     :data_type: :number
@@ -211,7 +194,7 @@
     :group_max: false
   actual_quantity:
     :name: actual_quantity
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Actual qty
     :namespaced_name: mr_bulk_stock_adjustment_items.actual_quantity
     :data_type: :number
@@ -227,7 +210,7 @@
     :group_max: false
   stock_take_complete:
     :name: stock_take_complete
-    :sequence_no: 14
+    :sequence_no: 13
     :caption: Stock take complete
     :namespaced_name: mr_bulk_stock_adjustment_items.stock_take_complete
     :data_type: :boolean
@@ -243,7 +226,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 15
+    :sequence_no: 14
     :caption: Active
     :namespaced_name: mr_bulk_stock_adjustment_items.active
     :data_type: :boolean
@@ -259,7 +242,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 16
+    :sequence_no: 15
     :caption: Created at
     :namespaced_name: mr_bulk_stock_adjustment_items.created_at
     :data_type: :datetime
@@ -275,7 +258,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 17
+    :sequence_no: 16
     :caption: Updated at
     :namespaced_name: mr_bulk_stock_adjustment_items.updated_at
     :data_type: :datetime
@@ -291,11 +274,11 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 18
+    :sequence_no: 17
     :caption: Status
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 

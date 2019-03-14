@@ -17,7 +17,8 @@ module PackMaterial
               form.action "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}"
               form.method :update
               form.remote!
-              form.add_field :mr_inventory_transaction_id
+              form.add_field :create_transaction_id
+              form.add_field :destroy_transaction_id
               form.add_field :stock_adjustment_number
               form.add_field :is_stock_take
               form.add_field :approved

@@ -51,6 +51,7 @@ module PackMaterialApp
     end
 
     def delete_mr_bulk_stock_adjustment(id)
+      assert_permission!(:delete, id)
       repo.transaction do
         repo.delete_mr_bulk_stock_adjustment(id)
         log_status('mr_bulk_stock_adjustments', id, 'DELETED')
@@ -108,11 +109,10 @@ module PackMaterialApp
     def approve_bulk_stock_adjustment(id)
       assert_permission!(:approve, id)
       repo.transaction do
-        repo.approve_bulk_stock_adjustment(id)
         log_transaction
 
         res = PackMaterialApp::BulkStockAdjustment.call(id, nil, user_name: @user.user_name)
-        raise Crossbeams::InfoError, res.message unless res.success
+        raise Crossbeams::InfoError#, res.message unless res.success
 
         log_status('mr_bulk_stock_adjustments', id, 'APPROVED')
         instance = mr_bulk_stock_adjustment(id)

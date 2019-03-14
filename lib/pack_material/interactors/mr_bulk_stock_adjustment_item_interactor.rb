@@ -72,6 +72,11 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
+    def list_items(bulk_stock_adjustment_id)
+      items = repo.bulk_stock_adjustment_list_items(bulk_stock_adjustment_id)
+      items.map { |r| "#{r[:product_variant_code]} (SKU:#{r[:sku_number]}) (LOC:#{r[:location_long_code]})" }
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::MrBulkStockAdjustmentItem.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success

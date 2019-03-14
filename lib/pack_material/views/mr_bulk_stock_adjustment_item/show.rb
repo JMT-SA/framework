@@ -11,7 +11,7 @@ module PackMaterial
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Mr Bulk Stock Adjustment Item'
+              # form.caption 'Bulk Stock Adjustment Item'
               form.view_only!
               form.add_field :mr_bulk_stock_adjustment_id
               form.add_field :mr_sku_location_id

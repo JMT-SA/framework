@@ -18,7 +18,7 @@ module PackMaterial
                                   text: 'Back to Bulk Stock Adjustments',
                                   url: '/list/mr_bulk_stock_adjustments',
                                   style: :back_button)
-              if rules[:can_complete] && !rules[:show_only]
+              if true #rules[:can_complete] && !rules[:show_only]
                 section.add_control(control_type: :link,
                                     text: 'Complete',
                                     url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/complete",
@@ -48,7 +48,6 @@ module PackMaterial
                 form.row do |row|
                   row.column do |col|
                     col.add_field :stock_adjustment_number
-                    col.add_field :mr_inventory_transaction_id
                   end
                   row.column do |col|
                     col.add_field :is_stock_take

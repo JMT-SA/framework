@@ -7,7 +7,8 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields @mode == :new ? new_fields : common_fields
+      # common_values_for_fields @mode == :new ? new_fields : common_fields
+      common_values_for_fields new_fields
 
       set_show_fields if @mode == :show
 
@@ -30,39 +31,41 @@ module UiRules
       fields[:stock_take_complete] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
-
-    def common_fields
-      {
-        mr_bulk_stock_adjustment_id: { renderer: :hidden },
-        mr_sku_location_id: { renderer: :hidden },
-        sku_number: { renderer: :label },
-        location_long_code: { renderer: :label },
-        scan_to_location_long_code: {}, # ???
-        product_variant_number: { renderer: :label },
-        mr_type_name: { required: true, caption: 'Type Name', renderer: :label },
-        mr_sub_type_name: { required: true, caption: 'Sub Type Name', renderer: :label },
-        product_variant_code: { required: true, renderer: :label },
-        inventory_uom_code: { caption: 'UOM Code', renderer: :label, with_value: @form_object.inventory_uom_code },
-        system_quantity: { renderer: :label },
-        actual_quantity: { renderer: :numeric, required: true },
-        stock_take_complete: { renderer: :checkbox }
-      }
-    end
+    #
+    # def common_fields
+    #   {
+    #     mr_bulk_stock_adjustment_id: { renderer: :hidden },
+    #     mr_sku_location_id: { renderer: :hidden },
+    #     sku_number: { renderer: :label },
+    #     location_long_code: { renderer: :label },
+    #     scan_to_location_long_code: {}, # ???
+    #     product_variant_number: { renderer: :label },
+    #     mr_type_name: { required: true, caption: 'Type Name', renderer: :label },
+    #     mr_sub_type_name: { required: true, caption: 'Sub Type Name', renderer: :label },
+    #     product_variant_code: { required: true, renderer: :label },
+    #     inventory_uom_code: { caption: 'UOM Code', renderer: :label, with_value: @form_object.inventory_uom_code },
+    #     system_quantity: { renderer: :label },
+    #     actual_quantity: { renderer: :numeric, required: true },
+    #     stock_take_complete: { renderer: :checkbox },
+    #   }
+    # end
 
     def new_fields
       {
         mr_bulk_stock_adjustment_id: { renderer: :hidden },
-        sku_location_lookup: { renderer: :lookup,
-                               lookup_name: :sku_locations,
-                               lookup_key: :standard,
-                               caption: 'Select SKU Location',
-                               param_values: {
-                                 allowed_sku_numbers: sku_number_options.map { |r| r[0] },
-                                 allowed_locations: location_options.map { |r| r[1] }
-                               }
+        sku_location_lookup: {
+          renderer: :lookup,
+          lookup_name: :sku_locations,
+          lookup_key: :standard,
+          caption: 'Select SKU Location',
+          param_values: {
+            allowed_sku_numbers: sku_number_options.map { |r| r[0] },
+            allowed_locations: location_options.map { |r| r[1] }
+          }
         },
         mr_sku_id: { renderer: :select, options: sku_number_options, caption: 'SKU Number' },
-        location_id: { renderer: :select, options: location_options, caption: 'Location Code' }
+        location_id: { renderer: :select, options: location_options, caption: 'Location Code' },
+        list_items: { renderer: :list, items: list_items, caption: 'List Items' }
       }
     end
 
@@ -76,7 +79,8 @@ module UiRules
       @form_object = OpenStruct.new(mr_bulk_stock_adjustment_id: @options[:parent_id],
                                     mr_sku_location_id: nil,
                                     sku_number: sku_number_options.first,
-                                    location_long_code: location_options.first)
+                                    location_long_code: location_options.first,
+                                    list_items: list_items)
     end
 
     def bulk_stock_adjustment_id
@@ -94,6 +98,11 @@ module UiRules
 
     def location_options
       @repo.bulk_stock_adjustment_locations(bulk_stock_adjustment_id)
+    end
+
+    def list_items
+      items = @repo.bulk_stock_adjustment_list_items(@options[:parent_id])
+      items.map { |r| "#{r[:product_variant_code]} (SKU:#{r[:sku_number]}) (LOC:#{r[:location_long_code]})" }
     end
   end
 end

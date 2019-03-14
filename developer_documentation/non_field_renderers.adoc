@@ -72,6 +72,16 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |`true` or `false`.
 |n/a
 
+|options - :id
+|Provide the id for the anchor so that you can refer to it in the DOM via javascript. Make sure it is unique in the page.
+|`String`.
+|n/a
+
+|options - :visible
+|Set this to `false` to render the link hidden (with style: `visiblity:hidden`).
+|`Boolean`
+|`true`
+
 |===
 
 === Text

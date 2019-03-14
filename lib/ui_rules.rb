@@ -30,7 +30,7 @@ module UiRules
       @authorizer  = authorizer
       @options     = options
       @form_object = nil
-      @rules       = {}
+      @rules       = { fields: {} }
     end
 
     def form_object
@@ -39,8 +39,8 @@ module UiRules
 
     private
 
-    def common_values_for_fields(value)
-      @rules[:fields] = value
+    def common_values_for_fields(value = nil)
+      @rules[:fields] = value.nil? ? {} : value
     end
 
     def fields

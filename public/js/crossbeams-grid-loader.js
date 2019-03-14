@@ -732,6 +732,7 @@ function NumericCellEditor() {
 
 // gets called once before the renderer is used
 NumericCellEditor.prototype.init = (params) => {
+  this.nonKeyInit = params.charPress === null;
   // create the cell
   this.eInput = document.createElement('input');
   this.eInput.value = crossbeamsUtils.isCharNumeric(params.charPress)
@@ -756,8 +757,8 @@ NumericCellEditor.prototype.getGui = () => this.eInput;
 
 // focus and select can be done after the gui is attached
 NumericCellEditor.prototype.afterGuiAttached = () => {
+  if (this.nonKeyInit) this.eInput.select();
   this.eInput.focus();
-  this.eInput.select();
 };
 
 // returns the new value after editing

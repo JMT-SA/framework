@@ -163,22 +163,33 @@ class Framework < Roda
         term = ''
       else
         term = params[:search_term]
-        res = `ag -C 2 --nonumber #{term} developer_documentation/`
-        curr = nil
-        res.split("\n").each do |t|
-          next if t.strip.empty?
-          if t == '--'
-            out[curr] << '<hr class="light-green mb0">' unless curr.nil?
-          else
-            fn, = t.split(':')
-            str = t.delete_prefix("#{fn}:")
-            if fn != curr
-              curr = fn
-              out[curr] = []
-            end
-            out[curr] << (str || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow pa1">\1</span>')
+
+        Dir.glob('developer_documentation/*.adoc').each do |filename|
+          lines = File.foreach(filename).grep(/#{term}/i)
+          next if lines.empty?
+          out[filename] = []
+          lines.each do |line|
+            out[filename] << (line.chomp || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow">\1</span>')
           end
         end
+
+        # Unlike the method above, this method includes lines of context:
+        # res = `ag -C 2 --nonumber #{term} developer_documentation/`
+        # curr = nil
+        # res.split("\n").each do |t|
+        #   next if t.strip.empty?
+        #   if t == '--'
+        #     out[curr] << '<hr class="light-green mb0">' unless curr.nil?
+        #   else
+        #     fn, = t.split(':')
+        #     str = t.delete_prefix("#{fn}:")
+        #     if fn != curr
+        #       curr = fn
+        #       out[curr] = []
+        #     end
+        #     out[curr] << (str || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow">\1</span>')
+        #   end
+        # end
       end
       got_res = out.empty? ? 'No s' : 'S'
       @documentation_page = true
@@ -193,8 +204,8 @@ class Framework < Roda
         <div class="db">
           #{out.map do |k, v|
             <<~STR
-              <div class=\"mt3\">
-                <a href=\"/#{k}\" class=\"f3 link dim br2 ph3 pv2 dib white bg-dark-blue\">
+              <div class=\"mt3 lh-copy\">
+                <a href=\"/#{k}\" class=\"f3 link dim br2 ph3 pv2 dib white bg-dark-blue mb2\">
                   #{Crossbeams::Layout::Icon.render(:back)} #{k.delete_prefix('developer_documentation/').delete_suffix('.adoc').tr('_', ' ')}
                 </a>
                 <br>

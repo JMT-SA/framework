@@ -1,0 +1,44 @@
+= cron
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== cron
+
+=== General
+
+General settings to be placed at the top of crontab (`crontab -e` to edit):
+[source,bash]
+----
+SHELL=/bin/bash                   #<1>
+HOME=/home/nsld                   #<2>
+PATH=/bin:/usr/bin:/usr/local/bin #<3>
+----
+<1> Make sure cron uses the `bash` shell (not `sh`).
+<2> Set this to the actual home dir for the user.
+<3> Minimum path required to find binaries.
+
+=== Specific jobs
+
+NOTE: Use the appropriate ruby version for the installation. (wherever you see `chruby-exec 2.5.0`, set the `2.5.0` to the installed Ruby version).
+
+==== Label Designer Queue
+
+[source,bash]
+----
+@reboot cd $HOME/label_designer/current && chruby-exec 2.5.0 -- bundle exec rake jobs:restart_screen
+----
+
+==== Pack Material Queue
+
+[source,bash]
+----
+@reboot cd $HOME/label_designer/current && chruby-exec 2.5.0 -- bundle exec rake jobs:restart_screen
+----
+
+==== MesServer
+
+[source,bash]
+----
+@reboot sleep 60 && cd $HOME/messerver/MesServer && screen -d -m -S messerver ./start.sh
+----

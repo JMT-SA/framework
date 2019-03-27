@@ -1,0 +1,35 @@
+= Aliases
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Aliases
+
+=== General
+
+Aliases should be added to `~/.bash_aliases`. Use the aliases during ssh sessions to ensure consistency (e.g. with cron screen names).
+
+=== List of aliases
+
+NOTE: Use the appropriate ruby version for the installation. (wherever you see `chruby-exec 2.5.0`, set the `2.5.0` to the installed Ruby version).
+
+restart_ld_que::
+Restart the Que jobs for Label Designer.
++
+`alias restart_ld_que='cd $HOME/label_designer/current && chruby-exec 2.5.0 -- bundle exec rake jobs:restart_screen'`
+restart_pm_que::
+Restart the Que jobs for Pack Materials.
++
+`alias restart_pm_que='cd $HOME/pack_materials/current && chruby-exec 2.5.0 -- bundle exec rake jobs:restart_screen'`
+restart_messerver::
+Restart the MesServer Java app
++
+`alias restart_messerver='screen -S messerver -X quit ; cd $HOME/messerver/MesServer && screen -d -m -S messerver ./start.sh'`
+restart_passenger::
+To restart passenger. Passenger will prompt to ask which application to restart.
++
+`alias restart_passenger='passenger-config restart-app'`
+restart_shared_config::
+Reload the shared config.
++
+`alias restart_shared_config='sudo systemctl restart crossbeams-shared-config.service'`

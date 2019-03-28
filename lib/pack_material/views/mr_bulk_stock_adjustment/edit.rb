@@ -18,13 +18,13 @@ module PackMaterial
                                   text: 'Back to Bulk Stock Adjustments',
                                   url: '/list/mr_bulk_stock_adjustments',
                                   style: :back_button)
-              if true #rules[:can_complete] && !rules[:show_only]
-                section.add_control(control_type: :link,
-                                    text: 'Complete',
-                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/complete",
-                                    prompt: true,
-                                    style: :button)
-              end
+              section.add_control(control_type: :link,
+                                  text: 'Complete',
+                                  url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/complete",
+                                  prompt: true,
+                                  style: :button,
+                                  visible: rules[:can_complete],
+                                  id: 'mr_bulk_stock_adjustments_complete_button')
               if rules[:can_approve]
                 section.add_control(control_type: :link,
                                     text: 'Reopen',

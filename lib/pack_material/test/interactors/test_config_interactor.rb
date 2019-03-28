@@ -258,6 +258,8 @@ module PackMaterialApp
         id: 1,
         material_resource_type_id: 1,
         internal_seq: 1,
+        inventory_uom_id: 1,
+        inventory_uom_code: 'each',
         sub_type_name: 'Bag Fruit',
         short_code: 'BF',
         product_code_separator: '_',

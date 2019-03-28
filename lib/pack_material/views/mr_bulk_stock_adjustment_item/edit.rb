@@ -13,7 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Mr Bulk Stock Adjustment Item'
+              form.caption 'Edit Bulk Stock Adjustment Item'
               form.action "/pack_material/transactions/mr_bulk_stock_adjustment_items/#{id}"
               form.remote!
               form.method :update

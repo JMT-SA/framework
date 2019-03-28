@@ -72,7 +72,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @object = @form_object = @repo.find_mr_bulk_stock_adjustment(@options[:id])
+      @form_object = @repo.find_mr_bulk_stock_adjustment(@options[:id])
     end
 
     def make_new_form_object

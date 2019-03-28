@@ -67,15 +67,16 @@ module PackMaterialApp
     end
 
     def business_process
-      DB[:business_processes].where(process: 'BULK STOCK ADJUSTMENT').get(:id)
+      process = @repo.where_hash(:business_processes, process: 'BULK STOCK ADJUSTMENT')
+      process[:id]
     end
 
     def destroy_transaction_id
-      transaction_id('destroy')
+      @destroy_transaction_id ||= transaction_id('destroy')
     end
 
     def create_transaction_id
-      transaction_id('create')
+      @create_transaction_id ||= transaction_id('create')
     end
 
     def transaction_id(type)

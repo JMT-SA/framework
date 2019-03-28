@@ -4,7 +4,7 @@ module PackMaterialApp
   MatresSubTypeSchema = Dry::Validation.Params do
     optional(:id).filled(:int?)
     required(:material_resource_type_id).filled(:int?)
-    required(:inventory_uom_id).filled(:int?)
+    optional(:inventory_uom_id).filled(:int?)
     required(:sub_type_name).filled(:str?)
     required(:short_code, Types::StrippedString).filled(:str?)
     optional(:product_code_separator).filled(:str?)

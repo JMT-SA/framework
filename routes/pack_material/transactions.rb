@@ -253,12 +253,16 @@ class Framework < Roda
         res = interactor.inline_update(id, params)
         if res.success
           show_json_notice(res.message)
-          # # TODO: check if can complete!!!
-          # json_actions([
-          #                OpenStruct.new(type: :show_element,
-          #                               dom_id: 'complete_button')
-          #              ],
-          #              res.message)
+
+          parent_id = interactor.mr_bulk_stock_adjustment_item(id)&.mr_bulk_stock_adjustment_id
+          permission_res = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment.call(:complete, parent_id)
+          if permission_res.success
+            json_actions([OpenStruct.new(type: :show_element, dom_id: 'mr_bulk_stock_adjustments_complete_button')],
+                         res.message)
+          else
+            json_actions([OpenStruct.new(type: :hide_element, dom_id: 'mr_bulk_stock_adjustments_complete_button')],
+                         res.message)
+          end
         else
           show_json_error(res.message, status: 200)
         end

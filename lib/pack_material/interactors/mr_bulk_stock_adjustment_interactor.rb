@@ -112,9 +112,11 @@ module PackMaterialApp
         log_transaction
 
         res = PackMaterialApp::BulkStockAdjustment.call(id, nil, user_name: @user.user_name)
-        raise Crossbeams::InfoError#, res.message unless res.success
+        raise Crossbeams::InfoError, res.message unless res.success
 
         log_status('mr_bulk_stock_adjustments', id, 'APPROVED')
+        repo.approve_mr_bulk_stock_adjustment(id)
+
         instance = mr_bulk_stock_adjustment(id)
         success_response('Approved Bulk Stock Adjustment', instance)
       end

@@ -4,14 +4,11 @@ module PackMaterialApp
   class MrBulkStockAdjustmentItem < Dry::Struct
     attribute :id, Types::Integer
     attribute :mr_bulk_stock_adjustment_id, Types::Integer
-    attribute :mr_sku_location_id, Types::Integer
     attribute :sku_number, Types::Integer
     attribute :product_variant_number, Types::Integer
-    attribute :product_number, Types::Integer
     attribute :mr_type_name, Types::String
     attribute :mr_sub_type_name, Types::String
     attribute :product_variant_code, Types::String
-    attribute :product_code, Types::String
     attribute :location_long_code, Types::String
     attribute :inventory_uom_id, Types::Integer
     attribute :inventory_uom_code, Types::String.optional

@@ -64,12 +64,7 @@ module PackMaterialApp
     crud_calls_for :mr_bulk_stock_adjustment_items, name: :mr_bulk_stock_adjustment_item, wrapper: MrBulkStockAdjustmentItem
 
     def create_mr_bulk_stock_adjustment(attrs)
-      transaction_id = create_mr_inventory_transaction(business_process_id: attrs[:business_process_id],
-                                                       ref_no: attrs[:ref_no],
-                                                       created_by: attrs[:user_name])
-      create(:mr_bulk_stock_adjustments,
-             mr_inventory_transaction_id: transaction_id,
-             is_stock_take: attrs[:is_stock_take])
+      create(:mr_bulk_stock_adjustments, is_stock_take: attrs[:is_stock_take], ref_no: attrs[:ref_no])
     end
 
     def delete_mr_bulk_stock_adjustment(id)
@@ -82,9 +77,6 @@ module PackMaterialApp
     def create_mr_bulk_stock_adjustment_item(attrs)
       sku_id = attrs[:mr_sku_id]
       location_id = attrs[:location_id]
-      sku_location = DB[:mr_sku_locations].where(mr_sku_id: attrs[:mr_sku_id], location_id: attrs[:location_id])
-      # sku_location_id = sku_location.get(:id)
-      system_qty = sku_location.get(:quantity) || 0
 
       mr_product_variant_id = DB[:mr_skus].where(id: sku_id).get(:mr_product_variant_id)
       variant = DB[:material_resource_product_variants].where(id: mr_product_variant_id)
@@ -98,10 +90,10 @@ module PackMaterialApp
       mr_type_name = DB[:material_resource_types].where(id: mr_type_id).get(:type_name)
       inventory_uom_id = sub_type.get(:inventory_uom_id)
       inventory_uom_code = DB[:uoms].where(id: inventory_uom_id).get(:uom_code)
+      system_qty = system_quantity(attrs)
 
       create(:mr_bulk_stock_adjustment_items,
              mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
-             # mr_sku_location_id: sku_location_id,
              sku_number: DB[:mr_skus].where(id: sku_id).get(:sku_number),
              mr_sku_id: sku_id,
              location_id: location_id,
@@ -113,6 +105,11 @@ module PackMaterialApp
              inventory_uom_code: inventory_uom_code,
              system_quantity: system_qty,
              location_long_code: DB[:locations].where(id: location_id).get(:location_long_code))
+    end
+
+    def system_quantity(attrs)
+      sku_location = DB[:mr_sku_locations].where(mr_sku_id: attrs[:mr_sku_id], location_id: attrs[:location_id]).first
+      sku_location ? sku_location[:quantity].to_f : 0.0
     end
 
     def get_sku_location_info_ids(sku_location_id)
@@ -205,8 +202,7 @@ module PackMaterialApp
       find_with_association(:mr_bulk_stock_adjustment_items, id,
                             parent_tables: [{ parent_table: :uoms,
                                               foreign_key: :inventory_uom_id,
-                                              flatten_columns: { uom_code: :inventory_uom_code }
-                                            }],
+                                              flatten_columns: { uom_code: :inventory_uom_code } }],
                             wrapper: PackMaterialApp::MrBulkStockAdjustmentItem)
     end
 

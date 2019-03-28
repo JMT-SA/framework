@@ -9,6 +9,7 @@ module PackMaterialApp
   class TestMrStockRepo < MiniTestWithHooks
     include PmProductFactory
     include ConfigFactory
+    include MasterfilesApp::PartyFactory
 
     def test_delivery_process_id
       assert_equal repo.delivery_process_id, @fixed_table_set[:processes][:delivery_process_id]
@@ -337,46 +338,22 @@ module PackMaterialApp
 
     def test_sku_uom_id
       pv1 = create_material_resource_product_variant
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
-      po = DB[:mr_purchase_orders].insert(
-        purchase_order_number: 5,
-        mr_delivery_term_id: term_id
-      )
       inv_uom_id = @fixed_table_set[:uoms][:uom_id]
-      po_item_id = DB[:mr_purchase_order_items].insert(
-        mr_purchase_order_id: po,
-        mr_product_variant_id: pv1[:id],
-        inventory_uom_id: inv_uom_id
-      )
-      mr_delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
-      item_id = DB[:mr_delivery_items].insert(
-        mr_delivery_id: mr_delivery_id,
-        mr_product_variant_id: pv1[:id],
-        mr_purchase_order_item_id: po_item_id
-      )
-      DB[:mr_delivery_item_batches].insert(
-        mr_delivery_item_id: item_id,
-        client_batch_number: 'one',
-        quantity_on_note: 5,
-        quantity_received: 5
-      )
-      DB[:mr_delivery_item_batches].insert(
-        mr_delivery_item_id: item_id,
-        client_batch_number: 'two',
-        quantity_on_note: 5,
-        quantity_received: 5
-      )
-      owner_party_id = rand(12)
-      MasterfilesApp::PartyRepo.any_instance.stubs(:implementation_owner_party_role)
-        .returns(OpenStruct.new(id: owner_party_id))
 
-      sku_ids = repo.create_skus_for_delivery(mr_delivery_id)
-      assert_equal inv_uom_id, repo.sku_uom_id(sku_ids[0])
-      assert_equal inv_uom_id, repo.sku_uom_id(sku_ids[1])
+      int_batch_id = DB[:mr_internal_batch_numbers].insert(
+        batch_number: 2,
+        description: 'desc desc desc'
+      )
+      party_role = create_party_role
+
+      sku_id = DB[:mr_skus].insert(
+        mr_product_variant_id: pv1[:id],
+        owner_party_role_id: party_role[:id],
+        sku_number: 5,
+        mr_internal_batch_number_id: int_batch_id
+      )
+
+      assert_equal inv_uom_id, repo.sku_uom_id(sku_id)
     end
 
     private

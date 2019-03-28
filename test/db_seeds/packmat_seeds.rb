@@ -33,14 +33,21 @@ module MiniTestSeeds
     DB[prod_col_sql].insert
 
     # mr type
-    type_id = DB[:material_resource_types].insert(
+    mr_type_id = DB[:material_resource_types].insert(
       material_resource_domain_id: dom_id,
       internal_seq: 1,
       type_name: 'PM SC Type',
       short_code: 'SC',
       description: 'This is the description field'
     )
-    @fixed_table_set[:matres_types] = { sc: { id: type_id, short_code: 'SC' } }
+    @fixed_table_set[:matres_types] = { sc: { id: mr_type_id, short_code: 'SC' } }
+
+    # Units of Measure
+    uom_type_id = DB[:uom_types].insert(code: 'PM')
+    @fixed_table_set[:uoms] = {
+      uom_type_id: uom_type_id,
+      uom_id: DB[:uoms].insert(uom_type_id: uom_type_id, uom_code: 'kg')
+    }
 
     # mr sub
     sql = <<~SQL
@@ -54,8 +61,9 @@ module MiniTestSeeds
     SQL
     prod_col_ids = DB[sql].select_map
     sub_id = DB[:material_resource_sub_types].insert(
-      material_resource_type_id: type_id,
+      material_resource_type_id: mr_type_id,
       internal_seq: 1,
+      inventory_uom_id: @fixed_table_set[:uoms][:uom_id],
       sub_type_name: 'PM SC Sub Type',
       short_code: 'SC',
       product_code_ids: "{#{prod_code_ids.join(',')}}",
@@ -118,14 +126,6 @@ module MiniTestSeeds
       storage_type_id: storage_type_id,
       type_id: location_type_id,
       default_receiving_bay_id: default_receiving_bay_id
-    }
-  end
-
-  def db_create_uoms
-    type_id = DB[:uom_types].insert(code: 'PM')
-    @fixed_table_set[:uoms] = {
-      uom_type_id: type_id,
-      uom_id: DB[:uoms].insert(uom_type_id: type_id, uom_code: 'kg')
     }
   end
 

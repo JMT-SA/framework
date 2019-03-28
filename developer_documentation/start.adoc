@@ -15,6 +15,8 @@ The following special environment variables are available when running the app:
 === General
 
 * link:/developer_documentation/development_guide.adoc[Development Guide]
+* link:/developer_documentation/cron.adoc[cron jobs]
+* link:/developer_documentation/aliases.adoc[Bash aliases]
 
 === Reference
 

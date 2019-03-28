@@ -515,7 +515,7 @@ const crossbeamsUtils = {
       return;
     }
     if (action.hide_element.reclaim_space) {
-      elem.style.display = 'none';
+      elem.hidden = true;
     } else {
       elem.style.visibility = 'hidden';
     }
@@ -536,7 +536,7 @@ const crossbeamsUtils = {
       return;
     }
     if (action.show_element.reclaim_space) {
-      elem.style.display = 'block'; // OR inline / inline-block????
+      elem.hidden = false;
     } else {
       elem.style.visibility = 'visible';
     }
@@ -807,23 +807,11 @@ const crossbeamsUtils = {
   /**
    * Toggle the visibility of en element in the DOM:
    * @param {string} id - the id of the DOM element.
-   * @param {element} [button] - optional. Button to add the pure-button-active class (Pure.css)
    * @returns {void}
    */
-  toggleVisibility: function toggleVisibility(id, button) {
+  toggleVisibility: function toggleVisibility(id) {
     const e = document.getElementById(id);
-
-    if (e.style.display === 'block') {
-      e.style.display = 'none';
-      if (button !== undefined) {
-        button.classList.remove('pure-button-active');
-      }
-    } else {
-      e.style.display = 'block';
-      if (button !== undefined) {
-        button.classList.add('pure-button-active');
-      }
-    }
+    e.hidden = !e.hidden;
   },
 
   /**

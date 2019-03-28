@@ -793,6 +793,9 @@ ul.cbl-progress-state > li {
 div.cbl-progress-bar-text {
   /* TODO: ...? */
 }
+[hidden] {
+  display: none !important;
+}
 /* RESPONSIVE */
 @media (max-width: 48em) {
   .crossbeams-row {

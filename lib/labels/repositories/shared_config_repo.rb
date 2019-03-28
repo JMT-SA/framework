@@ -10,10 +10,10 @@ module LabelApp
       @packmat_labels_config ||= remote_object_packmat_config
     end
 
-    def remote_object_packmat_config
+    def remote_object_config_for(variable_set)
       DRb.start_service
       remote_object = DRbObject.new_with_uri("druby://#{AppConst::SHARED_CONFIG_HOST_PORT}")
-      remote_object.config_for('Pack Material')
+      remote_object.config_for(variable_set)
     rescue DRb::DRbConnError => e
       msg = if e.cause
               e.cause.message
@@ -21,6 +21,10 @@ module LabelApp
               e.message
             end
       raise Crossbeams::FrameworkError, "The Shared config is not reachable at #{AppConst::SHARED_CONFIG_HOST_PORT} : #{msg}"
+    end
+
+    def remote_object_packmat_config
+      remote_object_config_for('Pack Material')
     end
 
     def remote_object_variable_groups(key)

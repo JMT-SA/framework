@@ -39,7 +39,7 @@ module DevelopmentApp
       return [] if logged_action.nil?
       left = Sequel.hstore(logged_action[:row_data]).to_hash
       right = changed_fields_for_right(logged_action)
-      [left, right]
+      [diff_with_excluded_fields(left), diff_with_excluded_fields(right)]
     end
 
     private
@@ -50,6 +50,10 @@ module DevelopmentApp
       else
         Sequel.hstore(logged_action[:row_data]).to_hash.merge(Sequel.hstore(logged_action[:changed_fields]).to_hash)
       end
+    end
+
+    def diff_with_excluded_fields(hash)
+      hash.reject { |k, _| AppConst::FIELDS_TO_EXCLUDE_FROM_DIFF.include?(k) }
     end
 
     def col_defs_for_logged_actions(logged_action) # rubocop:disable Metrics/AbcSize

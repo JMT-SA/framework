@@ -441,11 +441,11 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :replace_list_items, dom_id: dom_id, items: Array(items)), message, keep_dialog_open: keep_dialog_open)
   end
 
-  def json_hide_element(dom_id, reclaim_space: false, message: nil, keep_dialog_open: false)
+  def json_hide_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :hide_element, dom_id: dom_id, reclaim_space: reclaim_space), message, keep_dialog_open: keep_dialog_open)
   end
 
-  def json_show_element(dom_id, reclaim_space: false, message: nil, keep_dialog_open: false)
+  def json_show_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :show_element, dom_id: dom_id, reclaim_space: reclaim_space), message, keep_dialog_open: keep_dialog_open)
   end
 
@@ -495,11 +495,11 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   end
 
   def action_hide_element(action)
-    { hide_element: { id: action.dom_id, reclaim_space: action.reclaim_space || false } }
+    { hide_element: { id: action.dom_id, reclaim_space: action.reclaim_space.nil? ? true : action.reclaim_space } }
   end
 
   def action_show_element(action)
-    { show_element: { id: action.dom_id, reclaim_space: action.reclaim_space || false } }
+    { show_element: { id: action.dom_id, reclaim_space: action.reclaim_space.nil? ? true : action.reclaim_space } }
   end
 
   def action_clear_form_validation(action)

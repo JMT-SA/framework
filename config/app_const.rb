@@ -11,6 +11,9 @@ class AppConst
   # Menu
   FUNCTIONAL_AREA_RMD = 'RMD'
 
+  # Logging
+  FIELDS_TO_EXCLUDE_FROM_DIFF = %w[label_json png_image].freeze
+
   # MesServer
   LABEL_SERVER_URI = ENV.fetch('LABEL_SERVER_URI')
   POST_FORM_BOUNDARY = 'AaB03x'

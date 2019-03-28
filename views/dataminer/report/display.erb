@@ -1,10 +1,10 @@
 <section class="crossbeams_layout-border pa2">
   <%= Crossbeams::Layout::Link.new(text: 'Back', url: "#{request.referer.gsub('?back=y', '')}?back=y", style: :back_button, css_class: 'mr4').render %>
-  <a href="#" class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle SQL</a>
-  <a href="#" class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('rpt_param_text', this);return false"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle Parameters</a>
+  <a href="#" class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code');return false"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle SQL</a>
+  <a href="#" class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('rpt_param_text');return false"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle Parameters</a>
   <a href="/dataminer/prepared_reports/new/<%= @page.id %>?json_var=<%= Base64.encode64(@page.json_var) %>" class="f6 link dim br2 ph3 pv2 dib white bg-silver" data-popup-dialog="true"><%= Crossbeams::Layout::Icon.render(:save) %> Save prepared report</a>
-  <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.sql_to_run) %></pre>
-  <div id="rpt_param_text" style="display:none;" data-report-param-display="<%= @page.id %>"></div>
+  <pre id="sql_code" hidden><%= sql_to_highlight(@page.sql_to_run) %></pre>
+  <div id="rpt_param_text" hidden data-report-param-display="<%= @page.id %>"></div>
 </section>
 
 <section class="crossbeams-layout crossbeams_layout-fit-height">

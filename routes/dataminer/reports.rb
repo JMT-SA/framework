@@ -40,10 +40,10 @@ class Framework < Roda
           <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
           <p>Report: <em>#{@page.nil? ? id : @page.report.caption}</em></p>The error message is:
           <pre>#{e.message}</pre>
-          <button class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
+          <button class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code');return false">
             #{Crossbeams::Layout::Icon.render(:info)} Toggle SQL
           </button>
-          <pre id="sql_code" style="display:none;">#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
+          <pre id="sql_code" hidden>#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
         </div>
         HTML
       end
@@ -63,10 +63,10 @@ class Framework < Roda
           <p style='color:red;'>There is a problem with the SQL definition of this report:</p>
           <p>Report: <em>#{@page.nil? ? id : @page.report.caption}</em></p>The error message is:
           <pre>#{e.message}</pre>
-          <button class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false">
+          <button class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsUtils.toggleVisibility('sql_code');return false">
             #{Crossbeams::Layout::Icon.render(:info)} Toggle SQL
           </button>
-          <pre id="sql_code" style="display:none;">#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
+          <pre id="sql_code" hidden>#{@page.nil? ? 'Unknown' : '<%= sql_to_highlight(@page.report.runnable_sql) %>'}</pre>
         </div>
         HTML
       end

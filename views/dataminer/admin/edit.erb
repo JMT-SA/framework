@@ -34,10 +34,10 @@
 </form>
 </section>
 <section class="crossbeams_layout-border pa2">
-  <a href="#" onclick="crossbeamsUtils.toggleVisibility('sql_code', this);return false" class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle SQL view</a>
+  <a href="#" onclick="crossbeamsUtils.toggleVisibility('sql_code');return false" class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:info) %> Toggle SQL view</a>
   <a href='/dataminer/admin/<%= @page.id %>/change_sql/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:edit) %> Change SQL</a>
   <a href='/dataminer/admin/<%= @page.id %>/reorder_columns/' class="crossbeams-button f6 link dim br2 ph3 pv2 dib white bg-silver"><%= Crossbeams::Layout::Icon.render(:sort) %> Re-order columns</a>
-  <pre id="sql_code" style="display:none;"><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
+  <pre id="sql_code" hidden><%= sql_to_highlight(@page.report.runnable_sql) %></pre>
 </section>
 
 <div style="height:20em">

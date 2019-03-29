@@ -270,7 +270,7 @@ class Framework < Roda
                            caption: 'Stock Item Adjustment',
                            action: '/rmd/stock_adjustments/adjust_item',
                            button_caption: 'Adjust Item')
-        form.add_field(:stock_adjustment_number, 'Stock Adjustment', scan: 'key248_all', scan_type: :stock_adjustment_number)
+        form.add_field(:stock_adjustment_number, 'Stock Adjustment', scan: 'key248_all', scan_type: :stock_adjustment)
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
         form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location)
         form.add_field(:quantity, 'Actual Quantity', data_type: 'number')

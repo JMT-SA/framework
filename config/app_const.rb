@@ -39,7 +39,8 @@ class AppConst
   BARCODE_PRINT_RULES = {
     location: { format: 'LC%d', fields: [:id] },
     sku: { format: 'SK%d', fields: [:sku_number] },
-    delivery: { format: 'DN%d', fields: [:delivery_number] }
+    delivery: { format: 'DN%d', fields: [:delivery_number] },
+    stock_adjustment: { format: 'SA%d', fields: [:stock_adjustment_number] }
   }.freeze
 
   BARCODE_SCAN_RULES = [
@@ -47,7 +48,8 @@ class AppConst
     { regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' },
     { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
     { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
-    { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' }
+    { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
+    { regex: '^SA(\\d+)', type: 'stock_adjustment', field: 'stock_adjustment_number' }
   ].freeze
 
   # Que

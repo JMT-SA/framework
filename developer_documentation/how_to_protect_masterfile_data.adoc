@@ -1,0 +1,101 @@
+= How to protect masterfile data
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to protect masterfile data
+
+Sometimes masterfile data in the database has to match application code.
+
+e.g. the implementation owner of the system might be defined as "ACME".
+There needs to be an organization named "ACME" in the database, but users should not be able to rename this to e.g. "ACME (PTY) LTD" because then application code would not be able to find the organization.
+
+At the same time, users should stil be able to modify other rows in the table and maybe be able to change less critical data on the protected row - like VAT number.
+
+=== How database protection works
+
+The database has functions that can be called to block update or delete of a row with a "reserved value" in a column.
+
+You can define a trigger on a table that will block delete and update for certain values, or you can define a trigger to block deletes, but allow changes to all but certain columns of the row.
+
+The error-handling code of the framework will display the exception message from the trigger function so no application code needs to be written to handle changes.
+
+=== Migration for blocking update and delete
+
+In this example, no update or delete of `location_storage_types` may take place if the `storage_type_code` is `Pack Material`.
+
+NOTE: Highly recommended: The migration is not applied for tests (`unless ENV['RACK_ENV'] == 'test'`). This is to prevent unnecessary errors in tests that might need to update/delete protected data.
+
+[source,ruby]
+----
+Sequel.migration do
+  up do
+    unless ENV['RACK_ENV'] == 'test'
+      run <<~SQL
+        SELECT set_reserved_data_on_table('location_storage_types',    #<1>
+                                          'storage_type_code',         #<2>
+                                          '{Pack Material}'::text[]);  #<3>
+      SQL
+    end
+  end
+
+  down do
+    unless ENV['RACK_ENV'] == 'test'
+      run <<~SQL
+        DROP TRIGGER check_for_reserved_data ON location_storage_types; #<4>
+      SQL
+    end
+  end
+end
+----
+<1> Table name: `location_storage_types`
+<2> Column to check for reserved value: `storage_type_code`
+<3> Array list of reserved values: `Pack Material`
+<4> Drop the trigger `check_for_reserved_data` on the table `location_storage_types`.
+
+=== Migration for blocking delete and update of certain fields
+
+In this example, no delete of `organizations` may take place if the `short_description` is `ACME` or `ANOTHER`.
+Updates of those records can take place as long as the `short_description` is not modified.
+
+[source,ruby]
+----
+Sequel.migration do
+  up do
+    unless ENV['RACK_ENV'] == 'test'
+      run <<~SQL
+        SELECT set_reserved_data_on_table('organizations',
+                                          'short_description',
+                                          '{ACME,ANOTHER}'::text[],       #<1>
+                                          '{short_description}'::text[]); #<2>
+      SQL
+    end
+  end
+
+  down do
+    unless ENV['RACK_ENV'] == 'test'
+      run <<~SQL
+        DROP TRIGGER check_for_reserved_data_del ON organizations;        #<3>
+        DROP TRIGGER check_for_reserved_data_upd ON organizations;        #<4>
+      SQL
+    end
+  end
+end
+----
+<1> Note two reserved values (`ACME` and `ANOTHER`).
+<2> Just the `short_description` column is protected, other columns can be changed.
+<3> There is a specific trigger to handle deletes: `check_for_reserved_data_del`.
+<4> There is a specific trigger to handle updates: `check_for_reserved_data_upd`.
+
+NOTE: In the case of key data that varies from implementation to implementation, the correct config environment variable should be used in the migration.
+e.g:
+[source,ruby]
+----
+run <<~SQL
+  SELECT set_reserved_data_on_table('organizations',
+                                    'short_description',
+                                    '{#{ENV['IMPLEMENTATION_OWNER']}}'::text[], #<1>
+                                    '{short_description}'::text[]);
+SQL
+----
+<1> Using environment variable `IMPLEMENTATION_OWNER` as set in `.env.local`.

@@ -18,7 +18,7 @@ In the `.env` file add a line like this:
 IMPLEMENTATION_OWNER=KROMCO (PTY) LTD
 ----
 
-NOTE: The value of implementation owner must exactly match the name of the organization in the database.
+NOTE: The value of implementation owner must exactly match the name of the organization in the database. See link:/developer_documentation/how_to_protect_masterfile_data.adoc[how to protect masterfile data] to ensure the db and app do not get out of sync.
 
 === 3. Override the default owner on site
 

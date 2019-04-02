@@ -110,11 +110,13 @@
 
 /* Colouring/styling of Header and its Menus */
 .functional-area-menu {
-  background: #0f8b99;
+  /* background: #0f8b99; */
+  background: #3A5974;
 }
 .Header {
   /*background: rgba(0,0,0,0.8);*/
-  background: #0f9962;
+  /* background: #0f9962; */
+  background-color: #5F98CA;
 }
 .Header .Menu, .functional-area-menu ul {
   background: none;

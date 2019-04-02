@@ -253,7 +253,8 @@ header,
   flex: none; /* 2 */
 }
 .footness {
-  background-color: #0F9962;
+  /* background-color: #0F9962; */
+  background-color: #5F98CA;
 }
 .footness p {
   margin: 0.5em;
@@ -482,7 +483,8 @@ input[readonly] {
 /* END: SEARCH MENU RESULTS */
 
 .menu-prog-selected {
-  background: rgba(53, 136, 94, 0.85);
+  /* background: rgba(53, 136, 94, 0.85); */
+  background-color: rgba(255,255,255,0.2);
 }
 
 .thinbordertable {

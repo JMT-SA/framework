@@ -21,6 +21,8 @@ module UiRules
                                  header_fields
                                when :edit
                                  rules[:show_only] ? show_fields : edit_fields
+                               when :show
+                                 view_header_fields
                                else
                                  new_fields
                                end
@@ -56,6 +58,18 @@ module UiRules
         approved: { renderer: :hidden },
         business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
         ref_no: { required: true },
+        sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
+        location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
+      }
+    end
+
+    def view_header_fields
+      {
+        stock_adjustment_number: { renderer: :label },
+        is_stock_take: { renderer: :label, as_boolean: true },
+        completed: { renderer: :label, as_boolean: true },
+        approved: { renderer: :label, as_boolean: true },
+        ref_no: { renderer: :label },
         sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
         location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
       }

@@ -26,7 +26,6 @@ module PackMaterialApp
       repo.transaction do
         id = repo.create_mr_bulk_stock_adjustment(attrs.merge(user_name: @user.user_name))
         log_status('mr_bulk_stock_adjustments', id, 'CREATED')
-        log_status('mr_bulk_stock_adjustments', id, 'EDITING')
         log_transaction
       end
       instance = mr_bulk_stock_adjustment(id)
@@ -111,7 +110,7 @@ module PackMaterialApp
       repo.transaction do
         log_transaction
 
-        res = PackMaterialApp::BulkStockAdjustment.call(id, nil, user_name: @user.user_name)
+        res = PackMaterialApp::BulkStockAdjustmentService.call(id, nil, user_name: @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_status('mr_bulk_stock_adjustments', id, 'APPROVED')
@@ -138,9 +137,8 @@ module PackMaterialApp
         qty = Integer(params[:quantity])
 
         location_id = replenish_repo.resolve_location_id_from_scan(params[:location], params[:location_scan_field])
+        return failed_response('Location not found, please use location short code') unless location_id
         location_id = Integer(location_id)
-
-        opts = { user_name: @user.user_name, bulk_stock_adjustment_id: bulk_stock_adjustment_id }
 
         repo.transaction do
           log_transaction
@@ -152,6 +150,7 @@ module PackMaterialApp
           )
           raise Crossbeams::InfoError, res.message unless res.success
 
+          log_status('mr_bulk_stock_adjustment_items', res.instance, 'RMD ADJUSTMENT')
           log_status('mr_bulk_stock_adjustments', bulk_stock_adjustment_id, 'ADJUSTMENT REGISTERED')
           html_report = repo.html_stock_adjustment_progress_report(bulk_stock_adjustment_id, sku_id, location_id)
           success_response('Successful stock adjustment', OpenStruct.new(bulk_stock_adjustment_id: bulk_stock_adjustment_id, report: html_report))

@@ -38,7 +38,7 @@ WHERE functional_area_name = 'Pack Material')),
         'Bulk Stock Adjustments', '/list/mr_bulk_stock_adjustments', 4);
 
 
-INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('BULK STOCK ADJUSTMENT');
+INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('BULK STOCK ADJUSTMENTS');
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('STOCK TAKE');
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('STOCK TAKE ON');
 

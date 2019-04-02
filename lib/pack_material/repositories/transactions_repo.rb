@@ -109,7 +109,7 @@ module PackMaterialApp
 
     def system_quantity(attrs)
       sku_location = DB[:mr_sku_locations].where(mr_sku_id: attrs[:mr_sku_id], location_id: attrs[:location_id]).first
-      sku_location ? sku_location[:quantity].to_f : 0.0
+      sku_location ? sku_location[:quantity].to_d : 0.0
     end
 
     def get_sku_location_info_ids(sku_location_id)

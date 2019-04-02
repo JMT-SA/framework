@@ -6,3 +6,4 @@
     :preselect: "SELECT mr_sku_id AS id FROM mr_bulk_stock_adjustments_sku_numbers WHERE mr_bulk_stock_adjustment_id = $:id$"
     :section_caption: Link SKU Numbers
     :can_be_cleared: true
+    :multiselect_save_method: remote

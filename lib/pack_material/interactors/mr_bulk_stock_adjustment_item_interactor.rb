@@ -64,7 +64,7 @@ module PackMaterialApp
     def inline_update(id, params)
       repo.transaction do
         repo.inline_update_bulk_stock_adjustment_item(id, params)
-        log_status('mr_bulk_stock_adjustment_items', id, 'UPDATED')
+        log_status('mr_bulk_stock_adjustment_items', id, 'INLINE ADJUSTMENT')
         log_transaction
       end
       success_response('Updated bulk stock adjustment item')

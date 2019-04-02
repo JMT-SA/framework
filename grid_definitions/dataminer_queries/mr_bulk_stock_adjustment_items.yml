@@ -7,10 +7,9 @@
   \ \"mr_bulk_stock_adjustment_items\".\"inventory_uom_code\",\r\n  \"mr_bulk_stock_adjustment_items\".\"scan_to_location_long_code\",\r\n
   \ \"mr_bulk_stock_adjustment_items\".\"system_quantity\",\r\n  \"mr_bulk_stock_adjustment_items\".\"actual_quantity\",\r\n
   \ \"mr_bulk_stock_adjustment_items\".\"stock_take_complete\",\r\n  \"mr_bulk_stock_adjustment_items\".\"active\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"created_at\",\r\n  \"mr_bulk_stock_adjustment_items\".\"updated_at\",\r\n
-  \ fn_current_status('mr_bulk_stock_adjustment_items', \"mr_bulk_stock_adjustment_items\".\"id\")
-  AS status\r\nFROM \"mr_bulk_stock_adjustment_items\"\r\n  JOIN \"mr_bulk_stock_adjustments\"
-  ON \"mr_bulk_stock_adjustments\".\"id\" = \"mr_bulk_stock_adjustment_items\".\"mr_bulk_stock_adjustment_id\"\r\n"
+  \ \"mr_bulk_stock_adjustment_items\".\"created_at\",\r\n  \"mr_bulk_stock_adjustment_items\".\"updated_at\"\r\nFROM
+  \"mr_bulk_stock_adjustment_items\"\r\n  JOIN \"mr_bulk_stock_adjustments\" ON \"mr_bulk_stock_adjustments\".\"id\"
+  = \"mr_bulk_stock_adjustment_items\".\"mr_bulk_stock_adjustment_id\"\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -265,22 +264,6 @@
     :width: 
     :format: 
     :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 17
-    :caption: Status
-    :namespaced_name: 
-    :data_type: :string
-    :width: 100
-    :format: 
-    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

@@ -10,5 +10,6 @@ module PackMaterialApp
     attribute :completed, Types::Bool
     attribute :approved, Types::Bool
     attribute :active, Types::Bool
+    attribute :ref_no, Types::StrippedString
   end
 end

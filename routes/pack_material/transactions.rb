@@ -99,7 +99,7 @@ class Framework < Roda
         show_page { PackMaterial::Transactions::MrBulkStockAdjustment::Edit.call(id) }
       end
 
-      r.on 'edit_header' do   # EDIT
+      r.on 'edit_header' do   # EDIT HEADER
         check_auth!('transactions', 'edit')
         interactor.assert_permission!(:edit_header, id)
         show_partial { PackMaterial::Transactions::MrBulkStockAdjustment::EditHeader.call(id) }
@@ -191,22 +191,20 @@ class Framework < Roda
         r.post do
           res = interactor.link_mr_skus(id, multiselect_grid_choices(params))
           if res.success
-            flash[:notice] = res.message
+            show_json_notice(res.message)
           else
-            flash[:error] = res.message
+            show_json_error(res.message)
           end
-          redirect_to_last_grid(r)
         end
       end
       r.on 'link_locations', Integer do |id|
         r.post do
           res = interactor.link_locations(id, multiselect_grid_choices(params))
           if res.success
-            flash[:notice] = res.message
+            show_json_notice(res.message)
           else
-            flash[:error] = res.message
+            show_json_error(res.message)
           end
-          redirect_to_last_grid(r)
         end
       end
       r.post do        # CREATE

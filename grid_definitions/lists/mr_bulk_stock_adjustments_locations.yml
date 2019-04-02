@@ -7,6 +7,7 @@
     :section_caption: Link Locations
     :can_be_cleared: true
     :conditions: bulk_stock_adj_locations
+    :multiselect_save_method: remote
 :conditions:
   :bulk_stock_adj_locations:
     - :col: locations.primary_storage_type_id

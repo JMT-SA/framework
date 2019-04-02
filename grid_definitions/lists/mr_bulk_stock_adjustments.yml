@@ -1,16 +1,16 @@
 ---
 :dataminer_definition: mr_bulk_stock_adjustments
 :actions:
-- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$/edit_header"
-  :text: edit header
-  :icon: edit-pencil
-  :title: Edit Header
+- :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$"
+  :text: show header
+  :icon: view-show
+  :title: Show Header
   :popup: true
-  :hide_if_true: completed
 - :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
+  :hide_if_false: has_locations, has_skus
 - :url: "/list/mr_bulk_stock_adjustments_mr_skus/multi?key=mr_bulk_stock_adjustments&id=$:id$"
   :text: SKU Numbers
   :icon: list

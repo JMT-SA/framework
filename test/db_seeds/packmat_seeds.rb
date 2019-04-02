@@ -1,9 +1,10 @@
 module MiniTestSeeds
   def db_create_processes
     # processes
-    @fixed_table_set[:processes] = { delivery_process_id: DB[:business_processes].insert(process: 'DELIVERIES'),
-                                     vehicle_job_process_id: DB[:business_processes].insert(process: 'VEHICLE JOBS'),
-                                     adhoc_transactions_process_id: DB[:business_processes].insert(process: 'ADHOC TRANSACTIONS')
+    @fixed_table_set[:processes] = { delivery_process_id: DB[:business_processes].insert(process: AppConst::PROCESS_DELIVERIES),
+                                     vehicle_job_process_id: DB[:business_processes].insert(process: AppConst::PROCESS_VEHICLE_JOBS),
+                                     adhoc_transactions_process_id: DB[:business_processes].insert(process: AppConst::PROCESS_ADHOC_TRANSACTIONS),
+                                     bulk_stock_adjustments_process_id: DB[:business_processes].insert(process: AppConst::PROCESS_BULK_STOCK_ADJUSTMENTS)
     }
   end
 
@@ -111,7 +112,7 @@ module MiniTestSeeds
 
   def db_create_locations
     assignment_id = DB[:location_assignments].insert(assignment_code: 'Assignment Code')
-    storage_type_id = DB[:location_storage_types].insert(storage_type_code: 'Storage Type Code')
+    storage_type_id = DB[:location_storage_types].insert(storage_type_code: PackMaterialApp::DOMAIN_NAME)
     location_type_id = DB[:location_types].insert(location_type_code: 'Location Type Code', short_code: 'LT')
     default_receiving_bay_id = DB[:locations].insert(
       primary_storage_type_id: storage_type_id,

@@ -3,91 +3,78 @@
 # rubocop:disable Metrics/AbcSize
 
 module PackMaterialApp
-  class BulkStockAdjustment < BaseService
+  class BulkStockAdjustmentService < BaseService
     # @param [Integer] bulk_stock_adjustment_id
     # @param [Integer] business_process_id
-    # @param [Hash] opts { :user_name, :parent_transaction_id }
+    # @param [Hash] opts { :user_name }
     def initialize(bulk_stock_adjustment_id, business_process_id = nil, opts = {})
-      @repo = MrStockRepo.new
+      @this_repo = PackMaterialApp::BulkStockAdjustmentRepo.new
       @transaction_repo = PackMaterialApp::TransactionsRepo.new
+
       @bulk_stock_adjustment_id = bulk_stock_adjustment_id
-      @business_process_id = business_process_id || business_process
+      @bulk_stock_adj = @transaction_repo.find_mr_bulk_stock_adjustment(bulk_stock_adjustment_id)
+      @ref_no = @bulk_stock_adj.ref_no unless @bulk_stock_adj.nil?
+      @business_process_id = business_process_id || @this_repo.find_business_process_id
       @opts = opts
+      @destroy_transaction_id = nil
+      @create_transaction_id = nil
     end
 
     def call
-      bulk_stock_adj = @repo.find_hash(:mr_bulk_stock_adjustments, @bulk_stock_adjustment_id)
-      return failed_response('Bulk Stock Adjustment record does not exist') unless bulk_stock_adj
+      return failed_response('Bulk Stock Adjustment record does not exist') unless @bulk_stock_adj
 
-      @ref_no = bulk_stock_adj[:ref_no]
-
-      destroy_stock_items = []
-      create_stock_items = []
-      items = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: @bulk_stock_adjustment_id).all
-      items.each do |item|
-        if item[:system_quantity].to_f > item[:actual_quantity].to_f
-          destroy_stock_items << item
-        else
-          create_stock_items << item
-        end
-      end
-
-      destroy_stock_items.each do |item|
-        qty = item[:system_quantity].to_f - item[:actual_quantity].to_f
+      separated_items = @this_repo.separate_items(@bulk_stock_adjustment_id)
+      separated_items[:destroy_stock_items].each do |item|
+        sys_qty = @this_repo.system_quantity(item[:mr_sku_id], item[:location_id])
+        qty = sys_qty - item[:actual_quantity].to_d
         res = RemoveMrStock.call(item[:mr_sku_id],
                                  item[:location_id],
                                  qty,
                                  ref_no: @ref_no,
-                                 parent_transaction_id: destroy_transaction_id,
+                                 parent_transaction_id: destroy_transaction_id(attrs),
                                  business_process_id: @business_process_id,
                                  user_name: @opts[:user_name])
         return failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to destroy stock failed - #{res.message}") unless res.success
-        DB[:mr_bulk_stock_adjustment_items].where(id: item[:id]).update(mr_inventory_transaction_item_id: res.instance)
+
+        @this_repo.update_item_transaction_id(item[:id], res.instance)
       end
 
-      create_stock_items.each do |item|
-        qty = item[:actual_quantity].to_f - item[:system_quantity].to_f
+      separated_items[:create_stock_items].each do |item|
+        parent_transaction_id = create_transaction_id(attrs)
+        sys_qty = @this_repo.system_quantity(item[:mr_sku_id], item[:location_id])
+        qty = item[:actual_quantity].to_d - sys_qty
         res = CreateMrStock.call([item[:mr_sku_id]],
                                  @business_process_id,
                                  to_location_id: item[:location_id],
                                  user_name: @opts[:user_name],
                                  ref_no: @ref_no,
-                                 parent_transaction_id: create_transaction_id,
+                                 parent_transaction_id: parent_transaction_id,
                                  quantities: [{ sku_id: item[:mr_sku_id], qty: qty }])
         return failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to create stock failed - #{res.message}") unless res.success
-        transaction_item_id = res.instance[:transaction_item_ids][0][:transaction_item_id]
-        DB[:mr_bulk_stock_adjustment_items].where(id: item[:id]).update(mr_inventory_transaction_item_id: transaction_item_id)
+
+        item_transaction_id = res.instance[:transaction_item_ids][0][:transaction_item_id]
+        @this_repo.update_item_transaction_id(item[:id], item_transaction_id)
       end
 
-      bulk_stock_adj = DB[:mr_bulk_stock_adjustments].where(id: @bulk_stock_adjustment_id)
-      bulk_stock_adj.update(create_transaction_id: create_transaction_id) if create_stock_items.any?
-      bulk_stock_adj.update(destroy_transaction_id: destroy_transaction_id) if destroy_stock_items.any?
+      @this_repo.update_transaction_ids(@bulk_stock_adjustment_id, @create_transaction_id, @destroy_transaction_id)
 
       success_response('ok')
     end
 
-    def business_process
-      process = @repo.where_hash(:business_processes, process: 'BULK STOCK ADJUSTMENT')
-      process[:id]
-    end
-
-    def destroy_transaction_id
-      @destroy_transaction_id ||= transaction_id('destroy')
-    end
-
-    def create_transaction_id
-      @create_transaction_id ||= transaction_id('create')
-    end
-
-    def transaction_id(type)
-      type_id = @repo.transaction_type_id_for(type)
-      @transaction_repo.create_mr_inventory_transaction(
+    def attrs
+      {
         business_process_id: @business_process_id,
         ref_no: @ref_no,
-        active: true,
-        created_by: @opts[:user_name],
-        mr_inventory_transaction_type_id: type_id
-      )
+        user_name: @opts[:user_name]
+      }
+    end
+
+    def destroy_transaction_id(attrs)
+      @destroy_transaction_id ||= @this_repo.transaction_id('destroy', attrs)
+    end
+
+    def create_transaction_id(attrs)
+      @create_transaction_id ||= @this_repo.transaction_id('create', attrs)
     end
   end
 end

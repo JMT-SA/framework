@@ -21,6 +21,26 @@ module ErrorHelpers
     when Sequel::ForeignKeyConstraintViolation
       msg = pg_foreign_key_violation_msg(err)
       send_appropriate_error_response(msg, fetch_request, status: 200)
+    when Sequel::DatabaseError
+      send_sequel_database_error(err, fetch_request)
+    else
+      send_appropriate_error_response(err, fetch_request)
+    end
+  end
+
+  # Formats a Sequel::DatabaseError for display in the browser.
+  #
+  # @param err [Exception, String] the error object or an error message.
+  # @param fetch_request [Boolean] is the error to be displayed for a fetch or normal request.
+  # @return [String, JSON] the error as HTML or JSON.
+  def send_sequel_database_error(err, fetch_request)
+    if err.message.include?('tf_protect_reserved_data')
+      if err.message.include?('] - ')
+        # Show everything in the message after "...] - "
+        send_appropriate_error_response(err.message[/(?<=\] - ).*/], fetch_request, status: 200)
+      else
+        send_appropriate_error_response(err.message, fetch_request, status: 200)
+      end
     else
       send_appropriate_error_response(err, fetch_request)
     end

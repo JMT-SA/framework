@@ -16,7 +16,7 @@ gem 'roda-symbolized_params'
 gem 'rodauth'
 gem 'rouge'
 gem 'rubocop'
-gem 'sass'
+gem 'sassc'
 gem 'sequel'
 gem 'sequel_pg', require: false
 gem 'sequel_postgresql_triggers'

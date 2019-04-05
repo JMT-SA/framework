@@ -19,6 +19,7 @@ module Masterfiles
               form.add_field :location_type_id
               form.add_field :primary_storage_type_id
               form.add_field :primary_assignment_id
+              form.add_field :location_storage_definition_id
               form.add_field :location_long_code
               form.add_field :location_description
               form.add_field :location_short_code

@@ -13,7 +13,8 @@
   \ \"mr_deliveries\".delivery_number,\r\n       COALESCE(mr_internal_batch_numbers.\"batch_number\"::text,
   mr_delivery_item_batches.client_batch_number) AS batch_number,\r\n  \"locations\".\"has_single_container\",\r\n\"locations\".\"location_type_id\",\r\n
   \ \"location_types\".\"location_type_code\",\r\n  \"locations\".\"primary_assignment_id\",\r\n
-  \ \"location_assignments\".\"assignment_code\",\r\n  \"locations\".\"location_description\"\r\nFROM
+  \ \"location_assignments\".\"assignment_code\",\r\n  \"locations\".\"location_storage_definition_id\",\r\n
+  \ \"location_storage_definitions\".\"storage_definition_code\",\r\n  \"locations\".\"location_description\"\r\nFROM
   \"locations\"\r\n  JOIN \"location_types\" ON \"location_types\".\"id\" = \"locations\".\"location_type_id\"\r\n
   \ JOIN \"location_assignments\" ON \"location_assignments\".\"id\" = \"locations\".\"primary_assignment_id\"\r\n
   \ JOIN \"location_storage_types\" ON \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\n
@@ -21,13 +22,15 @@
   \ JOIN \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
   \ JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"id\"
   =\r\n                                               \"mr_skus\".\"mr_product_variant_id\"\r\n
-  \ LEFT JOIN mr_delivery_item_batches on mr_skus.mr_delivery_item_batch_id = mr_delivery_item_batches.id\r\n
-  \ LEFT JOIN mr_delivery_items on mr_delivery_item_batches.mr_delivery_item_id =
-  mr_delivery_items.id\r\n  LEFT JOIN mr_deliveries on mr_delivery_items.mr_delivery_id
-  = mr_deliveries.id\r\n  LEFT JOIN mr_internal_batch_numbers on mr_skus.mr_internal_batch_number_id
-  = mr_internal_batch_numbers.id\r\nWHERE \"locations\".\"active\" AND\r\n      \"location_storage_types\".\"storage_type_code\"
-  = 'Pack Material'\r\nORDER BY (SELECT string_agg(\"cc\".\"location_long_code\", ';')
-  AS path\r\n          FROM (SELECT \"c\".\"location_long_code\"\r\n                FROM
+  \ LEFT JOIN \"location_storage_definitions\" ON \"location_storage_definitions\".\"id\"
+  = \"locations\".\"location_storage_definition_id\"\r\n  LEFT JOIN mr_delivery_item_batches
+  on mr_skus.mr_delivery_item_batch_id = mr_delivery_item_batches.id\r\n  LEFT JOIN
+  mr_delivery_items on mr_delivery_item_batches.mr_delivery_item_id = mr_delivery_items.id\r\n
+  \ LEFT JOIN mr_deliveries on mr_delivery_items.mr_delivery_id = mr_deliveries.id\r\n
+  \ LEFT JOIN mr_internal_batch_numbers on mr_skus.mr_internal_batch_number_id = mr_internal_batch_numbers.id\r\nWHERE
+  \"locations\".\"active\" AND\r\n      \"location_storage_types\".\"storage_type_code\"
+  = 'Pack Material'\r\nORDER BY (SELECT string_agg(\"cc\".\"location_long_code\",
+  ';') AS path\r\n          FROM (SELECT \"c\".\"location_long_code\"\r\n                FROM
   \"locations\" c\r\n                  JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
   = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
   \               ORDER BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
@@ -275,9 +278,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  location_storage_definition_id:
+    :name: location_storage_definition_id
+    :sequence_no: 16
+    :caption: Location storage definition
+    :namespaced_name: locations.location_storage_definition_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  storage_definition_code:
+    :name: storage_definition_code
+    :sequence_no: 17
+    :caption: Storage definition code
+    :namespaced_name: location_storage_definitions.storage_definition_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   location_description:
     :name: location_description
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Location description
     :namespaced_name: locations.location_description
     :data_type: :string

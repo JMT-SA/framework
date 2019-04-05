@@ -31,10 +31,16 @@ module MasterfilesApp
                      no_active_check: true,
                      order_by: :location_type_code
 
+    build_for_select :location_storage_definitions,
+                     label: :storage_definition_code,
+                     value: :id,
+                     order_by: :storage_definition_code
+
     crud_calls_for :locations, name: :location
     crud_calls_for :location_assignments, name: :location_assignment, wrapper: LocationAssignment
     crud_calls_for :location_storage_types, name: :location_storage_type, wrapper: LocationStorageType
     crud_calls_for :location_types, name: :location_type, wrapper: LocationType
+    crud_calls_for :location_storage_definitions, name: :location_storage_definition, wrapper: LocationStorageDefinition
 
     def find_location_by(key, val) # rubocop:disable Metrics/AbcSize
       hash = DB[:locations]

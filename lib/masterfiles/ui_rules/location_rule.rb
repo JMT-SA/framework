@@ -25,10 +25,12 @@ module UiRules
       primary_storage_type_id_label = @repo.find(:location_storage_types, MasterfilesApp::LocationStorageType, @form_object.primary_storage_type_id)&.storage_type_code
       location_type_id_label = @repo.find(:location_types, MasterfilesApp::LocationType, @form_object.location_type_id)&.location_type_code
       primary_assignment_id_label = @repo.find(:location_assignments, MasterfilesApp::LocationAssignment, @form_object.primary_assignment_id)&.assignment_code
+      location_storage_definition_id_label = @repo.find(:location_storage_definitions, MasterfilesApp::LocationStorageDefinition, @form_object.location_storage_definition_id)&.storage_deifinition_code
 
       fields[:primary_storage_type_id] = { renderer: :label, with_value: primary_storage_type_id_label, caption: 'Primary Storage Type' }
       fields[:location_type_id] = { renderer: :label, with_value: location_type_id_label, caption: 'Location Type' }
       fields[:primary_assignment_id] = { renderer: :label, with_value: primary_assignment_id_label, caption: 'Primary Assignment' }
+      fields[:location_storage_definition_id] = { renderer: :label, with_value: location_storage_definition_id_label, caption: 'Storage Definition' }
       fields[:location_long_code] = { renderer: :label, caption: 'Long Code' }
       fields[:location_description] = { renderer: :label, caption: 'Description' }
       fields[:location_short_code] = { renderer: :label, caption: 'Short Code' }
@@ -55,6 +57,7 @@ module UiRules
         primary_storage_type_id: { renderer: :select, options: storage_types, caption: 'Primary Storage Type', required: true },
         location_type_id: { renderer: :select, options: @repo.for_select_location_types, caption: 'Location Type', required: true },
         primary_assignment_id: { renderer: :select, options: location_assignments, caption: 'Primary Assignment', required: true },
+        location_storage_definition_id: { renderer: :select, options: @repo.for_select_location_storage_definitions, caption: 'Storage Definition', required: true, prompt: true },
         location_long_code: { required: true, caption: 'Long Code' },
         location_description: { required: true, caption: 'Description' },
         location_short_code: { required: true, caption: 'Short Code' },
@@ -79,6 +82,7 @@ module UiRules
       @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(parent),
                                     location_type_id: @repo.for_select_location_types.first.last,
                                     primary_assignment_id: initial_assignment(parent),
+                                    location_storage_definition_id: nil,
                                     location_long_code: initial_code(parent),
                                     location_description: nil,
                                     location_short_code: nil,

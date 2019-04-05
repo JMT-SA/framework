@@ -321,6 +321,73 @@ class Framework < Roda
         end
       end
     end
+
+    # LOCATION STORAGE DEFINITIONS
+    # --------------------------------------------------------------------------
+    r.on 'location_storage_definitions', Integer do |id|
+      interactor = MasterfilesApp::LocationStorageDefinitionInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:location_storage_definitions, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('locations', 'edit')
+        show_partial { Masterfiles::Locations::LocationStorageDefinition::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('locations', 'read')
+          show_partial { Masterfiles::Locations::LocationStorageDefinition::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_location_storage_definition(id, params[:location_storage_definition])
+          if res.success
+            update_grid_row(id, changes: { storage_definition_code: res.instance[:storage_definition_code], active: res.instance[:active] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Locations::LocationStorageDefinition::Edit.call(id, form_values: params[:location_storage_definition], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('locations', 'delete')
+          res = interactor.delete_location_storage_definition(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'location_storage_definitions' do
+      interactor = MasterfilesApp::LocationStorageDefinitionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'new' do    # NEW
+        check_auth!('locations', 'new')
+        show_partial_or_page(r) { Masterfiles::Locations::LocationStorageDefinition::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_location_storage_definition(params[:location_storage_definition])
+        if res.success
+          row_keys = %i[
+            id
+            storage_definition_code
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/locations/location_storage_definitions/new') do
+            Masterfiles::Locations::LocationStorageDefinition::New.call(form_values: params[:location_storage_definition],
+                                                                        form_errors: res.errors,
+                                                                        remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 

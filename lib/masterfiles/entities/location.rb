@@ -6,6 +6,7 @@ module MasterfilesApp
     attribute :primary_storage_type_id, Types::Integer
     attribute :location_type_id, Types::Integer
     attribute :primary_assignment_id, Types::Integer
+    attribute :location_storage_definition_id, Types::Integer
     attribute :location_long_code, Types::String
     attribute :location_description, Types::String
     attribute :has_single_container, Types::Bool

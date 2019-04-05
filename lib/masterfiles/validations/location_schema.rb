@@ -8,6 +8,7 @@ module MasterfilesApp
     required(:primary_storage_type_id, :integer).filled(:int?)
     required(:location_type_id, :integer).filled(:int?)
     required(:primary_assignment_id, :integer).filled(:int?)
+    required(:location_storage_definition_id, :integer).maybe(:int?)
     required(:location_long_code, Types::StrippedString).filled(:str?)
     required(:location_description, Types::StrippedString).filled(:str?)
     required(:location_short_code, Types::StrippedString).filled(:str?)

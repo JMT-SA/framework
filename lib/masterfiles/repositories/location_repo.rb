@@ -62,6 +62,16 @@ module MasterfilesApp
       find_location_by(:location_short_code, barcode)
     end
 
+    def location_exists(location_long_code, location_short_code)
+      return failed_response(%(Location "#{location_long_code}" already exists)) if exists?(:locations, location_long_code: location_long_code)
+      return failed_response(%(Location with short code "#{location_short_code}" already exists)) if exists?(:locations, location_short_code: location_short_code)
+      ok_response
+    end
+
+    def location_id_from_long_code(location_long_code)
+      DB[:locations].where(location_long_code: location_long_code).get(:id)
+    end
+
     def create_root_location(params)
       id = create_location(params)
       DB[:location_storage_types_locations].insert(location_id: id,
@@ -124,7 +134,7 @@ module MasterfilesApp
       end
       DB.execute(del)
       DB.execute(ins)
-      success_response('ok')
+      ok_response
     end
 
     def link_storage_types(id, multiselect_ids)
@@ -139,7 +149,7 @@ module MasterfilesApp
       end
       DB.execute(del)
       DB.execute(ins)
-      success_response('ok')
+      ok_response
     end
 
     def location_long_code_suggestion(ancestor_id, location_type_id)
@@ -164,6 +174,60 @@ module MasterfilesApp
 
     def descendants_for_ancestor_id(ancestor_id)
       DB[:tree_locations].where(ancestor_location_id: ancestor_id).select_map(:descendant_location_id)
+    end
+
+    def check_location_storage_types(values)
+      qry = sql_for_missing_str_values(values, 'location_storage_types', 'storage_type_code')
+      res = DB[qry].select_map
+      if res.empty?
+        ok_response
+      else
+        failed_response(res.map { |r| "#{r} is not a valid storage type" }.join(', '))
+      end
+    end
+
+    def check_location_assignments(values)
+      qry = sql_for_missing_str_values(values, 'location_assignments', 'assignment_code')
+      res = DB[qry].select_map
+      if res.empty?
+        ok_response
+      else
+        failed_response(res.map { |r| "#{r} is not a valid assignment" }.join(', '))
+      end
+    end
+
+    def check_location_types(values)
+      qry = sql_for_missing_str_values(values, 'location_types', 'location_type_code')
+      res = DB[qry].select_map
+      if res.empty?
+        ok_response
+      else
+        failed_response(res.map { |r| "#{r} is not a valid location type" }.join(', '))
+      end
+    end
+
+    def check_locations(values)
+      qry = sql_for_missing_str_values(values, 'locations', 'location_long_code')
+      res = DB[qry].select_map
+      if res.empty?
+        ok_response
+      else
+        failed_response(res.map { |r| "#{r} is not a valid location" }.join(', '))
+      end
+    end
+
+    private
+
+    def sql_for_missing_str_values(values, table, column)
+      <<~SQL
+        WITH v (code) AS (
+         VALUES ('#{values.join("'), ('")}')
+        )
+        SELECT v.code
+        FROM v
+          LEFT JOIN #{table} i ON i.#{column} = v.code
+        WHERE i.id is null;
+      SQL
     end
   end
 end

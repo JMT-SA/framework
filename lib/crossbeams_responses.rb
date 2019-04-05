@@ -57,5 +57,13 @@ module Crossbeams
                      errors: {},
                      message: message)
     end
+
+    # Retrurn a basic success response with message 'ok'
+    # - use this when the message does not matter.
+    #
+    # @return [OpenStruct] the success response object.
+    def ok_response
+      success_response('ok')
+    end
   end
 end

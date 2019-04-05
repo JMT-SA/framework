@@ -4,6 +4,8 @@ require 'rake/clean'
 require 'yard'
 require 'rubocop/rake_task'
 
+Dir['./lib/tasks/**/*.rake'].sort.each { |ext| load ext }
+
 Rake::TestTask.new(:test) do |t|
   if ENV['TEST'] == 'test/**/*_test.rb'
     ENV['TEST'] = nil
@@ -39,6 +41,11 @@ end
 task :dotenv_with_override do
   require 'dotenv'
   Dotenv.load('.env.local', '.env')
+end
+
+# This task ensures the app is loaded.
+task load_app: [:dotenv_with_override] do
+  require './app_loader'
 end
 
 namespace :jobs do

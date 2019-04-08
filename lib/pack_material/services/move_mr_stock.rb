@@ -11,13 +11,14 @@ module PackMaterialApp
     def initialize(sku_id, to_location_id, quantity, opts = {})
       @repo = MrStockRepo.new
       @transaction_repo = PackMaterialApp::TransactionsRepo.new
+      @replenish_repo = PackMaterialApp::ReplenishRepo.new
       @to_location_id = to_location_id
       @quantity = quantity
       @sku_id = sku_id
       @opts = opts
 
       @from_location_id = opts.fetch(:from_location_id, nil)
-      @from_location_id = @repo.default_receiving_bay_id if @opts[:delivery_id]
+      @from_location_id = @replenish_repo.find_mr_delivery(@opts[:delivery_id]).receipt_location_id if @opts[:delivery_id]
 
       @parent_transaction_id = @repo.resolve_parent_transaction_id(@opts)
       @business_process_id = @repo.resolve_business_process_id(@opts)

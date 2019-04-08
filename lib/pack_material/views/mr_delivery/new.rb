@@ -17,6 +17,7 @@ module PackMaterial
               form.action '/pack_material/replenish/mr_deliveries'
               form.remote! if remote
               form.add_field :transporter_party_role_id
+              form.add_field :receipt_location_id
               form.add_field :driver_name
               form.add_field :client_delivery_ref_number
               form.add_field :vehicle_registration

@@ -40,7 +40,7 @@ module PackMaterial
                 form.action "/pack_material/replenish/mr_purchase_orders/#{id}"
                 form.method :update unless rules[:show_only]
                 form.view_only! if rules[:show_only]
-                form.no_submit!
+                form.no_submit! if rules[:show_only]
                 form.row do |row|
                   row.column do |col|
                     col.add_field :purchase_order_number

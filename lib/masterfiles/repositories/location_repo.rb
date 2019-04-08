@@ -42,6 +42,11 @@ module MasterfilesApp
     crud_calls_for :location_types, name: :location_type, wrapper: LocationType
     crud_calls_for :location_storage_definitions, name: :location_storage_definition, wrapper: LocationStorageDefinition
 
+    def for_select_receiving_bays
+      location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_RECEIVING_BAY).get(:id)
+      for_select_locations(where: { location_type_id: location_type_id })
+    end
+
     def find_location_by(key, val) # rubocop:disable Metrics/AbcSize
       hash = DB[:locations]
              .join(:location_storage_types, id: :primary_storage_type_id)

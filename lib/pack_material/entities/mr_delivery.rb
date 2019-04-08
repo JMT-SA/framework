@@ -6,6 +6,7 @@ module PackMaterialApp
     attribute :receipt_transaction_id, Types::Integer
     attribute :putaway_transaction_id, Types::Integer
     attribute :transporter_party_role_id, Types::Integer
+    attribute :receipt_location_id, Types::Integer
     attribute :transporter, Types::String
     attribute :driver_name, Types::String
     attribute :client_delivery_ref_number, Types::String

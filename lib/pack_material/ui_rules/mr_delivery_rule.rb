@@ -5,6 +5,7 @@ module UiRules
     def generate_rules
       @repo = PackMaterialApp::ReplenishRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
+      @locations_repo = MasterfilesApp::LocationRepo.new
       make_form_object
       apply_form_values
 
@@ -21,10 +22,12 @@ module UiRules
     end
 
     def show_fields
+      receiving_bay_label = @locations_repo.find_location(@form_object.receipt_location_id)&.location_long_code
       {
         status: { renderer: :label },
         transporter: { renderer: :label },
         transporter_party_role_id: { renderer: :hidden },
+        receipt_location_id: { renderer: :label, with_value: receiving_bay_label, caption: 'Receiving Bay' },
         driver_name: { renderer: :label },
         client_delivery_ref_number: { renderer: :label },
         delivery_number: { renderer: :label },
@@ -38,6 +41,7 @@ module UiRules
         status: { renderer: :hidden },
         transporter: { renderer: :hidden },
         transporter_party_role_id: { renderer: :select, options: @party_repo.for_select_party_roles(AppConst::ROLE_TRANSPORTER), caption: 'Transporter' },
+        receipt_location_id: { renderer: :select, options: @locations_repo.for_select_receiving_bays, caption: 'Receiving Bay' },
         delivery_number: { renderer: :label, with_value: @form_object.delivery_number },
         driver_name: { required: true },
         client_delivery_ref_number: { required: true },
@@ -54,6 +58,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(transporter_party_role_id: nil,
+                                    receipt_location_id: nil,
                                     driver_name: nil,
                                     client_delivery_ref_number: nil,
                                     vehicle_registration: nil,

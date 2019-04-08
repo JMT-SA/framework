@@ -243,6 +243,8 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Locations'
 WHERE functional_area_name = 'Masterfiles')),
         'Storage Definitions', '/list/location_storage_definitions', 2);
 
+INSERT INTO location_types (location_type_code, short_code) VALUES ('RECEIVING BAY', 'RB');
+
 
 -- CONFIG / LABEL TEMPLATES
 

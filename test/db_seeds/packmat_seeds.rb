@@ -113,8 +113,8 @@ module MiniTestSeeds
   def db_create_locations
     assignment_id = DB[:location_assignments].insert(assignment_code: 'Assignment Code')
     storage_type_id = DB[:location_storage_types].insert(storage_type_code: PackMaterialApp::DOMAIN_NAME)
-    location_type_id = DB[:location_types].insert(location_type_code: 'Location Type Code', short_code: 'LT')
-    default_receiving_bay_id = DB[:locations].insert(
+    location_type_id = DB[:location_types].insert(location_type_code: 'RECEIVING BAY', short_code: 'RB')
+    default_id = DB[:locations].insert(
       primary_storage_type_id: storage_type_id,
       location_type_id: location_type_id,
       primary_assignment_id: assignment_id,
@@ -126,7 +126,7 @@ module MiniTestSeeds
       assignment_id: assignment_id,
       storage_type_id: storage_type_id,
       type_id: location_type_id,
-      default_receiving_bay_id: default_receiving_bay_id
+      default_id: default_id
     }
   end
 

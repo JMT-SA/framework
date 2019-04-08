@@ -62,12 +62,7 @@ module PackMaterialApp
       attrs
     end
 
-    def default_receiving_bay_id
-      DB[:locations].where(location_long_code: DEFAULT_RECEIVING_BAY_NAME).get(:id)
-    end
-
     def find_location_id_by_code(location_long_code)
-      return default_receiving_bay_id unless location_long_code
       DB[:locations].where(location_long_code: location_long_code).get(:id)
     end
 

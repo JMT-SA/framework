@@ -118,7 +118,7 @@ module PackMaterialApp
 
     def create_transaction_item(opts = {})
       transaction_id = create_transaction[:id]
-      location_id = @fixed_table_set[:locations][:default_receiving_bay_id]
+      location_id = @fixed_table_set[:locations][:default_id]
       sku_id = create_mr_sku[:id]
       default = {
         mr_inventory_transaction_id: transaction_id,
@@ -153,7 +153,7 @@ module PackMaterialApp
 
     def create_bulk_stock_adjustment_item(opts = {})
       bsa_id = create_bulk_stock_adjustment[:id]
-      location_id = @fixed_table_set[:locations][:default_receiving_bay_id]
+      location_id = @fixed_table_set[:locations][:default_id]
       sku_id = create_mr_sku[:id]
       inventory_uom_id = @fixed_table_set[:uoms][:uom_id]
       default = {

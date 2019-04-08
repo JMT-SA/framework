@@ -8,6 +8,7 @@ module PackMaterialApp
     optional(:receipt_transaction_id, :integer).maybe(:int?)
     optional(:putaway_transaction_id, :integer).maybe(:int?)
     required(:transporter_party_role_id, :integer).maybe(:int?)
+    required(:receipt_location_id, :integer).filled(:int?)
     required(:driver_name, Types::StrippedString).filled(:str?)
     required(:client_delivery_ref_number, Types::StrippedString).filled(:str?)
     optional(:delivery_number, :integer).filled(:int?)

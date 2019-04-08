@@ -136,14 +136,6 @@ module PackMaterialApp
       assert_instance_of(MasterfilesApp::PartyRepo, MrStockRepo.new.party_repo)
     end
 
-    def test_default_receiving_bay_id
-      assert_equal @fixed_table_set[:locations][:default_receiving_bay_id], repo.default_receiving_bay_id
-    end
-
-    def test_find_location_id_by_code
-      assert_equal @fixed_table_set[:locations][:default_receiving_bay_id], repo.find_location_id_by_code('RECEIVING BAY')
-    end
-
     def test_resolve_parent_transaction_id
       inv_trans_id = DB[:mr_inventory_transactions].insert(
         created_by: 'current user'
@@ -257,7 +249,7 @@ module PackMaterialApp
       sku2_id = DB[:mr_skus].insert(mr_product_variant_id: pv, sku_number: 2)
       sku3_id = DB[:mr_skus].insert(mr_product_variant_id: pv, sku_number: 3)
 
-      bay_id = @fixed_table_set[:locations][:default_receiving_bay_id]
+      bay_id = @fixed_table_set[:locations][:default_id]
 
       repo.create_sku_location_ids([sku1_id, sku2_id, sku3_id], bay_id)
       assert DB[:mr_sku_locations].where(mr_sku_id: sku1_id, location_id: bay_id).first

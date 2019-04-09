@@ -35,11 +35,7 @@ module PackMaterialApp
         mr_product_variant_id: pv[:id],
         inventory_uom_id: inv_uom_id
       )
-      mr_delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      mr_delivery_id = create_mr_delivery[:id]
       item_id = DB[:mr_delivery_items].insert(
         mr_delivery_id: mr_delivery_id,
         mr_product_variant_id: pv[:id],
@@ -69,11 +65,7 @@ module PackMaterialApp
         mr_product_variant_id: pv1[:id],
         inventory_uom_id: inv_uom_id
       )
-      mr_delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      mr_delivery_id = create_mr_delivery[:id]
       item1_id = DB[:mr_delivery_items].insert(
         mr_delivery_id: mr_delivery_id,
         mr_product_variant_id: pv1[:id],
@@ -135,11 +127,7 @@ module PackMaterialApp
         mr_product_variant_id: pv1[:id],
         inventory_uom_id: inv_uom_id
       )
-      mr_delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      mr_delivery_id = create_mr_delivery[:id]
       item1_id = DB[:mr_delivery_items].insert(
         mr_delivery_id: mr_delivery_id,
         mr_product_variant_id: pv1[:id],
@@ -209,11 +197,7 @@ module PackMaterialApp
         inventory_uom_id: inv_uom_id,
         quantity_required: 15
       )
-      mr_delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      mr_delivery_id = create_mr_delivery[:id]
       item1_id = DB[:mr_delivery_items].insert(
         mr_delivery_id: mr_delivery_id,
         mr_product_variant_id: pv1[:id],

@@ -21,11 +21,7 @@ module PackMaterialApp
         purchase_order_number: 5,
         mr_delivery_term_id: term_id
       )
-      mr_delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      mr_delivery_id = create_mr_delivery[:id]
 
       pv1 = create_material_resource_product_variant
       po_item_id = DB[:mr_purchase_order_items].insert(
@@ -96,11 +92,7 @@ module PackMaterialApp
         mr_purchase_order_id: po,
         mr_product_variant_id: pv[:id]
       )
-      del = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      del = create_mr_delivery[:id]
       item_id = DB[:mr_delivery_items].insert(
         mr_delivery_id: del,
         mr_product_variant_id: pv[:id],
@@ -140,12 +132,7 @@ module PackMaterialApp
       inv_trans_id = DB[:mr_inventory_transactions].insert(
         created_by: 'current user'
       )
-      delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12,
-        putaway_transaction_id: inv_trans_id
-      )
+      delivery_id = create_mr_delivery(putaway_transaction_id: inv_trans_id)[:id]
 
       assert 5, repo.resolve_parent_transaction_id(delivery_id: delivery_id)
       assert_nil repo.resolve_parent_transaction_id(tripsheet_id: 1)
@@ -170,11 +157,7 @@ module PackMaterialApp
       receipt_id = DB[:mr_inventory_transactions].insert(
         created_by: 'current user'
       )
-      delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      delivery_id = create_mr_delivery[:id]
       repo.update_delivery_receipt_id(delivery_id, receipt_id)
       assert_equal receipt_id, DB[:mr_deliveries].where(id: delivery_id).get(:receipt_transaction_id)
       assert_equal DB[:mr_deliveries].where(id: delivery_id).get(:receipt_transaction_id), repo.delivery_receipt_id(delivery_id)
@@ -186,11 +169,7 @@ module PackMaterialApp
         purchase_order_number: 5,
         mr_delivery_term_id: term_id
       )
-      mr_delivery_id = DB[:mr_deliveries].insert(
-        driver_name: 'Jack',
-        vehicle_registration: 123,
-        client_delivery_ref_number: 12
-      )
+      mr_delivery_id = create_mr_delivery[:id]
 
       pv1 = create_material_resource_product_variant
       po_item_id = DB[:mr_purchase_order_items].insert(

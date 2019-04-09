@@ -55,6 +55,19 @@ module PackMaterialApp
       }
     end
 
+    def create_mr_delivery(opts = {})
+      default = {
+        driver_name: 'Jack',
+        vehicle_registration: 123,
+        client_delivery_ref_number: 12,
+        receipt_location_id: @fixed_table_set[:locations][:default_id]
+      }
+      del_id = DB[:mr_deliveries].insert(default.merge(opts))
+      {
+        id: del_id
+      }
+    end
+
     def create_mr_internal_batch_number(opts = {})
       default = {
         batch_number: rand(1_000_000_000),

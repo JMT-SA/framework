@@ -85,7 +85,7 @@ module UiRules
                                     location_storage_definition_id: nil,
                                     location_long_code: initial_code(parent),
                                     location_description: nil,
-                                    location_short_code: nil,
+                                    location_short_code: initial_short_code(parent),
                                     print_code: nil,
                                     has_single_container: nil,
                                     virtual_location: nil,
@@ -112,6 +112,7 @@ module UiRules
       behaviours do |behaviour|
         behaviour.enable :can_be_moved, when: :location_type_id, changes_to: can_be_moved_location_type_ids
         behaviour.dropdown_change :location_type_id, notify: [{ url: "/masterfiles/locations/locations/#{@options[:id]}/add_child/location_type_changed" }]
+        behaviour.dropdown_change :primary_storage_type_id, notify: [{ url: "/masterfiles/locations/locations/#{@options[:id]}/primary_storage_type_changed" }]
       end
     end
 
@@ -121,6 +122,12 @@ module UiRules
       location_type_id = @repo.for_select_location_types.first.last
       res = @repo.location_long_code_suggestion(parent.id, location_type_id)
       res.success ? res.instance : nil
+    end
+
+    def initial_short_code(parent)
+      storage_type_id = parent.primary_storage_type_id
+      res = @repo.suggested_short_code(storage_type_id)
+      res.instance
     end
 
     def initial_storage_type(parent)

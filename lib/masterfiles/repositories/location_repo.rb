@@ -237,6 +237,23 @@ module MasterfilesApp
       end
     end
 
+    def suggested_short_code(storage_type_id)
+      storage_type = DB[:location_storage_types].where(id: storage_type_id)
+      return failed_response('storage type does not exist') unless storage_type.first
+      prefix = storage_type.get(:location_short_code_prefix)
+      return failed_response('no prefix') unless prefix
+
+      query = <<~SQL
+        SELECT max(locations.location_short_code)
+        FROM locations
+        WHERE locations.location_short_code LIKE '01%';
+      SQL
+
+      last_val = DB[query].single_value
+      code = last_val ? last_val.succ : (prefix + 'AAA')
+      success_response('ok', code)
+    end
+
     private
 
     def sql_for_missing_str_values(values, table, column)

@@ -42,7 +42,7 @@ INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('BU
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('STOCK TAKE');
 INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('STOCK TAKE ON');
 
-INSERT INTO crossbeams_framework.public.location_storage_types (storage_type_code) VALUES ('Pack Material');
+INSERT INTO crossbeams_framework.public.location_storage_types (storage_type_code, location_short_code_prefix) VALUES ('Pack Material', '01');
 
 -- Tripsheet Grid
 --   Vehicle Types

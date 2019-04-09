@@ -97,6 +97,11 @@ class Framework < Roda
         end
       end
 
+      r.on 'primary_storage_type_changed' do
+        res = interactor.location_short_code_suggestion(params[:changed_value])
+        json_replace_input_value('location_location_short_code', res.success ? res.instance : nil)
+      end
+
       r.on 'add_child' do   # NEW CHILD
         r.on 'location_type_changed' do
           res = interactor.location_long_code_suggestion(id, params[:changed_value])
@@ -284,7 +289,8 @@ class Framework < Roda
           res = interactor.update_location_storage_type(id, params[:location_storage_type])
           if res.success
             update_grid_row(id,
-                            changes: { storage_type_code: res.instance[:storage_type_code] },
+                            changes: { storage_type_code: res.instance[:storage_type_code],
+                                       location_short_code_prefix: res.instance[:location_short_code_prefix] },
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Locations::LocationStorageType::Edit.call(id, form_values: params[:location_storage_type], form_errors: res.errors) }

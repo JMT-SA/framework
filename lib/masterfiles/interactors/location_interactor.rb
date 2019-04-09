@@ -179,6 +179,12 @@ module MasterfilesApp
       success_response('See location code suggestion', res.instance)
     end
 
+    def location_short_code_suggestion(storage_type_id)
+      res = repo.suggested_short_code(storage_type_id)
+      return res unless res.success
+      success_response('See location code suggestion', res.instance)
+    end
+
     def print_location_barcode(id, params)
       instance = location(id)
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_LOCATION_BARCODE, instance, params)

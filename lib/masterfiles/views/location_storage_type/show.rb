@@ -13,6 +13,7 @@ module Masterfiles
             page.form do |form|
               form.view_only!
               form.add_field :storage_type_code
+              form.add_field :location_short_code_prefix
             end
           end
 

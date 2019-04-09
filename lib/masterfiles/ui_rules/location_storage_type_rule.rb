@@ -16,11 +16,13 @@ module UiRules
 
     def set_show_fields
       fields[:storage_type_code] = { renderer: :label }
+      fields[:location_short_code_prefix] = { renderer: :label }
     end
 
     def common_fields
       {
-        storage_type_code: { required: true }
+        storage_type_code: { required: true },
+        location_short_code_prefix: {}
       }
     end
 
@@ -31,7 +33,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(storage_type_code: nil)
+      @form_object = OpenStruct.new(storage_type_code: nil, location_short_code_prefix: nil)
     end
   end
 end

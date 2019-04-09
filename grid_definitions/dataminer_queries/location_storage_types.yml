@@ -1,8 +1,7 @@
 ---
 :caption: Location Storage Types
-:sql: SELECT "location_storage_types"."id", "location_storage_types"."storage_type_code",
-  "location_storage_types"."created_at", "location_storage_types"."updated_at" FROM
-  "location_storage_types"
+:sql: "SELECT \"location_storage_types\".\"id\",\r\n\"location_storage_types\".\"storage_type_code\",\r\n\"location_storage_types\".\"location_short_code_prefix\",\r\n\"location_storage_types\".\"created_at\",\r\n\"location_storage_types\".\"updated_at\"\r\nFROM
+  \"location_storage_types\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -16,6 +15,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -31,7 +31,24 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_short_code_prefix:
+    :name: location_short_code_prefix
+    :sequence_no: 3
+    :caption: Location short code prefix
+    :namespaced_name: location_storage_types.location_short_code_prefix
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -39,13 +56,14 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Created at
     :namespaced_name: location_storage_types.created_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -54,13 +72,14 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Updated at
     :namespaced_name: location_storage_types.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -73,6 +92,6 @@
   :data_type: :string
   :control_type: :text
   :default_value: 
-  :ordered_list: 
+  :ordered_list: false
   :ui_priority: 1
   :list_def: 

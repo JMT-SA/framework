@@ -16,6 +16,7 @@ module Masterfiles
               form.action '/masterfiles/locations/location_storage_types'
               form.remote! if remote
               form.add_field :storage_type_code
+              form.add_field :location_short_code_prefix
             end
           end
 

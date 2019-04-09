@@ -54,16 +54,17 @@ module MasterfilesApp
       lkp_stg_def = Hash[repo.for_select_location_storage_definitions]
       lookups = {}
       csv_data.each do |row| # rubocop:disable Metrics/BlockLength
+        short_code = row['location_short_code'] || next_short_code(row['primary_storage_type'])
         if row['parent_location'].nil?
           lookups[row['location_long_code']] = repo.create_root_location(
             location_long_code: row['location_long_code'],
-            location_short_code: row['location_short_code'],
+            location_short_code: short_code,
             location_description: row['location_description'],
             print_code: row['print_code'],
             location_type_id: lkp_types[row['location_type']],
             primary_storage_type_id: lkp_storage[row['primary_storage_type']],
             primary_assignment_id: lkp_assign[row['primary_assignment']],
-            storage_definition_id: lkp_stg_def[row['storage_definition']],
+            location_storage_definition_id: lkp_stg_def[row['storage_definition']],
             has_single_container: row['has_single_container'] == 't',
             virtual_location: row['virtual_location'] == 't',
             consumption_area: row['consumption_area'] == 't',
@@ -74,13 +75,13 @@ module MasterfilesApp
           lookups[row['location_long_code']] = repo.create_child_location(
             parent_id,
             location_long_code: row['location_long_code'],
-            location_short_code: row['location_short_code'],
+            location_short_code: short_code,
             location_description: row['location_description'],
             print_code: row['print_code'],
             location_type_id: lkp_types[row['location_type']],
             primary_storage_type_id: lkp_storage[row['primary_storage_type']],
             primary_assignment_id: lkp_assign[row['primary_assignment']],
-            storage_definition_id: lkp_stg_def[row['storage_definition']],
+            location_storage_definition_id: lkp_stg_def[row['storage_definition']],
             has_single_container: row['has_single_container'] == 't',
             virtual_location: row['virtual_location'] == 't',
             consumption_area: row['consumption_area'] == 't',
@@ -89,6 +90,12 @@ module MasterfilesApp
         end
         # Add any extra stg/asign
       end
+    end
+
+    def next_short_code(storage_code)
+      res = repo.suggested_short_code(storage_code, id_lookup: false)
+      raise Crossbeams::InfoError, res.message unless res.success
+      res.instance
     end
 
     def check_primary_storage_types

@@ -15,6 +15,7 @@ module MasterfilesApp
       primary_storage_type
       location_type
       primary_assignment
+      storage_definition
       assignments
       storage_types
       has_single_container
@@ -50,6 +51,7 @@ module MasterfilesApp
       lkp_types = Hash[repo.for_select_location_types]
       lkp_storage = Hash[repo.for_select_location_storage_types]
       lkp_assign = Hash[repo.for_select_location_assignments]
+      lkp_stg_def = {} # Hash[repo.for_select_location_storage_definitions]
       lookups = {}
       csv_data.each do |row| # rubocop:disable Metrics/BlockLength
         if row['parent_location'].nil?
@@ -61,6 +63,7 @@ module MasterfilesApp
             location_type_id: lkp_types[row['location_type']],
             primary_storage_type_id: lkp_storage[row['primary_storage_type']],
             primary_assignment_id: lkp_assign[row['primary_assignment']],
+            storage_definition_id: lkp_stg_def[row['storage_definition']],
             has_single_container: row['has_single_container'] == 't',
             virtual_location: row['virtual_location'] == 't',
             consumption_area: row['consumption_area'] == 't',
@@ -77,6 +80,7 @@ module MasterfilesApp
             location_type_id: lkp_types[row['location_type']],
             primary_storage_type_id: lkp_storage[row['primary_storage_type']],
             primary_assignment_id: lkp_assign[row['primary_assignment']],
+            storage_definition_id: lkp_stg_def[row['storage_definition']],
             has_single_container: row['has_single_container'] == 't',
             virtual_location: row['virtual_location'] == 't',
             consumption_area: row['consumption_area'] == 't',
@@ -108,6 +112,12 @@ module MasterfilesApp
       errs << res.message unless res.success
     end
 
+    def check_storage_definitions
+      stg_defs = csv_data.map { |r| r['storage_definition'] }.uniq
+      res = repo.check_storage_definitions(stg_defs.compact)
+      errs << res.message unless res.success
+    end
+
     def check_assignments # rubocop:disable Metrics/AbcSize
       asns = csv_data.map { |r| r['assignments'].nil? ? [nil] : r['assignments'].split(',') }.flatten.uniq
       errs << 'Cannot have blank assignments' if asns.any?(&:nil?)
@@ -135,6 +145,7 @@ module MasterfilesApp
       check_primary_storage_types
       check_location_types
       check_primary_assignments
+      # check_storage_definitions
       check_assignments
       check_storage_types
       check_location_errors

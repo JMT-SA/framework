@@ -206,6 +206,16 @@ module MasterfilesApp
       end
     end
 
+    def check_storage_definitions(values)
+      qry = sql_for_missing_str_values(values, 'location_storage_definitions', 'storage_definition_code')
+      res = DB[qry].select_map
+      if res.empty?
+        ok_response
+      else
+        failed_response(res.map { |r| "#{r} is not a valid storage definition" }.join(', '))
+      end
+    end
+
     def check_locations(values)
       qry = sql_for_missing_str_values(values, 'locations', 'location_long_code')
       res = DB[qry].select_map

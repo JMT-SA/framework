@@ -51,7 +51,7 @@ module MasterfilesApp
       lkp_types = Hash[repo.for_select_location_types]
       lkp_storage = Hash[repo.for_select_location_storage_types]
       lkp_assign = Hash[repo.for_select_location_assignments]
-      lkp_stg_def = {} # Hash[repo.for_select_location_storage_definitions]
+      lkp_stg_def = Hash[repo.for_select_location_storage_definitions]
       lookups = {}
       csv_data.each do |row| # rubocop:disable Metrics/BlockLength
         if row['parent_location'].nil?
@@ -114,6 +114,7 @@ module MasterfilesApp
 
     def check_storage_definitions
       stg_defs = csv_data.map { |r| r['storage_definition'] }.uniq
+      return if stg_defs.compact.empty?
       res = repo.check_storage_definitions(stg_defs.compact)
       errs << res.message unless res.success
     end
@@ -145,7 +146,7 @@ module MasterfilesApp
       check_primary_storage_types
       check_location_types
       check_primary_assignments
-      # check_storage_definitions
+      check_storage_definitions
       check_assignments
       check_storage_types
       check_location_errors

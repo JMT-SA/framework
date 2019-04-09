@@ -50,7 +50,7 @@ module MesserverApp
     def print_label(label_template_name, vars, quantity, printer)
       res = post_print(print_label_uri, label_template_name, vars, quantity, printer)
       unless res.success
-        res = if res.instance == '404'
+        res = if res.instance[:response_code].to_s == '404'
                 failed_response('The label was not found. Has it been published yet?')
               else
                 res
@@ -216,10 +216,10 @@ module MesserverApp
       if response.code == '200'
         success_response(response.code, response)
       elsif response.code == '503' # The printer is unavailable
-        failed_response(response.body, response.code)
+        failed_response(response.body, response_code: response.code)
       else
         msg = response.code.start_with?('5') ? 'The destination server encountered an error.' : 'The request was not successful.'
-        failed_response("#{msg} The response code is #{response.code}", response.code)
+        failed_response("#{msg} The response code is #{response.code}", response_code: response.code)
       end
     end
 

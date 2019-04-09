@@ -150,7 +150,7 @@ const crossbeamsGridEvents = {
       // Save via a remote fetch call that renders in a dialog.
       const saveToPopup = () => {
         crossbeamsUtils.recordGridIdForPopup(gridId);
-        crossbeamsUtils.popupDialog('JS Test', `${url}?selection[list]=${ids.join(',')}`);
+        crossbeamsUtils.popupDialog('', `${url}?selection[list]=${ids.join(',')}`);
       };
 
       // Save via a remote fetch call.

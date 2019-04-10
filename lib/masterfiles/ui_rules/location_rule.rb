@@ -57,7 +57,7 @@ module UiRules
         primary_storage_type_id: { renderer: :select, options: storage_types, caption: 'Primary Storage Type', required: true },
         location_type_id: { renderer: :select, options: @repo.for_select_location_types, caption: 'Location Type', required: true },
         primary_assignment_id: { renderer: :select, options: location_assignments, caption: 'Primary Assignment', required: true },
-        location_storage_definition_id: { renderer: :select, options: @repo.for_select_location_storage_definitions, caption: 'Storage Definition', required: true, prompt: true },
+        location_storage_definition_id: { renderer: :select, options: @repo.for_select_location_storage_definitions, caption: 'Storage Definition', prompt: true },
         location_long_code: { required: true, caption: 'Long Code' },
         location_description: { required: true, caption: 'Description' },
         location_short_code: { required: true, caption: 'Short Code' },

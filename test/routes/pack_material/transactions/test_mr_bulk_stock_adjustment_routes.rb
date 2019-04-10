@@ -185,39 +185,41 @@ class TestMrBulkStockAdjustmentRoutes < RouteTester
     end
     expect_json_replace_dialog
   end
-end
 
-# r.on 'mr_bulk_stock_adjustments' do
-#   interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path }, {})
-#   r.on 'sku_location_lookup_result', Integer do |sku_location_id|
-#     result_hash = interactor.get_sku_location_info_ids(sku_location_id)
-#     json_actions([OpenStruct.new(type: :change_select_value,
-#                                  dom_id: 'mr_bulk_stock_adjustment_item_mr_sku_id',
-#                                  value: result_hash[:sku_id]),
-#                   OpenStruct.new(type: :change_select_value,
-#                                  dom_id: 'mr_bulk_stock_adjustment_item_location_id',
-#                                  value: result_hash[:location_id])],
-#                  'Selected a SKU Location')
-#   end
-#   r.on 'link_mr_skus', Integer do |id|
-#     r.post do
-#       res = interactor.link_mr_skus(id, multiselect_grid_choices(params))
-#       if res.success
-#         flash[:notice] = res.message
-#       else
-#         flash[:error] = res.message
-#       end
-#       redirect_to_last_grid(r)
-#     end
-#   end
-#   r.on 'link_locations', Integer do |id|
-#     r.post do
-#       res = interactor.link_locations(id, multiselect_grid_choices(params))
-#       if res.success
-#         flash[:notice] = res.message
-#       else
-#         flash[:error] = res.message
-#       end
-#       redirect_to_last_grid(r)
-#     end
-#   end
+  def test_sku_location_lookup_result
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    INTERACTOR.any_instance.stubs(:get_sku_location_info_ids).returns({ sku_id: 1, location_id: 2 })
+    get_as_fetch 'pack_material/transactions/mr_bulk_stock_adjustments/sku_location_lookup_result/1', {}, 'rack.session' => { user_id: 1 }
+
+    assert last_response.body.include?('change_select_value')
+    assert last_response.body.include?('mr_bulk_stock_adjustment_item_mr_sku_id')
+    assert last_response.body.include?('mr_bulk_stock_adjustment_item_location_id')
+    assert last_response.ok?
+    assert has_json_response
+  end
+
+  def test_link_mr_skus
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    Framework.any_instance.stubs(:multiselect_grid_choices).returns(true)
+    INTERACTOR.any_instance.stubs(:link_mr_skus).returns(ok_response)
+    post_as_fetch 'pack_material/transactions/mr_bulk_stock_adjustments/link_mr_skus/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+
+    assert last_response.body.include?('notice')
+    assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
+    assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
+  end
+
+  def test_link_locations
+    authorise_pass!
+    ensure_exists!(INTERACTOR)
+    Framework.any_instance.stubs(:multiselect_grid_choices).returns(true)
+    INTERACTOR.any_instance.stubs(:link_locations).returns(ok_response)
+    post_as_fetch 'pack_material/transactions/mr_bulk_stock_adjustments/link_locations/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+
+    assert last_response.body.include?('notice')
+    assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
+    assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
+  end
+end

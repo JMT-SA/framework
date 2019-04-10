@@ -81,5 +81,9 @@ module PackMaterialApp
       res = TaskPermissionCheck::MrBulkStockAdjustmentItem.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
+
+    def can_complete(parent_id)
+      TaskPermissionCheck::MrBulkStockAdjustment.call(:complete, parent_id)
+    end
   end
 end

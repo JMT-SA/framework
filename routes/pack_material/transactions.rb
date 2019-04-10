@@ -240,12 +240,6 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      # r.on 'edit' do   # EDIT
-      #   check_auth!('transactions', 'edit')
-      #   interactor.assert_permission!(:edit, id)
-      #   show_partial { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Edit.call(id) }
-      # end
-
       r.on 'inline_save' do
         check_auth!('transactions', 'edit')
         res = interactor.inline_update(id, params)
@@ -253,7 +247,7 @@ class Framework < Roda
           show_json_notice(res.message)
 
           parent_id = interactor.mr_bulk_stock_adjustment_item(id)&.mr_bulk_stock_adjustment_id
-          permission_res = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment.call(:complete, parent_id)
+          permission_res = interactor.can_complete(parent_id)
           if permission_res.success
             json_actions([OpenStruct.new(type: :show_element, dom_id: 'mr_bulk_stock_adjustments_complete_button')],
                          res.message)
@@ -271,36 +265,6 @@ class Framework < Roda
           check_auth!('transactions', 'read')
           show_partial { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Show.call(id) }
         end
-        # r.patch do     # UPDATE
-        #   res = interactor.update_mr_bulk_stock_adjustment_item(id, params[:mr_bulk_stock_adjustment_item])
-        #   if res.success
-        #     row_keys = %i[
-        #       mr_bulk_stock_adjustment_id
-        #       mr_sku_location_id
-        #       sku_number
-        #       product_variant_number
-        #       product_number
-        #       mr_type_name
-        #       mr_sub_type_name
-        #       product_variant_code
-        #       product_code
-        #       location_long_code
-        #       inventory_uom_code
-        #       scan_to_location_long_code
-        #       system_quantity
-        #       actual_quantity
-        #       stock_take_complete
-        #     ]
-        #     if retrieve_from_local_store(:new_bulk_stock_adjustment_item)
-        #       row_keys << :id
-        #       add_grid_row(attrs: select_attributes(res.instance, row_keys), notice: res.message)
-        #     else
-        #       update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
-        #     end
-        #   else
-        #     re_show_form(r, res) { PackMaterial::Transactions::MrBulkStockAdjustmentItem::Edit.call(id, form_values: params[:mr_bulk_stock_adjustment_item], form_errors: res.errors) }
-        #   end
-        # end
         r.delete do    # DELETE
           check_auth!('transactions', 'delete')
           interactor.assert_permission!(:delete, id)

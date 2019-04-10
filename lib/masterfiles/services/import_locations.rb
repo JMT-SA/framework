@@ -59,7 +59,7 @@ module MasterfilesApp
           lookups[row['location_long_code']] = repo.create_root_location(
             location_long_code: row['location_long_code'],
             location_short_code: short_code,
-            location_description: row['location_description'],
+            location_description: row['location_description'] || row['location_long_code'],
             print_code: row['print_code'],
             location_type_id: lkp_types[row['location_type']],
             primary_storage_type_id: lkp_storage[row['primary_storage_type']],
@@ -76,7 +76,7 @@ module MasterfilesApp
             parent_id,
             location_long_code: row['location_long_code'],
             location_short_code: short_code,
-            location_description: row['location_description'],
+            location_description: row['location_description'] || row['location_long_code'],
             print_code: row['print_code'],
             location_type_id: lkp_types[row['location_type']],
             primary_storage_type_id: lkp_storage[row['primary_storage_type']],

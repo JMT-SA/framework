@@ -58,6 +58,7 @@ namespace :jobs do
     part1 = "screen -S #{session_name} -X quit"
     part2 = "cd #{__dir__} && screen -dmS #{session_name} bash -c 'source /usr/local/share/chruby/chruby.sh && chruby #{ruby_ver} && RACK_ENV=production bundle exec que -q #{queue} ./app_loader.rb'"
     # `#{part1} ; #{part2}`
+    # `{ #{part1} ; #{part2} }`
     `#{part1}`
     `#{part2}`
   end

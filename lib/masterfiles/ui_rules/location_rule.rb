@@ -25,7 +25,7 @@ module UiRules
       primary_storage_type_id_label = @repo.find(:location_storage_types, MasterfilesApp::LocationStorageType, @form_object.primary_storage_type_id)&.storage_type_code
       location_type_id_label = @repo.find(:location_types, MasterfilesApp::LocationType, @form_object.location_type_id)&.location_type_code
       primary_assignment_id_label = @repo.find(:location_assignments, MasterfilesApp::LocationAssignment, @form_object.primary_assignment_id)&.assignment_code
-      location_storage_definition_id_label = @repo.find(:location_storage_definitions, MasterfilesApp::LocationStorageDefinition, @form_object.location_storage_definition_id)&.storage_deifinition_code
+      location_storage_definition_id_label = @repo.find(:location_storage_definitions, MasterfilesApp::LocationStorageDefinition, @form_object.location_storage_definition_id)&.storage_definition_code
 
       fields[:primary_storage_type_id] = { renderer: :label, with_value: primary_storage_type_id_label, caption: 'Primary Storage Type' }
       fields[:location_type_id] = { renderer: :label, with_value: location_type_id_label, caption: 'Location Type' }

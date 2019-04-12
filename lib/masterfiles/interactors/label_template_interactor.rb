@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class LabelTemplateInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+  class LabelTemplateInteractor < BaseInteractor
     def repo
       @repo ||= LabelTemplateRepo.new
     end
@@ -55,10 +55,7 @@ module MasterfilesApp
     def label_variables_from_file(id, params)
       return failed_response('No file selected to import') unless params[:variables] && (tempfile = params[:variables][:tempfile])
 
-      res = variables_from_xml(id, File.read(tempfile))
-      return res unless res.success
-
-      store_new_label_variables(id, res.instance)
+      UpdateLabelTemplateVariables.call(id, File.read(tempfile), @user)
     end
 
     def label_variables_from_server(id)
@@ -67,9 +64,7 @@ module MasterfilesApp
       res = mes_repo.label_variables('any', instance.label_template_name)
       return res unless res.success
 
-      res = variables_from_xml(id, res.instance)
-      return res unless res.success
-      store_new_label_variables(id, res.instance)
+      UpdateLabelTemplateVariables.call(id, res.instance, @user)
     end
 
     def update_published_templates(params)
@@ -99,59 +94,6 @@ module MasterfilesApp
 
       return OpenStruct.new(messages: var_errs) unless var_errs.empty?
       res
-    end
-
-    def store_new_label_variables(id, package)
-      repo.transaction do
-        repo.update_label_template(id, package)
-        log_transaction
-        log_status('label_templates', id, 'VARIABLE_LIST_UPDATED')
-      end
-      instance = label_template(id)
-      success_response('Variables stored', instance)
-    end
-
-    def variables_from_xml(id, xml_string)
-      doc = Nokogiri::XML(xml_string)
-      return failed_response('This is not an NSLD label definition') if doc.css('nsld_schema').empty?
-
-      var_list = doc.css('variable_type').map(&:text)
-      res = validate_variable_names(label_template(id), var_list)
-      return res unless res.success
-
-      success_response('ok', variables: var_list.empty? ? nil : Sequel.pg_array(var_list))
-    end
-
-    def validate_variable_names(instance, var_list)
-      messages = check_variables(instance, var_list)
-      if messages.empty?
-        success_response('ok')
-      else
-        validation_failed_response(OpenStruct.new(messages: { base: messages }))
-      end
-    rescue Crossbeams::FrameworkError => e
-      failed_response(e.message)
-    end
-
-    def shared_label_config
-      @shared_label_config ||= begin
-                                 config_repo = LabelApp::SharedConfigRepo.new
-                                 config_repo.packmat_labels_config
-                               end
-    end
-
-    def check_variables(instance, var_list)
-      messages = []
-      var_list.each do |varname|
-        next if varname.start_with?('CMP:')
-        settings = shared_label_config[varname]
-        if settings.nil?
-          messages << "There is no configuration for variable \"#{varname}\""
-        else
-          messages << "Variable \"#{varname}\" is not available for application \"#{instance.application}\"" unless settings[:applications].include?(instance.application)
-        end
-      end
-      messages
     end
   end
 end

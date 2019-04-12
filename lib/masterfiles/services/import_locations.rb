@@ -22,6 +22,7 @@ module MasterfilesApp
       virtual_location
       consumption_area
       can_be_moved
+      can_store_stock
     ].freeze
 
     def initialize(filename)
@@ -68,7 +69,8 @@ module MasterfilesApp
             has_single_container: row['has_single_container'] == 't',
             virtual_location: row['virtual_location'] == 't',
             consumption_area: row['consumption_area'] == 't',
-            can_be_moved: row['can_be_moved'] == 't'
+            can_be_moved: row['can_be_moved'] == 't',
+            can_store_stock: row['can_store_stock'] == 't'
           )
         else
           parent_id = lookups[row['parent_location']] || repo.location_id_from_long_code(row['parent_location'])
@@ -85,7 +87,8 @@ module MasterfilesApp
             has_single_container: row['has_single_container'] == 't',
             virtual_location: row['virtual_location'] == 't',
             consumption_area: row['consumption_area'] == 't',
-            can_be_moved: row['can_be_moved'] == 't'
+            can_be_moved: row['can_be_moved'] == 't',
+            can_store_stock: row['can_store_stock'] == 't'
           )
         end
         # Add any extra stg/asign

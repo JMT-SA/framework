@@ -31,6 +31,7 @@ class Framework < Roda
               location_type_code
               short_code
               can_be_moved
+              can_store_stock
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -167,6 +168,7 @@ class Framework < Roda
               has_single_container
               virtual_location
               can_be_moved
+              can_store_stock
               consumption_area
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)

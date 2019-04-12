@@ -26,6 +26,7 @@ module Masterfiles
               form.add_field :storage_types
               form.add_field :assignments
               form.add_field :can_be_moved
+              form.add_field :can_store_stock
             end
           end
 

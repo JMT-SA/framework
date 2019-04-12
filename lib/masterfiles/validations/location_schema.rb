@@ -17,5 +17,6 @@ module MasterfilesApp
     required(:virtual_location, :bool).maybe(:bool?)
     required(:consumption_area, :bool).maybe(:bool?)
     optional(:can_be_moved, :bool).maybe(:bool?)
+    required(:can_store_stock, :bool).maybe(:bool?)
   end
 end

@@ -41,6 +41,7 @@ module UiRules
       fields[:storage_types] = { renderer: :list, items: storage_types }
       fields[:assignments] = { renderer: :list, items: location_assignments }
       fields[:can_be_moved] = { renderer: :label, as_boolean: true }
+      fields[:can_store_stock] = { renderer: :label, as_boolean: true }
     end
 
     def set_print_fields
@@ -65,7 +66,8 @@ module UiRules
         has_single_container: { renderer: :checkbox },
         virtual_location: { renderer: :checkbox },
         consumption_area: { renderer: :checkbox },
-        can_be_moved: { renderer: :checkbox }
+        can_be_moved: { renderer: :checkbox },
+        can_store_stock: { renderer: :checkbox }
       }
     end
 
@@ -89,7 +91,8 @@ module UiRules
                                     print_code: nil,
                                     has_single_container: nil,
                                     virtual_location: nil,
-                                    consumption_area: nil)
+                                    consumption_area: nil,
+                                    can_store_stock: false)
     end
 
     def storage_types

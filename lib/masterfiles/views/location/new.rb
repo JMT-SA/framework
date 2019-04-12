@@ -29,6 +29,7 @@ module Masterfiles
               form.add_field :virtual_location
               form.add_field :consumption_area
               form.add_field :can_be_moved
+              form.add_field :can_store_stock
             end
           end
 

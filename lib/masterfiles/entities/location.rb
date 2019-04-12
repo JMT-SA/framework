@@ -18,5 +18,6 @@ module MasterfilesApp
     attribute :location_short_code, Types::String
     attribute :print_code, Types::String
     attribute :can_be_moved, Types::Bool
+    attribute :can_store_stock, Types::Bool
   end
 end

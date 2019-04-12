@@ -191,7 +191,9 @@ class Framework < Roda
         r.post do
           res = interactor.link_mr_skus(id, multiselect_grid_choices(params))
           if res.success
-            show_json_notice(res.message)
+            update_grid_row(id,
+                            changes: { has_skus: res.instance[:has_skus] },
+                            notice: res.message)
           else
             show_json_error(res.message)
           end
@@ -201,7 +203,9 @@ class Framework < Roda
         r.post do
           res = interactor.link_locations(id, multiselect_grid_choices(params))
           if res.success
-            show_json_notice(res.message)
+            update_grid_row(id,
+                            changes: { has_locations: res.instance[:has_locations] },
+                            notice: res.message)
           else
             show_json_error(res.message)
           end

@@ -65,14 +65,14 @@ module PackMaterialApp
       repo.transaction do
         repo.link_mr_skus(id, mr_sku_ids)
       end
-      success_response('SKUs linked successfully')
+      success_response('SKUs linked successfully', has_skus: mr_sku_ids.any?)
     end
 
     def link_locations(id, location_ids)
       repo.transaction do
         repo.link_locations(id, location_ids)
       end
-      success_response('Locations linked successfully')
+      success_response('Locations linked successfully', has_locations: location_ids.any?)
     end
 
     def get_sku_location_info_ids(sku_location_id)

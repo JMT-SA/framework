@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class LabelTemplateInteractor < BaseInteractor
+  class LabelTemplateInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def repo
       @repo ||= LabelTemplateRepo.new
     end
@@ -72,7 +72,34 @@ module MasterfilesApp
       store_new_label_variables(id, res.instance)
     end
 
+    def update_published_templates(params)
+      # validate params are as expected
+      res = validate_published_labels(params)
+      # Log error here unless res.messages.empty?
+      return validation_failed_response(res) unless res.messages.empty?
+
+      UpdatePublishedTemplates.call(res)
+    end
+
     private
+
+    def validate_published_labels(params) # rubocop:disable Metrics/AbcSize
+      res = LabelTemplatePublishSchema.call(params)
+      return res unless res.messages.empty?
+
+      var_errs = {}
+      res[:labels].each do |lbl|
+        lbl[:variables].each do |var_hash|
+          var_hash.each do |var, val|
+            inner_res = LabelTemplatePublishInnerSchema.call(val)
+            var_errs[var] = inner_res.messages.map { |k, v| "#{k} #{v.join(', ')}" } unless inner_res.messages.empty?
+          end
+        end
+      end
+
+      return OpenStruct.new(messages: var_errs) unless var_errs.empty?
+      res
+    end
 
     def store_new_label_variables(id, package)
       repo.transaction do

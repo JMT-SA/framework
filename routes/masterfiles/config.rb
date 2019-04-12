@@ -2,7 +2,7 @@
 
 # rubocop:disable Metrics/BlockLength
 
-class Framework < Roda
+class Framework < Roda # rubocop:disable Metrics/ClassLength
   route 'config', 'masterfiles' do |r|
     # LABEL TEMPLATES
     # --------------------------------------------------------------------------
@@ -79,6 +79,20 @@ class Framework < Roda
         check_auth!('config', 'new')
         show_partial_or_page(r) { Masterfiles::Config::LabelTemplate::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'published' do
+        # To Test: curl -H "Content-Type: application/json" --data @body.json http://localhost:9292/masterfiles/config/label_templates/published
+        #          (where file "body.json" contains the JSON parameters to be sent)
+        res = interactor.update_published_templates(params[:publish_data])
+        if res.success
+          response.status = 200
+          'Applied'
+        else
+          response.status = 400
+          res.message
+        end
+      end
+
       r.post do        # CREATE
         res = interactor.create_label_template(params[:label_template])
         if res.success

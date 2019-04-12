@@ -7,6 +7,7 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute :application, Types::String
     attribute :variables, Types::Array.default([])
+    attribute :variable_rules, Types::JSON::Hash
     attribute :active, Types::Bool
   end
 end

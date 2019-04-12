@@ -1,7 +1,7 @@
 ---
 :caption: Label Templates
 :sql: SELECT "label_templates"."id", "label_templates"."label_template_name", "label_templates"."description",
-  "label_templates"."application", "label_templates"."variables", "label_templates"."active",
+  "label_templates"."application", "label_templates"."active", "label_templates"."variables",
   "label_templates"."created_at", "label_templates"."updated_at" FROM "label_templates"
 :limit: 
 :offset: 
@@ -69,11 +69,11 @@
     :group_max: false
   variables:
     :name: variables
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Variables
     :namespaced_name: label_templates.variables
     :data_type: :string_array
-    :width: 
+    :width: 800
     :format: 
     :hide: false
     :groupable: false
@@ -84,7 +84,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Active
     :namespaced_name: label_templates.active
     :data_type: :boolean

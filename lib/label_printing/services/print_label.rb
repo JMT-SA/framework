@@ -117,4 +117,3 @@ module LabelPrintingApp
     end
   end
 end
-

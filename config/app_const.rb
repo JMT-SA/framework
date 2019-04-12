@@ -8,6 +8,11 @@ class AppConst
   ROLE_SUPPLIER = 'SUPPLIER'
   ROLE_TRANSPORTER = 'TRANSPORTER'
 
+  # Routes that do not require login:
+  BYPASS_LOGIN_ROUTES = [
+    '/masterfiles/config/label_templates/published'
+  ].freeze
+
   # Menu
   FUNCTIONAL_AREA_RMD = 'RMD'
 

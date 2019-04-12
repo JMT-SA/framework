@@ -33,7 +33,8 @@ class Framework < Roda
   plugin :content_for, append: true
   plugin :symbolized_params    # - automatically converts all keys of params to symbols.
   plugin :flash
-  plugin :csrf, raise: true, skip_if: ->(_) { ENV['RACK_ENV'] == 'test' } # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
+  plugin :csrf, raise: true, skip_if: ->(req) { ENV['RACK_ENV'] == 'test' || AppConst::BYPASS_LOGIN_ROUTES.any? { |path| req.path == path } } # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
+  plugin :json_parser
   plugin :rodauth do
     db DB
     enable :login, :logout # , :change_password
@@ -128,9 +129,11 @@ class Framework < Roda
     #   end
     # end
 
-    r.rodauth
-    rodauth.require_authentication
-    r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
+    unless AppConst::BYPASS_LOGIN_ROUTES.any? { |path| request.path == path } # Might have to be more nuanced for params in path...
+      r.rodauth
+      rodauth.require_authentication
+      r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
+    end
 
     r.root do
       # TODO: Config this, and maybe set it up per user.

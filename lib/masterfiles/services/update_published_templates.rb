@@ -57,7 +57,7 @@ module MasterfilesApp
     end
 
     def variables_as_json(label_def)
-      repo.hash_to_jsonb_str(variables: label_def[:variables])
+      repo.hash_for_jsonb_col(variables: label_def[:variables])
     end
 
     def variables_list(label_def)

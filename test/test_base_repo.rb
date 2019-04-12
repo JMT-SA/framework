@@ -146,11 +146,18 @@ class TestBaseRepo < MiniTestWithHooks
     assert_equal y, x
   end
 
-  def test_hash_to_jsonb_str
+  def test_hash_for_jsonb_col
     hash = {test: 'Test', int: 123, array: [], bool: true, hash: {}}
-    result = BaseRepo.new.hash_to_jsonb_str(hash)
-    expected = "{\"test\":\"Test\",\"int\":\"123\",\"array\":\"[]\",\"bool\":\"true\",\"hash\":\"{}\"}"
-    assert_equal expected, result
+    result = BaseRepo.new.hash_for_jsonb_col(hash)
+    expected = 'Sequel::Postgres::JSONHash'
+    assert_equal expected, result.class.name
+  end
+
+  def test_array_for_db_col
+    arr = [1, 2, 3]
+    result = BaseRepo.new.array_for_db_col(arr)
+    expected = 'Sequel::Postgres::PGArray'
+    assert_equal expected, result.class.name
   end
 
   def test_optgroup_array

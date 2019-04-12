@@ -214,19 +214,18 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[query].select_map
   end
 
-  # Helper to convert a Ruby Hash into a string that postgresql will understand.
+  # Helper to convert a Ruby Hash into a value that postgresql will understand.
   #
   # @param hash [Hash] the hash to convert.
-  # @return [String] JSON String version of the Hash.
-  def hash_to_jsonb_str(hash)
-    # "{#{(hash || {}).map { |k, v| %("#{k}":"#{v}") }.join(',')}}"
+  # @return [Sequel::Postgres::JSONHash] JSON version of the Hash.
+  def hash_for_jsonb_col(hash)
     Sequel.pg_json(hash)
   end
 
-  # Helper to convert a Ruby Array into a string that postgresql will understand.
+  # Helper to convert a Ruby Array into a value that postgresql will understand.
   #
   # @param arr [Array] the array to convert.
-  # @return [String] JSON String version of the Array.
+  # @return [Sequel::Postgres::PGArray] Postgres version of the Array.
   def array_for_db_col(arr)
     Sequel.pg_array(arr)
   end

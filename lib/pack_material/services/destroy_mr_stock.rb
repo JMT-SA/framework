@@ -20,13 +20,14 @@ module PackMaterialApp
     end
 
     def call
-      return failed_response('SKU location does not exist') unless @repo.find_hash(:locations, @location_id)
+      return failed_response('SKU location does not exist') unless @repo.exists?(:locations, id: @location_id)
 
       res = @repo.update_sku_location_quantity(@sku_id, @quantity, @location_id, add: false)
       return res unless res.success
 
       if @parent_transaction_id
-        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+        res = @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+        return res unless res.success
       else
         attrs = {
           mr_inventory_transaction_type_id: @repo.transaction_type_id_for('destroy'),

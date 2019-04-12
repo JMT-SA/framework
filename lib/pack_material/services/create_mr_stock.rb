@@ -30,7 +30,8 @@ module PackMaterialApp
       return res unless res.success
 
       if @parent_transaction_id
-        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+        res = @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+        return res unless res.success
       else
         type_id = @repo.transaction_type_id_for('create')
         attrs = {
@@ -46,7 +47,8 @@ module PackMaterialApp
       end
 
       if @delivery_id
-        @repo.update_delivery_receipt_id(@delivery_id, @parent_transaction_id)
+        res = @repo.update_delivery_receipt_id(@delivery_id, @parent_transaction_id)
+        return res unless res.success
         @quantities = @repo.get_delivery_sku_quantities(@delivery_id)
       end
 

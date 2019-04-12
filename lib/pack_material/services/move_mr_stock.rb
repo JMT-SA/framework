@@ -25,8 +25,8 @@ module PackMaterialApp
     end
 
     def call
-      return failed_response('To location does not exist') unless @repo.find_hash(:locations, @to_location_id)
-      return failed_response('From location does not exist') unless @from_location_id && @repo.find_hash(:locations, @from_location_id)
+      return failed_response('To location does not exist') unless @repo.exists?(:locations, id: @to_location_id)
+      return failed_response('From location does not exist') unless @from_location_id && @repo.exists?(:locations, id: @from_location_id)
 
       res = @repo.create_sku_location_ids([@sku_id], @to_location_id)
       res = @repo.update_sku_location_quantity(@sku_id, @quantity, @from_location_id, add: false) if res.success
@@ -34,7 +34,8 @@ module PackMaterialApp
       return res unless res.success
 
       if @parent_transaction_id
-        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+        res = @repo.activate_mr_inventory_transaction(@parent_transaction_id)
+        return res unless res.success
       else
         type_id = @opts[:is_adhoc] ? @repo.transaction_type_id_for('adhoc') : @repo.transaction_type_id_for('putaway')
         attrs = {

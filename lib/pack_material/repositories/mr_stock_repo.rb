@@ -11,6 +11,10 @@ module PackMaterialApp
       DB[:business_processes].where(process: 'DELIVERIES').select(:id).single_value
     end
 
+    def find_mr_delivery(id)
+      PackMaterialApp::ReplenishRepo.new.find_mr_delivery(id)
+    end
+
     def create_skus_for_delivery(mr_delivery_id)
       sku_ids = []
       items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).all
@@ -103,7 +107,9 @@ module PackMaterialApp
     end
 
     def update_delivery_receipt_id(id, receipt_id)
+      return failed_response('Delivery does not exist') unless exists?(:mr_deliveries, id: id)
       update(:mr_deliveries, id, receipt_transaction_id: receipt_id)
+      success_response('ok')
     end
 
     def update_delivery_putaway_id(id, putaway_id)
@@ -147,7 +153,7 @@ module PackMaterialApp
     end
 
     def create_sku_location_ids(sku_ids, to_location_id)
-      return failed_response('Location does not exist') unless DB[:locations].where(id: to_location_id).first
+      return failed_response('Location does not exist') unless exists?(:locations, id: to_location_id)
       query = <<~SQL
         INSERT INTO mr_sku_locations (mr_sku_id, location_id)
         SELECT mr_skus.id, ?
@@ -165,6 +171,7 @@ module PackMaterialApp
 
     # @param [Object] sku_quantity_groups qty should be a float
     def add_sku_location_quantities(sku_quantity_groups, to_location_id)
+      return failed_response('No SKU quantities given') unless sku_quantity_groups.any?
       sku_quantity_groups.each do |grp|
         location = DB[:mr_sku_locations].where(mr_sku_id: grp[:sku_id], location_id: to_location_id)
         return failed_response('No SKUs at location') unless location.first
@@ -198,7 +205,9 @@ module PackMaterialApp
     end
 
     def activate_mr_inventory_transaction(parent_transaction_id)
+      return failed_response('Invalid Parent Transaction Id') unless exists?(:mr_inventory_transactions, id: parent_transaction_id)
       DB[:mr_inventory_transactions].where(id: parent_transaction_id).update(active: true)
+      success_response('ok')
     end
   end
 end

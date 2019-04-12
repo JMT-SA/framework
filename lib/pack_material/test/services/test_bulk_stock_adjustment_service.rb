@@ -7,7 +7,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module PackMaterialApp
   class TestBulkStockAdjustmentService < Minitest::Test
-    def test_initialisation
+    def test_initialize
       object = OpenStruct.new(ref_no: 'test_ref')
       PackMaterialApp::TransactionsRepo.any_instance.stubs(:find_mr_bulk_stock_adjustment).returns(object)
       service = PackMaterialApp::BulkStockAdjustmentService.new(1, 2, user_name: 'User Name')

@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields
       fields[:location_type_code] = { renderer: :label }
       fields[:short_code] = { renderer: :label }
-      fields[:can_be_moved] = { renderer: :checkbox }
+      fields[:can_be_moved] =  { renderer: :label, as_boolean: true }
     end
 
     def common_fields

@@ -79,7 +79,7 @@ const crossbeamsGridEvents = {
     const rowNode = gridOptions.api.getRowNode(id);
     if (rowNode === undefined) {
       Jackbox.error(`Could not find a grid with id "${id}".`, { time: 20 });
-      console.log('No grid with id:', id);
+      console.log('No grid with id:', id); // eslint-disable-line no-console
       return;
     }
     gridOptions.context.nonUserEdit = true;
@@ -202,7 +202,7 @@ const crossbeamsGridEvents = {
             sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
                                                      elem.dataset.sortableGroup));
           } else {
-            console.log('Not sure what to do with this:', data);
+            console.log('Not sure what to do with this:', data); // eslint-disable-line no-console
           }
           if (closeDialog) {
             crossbeamsUtils.closePopupDialog();
@@ -216,10 +216,10 @@ const crossbeamsGridEvents = {
               if (data.exception) {
                 Jackbox.error(data.flash.error, { time: 20 });
                 if (data.backtrace) {
-                  console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
-                  console.info('==Backend Backtrace==');
-                  console.info(data.backtrace.join('\n'));
-                  console.groupEnd();
+                  console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+                  console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+                  console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+                  console.groupEnd(); // eslint-disable-line no-console
                 }
               } else {
                 Jackbox.error(data.flash.error);
@@ -297,7 +297,7 @@ const crossbeamsGridEvents = {
         } else if (data.actions) {
           crossbeamsUtils.processActions(data.actions);
         } else {
-          console.log('Not sure what to do with this:', data);
+          console.log('Not sure what to do with this:', data); // eslint-disable-line no-console
         }
         // Only if not redirect...
         if (data.flash) {
@@ -309,10 +309,10 @@ const crossbeamsGridEvents = {
             if (data.exception) {
               Jackbox.error(data.flash.error, { time: 20 });
               if (data.backtrace) {
-                console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
-                console.info('==Backend Backtrace==');
-                console.info(data.backtrace.join('\n'));
-                console.groupEnd();
+                console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+                console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+                console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+                console.groupEnd(); // eslint-disable-line no-console
               }
             } else {
               Jackbox.error(data.flash.error);
@@ -846,7 +846,7 @@ Level2PanelCellRenderer.prototype.setupLevel2Grid = function setupLevel2Grid(l2D
   };
 
   const eDetailGrid = this.eGui.querySelector('.full-width-grid');
-  new agGrid.Grid(eDetailGrid, this.level2GridOptions);
+  new agGrid.Grid(eDetailGrid, this.level2GridOptions); // eslint-disable-line no-new
 };
 
 Level2PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
@@ -937,7 +937,7 @@ Level3PanelCellRenderer.prototype.setupDetailGrid = function setupDetailGrid(l3D
   };
 
   const eDetailGrid = this.eGui.querySelector('.full-width-grid');
-  new agGrid.Grid(eDetailGrid, this.detailGridOptions);
+  new agGrid.Grid(eDetailGrid, this.detailGridOptions); // eslint-disable-line no-new
 };
 
 Level3PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
@@ -1093,10 +1093,10 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
         if (httpResult.exception) {
           crossbeamsUtils.alert({ prompt: httpResult.flash.error, type: 'error' });
           if (httpResult.backtrace) {
-            console.groupCollapsed('EXCEPTION:', httpResult.exception, httpResult.flash.error);
-            console.info('==Backend Backtrace==');
-            console.info(httpResult.backtrace.join('\n'));
-            console.groupEnd();
+            console.groupCollapsed('EXCEPTION:', httpResult.exception, httpResult.flash.error); // eslint-disable-line no-console
+            console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+            console.info(httpResult.backtrace.join('\n')); // eslint-disable-line no-console
+            console.groupEnd(); // eslint-disable-line no-console
           }
           return null;
         }
@@ -1315,6 +1315,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       gridOptions.getDataPath = data => data[treeConfig.treeColumn];
       gridOptions.autoGroupColumnDef = {
         headerName: treeConfig.treeCaption || 'Hierarchy',
+        width: 300,
+        pinned: 'left',
         cellRendererParams: {
           suppressCount: treeConfig.suppressNodeCounts || false,
         },
@@ -1332,7 +1334,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
     // Index rows by the id column...
     gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
 
-    new agGrid.Grid(grid, gridOptions);
+    new agGrid.Grid(grid, gridOptions); // eslint-disable-line no-new
     crossbeamsGridStore.addGrid(gridId, gridOptions);
     loadGrid(grid, gridOptions);
   };
@@ -1415,7 +1417,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       return {
-        callback: (key, options) => {
+        // callback: (key, options) => {
+        callback: (key) => {
           const item = getItemFromTree(key, items);
           const caller = () => {
             let form = null;
@@ -1467,7 +1470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   } else if (data.actions) {
                     crossbeamsUtils.processActions(data.actions);
                   } else {
-                    console.log('Not sure what to do with this:', data);
+                    console.log('Not sure what to do with this:', data); // eslint-disable-line no-console
                   }
                   // Only if not redirect...
                   if (data.flash) {
@@ -1478,10 +1481,10 @@ document.addEventListener('DOMContentLoaded', () => {
                       if (data.exception) {
                         Jackbox.error(data.flash.error, { time: 20 });
                         if (data.backtrace) {
-                          console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
-                          console.info('==Backend Backtrace==');
-                          console.info(data.backtrace.join('\n'));
-                          console.groupEnd();
+                          console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+                          console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+                          console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+                          console.groupEnd(); // eslint-disable-line no-console
                         }
                       } else {
                         Jackbox.error(data.flash.error);

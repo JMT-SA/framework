@@ -83,6 +83,7 @@ module PackMaterialApp
       options = opts
       options.delete(:parent_transaction_id)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:exists?).returns(true)
+      PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:update_sku_location_quantity).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:transaction_type_id_for).returns(1)
 
@@ -94,6 +95,7 @@ module PackMaterialApp
     def test_create_transaction_item
       PackMaterialApp::MrStockRepo.any_instance.stubs(:exists?).returns(true)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:sku_uom_id).returns(20)
+      PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:update_sku_location_quantity).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:transaction_type_id_for).returns(1)
       PackMaterialApp::TransactionsRepo.any_instance.stubs(:create_mr_inventory_transaction).returns(15)
@@ -118,6 +120,7 @@ module PackMaterialApp
 
       PackMaterialApp::ReplenishRepo.any_instance.stubs(:find_mr_delivery).returns(OpenStruct.new(receipt_location_id: 20))
       PackMaterialApp::MrStockRepo.any_instance.stubs(:exists?).returns(true)
+      PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:sku_uom_id).returns(20)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:update_sku_location_quantity).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:transaction_type_id_for).returns(1)

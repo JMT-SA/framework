@@ -243,7 +243,8 @@ module PackMaterialApp
         primary_assignment_id: @fixed_table_set[:locations][:assignment_id],
         location_description: 'Pack Material Store',
         location_long_code: 'PM STORE 1',
-        location_short_code: 'PM1'
+        location_short_code: 'PM1',
+        can_store_stock: true
       )
 
       pv = create_material_resource_product_variant[:id]
@@ -275,7 +276,8 @@ module PackMaterialApp
         primary_assignment_id: @fixed_table_set[:locations][:assignment_id],
         location_description: 'Pack Material Store',
         location_long_code: 'PM STORE 1',
-        location_short_code: 'PM1'
+        location_short_code: 'PM1',
+        can_store_stock: true
       )
 
       pv = create_material_resource_product_variant[:id]

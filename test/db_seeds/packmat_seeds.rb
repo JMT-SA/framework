@@ -120,7 +120,8 @@ module MiniTestSeeds
       primary_assignment_id: assignment_id,
       location_description: 'Default Receiving Bay',
       location_long_code: 'RECEIVING BAY',
-      location_short_code: 'RBY'
+      location_short_code: 'RBY',
+      can_store_stock: true
     )
     @fixed_table_set[:locations] = {
       assignment_id: assignment_id,

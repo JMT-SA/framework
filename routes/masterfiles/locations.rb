@@ -31,7 +31,6 @@ class Framework < Roda
               location_type_code
               short_code
               can_be_moved
-              can_store_stock
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

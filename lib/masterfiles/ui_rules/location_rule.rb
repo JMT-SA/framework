@@ -128,9 +128,11 @@ module UiRules
     end
 
     def initial_short_code(parent)
+      return nil if parent.nil?
+
       storage_type_id = parent.primary_storage_type_id
       res = @repo.suggested_short_code(storage_type_id)
-      res.instance
+      res.success ? res.instance : nil
     end
 
     def initial_storage_type(parent)

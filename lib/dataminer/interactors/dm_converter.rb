@@ -19,13 +19,13 @@ class DmConverter
     rpt = Crossbeams::Dataminer::Report.new(grid_configs['caption'] || 'Unknown report')
     rpt.sql = hash['query']
     rpt.ordered_columns.each do |column|
-      if grid_configs['column_widths'] && grid_configs['column_widths'][column.name]
+      if grid_configs.dig('column_widths', column.name)
         rpt.column(column.name).width = grid_configs['column_widths'][column.name]
       end
-      if grid_configs['data_types'] && grid_configs['data_types'][column.name]
+      if grid_configs.dig('data_types', column.name)
         rpt.column(column.name).data_type = grid_configs['data_types'][column.name].to_sym
       end
-      if grid_configs['column_captions'] && grid_configs['column_captions'][column.name]
+      if grid_configs.dig('column_captions', column.name)
         rpt.column(column.name).caption = grid_configs['column_captions'][column.name]
       end
       rpt.column(column.name).groupable = true if groupable_fields.include?(column.name)
@@ -34,7 +34,7 @@ class DmConverter
       rpt.column(column.name).group_min = true if min_fields.include?(column.name)
       rpt.column(column.name).group_max = true if max_fields.include?(column.name)
       rpt.column(column.name).hide = true if hidden.include?(column.name)
-      if grid_configs['formats'] && grid_configs['formats'][column.name]
+      if grid_configs.dig('formats', column.name)
         rpt.column(column.name).format = grid_configs['formats'][column.name].to_sym
       end
       rpt.column(column.name).group_by_seq = grouped_fields.index(column.name)

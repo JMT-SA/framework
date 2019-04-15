@@ -9,7 +9,7 @@ module DataminerApp
     def report_parameters(id, params)
       db, = repo.split_db_and_id(id)
       page = OpenStruct.new(id: id,
-                            load_params: params[:back] && params[:back] == 'y',
+                            load_params: params[:back] == 'y',
                             report_action: "/dataminer/reports/report/#{id}/run",
                             excel_action: "/dataminer/reports/report/#{id}/xls",
                             prepared_action: "/dataminer/prepared_reports/new/#{id}")
@@ -26,7 +26,7 @@ module DataminerApp
       res
     end
 
-    def run_report(id, params)
+    def run_report(id, params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       db, = repo.split_db_and_id(id)
       page = OpenStruct.new(id: id, col_defs: [])
       page.report = repo.lookup_report(id)
@@ -43,7 +43,7 @@ module DataminerApp
         return page
       end
       # {"limit"=>"", "offset"=>"", "crosstab"=>{"row_columns"=>["organization_code", "commodity_code", "fg_code_old"], "column_columns"=>"grade_code", "value_columns"=>"no_pallets"}, "btnSubmit"=>"Run report", "json_var"=>"[]"}
-      page.report.ordered_columns.each do |col|
+      page.report.ordered_columns.each do |col| # rubocop:disable Metrics/BlockLength
         hs                  = { headerName: col.caption, field: col.name, hide: col.hide, headerTooltip: col.caption }
         hs[:width]          = col.width unless col.width.nil?
         hs[:enableValue]    = true if %i[integer number].include?(col.data_type)
@@ -82,7 +82,7 @@ module DataminerApp
       page
     end
 
-    def create_spreadsheet(id, params)
+    def create_spreadsheet(id, params) # rubocop:disable Metrics/AbcSize
       db, = repo.split_db_and_id(id)
       page = OpenStruct.new(id: id)
       page.report = repo.lookup_report(id)
@@ -126,7 +126,7 @@ module DataminerApp
       page
     end
 
-    def admin_report_list_grid(for_grids: false)
+    def admin_report_list_grid(for_grids: false) # rubocop:disable Metrics/AbcSize
       rpt_list = if for_grids
                    repo.list_all_grid_reports
                  else
@@ -171,7 +171,7 @@ module DataminerApp
       NewReportSchema.call(params)
     end
 
-    def create_report(params)
+    def create_report(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_report_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -210,7 +210,7 @@ module DataminerApp
     def convert_report(params)
       yml = params[:yml]
       dbname = params[:database]
-      hash = YAML.load(yml)
+      hash = YAML.load(yml) # rubocop:disable Security/YAMLLoad
       hash['query'] = params[:sql]
       rpt = DmConverter.new(repo.admin_report_path(dbname)).convert_hash(hash, params[:filename])
       success_response('Converted to a new report', rpt)
@@ -218,7 +218,7 @@ module DataminerApp
       failed_response(e.message)
     end
 
-    def edit_report(id)
+    def edit_report(id) # rubocop:disable Metrics/AbcSize
       page = OpenStruct.new(id: id, report: repo.lookup_report(id, true))
 
       page.filename = File.basename(repo.lookup_file_name(id, true))
@@ -279,7 +279,7 @@ module DataminerApp
       page
     end
 
-    def save_report(id, params)
+    def save_report(id, params) # rubocop:disable Metrics/AbcSize
       report = repo.lookup_report(id, true)
 
       filename = repo.lookup_file_name(id, true)
@@ -313,7 +313,7 @@ module DataminerApp
       failed_response(e.message)
     end
 
-    def save_report_column_order(id, params)
+    def save_report_column_order(id, params) # rubocop:disable Metrics/AbcSize
       report = repo.lookup_admin_report(id)
       col_order = params[:dm_sorted_ids].split(',')
       col_order.each_with_index do |col, index|
@@ -327,7 +327,7 @@ module DataminerApp
       failed_response(e.message)
     end
 
-    def save_param_grid_col(id, params)
+    def save_param_grid_col(id, params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       report = repo.lookup_admin_report(id)
       col = report.columns[params[:key_val]]
       attrib = params[:col_name]
@@ -371,7 +371,7 @@ module DataminerApp
       success_response('OK', res)
     end
 
-    def create_parameter(id, params)
+    def create_parameter(id, params) # rubocop:disable Metrics/AbcSize
       # Validate... also cannot add if col exists as param already
       report = repo.lookup_admin_report(id)
 
@@ -406,7 +406,7 @@ module DataminerApp
     #
     # @param str [String] the string-representation of the array.
     # @return [Array] the String converted to an Array.
-    def str_to_array(str)
+    def str_to_array(str) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       ar = str.split(']').map { |a| a.sub('[', '').sub(/\A,/, '').split(',').map(&:strip) }
       return ar if ar.empty?
       ar.flatten! if ar.length == 1 && ar.first.is_a?(Array)
@@ -432,7 +432,8 @@ module DataminerApp
     # @param params [Hash] the request parameters.
     # @param crosstab_hash [Hash] the crosstab config (if applicable).
     # @return [Crossbeams::Dataminer::Report] the modified report.
-    def setup_report_with_parameters(rpt, params, crosstab_hash = {}, db)
+    def setup_report_with_parameters(rpt, params, crosstab_hash, db_conn) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      crosstab_hash ||= {}
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
       parms   = []
@@ -468,7 +469,7 @@ module DataminerApp
       begin
         rpt.apply_params(parms)
 
-        CrosstabApplier.new(repo.db_connection_for(db), rpt, params, crosstab_hash).convert_report if params[:crosstab]
+        CrosstabApplier.new(repo.db_connection_for(db_conn), rpt, params, crosstab_hash).convert_report if params[:crosstab]
         rpt
         # rescue StandardError => e
         #   return "ERROR: #{e.message}"

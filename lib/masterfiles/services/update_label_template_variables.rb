@@ -80,7 +80,7 @@ module MasterfilesApp
 
       var_list.each do |varname|
         if varname.start_with?('CMP:')
-          resolver = 'CMP:' # BUILD THIS UP...
+          resolver = 'CMP:' # TODO: build this up...
           var_array << { varname => { group: 'Composites', resolver: resolver, applications: [label_template.application] } }
         else
           var_array << { varname => shared_label_config[varname] }

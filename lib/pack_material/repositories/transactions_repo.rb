@@ -63,6 +63,12 @@ module PackMaterialApp
 
     crud_calls_for :mr_bulk_stock_adjustment_items, name: :mr_bulk_stock_adjustment_item, wrapper: MrBulkStockAdjustmentItem
 
+    def create_mr_sku_location(attrs)
+      stock_location = DB[:locations].where(id: attrs[:location_id]).get(:can_store_stock)
+      return failed_response('Location can not store stock') unless stock_location
+      create(:mr_sku_locations, attrs)
+    end
+
     def create_mr_bulk_stock_adjustment(attrs)
       create(:mr_bulk_stock_adjustments, is_stock_take: attrs[:is_stock_take], ref_no: attrs[:ref_no])
     end

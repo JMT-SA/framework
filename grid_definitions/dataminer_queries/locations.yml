@@ -425,3 +425,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: locations.can_store_stock
+  :caption: Can Store Stock
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

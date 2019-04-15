@@ -154,6 +154,7 @@ module PackMaterialApp
 
     def create_sku_location_ids(sku_ids, to_location_id)
       return failed_response('Location does not exist') unless exists?(:locations, id: to_location_id)
+      return failed_response('Location can not store stock') unless is_stock_location?(to_location_id)
       query = <<~SQL
         INSERT INTO mr_sku_locations (mr_sku_id, location_id)
         SELECT mr_skus.id, ?
@@ -167,6 +168,10 @@ module PackMaterialApp
       SQL
       DB[query, to_location_id, sku_ids, to_location_id].insert
       success_response('ok')
+    end
+
+    def is_stock_location?(location_id)
+      DB[:locations].where(id: location_id).get(:can_store_stock)
     end
 
     # @param [Object] sku_quantity_groups qty should be a float

@@ -50,6 +50,8 @@ module MasterfilesApp
       success_response("Created location #{instance.location_long_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { location_long_code: ['This location already exists: Location Long and Short codes must be Unique'] }))
+    rescue Crossbeams::FrameworkError => e
+      validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
     def create_location(parent_id, params)
@@ -64,6 +66,8 @@ module MasterfilesApp
       success_response("Created location #{instance.location_long_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { location_long_code: ['This location already exists: Location Long and Short codes must be Unique'] }))
+    rescue Crossbeams::FrameworkError => e
+      validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
     def update_location(id, params)
@@ -75,6 +79,8 @@ module MasterfilesApp
       end
       instance = location(id)
       success_response("Updated location #{instance.location_long_code}", instance)
+    rescue Crossbeams::FrameworkError => e
+      validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
     def delete_location(id)

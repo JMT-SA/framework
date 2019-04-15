@@ -44,7 +44,7 @@ module MasterfilesApp
 
     def for_select_receiving_bays
       location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_RECEIVING_BAY).get(:id)
-      for_select_locations(where: { location_type_id: location_type_id })
+      for_select_locations(where: { location_type_id: location_type_id, can_store_stock: true })
     end
 
     def find_location_by(key, val) # rubocop:disable Metrics/AbcSize
@@ -110,6 +110,27 @@ module MasterfilesApp
         SELECT #{id}, #{id}, 0;
       SQL
       id
+    end
+
+    def create_location(attrs)
+      receiving_bay = location_type_is_receiving_bay(attrs[:location_type_id])
+      failed_message = 'Location must store stock if its location type is receiving bay'
+      raise Crossbeams::FrameworkError, failed_message if receiving_bay && !attrs[:can_store_stock]
+
+      create(:locations, attrs)
+    end
+
+    def update_location(id, attrs)
+      receiving_bay = location_type_is_receiving_bay(attrs[:location_type_id])
+      failed_message = 'Location must store stock if its location type is receiving bay'
+      raise Crossbeams::FrameworkError, failed_message if receiving_bay && !attrs[:can_store_stock]
+
+      update(:locations, id, attrs)
+    end
+
+    def location_type_is_receiving_bay(location_type_id)
+      code = DB[:location_types].where(id: location_type_id).get(:location_type_code)
+      code == AppConst::LOCATION_TYPES_RECEIVING_BAY
     end
 
     def location_has_children(id)
@@ -255,6 +276,7 @@ module MasterfilesApp
 
       last_val = DB[query].single_value
       code = last_val ? last_val.succ : (prefix + 'AAA')
+
       success_response('ok', code)
     end
 

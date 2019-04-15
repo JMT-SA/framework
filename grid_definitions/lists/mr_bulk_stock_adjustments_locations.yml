@@ -13,3 +13,6 @@
     - :col: locations.primary_storage_type_id
       :op: =
       :val: $:storage_type_id$
+    - :col: locations.can_store_stock
+      :op: =
+      :val: true

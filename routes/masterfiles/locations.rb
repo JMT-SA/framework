@@ -355,8 +355,14 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_location_storage_definition(id, params[:location_storage_definition])
           if res.success
-            update_grid_row(id, changes: { storage_definition_code: res.instance[:storage_definition_code], active: res.instance[:active] },
-                                notice: res.message)
+            update_grid_row(id,
+                            changes: {
+                              storage_definition_code: res.instance[:storage_definition_code],
+                              storage_definition_format: res.instance[:storage_definition_format],
+                              storage_definition_description: res.instance[:storage_definition_description],
+                              active: res.instance[:active]
+                            },
+                            notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Locations::LocationStorageDefinition::Edit.call(id, form_values: params[:location_storage_definition], form_errors: res.errors) }
           end
@@ -385,6 +391,8 @@ class Framework < Roda
           row_keys = %i[
             id
             storage_definition_code
+            storage_definition_format
+            storage_definition_description
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

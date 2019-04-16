@@ -17,6 +17,8 @@ module Masterfiles
               form.action '/masterfiles/locations/location_storage_definitions'
               form.remote! if remote
               form.add_field :storage_definition_code
+              form.add_field :storage_definition_format
+              form.add_field :storage_definition_description
             end
           end
 

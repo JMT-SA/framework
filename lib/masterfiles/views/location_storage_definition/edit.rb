@@ -18,6 +18,8 @@ module Masterfiles
               form.remote!
               form.method :update
               form.add_field :storage_definition_code
+              form.add_field :storage_definition_format
+              form.add_field :storage_definition_description
             end
           end
 

@@ -1,8 +1,7 @@
 ---
 :caption: Location Storage Definitions
-:sql: SELECT "location_storage_definitions"."id", "location_storage_definitions"."storage_definition_code",
-  "location_storage_definitions"."active", "location_storage_definitions"."created_at",
-  "location_storage_definitions"."updated_at" FROM "location_storage_definitions"
+:sql: "SELECT \"location_storage_definitions\".\"id\",\r\n\"location_storage_definitions\".\"storage_definition_code\",\r\n\"location_storage_definitions\".\"storage_definition_format\",\r\n\"location_storage_definitions\".\"storage_definition_description\",\r\n\"location_storage_definitions\".\"active\",\r\n\"location_storage_definitions\".\"created_at\",\r\n\"location_storage_definitions\".\"updated_at\"\r\nFROM
+  \"location_storage_definitions\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -39,9 +38,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  storage_definition_format:
+    :name: storage_definition_format
+    :sequence_no: 3
+    :caption: Storage definition format
+    :namespaced_name: location_storage_definitions.storage_definition_format
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  storage_definition_description:
+    :name: storage_definition_description
+    :sequence_no: 4
+    :caption: Storage definition description
+    :namespaced_name: location_storage_definitions.storage_definition_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Active
     :namespaced_name: location_storage_definitions.active
     :data_type: :boolean
@@ -57,7 +88,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: location_storage_definitions.created_at
     :data_type: :datetime
@@ -73,7 +104,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: location_storage_definitions.updated_at
     :data_type: :datetime

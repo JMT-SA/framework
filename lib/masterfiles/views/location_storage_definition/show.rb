@@ -14,6 +14,8 @@ module Masterfiles
               # form.caption 'Location Storage Definition'
               form.view_only!
               form.add_field :storage_definition_code
+              form.add_field :storage_definition_format
+              form.add_field :storage_definition_description
               form.add_field :active
             end
           end

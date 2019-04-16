@@ -15,13 +15,17 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:storage_definition_code] = { renderer: :label }
+      fields[:storage_definition_code] = { renderer: :label, caption: 'Code' }
+      fields[:storage_definition_format] = { renderer: :label, caption: 'Format' }
+      fields[:storage_definition_description] = { renderer: :label, caption: 'Description' }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
-        storage_definition_code: { required: true }
+        storage_definition_code: { required: true, caption: 'Code' },
+        storage_definition_format: { required: true, caption: 'Format' },
+        storage_definition_description: { required: true, caption: 'Description' }
       }
     end
 
@@ -32,7 +36,9 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(storage_definition_code: nil)
+      @form_object = OpenStruct.new(storage_definition_code: nil,
+                                    storage_definition_format: nil,
+                                    storage_definition_description: nil)
     end
   end
 end

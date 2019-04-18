@@ -38,7 +38,16 @@ module MasterfilesApp
       res = validate_variable_names(label_template, var_list)
       return res unless res.success
 
-      success_response('ok', variables: var_list.empty? ? nil : repo.array_for_db_col(var_list), variable_rules: create_variable_rules(var_list))
+      var_hash = {
+        variables: variable_list(var_list),
+        variable_rules: create_variable_rules(var_list)
+      }
+      success_response('ok', var_hash)
+    end
+
+    def variable_list(var_list)
+      return nil if var_list.empty?
+      repo.array_for_db_col(var_list.map { |var| display_varname(var) })
     end
 
     def validate_variable_names(instance, var_list)
@@ -80,13 +89,31 @@ module MasterfilesApp
 
       var_list.each do |varname|
         if varname.start_with?('CMP:')
-          resolver = 'CMP:' # TODO: build this up...
-          var_array << { varname => { group: 'Composites', resolver: resolver, applications: [label_template.application] } }
+          cmp_varname = display_varname(varname)
+          resolver = composite_config(varname)
+          # var_array << { cmp_varname => { group: 'Composites', resolver: resolver, applications: [label_template.application] } }
+          var_array << { cmp_varname => resolver }
         else
           var_array << { varname => shared_label_config[varname] }
         end
       end
       repo.hash_for_jsonb_col(hash)
+    end
+
+    def composite_config(varname)
+      # get tokens within ${} and replace with shared_label_config resolver
+      tokens = varname.scan(/\$\{(.+?)\}/).flatten
+      lkp = {}
+      tokens.each { |token| lkp[token] = shared_label_config[token][:resolver] }
+      composite_resolver = varname
+      tokens.each { |t| composite_resolver.gsub!(t, lkp[t]) }
+
+      { group: 'Any', resolver: composite_resolver, applications: [label_template.application] }
+    end
+
+    def display_varname(varname)
+      return varname unless varname.start_with?('CMP:')
+      varname.gsub(/CMP:|[${}]/, '')
     end
   end
 end

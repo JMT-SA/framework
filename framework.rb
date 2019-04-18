@@ -167,7 +167,7 @@ class Framework < Roda
       else
         term = params[:search_term]
 
-        Dir.glob('developer_documentation/*.adoc').each do |filename|
+        Dir.glob("#{ENV['ROOT']}/developer_documentation/*.adoc").each do |filename|
           lines = File.foreach(filename).grep(/#{term}/i)
           next if lines.empty?
           out[filename] = []

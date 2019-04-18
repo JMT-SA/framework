@@ -4,7 +4,7 @@ module PackMaterial
   module Replenish
     module MrDelivery
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -52,6 +52,19 @@ module PackMaterial
                   end
                 end
               end
+            end
+
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Goods Returned Note report',
+                                  url: "/pack_material/reports/goods_returned/#{id}",
+                                  loading_window: true,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Delivery Received Note report',
+                                  url: "/pack_material/reports/delivery_received/#{id}",
+                                  loading_window: true,
+                                  style: :button)
             end
 
             page.section do |section|

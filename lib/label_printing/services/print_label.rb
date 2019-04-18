@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module LabelPrintingApp
-  # Apply an instance's values to a label config and print a quantity of labels.
+  # Apply an instance's values to a label template's variable rules and print a quantity of labels.
   class PrintLabel < BaseService
-    attr_reader :label_name, :instance, :quantity, :printer_id, :config
+    attr_reader :label_name, :instance, :quantity, :printer_id
 
     def initialize(label_name, instance, params)
       @label_name = label_name
@@ -14,9 +14,6 @@ module LabelPrintingApp
     end
 
     def call
-      config_repo = LabelApp::SharedConfigRepo.new
-      @config = config_repo.packmat_labels_config
-
       lbl_required = fields_for_label
       vars = values_from(lbl_required)
       messerver_print(vars,  printer_code(printer_id))
@@ -51,38 +48,34 @@ module LabelPrintingApp
 
     def values_from(lbl_required)
       vars = {}
-      lbl_required.each_with_index do |var, index|
-        vars["F#{index + 1}".to_sym] = value_from(var)
+      lbl_required.each_with_index do |resolver, index|
+        vars["F#{index + 1}".to_sym] = value_from(resolver)
       end
       vars
     end
 
-    def value_from(varname)
-      case varname
+    def value_from(resolver)
+      case resolver
       when /\ABCD:/
-        make_barcode(varname.delete_prefix('BCD:'))
+        make_barcode(resolver.delete_prefix('BCD:'))
       when /\AFNC:/
-        make_function(varname.delete_prefix('FNC:'))
+        make_function(resolver.delete_prefix('FNC:'))
       when /\ACMP:/
-        make_composite(varname.delete_prefix('CMP:'))
+        make_composite(resolver.delete_prefix('CMP:'))
       else
-        instance[varname.to_sym]
+        instance[resolver.to_sym]
       end
     end
 
-    def make_function(varname)
-      "Functions not yet implemented - #{varname}"
+    def make_function(resolver)
+      "Functions not yet implemented - #{resolver}"
     end
 
-    def make_composite(varname)
+    def make_composite(resolver)
       # Example: 'CMP:x:${Location Long Code} - ${Location Short Code} / ${FNC:some_function,Location Long Code}'
-      tokens = varname.scan(/\$\{(.+?)\}/)
-      output = varname
-      tokens.flatten.each do |token|
-        var_rule = resolver_for(token)
-        raise Crossbeams::FrameworkError, 'A composite cannot include a composite in its makeup.' if var_rule.start_with?('CMP:')
-        output.gsub!("${#{token}}", value_from(var_rule))
-      end
+      tokens = resolver.scan(/\$\{(.+?)\}/)
+      output = resolver
+      tokens.flatten.each { |token| output.gsub!("${#{token}}", value_from(token).to_s) }
       output
     end
 
@@ -101,18 +94,8 @@ module LabelPrintingApp
       label_template = repo.find_label_template_by_name(label_name)
       raise Crossbeams::FrameworkError, "There is no label template named \"#{label_name}\"." if label_template.nil?
 
-      label_template.variables.map do |varname|
-        resolver_for(varname)
-      end
-    end
-
-    def resolver_for(varname)
-      if varname.start_with?('CMP:')
-        varname
-      elsif varname.start_with?('FNC:')
-        varname
-      else
-        config[varname][:resolver]
+      label_template.variable_rules['variables'].map do |var|
+        var.values.first['resolver']
       end
     end
   end

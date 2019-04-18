@@ -4,7 +4,7 @@
   :tree_column: path_array
   :tree_caption: Location Hierarchy
   :suppress_node_counts: false
-  :groupDefaultExpanded: 2
+  :groupDefaultExpanded: -1
 :actions:
 - :url: "/masterfiles/locations/locations/$:id$"
   :text: view

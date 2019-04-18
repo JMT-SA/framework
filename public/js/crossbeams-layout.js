@@ -223,7 +223,7 @@
       }
       // Show hint dialog
       if (event.target.closest('[data-cb-hint-for]')) {
-        const id = event.target.parentNode.dataset.cbHintFor;
+        const id = event.target.closest('[data-cb-hint-for]').dataset.cbHintFor;
         const el = document.querySelector(`[data-cb-hint='${id}']`);
         if (el) {
           crossbeamsUtils.showHtmlInDialog('Hint', el.innerHTML);

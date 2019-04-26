@@ -72,7 +72,7 @@ module DevelopmentApp
       if user_email_group.nil?
         email_addresses_for_all_users
       else
-        user_email_group_id = DB[:user_email_groups].where(mail_group: user_email_group).get(:id)
+        user_email_group_id = DB[:user_email_groups].where(mail_group: user_email_group, active: true).get(:id)
         raise Crossbeams::FrameworkError, "Email group \"#{user_email_group}\" does not exist" if user_email_group_id.nil?
         email_addresses_for_group(user_email_group_id)
       end
@@ -85,11 +85,12 @@ module DevelopmentApp
         .exclude(email: nil)
         .order(:user_name)
         .where(Sequel[:user_email_groups_users][:user_email_group_id] => user_email_group_id)
+        .where(Sequel[:users][:active] => true)
         .map(%i[user_name email])
     end
 
     def email_addresses_for_all_users
-      DB[:users].select(:user_name, :email).exclude(email: nil).order(:user_name).map(%i[user_name email])
+      DB[:users].select(:user_name, :email).where(active: true).exclude(email: nil).order(:user_name).map(%i[user_name email])
     end
   end
 end

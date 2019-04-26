@@ -151,6 +151,9 @@ class TestBaseRepo < MiniTestWithHooks
     result = BaseRepo.new.hash_for_jsonb_col(hash)
     expected = 'Sequel::Postgres::JSONHash'
     assert_equal expected, result.class.name
+
+    result = BaseRepo.new.hash_for_jsonb_col(nil)
+    assert_nil result
   end
 
   def test_array_for_db_col
@@ -158,6 +161,9 @@ class TestBaseRepo < MiniTestWithHooks
     result = BaseRepo.new.array_for_db_col(arr)
     expected = 'Sequel::Postgres::PGArray'
     assert_equal expected, result.class.name
+
+    result = BaseRepo.new.array_for_db_col(nil)
+    assert_nil result
   end
 
   def test_optgroup_array

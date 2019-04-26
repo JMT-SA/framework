@@ -208,8 +208,8 @@ class Framework < Roda
           #{out.map do |k, v|
             <<~STR
               <div class=\"mt3 lh-copy\">
-                <a href=\"/#{k}\" class=\"f3 link dim br2 ph3 pv2 dib white bg-dark-blue mb2\">
-                  #{Crossbeams::Layout::Icon.render(:back)} #{k.delete_prefix('developer_documentation/').delete_suffix('.adoc').tr('_', ' ')}
+                <a href=\"#{k.delete_prefix(ENV['ROOT'])}\" class=\"f3 link dim br2 ph3 pv2 dib white bg-dark-blue mb2\">
+                  #{Crossbeams::Layout::Icon.render(:back)} #{k.delete_prefix("#{ENV['ROOT']}/developer_documentation/").delete_suffix('.adoc').tr('_', ' ')}
                 </a>
                 <br>
                 #{v.join('<br>')}

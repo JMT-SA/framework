@@ -219,6 +219,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param hash [Hash] the hash to convert.
   # @return [Sequel::Postgres::JSONHash] JSON version of the Hash.
   def hash_for_jsonb_col(hash)
+    return nil if hash.nil?
     Sequel.pg_json(hash)
   end
 
@@ -227,6 +228,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param arr [Array] the array to convert.
   # @return [Sequel::Postgres::PGArray] Postgres version of the Array.
   def array_for_db_col(arr)
+    return nil if arr.nil?
     Sequel.pg_array(arr)
   end
 

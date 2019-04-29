@@ -2,6 +2,9 @@
 
 # A class for defining global constants in a central place.
 class AppConst
+  # Client-specific code
+  CLIENT_CODE = ENV.fetch('CLIENT_CODE')
+
   # Constants for roles:
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
   ROLE_CUSTOMER = 'CUSTOMER'

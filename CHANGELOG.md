@@ -9,6 +9,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Added
 - Exceptions are emailed. The recipients and subject prefix can be configured.
 - Inline editing for grids.
+- Tables can have a column named `extended_columns` with JSONB key/values that can be displayed and edited.
 ### Changed
 ### Fixed
 

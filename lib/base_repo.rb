@@ -214,6 +214,14 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[query].select_map
   end
 
+  # Get a list of values from the +master_lists+ table for a particular +list_type+.
+  #
+  # @param list_type [string] the list type to return.
+  # @return [Array] all master_list items for the given +list_type+.
+  def master_list_values(list_type)
+    DB[:master_lists].where(list_type: list_type).order(:description).select_map(:description)
+  end
+
   # Helper to convert a Ruby Hash into a value that postgresql will understand.
   #
   # @param hash [Hash] the hash to convert.

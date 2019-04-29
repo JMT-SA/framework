@@ -392,7 +392,12 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param extras [Hash] extra key/value combinations to add/replace attributes.
   # @return [Hash] the chosen attributes.
   def select_attributes(instance, row_keys, extras = {})
-    Hash[row_keys.map { |k| [k, instance[k]] }].merge(extras)
+    mods = if instance.to_h[:extended_columns]
+             extras.merge(instance.to_h[:extended_columns].symbolize_keys)
+           else
+             extras
+           end
+    Hash[row_keys.map { |k| [k, instance[k]] }].merge(mods)
   end
 
   def delete_grid_row(id, notice: nil)

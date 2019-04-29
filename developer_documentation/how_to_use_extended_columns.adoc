@@ -1,0 +1,215 @@
+= How to use extended columns
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to use extended columns
+
+If you add a column named `extended_columns` with datatype `JSONB` to a table, you can define arbitrary columns for the table that may differ from installation to installation.
+
+There are a few parts to this the developer needs to cover:
+
+* A configuration hash per table/client combination which specifies the content of `extended_columns` and rules for updating.
+* Client-specific queries to display the contents of `extended_columns` in their own columns.
+* Call a few helpers in the view, ui rules, interactor and route to handle display and update.
+
+=== Configuration
+
+Configuration is defined in `config/extended_column_definitions.rb`.
+
+==== UI definition
+
+There is a Hash named `EXTENDED_COLUMNS` with keys for table name as a `Symbol`.
+
+Each table name is a Hash with keys for every `CLIENT_CODE` (as a `String`). If there is no entry for the current `CLIENT_CODE`, the table will not have extended columns for that client.
+
+e.g.
+[source,ruby]
+----
+EXTENDED_COLUMNS = {
+  labels: {
+    'srcc' => {
+      agent: { type: :string, required: true },
+      important: { type: :boolean },
+      commodity: { type: :string, masterlist_key: 'commodity', required: true }
+    }
+  }
+}.freeze
+----
+
+NOTE: The table name **must** be a `Symbol` and the client code **must** be a `String`. In fact all keys are symbols except for the client code ('srcc' in this example).
+
+==== Validation
+
+
+There is a Hash named `VALIDATIONS` with keys for table name as a `Symbol`.
+
+Each table name is a Hash with keys for every `CLIENT_CODE` (as a `String`). If there is no entry for the current `CLIENT_CODE`, the table will not have validation for extended columns for that client.
+
+Each validation is a Dry::Validation schema.
+e.g.
+[source,ruby]
+----
+VALIDATIONS = {
+  labels: {
+    'srcc' => Dry::Validation.Params do
+      required(:agent).filled(:str?)
+      required(:pack_week).filled(:int?, gteq?: 1, lteq?: 52)
+      required(:important).maybe(:bool?)
+      required(:commodity).filled(:str?)
+    end
+  }
+}.freeze
+----
+
+=== Migration
+
+Add a column named `extended_columns` of type `JSONB` as per this example:
+[source,ruby]
+----
+Sequel.migration do
+  change do
+    extension :pg_json
+    add_column :labels, :extended_columns, :jsonb
+  end
+end
+----
+
+=== Grid queries
+
+==== List/Search YAML file changes
+
+You can change the list or search `.yml` file to get its SQL query from a different dataminer definition file which displays the relevant extended columns for the client:
+[source,yaml]
+----
+:dataminer_definition: labels
+:dataminer_client_definitions:  #<1>
+  srcc: labels_srcc             #<2>
+----
+<1> This is only required if the query needs to differ from client to client.
+<2> Note the client code is a `String`. The value points to the specific dataminer query for the client. If there is no entry for the client code, the value of `:datamnier_definition:` will be used.
+
+==== Including extended columns in the dataminer query
+
+Example of unpacking extended columns from the query in `labels_srcc.yml`:
+[source,sql]
+----
+SELECT label_name,
+extended_columns ->> 'agent' AS agent,
+extended_columns ->> 'important' AS important, #<1>
+extended_columns ->> 'commodity' AS commodity
+FROM labels
+----
+<1> Remember to set the datatype as boolean in the grid definition so this can display as a checkbox in grids.
+
+=== Updating and displaying extended columns
+
+==== View
+
+There is a method that will lay out the extended columns fields in a form for you:
+`Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view`. It takes the table name and the current form/fold object as parameters.
+[source,ruby]
+----
+page.form do |form|
+  # …
+  Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:labels, form)
+
+  # OR with a fold:
+  form.fold_up do |fold|
+    fold.caption 'Categories'
+    Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:labels, fold)
+  end
+end
+----
+This will call `add_field` for each extended column (prefixed with `extcol_`).
+
+==== UI Rules
+
+To apply the rendering rules as defined in the configuration, make a call to `extended_columns`, passing the parameters:
+any repo, table name as a Symbol and `:edit_mode` which should be `true` for update/new views and `false` for show views.
+[source,ruby]
+----
+extended_columns(@this_repo,
+                 :labels,
+                 edit_mode: !%i[show archive complete reopen].include?(@mode))
+----
+This will update the `:fields` in the rules object with renderers for each extended column (prefixed with `extcol_`).
+
+To apply default values to a new form object, call `apply_extended_column_defaults_to_form_object` passing the table name:
+[source,ruby]
+----
+@form_object = OpenStruct.new(label_name: nil,
+                              label_dimension: AppConst::DEFAULT_LABEL_DIMENSION,
+                              px_per_mm: '8',
+                              multi_label: false,
+                              variable_set: AppConst::LABEL_VARIABLE_SETS.first)
+apply_extended_column_defaults_to_form_object(:labels)
+----
+
+This will set defaults for extended column contents if there are any.
+
+==== Interactor
+
+Use `unwrap_extended_columns_params` to split params into normal parameters and extended_columns parameters.
+
+Use `validate_extended_columns` to validate just the extended_columns paramters.
+
+Validate the normal parameters as usual using DryValidation.
+If either validations have failed, use `mixed_validation_failed_response` to return all validation messages together.
+
+When updating, include the extended parameters using `add_extended_columns_to_changeset`.
+This takes all the `extcol_` parameters and strips the `extcol_` prefix and packs them in an `extended_columns` hash (formatted for a JSONB column) and adds it to the changeset.
+[source,ruby]
+----
+parms, extcols = unwrap_extended_columns_params(params)
+ext_res = validate_extended_columns(:labels, params)
+res = validate_label_params(parms)
+return mixed_validation_failed_response(res, ext_res) unless res.messages.empty? && ext_res.messages.empty?
+
+repo.transaction do
+  repo.update_label(id,
+    include_updated_by_in_changeset(add_extended_columns_to_changeset(res, repo, extcols)))
+  log_transaction
+end
+----
+
+[NOTE]
+====
+There is also another interactor method `select_extended_columns_params` which takes a set of params and returns only those params where the key starts with "extcol_".
+
+The resulting hash's keys have the "extcol_" prefix removed, but you can call the method with `delete_prefix: false` to keep the prefix in the keys.
+[source,ruby]
+----
+# params = { a: 1, excol_b: 2, extcol_c: 3 }
+
+select_extended_columns_params(params)
+# => { b: 2, c: 3 }
+
+select_extended_columns_params(params, delete_prefix: false)
+# => { extcol_b: 2, extcol_c: 3 }
+----
+====
+
+==== Route
+
+To update extended columns in a grid, use the `select_attributes` helper or else use the `BaseInteractor` method `extended_columns_for_row`.
+[source,ruby]
+----
+# Using the select_attributes helper requires no change to the code:
+
+row_keys = %i[id label_name category updated_by sub_category]
+add_grid_row(attrs: select_attributes(res.instance, row_keys),
+             notice: res.message)
+
+# OR - if for some reason you cannot use the select_attributes approach,
+#      use the interactor method:
+
+grid_cols = res.instance.to_h
+update_grid_row(id, changes:
+{
+  label_name: grid_cols[:label_name],
+  category: grid_cols[:category],
+  updated_by: grid_cols[:updated_by],
+  sub_category:  grid_cols[:sub_category]
+}.merge(interactor.extended_columns_for_row(grid_cols)), notice: res.message)
+----

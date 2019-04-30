@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class ReplenishRepo < BaseRepo
+  class ReplenishRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :mr_purchase_orders,
                      label: :purchase_order_number,
                      value: :id,
@@ -263,7 +263,6 @@ module PackMaterialApp
     end
 
     def sku_for_barcode(sku_id: nil, mr_delivery_item_id: nil, mr_delivery_item_batch_id: nil)
-      return nil unless (sku_id || mr_delivery_item_id || mr_delivery_item_batch_id)
       info = nil
       info = sku_info_from_batch_id(mr_delivery_item_batch_id) if mr_delivery_item_batch_id
       info = sku_info_from_item_id(mr_delivery_item_id) if mr_delivery_item_id
@@ -271,7 +270,7 @@ module PackMaterialApp
       info
     end
 
-    def sku_info_from_batch_id(mr_delivery_item_batch_id)
+    def sku_info_from_batch_id(mr_delivery_item_batch_id) # rubocop:disable Metrics/AbcSize
       batch = DB[:mr_delivery_item_batches].where(id: mr_delivery_item_batch_id)
       batch_number = batch.get(:client_batch_number)
 
@@ -279,7 +278,7 @@ module PackMaterialApp
       item = DB[:mr_delivery_items].where(id: item_id)
 
       pv = DB[:material_resource_product_variants].where(id: item.get(:mr_product_variant_id))
-      pv_code = pv.get(:product_variant_code)
+      pv_code, pv_number = pv.get(%i[product_variant_code product_variant_number])
 
       sku = DB[:mr_skus].where(mr_delivery_item_batch_id: mr_delivery_item_batch_id,
                                mr_product_variant_id: item.get(:mr_product_variant_id))
@@ -290,17 +289,19 @@ module PackMaterialApp
       {
         sku_number: sku_number,
         product_variant_code: pv_code,
+        product_variant_number: pv_number,
         batch_number: batch_number,
         no_of_prints: no_of_prints,
         delivery_number: delivery_number
       }
     end
 
-    def sku_info_from_item_id(mr_delivery_item_id)
+    def sku_info_from_item_id(mr_delivery_item_id) # rubocop:disable Metrics/AbcSize
       item = DB[:mr_delivery_items].where(id: mr_delivery_item_id)
 
       pv = DB[:material_resource_product_variants].where(id: item.get(:mr_product_variant_id))
-      pv_code = pv.get(:product_variant_code)
+      # pv_code = pv.get(:product_variant_code)
+      pv_code, pv_number = pv.get(%i[product_variant_code product_variant_number])
 
       batch_number = DB[:mr_internal_batch_numbers].where(id: pv.get(:mr_internal_batch_number_id)).get(:batch_number)
 
@@ -313,13 +314,14 @@ module PackMaterialApp
       {
         sku_number: sku_number,
         product_variant_code: pv_code,
+        product_variant_number: pv_number,
         batch_number: batch_number,
         no_of_prints: no_of_prints,
         delivery_number: delivery_number
       }
     end
 
-    def sku_info_from_sku_id(sku_id)
+    def sku_info_from_sku_id(sku_id) # rubocop:disable Metrics/AbcSize
       sku = DB[:mr_skus].where(id: sku_id).first
       no_of_prints = 0
       delivery_number = nil
@@ -332,12 +334,14 @@ module PackMaterialApp
       else
         batch_number = DB[:mr_internal_batch_numbers].where(id: sku[:mr_internal_batch_number_id]).get(:batch_number)
       end
-      pv_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
+      # pv_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
+      pv_code, pv_number = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(%i[product_variant_code product_variant_number])
       sku_number = sku[:sku_number]
       no_of_prints = 1 if no_of_prints.zero? || no_of_prints.negative?
       {
         sku_number: sku_number,
         product_variant_code: pv_code,
+        product_variant_number: pv_number,
         batch_number: batch_number,
         no_of_prints: no_of_prints,
         delivery_number: delivery_number
@@ -393,7 +397,7 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def update_delivery_putaway_quantity(sku_id, quantity, delivery_id)
+    def update_delivery_putaway_quantity(sku_id, quantity, delivery_id) # rubocop:disable Metrics/AbcSize
       sku = DB[:mr_skus].where(id: sku_id)
       pv_id = sku.get(:mr_product_variant_id)
       item = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id, mr_product_variant_id: pv_id)
@@ -425,7 +429,7 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def update_delivery_putaway_statuses(delivery_id)
+    def update_delivery_putaway_statuses(delivery_id) # rubocop:disable Metrics/AbcSize
       putaway_completed = DB[:mr_deliveries].where(id: delivery_id).get(:putaway_completed)
       return failed_response('ERROR: Delivery putaway already completed') if putaway_completed
 
@@ -443,7 +447,7 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def update_purchase_order_statuses(po_item_id)
+    def update_purchase_order_statuses(po_item_id) # rubocop:disable Metrics/AbcSize
       po_item = DB[:mr_purchase_order_items].where(id: po_item_id)
       qty_required = po_item.get(:quantity_required)
       items = DB[:mr_delivery_items].where(mr_purchase_order_item_id: po_item_id)
@@ -468,7 +472,7 @@ module PackMaterialApp
       end
     end
 
-    def html_delivery_progress_report(delivery_id, sku_id, to_location_id)
+    def html_delivery_progress_report(delivery_id, sku_id, to_location_id) # rubocop:disable Metrics/AbcSize
       return nil unless delivery_id && sku_id && to_location_id
       total_items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).all
       done = total_items.select { |r| r[:quantity_putaway].to_f >= r[:quantity_received].to_f }.count

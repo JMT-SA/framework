@@ -255,7 +255,8 @@ module MesserverApp
       if request.method == 'GET'
         puts ">>> MesServer call: #{request.method} >> #{request.path}"
       else
-        puts ">>> MesServer call: #{request.method} >> #{request.path} > #{request.body[0, 300]}"
+        body = ENV['LOGFULLMESSERVERCALLS'] ? request.body : request.body[0, 300]
+        puts ">>> MesServer call: #{request.method} >> #{request.path} > #{body}"
       end
     end
   end

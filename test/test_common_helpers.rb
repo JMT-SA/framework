@@ -17,6 +17,11 @@ class TestCommonHelpers < Minitest::Test
     assert_equal instance, select_attributes(instance, row_keys)
     assert_equal({ one: 1, two: 2, three: 3 }, select_attributes(instance, row_keys, three: 3))
     assert_equal({ one: 1, two: 22, three: 3 }, select_attributes(instance, row_keys, three: 3, two: 22))
+
+    # Automatic unpacking of extended_columns:
+    instance = { one: 1, two: 2, extended_columns: { red: 1, blue: 2 } }
+    assert_equal({ one: 1, two: 2, red: 1, blue: 2 }, select_attributes(instance, row_keys))
+    assert_equal({ one: 1, two: 2, three: 3, red: 1, blue: 2 }, select_attributes(instance, row_keys, three: 3))
   end
 
   def test_base_validation

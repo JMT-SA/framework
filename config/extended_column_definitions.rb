@@ -28,6 +28,43 @@ module Crossbeams
         return if config.nil?
         config.keys.each { |k| form.add_field("extcol_#{k}".to_sym) }
       end
+
+      def verify_config
+        if EXTENDED_COLUMNS.empty?
+          puts 'Nothing to verify'
+          return
+        end
+        errs = verify_client_keys
+
+        EXTENDED_COLUMNS.each do |table, rules|
+          rules.each do |client_code, rule|
+            errs += verify_validation(table, client_code, rule)
+          end
+        end
+        if errs.empty?
+          puts 'ExtendedColumnDefinitions is OK'
+        else
+          puts "ExtendedColumnDefinitions ERROR: #{errs.join(', ')}"
+        end
+      end
+
+      def verify_client_keys
+        errs = []
+        EXTENDED_COLUMNS.each { |_, v| v.keys.each { |key| errs << "Client code key must be a string: #{key.inspect}" unless key.is_a?(String) } }
+        errs
+      end
+
+      def verify_validation(table, client_code, rule)
+        errs = []
+        val = VALIDATIONS[table][client_code]
+        if val.nil?
+          errs << "#{table.inspect}/#{client_code} does not have a validation rule."
+        else
+          diff = rule.keys - val.rules.keys
+          errs << "#{table.inspect}/#{client_code} validation does not cover all columns (#{diff.join(', ')})" unless diff.empty?
+        end
+        errs
+      end
     end
   end
 end

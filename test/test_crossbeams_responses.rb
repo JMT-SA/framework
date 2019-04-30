@@ -85,4 +85,26 @@ class TestCrossbeamsResponses < Minitest::Test
     assert_equal({:in=>["is missing"]}, res.errors)
     assert_equal({ other: 'abc' }, res.instance)
   end
+
+  def test_mixed_validation_failed
+    schema = Dry::Validation.Params do
+      configure { config.type_specs = true }
+
+      required(:in, Types::StrippedString).filled(:str?)
+      required(:other, Types::StrippedString).filled(:str?)
+    end
+    validation = schema.call(other: 'abc')
+
+    schema2 = Dry::Validation.Params do
+      configure { config.type_specs = true }
+
+      required(:more, :integer).filled(:int?)
+      required(:extra, Types::StrippedString).filled(:str?)
+    end
+    validation2 = schema2.call(more: 'str')
+    res = @test_obj.mixed_validation_failed_response(validation, validation2)
+
+    assert_equal({:in=>["is missing"], :more => ['must be an integer'], :extra => ['is missing']}, res.errors)
+    assert_equal({ other: 'abc', more: 'str' }, res.instance)
+  end
 end

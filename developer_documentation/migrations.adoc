@@ -44,3 +44,99 @@ e.g. `rake db:migrate[20170101201533]` will:
 
 `rake db:recent_migrations` lists the 10 most recent migrations in decending order. This is useful to find the version for rolling back migrations.
 
+=== Special cases
+
+==== Created at and Updated at
+
+Automatic filling-in of `created_at` and `updated_at` columns with the current time by triggers when a row is inserted or updated.
+
+[source,ruby]
+----
+require 'sequel_postgresql_triggers'
+sequel.migration do
+  up do
+    extension :pg_triggers
+    create_table(:table_name, ignore_index_errors: true) do
+      primary_key :id
+      # …
+      datetime :created_at, null: false
+      datetime :updated_at, null: false
+    end
+
+    pgt_created_at(:table_name,
+                   :created_at,
+                   function_name: :table_name_set_created_at,
+                   trigger_name: :set_created_at)
+
+    pgt_updated_at(:table_name,
+                   :updated_at,
+                   function_name: :table_name_set_updated_at,
+                   trigger_name: :set_updated_at)
+  end
+
+  down do
+    drop_trigger(:table_name, :set_created_at)
+    drop_function(:table_name_set_created_at)
+    drop_trigger(:table_name, :set_updated_at)
+    drop_function(:table_name_set_updated_at)
+    drop_table :table_name
+  end
+end
+----
+
+==== Automatic logging of changes
+
+The trigger creates copies of rows on insert and update.
+
+See link:/developer_documentation/how_to_log_status_and_changes.adoc[how to log status and data changes].
+[source,ruby]
+----
+up do
+  run "SELECT audit.audit_table('table_name', true, true, '{updated_at}'::text[]);"
+end
+
+down do
+  # Drop logging for this table.
+  drop_trigger(:table_name, :audit_trigger_row)
+  drop_trigger(:table_name, :audit_trigger_stm)
+end
+----
+
+==== Automatic protection of special data
+
+Block users from changing table data that application code requires.
+
+See link:/developer_documentation/how_to_protect_masterfile_data.adoc[how to protect masterfile data].
+
+[source,ruby]
+----
+up do
+  unless ENV['RACK_ENV'] == 'test'
+    run <<~SQL
+      SELECT set_reserved_data_on_table('table_name', 'field_name', '{VALUE}'::text[]);
+    SQL
+  end
+end
+
+down do
+  unless ENV['RACK_ENV'] == 'test'
+    run <<~SQL
+      DROP TRIGGER check_for_reserved_data ON table_name;
+    SQL
+  end
+end
+----
+
+==== Extended columns
+
+See link:/developer_documentation/how_to_use_extended_columns.adoc[how to use extended columns].
+
+[source,ruby]
+----
+Sequel.migration do
+  change do
+    extension :pg_json
+    add_column :table_name, :extended_columns, :jsonb
+  end
+end
+----

@@ -8,9 +8,11 @@
 
 The following special environment variables are available when running the app:
 
+* `RACK_ENV` - Defaults to `development`. Is set to `test` automatically during test runs. Must be set to `production` in production environments. It is important to remember to set the environment to `production` in cron jobs or when running Rake tasks on deployed servers.
 * `NO_ERR_HANDLE` - Only applies in development mode. If set, the error_handler will not handle errors for you.
 * `DONOTLOGSQL` - If set, SQL statements are not included in the application logs. Note that statements are only logged in development mode.
 * `LOGSQLTOFILE` - If set, SQL will be logged to a separate file in the `log` directory.
+* `LOGFULLMESSERVERCALLS` - If set, all parameters sent in a POST message to MesServer will be logged. This can be useful for debugging. The default is to log just 300 characters of the body.
 
 === General
 

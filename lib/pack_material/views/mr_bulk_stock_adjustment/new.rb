@@ -13,7 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Mr Bulk Stock Adjustment'
+              form.caption 'New Bulk Stock Adjustment'
               form.action '/pack_material/transactions/mr_bulk_stock_adjustments'
               form.remote! if remote
               form.add_field :business_process_id

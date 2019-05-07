@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/transactions/mr_bulk_stock_adjustment_items/new"
-  :text: New Mr Bulk Stock Adjustment Item
+  :text: New Bulk Stock Adjustment Item
   :style: :button
   :behaviour: :popup

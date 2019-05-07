@@ -118,7 +118,7 @@
   mr_product_variant_id:
     :name: mr_product_variant_id
     :sequence_no: 6
-    :caption: Mr product variant
+    :caption: MR Product variant
     :namespaced_name: mr_delivery_items.mr_product_variant_id
     :data_type: :string
     :width: 
@@ -279,7 +279,7 @@
   mr_purchase_order_item_id:
     :name: mr_purchase_order_item_id
     :sequence_no: 16
-    :caption: Mr purchase order item
+    :caption: Purchase order item
     :namespaced_name: mr_delivery_items.mr_purchase_order_item_id
     :data_type: :string
     :width: 

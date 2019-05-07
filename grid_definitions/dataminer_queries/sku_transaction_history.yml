@@ -235,7 +235,7 @@
   mr_inventory_transaction_type_id:
     :name: mr_inventory_transaction_type_id
     :sequence_no: 14
-    :caption: Mr inventory transaction type
+    :caption: Inventory transaction type
     :namespaced_name: mr_inventory_transactions.mr_inventory_transaction_type_id
     :data_type: :integer
     :width: 
@@ -346,7 +346,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: mr_inventory_transactions.mr_inventory_transaction_type_id
-  :caption: Mr inventory transaction type
+  :caption: Inventory transaction type
   :data_type: :integer
   :control_type: :list
   :default_value: 

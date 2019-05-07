@@ -111,7 +111,7 @@
   mr_delivery_item_batch_id:
     :name: mr_delivery_item_batch_id
     :sequence_no: 7
-    :caption: Mr delivery item batch
+    :caption: Delivery item batch
     :namespaced_name: mr_skus.mr_delivery_item_batch_id
     :data_type: :integer
     :width: 
@@ -175,7 +175,7 @@
   mr_internal_batch_number_id:
     :name: mr_internal_batch_number_id
     :sequence_no: 11
-    :caption: Mr internal batch number
+    :caption: Internal batch number
     :namespaced_name: mr_skus.mr_internal_batch_number_id
     :data_type: :integer
     :width: 

@@ -682,7 +682,7 @@
   mr_id:
     :name: mr_id
     :sequence_no: 43
-    :caption: MR Variant id
+    :caption: Variant id
     :namespaced_name: material_resource_product_variants.id
     :data_type: :string
     :width: 
@@ -727,7 +727,7 @@
   mr_product_variant_number:
     :name: mr_product_variant_number
     :sequence_no: 46
-    :caption: Mr product variant number
+    :caption: Product variant number
     :namespaced_name: material_resource_product_variants.product_variant_number
     :data_type: :string
     :width: 
@@ -817,7 +817,7 @@
   mr_internal_batch_number_id:
     :name: mr_internal_batch_number_id
     :sequence_no: 52
-    :caption: Mr internal batch number
+    :caption: Internal batch number
     :namespaced_name: material_resource_product_variants.mr_internal_batch_number_id
     :data_type: :string
     :width: 

@@ -2,7 +2,7 @@
 :caption: Purchase Order Costs
 :sql: "SELECT \"mr_purchase_order_costs\".\"id\", \"mr_purchase_order_costs\".\"mr_cost_type_id\",
   \"mr_purchase_order_costs\".\"mr_purchase_order_id\", \"mr_purchase_order_costs\".\"amount\",
-  \"mr_cost_types\".\"cost_code_string\"\r\nFROM \"mr_purchase_order_costs\" LEFT
+  \"mr_cost_types\".\"cost_type_code\"\r\nFROM \"mr_purchase_order_costs\" LEFT
   JOIN \"mr_cost_types\" ON \"mr_cost_types\".\"id\" = \"mr_purchase_order_costs\".\"mr_cost_type_id\"
   \r\nLEFT JOIN \"mr_purchase_orders\" ON \"mr_purchase_orders\".\"id\" = \"mr_purchase_order_costs\".\"mr_purchase_order_id\""
 :limit: 
@@ -70,11 +70,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cost_code_string:
-    :name: cost_code_string
+  cost_type_code:
+    :name: cost_type_code
     :sequence_no: 5
-    :caption: Cost code string
-    :namespaced_name: mr_cost_types.cost_code_string
+    :caption: Cost Type Code
+    :namespaced_name: mr_cost_types.cost_type_code
     :data_type: :string
     :width: 
     :format: 

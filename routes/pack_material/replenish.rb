@@ -63,7 +63,7 @@ class Framework < Roda
             ]
             sub_totals = interactor.po_sub_totals(id)
             json_actions(po_sub_total_changes(sub_totals) +
-                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys, cost_code_string: res.instance[:cost_type]))], res.message)
+                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys, cost_type_code: res.instance[:cost_type]))], res.message)
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_costs/new") do
               PackMaterial::Replenish::MrPurchaseOrderCost::New.call(id,
@@ -232,7 +232,7 @@ class Framework < Roda
                                          {
                                            mr_cost_type_id: res.instance[:mr_cost_type_id],
                                            mr_purchase_order_id: res.instance[:mr_purchase_order_id],
-                                           cost_code_string: res.instance[:cost_type],
+                                           cost_type_code: res.instance[:cost_type],
                                            amount: res.instance[:amount]
                                          })], res.message)
           else
@@ -567,6 +567,71 @@ class Framework < Roda
         else
           attrs = interactor.resolve_print_sku_barcode_params(params)
           re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(attrs[:id], form_values: params[:mr_delivery_item_batch], form_errors: res.errors, type: attrs[:type]) }
+        end
+      end
+    end
+
+    # MR COST TYPES
+    # --------------------------------------------------------------------------
+    r.on 'mr_cost_types', Integer do |id|
+      interactor = PackMaterialApp::MrCostTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:mr_cost_types, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('replenish', 'edit')
+        show_partial { PackMaterial::Replenish::MrCostType::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('replenish', 'read')
+          show_partial { PackMaterial::Replenish::MrCostType::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mr_cost_type(id, params[:mr_cost_type])
+          if res.success
+            update_grid_row(id, changes: { cost_type_code: res.instance[:cost_type_code] },
+                            notice: res.message)
+          else
+            re_show_form(r, res) { PackMaterial::Replenish::MrCostType::Edit.call(id, form_values: params[:mr_cost_type], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('replenish', 'delete')
+          res = interactor.delete_mr_cost_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+    r.on 'mr_cost_types' do
+      interactor = PackMaterialApp::MrCostTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'new' do    # NEW
+        check_auth!('replenish', 'new')
+        show_partial_or_page(r) { PackMaterial::Replenish::MrCostType::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_mr_cost_type(params[:mr_cost_type])
+        if res.success
+          row_keys = %i[
+            id
+            cost_type_code
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/pack_material/replenish/mr_cost_types/new') do
+            PackMaterial::Replenish::MrCostType::New.call(form_values: params[:mr_cost_type],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
         end
       end
     end

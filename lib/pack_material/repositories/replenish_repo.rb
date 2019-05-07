@@ -27,10 +27,10 @@ module PackMaterialApp
     crud_calls_for :mr_vat_types, name: :mr_vat_type, wrapper: MrVatType
 
     build_for_select :mr_cost_types,
-                     label: :cost_code_string,
+                     label: :cost_type_code,
                      value: :id,
                      no_active_check: true,
-                     order_by: :cost_code_string
+                     order_by: :cost_type_code
 
     crud_calls_for :mr_cost_types, name: :mr_cost_type, wrapper: MrCostType
 
@@ -85,7 +85,7 @@ module PackMaterialApp
 
     def find_mr_purchase_order_cost(id)
       find_with_association(:mr_purchase_order_costs, id,
-                            parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_code_string: :cost_type } }],
+                            parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_type_code: :cost_type } }],
                             wrapper: MrPurchaseOrderCost)
     end
 

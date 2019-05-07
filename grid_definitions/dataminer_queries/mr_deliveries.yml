@@ -8,8 +8,9 @@
   \ \"mr_deliveries\".\"supplier_invoice_ref_number\",\r\n  \"mr_deliveries\".\"client_delivery_ref_number\",\r\n
   \ \"mr_deliveries\".\"driver_name\",\r\n  \"mr_deliveries\".\"vehicle_registration\",\r\n
   \ \"mr_deliveries\".\"created_at\",\r\n  \"mr_deliveries\".\"updated_at\",\r\n  case\r\n
-  \ when (mr_deliveries.verified and not mr_deliveries.putaway_completed) then 'inprogress'\r\n
-  \ else null\r\n  end as colour_rule\r\nFROM \"mr_deliveries\"\r\nORDER BY \"mr_deliveries\".\"delivery_number\"
+  \ when mr_deliveries.invoice_error then 'error'\r\n  when (mr_deliveries.verified
+  and not mr_deliveries.putaway_completed) then 'inprogress'\r\n  else null\r\n  end
+  as colour_rule\r\nFROM \"mr_deliveries\"\r\nORDER BY \"mr_deliveries\".\"delivery_number\"
   desc"
 :limit: 
 :offset: 

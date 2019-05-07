@@ -1,0 +1,29 @@
+---
+:dataminer_definition: mr_cost_types
+:actions:
+- :url: "/pack_material/replenish/mr_cost_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/pack_material/replenish/mr_cost_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/pack_material/replenish/mr_cost_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/development/statuses/list/mr_cost_types/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/replenish/mr_cost_types/new"
+  :text: New Cost Type
+  :style: :button
+  :behaviour: :popup

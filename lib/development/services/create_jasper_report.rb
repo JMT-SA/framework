@@ -33,6 +33,7 @@ class CreateJasperReport < BaseService
   def call
     result = run_report
     clear_temp_file
+    log_report_result(result)
 
     if result.to_s.include?('JMT Jasper error:') && (errors = result.split('JMT Jasper error:')).length.positive?
       failed_response("Jasper printing error: <BR> #{errors[1]}")
@@ -62,12 +63,30 @@ class CreateJasperReport < BaseService
   end
 
   def run_report
+    log_report_details
+
     File.open(print_command_file_name, 'w') do |f|
       f.puts "cd #{path}"
-      f.puts "java -jar JasperReportPrinter.jar \"#{report_dir}\" #{report_name} \"#{printer}\" \"#{connection_string}\" #{report_parameters}"
+      f.puts command
     end
 
     `sh #{print_command_file_name}`
+  end
+
+  def command
+    @command ||= "java -jar JasperReportPrinter.jar \"#{report_dir}\" #{report_name} \"#{printer}\" \"#{connection_string}\" #{report_parameters}"
+  end
+
+  def log_report_details
+    puts "--- JASPER REPORT : #{report_name} :: #{Time.now}"
+    puts "USER   : #{user}"
+    puts "COMMAND: #{command}"
+    puts '-'
+  end
+
+  def log_report_result(result)
+    puts "RESULT : #{result}"
+    puts '---'
   end
 
   def report_dir

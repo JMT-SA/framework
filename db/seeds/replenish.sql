@@ -29,8 +29,6 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
 WHERE functional_area_name = 'Pack Material')),
         'Search Purchase Orders', 'Purchase Orders', '/search/mr_purchase_orders', 2);
 
-INSERT INTO address_types (address_type) VALUES ('Delivery Address');
-
 
 -- Delivery Terms
 INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)

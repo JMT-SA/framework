@@ -1,5 +1,3 @@
-INSERT INTO roles (name) VALUES ('IMPLEMENTATION_OWNER');
-INSERT INTO roles (name) VALUES ('TRANSPORTER');
 
 INSERT INTO functional_areas (functional_area_name)
 VALUES ('Masterfiles');
@@ -69,7 +67,6 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Parties'
 WHERE functional_area_name = 'Masterfiles')),
         'Customers', '/list/customers', 2);
 
-INSERT INTO roles (name) VALUES ('CUSTOMER');
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Parties'
@@ -83,7 +80,6 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Parties'
 WHERE functional_area_name = 'Masterfiles')),
         'Suppliers', '/list/suppliers', 2);
 
-INSERT INTO roles (name) VALUES ('SUPPLIER');
 
 -- FRUIT
 INSERT INTO programs (program_name, program_sequence, functional_area_id)

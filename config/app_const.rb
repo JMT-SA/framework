@@ -4,6 +4,7 @@
 class AppConst
   # Client-specific code
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
+  IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
 
   # Constants for roles:
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'

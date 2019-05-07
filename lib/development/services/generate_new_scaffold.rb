@@ -980,7 +980,10 @@ module DevelopmentApp
               end
 
               def make_form_object
-                make_new_form_object && return if @mode == :new
+                if @mode == :new
+                  make_new_form_object
+                  return
+                end
 
                 @form_object = @repo.find_#{opts.singlename}(@options[:id])
               end

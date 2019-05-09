@@ -75,6 +75,14 @@ module PackMaterialApp
 
     crud_calls_for :mr_delivery_item_batches, name: :mr_delivery_item_batch, wrapper: MrDeliveryItemBatch
 
+    build_for_select :mr_purchase_invoice_costs,
+                     label: :id,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :id
+
+    crud_calls_for :mr_purchase_invoice_costs, name: :mr_purchase_invoice_cost, wrapper: MrPurchaseInvoiceCost
+
     def find_mr_purchase_order(id)
       find_with_association(:mr_purchase_orders, id,
                             lookup_functions: [{ function: :fn_current_status,
@@ -87,6 +95,12 @@ module PackMaterialApp
       find_with_association(:mr_purchase_order_costs, id,
                             parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_type_code: :cost_type } }],
                             wrapper: MrPurchaseOrderCost)
+    end
+
+    def find_mr_purchase_invoice_cost(id)
+      find_with_association(:mr_purchase_invoice_costs, id,
+                            parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_type_code: :cost_type } }],
+                            wrapper: MrPurchaseInvoiceCost)
     end
 
     def find_mr_purchase_order_item(id)
@@ -154,7 +168,7 @@ module PackMaterialApp
       ).get(:mr_purchase_order_id)
     end
 
-    def sub_totals(id)
+    def po_sub_totals(id)
       subtotal = po_total_items(id)
       costs = po_total_costs(id)
       vat = po_total_vat(id, subtotal)
@@ -199,6 +213,14 @@ module PackMaterialApp
       update(:mr_deliveries, id, verified: true)
     end
 
+    def delivery_complete_invoice(id, attrs)
+      update(:mr_deliveries, id,
+             invoice_error: false,
+             invoice_completed: true,
+             erp_purchase_order_number: attrs[:erp_purchase_order_number],
+             erp_purchase_invoice_number: attrs[:erp_purchase_invoice_number])
+    end
+
     def mr_delivery_items(mr_delivery_id)
       DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).select_map(:id)
     end
@@ -218,6 +240,11 @@ module PackMaterialApp
           id: delivery_item_id
         ).get(:mr_product_variant_id)
       ).get(:use_fixed_batch_number)
+    end
+
+    def items_without_prices(mr_delivery_id)
+      items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map(:invoiced_unit_price)
+      items.include?(nil)
     end
 
     def delivery_item_batches(mr_delivery_item_id)
@@ -486,6 +513,31 @@ module PackMaterialApp
         SKU (#{sku_number_from_id(sku_id)}): #{product_variant_code}<br>
         #{item.get(:quantity_putaway).to_i} of #{item.get(:quantity_received).to_i} items.<br>
       HTML
+    end
+
+    def inline_update_delivery_item(id, attrs)
+      val = attrs[:column_value].empty? ? nil : attrs[:column_value]
+      update(:mr_delivery_items, id, invoiced_unit_price: val)
+    end
+
+    def del_sub_totals(id)
+      subtotal = del_total_items(id)
+      costs = del_total_costs(id)
+      # vat = del_total_vat(id, subtotal)
+      {
+        subtotal: UtilityFunctions.delimited_number(subtotal),
+        costs: UtilityFunctions.delimited_number(costs),
+        # vat: UtilityFunctions.delimited_number(vat),
+        total: UtilityFunctions.delimited_number(subtotal + costs)
+      }
+    end
+
+    def del_total_items(id)
+      DB['SELECT SUM(quantity_received * invoiced_unit_price) AS total FROM mr_delivery_items WHERE mr_delivery_id = ?', id].single_value || BigDecimal('0')
+    end
+
+    def del_total_costs(id)
+      DB[:mr_purchase_invoice_costs].where(mr_delivery_id: id).sum(:amount) || BigDecimal('0')
     end
   end
 end

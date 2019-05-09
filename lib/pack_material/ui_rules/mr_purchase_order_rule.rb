@@ -8,9 +8,9 @@ module UiRules
       make_form_object
       apply_form_values
 
-      rules[:can_approve] = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder.call(:approve, @options[:id]) unless @mode == :new || @mode == :preselect
-      rules[:sub_totals] = @repo.sub_totals(@options[:id]) if @mode == :edit
-      rules[:show_only] = @form_object.approved if @mode == :edit
+      rules[:can_approve]   = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder.call(:approve, @options[:id]) unless @mode == :new || @mode == :preselect
+      rules[:po_sub_totals] = @repo.po_sub_totals(@options[:id]) if @mode == :edit
+      rules[:show_only]     = @form_object.approved if @mode == :edit
 
       common_values_for_fields case @mode
                                when :edit
@@ -105,18 +105,6 @@ module UiRules
     def preselect_fields
       {
         supplier_id: { renderer: :select, options: @repo.for_select_suppliers, caption: 'Please select the Supplier', required: true }
-      }
-    end
-
-    def address_fields
-      {
-        delivery_address_id: {
-          renderer: :select,
-          options: @party_repo.for_select_addresses_for_party(party_role_id: @form_object.supplier_party_role_id,
-                                                              address_type: 'Delivery Address'),
-          caption: 'Delivery Address',
-          required: true
-        }
       }
     end
 

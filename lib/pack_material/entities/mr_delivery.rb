@@ -16,5 +16,7 @@ module PackMaterialApp
     attribute :verified, Types::Bool
     attribute :putaway_completed, Types::Bool
     attribute :status, Types::String
+    attribute :supplier_invoice_date, Types::DateTime
+    attribute :invoice_completed, Types::Bool
   end
 end

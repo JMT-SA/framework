@@ -13,5 +13,7 @@ module PackMaterialApp
     attribute :invoiced_unit_price, Types::Decimal
     attribute :remarks, Types::String
     attribute :putaway_completed, Types::Bool
+    attribute :product_variant_number, Types::Integer.optional
+    attribute :product_variant_code, Types::String.optional
   end
 end

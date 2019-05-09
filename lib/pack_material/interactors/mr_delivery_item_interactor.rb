@@ -66,12 +66,27 @@ module PackMaterialApp
       end
     end
 
+    def inline_update(id, params)
+      repo.transaction do
+        repo.inline_update_delivery_item(id, params)
+        log_status('mr_delivery_items', id, 'INLINE ADJUSTMENT')
+        log_transaction
+      end
+      success_response('Updated delivery item invoice unit price')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def available_purchase_order_items(purchase_order_id, delivery_id)
       repo.for_select_remaining_purchase_order_items(purchase_order_id, delivery_id)
     end
 
     def purchase_order_id_for_delivery_item(delivery_item_id)
       repo.purchase_order_id_for_delivery_item(delivery_item_id)
+    end
+
+    def can_complete_invoice(parent_id)
+      TaskPermissionCheck::MrDelivery.call(:complete_invoice, parent_id)
     end
   end
 end

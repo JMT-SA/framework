@@ -13,7 +13,11 @@ module PackMaterialApp
     required(:client_delivery_ref_number, Types::StrippedString).filled(:str?)
     optional(:delivery_number, :integer).filled(:int?)
     required(:vehicle_registration, Types::StrippedString).filled(:str?)
-    required(:supplier_invoice_ref_number, Types::StrippedString).maybe(:str?)
+  end
+
+  MrDeliveryPurchaseInvoiceSchema = Dry::Validation.Params do
+    required(:supplier_invoice_ref_number, Types::StrippedString).filled(:str?)
+    required(:supplier_invoice_date, Types::DateTime).filled(:date_time?)
   end
 
   MrDeliveryPutawaySchema = Dry::Validation.Params do

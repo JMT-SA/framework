@@ -96,10 +96,10 @@ module PackMaterial
           <<~HTML
             <div class="fr">
             <table><tbody>
-            <tr><th class="tr pr2">Sub-total</th><td class="tr"><span id="po_totals_subtotal">#{rules[:sub_totals][:subtotal]}</span></td></tr>
-            <tr><th class="tr pr2">Costs</th><td class="tr"><span id="po_totals_costs">#{rules[:sub_totals][:costs]}</span></td></tr>
-            <tr><th class="tr pr2">VAT</th><td class="tr"><span id="po_totals_vat">#{rules[:sub_totals][:vat]}</span></td></tr>
-            <tr><th class="tr pr2">Total</th><td class="tr b bb bt"><span id="po_totals_total">#{rules[:sub_totals][:total]}</span></td></tr>
+            <tr><th class="tr pr2">Sub-total</th><td class="tr"><span id="po_totals_subtotal">#{rules[:po_sub_totals][:subtotal]}</span></td></tr>
+            <tr><th class="tr pr2">Costs</th><td class="tr"><span id="po_totals_costs">#{rules[:po_sub_totals][:costs]}</span></td></tr>
+            <tr><th class="tr pr2">VAT</th><td class="tr"><span id="po_totals_vat">#{rules[:po_sub_totals][:vat]}</span></td></tr>
+            <tr><th class="tr pr2">Total</th><td class="tr b bb bt"><span id="po_totals_total">#{rules[:po_sub_totals][:total]}</span></td></tr>
             </tbody></table>
             </div>
           HTML

@@ -35,7 +35,7 @@ module UiRules
         quantity_over_supplied: { renderer: :numeric },
         quantity_under_supplied: { renderer: :numeric },
         quantity_received: { renderer: :numeric, required: true },
-        invoiced_unit_price: { renderer: :numeric, required: true },
+        invoiced_unit_price: { renderer: :numeric },
         remarks: {}
       }
     end

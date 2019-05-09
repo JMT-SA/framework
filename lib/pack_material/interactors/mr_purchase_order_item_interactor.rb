@@ -68,9 +68,9 @@ module PackMaterialApp
 
     def po_sub_totals(id = nil, parent_id: nil)
       if parent_id
-        repo.sub_totals(parent_id)
+        repo.po_sub_totals(parent_id)
       else
-        repo.sub_totals(mr_purchase_order_item(id).mr_purchase_order_id)
+        repo.po_sub_totals(mr_purchase_order_item(id).mr_purchase_order_id)
       end
     end
   end

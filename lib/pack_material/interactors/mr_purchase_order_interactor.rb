@@ -70,7 +70,7 @@ module PackMaterialApp
     end
 
     def po_sub_totals(id)
-      repo.sub_totals(id)
+      repo.po_sub_totals(id)
     end
 
     private

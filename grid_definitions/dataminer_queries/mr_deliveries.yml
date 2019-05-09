@@ -2,10 +2,10 @@
 :caption: Deliveries
 :sql: "SELECT\r\n  \"mr_deliveries\".\"id\" as id,\r\nfn_current_status('mr_deliveries',
   id) AS status,\r\n  \"mr_deliveries\".\"delivery_number\",\r\n\"mr_deliveries\".\"verified\",\r\n
-  \ \"mr_deliveries\".\"putaway_completed\",\r\n  \"mr_deliveries\".\"receipt_transaction_id\",\r\n
-  \ \"mr_deliveries\".\"putaway_transaction_id\",\r\n  \"mr_deliveries\".\"transporter_party_role_id\",\r\n
-  \ fn_party_role_name(\"mr_deliveries\".\"transporter_party_role_id\") AS transporter,\r\n
-  \ \"mr_deliveries\".\"supplier_invoice_ref_number\",\r\n  \"mr_deliveries\".\"client_delivery_ref_number\",\r\n
+  \ \"mr_deliveries\".\"invoice_completed\",\r\n  \"mr_deliveries\".\"putaway_completed\",\r\n
+  \ \"mr_deliveries\".\"receipt_transaction_id\",\r\n  \"mr_deliveries\".\"putaway_transaction_id\",\r\n
+  \ \"mr_deliveries\".\"transporter_party_role_id\",\r\n  fn_party_role_name(\"mr_deliveries\".\"transporter_party_role_id\")
+  AS transporter,\r\n  \"mr_deliveries\".\"supplier_invoice_ref_number\",\r\n  \"mr_deliveries\".\"client_delivery_ref_number\",\r\n
   \ \"mr_deliveries\".\"driver_name\",\r\n  \"mr_deliveries\".\"vehicle_registration\",\r\n
   \ \"mr_deliveries\".\"created_at\",\r\n  \"mr_deliveries\".\"updated_at\",\r\n  case\r\n
   \ when mr_deliveries.invoice_error then 'error'\r\n  when (mr_deliveries.verified
@@ -80,9 +80,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  invoice_completed:
+    :name: invoice_completed
+    :sequence_no: 5
+    :caption: Invoice completed
+    :namespaced_name: mr_deliveries.invoice_completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   putaway_completed:
     :name: putaway_completed
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Putaway completed
     :namespaced_name: mr_deliveries.putaway_completed
     :data_type: :boolean
@@ -98,7 +114,7 @@
     :group_max: false
   receipt_transaction_id:
     :name: receipt_transaction_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Receipt transaction
     :namespaced_name: mr_deliveries.receipt_transaction_id
     :data_type: :integer
@@ -114,7 +130,7 @@
     :group_max: false
   putaway_transaction_id:
     :name: putaway_transaction_id
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Putaway transaction
     :namespaced_name: mr_deliveries.putaway_transaction_id
     :data_type: :integer
@@ -130,7 +146,7 @@
     :group_max: false
   transporter_party_role_id:
     :name: transporter_party_role_id
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Transporter party role
     :namespaced_name: mr_deliveries.transporter_party_role_id
     :data_type: :integer
@@ -146,7 +162,7 @@
     :group_max: false
   transporter:
     :name: transporter
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Transporter
     :namespaced_name: 
     :data_type: :string
@@ -162,7 +178,7 @@
     :group_max: false
   supplier_invoice_ref_number:
     :name: supplier_invoice_ref_number
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Supplier invoice ref number
     :namespaced_name: mr_deliveries.supplier_invoice_ref_number
     :data_type: :string
@@ -178,7 +194,7 @@
     :group_max: false
   client_delivery_ref_number:
     :name: client_delivery_ref_number
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Client delivery ref number
     :namespaced_name: mr_deliveries.client_delivery_ref_number
     :data_type: :string
@@ -194,7 +210,7 @@
     :group_max: false
   driver_name:
     :name: driver_name
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Driver name
     :namespaced_name: mr_deliveries.driver_name
     :data_type: :string
@@ -210,7 +226,7 @@
     :group_max: false
   vehicle_registration:
     :name: vehicle_registration
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Vehicle registration
     :namespaced_name: mr_deliveries.vehicle_registration
     :data_type: :string
@@ -226,7 +242,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Created at
     :namespaced_name: mr_deliveries.created_at
     :data_type: :datetime
@@ -242,7 +258,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Updated at
     :namespaced_name: mr_deliveries.updated_at
     :data_type: :datetime
@@ -258,7 +274,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

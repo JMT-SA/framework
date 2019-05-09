@@ -54,8 +54,17 @@ module UiRules
     def form_object_for_barcode_print # rubocop:disable Metrics/AbcSize
       @rules[:mr_delivery_item_batch_id] = @options[:type] == 'item_batch' ? @options[:id] : nil
       @rules[:delivery_item_id] = @options[:type] == 'internal_batch' ? @options[:id] : nil
+      @rules[:mr_sku_id] = @options[:type] == 'none' ? @options[:id] : nil
 
-      rec = @options[:type] == 'item_batch' ? @repo.sku_info_from_batch_id(@options[:id]) : @repo.sku_info_from_item_id(@options[:id])
+      rec = case @options[:type]
+            when 'item_batch'
+              @repo.sku_info_from_batch_id(@options[:id])
+            when 'internal_batch'
+              @repo.sku_info_from_item_id(@options[:id])
+            when 'none'
+              @repo.sku_info_from_sku_id(@options[:id])
+            end
+
       @form_object = OpenStruct.new(rec.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE)))
     end
 

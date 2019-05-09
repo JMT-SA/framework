@@ -5,6 +5,6 @@ module MasterfilesApp
     attribute :id, Types::Integer
     attribute :uom_type_id, Types::Integer
     attribute :uom_code, Types::String
-    attribute :uom_type_code, Types::String.optional
+    attribute? :uom_type_code, Types::String.optional
   end
 end

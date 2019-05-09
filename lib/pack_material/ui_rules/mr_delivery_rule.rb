@@ -59,7 +59,7 @@ module UiRules
     def invoice_fields
       {
         supplier_invoice_ref_number: { required: true, with_value: @form_object.supplier_invoice_ref_number },
-        supplier_invoice_date: { subtype: :datetime, required: true }
+        supplier_invoice_date: { subtype: :date, required: true }
       }
     end
 

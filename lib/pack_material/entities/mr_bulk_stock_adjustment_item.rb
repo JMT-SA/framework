@@ -11,7 +11,7 @@ module PackMaterialApp
     attribute :product_variant_code, Types::String
     attribute :location_long_code, Types::String
     attribute :inventory_uom_id, Types::Integer
-    attribute :inventory_uom_code, Types::String.optional
+    attribute? :inventory_uom_code, Types::String.optional
     attribute :scan_to_location_long_code, Types::String
     attribute :system_quantity, Types::Decimal
     attribute :actual_quantity, Types::Decimal

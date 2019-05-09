@@ -1,0 +1,8 @@
+---
+:dataminer_definition: mr_skus
+:actions:
+- :url: "/pack_material/replenish/print_sku_barcode?mr_sku_id=$:id$"
+  :text: Print SKU barcode
+  :icon: printer
+  :title: Print SKU barcode
+  :popup: true

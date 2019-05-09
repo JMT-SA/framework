@@ -5,7 +5,7 @@ module PackMaterialApp
     attribute :id, Types::Integer
     attribute :material_resource_type_id, Types::Integer
     attribute :inventory_uom_id, Types::Integer
-    attribute :inventory_uom_code, Types::String.optional
+    attribute? :inventory_uom_code, Types::String.optional
     attribute :sub_type_name, Types::String
     attribute :short_code, Types::String
     attribute :product_code_separator, Types::String

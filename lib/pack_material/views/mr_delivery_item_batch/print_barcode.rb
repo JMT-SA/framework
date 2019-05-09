@@ -11,6 +11,7 @@ module PackMaterial
 
           url_params = "mr_delivery_item_batch_id=#{rules[:mr_delivery_item_batch_id]}" if type == 'item_batch'
           url_params = "mr_delivery_item_id=#{rules[:delivery_item_id]}" if type == 'internal_batch'
+          url_params = "mr_sku_id=#{rules[:mr_sku_id]}" if type == 'none'
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object

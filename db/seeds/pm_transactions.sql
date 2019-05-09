@@ -48,3 +48,11 @@ INSERT INTO crossbeams_framework.public.location_storage_types (storage_type_cod
 --   Vehicle Types
 --   Vehicles
 --   Vehicle Jobs
+
+
+-- SEARCH menu item
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Transactions'
+                                       AND functional_area_id = (SELECT id FROM functional_areas
+WHERE functional_area_name = 'Pack Material')),
+         'Search SKUs', '/search/mr_skus', 5);

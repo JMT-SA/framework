@@ -55,7 +55,7 @@ module PackMaterialApp
     end
 
     def print_sku_barcode(params)
-      instance = repo.sku_for_barcode(mr_delivery_item_id: params[:mr_delivery_item_id], mr_delivery_item_batch_id: params[:mr_delivery_item_batch_id])
+      instance = repo.sku_for_barcode(sku_id: params[:mr_sku_id], mr_delivery_item_id: params[:mr_delivery_item_id], mr_delivery_item_batch_id: params[:mr_delivery_item_batch_id])
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, params[:mr_delivery_item_batch])
     end
 
@@ -63,13 +63,18 @@ module PackMaterialApp
       res = validate_print_sku_barcode_params(params)
       return nil unless res.messages.empty?
 
-      type = params[:mr_delivery_item_batch_id] ? 'item_batch' : 'internal_batch'
-      id = type == 'item_batch' ? params[:mr_delivery_item_batch_id] : params[:mr_delivery_item_id]
+      id = params[:mr_delivery_item_batch_id] || params[:mr_delivery_item_id] || params[:mr_sku_id]
+      type = nil
       sku_id = nil
       if params[:mr_delivery_item_batch_id]
+        type = 'item_batch'
         sku_id = repo.sku_id_for_delivery_item_batch(params[:mr_delivery_item_batch_id])
       elsif params[:mr_delivery_item_id]
+        type = 'internal_batch'
         sku_id = repo.sku_id_for_delivery_item(params[:mr_delivery_item_id])
+      elsif params[:mr_sku_id]
+        type = 'none'
+        sku_id = params[:mr_sku_id]
       end
       {
         type: type,

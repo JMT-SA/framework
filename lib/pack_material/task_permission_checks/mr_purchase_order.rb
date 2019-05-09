@@ -37,9 +37,9 @@ module PackMaterialApp
       end
 
       def approve_check
+        return failed_response('Purchase Order has no items') if no_items?
         return all_ok if no_purchase_order_number?
         return failed_response('Purchase Order is already approved') if approved?
-        return failed_response('Purchase Order has no items') if no_items?
         all_ok
       end
 

@@ -338,7 +338,8 @@ class Framework < Roda
           show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItem::Preselect.call(id, purchase_order_id: flash[:purchase_order_id]) }
         end
         r.on 'purchase_order_changed' do
-          options_array = item_interactor.available_purchase_order_items(params[:changed_value], id)
+          po_id = params[:changed_value].empty? ? nil : params[:changed_value]
+          options_array = po_id ? item_interactor.available_purchase_order_items(params[:changed_value], id) : []
           json_replace_select_options('mr_delivery_item_mr_purchase_order_item_id', options_array, message: nil, keep_dialog_open: true)
         end
         r.on 'done' do
@@ -352,13 +353,12 @@ class Framework < Roda
           r.post do
             check_auth!('replenish', 'new')
             item_id = params[:mr_delivery_item][:mr_purchase_order_item_id]
-            if item_id
+            if item_id && !item_id.empty?
               re_show_form(r, OpenStruct.new(message: nil), url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new/#{item_id}") do
-                PackMaterial::Replenish::MrDeliveryItem::New.call(id, item_id)
+                PackMaterial::Replenish::MrDeliveryItem::New.call(id, Integer(item_id))
               end
             else
-              flash[:error] = 'No Purchase Order Item was selected'
-              redirect_to_stored_referer(r, :delivery_items)
+              show_json_error('No Purchase Order Item was selected', status: 200)
             end
           end
         end

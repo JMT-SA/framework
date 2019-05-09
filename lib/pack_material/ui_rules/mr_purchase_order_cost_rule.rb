@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields
-      mr_cost_type_id_label = @repo.find_mr_cost_type(@form_object.mr_cost_type_id)&.cost_code_string
+      mr_cost_type_id_label = @repo.find_mr_cost_type(@form_object.mr_cost_type_id)&.cost_type_code
       fields[:mr_cost_type_id] = { renderer: :label, with_value: mr_cost_type_id_label, caption: 'Cost Type' }
       fields[:mr_purchase_order_id] = { renderer: :hidden }
       fields[:amount] = { renderer: :label }

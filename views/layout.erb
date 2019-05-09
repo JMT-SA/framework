@@ -118,6 +118,14 @@
     <script src="/js/multi.min.js"></script>
     <script src="/js/a11y-dialog-cbeam.js"></script>
     <script>
+      // Work around bug in SelectR (https://github.com/Mobius1/Selectr/issues/72):
+      Object.defineProperty(Selectr.prototype, 'mobileDevice', {
+        get() { return false; },
+        set() {},
+        enumerable: true,
+        configurable: true,
+      });
+
       let crossbeamsDialogLevel1;
       let crossbeamsDialogLevel2;
       // Prefix all jQuery AJAX post requests with the CSRF token.

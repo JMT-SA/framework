@@ -1,7 +1,8 @@
 ---
 :caption: SKU Transaction History
-:sql: "SELECT\r\n  mr_skus.id,\r\n  mr_skus.sku_number,\r\n  \"mr_inventory_transaction_items\".id
-  as item_id,\r\n  \"mr_inventory_transaction_items\".quantity,\r\n  \"mr_inventory_transaction_items\".inventory_uom_id,\r\n
+:sql: "SELECT\r\n  mr_skus.id,\r\n  mr_skus.sku_number,\r\n  m2.product_variant_code,\r\nfn_formatted_product_variant_number(m2.product_variant_number)
+  AS product_variant_number,\r\n  \"mr_inventory_transaction_items\".id as item_id,\r\n
+  \ \"mr_inventory_transaction_items\".quantity,\r\n  \"mr_inventory_transaction_items\".inventory_uom_id,\r\n
   \ uoms.uom_code,\r\n  \"mr_inventory_transaction_items\".from_location_id,\r\n  \"mr_inventory_transactions\".\"to_location_id\",\r\n
   \ from_locations.\"location_long_code\" as from_location_long_code,\r\n  to_locations.\"location_long_code\"
   as to_location_long_code,\r\n  \"mr_inventory_transactions\".\"ref_no\",\r\n  \"mr_inventory_transactions\".\"id\"
@@ -18,7 +19,8 @@
   JOIN \"business_processes\" ON \"business_processes\".\"id\" = \"mr_inventory_transactions\".\"business_process_id\"\r\n
   \ LEFT JOIN \"mr_inventory_transaction_types\" ON \"mr_inventory_transaction_types\".\"id\"
   = \"mr_inventory_transactions\".\"mr_inventory_transaction_type_id\"\r\n  LEFT JOIN
-  uoms ON uoms.id = \"mr_inventory_transaction_items\".inventory_uom_id"
+  uoms ON uoms.id = \"mr_inventory_transaction_items\".inventory_uom_id\r\nLEFT JOIN
+  material_resource_product_variants m2 on mr_skus.mr_product_variant_id = m2.id"
 :limit: 
 :offset: 
 :external_settings:
@@ -56,9 +58,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  product_variant_code:
+    :name: product_variant_code
+    :sequence_no: 3
+    :caption: Product variant code
+    :namespaced_name: m2.product_variant_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_number:
+    :name: product_variant_number
+    :sequence_no: 4
+    :caption: Product variant number
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   item_id:
     :name: item_id
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Item
     :namespaced_name: mr_inventory_transaction_items.id
     :data_type: :string
@@ -74,7 +108,7 @@
     :group_max: false
   quantity:
     :name: quantity
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Quantity
     :namespaced_name: mr_inventory_transaction_items.quantity
     :data_type: :string
@@ -90,7 +124,7 @@
     :group_max: false
   inventory_uom_id:
     :name: inventory_uom_id
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Inventory uom
     :namespaced_name: mr_inventory_transaction_items.inventory_uom_id
     :data_type: :string
@@ -106,7 +140,7 @@
     :group_max: false
   uom_code:
     :name: uom_code
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: UOM code
     :namespaced_name: uoms.uom_code
     :data_type: :string
@@ -122,7 +156,7 @@
     :group_max: false
   from_location_id:
     :name: from_location_id
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: From location
     :namespaced_name: mr_inventory_transaction_items.from_location_id
     :data_type: :string
@@ -138,7 +172,7 @@
     :group_max: false
   to_location_id:
     :name: to_location_id
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: To location
     :namespaced_name: mr_inventory_transactions.to_location_id
     :data_type: :integer
@@ -154,7 +188,7 @@
     :group_max: false
   from_location_long_code:
     :name: from_location_long_code
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: From location code
     :namespaced_name: from_locations.location_long_code
     :data_type: :string
@@ -170,7 +204,7 @@
     :group_max: false
   to_location_long_code:
     :name: to_location_long_code
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: To location code
     :namespaced_name: to_locations.location_long_code
     :data_type: :string
@@ -186,7 +220,7 @@
     :group_max: false
   ref_no:
     :name: ref_no
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Ref no
     :namespaced_name: mr_inventory_transactions.ref_no
     :data_type: :string
@@ -202,7 +236,7 @@
     :group_max: false
   transaction_id:
     :name: transaction_id
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Transaction
     :namespaced_name: mr_inventory_transactions.id
     :data_type: :string
@@ -218,7 +252,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Created by
     :namespaced_name: mr_inventory_transactions.created_by
     :data_type: :string
@@ -234,7 +268,7 @@
     :group_max: false
   mr_inventory_transaction_type_id:
     :name: mr_inventory_transaction_type_id
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Inventory transaction type
     :namespaced_name: mr_inventory_transactions.mr_inventory_transaction_type_id
     :data_type: :integer
@@ -250,7 +284,7 @@
     :group_max: false
   type_name:
     :name: type_name
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Type name
     :namespaced_name: mr_inventory_transaction_types.type_name
     :data_type: :string
@@ -266,7 +300,7 @@
     :group_max: false
   is_adhoc:
     :name: is_adhoc
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Is adhoc
     :namespaced_name: mr_inventory_transactions.is_adhoc
     :data_type: :boolean
@@ -282,7 +316,7 @@
     :group_max: false
   process:
     :name: process
-    :sequence_no: 17
+    :sequence_no: 19
     :caption: Process
     :namespaced_name: business_processes.process
     :data_type: :string
@@ -298,7 +332,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 18
+    :sequence_no: 20
     :caption: Active
     :namespaced_name: mr_inventory_transactions.active
     :data_type: :boolean
@@ -314,7 +348,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 19
+    :sequence_no: 21
     :caption: Created at
     :namespaced_name: mr_inventory_transactions.created_at
     :data_type: :datetime
@@ -330,7 +364,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 20
+    :sequence_no: 22
     :caption: Updated at
     :namespaced_name: mr_inventory_transactions.updated_at
     :data_type: :datetime

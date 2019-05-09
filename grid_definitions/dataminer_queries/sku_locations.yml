@@ -8,10 +8,11 @@
   \             FROM \"locations\" c\r\n                JOIN \"tree_locations\" t1
   ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n              WHERE \"t1\".\"descendant_location_id\"
   = \"locations\".\"id\"\r\n              ORDER BY \"t1\".\"path_length\" DESC) cc)
-  AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n  \"material_resource_product_variants\".\"product_variant_number\",\r\n
-  \ \"material_resource_product_variants\".\"product_variant_code\",\r\n  \"mr_sku_locations\".\"quantity\",\r\n
-  \ \"mr_deliveries\".delivery_number,\r\n       COALESCE(mr_internal_batch_numbers.\"batch_number\"::text,
-  mr_delivery_item_batches.client_batch_number) AS batch_number,\r\n  \"locations\".\"has_single_container\",\r\n\"locations\".\"location_type_id\",\r\n
+  AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n  fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
+  AS product_variant_number,\r\n  \"material_resource_product_variants\".\"product_variant_code\",\r\n
+  \ \"mr_sku_locations\".\"quantity\",\r\n  \"mr_deliveries\".delivery_number,\r\n
+  \      COALESCE(mr_internal_batch_numbers.\"batch_number\"::text, mr_delivery_item_batches.client_batch_number)
+  AS batch_number,\r\n  \"locations\".\"has_single_container\",\r\n\"locations\".\"location_type_id\",\r\n
   \ \"location_types\".\"location_type_code\",\r\n  \"locations\".\"primary_assignment_id\",\r\n
   \ \"location_assignments\".\"assignment_code\",\r\n  \"locations\".\"location_storage_definition_id\",\r\n
   \ \"location_storage_definitions\".\"storage_definition_code\",\r\n  \"locations\".\"location_description\"\r\nFROM
@@ -122,7 +123,7 @@
     :name: product_variant_number
     :sequence_no: 6
     :caption: Product variant number
-    :namespaced_name: material_resource_product_variants.product_variant_number
+    :namespaced_name: 
     :data_type: :integer
     :width: 180
     :format: 

@@ -73,6 +73,10 @@ module PackMaterialApp
       create(:mr_bulk_stock_adjustments, is_stock_take: attrs[:is_stock_take], ref_no: attrs[:ref_no])
     end
 
+    def pack_material_storage_type_id
+      DB[:location_storage_types].where(storage_type_code: PackMaterialApp::DOMAIN_NAME).get(:id)
+    end
+
     def delete_mr_bulk_stock_adjustment(id)
       DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: id).delete
       DB[:mr_bulk_stock_adjustments_sku_numbers].where(mr_bulk_stock_adjustment_id: id).delete

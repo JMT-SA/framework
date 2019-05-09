@@ -222,7 +222,8 @@ class Framework < Roda
             completed
             approved
           ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+          storage_type_id = interactor.pack_material_storage_type_id
+          add_grid_row(attrs: select_attributes(res.instance, row_keys, storage_type_id: storage_type_id),
                        notice: res.message)
         else
           re_show_form(r, res, url: '/pack_material/transactions/mr_bulk_stock_adjustments/new') do

@@ -79,6 +79,10 @@ module PackMaterialApp
       repo.get_sku_location_info_ids(sku_location_id)
     end
 
+    def pack_material_storage_type_id
+      repo.pack_material_storage_type_id
+    end
+
     def complete_bulk_stock_adjustment(id)
       assert_permission!(:complete, id)
       repo.transaction do

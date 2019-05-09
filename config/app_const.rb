@@ -78,4 +78,6 @@ class AppConst
 
   # Locations: Location Types
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
+
+  ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 end

@@ -329,6 +329,10 @@ module PackMaterialApp
                             lookup_functions: [{ function: :fn_formatted_product_variant_number, args: [:product_variant_number], col_name: :product_variant_number }],
                             wrapper: MatresProductVariant)
     end
+
+    def format_product_variant_number(product_variant_number)
+      DB['SELECT fn_formatted_product_variant_number(?)', product_variant_number].single_value
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength

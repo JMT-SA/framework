@@ -22,6 +22,10 @@ module PackMaterialApp
           verify_check
         when :putaway
           putaway_check
+        when :add_invoice
+          add_invoice_check
+        when :complete_invoice
+          complete_invoice_check
         else
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}"
         end
@@ -51,8 +55,28 @@ module PackMaterialApp
         all_ok
       end
 
+      def add_invoice_check
+        return failed_response('Delivery has not been verified') unless verified?
+        all_ok
+      end
+
+      def complete_invoice_check
+        return failed_response('Delivery Purchase Invoice has already been completed') if invoice_completed?
+        return failed_response('Delivery has items without prices') if items_without_prices?
+        return failed_response('Purchase Invoice incomplete') if invoice_incomplete?
+        all_ok
+      end
+
       def putaway_completed?
         @entity.putaway_completed
+      end
+
+      def invoice_completed?
+        @entity.invoice_completed
+      end
+
+      def invoice_incomplete?
+        @entity.supplier_invoice_ref_number.nil? || @entity.supplier_invoice_date.nil?
       end
 
       def verified?
@@ -65,6 +89,10 @@ module PackMaterialApp
 
       def items_without_batches?
         @repo.items_without_batches(@id)
+      end
+
+      def items_without_prices?
+        @repo.items_without_prices(@id)
       end
 
       def item_quantities_ignored?

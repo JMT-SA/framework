@@ -1,0 +1,422 @@
+---
+:caption: Delivery Items
+:sql: "SELECT mr_deliveries.id AS delivery_id,\r\n       mr_delivery_items.id,\r\n
+  \ mr_delivery_items.mr_product_variant_id,\r\n  material_resource_product_variants.product_variant_code,\r\n
+  \ material_resource_product_variants.product_variant_number,\r\n  material_resource_product_variants.use_fixed_batch_number,\r\n
+  \      (\"mr_deliveries\".\"verified\" OR \"material_resource_product_variants\".\"use_fixed_batch_number\")
+  AS new_batch_not_allowed,\r\n  mr_delivery_items.quantity_on_note,\r\n  mr_delivery_items.quantity_over_supplied,\r\n
+  \ mr_delivery_items.quantity_under_supplied,\r\n  mr_delivery_items.quantity_received,\r\n
+  \ mr_delivery_items.mr_purchase_order_item_id,\r\n  mr_purchase_orders.purchase_order_number,\r\n
+  \      fn_party_role_name(mr_purchase_orders.supplier_party_role_id) AS supplier,\r\n
+  \ mr_purchase_order_items.quantity_required,\r\n  uoms.uom_code,\r\n       mr_purchase_order_items.unit_price
+  AS ord_unit_price,\r\n       mr_delivery_items.invoiced_unit_price AS inv_unit_price,\r\n
+  \ mr_delivery_items.remarks,\r\n  mr_delivery_item_batches.id AS delivery_item_batch_id,\r\n
+  \ mr_delivery_item_batches.client_batch_number,\r\n       mr_internal_batch_numbers.batch_number
+  AS internal_batch_number,\r\n       mr_delivery_item_batches.quantity_on_note AS
+  batch_quantity_on_note,\r\n       mr_delivery_item_batches.quantity_received AS
+  batch_quantity_received\r\nFROM mr_deliveries\r\n  LEFT JOIN mr_delivery_items ON
+  mr_delivery_items.mr_delivery_id = mr_deliveries.id\r\n  LEFT JOIN mr_delivery_item_batches
+  ON mr_delivery_item_batches.mr_delivery_item_id = mr_delivery_items.id\r\n  LEFT
+  JOIN material_resource_product_variants ON material_resource_product_variants.id
+  = mr_delivery_items.mr_product_variant_id\r\n  LEFT JOIN mr_internal_batch_numbers
+  ON \"material_resource_product_variants\".\"mr_internal_batch_number_id\" = mr_internal_batch_numbers.id\r\n
+  \ LEFT JOIN mr_purchase_order_items ON mr_purchase_order_items.id = mr_delivery_items.mr_purchase_order_item_id\r\n
+  \ LEFT JOIN mr_purchase_orders ON mr_purchase_orders.id = mr_purchase_order_items.mr_purchase_order_id\r\n
+  \ LEFT JOIN uoms ON mr_purchase_order_items.inventory_uom_id = uoms.id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  delivery_id:
+    :name: delivery_id
+    :sequence_no: 1
+    :caption: Delivery
+    :namespaced_name: mr_deliveries.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 2
+    :caption: Id
+    :namespaced_name: mr_delivery_items.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_product_variant_id:
+    :name: mr_product_variant_id
+    :sequence_no: 3
+    :caption: Product variant
+    :namespaced_name: mr_delivery_items.mr_product_variant_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_code:
+    :name: product_variant_code
+    :sequence_no: 4
+    :caption: Product variant code
+    :namespaced_name: material_resource_product_variants.product_variant_code
+    :data_type: :string
+    :width: 400
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_number:
+    :name: product_variant_number
+    :sequence_no: 5
+    :caption: PV Number
+    :namespaced_name: material_resource_product_variants.product_variant_number
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  use_fixed_batch_number:
+    :name: use_fixed_batch_number
+    :sequence_no: 6
+    :caption: Use fixed batch number
+    :namespaced_name: material_resource_product_variants.use_fixed_batch_number
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  new_batch_not_allowed:
+    :name: new_batch_not_allowed
+    :sequence_no: 7
+    :caption: New batch not allowed
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_on_note:
+    :name: quantity_on_note
+    :sequence_no: 8
+    :caption: Qty on note
+    :namespaced_name: mr_delivery_items.quantity_on_note
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_over_supplied:
+    :name: quantity_over_supplied
+    :sequence_no: 9
+    :caption: Over Supplied
+    :namespaced_name: mr_delivery_items.quantity_over_supplied
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_under_supplied:
+    :name: quantity_under_supplied
+    :sequence_no: 10
+    :caption: Under Supplied
+    :namespaced_name: mr_delivery_items.quantity_under_supplied
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_received:
+    :name: quantity_received
+    :sequence_no: 11
+    :caption: Received
+    :namespaced_name: mr_delivery_items.quantity_received
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_purchase_order_item_id:
+    :name: mr_purchase_order_item_id
+    :sequence_no: 12
+    :caption: Mr purchase order item
+    :namespaced_name: mr_delivery_items.mr_purchase_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  purchase_order_number:
+    :name: purchase_order_number
+    :sequence_no: 13
+    :caption: Purchase order number
+    :namespaced_name: mr_purchase_orders.purchase_order_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier:
+    :name: supplier
+    :sequence_no: 14
+    :caption: Supplier
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: right
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_required:
+    :name: quantity_required
+    :sequence_no: 15
+    :caption: Qty required
+    :namespaced_name: mr_purchase_order_items.quantity_required
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  uom_code:
+    :name: uom_code
+    :sequence_no: 16
+    :caption: UOM code
+    :namespaced_name: uoms.uom_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ord_unit_price:
+    :name: ord_unit_price
+    :sequence_no: 17
+    :caption: Ord unit price
+    :namespaced_name: mr_purchase_order_items.unit_price
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inv_unit_price:
+    :name: inv_unit_price
+    :sequence_no: 18
+    :caption: Inv unit price
+    :namespaced_name: mr_delivery_items.invoiced_unit_price
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 19
+    :caption: Remarks
+    :namespaced_name: mr_delivery_items.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_item_batch_id:
+    :name: delivery_item_batch_id
+    :sequence_no: 20
+    :caption: Delivery item batch
+    :namespaced_name: mr_delivery_item_batches.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  client_batch_number:
+    :name: client_batch_number
+    :sequence_no: 21
+    :caption: Client batch number
+    :namespaced_name: mr_delivery_item_batches.client_batch_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_batch_number:
+    :name: internal_batch_number
+    :sequence_no: 22
+    :caption: Internal batch number
+    :namespaced_name: mr_internal_batch_numbers.batch_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  batch_quantity_on_note:
+    :name: batch_quantity_on_note
+    :sequence_no: 23
+    :caption: Batch quantity on note
+    :namespaced_name: mr_delivery_item_batches.quantity_on_note
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  batch_quantity_received:
+    :name: batch_quantity_received
+    :sequence_no: 24
+    :caption: Batch quantity received
+    :namespaced_name: mr_delivery_item_batches.quantity_received
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_deliveries.id
+  :caption: Delivery Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

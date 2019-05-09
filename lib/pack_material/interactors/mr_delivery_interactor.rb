@@ -38,6 +38,23 @@ module PackMaterialApp
       end
     end
 
+    def update_mr_delivery_purchase_invoice(id, params)
+      add_invoice = TaskPermissionCheck::MrDelivery.call(:add_invoice, id)
+      if add_invoice.success
+        res = validate_mr_delivery_purchase_invoice_params(params)
+        return validation_failed_response(res) unless res.messages.empty?
+        repo.transaction do
+          repo.update_mr_delivery(id, res)
+          log_transaction
+          log_status('mr_deliveries', id, 'PURCHASE INVOICE UPDATED')
+        end
+        instance = mr_delivery(id)
+        success_response("Updated purchase invoice for delivery: #{instance.delivery_number}", instance)
+      else
+        failed_response(add_invoice.message)
+      end
+    end
+
     def verify_mr_delivery(id) # rubocop:disable Metrics/AbcSize
       can_verify = TaskPermissionCheck::MrDelivery.call(:verify, id)
       if can_verify.success
@@ -52,6 +69,33 @@ module PackMaterialApp
         end
       else
         failed_response(can_verify.message)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def complete_invoice(id) # rubocop:disable Metrics/AbcSize
+      can_complete_invoice = TaskPermissionCheck::MrDelivery.call(:complete_invoice, id)
+      if can_complete_invoice.success
+        repo.transaction do
+          log_transaction
+          res = PackMaterialApp::CompletePurchaseInvoice.call(id)
+          raise Crossbeams::InfoError, res.message unless res.success
+
+          error_message = res.instance.delete(:error_message)
+          if !error_message.empty?
+            repo.update_mr_delivery(id, invoice_error: true)
+            log_status('mr_deliveries', id, error_message)
+            return failed_response(error_message)
+          else
+            repo.delivery_complete_invoice(id, res.instance)
+            log_status('mr_deliveries', id, 'PURCHASE INVOICE COMPLETED')
+          end
+          instance = mr_delivery(id)
+          success_response("Delivery #{instance.delivery_number}: Purchase Invoice Sent", instance)
+        end
+      else
+        failed_response(can_complete_invoice.message)
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
@@ -111,6 +155,10 @@ module PackMaterialApp
       repo.html_delivery_progress_report(delivery_id, sku_id, to_location_id)
     end
 
+    def del_sub_totals(id)
+      repo.del_sub_totals(id)
+    end
+
     private
 
     def repo
@@ -127,6 +175,10 @@ module PackMaterialApp
 
     def validate_mr_delivery_putaway_params(params)
       MrDeliveryPutawaySchema.call(params)
+    end
+
+    def validate_mr_delivery_purchase_invoice_params(params)
+      MrDeliveryPurchaseInvoiceSchema.call(params)
     end
   end
 end

@@ -1,0 +1,7 @@
+---
+:dataminer_definition: mr_purchase_invoice_costs
+:conditions:
+  :standard:
+  - :col: mr_purchase_invoice_costs.mr_delivery_id
+    :op: =
+    :val: $:mr_delivery_id$

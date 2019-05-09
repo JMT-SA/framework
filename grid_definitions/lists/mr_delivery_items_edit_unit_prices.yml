@@ -1,0 +1,19 @@
+---
+:dataminer_definition: mr_delivery_items_editable
+:actions:
+- :url: "/pack_material/replenish/mr_delivery_items/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+  :hide_if_null: delivery_item_id
+:conditions:
+  :standard:
+    - :col: mr_deliveries.id
+      :op: =
+      :val: $:delivery_id$
+:edit_rules:
+  :url: "/pack_material/replenish/mr_delivery_items/$:id$/inline_save"
+  :editable_fields:
+    inv_unit_price:
+      :editor: :numeric

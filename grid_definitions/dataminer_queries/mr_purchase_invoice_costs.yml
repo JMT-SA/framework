@@ -1,0 +1,107 @@
+---
+:caption: Purchase Invoice Costs
+:sql: "SELECT \"mr_purchase_invoice_costs\".\"id\",\r\n\"mr_purchase_invoice_costs\".\"mr_cost_type_id\",\r\n\"mr_purchase_invoice_costs\".\"mr_delivery_id\",\r\n\"mr_purchase_invoice_costs\".\"amount\",\r\n\"mr_cost_types\".\"cost_type_code\"\r\nFROM
+  \"mr_purchase_invoice_costs\" \r\nLEFT JOIN \"mr_cost_types\" ON \"mr_cost_types\".\"id\"
+  = \"mr_purchase_invoice_costs\".\"mr_cost_type_id\"\r\nLEFT JOIN \"mr_deliveries\"
+  ON \"mr_deliveries\".\"id\" = \"mr_purchase_invoice_costs\".\"mr_delivery_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_purchase_invoice_costs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_cost_type_id:
+    :name: mr_cost_type_id
+    :sequence_no: 2
+    :caption: Cost type
+    :namespaced_name: mr_purchase_invoice_costs.mr_cost_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_delivery_id:
+    :name: mr_delivery_id
+    :sequence_no: 3
+    :caption: Delivery
+    :namespaced_name: mr_purchase_invoice_costs.mr_delivery_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  amount:
+    :name: amount
+    :sequence_no: 4
+    :caption: Amount
+    :namespaced_name: mr_purchase_invoice_costs.amount
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cost_type_code:
+    :name: cost_type_code
+    :sequence_no: 5
+    :caption: Cost type code
+    :namespaced_name: mr_cost_types.cost_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_purchase_invoice_costs.mr_cost_type_id
+  :caption: Cost type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cost_type_code, id FROM mr_cost_types ORDER BY cost_type_code
+- :column: mr_purchase_invoice_costs.mr_delivery_id
+  :caption: Delivery
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT driver_name, id FROM mr_deliveries ORDER BY driver_name

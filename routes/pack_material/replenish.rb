@@ -330,6 +330,33 @@ class Framework < Roda
         handle_not_found(r)
       end
 
+      r.on 'mr_purchase_invoice_costs' do
+        cost_interactor = PackMaterialApp::MrPurchaseInvoiceCostInteractor.new(current_user, {}, { route_url: request.path }, {})
+        r.on 'new' do    # NEW
+          check_auth!('replenish', 'new')
+          show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseInvoiceCost::New.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = cost_interactor.create_mr_purchase_invoice_cost(id, params[:mr_purchase_invoice_cost])
+          if res.success
+            row_keys = %i[
+              id
+              mr_delivery_id
+              amount
+            ]
+            sub_totals = interactor.del_sub_totals(id)
+            json_actions(del_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys, cost_type_code: res.instance[:cost_type]))], res.message)
+          else
+            re_show_form(r, res, url: '/pack_material/replenish/mr_purchase_invoice_costs/new') do
+              PackMaterial::Replenish::MrPurchaseInvoiceCost::New.call(id,
+                                                                       form_values: params[:mr_purchase_invoice_cost],
+                                                                       form_errors: res.errors,
+                                                                       remote: fetch?(r))
+            end
+          end
+        end
+      end
       r.on 'mr_delivery_items' do
         item_interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'preselect' do
@@ -388,10 +415,46 @@ class Framework < Roda
         end
         redirect_to_stored_referer(r, :delivery_verify)
       end
+      r.on 'complete_invoice' do   # EDIT
+        check_auth!('replenish', 'edit')
+        store_last_referer_url(:delivery_complete_invoice)
+        res = interactor.complete_invoice(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :delivery_complete_invoice)
+      end
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
         show_page { PackMaterial::Replenish::MrDelivery::Edit.call(id) }
       end
+
+      r.on 'invoice' do
+        r.is do
+          r.get do
+            check_auth!('replenish', 'edit')
+            show_partial_or_page(r) { PackMaterial::Replenish::MrDelivery::Invoice.call(id, remote: fetch?(r)) }
+          end
+          r.patch do
+            res = interactor.update_mr_delivery_purchase_invoice(id, params[:mr_delivery])
+            if res.success
+              flash[:notice] = res.message
+              if fetch?(r)
+                redirect_via_json("/pack_material/replenish/mr_deliveries/#{id}/edit")
+              else
+                r.redirect("/pack_material/replenish/mr_deliveries/#{id}/edit")
+              end
+            else
+              re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/invoice") do
+                PackMaterial::Replenish::MrDelivery::Invoice.call(id, form_values: params[:mr_delivery], form_errors: res.errors)
+              end
+            end
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('replenish', 'read')
@@ -454,6 +517,29 @@ class Framework < Roda
         handle_not_found(r)
       end
 
+      r.on 'inline_save' do
+        check_auth!('replenish', 'edit')
+        del_interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+        res = interactor.inline_update(id, params)
+        if res.success
+          show_json_notice(res.message)
+
+          parent_id = interactor.mr_delivery_item(id)&.mr_delivery_id
+          permission_res = interactor.can_complete_invoice(parent_id)
+          sub_totals = del_interactor.del_sub_totals(parent_id)
+          if permission_res.success
+            json_actions(del_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(type: :show_element, dom_id: 'mr_delivery_complete_button')],
+                         res.message)
+          else
+            json_actions(del_sub_total_changes(sub_totals) +
+                         [OpenStruct.new(type: :hide_element, dom_id: 'mr_delivery_complete_button')],
+                         res.message)
+          end
+        else
+          show_json_error(res.message, status: 200)
+        end
+      end
       r.on 'mr_delivery_item_batches' do
         interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
@@ -635,6 +721,57 @@ class Framework < Roda
         end
       end
     end
+
+    # MR PURCHASE INVOICE COSTS
+    # --------------------------------------------------------------------------
+    r.on 'mr_purchase_invoice_costs', Integer do |id|
+      interactor = PackMaterialApp::MrPurchaseInvoiceCostInteractor.new(current_user, {}, { route_url: request.path }, {})
+      del_interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+      # Check for notfound:
+      r.on !interactor.exists?(:mr_purchase_invoice_costs, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('replenish', 'edit')
+        show_partial { PackMaterial::Replenish::MrPurchaseInvoiceCost::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('replenish', 'read')
+          show_partial { PackMaterial::Replenish::MrPurchaseInvoiceCost::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_mr_purchase_invoice_cost(id, params[:mr_purchase_invoice_cost])
+          if res.success
+            sub_totals = del_interactor.del_sub_totals(res.instance[:mr_delivery_id])
+            json_actions(del_sub_total_changes(sub_totals) +
+                           [OpenStruct.new(ids: id,
+                                           type: :update_grid_row,
+                                           changes: { mr_cost_type_id: res.instance[:mr_cost_type_id],
+                                                      mr_delivery_id: res.instance[:mr_delivery_id],
+                                                      amount: res.instance[:amount],
+                                                      cost_type_code: res.instance[:cost_type] })],
+                         res.message)
+          else
+            re_show_form(r, res) { PackMaterial::Replenish::MrPurchaseInvoiceCost::Edit.call(id, form_values: params[:mr_purchase_invoice_cost], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('replenish', 'delete')
+          delivery_id = interactor.mr_purchase_invoice_cost(id)&.mr_delivery_id
+          res = interactor.delete_mr_purchase_invoice_cost(id)
+          if res.success
+            sub_totals = del_interactor.del_sub_totals(delivery_id)
+            json_actions(del_sub_total_changes(sub_totals) +
+                           [OpenStruct.new(id: id, type: :delete_grid_row)], res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
   end
 
   def po_sub_total_changes(sub_totals)
@@ -643,6 +780,14 @@ class Framework < Roda
       OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
       OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
       OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
+    ]
+  end
+
+  def del_sub_total_changes(sub_totals)
+    [
+      OpenStruct.new(dom_id: 'del_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
+      OpenStruct.new(dom_id: 'del_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+      OpenStruct.new(dom_id: 'del_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
     ]
   end
 end

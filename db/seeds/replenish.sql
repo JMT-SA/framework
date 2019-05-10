@@ -61,9 +61,9 @@ INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('PUTAWAY');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('ADHOC MOVE');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('REMOVE STOCK');
 
-INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('DELIVERIES');
-INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('VEHICLE JOBS');
-INSERT INTO crossbeams_framework.public.business_processes (process) VALUES ('ADHOC TRANSACTIONS');
+INSERT INTO business_processes (process) VALUES ('DELIVERIES');
+INSERT INTO business_processes (process) VALUES ('VEHICLE JOBS');
+INSERT INTO business_processes (process) VALUES ('ADHOC TRANSACTIONS');
 
 
 -- SKU Locations grid

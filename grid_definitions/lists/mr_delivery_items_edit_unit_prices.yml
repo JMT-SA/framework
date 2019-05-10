@@ -7,6 +7,21 @@
   :title: View
   :popup: true
   :hide_if_null: delivery_item_id
+- :separator: true
+- :url: "/pack_material/replenish/print_sku_barcode?mr_delivery_item_batch_id=$:delivery_item_batch_id$"
+  :text: Print SKU barcode
+  :icon: printer
+  :title: Print SKU barcode
+  :hide_if_null: delivery_item_batch_id
+  :hide_if_false: verified
+  :popup: true
+- :url: "/pack_material/replenish/print_sku_barcode?mr_delivery_item_id=$:id$"
+  :text: Print SKU barcode
+  :icon: printer
+  :title: Print SKU barcode
+  :hide_if_present: delivery_item_batch_id
+  :hide_if_false: verified
+  :popup: true
 :conditions:
   :standard:
     - :col: mr_deliveries.id

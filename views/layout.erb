@@ -119,12 +119,13 @@
     <script src="/js/a11y-dialog-cbeam.js"></script>
     <script>
       // Work around bug in SelectR (https://github.com/Mobius1/Selectr/issues/72):
-      Object.defineProperty(Selectr.prototype, 'mobileDevice', {
-        get() { return false; },
-        set() {},
-        enumerable: true,
-        configurable: true,
-      });
+      // HOWEVER on mobile, clicking the select will launch the keyboard....
+      // Object.defineProperty(Selectr.prototype, 'mobileDevice', {
+      //   get() { return false; },
+      //   set() {},
+      //   enumerable: true,
+      //   configurable: true,
+      // });
 
       let crossbeamsDialogLevel1;
       let crossbeamsDialogLevel2;

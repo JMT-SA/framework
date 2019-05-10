@@ -759,7 +759,9 @@ const crossbeamsUtils = {
           allowDeselect: false,
           clearable: true,       // should configure via data...
           disabled: sel.disabled,
-          nativeDropdown: false,
+          // Work around bug in SelectR (https://github.com/Mobius1/Selectr/issues/72):
+          // HOWEVER on mobile, clicking the select will launch the keyboard....
+          // nativeDropdown: false,
           width: 'notset',       // stop Selectr from setting width to 100%
         }); // select that can be searched.
         // Store a reference on the DOM node.

@@ -217,8 +217,8 @@ module PackMaterialApp
       update(:mr_deliveries, id,
              invoice_error: false,
              invoice_completed: true,
-             erp_purchase_order_number: attrs[:erp_purchase_order_number],
-             erp_purchase_invoice_number: attrs[:erp_purchase_invoice_number])
+             erp_purchase_order_number: attrs[:purchase_order_number],
+             erp_purchase_invoice_number: attrs[:purchase_invoice_number])
     end
 
     def mr_delivery_items(mr_delivery_id)

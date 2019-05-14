@@ -5,8 +5,10 @@
 module PackMaterialApp
   class CompletePurchaseInvoice < BaseService
     # @param [Integer] delivery_id
-    def initialize(delivery_id)
+    def initialize(user_name, delivery_id)
       @repo = PurchaseInvoiceRepo.new
+      @replenish_repo = ReplenishRepo.new
+      @user_name = user_name
       @id = delivery_id
       @delivery = @repo.find_mr_delivery(@id)
     end
@@ -18,12 +20,10 @@ module PackMaterialApp
       delivery_number = @delivery.delivery_number
       supplier_invoice_number = @delivery.supplier_invoice_ref_number
       supplier_invoice_date = @delivery.supplier_invoice_date.to_s
-
       supplier_code = @repo.get_supplier_erp_number(@id)
 
       costs = @repo.costs_for_delivery(@id)
       products = @repo.products_for_delivery(@id)
-
 
       request_xml = Nokogiri::XML::Builder.new do |xml|
         xml.purchase_invoice do
@@ -52,14 +52,19 @@ module PackMaterialApp
           end
         end
       end
-      uri = @repo.erp_integration_uri
-
       http = Crossbeams::HTTPCalls.new
-      res = http.xml_post(uri, request_xml.to_xml)
-      return res unless res.success
+      res = http.xml_post(@repo.erp_integration_uri, request_xml.to_xml)
+      raise Crossbeams::InfoError, res.message unless res.success
 
       instance = @repo.format_response(res.instance.body)
-      success_response('Purchase Invoice Sent', instance)
+      error_message = instance.delete(:error_message)
+      if !error_message.empty?
+        @replenish_repo.update_mr_delivery(@id, invoice_error: true)
+        @repo.log_status('mr_deliveries', @id, error_message, user_name: @user_name)
+      else
+        @replenish_repo.delivery_complete_invoice(@id, instance)
+        @repo.log_status('mr_deliveries', @id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
+      end
     end
   end
 end

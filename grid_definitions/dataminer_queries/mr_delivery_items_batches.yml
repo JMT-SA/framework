@@ -19,8 +19,9 @@
   \ \"mr_delivery_item_batches\".id,\r\n  \"mr_delivery_item_batches\".client_batch_number,\r\n
   \ \"mr_internal_batch_numbers\".\"batch_number\" AS internal_batch_number,\r\n  \"mr_delivery_item_batches\".quantity_on_note
   AS batch_quantity_on_note,\r\n  \"mr_delivery_item_batches\".quantity_received AS
-  batch_quantity_received,\r\n  case\r\n  when mr_deliveries.putaway_completed then
-  'ok'\r\n  when mr_delivery_items.putaway_completed then 'ok'\r\n  when mr_delivery_item_batches.putaway_completed
+  batch_quantity_received,\r\n  \"mr_deliveries\".\"invoice_completed\",\r\n  \"mr_deliveries\".\"erp_purchase_order_number\",\r\n
+  \ \"mr_deliveries\".\"erp_purchase_invoice_number\",\r\n  case\r\n  when mr_deliveries.putaway_completed
+  then 'ok'\r\n  when mr_delivery_items.putaway_completed then 'ok'\r\n  when mr_delivery_item_batches.putaway_completed
   then 'ok'\r\n  when mr_deliveries.verified then 'inprogress'\r\n  else null\r\n
   \ end as colour_rule\r\nFROM \"mr_deliveries\"\r\n  LEFT JOIN \"mr_delivery_items\"
   ON \"mr_delivery_items\".\"mr_delivery_id\" = \"mr_deliveries\".\"id\"\r\n  LEFT
@@ -140,14 +141,13 @@
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: '1'
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-    :pinned: left
   product_variant_code:
     :name: product_variant_code
     :sequence_no: 8
@@ -215,7 +215,7 @@
   quantity_on_note:
     :name: quantity_on_note
     :sequence_no: 12
-    :caption: Quantity on note
+    :caption: Qty on note
     :namespaced_name: mr_delivery_items.quantity_on_note
     :data_type: :string
     :width: 
@@ -231,7 +231,7 @@
   quantity_over_supplied:
     :name: quantity_over_supplied
     :sequence_no: 13
-    :caption: Quantity over supplied
+    :caption: Qty over supplied
     :namespaced_name: mr_delivery_items.quantity_over_supplied
     :data_type: :string
     :width: 
@@ -247,7 +247,7 @@
   quantity_under_supplied:
     :name: quantity_under_supplied
     :sequence_no: 14
-    :caption: Quantity under supplied
+    :caption: Qty under supplied
     :namespaced_name: mr_delivery_items.quantity_under_supplied
     :data_type: :string
     :width: 
@@ -263,7 +263,7 @@
   quantity_received:
     :name: quantity_received
     :sequence_no: 15
-    :caption: Quantity received
+    :caption: Qty received
     :namespaced_name: mr_delivery_items.quantity_received
     :data_type: :string
     :width: 
@@ -295,7 +295,7 @@
   purchase_order_number:
     :name: purchase_order_number
     :sequence_no: 17
-    :caption: Purchase order number
+    :caption: Purchase order no
     :namespaced_name: mr_purchase_orders.purchase_order_number
     :data_type: :string
     :width: 
@@ -327,7 +327,7 @@
   quantity_required:
     :name: quantity_required
     :sequence_no: 19
-    :caption: Quantity required
+    :caption: Qty required
     :namespaced_name: mr_purchase_order_items.quantity_required
     :data_type: :string
     :width: 
@@ -375,7 +375,7 @@
   supplier_invoice_ref_number:
     :name: supplier_invoice_ref_number
     :sequence_no: 22
-    :caption: Supplier invoice ref number
+    :caption: Supplier invoice ref no
     :namespaced_name: mr_deliveries.supplier_invoice_ref_number
     :data_type: :string
     :width: 
@@ -391,7 +391,7 @@
   client_delivery_ref_number:
     :name: client_delivery_ref_number
     :sequence_no: 23
-    :caption: Client delivery ref number
+    :caption: Client delivery ref no
     :namespaced_name: mr_deliveries.client_delivery_ref_number
     :data_type: :string
     :width: 
@@ -455,7 +455,7 @@
   vehicle_registration:
     :name: vehicle_registration
     :sequence_no: 27
-    :caption: Vehicle registration
+    :caption: Vehicle reg
     :namespaced_name: mr_deliveries.vehicle_registration
     :data_type: :string
     :width: 
@@ -535,7 +535,7 @@
   client_batch_number:
     :name: client_batch_number
     :sequence_no: 32
-    :caption: Client batch number
+    :caption: Client batch no
     :namespaced_name: mr_delivery_item_batches.client_batch_number
     :data_type: :string
     :width: 
@@ -551,7 +551,7 @@
   internal_batch_number:
     :name: internal_batch_number
     :sequence_no: 33
-    :caption: Internal batch number
+    :caption: Internal batch no
     :namespaced_name: mr_internal_batch_numbers.batch_number
     :data_type: :string
     :width: 
@@ -596,9 +596,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  invoice_completed:
+    :name: invoice_completed
+    :sequence_no: 36
+    :caption: Invoice completed
+    :namespaced_name: mr_deliveries.invoice_completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_purchase_order_number:
+    :name: erp_purchase_order_number
+    :sequence_no: 37
+    :caption: ERP purchase order no
+    :namespaced_name: mr_deliveries.erp_purchase_order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_purchase_invoice_number:
+    :name: erp_purchase_invoice_number
+    :sequence_no: 38
+    :caption: ERP purchase invoice no
+    :namespaced_name: mr_deliveries.erp_purchase_invoice_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 36
+    :sequence_no: 39
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

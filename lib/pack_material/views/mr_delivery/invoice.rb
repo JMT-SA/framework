@@ -17,8 +17,12 @@ module PackMaterial
               form.action "/pack_material/replenish/mr_deliveries/#{id}/invoice"
               form.method :update
               form.remote! if remote
+              form.view_only! if rules[:invoice_completed]
+              form.no_submit! if rules[:invoice_completed]
               form.add_field :supplier_invoice_ref_number
               form.add_field :supplier_invoice_date
+              form.add_field :erp_purchase_order_number if rules[:invoice_completed]
+              form.add_field :erp_purchase_invoice_number if rules[:invoice_completed]
             end
           end
 

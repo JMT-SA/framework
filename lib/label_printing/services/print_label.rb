@@ -8,7 +8,7 @@ module LabelPrintingApp
     def initialize(label_name, instance, params)
       @label_name = label_name
       @instance = instance
-      @quantity = params[:quantity] || 1
+      @quantity = params[:no_of_prints] || 1
       @printer_id = params[:printer]
       raise ArgumentError if label_name.nil?
     end

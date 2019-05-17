@@ -1,0 +1,183 @@
+= RMD Forms
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+= RMD Forms
+
+RMD forms are special forms for rendering on Registered Mobile Devices (RMD).
+
+They are intenionally far simpler than Crossbeams::Layout pages. They should always be rendered inside `:layout_rmd`.
+
+== Example
+
+From a route:
+[source,ruby]
+----
+details = retrieve_from_local_store(:delivery_putaway) || {}
+items = %w[one two buckle my shoe]
+form = Crossbeams::RMDForm.new(details,
+                               form_name: :putaway,
+                               progress: 'Delivery 123: 3 of 5 items complete' : nil,
+                               notes: 'Please scan the Delivery and the SKU numbers.',
+                               scan_with_camera: @rmd_scan_with_camera,
+                               caption: 'Delivery putaway',
+                               action: '/rmd/deliveries/putaways',
+                               button_caption: 'Putaway')
+form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
+form.add_select(:choice, 'Choose', items: items, value: 'my', required: true, prompt: true)
+form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
+form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location)
+form.add_field(:quantity, 'Quantity', data_type: 'number')
+form.add_csrf_tag csrf_tag
+view(inline: form.render, layout: :layout_rmd)
+----
+
+== Form Methods
+
+|===
+|method |args |description
+
+|new
+|form_state (Hash), options (Hash)
+|Initialize the form.
+
+|add_field
+|name (String), label (String), options (Hash)
+|Adds a field to the form.
+
+|add_select
+|name (String), label (String), options (Hash)
+|Adds a select box to the form.
+
+|add_csrf_tag
+|tag
+|Adds CSRF tag to the form.
+
+|render
+|
+|Renders the form
+
+|===
+
+=== Method: new
+
+|===
+|attribute |description |possible values |default
+
+|form_state
+|The state of the form
+|Hash. Include current value of fields (and hidden `…_scan_field` values) when applicable. Can include `:errors` Hash and `:error_message` string.
+|None. Required.
+
+|options - :form_name
+|The name attribute of the `<form>` tag.
+|String
+|None. Required.
+
+|options - :action
+|The URL for the POST action.
+|String
+|Required.
+
+|options - :progress
+|Text to display progress with an operation.
+|String
+|None.
+
+|options - :notes
+|Text to display hints for the user.
+|String
+|None.
+
+|options - :button_caption
+|Caption for the submit button.
+|String
+|`Submit`.
+
+|options - :scan_with_camera
+|Should the RMD be able to use the camera to scan.
+|Boolean
+|`false`.
+
+|===
+
+=== Method: add_field
+
+|===
+|attribute |description |possible values |default
+
+|name
+|The name of the field
+|String
+|None. Required.
+
+|label
+|The label for the field
+|String
+|None. Required.
+
+|options - :required
+|Is this a required field?
+|Boolean
+|`true`
+
+|options - :data_type
+|The datatype of the input (`text`, `date` etc.)
+|String
+|`text`
+
+|options - :scan
+|Type of barcode symbology to accept.
+a|String:
+
+* `key248_all` (any)
+* `key249_3o9` (309)
+* `key250_upc` (UPC)
+* `key251_ean` (EAN)
+* `key252_2d` (2D - QR)
+|None. Leave out for a field that does not receive a barcode scan result.
+
+|options - :scan_type
+|The type of scan value to expect. This must have a matching entry in `AppConst::BARCODE_PRINT_RULES`.
+|Symbol
+|None.
+
+|===
+
+=== Method: add_select
+
+|===
+|attribute |description |possible values |default
+
+|name
+|The name of the field
+|String
+|None. Required.
+
+|label
+|The label for the field
+|String
+|None. Required.
+
+|options - :required
+|Is this a required field?
+|Boolean
+|`true`
+
+|options - :value
+|The current (selected) value.
+|String
+|None.
+
+|options - :items
+|The items in the dropdown. Use a Hash to include option groups. Otherwise the array can be one or two dimensional (`[[display, value], [display, value]]`)
+|Array or Hash
+|Empty array.
+
+|options - :prompt
+|If `true`, display a generic prompt. If a string, display the string as the prompt.
+|String or Booelan
+|None.
+
+|===

@@ -34,6 +34,7 @@ require './lib/base_step'
 require './lib/document_sequence'
 require './lib/http_calls'
 require './lib/local_store' # Will only work for processes running from one dir.
+require './lib/rmd_form'
 require './lib/ui_rules'
 require './lib/library_versions'
 require './lib/dataminer_connections'

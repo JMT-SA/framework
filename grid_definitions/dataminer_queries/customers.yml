@@ -16,6 +16,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -31,6 +32,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -40,12 +42,13 @@
   erp_customer_number:
     :name: erp_customer_number
     :sequence_no: 3
-    :caption: Erp customer number
+    :caption: ERP no
     :namespaced_name: customers.erp_customer_number
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -61,6 +64,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -76,6 +80,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -85,12 +90,13 @@
   party_role:
     :name: party_role
     :sequence_no: 6
-    :caption: Party role
+    :caption: Party Name
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

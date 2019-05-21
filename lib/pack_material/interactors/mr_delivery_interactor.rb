@@ -74,25 +74,14 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def complete_invoice(id) # rubocop:disable Metrics/AbcSize
+    def complete_invoice(id)
       can_complete_invoice = TaskPermissionCheck::MrDelivery.call(:complete_invoice, id)
       if can_complete_invoice.success
         repo.transaction do
+          PackMaterialApp::ERPPurchaseInvoiceJob.enqueue(@user.user_name, delivery_id: id)
           log_transaction
-          res = PackMaterialApp::CompletePurchaseInvoice.call(id)
-          raise Crossbeams::InfoError, res.message unless res.success
-
-          error_message = res.instance.delete(:error_message)
-          if !error_message.empty?
-            repo.update_mr_delivery(id, invoice_error: true)
-            log_status('mr_deliveries', id, error_message)
-            return failed_response(error_message)
-          else
-            repo.delivery_complete_invoice(id, res.instance)
-            log_status('mr_deliveries', id, 'PURCHASE INVOICE COMPLETED')
-          end
           instance = mr_delivery(id)
-          success_response("Delivery #{instance.delivery_number}: Purchase Invoice Sent", instance)
+          success_response("Delivery #{instance.delivery_number}: Purchase Invoice Queued", instance)
         end
       else
         failed_response(can_complete_invoice.message)

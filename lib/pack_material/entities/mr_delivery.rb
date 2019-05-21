@@ -18,5 +18,7 @@ module PackMaterialApp
     attribute :status, Types::String
     attribute :supplier_invoice_date, Types::DateTime
     attribute :invoice_completed, Types::Bool
+    attribute? :erp_purchase_order_number, Types::String.optional
+    attribute? :erp_purchase_invoice_number, Types::String.optional
   end
 end

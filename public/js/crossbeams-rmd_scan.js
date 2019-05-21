@@ -1,4 +1,4 @@
-const crossbeamsRmdScan = (function crossbeamsRmdScan() {
+const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line no-unused-vars
   //
   // Variables
   //
@@ -57,6 +57,31 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
   };
 
   /**
+   * Remove disabled state from a button.
+   * @param {element} element the button to re-enable.
+   * @returns {void}
+   */
+  function revertDisabledButton(element) {
+    element.disabled = false;
+    element.value = element.dataset.enableWith;
+    element.classList.add('dim');
+    element.classList.remove('o-50');
+  }
+
+  /**
+   * When an input is invalid according to HTML5 rules and
+   * the submit button has been disabled, we need to re-enable it
+   * so the user can re-submit the form once the error has been
+   * corrected.
+   */
+  document.addEventListener('invalid', (e) => {
+    window.setTimeout(() => {
+      const sel = '[data-disable-with][disabled], [data-briefly-disable-with][disabled]';
+      e.target.form.querySelectorAll(sel).forEach(el => revertDisabledButton(el));
+    }, 0); // Disable the button with a delay so the form still submits...
+  }, true);
+
+  /**
    * Prevent multiple clicks of submit buttons.
    * @returns {void}
    */
@@ -81,6 +106,14 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
       });
     }
     document.body.addEventListener('click', (event) => {
+      // On a touch device, try to prevent the form from
+      // being submitted after a scan...
+      if (event.sourceCapabilities === null) {
+        if (event.target.dataset && event.target.dataset.rmdBtn) {
+          event.preventDefault();
+          return;
+        }
+      }
       // Disable a button on click
       if (event.target.dataset && event.target.dataset.disableWith) {
         preventMultipleSubmits(event.target);
@@ -172,7 +205,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
           }
         });
       }
-      console.info('Raw msg:', event.data);
+      console.info('Raw msg:', event.data); // eslint-disable-line no-console
     };
   };
 
@@ -186,7 +219,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
    * @param {Array} args.
    */
   publicAPIs.logit = (...args) => {
-    console.info(...args);
+    console.info(...args); // eslint-disable-line no-console
     if (txtShow !== null) {
       txtShow.insertAdjacentHTML('beforeend', `${Array.from(args).map(a => (typeof (a) === 'string' ? a : JSON.stringify(a))).join(' ')}<br>`);
     }
@@ -208,7 +241,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() {
    * Call startScanner to make the websocket connection.
    *
    * @param {object} rules - the rules for identifying scan values.
-   * @param {boolean} bypassRules - should the rules be ignores (scan any barcode).
+   * @param {boolean} bypassRules - should the rules be ignored (scan any barcode).
    */
   publicAPIs.init = (rules, bypassRules) => {
     this.rules = rules;

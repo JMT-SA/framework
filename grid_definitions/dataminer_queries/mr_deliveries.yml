@@ -5,8 +5,9 @@
   \ \"mr_deliveries\".\"invoice_completed\",\r\n  \"mr_deliveries\".\"putaway_completed\",\r\n
   \ \"mr_deliveries\".\"receipt_transaction_id\",\r\n  \"mr_deliveries\".\"putaway_transaction_id\",\r\n
   \ \"mr_deliveries\".\"transporter_party_role_id\",\r\n  fn_party_role_name(\"mr_deliveries\".\"transporter_party_role_id\")
-  AS transporter,\r\n  \"mr_deliveries\".\"supplier_invoice_ref_number\",\r\n  \"mr_deliveries\".\"client_delivery_ref_number\",\r\n
-  \ \"mr_deliveries\".\"driver_name\",\r\n  \"mr_deliveries\".\"vehicle_registration\",\r\n
+  AS transporter,\r\n  \"mr_deliveries\".\"client_delivery_ref_number\",\r\n  \"mr_deliveries\".\"driver_name\",\r\n
+  \ \"mr_deliveries\".\"vehicle_registration\",\r\n  \"mr_deliveries\".\"supplier_invoice_ref_number\",\r\n
+  \ \"mr_deliveries\".\"erp_purchase_order_number\",\r\n  \"mr_deliveries\".\"erp_purchase_invoice_number\",\r\n
   \ \"mr_deliveries\".\"created_at\",\r\n  \"mr_deliveries\".\"updated_at\",\r\n  case\r\n
   \ when mr_deliveries.invoice_error then 'error'\r\n  when (mr_deliveries.verified
   and not mr_deliveries.putaway_completed) then 'inprogress'\r\n  else null\r\n  end
@@ -176,25 +177,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  supplier_invoice_ref_number:
-    :name: supplier_invoice_ref_number
-    :sequence_no: 11
-    :caption: Supplier invoice ref number
-    :namespaced_name: mr_deliveries.supplier_invoice_ref_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   client_delivery_ref_number:
     :name: client_delivery_ref_number
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Client delivery ref number
     :namespaced_name: mr_deliveries.client_delivery_ref_number
     :data_type: :string
@@ -210,7 +195,7 @@
     :group_max: false
   driver_name:
     :name: driver_name
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Driver name
     :namespaced_name: mr_deliveries.driver_name
     :data_type: :string
@@ -226,7 +211,7 @@
     :group_max: false
   vehicle_registration:
     :name: vehicle_registration
-    :sequence_no: 14
+    :sequence_no: 13
     :caption: Vehicle registration
     :namespaced_name: mr_deliveries.vehicle_registration
     :data_type: :string
@@ -240,9 +225,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  supplier_invoice_ref_number:
+    :name: supplier_invoice_ref_number
+    :sequence_no: 14
+    :caption: Supplier invoice ref number
+    :namespaced_name: mr_deliveries.supplier_invoice_ref_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_purchase_order_number:
+    :name: erp_purchase_order_number
+    :sequence_no: 15
+    :caption: Erp purchase order number
+    :namespaced_name: mr_deliveries.erp_purchase_order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_purchase_invoice_number:
+    :name: erp_purchase_invoice_number
+    :sequence_no: 16
+    :caption: Erp purchase invoice number
+    :namespaced_name: mr_deliveries.erp_purchase_invoice_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Created at
     :namespaced_name: mr_deliveries.created_at
     :data_type: :datetime
@@ -258,7 +291,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Updated at
     :namespaced_name: mr_deliveries.updated_at
     :data_type: :datetime
@@ -274,7 +307,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 17
+    :sequence_no: 19
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

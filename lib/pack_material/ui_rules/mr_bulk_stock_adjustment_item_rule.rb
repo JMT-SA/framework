@@ -31,24 +31,6 @@ module UiRules
       fields[:stock_take_complete] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
-    #
-    # def common_fields
-    #   {
-    #     mr_bulk_stock_adjustment_id: { renderer: :hidden },
-    #     mr_sku_location_id: { renderer: :hidden },
-    #     sku_number: { renderer: :label },
-    #     location_long_code: { renderer: :label },
-    #     scan_to_location_long_code: {}, # ???
-    #     product_variant_number: { renderer: :label },
-    #     mr_type_name: { required: true, caption: 'Type Name', renderer: :label },
-    #     mr_sub_type_name: { required: true, caption: 'Sub Type Name', renderer: :label },
-    #     product_variant_code: { required: true, renderer: :label },
-    #     inventory_uom_code: { caption: 'UOM Code', renderer: :label, with_value: @form_object.inventory_uom_code },
-    #     system_quantity: { renderer: :label },
-    #     actual_quantity: { renderer: :numeric, required: true },
-    #     stock_take_complete: { renderer: :checkbox },
-    #   }
-    # end
 
     def new_fields
       {

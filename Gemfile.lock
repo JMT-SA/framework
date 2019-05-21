@@ -237,6 +237,7 @@ DEPENDENCIES
   minitest-rg
   minitest-stub_any_instance (~> 1.0.1)
   mocha (~> 1.5)
+  nokogiri
   pg
   pry
   pry-byebug

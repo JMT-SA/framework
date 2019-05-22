@@ -108,4 +108,52 @@ class Framework < Roda
       end
     end
   end
+
+  # Printing
+  # --------------------------------------------------------------------------
+  route 'printing', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+    # PRINT SKU LABEL
+    # --------------------------------------------------------------------------
+    r.on 'sku_label' do # rubocop:disable Metrics/BlockLength
+      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'new' do
+        @print_repo = LabelApp::PrinterRepo.new
+        printers    = @print_repo.select_printers_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE)
+        details     = retrieve_from_local_store(:print_rmd_sku_label_options) || {}
+        form        = Crossbeams::RMDForm.new(details,
+                                              form_name:        :print_rmd_sku_label,
+                                              progress:         details[:progress],
+                                              notes:            'Please scan the SKU number, then enter the quantity to be printed.',
+                                              scan_with_camera: @rmd_scan_with_camera,
+                                              caption:          'Print SKU Label',
+                                              action:           '/rmd/printing/sku_label',
+                                              button_caption:   'Print')
+        form.add_select(:printer, 'Printer', items: printers, value: printers.first, required: true, prompt: true)
+        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
+        form.add_field(:no_of_prints, 'No of Prints', data_type: 'number')
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res     = interactor.print_sku_barcode(params[:print_rmd_sku_label], rmd: true)
+        payload = { progress: nil }
+        if res.success
+          payload[:printer]  = res.instance[:printer]
+          payload[:progress] = res.message
+        else
+          these_params            = params[:print_rmd_sku_label]
+          payload[:error_message] = res.message
+          payload[:errors]        = res.errors
+          payload.merge!(printer:               these_params[:printer],
+                         sku_number:            these_params[:sku_number],
+                         sku_number_scan_field: these_params[:sku_number_scan_field],
+                         no_of_prints:          these_params[:no_of_prints])
+        end
+
+        store_locally(:print_rmd_sku_label_options, payload)
+        r.redirect '/rmd/printing/sku_label/new'
+      end
+    end
+  end
 end

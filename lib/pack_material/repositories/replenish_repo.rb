@@ -215,9 +215,9 @@ module PackMaterialApp
 
     def delivery_complete_invoice(id, attrs)
       update(:mr_deliveries, id,
-             invoice_error: false,
-             invoice_completed: true,
-             erp_purchase_order_number: attrs[:purchase_order_number],
+             invoice_error:               false,
+             invoice_completed:           true,
+             erp_purchase_order_number:   attrs[:purchase_order_number],
              erp_purchase_invoice_number: attrs[:purchase_invoice_number])
     end
 
@@ -304,15 +304,15 @@ module PackMaterialApp
       item_id = batch.get(:mr_delivery_item_id)
       item = DB[:mr_delivery_items].where(id: item_id)
 
-      pv = DB[:material_resource_product_variants].where(id: item.get(:mr_product_variant_id))
+      pv                 = DB[:material_resource_product_variants].where(id: item.get(:mr_product_variant_id))
       pv_code, pv_number = pv.get(%i[product_variant_code product_variant_number])
-
-      sku = DB[:mr_skus].where(mr_delivery_item_batch_id: mr_delivery_item_batch_id,
+      pv_number          = ConfigRepo.new.format_product_variant_number(pv_number)
+      sku                = DB[:mr_skus].where(mr_delivery_item_batch_id: mr_delivery_item_batch_id,
                                mr_product_variant_id: item.get(:mr_product_variant_id))
-      sku_number = sku.get(:sku_number)
-      delivery_number = DB[:mr_deliveries].where(id: item.get(:mr_delivery_id)).get(:delivery_number)
-      no_of_prints = batch.get(:quantity_received) - batch.get(:quantity_putaway)
-      no_of_prints = 1 if no_of_prints.zero? || no_of_prints.negative?
+      sku_number         = sku.get(:sku_number)
+      delivery_number    = DB[:mr_deliveries].where(id: item.get(:mr_delivery_id)).get(:delivery_number)
+      no_of_prints       = batch.get(:quantity_received) - batch.get(:quantity_putaway)
+      no_of_prints       = 1 if no_of_prints.zero? || no_of_prints.negative?
       {
         sku_number: sku_number,
         product_variant_code: pv_code,
@@ -329,8 +329,8 @@ module PackMaterialApp
       pv = DB[:material_resource_product_variants].where(id: item.get(:mr_product_variant_id))
       # pv_code = pv.get(:product_variant_code)
       pv_code, pv_number = pv.get(%i[product_variant_code product_variant_number])
-
-      batch_number = DB[:mr_internal_batch_numbers].where(id: pv.get(:mr_internal_batch_number_id)).get(:batch_number)
+      pv_number          = ConfigRepo.new.format_product_variant_number(pv_number)
+      batch_number       = DB[:mr_internal_batch_numbers].where(id: pv.get(:mr_internal_batch_number_id)).get(:batch_number)
 
       sku = DB[:mr_skus].where(mr_internal_batch_number_id: pv.get(:mr_internal_batch_number_id),
                                mr_product_variant_id: item.get(:mr_product_variant_id))
@@ -349,9 +349,9 @@ module PackMaterialApp
     end
 
     def sku_info_from_sku_id(sku_id) # rubocop:disable Metrics/AbcSize
-      sku = DB[:mr_skus].where(id: sku_id).first
-      no_of_prints = 0
-      delivery_number = nil
+      sku             = DB[:mr_skus].where(id: sku_id).first
+      no_of_prints    = 0
+      delivery_number = 'unknown'
       if (item_batch_id = sku[:mr_delivery_item_batch_id])
         batch = DB[:mr_delivery_item_batches].where(id: item_batch_id)
         item = DB[:mr_delivery_items].where(id: batch.get(:mr_delivery_item_id))
@@ -363,8 +363,9 @@ module PackMaterialApp
       end
       # pv_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
       pv_code, pv_number = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(%i[product_variant_code product_variant_number])
-      sku_number = sku[:sku_number]
-      no_of_prints = 1 if no_of_prints.zero? || no_of_prints.negative?
+      pv_number          = ConfigRepo.new.format_product_variant_number(pv_number)
+      sku_number         = sku[:sku_number]
+      no_of_prints       = 1 if no_of_prints.zero? || no_of_prints.negative?
       {
         sku_number: sku_number,
         product_variant_code: pv_code,

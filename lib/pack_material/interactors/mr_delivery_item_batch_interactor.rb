@@ -54,9 +54,14 @@ module PackMaterialApp
       end
     end
 
-    def print_sku_barcode(params)
-      instance = repo.sku_for_barcode(sku_id: params[:mr_sku_id], mr_delivery_item_id: params[:mr_delivery_item_id], mr_delivery_item_batch_id: params[:mr_delivery_item_batch_id])
-      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, params[:mr_delivery_item_batch])
+    def print_sku_barcode(params, rmd: false)
+      options  = rmd ? params : params[:mr_delivery_item_batch]
+      sku_id   = rmd ? repo.sku_ids_from_numbers([params[:sku_number]]).first : params[:mr_sku_id]
+      instance = repo.sku_for_barcode(sku_id:                    sku_id,
+                                      mr_delivery_item_id:       params[:mr_delivery_item_id],
+                                      mr_delivery_item_batch_id: params[:mr_delivery_item_batch_id])
+
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, options)
     end
 
     def resolve_print_sku_barcode_params(params)

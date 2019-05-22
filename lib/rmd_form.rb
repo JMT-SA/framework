@@ -51,7 +51,7 @@ module Crossbeams
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}" name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}>#{hidden_scan_type(name, options)}
+        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}" name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
     end
@@ -110,6 +110,21 @@ module Crossbeams
     end
 
     private
+
+    def lookup_data(options)
+      return '' unless options[:lookup]
+      ' data-lookup="Y"'
+    end
+
+    def lookup_display(name, options)
+      return '' unless options[:lookup]
+      %(<div id ="#{form_name}_#{name}_scan_lookup" class="b gray"></div>)
+    end
+
+    def submit_form(options)
+      return '' unless options[:submit_form]
+      ' data-submit-form="Y"'
+    end
 
     # Set autofocus on fields in error, or else on the first field.
     def autofocus_for_field(name)

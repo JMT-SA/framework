@@ -21,7 +21,7 @@ class Framework < Roda
                                        button_caption: 'Putaway')
         form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
-        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location)
+        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, lookup: true)
         form.add_field(:quantity, 'Quantity', data_type: 'number')
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)

@@ -61,12 +61,62 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    * @param {element} element the button to re-enable.
    * @returns {void}
    */
-  function revertDisabledButton(element) {
+  const revertDisabledButton = (element) => {
     element.disabled = false;
     element.value = element.dataset.enableWith;
     element.classList.add('dim');
     element.classList.remove('o-50');
-  }
+  };
+
+  /**
+   * Get a lookup value to display on the form
+   * next to the field that was scanned.
+   * @param {element} the element that has just
+   * neen scanned.
+   * @returns {void}
+   */
+  const lookupScanField = (element, scanPack) => {
+    const url = `/rmd/utilities/lookup/${scanPack.scanType}/${scanPack.scanField}/${element.value}`;
+    const label = document.getElementById(`${element.id}_scan_lookup`);
+    console.log('lbl', label);
+    if (label === null) return null;
+
+    fetch(url, {
+      method: 'GET',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+      credentials: 'same-origin',
+    }).then((response) => {
+      if (response.status === 404) {
+        label.innerHTML = '<span class="light-red">404</span>';
+        console.log('404', url); // eslint-disable-line no-console
+        return {};
+      }
+      return response.json();
+    }).then((data) => {
+      if (data.flash) {
+        if (data.flash.type && data.flash.type === 'permission') {
+          label.innerHTML = '<span class="light-red">Permission error</span>';
+        } else {
+          label.innerHTML = '<span class="light-red">Error</span>';
+        }
+        if (data.exception) {
+          if (data.backtrace) {
+            console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+            console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+            console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+            console.groupEnd(); // eslint-disable-line no-console
+          }
+        }
+      } else {
+        label.innerHTML = data.showField;
+      }
+    }).catch((data) => {
+      console.info('==ERROR==', data); // eslint-disable-line no-console
+    });
+    return null;
+  };
 
   /**
    * When an input is invalid according to HTML5 rules and
@@ -197,6 +247,9 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
             const field = document.getElementById(`${e.id}_scan_field`);
             if (field) {
               field.value = scanPack.scanField;
+            }
+            if (e.dataset.lookup) {
+              lookupScanField(e, scanPack);
             }
             cnt += 1;
             if (e.dataset.submitForm) {

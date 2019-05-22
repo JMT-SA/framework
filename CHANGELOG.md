@@ -11,6 +11,8 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 - Inline editing for grids.
 - Tables can have a column named `extended_columns` with JSONB key/values that can be displayed and edited.
 - Added toggle camera scan route to RMD menu.
+- RMD form: can lookup an id to display a value on the form.
+- RMD form: a field can be set to submit the form on scan.
 ### Changed
 - Created RMD utilities route and moved check_barcode to it.
 ### Fixed

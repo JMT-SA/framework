@@ -3,14 +3,28 @@
 class Framework < Roda
   # RMD USER MENU PAGE
   # --------------------------------------------------------------------------
-  route 'home', 'rmd' do # |r|
+  route 'home', 'rmd' do
     @no_menu = true
     show_rmd_page { Rmd::Home::Show.call(rmd_menu_items(self.class.name, as_hash: true)) }
   end
 
-  # RMD BARCODE CHECK PAGE
-  # --------------------------------------------------------------------------
+  # route rmd/utilities/lookup/location/id/16
   route 'utilities', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+    # RMD LOOKUP A VALUE
+    # --------------------------------------------------------------------------
+    r.on 'lookup', String, String, String do |scan_type, scan_field, scan_value|
+      scan_rule = AppConst::BARCODE_LOOKUP_RULES[scan_type.to_sym]
+      rule = scan_rule[scan_field.to_sym] unless scan_rule.nil?
+      if rule.nil?
+        { showField: 'There is no lookup' }.to_json
+      else
+        show_field = DB[rule[:table]].where(rule[:field] => scan_value).get(rule[:show_field])
+        { showField: show_field || 'Not found' }.to_json
+      end
+    end
+
+    # RMD BARCODE CHECK PAGE
+    # --------------------------------------------------------------------------
     r.is 'check_barcode' do # # rubocop:disable Metrics/BlockLength
       r.get do
         form = Crossbeams::RMDForm.new({},

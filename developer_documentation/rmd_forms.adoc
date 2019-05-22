@@ -143,6 +143,16 @@ a|String:
 |Symbol
 |None.
 
+|options - :lookup
+|When scanned, should a lookup  be displayed? e.g. When scanning an `id`, display a `code`. `AppConst::BARCODE_LOOKUP_RULES` must be configured with appropriate rules to do a lookup.
+|Boolean
+|`false`
+
+|options - :submit_form
+|Should the form be submitted automatically after a scan? This should only be set to true if the form only contains the one field.
+|Boolean
+|`false`
+
 |===
 
 === Method: add_select

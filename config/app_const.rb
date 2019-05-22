@@ -61,6 +61,17 @@ class AppConst
     { regex: '^SA(\\d+)', type: 'stock_adjustment', field: 'stock_adjustment_number' }
   ].freeze
 
+  # Per scan type, per field, set attributes for displaying a lookup value below a scan field.
+  # The key matches a key in BARCODE_PRINT_RULES. (e.g. :location)
+  # The hash for that key is keyed by the value of the BARCODE_SCAN_RULES :field. (e.g. :id)
+  # The rules for that field are: the table to read, the field to match the scanned value and the field to display in the form.
+  BARCODE_LOOKUP_RULES = {
+    location: {
+      id: { table: :locations, field: :id, show_field: :location_long_code },
+      location_short_code: { table: :locations, field: :location_short_code, show_field: :location_long_code }
+    }
+  }.freeze
+
   # Que
   QUEUE_NAME = ENV.fetch('QUEUE_NAME', 'default')
 

@@ -1,21 +1,21 @@
 ---
 :dataminer_definition: sku_locations
 :actions:
-- :url: "/pack_material/transactions/adhoc_stock_transactions/$:id$/add"
-  :text: add stock
-  :icon: add-outline
-  :title: Add Stock
-  :popup: true
-- :url: "/pack_material/transactions/adhoc_stock_transactions/$:id$/move"
-  :text: move stock
-  :icon: code
-  :title: Move Stock
-  :popup: true
-- :url: "/pack_material/transactions/adhoc_stock_transactions/$:id$/remove"
-  :text: remove stock
-  :icon: minus-outline
-  :title: Remove Stock
-  :popup: true
+  #- :url: "/pack_material/transactions/adhoc_stock_transactions/$:id$/add"
+  #  :text: add stock
+  #  :icon: add-outline
+  #  :title: Add Stock
+  #  :popup: true
+  #- :url: "/pack_material/transactions/adhoc_stock_transactions/$:id$/move"
+  #  :text: move stock
+  #  :icon: code
+  #  :title: Move Stock
+  #  :popup: true
+  #- :url: "/pack_material/transactions/adhoc_stock_transactions/$:id$/remove"
+  #  :text: remove stock
+  #  :icon: minus-outline
+  #  :title: Remove Stock
+  #  :popup: true
 - :url: "/list/sku_transaction_history/with_params?key=standard&sku_number=$:sku_number$"
   :text: transaction history
   :icon: view-column

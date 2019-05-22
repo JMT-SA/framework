@@ -53,7 +53,7 @@ module PackMaterialApp
         end
       end
       http = Crossbeams::HTTPCalls.new
-      res = http.xml_post(@repo.erp_integration_uri, request_xml.to_xml)
+      res = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, request_xml.to_xml)
       raise Crossbeams::InfoError, res.message unless res.success
 
       instance = @repo.format_response(res.instance.body)

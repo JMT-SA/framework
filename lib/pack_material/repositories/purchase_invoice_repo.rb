@@ -74,10 +74,6 @@ module PackMaterialApp
                             wrapper: MrDeliveryItem)
     end
 
-    def erp_integration_uri
-      "#{AppConst::ERP_PURCHASE_INVOICE_URI}purchase_invoice"
-    end
-
     def format_response(response)
       resp = Nokogiri::XML(response)
       {

@@ -81,6 +81,7 @@ module MasterfilesApp
     def validate_published_labels(params) # rubocop:disable Metrics/AbcSize
       res = LabelTemplatePublishSchema.call(params)
       return res unless res.messages.empty?
+      return res unless matching_variable_set?(res)
 
       var_errs = {}
       res[:labels].each do |lbl|
@@ -94,6 +95,10 @@ module MasterfilesApp
 
       return OpenStruct.new(messages: var_errs) unless var_errs.empty?
       res
+    end
+
+    def matching_variable_set?(res)
+      res[:labels].any? { |l| l[:variable_set] == 'Pack Material' }
     end
   end
 end

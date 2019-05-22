@@ -125,14 +125,41 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Home'
         false);
 
 
+-- PROGRAM: Utilities
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Utilities', 1,
+        (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs
+                   WHERE program_name = 'Utilities'
+                     AND functional_area_id = (SELECT id
+                                               FROM functional_areas
+                                               WHERE functional_area_name = 'RMD')),
+                                               'Framework');
+
 -- PROGRAM FUNCTION Check Barcodes
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
                                group_name, restricted_user_access, show_in_iframe)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Home'
+VALUES ((SELECT id FROM programs WHERE program_name = 'Utilities'
           AND functional_area_id = (SELECT id FROM functional_areas
                                     WHERE functional_area_name = 'RMD')),
         'Check Barcodes',
-        '/rmd/check_barcode',
+        '/rmd/utilities/check_barcode',
+        1,
+        NULL,
+        false,
+        false);
+
+-- PROGRAM FUNCTION Check Barcodes
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Utilities'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'RMD')),
+        'Toggle Camera Scan',
+        '/rmd/utilities/toggle_camera',
         2,
         NULL,
         false,

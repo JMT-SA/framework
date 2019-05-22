@@ -43,5 +43,14 @@ module SecurityApp
         failed_response('Not a Remote Mobile Device')
       end
     end
+
+    def find_by_ip_address(ip_address)
+      id = DB[:registered_mobile_devices].where(ip_address: ip_address).get(:id)
+      if id.nil?
+        nil
+      else
+        find_registered_mobile_device(id)
+      end
+    end
   end
 end

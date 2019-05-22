@@ -51,5 +51,14 @@ module SecurityApp
       end
       success_response("Deleted registered mobile device #{name}")
     end
+
+    def toggle_camera_scan(ip_address)
+      rmd = repo.find_by_ip_address(ip_address)
+      return failed_response('This device is not a Registered Mobile Device') if rmd.nil?
+      repo.update_registered_mobile_device(rmd.id, scan_with_camera: !rmd.scan_with_camera)
+      instance = registered_mobile_device(rmd.id)
+      success_response("Toggled camera scan #{instance[:ip_address]}",
+                       instance)
+    end
   end
 end

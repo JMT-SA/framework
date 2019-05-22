@@ -32,12 +32,11 @@ module PackMaterial
                                     url: cost_url + "/with_params?key=standard&mr_delivery_id=#{id}",
                                     style: :button,
                                     behaviour: :popup)
-                url = rules[:invoice_completed]
                 section.add_control(control_type: :link,
-                                    text: 'Invoice Info',
-                                    url: "/pack_material/replenish/mr_deliveries/#{id}/invoice",
-                                    style: :button,
-                                    behaviour: :popup)
+                                    text:         'Invoice Info',
+                                    url:          "/pack_material/replenish/mr_deliveries/#{id}/invoice",
+                                    style:        :button,
+                                    behaviour:    :popup)
               end
               section.add_control(control_type: :link,
                                   text: 'Complete Purchase Invoice',

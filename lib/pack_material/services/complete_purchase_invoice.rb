@@ -6,11 +6,11 @@ module PackMaterialApp
   class CompletePurchaseInvoice < BaseService
     # @param [Integer] delivery_id
     def initialize(user_name, delivery_id)
-      @repo = PurchaseInvoiceRepo.new
+      @repo           = PurchaseInvoiceRepo.new
       @replenish_repo = ReplenishRepo.new
-      @user_name = user_name
-      @id = delivery_id
-      @delivery = @repo.find_mr_delivery(@id)
+      @user_name      = user_name
+      @id             = delivery_id
+      @delivery       = @repo.find_mr_delivery(@id)
     end
 
     def call
@@ -52,11 +52,11 @@ module PackMaterialApp
           end
         end
       end
-      http = Crossbeams::HTTPCalls.new
-      res = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, request_xml.to_xml)
+      http        = Crossbeams::HTTPCalls.new
+      res         = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, request_xml.to_xml)
       raise Crossbeams::InfoError, res.message unless res.success
 
-      instance = @repo.format_response(res.instance.body)
+      instance      = @repo.format_response(res.instance.body)
       error_message = instance.delete(:error_message)
       if !error_message.empty?
         @replenish_repo.update_mr_delivery(@id, invoice_error: true)

@@ -236,7 +236,7 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -247,12 +247,12 @@
     :caption: Erp purchase order number
     :namespaced_name: mr_deliveries.erp_purchase_order_number
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -263,12 +263,44 @@
     :caption: Erp purchase invoice number
     :namespaced_name: mr_deliveries.erp_purchase_invoice_number
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_purchase_order_number:
+    :name: erp_purchase_order_number
+    :sequence_no: 15
+    :caption: Erp purchase order number
+    :namespaced_name: mr_deliveries.erp_purchase_order_number
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_purchase_invoice_number:
+    :name: erp_purchase_invoice_number
+    :sequence_no: 16
+    :caption: Erp purchase invoice number
+    :namespaced_name: mr_deliveries.erp_purchase_invoice_number
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

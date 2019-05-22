@@ -16,7 +16,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -32,7 +32,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -48,7 +48,7 @@
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -64,7 +64,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -80,7 +80,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -96,7 +96,7 @@
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
     :group_by_seq: 
     :group_sum: false

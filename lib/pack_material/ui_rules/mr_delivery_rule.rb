@@ -59,15 +59,15 @@ module UiRules
     def invoice_fields
       {
         supplier_invoice_ref_number: { required: true, with_value: @form_object.supplier_invoice_ref_number },
-        supplier_invoice_date: { subtype: :date, required: true },
+        supplier_invoice_date:       { subtype: :date, required: true },
       }
     end
 
     def show_invoice_fields
       {
         supplier_invoice_ref_number: { renderer: :label },
-        supplier_invoice_date: { renderer: :label },
-        erp_purchase_order_number: { renderer: :label },
+        supplier_invoice_date:       { renderer: :label },
+        erp_purchase_order_number:   { renderer: :label },
         erp_purchase_invoice_number: { renderer: :label }
       }
     end

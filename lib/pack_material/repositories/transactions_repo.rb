@@ -130,10 +130,20 @@ module PackMaterialApp
       }
     end
 
-    def bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
+    def for_lookup_bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
       DB[:mr_skus].where(
         id: bulk_stock_adjustment_sku_ids(bulk_stock_adjustment_id)
       ).map { |r| [r[:sku_number], r[:id]] }
+    end
+
+    def bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
+      DB[:mr_skus].where(
+        id: bulk_stock_adjustment_sku_ids(bulk_stock_adjustment_id)
+      ).map { |r| ["#{r[:sku_number]}: #{product_code(r[:mr_product_variant_id])}", r[:id]] }
+    end
+
+    def product_code(mr_product_variant_id)
+      DB[:material_resource_product_variants].where(id: mr_product_variant_id).get(:product_variant_code)
     end
 
     def bulk_stock_adjustment_locations(bulk_stock_adjustment_id)

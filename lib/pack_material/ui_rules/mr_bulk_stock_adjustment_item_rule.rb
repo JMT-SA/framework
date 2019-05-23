@@ -41,7 +41,7 @@ module UiRules
           lookup_key: :standard,
           caption: 'Select SKU Location',
           param_values: {
-            allowed_sku_numbers: sku_number_options.map { |r| r[0] },
+            allowed_sku_numbers: for_lookup_sku_number_options.map { |r| r[0] },
             allowed_locations: location_options.map { |r| r[1] }
           }
         },
@@ -76,6 +76,10 @@ module UiRules
 
     def sku_number_options
       @repo.bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
+    end
+
+    def for_lookup_sku_number_options
+      @repo.for_lookup_bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
     end
 
     def location_options

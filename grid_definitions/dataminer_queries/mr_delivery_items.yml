@@ -1,8 +1,9 @@
 ---
 :caption: Delivery Items
 :sql: "SELECT mr_deliveries.id AS delivery_id,\r\n  mr_delivery_items.id AS delivery_item_id,\r\n
-  \ mr_delivery_items.mr_product_variant_id,\r\n  material_resource_product_variants.product_variant_code,\r\n
-  \ material_resource_product_variants.product_variant_number,\r\n  material_resource_product_variants.use_fixed_batch_number,\r\n(\"mr_deliveries\".\"verified\"
+  \ mr_delivery_items.mr_product_variant_id,\r\n  material_resource_product_variants.old_product_code,\r\n
+  \ material_resource_product_variants.product_variant_code,\r\n  material_resource_product_variants.product_variant_number,\r\n
+  \ material_resource_product_variants.use_fixed_batch_number,\r\n(\"mr_deliveries\".\"verified\"
   OR \"material_resource_product_variants\".\"use_fixed_batch_number\") AS new_batch_not_allowed,\r\n
   \ mr_delivery_items.quantity_on_note,\r\n  mr_delivery_items.quantity_over_supplied,\r\n
   \ mr_delivery_items.quantity_under_supplied,\r\n  mr_delivery_items.quantity_received,\r\n
@@ -66,16 +67,32 @@
     :width: 
     :format: 
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  old_product_code:
+    :name: old_product_code
+    :sequence_no: 4
+    :caption: Old product code
+    :namespaced_name: material_resource_product_variants.old_product_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   product_variant_code:
     :name: product_variant_code
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Product variant code
     :namespaced_name: material_resource_product_variants.product_variant_code
     :data_type: :string
@@ -91,7 +108,7 @@
     :group_max: false
   product_variant_number:
     :name: product_variant_number
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Product variant number
     :namespaced_name: material_resource_product_variants.product_variant_number
     :data_type: :string
@@ -107,7 +124,7 @@
     :group_max: false
   use_fixed_batch_number:
     :name: use_fixed_batch_number
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Use fixed batch number
     :namespaced_name: material_resource_product_variants.use_fixed_batch_number
     :data_type: :string
@@ -123,7 +140,7 @@
     :group_max: false
   new_batch_not_allowed:
     :name: new_batch_not_allowed
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: New batch not allowed
     :namespaced_name: 
     :data_type: :string
@@ -139,7 +156,7 @@
     :group_max: false
   quantity_on_note:
     :name: quantity_on_note
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Quantity on note
     :namespaced_name: mr_delivery_items.quantity_on_note
     :data_type: :number
@@ -155,7 +172,7 @@
     :group_max: false
   quantity_over_supplied:
     :name: quantity_over_supplied
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Quantity over supplied
     :namespaced_name: mr_delivery_items.quantity_over_supplied
     :data_type: :number
@@ -171,7 +188,7 @@
     :group_max: false
   quantity_under_supplied:
     :name: quantity_under_supplied
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Quantity under supplied
     :namespaced_name: mr_delivery_items.quantity_under_supplied
     :data_type: :number
@@ -187,7 +204,7 @@
     :group_max: false
   quantity_received:
     :name: quantity_received
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Quantity received
     :namespaced_name: mr_delivery_items.quantity_received
     :data_type: :number
@@ -203,7 +220,7 @@
     :group_max: false
   mr_purchase_order_item_id:
     :name: mr_purchase_order_item_id
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Purchase order item
     :namespaced_name: mr_delivery_items.mr_purchase_order_item_id
     :data_type: :integer
@@ -219,7 +236,7 @@
     :group_max: false
   purchase_order_number:
     :name: purchase_order_number
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Purchase order number
     :namespaced_name: mr_purchase_orders.purchase_order_number
     :data_type: :string
@@ -235,7 +252,7 @@
     :group_max: false
   supplier:
     :name: supplier
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Supplier
     :namespaced_name: 
     :data_type: :string
@@ -251,7 +268,7 @@
     :group_max: false
   quantity_required:
     :name: quantity_required
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Quantity required
     :namespaced_name: mr_purchase_order_items.quantity_required
     :data_type: :string
@@ -267,7 +284,7 @@
     :group_max: false
   uom_code:
     :name: uom_code
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: UOM code
     :namespaced_name: uoms.uom_code
     :data_type: :string
@@ -283,7 +300,7 @@
     :group_max: false
   ord_unit_price:
     :name: ord_unit_price
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Ord unit price
     :namespaced_name: mr_purchase_order_items.unit_price
     :data_type: :string
@@ -299,7 +316,7 @@
     :group_max: false
   inv_unit_price:
     :name: inv_unit_price
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Inv unit price
     :namespaced_name: mr_delivery_items.invoiced_unit_price
     :data_type: :string
@@ -315,7 +332,7 @@
     :group_max: false
   remarks:
     :name: remarks
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Remarks
     :namespaced_name: mr_delivery_items.remarks
     :data_type: :string
@@ -331,7 +348,7 @@
     :group_max: false
   id:
     :name: id
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Id
     :namespaced_name: mr_delivery_item_batches.id
     :data_type: :integer
@@ -347,7 +364,7 @@
     :group_max: false
   client_batch_number:
     :name: client_batch_number
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Client batch number
     :namespaced_name: mr_delivery_item_batches.client_batch_number
     :data_type: :string
@@ -363,7 +380,7 @@
     :group_max: false
   internal_batch_number:
     :name: internal_batch_number
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Internal batch number
     :namespaced_name: mr_internal_batch_numbers.batch_number
     :data_type: :string
@@ -379,7 +396,7 @@
     :group_max: false
   batch_quantity_on_note:
     :name: batch_quantity_on_note
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Batch quantity on note
     :namespaced_name: mr_delivery_item_batches.quantity_on_note
     :data_type: :string
@@ -395,7 +412,7 @@
     :group_max: false
   batch_quantity_received:
     :name: batch_quantity_received
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Batch quantity received
     :namespaced_name: mr_delivery_item_batches.quantity_received
     :data_type: :string

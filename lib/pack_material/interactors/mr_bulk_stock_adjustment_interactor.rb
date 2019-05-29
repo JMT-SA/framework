@@ -196,6 +196,16 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
+    def set_price_adjustment_inline(id, params)
+      repo.transaction do
+        repo.set_price_adjustment_inline(id, params)
+        log_transaction
+      end
+      success_response('Adjusted stock adjustment price')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def replenish_repo
       ReplenishRepo.new
     end

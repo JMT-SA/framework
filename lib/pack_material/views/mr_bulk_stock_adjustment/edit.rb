@@ -25,6 +25,13 @@ module PackMaterial
                                   style: :button,
                                   visible: rules[:can_complete],
                                   id: 'mr_bulk_stock_adjustments_complete_button')
+              section.add_control(control_type: :link,
+                                  text: 'Set Prices',
+                                  url: "/list/mr_price_adjustments/with_params?key=standard&mr_bulk_stock_adjustment_id=#{id}",
+                                  style: :button,
+                                  behaviour: :popup,
+                                  # grid_id: 'blk_stck_adj_items',
+                                  css_class: 'mb1')
               if rules[:can_approve]
                 section.add_control(control_type: :link,
                                     text: 'Reopen',

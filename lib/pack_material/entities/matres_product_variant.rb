@@ -14,5 +14,7 @@ module PackMaterialApp
     attribute :use_fixed_batch_number, Types::Bool
     attribute :internal_batch_number, Types::Integer
     attribute :mr_internal_batch_number_id, Types::Integer
+    attribute :current_price, Types::Decimal
+    attribute :stock_adj_price, Types::Decimal
   end
 end

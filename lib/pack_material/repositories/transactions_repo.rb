@@ -104,19 +104,44 @@ module PackMaterialApp
       inventory_uom_code = DB[:uoms].where(id: inventory_uom_id).get(:uom_code)
       system_qty = system_quantity(attrs)
 
-      create(:mr_bulk_stock_adjustment_items,
-             mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
-             sku_number: DB[:mr_skus].where(id: sku_id).get(:sku_number),
-             mr_sku_id: sku_id,
-             location_id: location_id,
-             product_variant_number: product_variant_number,
-             mr_type_name: mr_type_name,
-             mr_sub_type_name: mr_sub_type_name,
-             product_variant_code: product_variant_code,
-             inventory_uom_id: inventory_uom_id,
-             inventory_uom_code: inventory_uom_code,
-             system_quantity: system_qty,
-             location_long_code: DB[:locations].where(id: location_id).get(:location_long_code))
+      item_id = create(:mr_bulk_stock_adjustment_items,
+                       mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
+                       sku_number: DB[:mr_skus].where(id: sku_id).get(:sku_number),
+                       mr_sku_id: sku_id,
+                       location_id: location_id,
+                       product_variant_number: product_variant_number,
+                       mr_type_name: mr_type_name,
+                       mr_sub_type_name: mr_sub_type_name,
+                       product_variant_code: product_variant_code,
+                       inventory_uom_id: inventory_uom_id,
+                       inventory_uom_code: inventory_uom_code,
+                       system_quantity: system_qty,
+                       location_long_code: DB[:locations].where(id: location_id).get(:location_long_code))
+
+      create_mr_price_adjustment(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id], mr_product_variant_id: mr_product_variant_id)
+      item_id
+    end
+
+    def create_mr_price_adjustment(attrs)
+      DB[:mr_price_adjustments].insert(attrs) unless exists?(:mr_price_adjustments, attrs)
+    end
+
+    def delete_mr_bulk_stock_adjustment_item(id)
+      item = DB[:mr_bulk_stock_adjustment_items].where(id: id)
+      pv_number = item.get(:product_variant_number)
+      parent_id = item.get(:mr_bulk_stock_adjustment_id)
+
+      item.delete
+      delete_mr_price_adjustment(parent_id, pv_number)
+    end
+
+    def delete_mr_price_adjustment(parent_id, pv_number)
+      product_id = DB[:material_resource_product_variants].where(product_variant_number: pv_number).get(:id)
+      item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: parent_id,
+                                                       product_variant_number: pv_number).single_value
+      return nil if item
+      DB[:mr_price_adjustments].where(mr_bulk_stock_adjustment_id: parent_id,
+                                      mr_product_variant_id: product_id).delete
     end
 
     def system_quantity(attrs)
@@ -275,6 +300,15 @@ module PackMaterialApp
 
     def bulk_stock_adjustment_list_items(bulk_stock_adjustment_id)
       all(:mr_bulk_stock_adjustment_items, MrBulkStockAdjustmentItem, mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id)
+    end
+
+    def set_price_adjustment_inline(id, attrs)
+      # TODO:
+      # Only update price if something was set
+      # def inline_update_delivery_item(id, attrs)
+      #       val = attrs[:column_value].empty? ? nil : attrs[:column_value]
+      #       update(:mr_delivery_items, id, invoiced_unit_price: val)
+      #     end
     end
   end
 end

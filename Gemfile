@@ -43,6 +43,7 @@ group :test do
   gem 'minitest', '~>5.11'
   gem 'minitest-hooks', '1.4.2'
   gem 'minitest-rg'
+  gem 'minitest-stub-const'
   gem 'minitest-stub_any_instance', '~>1.0.1'
   gem 'mocha', '~>1.5'
   gem 'rack-test'

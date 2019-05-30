@@ -4,6 +4,10 @@
 .brown {
   color: #a52a2a;
 }
+/* Force editable grid column to render when in modal */
+.ag-theme-balham .ag-popup-editor {
+  z-index: 30 !important;
+}
 .gridEditableColumn {
   color: #357edd;
 }

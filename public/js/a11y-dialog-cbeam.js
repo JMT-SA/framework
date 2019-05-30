@@ -1,7 +1,10 @@
 /* global NodeList, Element, define */
 
 // NoSoft: DO NOT TRAP ESC key.
-// Modified from version 4.0.0 so that the ESC key is ignored (so that AG-Grid search input can be cleared with ESC key without closing the dialog)
+// Modified _bindKeypress() from version 4.0.0 so that the ESC key is ignored (so that AG-Grid search input can be cleared with ESC key without closing the dialog)
+
+// NoSoft: DO NOT SHIFT FOCUS WHEN EDITING AG GRID CELL
+// Modified _maintainFocus() from version 4.0.0 so that focus is not lost for AG-Grid inline-edit
 
 (function (global) {
   'use strict';
@@ -278,7 +281,11 @@
     // If the dialog is shown and the focus is not within the dialog element,
     // move it back to its first focusable child
     if (this.shown && !this.node.contains(event.target)) {
-      setFocusToFirstItem(this.node);
+      // NoSoft: For AG Grid, if inline edit pops up, we do NOT want to move the focus.
+      const parent = event.target.parentNode;
+      if (!parent.classList.contains('ag-popup-editor')) {
+        setFocusToFirstItem(this.node);
+      }
     }
   };
 

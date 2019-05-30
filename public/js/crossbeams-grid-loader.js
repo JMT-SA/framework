@@ -82,7 +82,7 @@ const crossbeamsGridEvents = {
       console.log('No grid with id:', id); // eslint-disable-line no-console
       return;
     }
-    gridOptions.context.nonUserEdit = true;
+
     Object.keys(changes).forEach((k) => {
       rowNode.setDataValue(k, changes[k]);
     });

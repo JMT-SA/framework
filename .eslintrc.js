@@ -29,6 +29,7 @@ module.exports = {
     "crossbeamsDialogLevel2": false,
     "crossbeamsGridStore": false,
     "crossbeamsUtils": false,
+    "crossbeamsDataMinerParams": false,
     "crossbeamsLocalStorage": false,
     "crossbeamsGridEvents": false
   }

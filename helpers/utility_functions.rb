@@ -92,4 +92,12 @@ module UtilityFunctions
     f = s.to_f
     i == f ? i.to_s : f.to_s
   end
+
+  # Deep merge for two hashes
+  #
+  # @param left [hash] the "base" hash
+  # @param right [hash] the "additional" hash
+  def merge_recursively(left, right)
+    left.merge(right) { |_, a_item, b_item| a_item.is_a?(Hash) ? merge_recursively(a_item, b_item) : b_item }
+  end
 end

@@ -25,6 +25,15 @@
     :program: masterfiles
     :permission: user_maintenance
 - :separator: true
+- :url: "/development/masterfiles/users/$:id$/permission_tree"
+  :text: User permissions
+  :icon: lock-closed
+  :title: User permissions
+  :popup: true
+  :auth:
+    :function: development
+    :program: masterfiles
+    :permission: user_maintenance
 - :url: "/list/programs/multi?key=program_users&id=$:id$"
   :text: select programs
   :icon: list

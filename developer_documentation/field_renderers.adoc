@@ -222,6 +222,11 @@ and all words start with initial capital letter.
 |HTML text
 |None
 
+|:tooltip
+|Text for the `title` attribute to diplay on hover of the checkbox label.
+|String
+|None
+
 |===
 
 === Renderer::Label

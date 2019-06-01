@@ -39,11 +39,15 @@ module UiRules
 
     private
 
+    def make_caption(value)
+      value.to_s.split('_').map(&:capitalize).join(' ')
+    end
+
     def extended_columns(repo, table, edit_mode: true)
       config = Crossbeams::Config::ExtendedColumnDefinitions::EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
       return if config.nil?
       config.each do |key, defn|
-        caption = key.to_s.split('_').map(&:capitalize).join(' ')
+        caption = make_caption(key)
         fields["extcol_#{key}".to_sym] = if edit_mode
                                            renderer_for_extcol(repo, defn, caption)
                                          else

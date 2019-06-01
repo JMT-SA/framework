@@ -191,6 +191,28 @@ class Framework < Roda
         r.redirect '/'
       end
 
+      r.on 'permission_tree' do
+        check_auth!('masterfiles', 'user_maintenance')
+        r.get do
+          show_partial { Development::Masterfiles::User::PermissionTree.call(id, current_user) }
+        end
+        r.patch do
+          update_dialog_content(content: params[:user].inspect, notice: 'try') # Label should also be disabled...
+          # {:user_name=>"Hans Zietsman", :stock_adj_sign_off=>"t", :stock_adj_approve=>"t", :invoice_complete=>"f", :invoice_approve_fruit=>"t", :invoice_approve_assets=>"f"}
+          # res = interactor.change_user_permissions(id, params[:user]) # apply params to tree & save hash to JSON permission_tree
+          # if res.success
+          #   show_json_notice res.message
+          # else
+          #   re_show_form(r, res) do
+          #     Development::Masterfiles::User::PermissionTree.call(id,
+          #                                                         current_user,
+          #                                                         form_values: params[:permission_tree],
+          #                                                         form_errors: res.errors)
+          #   end
+          # end
+        end
+      end
+
       r.on 'details' do
         r.get do
           show_partial { Development::Masterfiles::User::Details.call(id) }

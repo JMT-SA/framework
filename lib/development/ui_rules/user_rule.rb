@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-# rubocop#:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module UiRules
   class UserRule < Base
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity , Metrics/CyclomaticComplexity
       @repo = DevelopmentApp::UserRepo.new
+      build_permission_tree if @mode == :permission_tree
+
       make_form_object
       apply_form_values
 
@@ -17,8 +16,15 @@ module UiRules
       set_edit_fields if @mode == :edit
       set_detail_fields if @mode == :details
       set_password_fields if @mode == :change_password
+      set_permission_tree_fields if @mode == :permission_tree
 
       form_name 'user'
+    end
+
+    def build_permission_tree
+      ptree = Crossbeams::Config::UserPermissions.new(@options[:user])
+      @tree_fields = ptree.fields
+      rules[:tree_fields] = ptree.grouped_fields
     end
 
     def set_new_fields
@@ -35,6 +41,13 @@ module UiRules
     def set_password_fields
       set_show_fields
       set_new_fields
+    end
+
+    def set_permission_tree_fields
+      fields[:user_name] = { renderer: :label }
+      @tree_fields.each do |tf|
+        fields[tf[:field]] = { renderer: :checkbox, caption: make_caption(tf[:field]), tooltip: tf[:description] } # Make this tooltip...
+      end
     end
 
     def set_edit_fields
@@ -56,7 +69,7 @@ module UiRules
       }
     end
 
-    def make_form_object
+    def make_form_object # rubocop:disable Metrics/AbcSize
       make_new_form_object && return if @mode == :new
 
       @form_object = if @mode == :details
@@ -66,6 +79,10 @@ module UiRules
                      elsif @mode == :change_password
                        OpenStruct.new(@repo.find_user(@options[:id]).to_h.merge(password: nil,
                                                                                 password_confirmation: nil))
+                     elsif @mode == :permission_tree
+                       perms = {}
+                       @tree_fields.each { |tree| perms[tree[:field]] = tree[:value] }
+                       OpenStruct.new(@repo.find_user(@options[:id]).to_h.merge(perms))
                      else
                        @repo.find_user(@options[:id])
                      end
@@ -81,5 +98,3 @@ module UiRules
     end
   end
 end
-# rubocop#:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

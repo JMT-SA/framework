@@ -8,6 +8,13 @@ module Crossbeams
     # Leaf nodes must be true or false.
     #
     # The first key must be the Webapp (matches the Roda class)
+    #
+    # DOCUMENTATION mirrors BASE, but supplies a description of each permission
+    # to display in the UI to help users understand the context of the setting.
+    #
+    # The main method to use is Crossbeams::Config::UserPermissions.can_user?
+    # - pass the user object (or hash) and an array of permission keys.
+    #
     class UserPermissions
       WEBAPP = :Framework
 
@@ -42,21 +49,54 @@ module Crossbeams
         permissions.is_a? TrueClass
       end
 
-      # INSTANCE
-      # --------------------------------
+      # INSTANCE - used for maintaining a user's permission tree.
+      # ---------------------------------------------------------
       attr_reader :tree
 
-      def initialize(user)
+      def initialize(user = {})
         @user_permissions = user[:permission_tree] || {}
         @tree = make_tree(user)
       end
 
+      # An array of User permissions.
+      # Each field is a Hash of:
+      # - group
+      # - field
+      # - value
+      # - description
+      # - keys
+      #
+      # @return [Array]
       def fields
         tree.field_array
       end
 
+      # Return fields grouped per group value.
+      #
+      # @return [Hash] key is group and value is array of fields for the group.
       def grouped_fields
         tree.field_array.group_by { |g| g[:group] }
+      end
+
+      # Take input parameters, apply them to the base permissions
+      # and return a new hash of permissions for the user.
+      #
+      # @param params [array] the input parameters.
+      # @return [hash] the new permissions for the user.
+      def apply_params(params)
+        permissions = BASE[WEBAPP].dup
+        params.each do |compound_key, permission|
+          hash_keys = keys_for(compound_key)
+          h = permissions
+          hash_keys.each do |key|
+            if h[key].is_a?(Hash)
+              h = h[key]
+            else
+              h[key] = permission == 't'
+            end
+          end
+        end
+        permissions
       end
 
       private
@@ -114,6 +154,12 @@ module Crossbeams
           build_tree(child, k, v, group)
         end
       end
+
+      def keys_for(compound_key)
+        field = fields.find { |f| f[:field] == compound_key }
+        raise Crossbeams::InfoError %(There is no user permission for "#{compound_key}") if field.nil?
+        field[:keys]
+      end
     end
 
     class TreeNode
@@ -152,7 +198,7 @@ module Crossbeams
         if children?
           children.each { |child| ar += child.leaf_set }
         else
-          ar << { field: fieldname, description: description, value: permission, group: group }
+          ar << { field: fieldname, description: description, value: permission, group: group, keys: keys }
         end
         ar
       end

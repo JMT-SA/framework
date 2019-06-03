@@ -13,6 +13,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 - Added toggle camera scan route to RMD menu.
 - RMD form: can lookup an id to display a value on the form.
 - RMD form: a field can be set to submit the form on scan.
+- User permissions stored in `permission_tree` on users table.
 ### Changed
 - Created RMD utilities route and moved check_barcode to it.
 ### Fixed

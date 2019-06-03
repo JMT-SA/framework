@@ -94,6 +94,14 @@ module DevelopmentApp
                        res.instance)
     end
 
+    def change_user_permissions(id, params)
+      user_permissions = Crossbeams::Config::UserPermissions.new.apply_params(params)
+      repo.update_user(id, permission_tree: repo.hash_for_jsonb_col(user_permissions))
+      instance = user(id)
+      success_response("Updated user #{instance.user_name}",
+                       instance)
+    end
+
     private
 
     def validate_user_permission(params)

@@ -52,8 +52,8 @@ module SecurityApp
     def sql_for_f(functional_area)
       <<~SQL
         -- FUNCTIONAL AREA #{functional_area.functional_area_name}
-        INSERT INTO functional_areas (functional_area_name)
-        VALUES ('#{functional_area.functional_area_name}');
+        INSERT INTO functional_areas (functional_area_name, rmd_menu)
+        VALUES ('#{functional_area.functional_area_name}', #{functional_area.rmd_menu});
       SQL
     end
 

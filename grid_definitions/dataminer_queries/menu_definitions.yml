@@ -1,6 +1,6 @@
 ---
 :caption: Menu definitions
-:sql: "SELECT \r\nf.id AS functional_area_id, p.id AS program_id, pf.id, f.functional_area_name,
+:sql: "SELECT \r\nf.id AS functional_area_id, p.id AS program_id, pf.id, f.functional_area_name, f.rmd_menu,
   f.active AS f_active, f.created_at AS f_created_at, f.updated_at AS f_updated_at,\r\np.program_name,
   p.active AS p_active, p.created_at AS p_created_at, p.updated_at AS p_updated_at,
   -- p.functional_area_id\r\npf.group_name, pf.program_function_name, pf.url, p.program_sequence, pf.program_function_sequence,
@@ -75,9 +75,24 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rmd_menu:
+    :name: rmd_menu
+    :sequence_no: 11
+    :caption: RMD?
+    :namespaced_name: f.rmd_menu
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   f_active:
     :name: f_active
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: FA Active
     :namespaced_name: f.active
     :data_type: :boolean
@@ -92,7 +107,7 @@
     :group_max: false
   f_created_at:
     :name: f_created_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Created at
     :namespaced_name: f.created_at
     :data_type: :datetime
@@ -107,7 +122,7 @@
     :group_max: false
   f_updated_at:
     :name: f_updated_at
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Updated at
     :namespaced_name: f.updated_at
     :data_type: :datetime
@@ -122,7 +137,7 @@
     :group_max: false
   program_name:
     :name: program_name
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Program name
     :namespaced_name: p.program_name
     :data_type: :string
@@ -137,7 +152,7 @@
     :group_max: false
   p_active:
     :name: p_active
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Prog Active
     :namespaced_name: p.active
     :data_type: :boolean
@@ -152,7 +167,7 @@
     :group_max: false
   p_created_at:
     :name: p_created_at
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Created at
     :namespaced_name: p.created_at
     :data_type: :datetime
@@ -167,7 +182,7 @@
     :group_max: false
   p_updated_at:
     :name: p_updated_at
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Updated at
     :namespaced_name: p.updated_at
     :data_type: :datetime
@@ -261,7 +276,7 @@
     :caption: Restricted user access
     :namespaced_name: pf.restricted_user_access
     :data_type: :boolean
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :groupable: false
@@ -287,7 +302,7 @@
     :group_max: false
   pf_created_at:
     :name: pf_created_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Created at
     :namespaced_name: pf.created_at
     :data_type: :datetime
@@ -302,7 +317,7 @@
     :group_max: false
   pf_updated_at:
     :name: pf_updated_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Updated at
     :namespaced_name: pf.updated_at
     :data_type: :datetime
@@ -317,7 +332,7 @@
     :group_max: false
   webapps:
     :name: webapps
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Webapps
     :namespaced_name: 
     :data_type: :string
@@ -332,7 +347,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

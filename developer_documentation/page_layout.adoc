@@ -350,6 +350,10 @@ These are the methods used in building a page layout.
 |block
 |builds a fold-up with the block as contents.
 
+|expand_collapse
+|options (Hash)
+|Add links/buttons to open or close all FoldUps in the same form.
+
 |add_field
 |name (String), options (Hash)
 |Add a Field to the form.

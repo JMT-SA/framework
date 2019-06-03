@@ -175,6 +175,14 @@
       if (event.target.dataset && event.target.dataset.brieflyDisableWith) {
         preventMultipleSubmitsBriefly(event.target);
       }
+      // Expand or collapse FoldUps
+      if (event.target.closest('[data-expand-collapse]')) {
+        const elem = event.target.closest('[data-expand-collapse]');
+        const open = elem.dataset.expandCollapse === 'open';
+        event.stopPropagation();
+        event.preventDefault();
+        crossbeamsUtils.openOrCloseFolds(elem, open);
+      }
       // Open the href in a new window and show a loading animation.
       if (event.target.dataset && event.target.dataset.loadingWindow) {
         event.stopPropagation();

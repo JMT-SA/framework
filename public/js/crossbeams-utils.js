@@ -818,6 +818,22 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Open or close all FoldUps (<details> tags) in a form.
+   * @param {element} elem - the DOM element.
+   * @param {boolean} open - open or close the foldups.
+   * @returns {boolean}
+   */
+  openOrCloseFolds: function openOrCloseFolds(elem, open) {
+    const form = elem.closest('form');
+    if (form === undefined) {
+      return null;
+    }
+    const folds = form.querySelectorAll('details');
+    folds.forEach((f) => { f.open = open; });
+    return open;
+  },
+
+  /**
    * alert() Shows a SweetAlert2 info alert dialog.
    * @param {string} prompt - the prompt text.
    * @param {string} [title] - optional title for the dialog.

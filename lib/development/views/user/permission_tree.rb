@@ -17,7 +17,7 @@ module Development
               form.remote!
               form.method :update
               form.add_field :user_name
-              # Add an expend/collapse all ui control here
+              form.expand_collapse button: true, mini: true
               rules[:tree_fields].each do |group, list|
                 form.fold_up do |fold|
                   fold.caption group.to_s.split('_').map(&:capitalize).join(' ')

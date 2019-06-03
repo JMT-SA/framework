@@ -18,6 +18,7 @@ The following renderers that do not bind to fields in a form are available:
 * <<ProgressStep>>
 * <<RepeatingRequest>>
 * <<Notice>>
+* <<ExpandCollapseFoldUps>>
 
 === Link
 
@@ -589,5 +590,31 @@ page.add_notice('Some text', notice_type: :warning)
 |Display the text within a crossbeams-field div or not. This can affect the width of the display.
 |`true` or `false`.
 |`true`
+
+|===
+
+=== ExpandCollapseFoldUps
+
+This page control allows you to expand or collapse all Fold up controls in the same form.
+It renders two links next to each other -- one to expand and one to collapse.
+
+e.g.
+[source,ruby]
+----
+form.expand_collapse button: true, mini: true
+----
+
+|===
+|attribute |description |possible values |default
+
+|options - :button
+|Display the links as buttons. If false, they display as links.
+|`true` or `false`.
+|`false`
+
+|options - :mini
+|Display without text alongside icons. If true, just a plus and minus icon is rendered. If false, the text `Expand all` and `Collapse all` forms part of the links.
+|`true` or `false`.
+|`false`
 
 |===

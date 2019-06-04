@@ -44,6 +44,7 @@ class DocumentSequence
   def initialize(name)
     @name = name.to_s
     raise ArgumentError, "Document sequence #{name} has no configuration" if rule.nil?
+
     assert_rule_ok!
   end
 
@@ -85,11 +86,13 @@ class DocumentSequence
   def assert_rule_ok!
     messages = rule_schema.call(rule.transform_keys(&:to_sym)).messages(full: true)
     return if messages.empty?
+
     raise ArgumentError, "Document sequence config for #{name} is not valid: #{messages.map { |_, v| v.join(', ') }.join(', ')}"
   end
 
   def string_prefix
     return '' unless rule['data_type'] == :string
+
     ar = []
     ar << "concat('#{rule['prefix']}', " if rule['prefix']
     ar << 'to_char('
@@ -98,6 +101,7 @@ class DocumentSequence
 
   def string_suffix
     return '' unless rule['data_type'] == :string
+
     ar = []
     ar << ", 'FM#{string_format}')"
     ar << ')' if rule['prefix']
@@ -110,6 +114,7 @@ class DocumentSequence
   # and without truncating the number.
   def string_format
     return '999999999999999999999999999' if rule['digit_length'].nil? || rule['digit_length'] < 1
+
     "#{'0' * (rule['digit_length'] - 1)}9"
   end
 

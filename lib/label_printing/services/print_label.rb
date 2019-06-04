@@ -41,6 +41,7 @@ module LabelPrintingApp
 
     def assert_no_nil_fields!(vals, fields)
       return unless vals.any?(&:nil?)
+
       in_err = vals.zip(fields).select { |v, _| v.nil? }.map(&:last)
 
       raise Crossbeams::FrameworkError, "Make barcode: instance does not have a value for: #{in_err.join(', ')}"

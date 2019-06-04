@@ -1142,7 +1142,6 @@ module DevelopmentApp
 
           module #{opts.classnames[:module]}
             class Test#{opts.classnames[:repo]} < MiniTestWithHooks
-
               def test_for_selects
                 assert_respond_to repo, :for_select_#{opts.has_short_name ? opts.singlename : opts.table}
               end

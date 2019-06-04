@@ -2,12 +2,8 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class TestLabelTemplateRepo < MiniTestWithHooks
-
     def test_for_selects
       assert_respond_to repo, :for_select_label_templates
     end
@@ -23,5 +19,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

@@ -68,6 +68,7 @@ namespace :db do
   desc 'Add a new user'
   task :add_user, %i[login_name password user_name] => [:dotenv_with_override] do |_, args|
     raise "\nLogin name cannot include spaces.\n\n" if args[:login_name].include?(' ')
+
     require 'sequel'
     # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
     db_name = if ENV.fetch('RACK_ENV') == 'test'
@@ -93,7 +94,9 @@ namespace :db do
     db = Sequel.connect(db_name)
     version = if db.tables.include?(:schema_migrations)
                 db[:schema_migrations].reverse(:filename).first[:filename]
-              end || 0
+              else
+                0
+              end
 
     puts "Schema Version: #{version}"
   end

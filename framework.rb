@@ -170,6 +170,7 @@ class Framework < Roda
         Dir.glob("#{ENV['ROOT']}/developer_documentation/*.adoc").each do |filename|
           lines = File.foreach(filename).grep(/#{term}/i)
           next if lines.empty?
+
           out[filename] = []
           lines.each do |line|
             out[filename] << (line.chomp || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow">\1</span>')
@@ -231,6 +232,7 @@ class Framework < Roda
       out = []
       mds.sort_by(&:name).each do |m|
         next if m.visibility == :private
+
         toc << m.name
         parms = m.tags.select { |tag| tag.tag_name == 'param' }.map do |tag|
           opts = m.tags.select { |opt| opt.tag_name == 'option' && opt.name == tag.name }.map do |opt|

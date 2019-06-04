@@ -24,6 +24,7 @@ module Types
       elements.map do |element|
         if element&.is_a?(::String)
           next nil if element.empty?
+
           element.to_i.to_s == element ? element.to_i : element
         else
           element

@@ -4,7 +4,7 @@ module Development
   module Logging
     module QueJob
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:que_job, :show, id: id)
           rules   = ui_rule.compile
 

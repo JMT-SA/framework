@@ -21,6 +21,7 @@ module SecurityApp
     def create_security_permission(params)
       res = validate_security_permission_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @id = repo.create_security_permission(res)
       success_response("Created security permission #{security_permission.security_permission}",
                        security_permission)
@@ -32,6 +33,7 @@ module SecurityApp
       @id = id
       res = validate_security_permission_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_security_permission(id, res)
       success_response("Updated security permission #{security_permission.security_permission}",
                        security_permission(false))

@@ -37,6 +37,7 @@ module UtilityFunctions
 
   def change_days(anchor, no_days, up_down)
     raise ArgumentError unless no_days.positive?
+
     case anchor
     when Time
       anchor + (no_days * TIME_DAY * up_down)

@@ -4,9 +4,10 @@ module Development
   module Statuses
     module Status
       class Show
-        def self.call(table_name, id, remote: false) # rubocop:disable Metrics/AbcSize
+        def self.call(table_name, id, remote: false) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:status, :show, table_name: table_name, id: id)
           rules   = ui_rule.compile
+          no_other_details = rules[:other_details] ? rules[:other_details].empty? : false
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
@@ -28,7 +29,7 @@ module Development
                   col.add_text "<table class='thinbordertable'><tbody>#{cnt}</tbody></table>", toggle_button: true, toggle_caption: 'Details'
                   col.add_text '<h3>Status history</h3>'
                   col.add_table(rules[:details], rules[:headers], header_captions: rules[:header_captions])
-                  col.add_text '<h3>Other status changes</h3>' unless rules[:other_details]&.empty?
+                  col.add_text '<h3>Other status changes</h3>' unless no_other_details
                   if remote
                     col.add_table((rules[:other_details] || []).map do |a|
                       a[:link] = a[:link].sub('<a', '<a data-replace-dialog="y" ')

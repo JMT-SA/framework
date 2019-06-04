@@ -17,6 +17,7 @@ module SecurityApp
     def create_registered_mobile_device(params) # rubocop:disable Metrics/AbcSize
       res = validate_registered_mobile_device_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_registered_mobile_device(res)
@@ -33,6 +34,7 @@ module SecurityApp
     def update_registered_mobile_device(id, params)
       res = validate_registered_mobile_device_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_registered_mobile_device(id, res)
         log_transaction
@@ -55,6 +57,7 @@ module SecurityApp
     def toggle_camera_scan(ip_address)
       rmd = repo.find_by_ip_address(ip_address)
       return failed_response('This device is not a Registered Mobile Device') if rmd.nil?
+
       repo.update_registered_mobile_device(rmd.id, scan_with_camera: !rmd.scan_with_camera)
       instance = registered_mobile_device(rmd.id)
       success_response("Toggled camera scan #{instance[:ip_address]}",

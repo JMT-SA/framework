@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module SecurityApp
   class TestRegisteredMobileDeviceInteractor < Minitest::Test
     def test_repo
@@ -20,5 +17,3 @@ module SecurityApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

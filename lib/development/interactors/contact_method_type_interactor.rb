@@ -17,6 +17,7 @@ module DevelopmentApp
     def create_contact_method_type(params)
       res = validate_contact_method_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       DB.transaction do
         id = repo.create_contact_method_type(res)
@@ -30,6 +31,7 @@ module DevelopmentApp
     def update_contact_method_type(id, params)
       res = validate_contact_method_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       DB.transaction do
         repo.update_contact_method_type(id, res)
       end

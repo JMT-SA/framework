@@ -34,6 +34,7 @@ module LabelApp
     def create_printer_application(params) # rubocop:disable Metrics/AbcSize
       res = validate_printer_application_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_printer_application(res)
@@ -51,6 +52,7 @@ module LabelApp
     def update_printer_application(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_printer_application_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_printer_application(id, res)
         repo.unset_default_printer(id, res) if res.to_h[:default_printer]

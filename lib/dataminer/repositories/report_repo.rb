@@ -19,6 +19,7 @@ module DataminerApp
     def db_connected?(key)
       config = DM_CONNECTIONS.config(key)
       return success_response('ok') if config.connected
+
       failed_response(config.connection_error, key)
     end
 
@@ -92,6 +93,7 @@ module DataminerApp
       report_dictionary = load_report_dictionary(rep_loc)
       this_report       = report_dictionary[rep_loc.combined]
       return this_report[:file] if opts[:filename]
+
       if opts[:crosstab_hash]
         yml = YAML.load_file(this_report[:file])
         return yml[:crosstab]
@@ -155,6 +157,7 @@ module DataminerApp
 
     def external_render?(hash)
       return false if hash[:external_settings].nil?
+
       !hash[:external_settings][:render_url].nil?
     end
   end

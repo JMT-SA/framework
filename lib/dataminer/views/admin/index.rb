@@ -3,7 +3,7 @@
 module DM
   module Admin
     class Index
-      def self.call(context = {})
+      def self.call(context = {}) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
         grid_url = if context[:for_grid_queries]
                      '/dataminer/admin/grids_grid/'
                    else
@@ -21,7 +21,7 @@ module DM
                          end
         new_url = '/dataminer/admin/new/'
 
-        layout = Crossbeams::Layout::Page.build({}) do |page|
+        layout = Crossbeams::Layout::Page.build({}) do |page| # rubocop:disable Metrics/BlockLength
           page.section do |section|
             section.add_control(control_type: :link, text: button_caption, url: new_url, style: :button)
           end

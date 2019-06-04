@@ -160,7 +160,7 @@ module ErrorHelpers
   # @param message [Exception, String] the exception or error message.
   # @param status [Integer] the status to return - defaults to 500.
   # @return [JSON] the exception formatted for javascript to handle.
-  def show_json_error(err, status: 500)
+  def show_json_error(err, status: 500) # rubocop:disable Metrics/AbcSize
     msg = err.respond_to?(:message) ? err.message : err.to_s
     response.status = status
     puts err.full_message if err.respond_to?(:full_message) && status == 500 # Log the error too

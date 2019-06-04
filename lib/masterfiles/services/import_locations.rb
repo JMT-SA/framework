@@ -98,6 +98,7 @@ module MasterfilesApp
     def next_short_code(storage_code)
       res = repo.suggested_short_code(storage_code, id_lookup: false)
       raise Crossbeams::InfoError, res.message unless res.success
+
       res.instance
     end
 
@@ -125,6 +126,7 @@ module MasterfilesApp
     def check_storage_definitions
       stg_defs = csv_data.map { |r| r['storage_definition'] }.uniq
       return if stg_defs.compact.empty?
+
       res = repo.check_storage_definitions(stg_defs.compact)
       errs << res.message unless res.success
     end
@@ -162,6 +164,7 @@ module MasterfilesApp
       check_location_errors
 
       return failed_response(errs.join(', ')) unless errs.empty?
+
       check_each_row
       if errs.empty?
         ok_response
@@ -182,6 +185,7 @@ module MasterfilesApp
       errs << 'Location long codes are not unique' if locations.length != locations.uniq.length
       should_exist = parents - locations
       return if should_exist.empty?
+
       res = repo.check_locations(should_exist.compact)
       errs << res.message unless res.success
       # errs << 'Not all parent location are valid locations' unless (parents - locations).empty? # This should check db for existing locs too...
@@ -194,8 +198,10 @@ module MasterfilesApp
     def validate_file
       return failed_response(%(File "#{filename}" does not exist)) unless file_exists?
       return failed_response(%(File "#{filename}" does not have .csv extension)) unless ext_is_ok?
+
       read_csv
       return failed_response('CSV does not have the exact required set of headers') unless headers_equivalent?
+
       ok_response
     end
 

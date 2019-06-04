@@ -17,6 +17,7 @@ module SecurityApp
     def create_functional_area(params)
       res = validate_functional_area_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = repo.create_functional_area(res)
       instance = functional_area(id)
       success_response("Created functional area #{instance.functional_area_name}",
@@ -26,6 +27,7 @@ module SecurityApp
     def update_functional_area(id, params)
       res = validate_functional_area_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_functional_area(id, res)
       instance = functional_area(id)
       success_response("Updated functional area #{instance.functional_area_name}",

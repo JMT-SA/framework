@@ -15,9 +15,10 @@ module SecurityApp
     end
 
     # --| actions
-    def create_security_group(params)
+    def create_security_group(params) # rubocop:disable Metrics/AbcSize
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       # res = validate_security_group
       id = nil
       repo.transaction do
@@ -32,9 +33,10 @@ module SecurityApp
       validation_failed_response(OpenStruct.new(messages: { security_group_name: ['This security group already exists'] }))
     end
 
-    def update_security_group(id, params)
+    def update_security_group(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       # res = validate_security_group... etc.
       repo.transaction do
         repo.update_security_group(id, res)
@@ -55,7 +57,7 @@ module SecurityApp
       success_response("Deleted security group #{name}")
     end
 
-    def assign_security_permissions(id, params)
+    def assign_security_permissions(id, params) # rubocop:disable Metrics/AbcSize
       name = security_group(id).security_group_name
       if params[:security_permissions]
         repo.transaction do

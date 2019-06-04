@@ -3,7 +3,7 @@
 module Development
   module Documentation
     class GridIcons
-      def self.call
+      def self.call # rubocop:disable Metrics/AbcSize
         css = File.read(File.join(ENV['ROOT'], 'public/css/jquery.contextMenu.min.css'))
         icons = css.split(/\.context-menu-icon-/).select { |s| s.include?(':before{content') }.map { |s| s[0, s.index(':before')] }
 

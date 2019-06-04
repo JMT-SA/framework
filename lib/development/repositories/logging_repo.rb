@@ -20,6 +20,7 @@ module DevelopmentApp
     def find_logged_action(id)
       hash = find_logged_action_hash(id)
       return nil if hash.nil?
+
       LoggedAction.new(hash)
     end
 

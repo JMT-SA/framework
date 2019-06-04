@@ -16,14 +16,12 @@ module Development
               form.no_submit! unless remote
               form.row do |row|
                 row.column do |col|
-                  if rules[:detail_rows] && !rules[:detail_rows].empty?
+                  if rules[:detail_rows] && !rules[:detail_rows].empty? # rubocop:disable Style/IfUnlessModifier
                     col.add_table(rules[:detail_rows], rules[:detail_cols], header_captions: rules[:detail_headers], caption: rules[:detail_caption], top_margin: 2)
                   end
                   col.add_table(rules[:rows], rules[:cols], header_captions: rules[:header_captions], top_margin: 3)
 
-                  if rules[:rows].empty?
-                    col.add_notice 'No status changes have been logged yet', notice_type: :info
-                  end
+                  col.add_notice 'No status changes have been logged yet', notice_type: :info if rules[:rows].empty?
                 end
               end
             end

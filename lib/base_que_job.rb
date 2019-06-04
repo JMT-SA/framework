@@ -73,6 +73,7 @@ class BaseQueJob < Que::Job
   # Before a job executes, check if onother instance of the same job is busy.
   def lock_single_instance
     return if single_instance_job.nil?
+
     retry_in(30) if File.exist?(lock_file)
     FileUtils.touch(lock_file)
   end
@@ -80,6 +81,7 @@ class BaseQueJob < Que::Job
   # After a job executes, remove the lock file if it exists.
   def clear_single_instance
     return if single_instance_job.nil?
+
     File.delete(lock_file) if File.exist?(lock_file)
   end
 end

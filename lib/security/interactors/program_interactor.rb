@@ -25,6 +25,7 @@ module SecurityApp
     def create_program(params, webapp)
       res = validate_program_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @id = repo.create_program(res, webapp)
       success_response("Created program #{program.program_name}",
                        program)
@@ -34,6 +35,7 @@ module SecurityApp
       @id = id
       res = validate_edit_program_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_program(id, res)
       success_response("Updated program #{program.program_name}",
                        program(false))

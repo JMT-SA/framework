@@ -4,7 +4,7 @@ module Development
   module Grids
     module PageControl
       class Edit
-        def self.call(form_values)
+        def self.call(form_values) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:grid_page_control, :edit, form_values: OpenStruct.new(form_values))
           rules   = ui_rule.compile
 

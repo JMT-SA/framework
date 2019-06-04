@@ -17,7 +17,7 @@ module DevelopmentApp
 
       {
         columnDefs: list_col_defs,
-        rowDefs:    row_defs
+        rowDefs: row_defs
       }
     end
 
@@ -29,7 +29,7 @@ module DevelopmentApp
       row_defs = page_control_row_defs(file)
       {
         columnDefs: page_control_col_defs(file),
-        rowDefs:    row_defs
+        rowDefs: row_defs
       }
     end
 
@@ -37,7 +37,7 @@ module DevelopmentApp
       row_defs = multiselect_row_defs(file)
       {
         columnDefs: multiselect_col_defs,
-        rowDefs:    row_defs
+        rowDefs: row_defs
       }
     end
 
@@ -45,7 +45,7 @@ module DevelopmentApp
       row_defs = condition_row_defs(file)
       {
         columnDefs: condition_col_defs,
-        rowDefs:    row_defs
+        rowDefs: row_defs
       }
     end
 
@@ -53,7 +53,7 @@ module DevelopmentApp
       row_defs = action_row_defs(file)
       {
         columnDefs: action_col_defs,
-        rowDefs:    row_defs
+        rowDefs: row_defs
       }
     end
 

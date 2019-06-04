@@ -65,6 +65,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     hash = find_hash(table_name, id)
     # raise Crossbeams::FrameworkError, "#{table_name}: id #{id} not found." if hash.nil?
     raise "#{table_name}: id #{id} not found." if hash.nil?
+
     wrapper.new(hash)
   end
 
@@ -77,6 +78,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   def find(table_name, wrapper, id)
     hash = find_hash(table_name, id)
     return nil if hash.nil?
+
     wrapper.new(hash)
   end
 
@@ -99,6 +101,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   def where(table_name, wrapper, args)
     hash = where_hash(table_name, args)
     return nil if hash.nil?
+
     wrapper.new(hash)
   end
 
@@ -228,6 +231,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @return [Sequel::Postgres::JSONHash] JSON version of the Hash.
   def hash_for_jsonb_col(hash)
     return nil if hash.nil?
+
     Sequel.pg_json(hash)
   end
 
@@ -237,6 +241,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @return [Sequel::Postgres::PGArray] Postgres version of the Array.
   def array_for_db_col(arr)
     return nil if arr.nil?
+
     Sequel.pg_array(arr)
   end
 
@@ -472,6 +477,7 @@ module MethodBuilder
 
     unless wrapper.nil?
       raise ArgumentError, 'Crud calls for: Wrapper not defined' unless wrapper.is_a?(Class)
+
       define_method(:"find_#{name}") do |id|
         find(table_with_schema, wrapper, id)
       end

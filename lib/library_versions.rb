@@ -60,6 +60,7 @@ class LibraryVersions
   def jsver(key)
     js_strategy = JS_STRATEGY[key]
     return format_lib('Unknown directive', key) if js_strategy.nil?
+
     js_strategy.call(self)
   end
 

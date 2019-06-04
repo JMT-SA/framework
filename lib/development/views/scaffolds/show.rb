@@ -1,18 +1,14 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-# rubocop:disable Metrics/BlockLength
-# rubocop:disable Metrics/ClassLength
-
 module Development
   module Generators
     module Scaffolds
-      class Show
-        def self.call(results)
+      class Show # rubocop:disable Metrics/ClassLength
+        def self.call(results) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:scaffolds, :new)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.section do |section|
               section.add_text <<~HTML
                 <p>
@@ -176,7 +172,7 @@ module Development
           layout
         end
 
-        def self.save_snippet_form(section, path, code)
+        def self.save_snippet_form(section, path, code) # rubocop:disable Metrics/AbcSize
           if !File.exist?(File.join(ENV['ROOT'], path))
             section.form do |form|
               form.form_config = {

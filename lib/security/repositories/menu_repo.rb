@@ -8,6 +8,7 @@ module SecurityApp
 
     def authorise?(user, programs, sought_permission, functional_area_id)
       raise 'Invalid Functional Area' if functional_area_id.nil?
+
       prog_ids = program_ids_for(functional_area_id, programs)
       raise 'Invalid Functional Area/Program combination' if prog_ids.empty?
 

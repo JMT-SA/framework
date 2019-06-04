@@ -46,6 +46,7 @@ module UiRules
     def extended_columns(repo, table, edit_mode: true)
       config = Crossbeams::Config::ExtendedColumnDefinitions::EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
       return if config.nil?
+
       config.each do |key, defn|
         caption = make_caption(key)
         fields["extcol_#{key}".to_sym] = if edit_mode
@@ -72,16 +73,18 @@ module UiRules
       field
     end
 
-    def apply_extended_column_defaults_to_form_object(table)
+    def apply_extended_column_defaults_to_form_object(table) # rubocop:disable Metrics/AbcSize
       config = Crossbeams::Config::ExtendedColumnDefinitions::EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
       return if config.nil?
 
       col_with_default = {}
       config.each do |key, defn|
         next if defn[:default].nil?
+
         col_with_default[key.to_s] = defn[:default]
       end
       return if col_with_default.empty?
+
       if @form_object.is_a?(Hash) || @form_object.is_a?(OpenStruct)
         @form_object[:extended_columns] = col_with_default
       else
@@ -111,6 +114,7 @@ module UiRules
 
     def apply_form_values
       return unless @options && @options[:form_values]
+
       # We need to apply values to the form object, so make sure it is not immutable first.
       @form_object = OpenStruct.new(@form_object.to_h)
 
@@ -138,6 +142,7 @@ module UiRules
 
     def dropdown_change(field_name, conditions = {})
       raise(ArgumentError, 'Dropdown change behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
       @rules << { field_name => {
         notify: (conditions[:notify] || []).map do |n|
           {

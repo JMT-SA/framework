@@ -13,7 +13,7 @@ module UiRules
       form_name 'que_job'
     end
 
-    def set_show_fields
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:priority] = { renderer: :label }
       fields[:run_at] = { renderer: :label }
       fields[:job_class] = { renderer: :label }

@@ -23,6 +23,7 @@ module DataminerApp
       db, = repo.split_db_and_id(id)
       res = repo.db_connected?(db)
       return success_response('ok') if res.success
+
       res
     end
 
@@ -43,7 +44,7 @@ module DataminerApp
         return page
       end
       # {"limit"=>"", "offset"=>"", "crosstab"=>{"row_columns"=>["organization_code", "commodity_code", "fg_code_old"], "column_columns"=>"grade_code", "value_columns"=>"no_pallets"}, "btnSubmit"=>"Run report", "json_var"=>"[]"}
-      page.report.ordered_columns.each do |col| # rubocop:disable Metrics/BlockLength
+      page.report.ordered_columns.each do |col|
         hs                  = { headerName: col.caption, field: col.name, hide: col.hide, headerTooltip: col.caption }
         hs[:width]          = col.width unless col.width.nil?
         hs[:enableValue]    = true if %i[integer number].include?(col.data_type)
@@ -58,12 +59,8 @@ module DataminerApp
           hs[:width]     = 100 if col.width.nil? && col.data_type == :integer
           hs[:width]     = 120 if col.width.nil? && col.data_type == :number
         end
-        if col.format == :delimited_1000
-          hs[:valueFormatter] = 'crossbeamsGridFormatters.numberWithCommas2'
-        end
-        if col.format == :delimited_1000_4
-          hs[:valueFormatter] = 'crossbeamsGridFormatters.numberWithCommas4'
-        end
+        hs[:valueFormatter] = 'crossbeamsGridFormatters.numberWithCommas2' if col.format == :delimited_1000
+        hs[:valueFormatter] = 'crossbeamsGridFormatters.numberWithCommas4' if col.format == :delimited_1000_4
         if col.data_type == :boolean
           hs[:cellRenderer] = 'crossbeamsGridFormatters.booleanFormatter'
           hs[:cellClass]    = 'grid-boolean-column'
@@ -145,7 +142,7 @@ module DataminerApp
       end
       {
         columnDefs: col_defs,
-        rowDefs:    rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
+        rowDefs: rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
       }.to_json
     end
 
@@ -163,7 +160,7 @@ module DataminerApp
       end
       {
         columnDefs: col_defs,
-        rowDefs:    rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
+        rowDefs: rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
       }.to_json
     end
 
@@ -176,7 +173,7 @@ module DataminerApp
       return validation_failed_response(res) unless res.messages.empty?
 
       page = OpenStruct.new
-      s = params[:filename].strip.downcase.tr(' ', '_').gsub(/_+/, '_').gsub(/[\/:*?"\\<>\|\r\n]/i, '-')
+      s = params[:filename].strip.downcase.tr(' ', '_').gsub(/_+/, '_').gsub(%r{[/:*?"\\<>\|\r\n]}i, '-')
       page.filename = File.basename(s).reverse.sub(File.extname(s).reverse, '').reverse << '.yml'
       page.caption  = params[:caption]
       page.sql      = params[:sql]
@@ -191,9 +188,7 @@ module DataminerApp
         err = e.message
       end
       # Check for existing file name...
-      if File.exist?(File.join(repo.admin_report_path(page.database), page.filename))
-        err = 'A file with this name already exists'
-      end
+      err = 'A file with this name already exists' if File.exist?(File.join(repo.admin_report_path(page.database), page.filename))
       # Write file, rebuild index and go to edit...
 
       if err.empty?
@@ -376,9 +371,7 @@ module DataminerApp
       report = repo.lookup_admin_report(id)
 
       col_name = params[:column]
-      if col_name.nil? || col_name.empty?
-        col_name = "#{params[:table]}.#{params[:field]}"
-      end
+      col_name = "#{params[:table]}.#{params[:field]}" if col_name.nil? || col_name.empty?
       opts = { control_type: params[:control_type].to_sym,
                data_type: params[:data_type].to_sym, caption: params[:caption] }
       unless params[:list_def].nil? || params[:list_def].empty?
@@ -409,6 +402,7 @@ module DataminerApp
     def str_to_array(str) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       ar = str.split(']').map { |a| a.sub('[', '').sub(/\A,/, '').split(',').map(&:strip) }
       return ar if ar.empty?
+
       ar.flatten! if ar.length == 1 && ar.first.is_a?(Array)
       ar.map!(&:to_i) if !ar.first.is_a?(Array) && ar.all? { |a| a.match?(/\A\d+\Z/) }
       ar.map! { |a, b| [a, b.to_i] } if ar.first.is_a?(Array) && ar.all? { |_, b| b.match?(/\A\d+\Z/) }

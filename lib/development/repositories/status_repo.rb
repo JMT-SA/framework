@@ -8,6 +8,7 @@ module DevelopmentApp
     def find_by_table_and_id(table_name, id)
       res = where_hash(Sequel[:audit][:current_statuses], table_name: table_name.to_s, row_data_id: id)
       return nil if res.nil?
+
       Status.new(res)
     end
 
@@ -27,6 +28,7 @@ module DevelopmentApp
                     Sequel.function(:concat_ws, ' ', :status, :comment).as('status'))
             .first
       return nil if res.nil?
+
       Status.new(res)
     end
 

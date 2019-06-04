@@ -70,6 +70,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [JSON] formatted to be interpreted by javascript to replace a callback section.
   def show_in_callback(content: nil, content_style: nil, notice: nil, error: nil, &block)
     raise ArgumentError, 'Invalid content style' unless [nil, :info, :success, :warning, :error].include?(content_style)
+
     res = {}
     res[:content] = if block_given?
                       render_partial(&block)
@@ -103,6 +104,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [HTML]
   def wrap_content_in_style(content, content_style, caption: nil)
     return content if content_style.nil?
+
     css = "crossbeams-#{content_style}-note"
     head = CONTENT_STYLE_HEAD[content_style]
     "<div class='#{css}'><p><strong>#{caption || head}</strong></p><p>#{content}</p></div>"
@@ -154,6 +156,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     Array(keys).each do |key|
       # raise ArgumentError, "Move validation errors - key not present: #{key}" unless interim.key?(key)
       next unless interim.key?(key) # Note: It only needs to move error message to base if it exists in the first place
+
       if highlights.key?(key)
         interim[:base_with_highlights] ||= { messages: [], highlights: [] }
         interim[:base_with_highlights][:messages] +=  Array(interim.delete(key))
@@ -210,6 +213,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [User, nil] the logged-in user or the acts-as user.
   def current_user
     return nil unless session[:user_id]
+
     @current_user ||= DevelopmentApp::UserRepo.new.find(:users, DevelopmentApp::User, session[:act_as_user_id] || session[:user_id])
   end
 
@@ -218,6 +222,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [User, nil] the logged-in user acting as another user.
   def actor_user
     return nil unless session[:act_as_user_id]
+
     @actor_user ||= DevelopmentApp::UserRepo.new.find(:users, DevelopmentApp::User, session[:user_id])
   end
 
@@ -247,6 +252,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
 
   def authorised?(programs, sought_permission, functional_area_id = nil)
     return false unless current_user
+
     functional_area_id ||= current_functional_area
     prog_repo = SecurityApp::MenuRepo.new
     prog_repo.authorise?(current_user, Array(programs), sought_permission, functional_area_id)
@@ -459,6 +465,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   end
 
   def build_json_action(action) # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Layout/AlignHash
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
       change_select_value:    ->(act) { action_change_select_value(act) },
@@ -473,6 +480,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
       clear_form_validation:  ->(act) { action_clear_form_validation(act) }
     }[action.type].call(action)
+    # rubocop:enable Layout/AlignHash
   end
 
   def action_replace_select_options(action)
@@ -540,6 +548,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [void]
   def store_locally(key, value)
     raise ArgumentError, 'store_locally: key must be a Symbol' unless key.is_a? Symbol
+
     store = LocalStore.new(current_user.id)
     store.write(key, value)
   end
@@ -550,6 +559,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [Object] the retrieved value.
   def retrieve_from_local_store(key)
     raise ArgumentError, 'store_locally: key must be a Symbol' unless key.is_a? Symbol
+
     store = LocalStore.new(current_user.id)
     store.read_once(key)
   end

@@ -54,10 +54,11 @@ class DataminerConnection
     optional(:connection)
   end
 
-  def initialize(config)
+  def initialize(config) # rubocop:disable Metrics/AbcSize
     @connected = false
     validation = ConnSchema.call(config)
     raise %(Dataminer report config is not correct: #{validation.messages.map { |k, v| "#{k} #{v.join(', ')}" }.join(', ')}) unless validation.success?
+
     @name = validation[:name]
     @report_path = Pathname.new(validation[:report_path]).expand_path
     @prepared_report_path = Pathname.new(validation[:prepared_report_path]).expand_path

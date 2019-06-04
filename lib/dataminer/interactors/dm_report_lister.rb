@@ -2,6 +2,7 @@ class DmReportLister
   def initialize(path)
     @path = Pathname.new(path)
     return if File.exist?(File.join(path, '.dm_report_list.yml'))
+
     make_list
     persist_list
   end
@@ -39,7 +40,7 @@ class DmReportLister
 
   attr_reader :path, :report_lookup
 
-  def make_list(from_cache = false)
+  def make_list(from_cache = false) # rubocop:disable Metrics/AbcSize
     @report_lookup = {}
     if from_cache
       @report_lookup = YAML.load_file(File.join(path, '.dm_report_list.yml'))

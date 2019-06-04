@@ -39,6 +39,7 @@ module DevelopmentApp
     def create_user(params)
       res = validate_new_user_params(params)
       return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+
       id = repo.create_user(prepare_password(res))
       instance = user(id)
       success_response("Created user #{instance.user_name}",
@@ -50,6 +51,7 @@ module DevelopmentApp
     def update_user(id, params)
       res = validate_user_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_user(id, res)
       instance = user(id)
       success_response("Updated user #{instance.user_name}",
@@ -64,8 +66,10 @@ module DevelopmentApp
 
     def change_user_password(id, params)
       return invalid_password unless matching_password?(id, params[:old_password])
+
       res = validate_change_user_params(params)
       return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+
       repo.transaction do
         repo.save_new_password(id, params[:password])
         log_transaction
@@ -78,6 +82,7 @@ module DevelopmentApp
       # Force the user's password to the new value.
       res = validate_change_password(params)
       return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+
       repo.transaction do
         repo.save_new_password(id, params[:password])
         log_transaction
@@ -89,6 +94,7 @@ module DevelopmentApp
     def set_user_permissions(id, ids, params)
       res = validate_user_permission(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       res = repo.update_user_permission(ids, res.to_h[:security_group_id])
       success_response("Updated permissions for #{user(id).user_name}",
                        res.instance)

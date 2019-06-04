@@ -87,6 +87,7 @@ module Crossbeams
     # @return [String] HTML for the form.
     def render
       raise ArgumentError, 'RMDForm: no CSRF tag provided' if csrf_tag.nil?
+
       <<~HTML
         <h2>#{caption}</h2>
         <form action="#{action}" method="POST">
@@ -113,16 +114,19 @@ module Crossbeams
 
     def lookup_data(options)
       return '' unless options[:lookup]
+
       ' data-lookup="Y"'
     end
 
     def lookup_display(name, options)
       return '' unless options[:lookup]
+
       %(<div id ="#{form_name}_#{name}_scan_lookup" class="b gray"></div>)
     end
 
     def submit_form(options)
       return '' unless options[:submit_form]
+
       ' data-submit-form="Y"'
     end
 
@@ -141,6 +145,7 @@ module Crossbeams
 
     def hidden_scan_type(name, options)
       return '' unless options[:scan]
+
       <<~HTML
         <input id="#{form_name}_#{name}_scan_field" type="hidden" name="#{form_name}[#{name}_scan_field]" value="#{form_state["#{name}_scan_field".to_sym]}">
       HTML
@@ -165,18 +170,21 @@ module Crossbeams
     def field_error_state
       val = form_state[:errors] && form_state[:errors][@current_field]
       return '' unless val
+
       ' class="bg-washed-red"'
     end
 
     def field_error_message
       val = form_state[:errors] && form_state[:errors][@current_field]
       return '' unless val
+
       "<span class='brown'><br>#{val.compact.join('; ')}</span>"
     end
 
     def field_error_class
       val = form_state[:errors] && form_state[:errors][@current_field]
       return '' unless val
+
       ' bg-washed-red'
     end
 
@@ -200,6 +208,7 @@ module Crossbeams
 
     def notes_section
       return '' unless notes
+
       "<p>#{notes}</p>"
     end
 
@@ -213,6 +222,7 @@ module Crossbeams
 
     def camera_section
       return '' unless scan_with_camera
+
       <<~HTML
         <button id="cameraScan" type="button" class="dim br2 pa3 bn white bg-blue">
           #{Crossbeams::Layout::Icon.render(:camera)} Scan with camera
@@ -222,6 +232,7 @@ module Crossbeams
 
     def make_prompt(prompt)
       return '' if prompt.nil?
+
       str = prompt.is_a?(String) ? prompt : 'Select a value'
       "<option value=\"\">#{str}</option>\n"
     end

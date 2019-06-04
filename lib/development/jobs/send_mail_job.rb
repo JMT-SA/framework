@@ -25,11 +25,13 @@ module DevelopmentApp
         assert_attachment_ok!(rule)
         if rule[:path]
           raise "Unable to send mail with attachment \"#{rule[:path]}\" as it is not on disk" unless File.exist?(rule[:path])
+
           mail.add_file(rule[:path])
           next
         end
 
         next unless rule[:filename]
+
         config = { filename: rule[:filename], content: rule[:content] }
         config[:mime_type] = rule[:mime_type] if rule[:mime_type]
         mail.add_file(config)

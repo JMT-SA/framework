@@ -213,6 +213,7 @@ module DevelopmentApp
           next if this_name == :id
           next if this_name.to_s.end_with?('_id')
           next unless attrs[:type] == :string
+
           col_name = this_name
           break
         end
@@ -283,6 +284,7 @@ module DevelopmentApp
               def create_#{opts.singlename}(#{needs_id}params)#{add_parent_to_params}
                 res = validate_#{opts.singlename}_params(params)
                 return validation_failed_response(res) unless res.messages.empty?
+
                 id = nil
                 repo.transaction do
                   id = repo.create_#{opts.singlename}(res)
@@ -301,6 +303,7 @@ module DevelopmentApp
               def update_#{opts.singlename}(id, params)
                 res = validate_#{opts.singlename}_params(params)
                 return validation_failed_response(res) unless res.messages.empty?
+
                 repo.transaction do
                   repo.update_#{opts.singlename}(id, res)
                   log_transaction
@@ -423,27 +426,32 @@ module DevelopmentApp
 
                 def edit_check
                   return failed_response '#{opts.classnames[:class]} has been completed' if completed?
+
                   all_ok
                 end
 
                 def delete_check
                   return failed_response '#{opts.classnames[:class]} has been completed' if completed?
+
                   all_ok
                 end
 
                 def complete_check
                   return failed_response '#{opts.classnames[:class]} has already been completed' if completed?
+
                   all_ok
                 end
 
                 def approve_check
                   return failed_response '#{opts.classnames[:class]} has not been completed' unless completed?
                   return failed_response '#{opts.classnames[:class]} has already been approved' if approved?
+
                   all_ok
                 end
 
                 def reopen_check
                   return failed_response '#{opts.classnames[:class]} has not been approved' unless approved?
+
                   all_ok
                 end
 
@@ -898,6 +906,7 @@ module DevelopmentApp
 
       def on_new_lastgrid
         return '' unless opts.new_from_menu
+
         "\n    set_last_grid_url('/list/#{opts.table}', r)"
       end
 
@@ -1020,6 +1029,7 @@ module DevelopmentApp
         fields_to_use(true).each do |f|
           fk = opts.table_meta.fk_lookup[f]
           next unless fk
+
           tm = TableMeta.new(fk[:table])
           singlename  = opts.inflector.singularize(fk[:table].to_s)
           klassname   = opts.inflector.camelize(singlename)
@@ -1064,6 +1074,7 @@ module DevelopmentApp
       def make_select(field, can_be_null)
         fk = opts.table_meta.fk_lookup[field]
         return "#{field}: {}" if fk.nil?
+
         singlename  = opts.inflector.singularize(fk[:table].to_s)
         klassname   = opts.inflector.camelize(singlename)
         fk_repo = "#{opts.classnames[:module]}::#{klassname}Repo"
@@ -1381,6 +1392,7 @@ module DevelopmentApp
 
       def non_fetch_new(base_route)
         return '' unless opts.new_from_menu
+
         <<~RUBY
 
 
@@ -1715,6 +1727,7 @@ module DevelopmentApp
         opts.table_meta.foreigns.map do |fk|
           tab_alias = fk[:table]
           next if tab_alias == :party_roles # No join - usualy no need to join if using fn_party_role_name() function for party name
+
           cnt       = used_tables[fk[:table]] += 1
           tab_alias = "#{tab_alias}#{cnt}" if cnt > 1
           on_str    = make_on_clause(tab_alias, fk[:key], fk[:columns])

@@ -26,7 +26,7 @@ module DevelopmentApp
 
       {
         columnDefs: col_defs_for_logged_actions(logged_action),
-        rowDefs:    row_defs
+        rowDefs: row_defs
       }.to_json
     end
 
@@ -37,6 +37,7 @@ module DevelopmentApp
                         repo.find_logged_action_hash(id)
                       end
       return [] if logged_action.nil?
+
       left = Sequel.hstore(logged_action[:row_data]).to_hash
       right = changed_fields_for_right(logged_action)
       [diff_with_excluded_fields(left), diff_with_excluded_fields(right)]

@@ -118,7 +118,7 @@ module DataminerApp
       end
       {
         columnDefs: col_defs,
-        rowDefs:    rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
+        rowDefs: rpt_list.sort_by { |rpt| "#{rpt[:db]}#{rpt[:caption]}" }
       }.to_json
     end
 
@@ -141,7 +141,7 @@ module DataminerApp
       end
       {
         columnDefs: col_defs,
-        rowDefs:    row_defs
+        rowDefs: row_defs
       }.to_json
     end
 
@@ -194,6 +194,7 @@ module DataminerApp
     def create_prepared_report(params)
       res = validate_prepared_report_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       # NB. Validate the report description - must be unique. (unless we are replacing an existing prep rpt.)
 
       json_var = if params[:json_var].start_with?('[')

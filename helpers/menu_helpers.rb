@@ -23,6 +23,7 @@ module MenuHelpers
 
   def menu_items(webapp)
     return nil if current_user.nil?
+
     repo      = SecurityApp::MenuRepo.new
     rows      = repo.menu_for_user(current_user, webapp)
     build_menu(rows).to_json
@@ -30,6 +31,7 @@ module MenuHelpers
 
   def rmd_menu_items(webapp, as_hash: false)
     return nil if current_user.nil?
+
     repo      = SecurityApp::MenuRepo.new
     rows      = repo.rmd_menu_for_user(current_user, webapp)
     hash = build_menu(rows)

@@ -21,6 +21,7 @@ module SecurityApp
     def create_program_function(params)
       res = validate_program_function_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @id = repo.create_program_function(res)
       success_response("Created program function #{program_function.program_function_name}",
                        program_function)
@@ -32,6 +33,7 @@ module SecurityApp
       @id = id
       res = validate_program_function_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_program_function(id, res)
       success_response("Updated program function #{program_function.program_function_name}",
                        program_function(false))

@@ -74,6 +74,7 @@ module DevelopmentApp
       else
         user_email_group_id = DB[:user_email_groups].where(mail_group: user_email_group, active: true).get(:id)
         raise Crossbeams::FrameworkError, "Email group \"#{user_email_group}\" does not exist" if user_email_group_id.nil?
+
         email_addresses_for_group(user_email_group_id)
       end
     end

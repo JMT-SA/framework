@@ -23,7 +23,7 @@ class CrosstabApplier
 
     group_row_columns_in_array
 
-    get_sql_for_column # TODO: optionally modify with where... if apply_report_where_clause is true...
+    sql_for_column # TODO: optionally modify with where... if apply_report_where_clause is true...
     setup_crosstab_specs
     apply_new_column_fields
 
@@ -63,7 +63,7 @@ class CrosstabApplier
     @report.convert_columns_to_array('row_name', @row_cols) unless @row_cols.length == 1
   end
 
-  def get_sql_for_column
+  def sql_for_column
     this_col = @crosstab_hash[:column_columns].select { |c| c.keys.first == @col_col }.first
     @col_sql = this_col[@col_col][:sql]
   end

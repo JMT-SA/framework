@@ -26,6 +26,7 @@ module Crossbeams
       def self.extended_columns_for_view(table, form)
         config = EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
         return if config.nil?
+
         config.keys.each { |k| form.add_field("extcol_#{k}".to_sym) }
       end
 

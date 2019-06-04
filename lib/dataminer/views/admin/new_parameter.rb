@@ -3,7 +3,7 @@
 module DM
   module Admin
     class NewParameter
-      def self.call(id, form_values = nil, form_errors = nil)
+      def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
         ui_rule = UiRules::Compiler.new(:parameter, :new, id: id, form_values: form_values)
         rules   = ui_rule.compile
         # # report = lookup_admin_report(id) # TODO: create a repo for this...
@@ -26,12 +26,12 @@ module DM
         #   name: 'report'
         # }
 
-        layout = Crossbeams::Layout::Page.build(rules) do |page|
+        layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
           page.form_object ui_rule.form_object
           # page.form_object obj
           page.form_values form_values
           page.form_errors form_errors
-          page.section do |section|
+          page.section do |section| # rubocop:disable Metrics/BlockLength
             section.add_text('Choose a column or choose a table with field. Use the second option when requiring a parameter that is not returned by the query.')
             section.form do |form|
               form.action "/dataminer/admin/#{id}/parameter/create"

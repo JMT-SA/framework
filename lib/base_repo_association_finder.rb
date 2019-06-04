@@ -4,6 +4,7 @@
 class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
   def initialize(table_name, id, sub_tables: [], parent_tables: [], lookup_functions: [], wrapper: nil) # rubocop:disable Metrics/ParameterLists
     raise ArgumentError unless table_name.is_a?(Symbol)
+
     @main_table = table_name
     @id = id
     @sub_tables = sub_tables
@@ -29,6 +30,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     apply_parent_tables
 
     return @rec if @wrapper.nil?
+
     @wrapper.new(@rec)
   end
 
@@ -44,6 +46,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
 
   def apply_lookup_functions
     return if @lookup_functions.empty?
+
     @function_selects = []
     @lookup_functions.each { |rule| apply_lkp_function_rule(rule) }
     @dataset = @dataset.select(Sequel.lit('*'), *@function_selects)
@@ -51,11 +54,13 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
 
   def apply_sub_tables
     return if @sub_tables.empty?
+
     @sub_tables.each { |rule| apply_sub_table_rule(rule) }
   end
 
   def apply_parent_tables
     return if @parent_tables.empty?
+
     @parent_tables.each do |rule|
       @parent_table = rule.fetch(:parent_table)
       @foreign_key = rule[:foreign_key]
@@ -67,6 +72,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     @sub_tables.each do |rule|
       sub_table = rule.fetch(:sub_table)
       raise ArgumentError, "Sub_table #{sub_table} must be a Symbol" unless sub_table.is_a?(Symbol)
+
       rule.keys.each { |k| raise ArgumentError, "Unknown sub-table key: #{k}" unless VALID_SUB_KEYS.include?(k) }
       rule.keys.each { |k| validate_sub_table_rule!(k, rule) }
     end
@@ -77,6 +83,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
       function = rule.fetch(:function)
       args = rule.fetch(:args)
       raise ArgumentError, "Args for function #{function} must be an Array" unless args.is_a?(Array)
+
       _ = rule.fetch(:col_name)
       rule.keys.each { |k| raise ArgumentError, "Unknown lookup-function key: #{k}" unless VALID_LKP_KEYS.include?(k) }
     end
@@ -86,6 +93,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     @parent_tables.each do |rule|
       parent_table = rule.fetch(:parent_table)
       raise ArgumentError, "parent_table #{parent_table} must be a Symbol" unless parent_table.is_a?(Symbol)
+
       rule.keys.each { |k| raise ArgumentError, "Unknown parent-table key: #{k}" unless VALID_PARENT_KEYS.include?(k) }
     end
   end
@@ -183,6 +191,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
   def sub_table_join_table(uses_join_table, join_table)
     return nil unless join_table || uses_join_table
     return join_table unless uses_join_table
+
     [@main_table, @sub_table].sort.join('_').to_sym
   end
 

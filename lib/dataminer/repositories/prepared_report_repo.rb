@@ -62,6 +62,7 @@ module DataminerApp
       report_dictionary = load_report_dictionary(rep_loc)
       this_report       = report_dictionary[rep_loc.combined]
       return this_report[:file] if opts[:filename]
+
       if opts[:crosstab_hash]
         yml = YAML.load_file(this_report[:file])
         return yml[:crosstab]
@@ -96,7 +97,7 @@ module DataminerApp
       report_lookup.map { |id, lkp| { id: id, db: lkp[:db], report_name: lkp[:report_name], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab], owner: lkp[:owner] } }
     end
 
-    def get_reports_for(key, path, user = nil, for_user_only = false)
+    def get_reports_for(key, path, user = nil, for_user_only = false) # rubocop:disable Metrics/AbcSize
       user_id = user&.id
       lkp = {}
       yml_list = yml_files_in_path(path)
@@ -200,6 +201,7 @@ module DataminerApp
 
     def new_prepared_report_file(user, id, prepared_path, existing_report)
       return existing_report unless existing_report.nil? || existing_report&.blank?
+
       prefix = "#{user.id}_#{id}"
       "#{prefix}_#{next_seq_no(prepared_path, prefix).to_s.rjust(3, '0')}"
     end

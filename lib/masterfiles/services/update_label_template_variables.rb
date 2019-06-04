@@ -47,6 +47,7 @@ module MasterfilesApp
 
     def variable_list(var_list)
       return nil if var_list.empty?
+
       repo.array_for_db_col(var_list.map { |var| display_varname(var) })
     end
 
@@ -72,6 +73,7 @@ module MasterfilesApp
       messages = []
       var_list.each do |varname|
         next if varname.start_with?('CMP:')
+
         settings = shared_label_config[varname]
         if settings.nil?
           messages << "There is no configuration for variable \"#{varname}\""
@@ -84,6 +86,7 @@ module MasterfilesApp
 
     def create_variable_rules(var_list)
       return nil if var_list.empty?
+
       hash = { variables: [] }
       var_array = hash[:variables]
 
@@ -113,6 +116,7 @@ module MasterfilesApp
 
     def display_varname(varname)
       return varname unless varname.start_with?('CMP:')
+
       varname.gsub(/CMP:|[${}]/, '')
     end
   end

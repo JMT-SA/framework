@@ -23,6 +23,7 @@ module MesserverApp
     def send_publish_package(printer_type, targets, fname, binary_data)
       res = post_package(publish_send_uri, printer_type, targets, fname, binary_data)
       return res unless res.success
+
       success_response('ok', res.instance.body)
     end
 
@@ -44,6 +45,7 @@ module MesserverApp
     def preview_label(screen_or_print, vars, fname, binary_data)
       res = post_binary(preview_uri, vars, screen_or_print, fname, binary_data)
       return res unless res.success
+
       success_response('ok', res.instance.body)
     end
 

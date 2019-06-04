@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/AbcSize
 module DataminerApp
-  class PreparedReportInteractor < BaseInteractor
+  class PreparedReportInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def repo
       @repo ||= PreparedReportRepo.new
     end
@@ -14,7 +15,7 @@ module DataminerApp
     # @param params [Hash] the request parameters.
     # @param crosstab_hash [Hash] the crosstab config (if applicable).
     # @return [Crossbeams::Dataminer::Report] the modified report.
-    def setup_report_with_parameters(rpt, params, db_name, crosstab_hash = {})
+    def setup_report_with_parameters(rpt, params, db_name, crosstab_hash = {}) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
       # logger.info input_parameters.inspect
@@ -264,7 +265,7 @@ module DataminerApp
         m
       end
 
-      s = String.new("<table><tr><th>#{rpt.ordered_columns.map(&:caption).join('</th><th>')}</th></tr>")
+      s = +"<table><tr><th>#{rpt.ordered_columns.map(&:caption).join('</th><th>')}</th></tr>"
       row_defs.each do |record|
         s << '<tr>'
         rpt.ordered_columns.each do |k|
@@ -287,7 +288,7 @@ module DataminerApp
         m
       end
 
-      s = String.new(<<~STR)
+      s = +<<~STR
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <data-set xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       STR
@@ -313,3 +314,4 @@ module DataminerApp
     end
   end
 end
+# rubocop:enable Metrics/AbcSize

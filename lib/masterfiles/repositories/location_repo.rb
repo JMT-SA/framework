@@ -160,12 +160,12 @@ module MasterfilesApp
       return failed_response('The primary assignment must be included in your selection') unless multiselect_ids.include?(location.primary_assignment_id)
 
       del = "DELETE FROM location_assignments_locations WHERE location_id = #{id}"
-      ins = String.new
+      ins = []
       multiselect_ids.each do |m_id|
         ins << "INSERT INTO location_assignments_locations (location_id, location_assignment_id) VALUES(#{id}, #{m_id});"
       end
       DB.execute(del)
-      DB.execute(ins)
+      DB.execute(ins.join("\n"))
       ok_response
     end
 
@@ -175,12 +175,12 @@ module MasterfilesApp
       return failed_response('The primary storage type must be included in your selection') unless multiselect_ids.include?(location.primary_storage_type_id)
 
       del = "DELETE FROM location_storage_types_locations WHERE location_id = #{id}"
-      ins = String.new
+      ins = []
       multiselect_ids.each do |m_id|
         ins << "INSERT INTO location_storage_types_locations (location_id, location_storage_type_id) VALUES(#{id}, #{m_id});"
       end
       DB.execute(del)
-      DB.execute(ins)
+      DB.execute(ins.join("\n"))
       ok_response
     end
 

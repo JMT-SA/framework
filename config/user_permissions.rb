@@ -15,25 +15,37 @@ module Crossbeams
     # The main method to use is Crossbeams::Config::UserPermissions.can_user?
     # - pass the user object (or hash) and an array of permission keys.
     #
-    class UserPermissions
+    class UserPermissions # rubocop:disable Metrics/ClassLength
       WEBAPP = :Framework
 
       BASE = {
         WEBAPP => {
-          stock_adj: { sign_off: false, approve: true },
+          stock_adj: { sign_off: false, approve: true, take_out_rubbish: true },
+          hans: { some: true },
           invoice: { complete: false, approve: { fruit: true, assets: false } }
         }
       }.freeze
 
       DOCUMENTATION = {
         WEBAPP => {
-          stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr' },
+          stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
+          hans: { some: 'Describe me' },
           invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
         }
       }.freeze
 
+      # Take a nested hash and return all its keys in an array
+      def self.tree_hash_keys_to_a(hash)
+        ar = []
+        hash.keys.sort.each do |k|
+          ar << k
+          ar += tree_hash_keys_to_a(hash[k]) if hash[k].is_a?(Hash)
+        end
+        ar
+      end
+
       # Ensure documentation matches declaration.
-      raise 'Crossbeams::Config::UserPermissions documentation is incomplete' if DOCUMENTATION[WEBAPP].keys != BASE[WEBAPP].keys
+      raise 'Crossbeams::Config::UserPermissions documentation is incomplete' unless tree_hash_keys_to_a(DOCUMENTATION[WEBAPP]) == tree_hash_keys_to_a(BASE[WEBAPP])
 
       # Does the given user have a certain permission?
       #
@@ -150,6 +162,7 @@ module Crossbeams
         child = TreeNode.new(key, desc, node_val, group)
         node.add_child(child)
         return unless node_val.nil?
+
         value.each do |k, v|
           build_tree(child, k, v, group)
         end
@@ -158,10 +171,12 @@ module Crossbeams
       def keys_for(compound_key)
         field = fields.find { |f| f[:field] == compound_key }
         raise Crossbeams::InfoError %(There is no user permission for "#{compound_key}") if field.nil?
+
         field[:keys]
       end
     end
 
+    # Tree component for storing user permissions.
     class TreeNode
       attr_accessor :keyname, :children, :description, :permission, :group, :parent
 
@@ -175,36 +190,41 @@ module Crossbeams
         @children = []
       end
 
+      # Keys for the node (excludes the top-most node)
       def keys
-        return [keyname] if parent.nil?
+        return [nil] if parent.nil?
+
         ar = []
         node = self
         while node.parent
           ar << node.keyname
           node = node.parent
         end
-        ar << node.keyname
         ar.reverse
       end
 
+      # An array of all the leaf nodes below this node.
       def field_array
         ar = []
         children.each { |child| ar += child.leaf_set }
         ar
       end
 
+      # An array of all leaf nodes in the tree from this node.
       def leaf_set
         ar = []
         if children?
           children.each { |child| ar += child.leaf_set }
         else
-          ar << { field: fieldname, description: description, value: permission, group: group, keys: keys }
+          ar << { field: fieldname, description: description, value: permission, group: group, keys: keys.compact }
         end
         ar
       end
 
+      # Fieldname is constructed from a concatenation of all parent keys and this node's key.
       def fieldname
         return keyname if parent.nil?
+
         ar = []
         node = self
         while node.parent
@@ -235,7 +255,7 @@ module Crossbeams
       # For debugging, show a simplified version of the tree.
       def to_s(indent = 0)
         kids = @children.empty? ? '' : "#{@children.length} children."
-        s = String.new("#{@keyname}: #{@permission} #{kids}")
+        s = +"#{@keyname}: #{@permission} #{kids}"
         ind = indent + 2
         @children.each { |c| s << "\n#{' ' * ind}#{c.to_s(ind)}" }
         s

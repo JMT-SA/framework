@@ -18,6 +18,17 @@ class LibraryVersions
     multi: %i[jsver multi]
   }.freeze
 
+  # Javascript strategies - use send to call private methods.
+  JS_STRATEGY = {
+    ag_grid: ->(s) { s.send :ag_grid_version },
+    selectr: ->(s) { s.send :selectr_version },
+    sweetalert: ->(s) { s.send :sweetalert_version },
+    sortable: ->(s) { s.send :sortable_version },
+    konva: ->(s) { s.send :konva_version },
+    lodash: ->(s) { s.send :lodash_version },
+    multi: ->(s) { s.send :multi_version }
+  }.freeze
+
   def initialize(*requested_libs)
     @requested_libs = requested_libs
   end
@@ -34,8 +45,8 @@ class LibraryVersions
 
   private
 
-  def resolve(r)
-    send(*LIB_STRATEGIES[r])
+  def resolve(lib)
+    send(*LIB_STRATEGIES[lib])
   end
 
   def format_lib(lib, version)
@@ -47,24 +58,9 @@ class LibraryVersions
   end
 
   def jsver(key)
-    case key
-    when :ag_grid
-      ag_grid_version
-    when :selectr
-      selectr_version
-    when :sweetalert
-      sweetalert_version
-    when :sortable
-      sortable_version
-    when :konva
-      konva_version
-    when :lodash
-      lodash_version
-    when :multi
-      multi_version
-    else
-      format_lib('Unknown directive', key)
-    end
+    js_strategy = JS_STRATEGY[key]
+    return format_lib('Unknown directive', key) if js_strategy.nil?
+    js_strategy.call(self)
   end
 
   def ag_grid_version

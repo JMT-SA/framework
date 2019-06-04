@@ -36,6 +36,3 @@ Metrics/AbcSize:
 
 Layout/SpaceAroundOperators:
   AllowForAlignment: true
-
-Performance/UnfreezeString:
-  Enabled: false

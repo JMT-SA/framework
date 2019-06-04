@@ -39,3 +39,13 @@ UtilityFunctions.merge_recursively(left, right)
 
 #=> { one: { two: { three: 5 }, four: 4, seven: 7 } }
 ----
+
+Change keys of a nested hash from strings to symbols.
+[source,ruby]
+----
+example  = { "one" => { "two" => { "three" => 3 }, "four" => 4 } }
+
+UtilityFunctions.symbolize_keys(example)
+
+# => { one: { two: { three: 3 }, four: 4 } }
+----

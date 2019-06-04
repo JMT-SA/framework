@@ -101,4 +101,20 @@ module UtilityFunctions
   def merge_recursively(left, right)
     left.merge(right) { |_, a_item, b_item| a_item.is_a?(Hash) ? merge_recursively(a_item, b_item) : b_item }
   end
+
+  # Change string keys in a nested hash into symbol keys.
+  #
+  # @param hash [hash] the hash with keys to symbolize.
+  # @return [hash]
+  def symbolize_keys(hash)
+    if hash.is_a?(Hash)
+      Hash[
+        hash.map do |k, v|
+          [k.respond_to?(:to_sym) ? k.to_sym : k, symbolize_keys(v)]
+        end
+      ]
+    else
+      hash
+    end
+  end
 end

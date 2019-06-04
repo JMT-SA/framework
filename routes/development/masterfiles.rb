@@ -194,7 +194,7 @@ class Framework < Roda
       r.on 'permission_tree' do
         check_auth!('masterfiles', 'user_maintenance')
         r.get do
-          show_partial { Development::Masterfiles::User::PermissionTree.call(id, current_user) }
+          show_partial { Development::Masterfiles::User::PermissionTree.call(id) }
         end
         r.patch do
           res = interactor.change_user_permissions(id, params[:user]) # apply params to tree & save hash to JSON permission_tree
@@ -203,7 +203,6 @@ class Framework < Roda
           else
             re_show_form(r, res) do
               Development::Masterfiles::User::PermissionTree.call(id,
-                                                                  current_user,
                                                                   form_values: params[:permission_tree],
                                                                   form_errors: res.errors)
             end

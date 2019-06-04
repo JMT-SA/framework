@@ -22,7 +22,7 @@ module UiRules
     end
 
     def build_permission_tree
-      ptree = Crossbeams::Config::UserPermissions.new(@options[:user])
+      ptree = Crossbeams::Config::UserPermissions.new(@repo.find_user(@options[:id]))
       @tree_fields = ptree.fields
       rules[:tree_fields] = ptree.grouped_fields
     end

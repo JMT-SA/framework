@@ -20,17 +20,17 @@ module Crossbeams
 
       BASE = {
         WEBAPP => {
-          stock_adj: { sign_off: false, approve: true, take_out_rubbish: true },
-          hans: { some: true },
-          invoice: { complete: false, approve: { fruit: true, assets: false } }
+          stock_adj: { sign_off: false }
+          # stock_adj: { sign_off: false, approve: true, take_out_rubbish: true },
+          # invoice: { complete: false, approve: { fruit: true, assets: false } }
         }
       }.freeze
 
       DOCUMENTATION = {
         WEBAPP => {
-          stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
-          hans: { some: 'Describe me' },
-          invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
+          stock_adj: { sign_off: 'Sign off on a stock adjustment' }
+          # stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
+          # invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
         }
       }.freeze
 
@@ -136,7 +136,7 @@ module Crossbeams
 
       def make_tree(user)
         @permissions = BASE[WEBAPP].dup
-        user_permissions = user[:permission_tree] || {}
+        user_permissions = UtilityFunctions.symbolize_keys(user[:permission_tree].to_h) || {}
         @new_set = UtilityFunctions.merge_recursively(@permissions, user_permissions)
 
         # Clean up the merged permissions - remove obsolete entries.
@@ -157,7 +157,7 @@ module Crossbeams
 
       def build_tree(node, key, value, group)
         node_val = value.is_a?(Hash) ? nil : value
-        leaf = DOCUMENTATION.dig(*node.keys.push(key))
+        leaf = DOCUMENTATION.dig(*node.keys.push(key).unshift(WEBAPP))
         desc = leaf.is_a?(String) ? leaf : ''
         child = TreeNode.new(key, desc, node_val, group)
         node.add_child(child)

@@ -85,6 +85,11 @@ module PackMaterial
                                   url: "/pack_material/reports/delivery_received/#{id}",
                                   loading_window: true,
                                   style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Waybill Note',
+                                  url: "/pack_material/reports/waybill_note/#{id}",
+                                  loading_window: true,
+                                  style: :button)
             end
 
             page.section do |section|

@@ -29,5 +29,18 @@ class Framework < Roda
         show_error(res.message, fetch?(r))
       end
     end
+
+    r.on 'waybill_note', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'waybill_note',
+                                    user: current_user.login_name,
+                                    file: 'waybill_note',
+                                    params: { delivery_id: id,
+                                              keep_file: true })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
   end
 end

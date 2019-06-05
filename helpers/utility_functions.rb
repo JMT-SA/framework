@@ -117,4 +117,16 @@ module UtilityFunctions
       hash
     end
   end
+
+  def stringify_keys(hash)
+    if hash.is_a?(Hash)
+      Hash[
+        hash.map do |k, v|
+          [k.respond_to?(:to_s) ? k.to_s : k, stringify_keys(v)]
+        end
+      ]
+    else
+      hash
+    end
+  end
 end

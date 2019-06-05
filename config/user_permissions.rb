@@ -55,7 +55,7 @@ module Crossbeams
       def self.can_user?(user, *permission_tree)
         keys = permission_tree.unshift(WEBAPP)
 
-        permissions = (user[:permission_tree] || {}).dig(*keys)
+        permissions = UtilityFunctions.symbolize_keys(user[:permission_tree].to_h).dig(*keys)
         permissions = BASE.dig(*keys) if permissions.nil?
 
         permissions.is_a? TrueClass
@@ -66,8 +66,9 @@ module Crossbeams
       attr_reader :tree
 
       def initialize(user = {})
-        @user_permissions = user[:permission_tree] || {}
-        @tree = make_tree(user)
+        top = UtilityFunctions.symbolize_keys(user[:permission_tree].to_h)
+        @user_permissions = top[WEBAPP] || {}
+        @tree = make_tree
       end
 
       # An array of User permissions.
@@ -108,7 +109,7 @@ module Crossbeams
             end
           end
         end
-        permissions
+        { WEBAPP => permissions }
       end
 
       private
@@ -134,10 +135,9 @@ module Crossbeams
         end
       end
 
-      def make_tree(user)
+      def make_tree
         @permissions = BASE[WEBAPP].dup
-        user_permissions = UtilityFunctions.symbolize_keys(user[:permission_tree].to_h) || {}
-        @new_set = UtilityFunctions.merge_recursively(@permissions, user_permissions)
+        @new_set = UtilityFunctions.merge_recursively(@permissions, @user_permissions)
 
         # Clean up the merged permissions - remove obsolete entries.
         @new_set.each_key do |key|

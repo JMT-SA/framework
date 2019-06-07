@@ -24,6 +24,9 @@ The actions are rendered as a context menu that can include submenu groupings.
       :function: function_name
       :program: program_name
       :permission: required_permission
+    :has_permission:
+      - invoice
+      - complete
     :hide_if_null: another_field_id,further_field
   - :separator: true
   - submenu:
@@ -128,6 +131,12 @@ The link will be POSTed to the server with `_method` = `'DELETE'` if the user ch
 a|If the user does not have the required permission, the link will not appear.
 
 This is usually used when an action requires a special level of authorisation -- not so much for basic CRUD authorisations (which are almost implied by the fact that the user can call the list action and thus has permission to at least view the applicable program).
+
+|:has_permission
+|An Array of keys (String or Symbol) that match the user's setting for an entry in `Crossbeams::Config::UserPermissions`.
+a|If the user does not have the required permission, the link will not appear.
+
+This is similar to the `:auth` setting, but allows for user permissions that are not tied to the menu structure.
 
 |===
 

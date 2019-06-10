@@ -1,0 +1,159 @@
+= Services
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Services
+
+Services inherit from BaseService.
+
+They are called in this way: `ServiceName.call(args)` and return a `Crossbeams::Response`.
+
+See link:/yarddocthis/lib=base_service.rb[BaseService methods] for a list of built-in methods.
+
+=== Example
+
+[source,ruby]
+----
+module SomeApp
+  class SomeService < BaseService
+    attr_reader :name
+
+    def initialize(name)
+      @name = name
+      raise ArgumentError if name.nil?
+    end
+
+    def call
+      do_something
+      success_response(name)
+    rescue Crossbeams::FrameworkError => e
+      failed_response(e.message)
+    end
+  end
+end
+
+# Usage:
+res = SomeApp::SomeService.call('John')
+p res.success
+# => true
+p res.message
+# => John
+----
+
+=== Example with a block
+
+In this example, the calling code passes a block to be executed inside the database transaction. (A job needs to call finish inside the transaction).
+[source,ruby]
+----
+module SomeApp
+  class SomeService < BaseService
+    attr_reader :name
+
+    def initialize(name, block = nil)
+      @block = block
+      @name = name
+      raise ArgumentError if name.nil?
+    end
+
+    def call
+      do_something
+      repo.transaction do
+        repo.update_table
+        @block&.call true
+      end
+      success_response(name)
+    rescue Crossbeams::FrameworkError => e
+      @block&.call false
+      failed_response(e.message)
+    end
+  end
+end
+
+# Usage (e.g. in a Job):
+res = SomeApp::SomeService.call('John') do |ok|
+  if ok
+    finish
+  else
+    expire
+  end
+end
+p res.success
+# => true
+p res.message
+# => John
+----
+
+=== Observers
+
+Observers can be called from a service -- thus allowing the service to be extended to perform extra work under different conditions without having to include extensive conditional logic in the service itself.
+
+See link:/developer_documentation/how_to_attach_observers_to_a_service.adoc[how to attach observers to a service].
+
+=== EDI base
+
+=== TaskPermission
+
+Task permission services are services that by convention check if a task can be performed at a particular stage.
+
+They should be designed much like this:
+[source,ruby]
+----
+    class Thing < BaseService
+      attr_reader :task, :entity
+      def initialize(task, thing_id = nil)
+        @task = task
+        @repo = ThingRepo.new
+        @id = thing_id
+        @entity = @id ? @repo.find_thing(@id) : nil
+      end
+
+      CHECKS = {
+        create: :create_check,
+        edit: :edit_check,
+        delete: :delete_check,
+        approve: :approve_check,
+      }.freeze
+
+      def call
+        return failed_response 'Record not found' unless @entity || task == :create
+
+        check = CHECKS[task]
+        raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
+
+        send(check)
+      end
+
+      private
+
+      def create_check
+        all_ok
+      end
+
+      def edit_header_check
+        return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
+
+        all_ok
+      end
+
+      def edit_check
+        all_ok
+      end
+
+      def delete_check
+        return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
+
+        all_ok
+      end
+
+      def approve_check
+        return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
+
+        all_ok
+      end
+
+      def approved?
+        @entity.approved
+      end
+    end
+----

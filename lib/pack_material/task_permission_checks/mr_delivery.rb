@@ -39,6 +39,7 @@ module PackMaterialApp
 
       def mutable_check
         return failed_response "Verified delivery can not be #{task}d" if verified?
+
         all_ok
       end
 
@@ -47,16 +48,19 @@ module PackMaterialApp
         return failed_response('Delivery has no items') if no_items?
         return failed_response('Delivery has items without batches') if items_without_batches?
         return failed_response('Delivery batch quantities do not equate to item quantities where applicable') if item_quantities_ignored?
+
         all_ok
       end
 
       def putaway_check
         return failed_response('Delivery Putaway has already been completed') if putaway_completed?
+
         all_ok
       end
 
       def add_invoice_check
         return failed_response('Delivery has not been verified') unless verified?
+
         all_ok
       end
 
@@ -64,6 +68,7 @@ module PackMaterialApp
         return failed_response('Delivery Purchase Invoice has already been completed') if invoice_completed?
         return failed_response('Delivery has items without prices') if items_without_prices?
         return failed_response('Purchase Invoice incomplete') if invoice_incomplete?
+
         all_ok
       end
 

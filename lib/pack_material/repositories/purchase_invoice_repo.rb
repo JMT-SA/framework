@@ -73,14 +73,5 @@ module PackMaterialApp
                                               flatten_columns: { product_variant_number: :product_variant_number, product_variant_code: :product_variant_code } }],
                             wrapper: MrDeliveryItem)
     end
-
-    def format_response(response)
-      resp = Nokogiri::XML(response)
-      {
-        error_message: resp.xpath('//error').text,
-        purchase_order_number: resp.xpath('//purchase_order_number').text,
-        purchase_invoice_number: resp.xpath('//purchase_invoice_number').text
-      }
-    end
   end
 end

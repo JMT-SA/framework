@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class CompletePurchaseInvoice < BaseService
     # @param [Integer] delivery_id
-    def initialize(user_name, delivery_id)
+    def initialize(user_name, delivery_id, block = nil)
+      @block = block
       @repo           = PurchaseInvoiceRepo.new
       @replenish_repo = ReplenishRepo.new
       @user_name      = user_name
@@ -16,6 +15,25 @@ module PackMaterialApp
     def call
       return failed_response('Delivery does not exist') unless @repo.exists?(:mr_deliveries, id: @id)
 
+      request_xml = build_xml
+      res = make_http_call(request_xml)
+      formatted_res = format_response(res.instance.body)
+
+      @repo.transaction do
+        if formatted_res.success
+          p "SUCCESS"
+          @replenish_repo.delivery_complete_invoice(@id, formatted_res.instance)
+          @repo.log_status('mr_deliveries', @id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
+        else
+          p "FAIL"
+          @replenish_repo.update_mr_delivery(@id, invoice_error: true)
+          @repo.log_status('mr_deliveries', @id, formatted_res.message, user_name: @user_name)
+        end
+        @block&.call
+      end
+    end
+
+    def build_xml # rubocop:disable Metrics/AbcSize
       # Deliveries are limited to single suppliers
       delivery_number = @delivery.delivery_number
       supplier_invoice_number = @delivery.supplier_invoice_ref_number
@@ -52,18 +70,28 @@ module PackMaterialApp
           end
         end
       end
-      http        = Crossbeams::HTTPCalls.new
-      res         = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, request_xml.to_xml)
+      request_xml.to_xml
+    end
+
+    def make_http_call(xml)
+      http = Crossbeams::HTTPCalls.new
+      res  = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, xml)
       raise Crossbeams::InfoError, res.message unless res.success
 
-      instance      = @repo.format_response(res.instance.body)
-      error_message = instance.delete(:error_message)
-      if !error_message.empty?
-        @replenish_repo.update_mr_delivery(@id, invoice_error: true)
-        @repo.log_status('mr_deliveries', @id, error_message, user_name: @user_name)
+      res
+    end
+
+    def format_response(response)
+      resp = Nokogiri::XML(response)
+      message = resp.xpath('//error').text
+      instance = {
+        purchase_order_number: resp.xpath('//purchase_order_number').text,
+        purchase_invoice_number: resp.xpath('//purchase_invoice_number').text
+      }
+      if message.empty?
+        success_response('ok', instance)
       else
-        @replenish_repo.delivery_complete_invoice(@id, instance)
-        @repo.log_status('mr_deliveries', @id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
+        failed_response(message, instance)
       end
     end
   end

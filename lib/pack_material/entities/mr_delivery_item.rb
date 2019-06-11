@@ -10,7 +10,7 @@ module PackMaterialApp
     attribute :quantity_over_supplied, Types::Decimal
     attribute :quantity_under_supplied, Types::Decimal
     attribute :quantity_received, Types::Decimal
-    attribute :invoiced_unit_price, Types::Decimal
+    attribute? :invoiced_unit_price, Types::Decimal.optional
     attribute :remarks, Types::String
     attribute :putaway_completed, Types::Bool
     attribute? :product_variant_number, Types::Integer.optional

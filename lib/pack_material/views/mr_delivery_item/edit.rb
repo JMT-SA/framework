@@ -24,7 +24,7 @@ module PackMaterial
               form.add_field :quantity_over_supplied
               form.add_field :quantity_under_supplied
               form.add_field :quantity_received
-              form.add_field :invoiced_unit_price
+              # form.add_field :invoiced_unit_price
               form.add_field :remarks
             end
           end

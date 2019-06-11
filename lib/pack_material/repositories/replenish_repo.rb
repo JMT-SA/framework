@@ -190,8 +190,12 @@ module PackMaterialApp
 
     def po_total_vat(id, subtotal)
       return BigDecimal('0') if subtotal.zero?
-      factor = DB['SELECT percentage_applicable / 100.0 AS vat_factor FROM mr_vat_types WHERE id = (SELECT mr_vat_type_id FROM mr_purchase_orders WHERE id = ?)', id].single_value || BigDecimal('0')
+      factor = po_vat_factor(id)
       subtotal * factor
+    end
+
+    def po_vat_factor(po_id)
+      DB['SELECT percentage_applicable / 100.0 AS vat_factor FROM mr_vat_types WHERE id = (SELECT mr_vat_type_id FROM mr_purchase_orders WHERE id = ?)', po_id].single_value || BigDecimal('0')
     end
 
     def mr_purchase_order_items(mr_purchase_order_id)
@@ -524,11 +528,11 @@ module PackMaterialApp
     def del_sub_totals(id)
       subtotal = del_total_items(id)
       costs = del_total_costs(id)
-      # vat = del_total_vat(id, subtotal)
+      vat = del_total_vat(id, subtotal)
       {
         subtotal: UtilityFunctions.delimited_number(subtotal),
         costs: UtilityFunctions.delimited_number(costs),
-        # vat: UtilityFunctions.delimited_number(vat),
+        vat: UtilityFunctions.delimited_number(vat),
         total: UtilityFunctions.delimited_number(subtotal + costs)
       }
     end
@@ -537,8 +541,30 @@ module PackMaterialApp
       DB['SELECT SUM(quantity_received * invoiced_unit_price) AS total FROM mr_delivery_items WHERE mr_delivery_id = ?', id].single_value || BigDecimal('0')
     end
 
+    def del_total_vat(id, subtotal)
+      return BigDecimal('0') if subtotal.zero?
+      # We take the first Purchase Order we can find for the VAT factor
+      po_item_id = DB[:mr_delivery_items].where(mr_delivery_id: id).get(:mr_purchase_order_item_id)
+      po_id = DB[:mr_purchase_order_items].where(id: po_item_id).get(:mr_purchase_order_id)
+      factor = po_vat_factor(po_id)
+      subtotal * factor
+    end
+
     def del_total_costs(id)
       DB[:mr_purchase_invoice_costs].where(mr_delivery_id: id).sum(:amount) || BigDecimal('0')
+    end
+
+    def update_current_prices(delivery_id)
+      items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).map{ |r| { pv_id: r[:mr_product_variant_id], price: r[:invoiced_unit_price] } }
+      items.each do |item|
+        product = config_repo.find_matres_product_variant(item[:pv_id])
+        stock_adj_price = product.stock_adj_price > 0 ? product.stock_adj_price : item[:price]
+        update(:material_resource_product_variants, item[:pv_id], current_price: item[:price], stock_adj_price: stock_adj_price)
+      end
+    end
+
+    def config_repo
+      ConfigRepo.new
     end
   end
 end

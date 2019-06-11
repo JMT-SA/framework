@@ -787,6 +787,7 @@ class Framework < Roda
     [
       OpenStruct.new(dom_id: 'del_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
       OpenStruct.new(dom_id: 'del_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+      OpenStruct.new(dom_id: 'del_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
       OpenStruct.new(dom_id: 'del_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
     ]
   end

@@ -138,6 +138,8 @@ module PackMaterialApp
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue StandardError
+      failed_response('Please ensure that you are using the Location Short Code if you are typing in the value.')
     end
 
     def html_progress_report(delivery_id, sku_id, to_location_id)

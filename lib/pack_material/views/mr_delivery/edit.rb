@@ -68,7 +68,7 @@ module PackMaterial
                   row.column do |col|
                     col.add_field :client_delivery_ref_number
                     col.add_field :vehicle_registration
-                    col.add_text po_totals(rules)
+                    col.add_text del_totals(rules)
                   end
                 end
               end
@@ -129,12 +129,13 @@ module PackMaterial
           layout
         end
 
-        def self.po_totals(rules)
+        def self.del_totals(rules)
           <<~HTML
             <div class="fr">
             <table><tbody>
             <tr><th class="tr pr2">Sub-total</th><td class="tr"><span id="del_totals_subtotal">#{rules[:del_sub_totals][:subtotal]}</span></td></tr>
             <tr><th class="tr pr2">Costs</th><td class="tr"><span id="del_totals_costs">#{rules[:del_sub_totals][:costs]}</span></td></tr>
+            <tr><th class="tr pr2">VAT</th><td class="tr"><span id="del_totals_vat">#{rules[:del_sub_totals][:vat]}</span></td></tr>
             <tr><th class="tr pr2">Total</th><td class="tr b bb bt"><span id="del_totals_total">#{rules[:del_sub_totals][:total]}</span></td></tr>
             </tbody></table>
             </div>

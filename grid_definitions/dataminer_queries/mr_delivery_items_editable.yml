@@ -62,7 +62,7 @@
     :group_max: false
   mr_product_variant_id:
     :name: mr_product_variant_id
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Product variant
     :namespaced_name: mr_delivery_items.mr_product_variant_id
     :data_type: :integer
@@ -78,7 +78,7 @@
     :group_max: false
   old_product_code:
     :name: old_product_code
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Old product code
     :namespaced_name: material_resource_product_variants.old_product_code
     :data_type: :string
@@ -94,7 +94,7 @@
     :group_max: false
   product_variant_code:
     :name: product_variant_code
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Product variant code
     :namespaced_name: material_resource_product_variants.product_variant_code
     :data_type: :string
@@ -110,7 +110,7 @@
     :group_max: false
   product_variant_number:
     :name: product_variant_number
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: PV Number
     :namespaced_name: material_resource_product_variants.product_variant_number
     :data_type: :integer
@@ -126,7 +126,7 @@
     :group_max: false
   use_fixed_batch_number:
     :name: use_fixed_batch_number
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Use fixed batch number
     :namespaced_name: material_resource_product_variants.use_fixed_batch_number
     :data_type: :boolean
@@ -142,7 +142,7 @@
     :group_max: false
   new_batch_not_allowed:
     :name: new_batch_not_allowed
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: New batch not allowed
     :namespaced_name: 
     :data_type: :string
@@ -158,7 +158,7 @@
     :group_max: false
   quantity_on_note:
     :name: quantity_on_note
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Qty on note
     :namespaced_name: mr_delivery_items.quantity_on_note
     :data_type: :number
@@ -174,7 +174,7 @@
     :group_max: false
   quantity_over_supplied:
     :name: quantity_over_supplied
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Over Supplied
     :namespaced_name: mr_delivery_items.quantity_over_supplied
     :data_type: :number
@@ -190,7 +190,7 @@
     :group_max: false
   quantity_under_supplied:
     :name: quantity_under_supplied
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Under Supplied
     :namespaced_name: mr_delivery_items.quantity_under_supplied
     :data_type: :number
@@ -206,7 +206,7 @@
     :group_max: false
   quantity_received:
     :name: quantity_received
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Received
     :namespaced_name: mr_delivery_items.quantity_received
     :data_type: :number
@@ -222,7 +222,7 @@
     :group_max: false
   mr_purchase_order_item_id:
     :name: mr_purchase_order_item_id
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Mr purchase order item
     :namespaced_name: mr_delivery_items.mr_purchase_order_item_id
     :data_type: :integer
@@ -238,11 +238,11 @@
     :group_max: false
   purchase_order_number:
     :name: purchase_order_number
-    :sequence_no: 14
-    :caption: Purchase order number
+    :sequence_no: 3
+    :caption: PO no
     :namespaced_name: mr_purchase_orders.purchase_order_number
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -321,7 +321,7 @@
     :sequence_no: 19
     :caption: Inv unit price
     :namespaced_name: mr_delivery_items.invoiced_unit_price
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false

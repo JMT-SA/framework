@@ -1,4 +1,4 @@
-require './framework.rb'
+require './webapp.rb'
 
 # EXAMPLE of quick+dirty debug middleware:
 #

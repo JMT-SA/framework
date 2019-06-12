@@ -31,7 +31,7 @@ namespace :assets do
   desc 'Precompile the assets'
   task :precompile do
     require_relative 'config/environment'
-    require './framework'
+    require './webapp'
     Framework.compile_assets
   end
   CLEAN << 'prestyle.css'

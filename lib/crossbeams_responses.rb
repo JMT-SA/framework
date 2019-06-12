@@ -8,17 +8,17 @@ module Crossbeams
     #   - errors: the error messages.
     #   - message: "Validation error".
     #
-    # validation results must either be a Dry::Validation::Result or a Hash.
+    # validation results must either be a Dry::Validation::Result or a Hash or OpenStruct.
     # The Hash should have attributes for the object in error and a key `:messages`.
     # `:messages` must be in the same format as Dry::Validation::Result.messages.
     # i.e `messages: { field1: ['error', 'another error'], field2: ['an err'] }`
     #
-    # @param validation_results [Hash, Dry::Validation::Result] the validation object and messages.
+    # @param validation_results [Hash, Dry::Validation::Result, OpenStruct] the validation object and messages.
     # @return [OpenStruct] the response object.
     def validation_failed_response(validation_results)
       OpenStruct.new(success: false,
                      instance: validation_results.is_a?(Dry::Validation::Result) ? validation_results.to_h : validation_results.to_h.reject { |k, _| k == :messages },
-                     errors: validation_results.messages,
+                     errors: validation_results.is_a?(Hash) ? validation_results[:messages] : validation_results.messages,
                      message: 'Validation error')
     end
 
@@ -40,7 +40,7 @@ module Crossbeams
       errs = {}
       instance = {}
       validation_results.each do |vr|
-        errs.merge!(vr.messages)
+        errs.merge!(vr.is_a?(Hash) ? vr[:messages] : vr.messages)
         instance.merge!(vr.to_h)
       end
       OpenStruct.new(success: false,

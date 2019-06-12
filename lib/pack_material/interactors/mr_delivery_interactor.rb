@@ -7,6 +7,7 @@ module PackMaterialApp
       if can_create.success
         res = validate_mr_delivery_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         id = nil
         repo.transaction do
           id = repo.create_mr_delivery(res)
@@ -27,6 +28,7 @@ module PackMaterialApp
       if can_update.success
         res = validate_mr_delivery_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
           repo.update_mr_delivery(id, res)
           log_transaction
@@ -43,6 +45,7 @@ module PackMaterialApp
       if add_invoice.success
         res = validate_mr_delivery_purchase_invoice_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
           repo.update_mr_delivery(id, res)
           log_transaction
@@ -64,6 +67,7 @@ module PackMaterialApp
           log_status('mr_deliveries', id, 'VERIFIED')
           res = PackMaterialApp::CreateDeliverySKUS.call(id, @user.user_name)
           raise Crossbeams::InfoError, res.message unless res.success
+
           instance = mr_delivery(id)
           success_response("Verified delivery #{instance.delivery_number}", instance)
         end
@@ -117,6 +121,8 @@ module PackMaterialApp
         qty = Integer(attrs[:quantity])
 
         to_location_id = repo.resolve_location_id_from_scan(attrs[:location], attrs[:location_scan_field])
+        return validation_failed_response(location: attrs[:location], messages: { location: ['Location short code not found'] }) if to_location_id.nil?
+
         to_location_id = Integer(to_location_id)
 
         opts = { user_name: @user.user_name, delivery_id: delivery_id }
@@ -138,8 +144,6 @@ module PackMaterialApp
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
-    rescue StandardError
-      failed_response('Please ensure that you are using the Location Short Code if you are typing in the value.')
     end
 
     def html_progress_report(delivery_id, sku_id, to_location_id)

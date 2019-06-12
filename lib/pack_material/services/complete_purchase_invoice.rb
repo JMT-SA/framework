@@ -21,11 +21,9 @@ module PackMaterialApp
 
       @repo.transaction do
         if formatted_res.success
-          p "SUCCESS"
           @replenish_repo.delivery_complete_invoice(@id, formatted_res.instance)
           @repo.log_status('mr_deliveries', @id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
         else
-          p "FAIL"
           @replenish_repo.update_mr_delivery(@id, invoice_error: true)
           @repo.log_status('mr_deliveries', @id, formatted_res.message, user_name: @user_name)
         end

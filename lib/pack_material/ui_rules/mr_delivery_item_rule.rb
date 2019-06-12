@@ -100,7 +100,7 @@ module UiRules
     end
 
     def purchase_order_item
-      @repo.find_mr_purchase_order_item(@options[:item_id])
+      @purchase_order_item ||= @repo.find_mr_purchase_order_item(@options[:item_id])
     end
 
     def selected_purchase_order

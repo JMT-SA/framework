@@ -39,7 +39,7 @@ module PackMaterialApp
     end
 
     def approve_purchase_order(id)
-      can_approve = TaskPermissionCheck::MrPurchaseOrder.call(:approve, id)
+      can_approve = can_approve_purchase_order(id)
       if can_approve.success
         instance = mr_purchase_order(id)
         repo.transaction do
@@ -71,6 +71,10 @@ module PackMaterialApp
 
     def po_sub_totals(id)
       repo.po_sub_totals(id)
+    end
+
+    def can_approve_purchase_order(id)
+      TaskPermissionCheck::MrPurchaseOrder.call(:approve, id, @user)
     end
 
     private

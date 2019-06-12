@@ -23,7 +23,7 @@ class Framework < Roda
         r.post do        # CREATE
           res = item_interactor.create_mr_purchase_order_item(id, params[:mr_purchase_order_item])
           if res.success
-            row_keys = %i[
+            row_keys       = %i[
               id
               mr_purchase_order_id
               mr_product_variant_id
@@ -33,9 +33,14 @@ class Framework < Roda
               product_variant_code
               inventory_uom_code
             ]
+            permission_res = interactor.can_approve_purchase_order(id)
+            type           = permission_res.success ? :show_element : :hide_element
+
             sub_totals = interactor.po_sub_totals(id)
             json_actions(po_sub_total_changes(sub_totals) +
-                         [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys))], res.message)
+                           [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys)),
+                            OpenStruct.new(type: type, dom_id: 'mr_purchase_order_approve_button')],
+                         res.message)
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new") do
               PackMaterial::Replenish::MrPurchaseOrderItem::New.call(id,
@@ -86,13 +91,13 @@ class Framework < Roda
       end
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
-        show_page { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id) }
+        show_page { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id, current_user) }
       end
       r.is do
         r.get do       # SHOW
           check_auth!('replenish', 'read')
           # TODO: implement show view
-          show_page { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id) }
+          show_page { PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id, current_user) }
         end
         r.patch do     # UPDATE
           res = interactor.update_mr_purchase_order(id, params[:mr_purchase_order])
@@ -101,7 +106,7 @@ class Framework < Roda
             r.redirect("/pack_material/replenish/mr_purchase_orders/#{id}/edit")
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_purchase_orders/#{id}/edit") do
-              PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id, form_values: params[:mr_purchase_order], form_errors: res.errors)
+              PackMaterial::Replenish::MrPurchaseOrder::Edit.call(id, current_user, form_values: params[:mr_purchase_order], form_errors: res.errors)
             end
           end
         end
@@ -193,10 +198,17 @@ class Framework < Roda
           check_auth!('replenish', 'delete')
           po_id = interactor.mr_purchase_order_item(id).mr_purchase_order_id
           res = interactor.delete_mr_purchase_order_item(id)
+
           if res.success
+            po_interactor  = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
+            permission_res = po_interactor.can_approve_purchase_order(po_id)
+            type           = permission_res.success ? :show_element : :hide_element
+
             sub_totals = interactor.po_sub_totals(parent_id: po_id)
             json_actions(po_sub_total_changes(sub_totals) +
-                         [OpenStruct.new(id: id, type: :delete_grid_row)], res.message)
+                           [OpenStruct.new(id: id, type: :delete_grid_row),
+                            OpenStruct.new(type: type, dom_id: 'mr_purchase_order_approve_button')],
+                         res.message)
           else
             show_json_error(res.message, status: 200)
           end

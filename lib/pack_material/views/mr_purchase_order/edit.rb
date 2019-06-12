@@ -4,8 +4,8 @@ module PackMaterial
   module Replenish
     module MrPurchaseOrder
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:mr_purchase_order, :edit, id: id, form_values: form_values)
+        def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:mr_purchase_order, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -24,13 +24,13 @@ module PackMaterial
                                   url: cost_url + "/with_params?key=standard&purchase_order_id=#{id}",
                                   style: :button,
                                   behaviour: :popup)
-              if rules[:can_approve] && !rules[:show_only]
-                section.add_control(control_type: :link,
-                                    text: 'Approve Purchase Order',
-                                    url: "/pack_material/replenish/mr_purchase_orders/#{id}/approve_purchase_order",
-                                    prompt: true,
-                                    style: :button)
-              end
+              section.add_control(control_type: :link,
+                                  text:         'Approve Purchase Order',
+                                  url:          "/pack_material/replenish/mr_purchase_orders/#{id}/approve_purchase_order",
+                                  prompt:       true,
+                                  id:           'mr_purchase_order_approve_button',
+                                  visible:      rules[:can_approve],
+                                  style:        :button)
             end
 
             page.section do |section|

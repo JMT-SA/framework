@@ -13,6 +13,7 @@ module PackMaterialApp
 
       def call
         return failed_response 'Record not found' unless @entity || task == :create
+
         case task
         when :create
           create_check

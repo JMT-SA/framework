@@ -3,12 +3,13 @@
 module UiRules
   class MrPurchaseOrderRule < Base
     def generate_rules
-      @repo = PackMaterialApp::ReplenishRepo.new
+      @repo       = PackMaterialApp::ReplenishRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
+      @perm       = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder
       make_form_object
       apply_form_values
 
-      rules[:can_approve]   = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder.call(:approve, @options[:id]) unless @mode == :new || @mode == :preselect
+      rules[:can_approve]   = can_approve unless @mode == :new || @mode == :preselect
       rules[:po_sub_totals] = @repo.po_sub_totals(@options[:id]) if @mode == :edit
       rules[:show_only]     = @form_object.approved if @mode == :edit
 
@@ -136,6 +137,11 @@ module UiRules
     def supplier
       find_by_id = @options[:supplier_id] || @form_object.supplier_party_role_id
       MasterfilesApp::PartyRepo.new.find_supplier(find_by_id, by_party_role: @options[:supplier_id].nil?)
+    end
+
+    def can_approve
+      res = @perm.call(:approve, @options[:id], @options[:current_user])
+      res.success
     end
   end
 end

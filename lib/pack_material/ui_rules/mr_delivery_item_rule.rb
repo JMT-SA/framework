@@ -72,15 +72,15 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(mr_delivery_id: @options[:parent_id],
+      @form_object = OpenStruct.new(mr_delivery_id:            @options[:parent_id],
                                     mr_purchase_order_item_id: @options[:item_id],
-                                    mr_product_variant_id: product_variant_id,
-                                    quantity_on_note: nil,
-                                    quantity_over_supplied: nil,
-                                    quantity_under_supplied: nil,
-                                    quantity_received: nil,
-                                    invoiced_unit_price: nil,
-                                    remarks: nil)
+                                    mr_product_variant_id:     product_variant_id,
+                                    quantity_on_note:          nil,
+                                    quantity_over_supplied:    nil,
+                                    quantity_under_supplied:   nil,
+                                    quantity_received:         nil,
+                                    invoiced_unit_price:       unit_price,
+                                    remarks:                   nil)
     end
 
     def product_variant_code
@@ -88,11 +88,19 @@ module UiRules
     end
 
     def product_variant_id
-      @repo.find_mr_purchase_order_item(@options[:item_id])&.mr_product_variant_id
+      purchase_order_item&.mr_product_variant_id
     end
 
     def available_purchase_order_items
       @repo.for_select_remaining_purchase_order_items(@options[:purchase_order_id], @options[:parent_id])
+    end
+
+    def unit_price
+      purchase_order_item&.unit_price
+    end
+
+    def purchase_order_item
+      @repo.find_mr_purchase_order_item(@options[:item_id])
     end
 
     def selected_purchase_order

@@ -12,7 +12,7 @@ module PackMaterialApp
     required(:quantity_over_supplied, :decimal).maybe(:decimal?)
     required(:quantity_under_supplied, :decimal).maybe(:decimal?)
     required(:quantity_received, :decimal).maybe(:decimal?)
-    optional(:invoiced_unit_price, :decimal).maybe(:decimal?)
+    required(:invoiced_unit_price, :decimal).maybe(:decimal?)
     required(:remarks, Types::StrippedString).maybe(:str?)
   end
 end

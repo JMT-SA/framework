@@ -732,6 +732,7 @@ function NumericCellEditor() {
 
 // gets called once before the renderer is used
 NumericCellEditor.prototype.init = (params) => {
+  this.dataType = params.dataType || 'numeric';
   this.nonKeyInit = params.charPress === null;
   // create the cell
   this.eInput = document.createElement('input');
@@ -741,14 +742,24 @@ NumericCellEditor.prototype.init = (params) => {
 
   const that = this;
   this.eInput.addEventListener('keypress', (event) => {
-    if (!crossbeamsUtils.isKeyPressedNumeric(event)) {
-      that.eInput.focus();
-      if (event.preventDefault) event.preventDefault();
+    if (this.dataType === 'integer') {
+      if (!crossbeamsUtils.isKeyPressedNumeric(event)) {
+        that.eInput.focus();
+        if (event.preventDefault) event.preventDefault();
+      }
+    } else {
+      const charCode = crossbeamsUtils.getCharCodeFromEvent(event);
+      const charStr = String.fromCharCode(charCode);
+      if (!crossbeamsUtils.isKeyPressedNumeric(event) && charStr !== '.') {
+        that.eInput.focus();
+        if (event.preventDefault) event.preventDefault();
+      }
     }
   });
 
   // only start edit if key pressed is a number, not a letter
-  const charPressIsNotANumber = params.charPress && ('1234567890'.indexOf(params.charPress) < 0);
+  const charSet = this.dataType === 'integer' ? '1234567890' : '1234567890.';
+  const charPressIsNotANumber = params.charPress && (charSet.indexOf(params.charPress) < 0);
   this.cancelBeforeStart = charPressIsNotANumber;
 };
 
@@ -776,7 +787,10 @@ NumericCellEditor.prototype.getValue = () => {
   if (this.eInput.value === '') {
     return '';
   }
-  return parseInt(this.eInput.value, 10);
+  if (this.dataType === 'integer') {
+    return parseInt(this.eInput.value, 10);
+  }
+  return parseFloat(this.eInput.value, 10);
 };
 
 // any cleanup we need to be done here
@@ -1054,6 +1068,12 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
             newCol[attr] = col[attr];
           } else {
             crossbeamsUtils.alert({ prompt: `${col[attr]} is not a recognised cellEditor`, type: 'error' });
+          }
+        } else if (attr === 'cellEditorType') {
+          if (['integer'].indexOf(col[attr]) > -1) {
+            newCol.cellEditorParams = { dataType: col[attr] };
+          } else {
+            crossbeamsUtils.alert({ prompt: `${col[attr]} is not a recognised cellEditorType`, type: 'error' });
           }
         } else if (attr === 'valueGetter') {
           // This blankWhenNull valueGetter is written especially to help when

@@ -17,13 +17,6 @@ lib/applets/.sass-cache/
 public/assets/*.*
 public/downloads/jasper/*.*
 public/js/ag-enterprise-activation.js
-# public/js/ag-grid-*.*
-# public/js/jackbox*.*
-# public/css/jackbox*.*
-# public/css/font*.*
-public/css/pure.css
-public/css/grids-responsive.css
-# public/fonts
 .dm_report_list.yml
 
 # Used by dotenv library to load environment variables.

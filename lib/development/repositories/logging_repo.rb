@@ -40,5 +40,14 @@ module DevelopmentApp
       SQL
       DB[query].all
     end
+
+    def clear_audit_trail(table_name, id)
+      DB[Sequel[:audit][:logged_actions]].where(table_name: table_name, row_data_id: id).delete
+    end
+
+    def clear_audit_trail_keeping_latest(table_name, id)
+      max_id = DB[Sequel[:audit][:logged_actions]].where(table_name: table_name, row_data_id: id).max(:event_id)
+      DB[Sequel[:audit][:logged_actions]].where(table_name: table_name, row_data_id: id).exclude(event_id: max_id).delete
+    end
   end
 end

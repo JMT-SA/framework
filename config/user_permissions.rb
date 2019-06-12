@@ -53,6 +53,9 @@ module Crossbeams
       # @param permission_tree [Array] the tree of permission keys (Excluding the top-most [Webapp] key)
       # @return [boolean]
       def self.can_user?(user, *permission_tree)
+        raise ArgumentError, 'User argument is required for "can_user?" method' if user.nil?
+        raise ArgumentError, 'Permission tree array argument is required for "can_user?" method' if permission_tree.nil?
+
         keys = permission_tree.unshift(WEBAPP)
 
         permissions = UtilityFunctions.symbolize_keys(user[:permission_tree].to_h).dig(*keys)

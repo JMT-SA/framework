@@ -531,9 +531,9 @@ module PackMaterialApp
       vat = del_total_vat(id, subtotal)
       {
         subtotal: UtilityFunctions.delimited_number(subtotal),
-        costs: UtilityFunctions.delimited_number(costs),
-        vat: UtilityFunctions.delimited_number(vat),
-        total: UtilityFunctions.delimited_number(subtotal + costs)
+        costs:    UtilityFunctions.delimited_number(costs),
+        vat:      UtilityFunctions.delimited_number(vat),
+        total:    UtilityFunctions.delimited_number(subtotal + costs + vat)
       }
     end
 
@@ -555,7 +555,7 @@ module PackMaterialApp
     end
 
     def update_current_prices(delivery_id)
-      items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).map{ |r| { pv_id: r[:mr_product_variant_id], price: r[:invoiced_unit_price] } }
+      items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).map { |r| { pv_id: r[:mr_product_variant_id], price: r[:invoiced_unit_price] } }
       items.each do |item|
         product = config_repo.find_matres_product_variant(item[:pv_id])
         stock_adj_price = product.stock_adj_price > 0 ? product.stock_adj_price : item[:price]

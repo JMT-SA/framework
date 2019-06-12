@@ -92,11 +92,33 @@ class Framework < Roda
         end
         redirect_to_stored_referer(r, :bulk_stock_adjustment_approve)
       end
+      r.on 'sign_off' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:bulk_stock_adjustment_sign_off)
+        res = interactor.sign_off_bulk_stock_adjustment(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :bulk_stock_adjustment_sign_off)
+      end
+      r.on 'decline' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:bulk_stock_adjustment_decline)
+        res = interactor.decline_bulk_stock_adjustment(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :bulk_stock_adjustment_decline)
+      end
 
       r.on 'edit' do   # EDIT
         check_auth!('transactions', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_page { PackMaterial::Transactions::MrBulkStockAdjustment::Edit.call(id) }
+        show_page { PackMaterial::Transactions::MrBulkStockAdjustment::Edit.call(id, current_user) }
       end
 
       r.on 'edit_header' do   # EDIT HEADER
@@ -152,6 +174,7 @@ class Framework < Roda
               is_stock_take
               completed
               approved
+              signed_off
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -221,6 +244,7 @@ class Framework < Roda
             is_stock_take
             completed
             approved
+            signed_off
           ]
           storage_type_id = interactor.pack_material_storage_type_id
           add_grid_row(attrs:  select_attributes(res.instance,

@@ -114,9 +114,6 @@ module PackMaterialApp
       repo.transaction do
         log_transaction
 
-        res = PackMaterialApp::BulkStockAdjustmentService.call(id, nil, user_name: @user.user_name)
-        raise Crossbeams::InfoError, res.message unless res.success
-
         log_status('mr_bulk_stock_adjustments', id, 'APPROVED')
         repo.approve_mr_bulk_stock_adjustment(id)
 
@@ -126,6 +123,39 @@ module PackMaterialApp
     rescue Crossbeams::TaskNotPermittedError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def sign_off_bulk_stock_adjustment(id)
+      assert_permission!(:sign_off, id)
+      repo.transaction do
+        log_transaction
+
+        res = PackMaterialApp::BulkStockAdjustmentService.call(id, nil, user_name: @user.user_name)
+        raise Crossbeams::InfoError, res.message unless res.success
+
+        log_status('mr_bulk_stock_adjustments', id, 'SIGNED OFF')
+        repo.signed_off_mr_bulk_stock_adjustment(id)
+
+        instance = mr_bulk_stock_adjustment(id)
+        success_response('Signed Off Bulk Stock Adjustment', instance)
+      end
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def decline_bulk_stock_adjustment(id)
+      assert_permission!(:decline, id)
+      repo.transaction do
+        repo.decline_mr_bulk_stock_adjustment(id)
+        log_transaction
+        log_status('mr_bulk_stock_adjustments', id, 'REOPENED')
+        instance = mr_bulk_stock_adjustment(id)
+        success_response('Reopened Bulk Stock Adjustment', instance)
+      end
+    rescue Crossbeams::TaskNotPermittedError => e
       failed_response(e.message)
     end
 
@@ -171,7 +201,7 @@ module PackMaterialApp
     end
 
     def assert_permission!(task, id = nil)
-      res = TaskPermissionCheck::MrBulkStockAdjustment.call(task, id)
+      res = TaskPermissionCheck::MrBulkStockAdjustment.call(task, id, @user)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
   end

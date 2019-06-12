@@ -9,6 +9,7 @@ module PackMaterialApp
     attribute :is_stock_take, Types::Bool
     attribute :completed, Types::Bool
     attribute :approved, Types::Bool
+    attribute :signed_off, Types::Bool
     attribute :active, Types::Bool
     attribute :ref_no, Types::StrippedString
   end

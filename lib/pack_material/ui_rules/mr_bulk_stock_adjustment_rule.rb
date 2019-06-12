@@ -3,15 +3,17 @@
 module UiRules
   class MrBulkStockAdjustmentRule < Base
     def generate_rules
-      @repo = PackMaterialApp::TransactionsRepo.new
+      @repo       = PackMaterialApp::TransactionsRepo.new
       @stock_repo = PackMaterialApp::MrStockRepo.new
+      @perm       = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment
       make_form_object
       apply_form_values
 
       if @mode == :edit
+        rules[:can_sign_off] = can_sign_off
         rules[:can_complete] = can_complete
-        rules[:can_approve] = can_approve
-        rules[:show_only] = @form_object.completed || @form_object.approved
+        rules[:can_approve]  = can_approve
+        rules[:show_only]    = @form_object.completed || @form_object.approved
       end
 
       common_values_for_fields case @mode
@@ -33,45 +35,51 @@ module UiRules
     def show_fields
       {
         stock_adjustment_number: { renderer: :label },
-        is_stock_take: { renderer: :label, as_boolean: true },
-        completed: { renderer: :label, as_boolean: true },
-        approved: { renderer: :label, as_boolean: true },
+        ref_no:                  { renderer: :label },
+        is_stock_take:           { renderer: :label, as_boolean: true },
+        completed:               { renderer: :label, as_boolean: true },
+        approved:                { renderer: :label, as_boolean: true },
+        signed_off:              { renderer: :label, as_boolean: true },
       }
     end
 
     def edit_fields
       {
         stock_adjustment_number: { renderer: :label },
-        is_stock_take: { renderer: :label, as_boolean: true },
-        completed: { renderer: :label, as_boolean: true },
-        approved: { renderer: :label, as_boolean: true },
+        ref_no:                  { renderer: :label },
+        is_stock_take:           { renderer: :label, as_boolean: true },
+        completed:               { renderer: :label, as_boolean: true },
+        approved:                { renderer: :label, as_boolean: true },
+        signed_off:              { renderer: :label, as_boolean: true },
       }
     end
 
     def header_fields
       {
-        create_transaction_id: { renderer: :label, caption: 'Create Transaction' },
-        destroy_transaction_id: { renderer: :label, caption: 'Destroy Transaction' },
+        create_transaction_id:   { renderer: :label, caption: 'Create Transaction' },
+        destroy_transaction_id:  { renderer: :label, caption: 'Destroy Transaction' },
         stock_adjustment_number: { renderer: :label },
-        is_stock_take: { renderer: :checkbox },
-        completed: { renderer: :hidden },
-        approved: { renderer: :hidden },
-        business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
-        ref_no: { required: true },
-        sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
-        location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
+        is_stock_take:           { renderer: :checkbox },
+        completed:               { renderer: :hidden },
+        approved:                { renderer: :hidden },
+        signed_off:              { renderer: :hidden },
+        business_process_id:     { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
+        ref_no:                  { required: true },
+        sku_numbers_list:        { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
+        location_list:           { renderer: :list, items: locations, caption: 'Location Codes' }
       }
     end
 
     def view_header_fields
       {
         stock_adjustment_number: { renderer: :label },
-        is_stock_take: { renderer: :label, as_boolean: true },
-        completed: { renderer: :label, as_boolean: true },
-        approved: { renderer: :label, as_boolean: true },
-        ref_no: { renderer: :label },
-        sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
-        location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
+        is_stock_take:           { renderer: :label, as_boolean: true },
+        completed:               { renderer: :label, as_boolean: true },
+        approved:                { renderer: :label, as_boolean: true },
+        signed_off:              { renderer: :label, as_boolean: true },
+        ref_no:                  { renderer: :label },
+        sku_numbers_list:        { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
+        location_list:           { renderer: :list, items: locations, caption: 'Location Codes' }
       }
     end
 
@@ -116,12 +124,17 @@ module UiRules
     end
 
     def can_approve
-      res = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment.call(:approve, @options[:id])
+      res = @perm.call(:approve, @options[:id], @options[:current_user])
       res.success
     end
 
     def can_complete
-      res = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment.call(:complete, @options[:id])
+      res = @perm.call(:complete, @options[:id], @options[:current_user])
+      res.success
+    end
+
+    def can_sign_off
+      res = @perm.call(:sign_off, @options[:id], @options[:current_user])
       res.success
     end
   end

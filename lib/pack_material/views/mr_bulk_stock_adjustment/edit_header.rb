@@ -20,6 +20,7 @@ module PackMaterial
               form.add_field :create_transaction_id
               form.add_field :destroy_transaction_id
               form.add_field :stock_adjustment_number
+              form.add_field :ref_no
               form.add_field :is_stock_take
               form.add_field :approved
               form.add_field :completed

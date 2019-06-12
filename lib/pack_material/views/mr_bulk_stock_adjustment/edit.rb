@@ -4,8 +4,8 @@ module PackMaterial
   module Transactions
     module MrBulkStockAdjustment
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:mr_bulk_stock_adjustment, :edit, id: id, form_values: form_values)
+        def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:mr_bulk_stock_adjustment, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -37,6 +37,18 @@ module PackMaterial
                                     prompt: true,
                                     style: :button)
               end
+              if rules[:can_sign_off]
+                section.add_control(control_type: :link,
+                                    text:         'Reopen',
+                                    url:          "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/decline",
+                                    prompt:       true,
+                                    style:        :button)
+                section.add_control(control_type: :link,
+                                    text:         'Sign Off',
+                                    url:          "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/sign_off",
+                                    prompt:       true,
+                                    style:        :button)
+              end
             end
             page.section do |section|
               section.show_border!
@@ -48,11 +60,13 @@ module PackMaterial
                 form.row do |row|
                   row.column do |col|
                     col.add_field :stock_adjustment_number
+                    col.add_field :ref_no
                   end
                   row.column do |col|
                     col.add_field :is_stock_take
                     col.add_field :completed
                     col.add_field :approved
+                    col.add_field :signed_off
                   end
                 end
               end

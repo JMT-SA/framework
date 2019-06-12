@@ -83,7 +83,7 @@ module PackMaterialApp
     end
 
     def can_complete(parent_id)
-      TaskPermissionCheck::MrBulkStockAdjustment.call(:complete, parent_id)
+      TaskPermissionCheck::MrBulkStockAdjustment.call(:complete, parent_id, @user)
     end
   end
 end

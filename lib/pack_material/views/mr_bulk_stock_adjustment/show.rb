@@ -18,6 +18,7 @@ module PackMaterial
               form.add_field :is_stock_take
               form.add_field :completed
               form.add_field :approved
+              form.add_field :signed_off
               form.add_field :sku_numbers_list
               form.add_field :location_list
             end

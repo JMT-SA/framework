@@ -142,8 +142,8 @@ module PackMaterialApp
       ).map { |r| ["#{r[:sku_number]}: #{product_code(r[:mr_product_variant_id])}", r[:id]] }
     end
 
-    def product_code(mr_product_variant_id)
-      DB[:material_resource_product_variants].where(id: mr_product_variant_id).get(:product_variant_code)
+    def product_code(product_variant_id)
+      DB[:material_resource_product_variants].where(id: product_variant_id).get(:product_variant_code)
     end
 
     def bulk_stock_adjustment_locations(bulk_stock_adjustment_id)
@@ -218,6 +218,14 @@ module PackMaterialApp
       update(:mr_bulk_stock_adjustments, id, approved: true)
     end
 
+    def decline_mr_bulk_stock_adjustment(id)
+      update(:mr_bulk_stock_adjustments, id, approved: false, completed: false)
+    end
+
+    def signed_off_mr_bulk_stock_adjustment(id)
+      update(:mr_bulk_stock_adjustments, id, signed_off: true)
+    end
+
     def find_mr_bulk_stock_adjustment_item(id)
       find_with_association(:mr_bulk_stock_adjustment_items, id,
                             parent_tables: [{ parent_table: :uoms,
@@ -257,7 +265,8 @@ module PackMaterialApp
     end
 
     def inline_update_bulk_stock_adjustment_item(id, attrs)
-      update(:mr_bulk_stock_adjustment_items, id, "#{attrs[:column_name]}": attrs[:column_value])
+      val = attrs[:column_value].empty? ? nil : attrs[:column_value]
+      update(:mr_bulk_stock_adjustment_items, id, "#{attrs[:column_name]}": val)
     end
 
     def replenish_repo

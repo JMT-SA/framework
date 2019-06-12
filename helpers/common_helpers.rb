@@ -399,7 +399,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [Hash] the chosen attributes.
   def select_attributes(instance, row_keys, extras = {})
     mods = if instance.to_h[:extended_columns]
-             extras.merge(instance.to_h[:extended_columns].symbolize_keys)
+             extras.merge(instance.to_h[:extended_columns].transform_keys(&:to_sym))
            else
              extras
            end

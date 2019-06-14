@@ -49,6 +49,27 @@ module PackMaterialApp
       }
     end
 
+    # @param [Array] sku_ids
+    # @param [Integer] loc_id - remove: from_location, add: to_location, move: from/to_location
+    # @param [Integer] move_loc_id - move: from/to_location
+    def any_in_progress?(sku_ids: [], loc_id: nil, move_loc_id: nil)
+      return false unless DB[:mr_bulk_stock_adjustments].where(signed_off: false).single_value
+
+      in_use = sku_location_pair_in_use(sku_ids, loc_id)
+      in_use ||= sku_location_pair_in_use(sku_ids, move_loc_id) if move_loc_id
+      in_use
+    end
+
+    def sku_location_pair_in_use(sku_ids, location_id)
+      DB[:mr_bulk_stock_adjustment_items].where(
+        mr_bulk_stock_adjustment_id: DB[:mr_bulk_stock_adjustments].where(
+          signed_off: false
+        ).select_map(:id),
+        location_id:                 location_id,
+        mr_sku_id:                   sku_ids
+      ).select_map(:id).any?
+    end
+
     def mr_stock_repo
       PackMaterialApp::MrStockRepo.new
     end

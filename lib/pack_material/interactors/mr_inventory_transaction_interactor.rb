@@ -2,50 +2,48 @@
 
 module PackMaterialApp
   class MrInventoryTransactionInteractor < BaseInteractor
-    def sku_location_transaction_history(sku_location_id)
-      repo.sku_number_for_sku_location(id)
-    end
 
-    def create_adhoc_stock_transaction(id, params, type)
-      attrs = {}
-      attrs[:location_id] = replenish_repo.location_id_from_sku_location_id(id)
-      attrs[:sku_ids] = replenish_repo.sku_ids_from_numbers([params[:sku_number]])
-      return validation_failed_response(OpenStruct.new(messages: { sku_number: ['SKU number invalid'] })) unless attrs[:sku_ids].any?
-      attrs[:user_name] = @user.user_name
-      attrs = attrs.merge(params)
-      attrs[:quantity] = params[:quantity].to_f
-      instance = attrs[:sku_number]
-      repo.transaction do
-        case type
-        when 'add'
-          res = adhoc_add_stock(attrs)
-          res = res.success ? success_response("Stock Added for SKU Number: #{instance}", instance) : res
-        when 'move'
-          res = adhoc_move_stock(attrs)
-          res = res.success ? success_response("Stock Moved for SKU Number: #{instance}") : res
-        when 'remove'
-          res = adhoc_remove_stock(attrs)
-          res = res.success ? success_response("Stock Removed for SKU Number: #{instance}") : res
-        else
-          res = failed_response('Adhoc Transaction Type invalid')
+    def create_adhoc_stock_transaction(sku_location_id, params, type) # rubocop:disable Metrics/AbcSize
+      res = validate_adhoc_transaction_params(sku_location_id, params)
+      return validation_failed_response(res) if res[:messages]
+
+      can_action = TaskPermissionCheck::MrInventoryTransaction.call(type.to_sym,
+                                                                    sku_ids:     res[:sku_ids],
+                                                                    loc_id:      res[:location_id],
+                                                                    move_loc_id: res[:to_location_id])
+      if can_action.success
+        repo.transaction do
+          opts = {
+            'add'    => { call: ->(attrs) { adhoc_add_stock(attrs) }, message: 'Stock Added for SKU Number: %s' },
+            'move'   => { call: ->(attrs) { adhoc_move_stock(attrs) }, message: 'Stock Moved for SKU Number: %s' },
+            'remove' => { call: ->(attrs) { adhoc_remove_stock(attrs) }, message: 'Stock Removed for SKU Number: %s' }
+          }
+          resp = opts[type][:call]&.call(res)
+          return failed_response('Adhoc Transaction Type invalid') if resp.nil?
+
+          success_response(format(opts[type][:message], res[:sku_number]), res[:sku_number])
         end
-        res
+      else
+        failed_response(can_action.message)
       end
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { ref_no: ['must be unique'] }))
+    rescue Sequel::UniqueConstraintViolation => e
+      failed_response(e.message)
     end
 
     def create_mr_inventory_transaction(params)
       res = validate_mr_inventory_transaction_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_mr_inventory_transaction(res)
         log_status('mr_inventory_transactions', id, 'CREATED')
         log_transaction
       end
+
       instance = mr_inventory_transaction(id)
       success_response("Created inventory transaction #{instance.created_by}", instance)
+
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { created_by: ['This inventory transaction already exists'] }))
     end
@@ -53,10 +51,12 @@ module PackMaterialApp
     def update_mr_inventory_transaction(id, params)
       res = validate_mr_inventory_transaction_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_mr_inventory_transaction(id, res)
         log_transaction
       end
+
       instance = mr_inventory_transaction(id)
       success_response("Updated inventory transaction #{instance.created_by}", instance)
     end
@@ -87,6 +87,23 @@ module PackMaterialApp
 
     def validate_mr_inventory_transaction_params(params)
       MrInventoryTransactionSchema.call(params)
+    end
+
+    def validate_adhoc_transaction_params(sku_location_id, params)
+      loc_id = replenish_repo.location_id_from_sku_location_id(sku_location_id)
+      return { messages: { location: ['Location can not store stock'] } } unless replenish_repo.location_can_store_stock?(loc_id)
+      return { messages: { ref_no: ['Reference Number already exists'] } } if replenish_repo.ref_no_already_exists?(params[:ref_no])
+
+      sku_ids = replenish_repo.sku_ids_from_numbers([params[:sku_number]])
+      return { messages: { sku_number: ['SKU number invalid'] } } unless sku_ids.any?
+
+      attrs = {
+        location_id: loc_id,
+        sku_ids:     sku_ids,
+        user_name:   @user.user_name,
+        quantity:    params[:quantity].to_f
+      }
+      params.merge(attrs)
     end
 
     def adhoc_add_stock(attrs)

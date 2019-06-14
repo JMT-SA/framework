@@ -116,28 +116,30 @@ module PackMaterialApp
         res = validate_mr_delivery_putaway_params(attrs)
         return validation_failed_response(res) unless res.messages.empty?
 
+        to_location_id = repo.resolve_location_id_from_scan(attrs[:location], attrs[:location_scan_field])
+        return validation_failed_response(location: attrs[:location], messages: { location: ['Location short code not found'] }) unless to_location_id
+
         sku_ids = repo.sku_ids_from_numbers(attrs[:sku_number])
         sku_id = sku_ids[0]
         qty = Integer(attrs[:quantity])
-
-        to_location_id = repo.resolve_location_id_from_scan(attrs[:location], attrs[:location_scan_field])
-        return validation_failed_response(location: attrs[:location], messages: { location: ['Location short code not found'] }) if to_location_id.nil?
-
         to_location_id = Integer(to_location_id)
 
-        opts = { user_name: @user.user_name, delivery_id: delivery_id }
+        bsa_check = TaskPermissionCheck::MrDelivery.call(:bsa_in_progress_check, delivery_id, sku_ids: sku_ids, loc_id: to_location_id)
+        if bsa_check.success
+          repo.transaction do
+            log_transaction
+            res1 = PackMaterialApp::MoveMrStock.call(sku_id, to_location_id, qty, user_name: @user.user_name, delivery_id: delivery_id)
+            raise Crossbeams::InfoError, res1.message unless res1.success
 
-        repo.transaction do
-          log_transaction
-          res1 = PackMaterialApp::MoveMrStock.call(sku_id, to_location_id, qty, opts)
-          raise Crossbeams::InfoError, res1.message unless res1.success
+            res2 = PackMaterialApp::DeliveryPutawayStatusCheck.call(sku_id, qty, delivery_id)
+            raise Crossbeams::InfoError, res2.message unless res2.success
 
-          res2 = PackMaterialApp::DeliveryPutawayStatusCheck.call(sku_id, qty, delivery_id)
-          raise Crossbeams::InfoError, res2.message unless res2.success
-
-          log_status('mr_deliveries', delivery_id, 'PUTAWAY REGISTERED')
-          html_report = repo.html_delivery_progress_report(delivery_id, sku_id, to_location_id)
-          success_response('Successful putaway', OpenStruct.new(delivery_id: delivery_id, report: html_report))
+            log_status('mr_deliveries', delivery_id, 'PUTAWAY REGISTERED')
+            html_report = repo.html_delivery_progress_report(delivery_id, sku_id, to_location_id)
+            success_response('Successful putaway', OpenStruct.new(delivery_id: delivery_id, report: html_report))
+          end
+        else
+          failed_response(bsa_check.message)
         end
       else
         failed_response(can_putaway.message)

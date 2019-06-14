@@ -4,11 +4,15 @@ module PackMaterialApp
   module TaskPermissionCheck
     class MrDelivery < BaseService
       attr_reader :task, :entity
-      def initialize(task, delivery_id = nil)
-        @task = task
-        @repo = ReplenishRepo.new
-        @id = delivery_id
+      # @param [Symbol] task
+      # @param [Integer] delivery_id
+      # @param [Hash] opts ex: { sku_ids: 1, loc_id: 1 }
+      def initialize(task, delivery_id = nil, opts = {})
+        @task   = task
+        @repo   = ReplenishRepo.new
+        @id     = delivery_id
         @entity = @id ? @repo.find_mr_delivery(@id) : nil
+        @opts   = opts
       end
 
       def call
@@ -27,6 +31,8 @@ module PackMaterialApp
           add_invoice_check
         when :complete_invoice
           complete_invoice_check
+        when :bsa_in_progress_check
+          bsa_in_progress_check
         else
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}"
         end
@@ -55,6 +61,12 @@ module PackMaterialApp
 
       def putaway_check
         return failed_response('Delivery Putaway has already been completed') if putaway_completed?
+
+        all_ok
+      end
+
+      def bsa_in_progress_check
+        return failed_response('Bulk Stock Adjustment in progress') if bsa_in_progress?
 
         all_ok
       end
@@ -103,6 +115,11 @@ module PackMaterialApp
 
       def item_quantities_ignored?
         !@repo.batch_quantities_match(@id)
+      end
+
+      def bsa_in_progress?
+        bsa_repo = BulkStockAdjustmentRepo.new
+        bsa_repo.any_in_progress?(@opts)
       end
     end
   end

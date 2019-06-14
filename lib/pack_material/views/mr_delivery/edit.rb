@@ -94,34 +94,30 @@ module PackMaterial
 
             page.section do |section|
               section.show_border!
-              section.row do |row|
-                row.column do |col|
-                  unless rules[:is_verified]
-                    col.add_control(control_type: :link,
+              unless rules[:is_verified]
+                section.add_control(control_type: :link,
                                     text: 'New Item',
                                     url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect",
                                     style: :button,
                                     behaviour: :popup,
                                     grid_id: 'del_items',
                                     css_class: 'mb1')
-                    col.add_grid('del_items',
+                section.add_grid('del_items',
                                  "/list/mr_delivery_items/grid?key=standard&delivery_id=#{id}",
                                  height: 8,
                                  caption: 'Delivery Line Items')
-                  end
-                  if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed]
-                    col.add_grid('del_items',
+              end
+              if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed]
+                section.add_grid('del_items',
                                  "/list/mr_delivery_items_edit_unit_prices/grid?key=standard&delivery_id=#{id}",
                                  height: 8,
                                  caption: 'Delivery Line Items')
-                  end
-                  if rules[:invoice_completed]
-                    col.add_grid('del_items',
+              end
+              if rules[:invoice_completed]
+                section.add_grid('del_items',
                                  "/list/mr_delivery_items_show/grid?key=standard&delivery_id=#{id}",
                                  height: 8,
                                  caption: 'Delivery Line Items')
-                  end
-                end
               end
             end
           end

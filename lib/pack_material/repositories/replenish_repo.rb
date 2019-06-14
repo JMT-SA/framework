@@ -400,6 +400,10 @@ module PackMaterialApp
       DB[:locations].where(id: location_id).get(:location_long_code)
     end
 
+    def location_can_store_stock?(location_id)
+      DB[:locations].where(id: location_id).get(:can_store_stock)
+    end
+
     def sku_ids_from_numbers(values)
       DB[:mr_skus].where(sku_number: values).map(:id)
     end
@@ -565,6 +569,10 @@ module PackMaterialApp
 
     def config_repo
       ConfigRepo.new
+    end
+
+    def ref_no_already_exists?(ref_no)
+      exists?(:mr_inventory_transactions, ref_no: ref_no)
     end
   end
 end

@@ -13,6 +13,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
   NO_OVERRIDE = [
     { RACK_ENV: 'This is set to "development" in the .env file and set to "production" by deployment settings.' },
     { APP_CAPTION: 'The application name to display in web pages.' },
+    { DATABASE_NAME: 'The name of the database. This is mostly used to derive the test database name.' },
     { QUEUE_NAME: 'The name of the job Que.' }
   ].freeze
 

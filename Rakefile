@@ -70,9 +70,8 @@ namespace :db do
     raise "\nLogin name cannot include spaces.\n\n" if args[:login_name].include?(' ')
 
     require 'sequel'
-    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -85,9 +84,8 @@ namespace :db do
   task version: :dotenv_with_override do
     require 'sequel'
     Sequel.extension :migration
-    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -105,9 +103,8 @@ namespace :db do
   task recent_migrations: :dotenv_with_override do
     require 'sequel'
     Sequel.extension :migration
-    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -125,9 +122,8 @@ namespace :db do
   task :migrate, [:version] => :dotenv_with_override do |_, args|
     require 'sequel'
     Sequel.extension :migration
-    # db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
               else
                 ENV.fetch('DATABASE_URL')
               end

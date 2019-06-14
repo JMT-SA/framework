@@ -2,13 +2,12 @@ require 'dotenv'
 require 'que'
 
 if ENV.fetch('RACK_ENV') == 'test'
-  Dotenv.load('.env.test', '.env')
+  Dotenv.load('.env.test', '.env.local', '.env')
 else
   Dotenv.load('.env.local', '.env')
 end
-# db_name = "#{ENV.fetch('DATABASE_URL')}#{'_test' if ENV.fetch('RACK_ENV') == 'test'}"
 db_name = if ENV.fetch('RACK_ENV') == 'test'
-            'postgres://postgres:postgres@localhost/crossbeams_framework_test'
+            ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
           else
             ENV.fetch('DATABASE_URL')
           end

@@ -43,7 +43,7 @@ Use link:https://github.com/postmodern/chruby[chruby] to run the correct version
 
 Use link:http://batsov.com/rubocop/[rubocop] to lint code.
 
-Rubocop follows the style guide found at link:https://github.com/rubocop-hq/ruby-style-guide[Ruby Style Guide] with some overrides specified in `.rubocop.yml`.
+Rubocop follows the style guide found at link:https://rubystyle.guide[Ruby Style Guide] with some overrides specified in `.rubocop.yml`.
 
 Code should have no rubocop errors or warnings before being checked in.
 
@@ -60,10 +60,53 @@ bundle exec rake rubocop:auto_correct
 bundle exec rubocop lib routes config/deploy.rb
 ----
 
+==== Logging changes and versions
+
+In the root of the project are two files named `CHANGELOG.md` and `VERSION`. These must be updated when appropriate to track significant changes.
+
+Here's an example of some CHANGELOG entries:
+
+.CHANGELOG.md
+[source,markdown]
+----
+# Change Log
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres roughly to [Semantic Versioning](http://semver.org/).
+
+
+## [Unreleased]
+### Added
+- New Setting: EDI_OUT_TARGET. This should be set to a valid URL to be called with output from EDI processes.
+### Changed
+### Fixed
+- Bug with display of labels. If content is null, the label was not displaying at full height.
+
+## [0.6.0] - 2019-02-01
+### Added
+- Maintain printers.
+### Changed
+- User name displayed on page headers instead of user login.
+
+## [0.5.0] - 2018-12-03
+### Added
+- Job queue for invoice completion. Sends an email to address(es) in INV_EMAIL setting.
+----
+
+The version file content is simple. There must be an entry in `CHANGELOG.md` every time the `VERSION` changes.
+
+.VERSION
+----
+0.1.0
+----
+This follows link:http://semver.org/[symantic versioning] somewhat - where the version is made up of MAJOR.MINOR.PATCH numbers.
+Generally smallish changes should increment the PATCH number, larger changes increment the MINOR number and significant changes (typically where something is no longer backwards-compatible) increment the MAJOR number.
+
+The VERSION number is displayed in the web page heading.
+
 Notes to come for:
 
-* versions
-* changelog
 * deploy
 * migrations (default values for booleans, audit log, created/updated etc)
 * scaffold
@@ -95,6 +138,12 @@ Other useful git tools:
 === Aliases
 
 These aliases can be useful during development.
+
+==== brake
+
+A shortcut for running `rake` without having to prefix with `bundle exec`.
+[source,bash]
+alias brake='bundle exec rake'
 
 ==== checkp
 

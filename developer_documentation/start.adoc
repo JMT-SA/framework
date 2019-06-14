@@ -30,51 +30,75 @@ Handy Rake prep tasks
 
 === Reference
 
+* link:/developer_documentation/app_config.adoc[App Configuration]
+
+==== UI: grids
+
 * link:/developer_documentation/grids.adoc[Grids]
 * link:/developer_documentation/grid_actions.adoc[Grid actions]
+
+==== UI: pages
+
 * link:/developer_documentation/page_layout.adoc[Page layout]
 * link:/developer_documentation/non_field_renderers.adoc[Non-field Renderers]
 * link:/developer_documentation/field_renderers.adoc[Field Renderers]
 * link:/developer_documentation/field_renderer_behaviours.adoc[Field renderer behaviours]
-* link:/developer_documentation/repositories.adoc[Repositories]
-* link:/developer_documentation/services.adoc[Services]
 * link:/developer_documentation/rmd_forms.adoc[RMD Forms]
-* link:/developer_documentation/app_config.adoc[App Configuration]
 * link:/developer_documentation/json_rendering.adoc[JSON rendering]
 * link:/developer_documentation/icons.adoc[Icons]
+
+==== Backend
+
+* link:/developer_documentation/repositories.adoc[Repositories]
+* link:/developer_documentation/services.adoc[Services]
 * link:/developer_documentation/utility_functions.adoc[Utility functions]
 * link:/developer_documentation/jobs.adoc[Jobs (Que)]
 
+////
 === Tutorials
 
 * Build CRUD from scaffold
+////
 
 === How-to guides
 
+==== Database
+
 * How to link:/developer_documentation/migrations.adoc[generate and run migrations].
-* How to link:/developer_documentation/how_to_use_multiselect_grid.adoc[use a multiselect grid].
-* How to link:/developer_documentation/how_to_use_repositories.adoc[use repositories].
-* How to link:/developer_documentation/how_to_do_dry_validation.adoc[do dry validation].
-* How to link:/developer_documentation/how_to_populate_entity_with_associated_entities.adoc[populate an entity with associated entities].
-* How to link:/developer_documentation/how_to_work_with_document_sequence_numbers.adoc[work with document sequence numbers].
-* How to link:/developer_documentation/how_to_set_up_implementation_owner.adoc[set up the implementation owner].
 * How to link:/developer_documentation/how_to_log_status_and_changes.adoc[log status and data changes] (Audit).
 * How to link:/developer_documentation/how_to_protect_masterfile_data.adoc[protect masterfile data].
 +
 Block users from changing table data that application code requires.
-* How to link:/developer_documentation/how_to_produce_a_jasper_report.adoc[produce a jasper report].
-* How to link:/developer_documentation/how_to_send_a_basic_email.adoc[send a basic email via the send mail job].
-* How to link:/developer_documentation/how_to_attach_observers_to_a_service.adoc[attach observers to a service].
+
+==== UI
+
+* How to link:/developer_documentation/how_to_use_multiselect_grid.adoc[use a multiselect grid].
 * How to link:/developer_documentation/how_to_use_lookup_grid.adoc[set up a lookup grid].
-* How to link:/developer_documentation/how_to_share_data_between_requests.adoc[share data between requests].
+
+==== Config
+
+* How to link:/developer_documentation/how_to_work_with_document_sequence_numbers.adoc[work with document sequence numbers].
+* How to link:/developer_documentation/how_to_set_up_implementation_owner.adoc[set up the implementation owner].
 * How to link:/developer_documentation/how_to_use_extended_columns.adoc[use extended columns].
 +
 Client-defined columns for a table.
-* How to disable/enable a field based on the value of another field.
-* How to layout a multi-column form.
-* How to layout a page to include a form and a grid.
+
+==== Other
+
+* How to link:/developer_documentation/how_to_use_repositories.adoc[use repositories].
+* How to link:/developer_documentation/how_to_do_dry_validation.adoc[do dry validation].
+* How to link:/developer_documentation/how_to_populate_entity_with_associated_entities.adoc[populate an entity with associated entities].
+* How to link:/developer_documentation/how_to_produce_a_jasper_report.adoc[produce a jasper report].
+* How to link:/developer_documentation/how_to_send_a_basic_email.adoc[send a basic email via the send mail job].
+* How to link:/developer_documentation/how_to_attach_observers_to_a_service.adoc[attach observers to a service].
+* How to link:/developer_documentation/how_to_share_data_between_requests.adoc[share data between requests].
+// * How to disable/enable a field based on the value of another field.
+// * How to layout a multi-column form.
+// * How to layout a page to include a form and a grid.
 
 === Yard Doc
+
+View source code documentation for methods in the following files:
 
 * link:/yarddocthis/helpers=common_helpers.rb[Common Helper methods]
 * link:/yarddocthis/helpers=error_helpers.rb[Error Helper methods]

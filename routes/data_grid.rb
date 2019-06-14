@@ -88,7 +88,11 @@ class Framework < Roda
       end
 
       r.on 'grid' do
-        render_data_grid_lookup_rows(id, ->(function, program, permission) { auth_blocked?(function, program, permission) }, key, params)
+        render_data_grid_lookup_rows(id,
+                                     ->(function, program, permission) { auth_blocked?(function, program, permission) },
+                                     ->(*args) { Crossbeams::Config::UserPermissions.can_user?(current_user, *args) },
+                                     key,
+                                     params)
       rescue StandardError => e
         show_json_exception(e)
       end

@@ -31,6 +31,7 @@ Handy Rake prep tasks
 === Reference
 
 * link:/developer_documentation/app_config.adoc[App Configuration]
+* link:/developer_documentation/routes.adoc[Routing]
 
 ==== UI: grids
 

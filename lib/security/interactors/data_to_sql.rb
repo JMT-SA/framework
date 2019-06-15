@@ -2,7 +2,7 @@
 
 module SecurityApp
   # Generate INSERT SQL commands that can be used to re-create data in another database.
-  class DataToSql
+  class DataToSql # rubocop:disable Metrics/ClassLength
     def initialize(webapp)
       @webapp = webapp
     end
@@ -12,10 +12,57 @@ module SecurityApp
     # @param table [Symbol] a table name. Can be :functional_areas, :programs or :program_functions.
     # @return [String] The SQL script.
     def sql_for(table, id)
-      send(table, id)
+      if respond_to?(table)
+        send(table, id)
+      else
+        @columns = Hash[dev_repo.table_columns(table)]
+        @column_names = dev_repo.table_col_names(table).reject { |c| %i[id active created_at updated_at].include?(c) }
+        @insert_stmt = "INSERT INTO #{table} (#{@column_names.map(&:to_s).join(', ')}) VALUES("
+        make_extract(table, id)
+      end
     end
 
     private
+
+    # Store these in config - per application
+    LKP_RULES = {
+      commodity_group_id: { subquery: 'SELECT id FROM commodity_groups WHERE code = ?', values: 'SELECT code FROM commodity_groups WHERE id = ?' },
+      commodity_id: { subquery: 'SELECT id FROM commodities WHERE code = ?', values: 'SELECT code FROM commodities WHERE id = ?' },
+      cultivar_group_id: { subquery: 'SELECT id FROM cultivar_groups WHERE cultivar_group_code = ?', values: 'SELECT cultivar_group_code FROM cultivar_groups WHERE id = ?' },
+      cultivar_id: { subquery: 'SELECT id FROM cultivars WHERE cultivar_name = ?', values: 'SELECT cultivar_name FROM cultivars WHERE id = ?' } # && commodity?
+    }.freeze
+
+    def make_extract(table, id)
+      table_records(table, id).each do |rec|
+        values = []
+        @column_names.each { |col| values << get_insert_value(rec, col) }
+        puts "#{@insert_stmt}#{values.join(', ')});"
+      end
+    end
+
+    def table_records(table, id)
+      if id.nil?
+        dev_repo.all_hash(table)
+      else
+        [dev_repo.where_hash(table, id: id)]
+      end
+    end
+
+    def get_insert_value(rec, col)
+      if LKP_RULES.keys.include?(col)
+        lookup(col, rec[col])
+      elsif %i[integer decimal float].include?(@columns[col][:type])
+        rec[col].to_s
+      else
+        "'#{rec[col].gsub("'", "''")}'" # Need to escape single quotes...
+      end
+    end
+
+    def lookup(col, val)
+      qry = LKP_RULES[col][:values]
+      lkp_val = DB[qry, val].get
+      "(#{DB[LKP_RULES[col][:subquery], lkp_val].sql})"
+    end
 
     def functional_areas(id)
       functional_area = repo.find_functional_area(id)
@@ -47,6 +94,10 @@ module SecurityApp
 
     def repo
       @repo ||= MenuRepo.new
+    end
+
+    def dev_repo
+      @dev_repo ||= DevelopmentApp::DevelopmentRepo.new
     end
 
     def sql_for_f(functional_area)

@@ -141,6 +141,7 @@ module PackMaterialApp
       else
         purchase_orders = DB[:mr_purchase_orders].where(approved: true, deliveries_received: false)
       end
+      purchase_orders = purchase_orders.order(:purchase_order_number)
       purchase_orders.select(
         :id,
         :purchase_order_number,

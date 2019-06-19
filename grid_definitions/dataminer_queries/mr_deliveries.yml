@@ -1,17 +1,22 @@
 ---
 :caption: Deliveries
-:sql: "SELECT\r\n  \"mr_deliveries\".\"id\" as id,\r\nfn_current_status('mr_deliveries',
-  id) AS status,\r\n  \"mr_deliveries\".\"delivery_number\",\r\n\"mr_deliveries\".\"verified\",\r\n
-  \ \"mr_deliveries\".\"invoice_completed\",\r\n  \"mr_deliveries\".\"putaway_completed\",\r\n
-  \ \"mr_deliveries\".\"receipt_transaction_id\",\r\n  \"mr_deliveries\".\"putaway_transaction_id\",\r\n
-  \ \"mr_deliveries\".\"transporter_party_role_id\",\r\n  fn_party_role_name(\"mr_deliveries\".\"transporter_party_role_id\")
-  AS transporter,\r\n  \"mr_deliveries\".\"client_delivery_ref_number\",\r\n  \"mr_deliveries\".\"driver_name\",\r\n
-  \ \"mr_deliveries\".\"vehicle_registration\",\r\n  \"mr_deliveries\".\"supplier_invoice_ref_number\",\r\n
-  \ \"mr_deliveries\".\"erp_purchase_order_number\",\r\n  \"mr_deliveries\".\"erp_purchase_invoice_number\",\r\n
-  \ \"mr_deliveries\".\"created_at\",\r\n  \"mr_deliveries\".\"updated_at\",\r\n  case\r\n
-  \ when mr_deliveries.invoice_error then 'error'\r\n  when (mr_deliveries.verified
-  and not mr_deliveries.putaway_completed) then 'inprogress'\r\n  else null\r\n  end
-  as colour_rule\r\nFROM \"mr_deliveries\"\r\nORDER BY \"mr_deliveries\".\"delivery_number\"
+:sql: "SELECT mr_deliveries.id as id,\r\n       fn_current_status('mr_deliveries',
+  id) AS status,\r\n       (SELECT string_agg(purchase_order_number::text, '; ')\r\n
+  \      FROM (SELECT mr_purchase_orders.purchase_order_number\r\n        from mr_purchase_orders\r\n
+  \        JOIN mr_delivery_items mdi on mr_deliveries.id = mdi.mr_delivery_id\r\n
+  \        JOIN mr_purchase_order_items on mdi.mr_purchase_order_item_id = mr_purchase_order_items.id\r\n
+  \        WHERE mr_purchase_orders.id = mr_purchase_order_items.mr_purchase_order_id)
+  sub) as po_nos,\r\n       mr_deliveries.delivery_number,\r\n       mr_deliveries.verified,\r\n
+  \      mr_deliveries.invoice_completed,\r\n       mr_deliveries.putaway_completed,\r\n
+  \      mr_deliveries.receipt_transaction_id,\r\n       mr_deliveries.putaway_transaction_id,\r\n
+  \      mr_deliveries.transporter_party_role_id,\r\n       fn_party_role_name(mr_deliveries.transporter_party_role_id)
+  AS transporter,\r\n       mr_deliveries.client_delivery_ref_number,\r\n       mr_deliveries.driver_name,\r\n
+  \      mr_deliveries.vehicle_registration,\r\n       mr_deliveries.supplier_invoice_ref_number,\r\n
+  \      mr_deliveries.erp_purchase_order_number,\r\n       mr_deliveries.erp_purchase_invoice_number,\r\n
+  \      mr_deliveries.created_at,\r\n       mr_deliveries.updated_at,\r\n       case\r\n
+  \       when mr_deliveries.invoice_error then 'error'\r\n        when (mr_deliveries.verified\r\n
+  \       and not mr_deliveries.putaway_completed) then 'inprogress'\r\n        else
+  null\r\n        end as colour_rule\r\n    FROM mr_deliveries\r\n    ORDER BY mr_deliveries.delivery_number
   desc"
 :limit: 
 :offset: 
@@ -49,13 +54,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  po_nos:
+    :name: po_nos
+    :sequence_no: 3
+    :caption: PO nos
+    :namespaced_name:
+    :data_type: :string
+    :width: 80
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   delivery_number:
     :name: delivery_number
-    :sequence_no: 3
-    :caption: Delivery number
+    :sequence_no: 4
+    :caption: Del no
     :namespaced_name: mr_deliveries.delivery_number
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -67,7 +88,7 @@
     :group_max: false
   verified:
     :name: verified
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Verified
     :namespaced_name: mr_deliveries.verified
     :data_type: :boolean
@@ -83,7 +104,7 @@
     :group_max: false
   invoice_completed:
     :name: invoice_completed
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Invoice completed
     :namespaced_name: mr_deliveries.invoice_completed
     :data_type: :boolean
@@ -99,7 +120,7 @@
     :group_max: false
   putaway_completed:
     :name: putaway_completed
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Putaway completed
     :namespaced_name: mr_deliveries.putaway_completed
     :data_type: :boolean
@@ -115,7 +136,7 @@
     :group_max: false
   receipt_transaction_id:
     :name: receipt_transaction_id
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Receipt transaction
     :namespaced_name: mr_deliveries.receipt_transaction_id
     :data_type: :integer
@@ -131,7 +152,7 @@
     :group_max: false
   putaway_transaction_id:
     :name: putaway_transaction_id
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Putaway transaction
     :namespaced_name: mr_deliveries.putaway_transaction_id
     :data_type: :integer
@@ -147,7 +168,7 @@
     :group_max: false
   transporter_party_role_id:
     :name: transporter_party_role_id
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Transporter party role
     :namespaced_name: mr_deliveries.transporter_party_role_id
     :data_type: :integer
@@ -163,7 +184,7 @@
     :group_max: false
   transporter:
     :name: transporter
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Transporter
     :namespaced_name: 
     :data_type: :string
@@ -179,7 +200,7 @@
     :group_max: false
   client_delivery_ref_number:
     :name: client_delivery_ref_number
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Client delivery ref number
     :namespaced_name: mr_deliveries.client_delivery_ref_number
     :data_type: :string
@@ -195,7 +216,7 @@
     :group_max: false
   driver_name:
     :name: driver_name
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Driver name
     :namespaced_name: mr_deliveries.driver_name
     :data_type: :string
@@ -211,7 +232,7 @@
     :group_max: false
   vehicle_registration:
     :name: vehicle_registration
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Vehicle registration
     :namespaced_name: mr_deliveries.vehicle_registration
     :data_type: :string
@@ -227,7 +248,7 @@
     :group_max: false
   supplier_invoice_ref_number:
     :name: supplier_invoice_ref_number
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Supplier invoice ref number
     :namespaced_name: mr_deliveries.supplier_invoice_ref_number
     :data_type: :string
@@ -243,7 +264,7 @@
     :group_max: false
   erp_purchase_order_number:
     :name: erp_purchase_order_number
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Erp purchase order number
     :namespaced_name: mr_deliveries.erp_purchase_order_number
     :data_type: :string
@@ -259,39 +280,7 @@
     :group_max: false
   erp_purchase_invoice_number:
     :name: erp_purchase_invoice_number
-    :sequence_no: 16
-    :caption: Erp purchase invoice number
-    :namespaced_name: mr_deliveries.erp_purchase_invoice_number
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  erp_purchase_order_number:
-    :name: erp_purchase_order_number
-    :sequence_no: 15
-    :caption: Erp purchase order number
-    :namespaced_name: mr_deliveries.erp_purchase_order_number
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  erp_purchase_invoice_number:
-    :name: erp_purchase_invoice_number
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Erp purchase invoice number
     :namespaced_name: mr_deliveries.erp_purchase_invoice_number
     :data_type: :string
@@ -307,7 +296,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Created at
     :namespaced_name: mr_deliveries.created_at
     :data_type: :datetime
@@ -323,7 +312,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Updated at
     :namespaced_name: mr_deliveries.updated_at
     :data_type: :datetime
@@ -339,7 +328,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

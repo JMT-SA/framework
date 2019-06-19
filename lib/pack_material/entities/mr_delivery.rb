@@ -20,5 +20,6 @@ module PackMaterialApp
     attribute :invoice_completed, Types::Bool
     attribute? :erp_purchase_order_number, Types::String.optional
     attribute? :erp_purchase_invoice_number, Types::String.optional
+    attribute? :purchase_order_numbers, Types::String.optional
   end
 end

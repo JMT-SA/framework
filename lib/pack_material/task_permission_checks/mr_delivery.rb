@@ -53,6 +53,7 @@ module PackMaterialApp
       def verify_check
         return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery has no items') if no_items?
+        return failed_response('Delivery has incomplete items') if incomplete_items?
         return failed_response('Delivery has items without batches') if items_without_batches?
         return failed_response('Delivery batch quantities do not equate to item quantities where applicable') if item_quantities_ignored?
 
@@ -111,6 +112,10 @@ module PackMaterialApp
 
       def items_without_prices?
         @repo.items_without_prices(@id)
+      end
+
+      def incomplete_items?
+        @repo.incomplete_items(@id)
       end
 
       def item_quantities_ignored?

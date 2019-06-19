@@ -21,6 +21,7 @@ module PackMaterial
               form.add_field :driver_name
               form.add_field :client_delivery_ref_number
               form.add_field :vehicle_registration
+              form.add_field :mr_purchase_order_id
             end
           end
 

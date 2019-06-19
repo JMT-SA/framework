@@ -213,6 +213,16 @@ module PackMaterialApp
                             wrapper: MrDelivery)
     end
 
+    def purchase_order_numbers_for_delivery(delivery_id)
+      DB[:mr_purchase_orders].where(
+        id: DB[:mr_purchase_order_items].where(
+          id: DB[:mr_delivery_items].where(
+            mr_delivery_id: delivery_id
+          ).select_map(:mr_purchase_order_item_id)
+        ).select_map(:mr_purchase_order_id)
+      ).select_map(:purchase_order_number).join('; ')
+    end
+
     def verify_mr_delivery(id)
       update(:mr_deliveries, id, verified: true)
     end
@@ -251,6 +261,11 @@ module PackMaterialApp
       items.include?(nil)
     end
 
+    def incomplete_items(mr_delivery_id)
+      items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map { |r| [r[:quantity_on_note], r[:quantity_received]] }
+      items.flatten.include?(nil)
+    end
+
     def delivery_item_batches(mr_delivery_item_id)
       where(:mr_delivery_item_batches, MrDeliveryItemBatch, mr_delivery_item_id: mr_delivery_item_id)
     end
@@ -258,11 +273,28 @@ module PackMaterialApp
     def batch_quantities_match(mr_delivery_id)
       DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).all.each do |item|
         next if item_has_fixed_batch(item[:id])
+
         batch_quantities = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id]).sum(:quantity_on_note)
         quantities_match = item[:quantity_on_note] == batch_quantities
         return false unless quantities_match
       end
       true
+    end
+
+    def create_mr_delivery(attrs)
+      hash     = attrs.to_h
+      po_id    = hash.delete(:mr_purchase_order_id)
+      del_id   = create(:mr_deliveries, hash)
+      po_items = DB[:mr_purchase_order_items].where(mr_purchase_order_id: po_id).all
+      po_items.each do |item|
+        DB[:mr_delivery_items].insert(
+          mr_delivery_id:            del_id,
+          mr_purchase_order_item_id: item[:id],
+          mr_product_variant_id:     item[:mr_product_variant_id],
+          invoiced_unit_price:       item[:unit_price]
+        )
+      end
+      del_id
     end
 
     def delete_mr_delivery(mr_delivery_id)
@@ -285,6 +317,7 @@ module PackMaterialApp
     def sku_id_for_delivery_item(delivery_item_id)
       item_batches = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: delivery_item_id).all
       return nil if item_batches.any?
+
       pv_id = DB[:mr_delivery_items].where(id: delivery_item_id).get(:mr_product_variant_id)
       int_batch_id = DB[:material_resource_product_variants].where(id: pv_id).get(:mr_internal_batch_number_id)
       DB[:mr_skus].where(
@@ -312,7 +345,7 @@ module PackMaterialApp
       pv_code, pv_number = pv.get(%i[product_variant_code product_variant_number])
       pv_number          = ConfigRepo.new.format_product_variant_number(pv_number)
       sku                = DB[:mr_skus].where(mr_delivery_item_batch_id: mr_delivery_item_batch_id,
-                               mr_product_variant_id: item.get(:mr_product_variant_id))
+                                              mr_product_variant_id:     item.get(:mr_product_variant_id))
       sku_number         = sku.get(:sku_number)
       delivery_number    = DB[:mr_deliveries].where(id: item.get(:mr_delivery_id)).get(:delivery_number)
       no_of_prints       = batch.get(:quantity_received) - batch.get(:quantity_putaway)
@@ -423,6 +456,7 @@ module PackMaterialApp
     def delivery_putaway_reaction_job(sku_id, quantity, delivery_id)
       res = update_delivery_putaway_quantity(sku_id, quantity, delivery_id)
       return res unless res.success
+
       update_delivery_putaway_statuses(delivery_id)
       sku = DB[:mr_skus].where(id: sku_id)
       po_item_id = DB[:mr_delivery_items].where(
@@ -510,6 +544,7 @@ module PackMaterialApp
 
     def html_delivery_progress_report(delivery_id, sku_id, to_location_id) # rubocop:disable Metrics/AbcSize
       return nil unless delivery_id && sku_id && to_location_id
+
       total_items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).all
       done = total_items.select { |r| r[:quantity_putaway].to_f >= r[:quantity_received].to_f }.count
       sku = DB[:mr_skus].where(id: sku_id).first
@@ -547,6 +582,7 @@ module PackMaterialApp
 
     def del_total_vat(id, subtotal)
       return BigDecimal('0') if subtotal.zero?
+
       # We take the first Purchase Order we can find for the VAT factor
       po_item_id = DB[:mr_delivery_items].where(mr_delivery_id: id).get(:mr_purchase_order_item_id)
       po_id = DB[:mr_purchase_order_items].where(id: po_item_id).get(:mr_purchase_order_id)

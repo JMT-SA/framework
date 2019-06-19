@@ -16,12 +16,14 @@ module UiRules
       rules[:invoice_completed] = @form_object.invoice_completed unless @mode == :new
       rules[:del_sub_totals] = @repo.del_sub_totals(@options[:id]) if @mode == :edit
       common_values_for_fields case @mode
+                               when :new
+                                 new_fields
                                when :edit
-                                 rules[:is_verified] ? show_fields : common_fields
+                                 rules[:is_verified] ? show_fields : edit_fields
                                when :edit_invoice
                                  rules[:invoice_completed] ? show_invoice_fields : invoice_fields
                                else
-                                 common_fields
+                                 edit_fields
                                end
 
       form_name 'mr_delivery'
@@ -30,17 +32,34 @@ module UiRules
     def show_fields
       receiving_bay_label = @locations_repo.find_location(@form_object.receipt_location_id)&.location_long_code
       {
-        status: { renderer: :label },
-        transporter: { renderer: :label },
-        transporter_party_role_id: { renderer: :hidden },
-        receipt_location_id: { renderer: :label, with_value: receiving_bay_label, caption: 'Receiving Bay' },
-        driver_name: { renderer: :label },
-        client_delivery_ref_number: { renderer: :label },
-        delivery_number: { renderer: :label },
-        vehicle_registration: { renderer: :label },
+        status:                      { renderer: :label },
+        transporter:                 { renderer: :label },
+        transporter_party_role_id:   { renderer: :hidden },
+        receipt_location_id:         { renderer: :label, with_value: receiving_bay_label, caption: 'Receiving Bay' },
+        driver_name:                 { renderer: :label },
+        client_delivery_ref_number:  { renderer: :label },
+        delivery_number:             { renderer: :label },
+        vehicle_registration:        { renderer: :label },
         supplier_invoice_ref_number: { renderer: :label },
-        supplier_invoice_date: { renderer: :label }
+        supplier_invoice_date:       { renderer: :label },
+        purchase_order_numbers:      { renderer: :label, with_value: purchase_order_numbers }
       }
+    end
+
+    def new_fields
+      common_fields.merge(
+        mr_purchase_order_id: {
+          renderer: :select,
+          options:  @repo.for_select_purchase_orders_with_supplier,
+          caption:  'Purchase Order'
+        }
+      )
+    end
+
+    def edit_fields
+      common_fields.merge(
+        purchase_order_numbers: { renderer: :label, with_value: purchase_order_numbers }
+      )
     end
 
     def common_fields
@@ -59,7 +78,7 @@ module UiRules
     def invoice_fields
       {
         supplier_invoice_ref_number: { required: true, with_value: @form_object.supplier_invoice_ref_number },
-        supplier_invoice_date:       { subtype: :date, required: true },
+        supplier_invoice_date:       { subtype: :date, required: true }
       }
     end
 
@@ -89,12 +108,12 @@ module UiRules
     end
 
     def make_new_invoice_form_object
-      delivery = @repo.find_mr_delivery(@options[:id])
-      if delivery.supplier_invoice_ref_number.nil?
-        @form_object = OpenStruct.new(supplier_invoice_ref_number: nil,
+      delivery     = @repo.find_mr_delivery(@options[:id])
+      @form_object = if delivery.supplier_invoice_ref_number.nil?
+        OpenStruct.new(supplier_invoice_ref_number:          nil,
                                       supplier_invoice_date: UtilityFunctions.weeks_since(Time.now, 1))
       else
-        @form_object = delivery
+        delivery
       end
     end
 
@@ -111,6 +130,10 @@ module UiRules
     def can_complete_invoice
       res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:complete_invoice, @options[:id])
       res.success
+    end
+
+    def purchase_order_numbers
+      @repo.purchase_order_numbers_for_delivery(@options[:id])
     end
   end
 end

@@ -201,7 +201,7 @@ const crossbeamsUtils = {
         // err.style.display = 'block';
         document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">404</span>';
         crossbeamsUtils.setDialogContent('The requested URL could not be found.');
-        console.log('404', href);
+        console.log('404', href); // eslint-disable-line no-console
         return {};
       }
       return response.json();
@@ -218,10 +218,10 @@ const crossbeamsUtils = {
         crossbeamsUtils.setDialogContent(data.flash.error);
         if (data.exception) {
           if (data.backtrace) {
-            console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
-            console.info('==Backend Backtrace==');
-            console.info(data.backtrace.join('\n'));
-            console.groupEnd();
+            console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+            console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+            console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+            console.groupEnd(); // eslint-disable-line no-console
           }
         }
       } else if (data.replaceDialog) {
@@ -680,10 +680,10 @@ const crossbeamsUtils = {
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
-              console.info('==Backend Backtrace==');
-              console.info(data.backtrace.join('\n'));
-              console.groupEnd();
+              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+              console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+              console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+              console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
             Jackbox.error(data.flash.error);
@@ -693,6 +693,21 @@ const crossbeamsUtils = {
     }).catch((data) => {
       crossbeamsUtils.fetchErrorHandler(data);
     });
+  },
+
+  /**
+   * observeChange behaviour - call specified urls on change of an
+   * input's value - either through keyup or blur events.
+   * @param {element} elem - the input element that changed.
+   * @param {string} rules - the input element dataset rule.
+   * @returns {void}
+   */
+  observeInputChange: function observeInputChange(elem, rules) {
+    // const s = elem.dataset.observeChange;
+    const j = JSON.parse(rules);
+    const urls = j.map(el => this.buildObserveChangeUrl(el, elem.value));
+
+    urls.forEach(url => this.fetchDropdownChanges(url));
   },
 
   /**
@@ -994,16 +1009,16 @@ const crossbeamsUtils = {
    * @returns {void}
    */
   fetchErrorHandler: function fetchErrorHandler(data) {
-    console.log(data);
+    console.log(data); // eslint-disable-line no-console
     if (data.response && data.response.status === 500) {
       data.response.json().then((body) => {
         if (body.flash.error) {
           if (body.exception) {
             if (body.backtrace) {
-              console.groupCollapsed('EXCEPTION:', body.exception, body.flash.error);
-              console.info('==Backend Backtrace==');
-              console.info(body.backtrace.join('\n'));
-              console.groupEnd();
+              console.groupCollapsed('EXCEPTION:', body.exception, body.flash.error); // eslint-disable-line no-console
+              console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+              console.info(body.backtrace.join('\n')); // eslint-disable-line no-console
+              console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
             Jackbox.error(body.flash.error);
@@ -1052,7 +1067,7 @@ const crossbeamsUtils = {
             setTimeout(pollMessage, interval, element, url, interval);
           }
         } else {
-          console.log('Not sure what to do with this:', data);
+          console.log('Not sure what to do with this:', data); // eslint-disable-line no-console
         }
         if (data.flash) {
           if (data.flash.notice) {
@@ -1062,10 +1077,10 @@ const crossbeamsUtils = {
             if (data.exception) {
               Jackbox.error(data.flash.error, { time: 20 });
               if (data.backtrace) {
-                console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
-                console.info('==Backend Backtrace==');
-                console.info(data.backtrace.join('\n'));
-                console.groupEnd();
+                console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+                console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+                console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+                console.groupEnd(); // eslint-disable-line no-console
               }
             } else {
               Jackbox.error(data.flash.error);
@@ -1133,10 +1148,10 @@ const crossbeamsUtils = {
           if (data.exception) {
             Jackbox.error(data.flash.error, { time: 20 });
             if (data.backtrace) {
-              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error);
-              console.info('==Backend Backtrace==');
-              console.info(data.backtrace.join('\n'));
-              console.groupEnd();
+              console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+              console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+              console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+              console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
             Jackbox.error(data.flash.error);

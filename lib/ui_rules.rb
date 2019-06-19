@@ -163,5 +163,33 @@ module UiRules
         end
       } }
     end
+
+    def keyup(field_name, conditions = {})
+      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        keyup: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
+    def lose_focus(field_name, conditions = {})
+      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        lose_focus: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
   end
 end

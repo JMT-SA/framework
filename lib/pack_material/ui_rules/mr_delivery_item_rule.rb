@@ -116,7 +116,7 @@ module UiRules
 
     def add_new_item_behaviours
       delivery_id = @options[:parent_id] || @form_object.mr_delivery_id
-      url         = "/pack_material/replenish/mr_deliveries/#{delivery_id}/mr_delivery_items/quantity_received"
+      url         = "/pack_material/replenish/mr_deliveries/#{delivery_id}/mr_delivery_items/quantity_received_changed"
       behaviours do |behaviour|
         behaviour.keyup :quantity_received, notify: [{ url: url, param_keys: [:mr_delivery_item_mr_purchase_order_item_id] }]
       end

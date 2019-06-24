@@ -376,7 +376,7 @@ class Framework < Roda
           store_last_referer_url(:delivery_items)
           show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItem::Preselect.call(id, purchase_order_id: flash[:purchase_order_id]) }
         end
-        r.on 'quantity_received' do
+        r.on 'quantity_received_changed' do
           qty_received = params[:changed_value].empty? ? nil : params[:changed_value]
           quantities   = qty_received ? item_interactor.over_under_supply(qty_received, params[:mr_delivery_item_mr_purchase_order_item_id]) : {}
           json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_input_value, value: quantities[:quantity_over_supply].to_f),

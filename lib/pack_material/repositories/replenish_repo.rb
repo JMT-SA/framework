@@ -191,6 +191,7 @@ module PackMaterialApp
 
     def po_total_vat(id, subtotal)
       return BigDecimal('0') if subtotal.zero?
+
       factor = po_vat_factor(id)
       subtotal * factor
     end
@@ -243,6 +244,7 @@ module PackMaterialApp
     def items_without_batches(mr_delivery_id)
       DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map(:id).each do |item_id|
         next if item_has_fixed_batch(item_id)
+
         has_batch = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_id).get(:id)
         return true unless has_batch
       end
@@ -264,7 +266,7 @@ module PackMaterialApp
 
     def incomplete_items(mr_delivery_id)
       items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map { |r| [r[:quantity_on_note], r[:quantity_received]] }
-      items.flatten.include?(nil)
+      items.flatten.include?(nil) || items.flatten.include?(0)
     end
 
     def delivery_item_batches(mr_delivery_item_id)
@@ -612,32 +614,43 @@ module PackMaterialApp
       exists?(:mr_inventory_transactions, ref_no: ref_no)
     end
 
-    def over_under_supply(quantity_received, delivery_item_id)
-      po_item              = purchase_order_item(delivery_item_id)
-      qty_required         = po_item[:quantity_required] || BigDecimal('0')
+    def over_under_supply(quantity_received, purchase_order_item_id)
+      po_item              = DB[:mr_purchase_order_items].where(id: purchase_order_item_id).first
+      qty_required         = po_item[:quantity_required] || 0
       delivered_quantities = total_delivered_quantities(po_item[:id])
 
-      total_received = delivered_quantities + quantity_received
-      amt            = qty_required - total_received
+      total_received = delivered_quantities + BigDecimal(quantity_received)
+      amt            = BigDecimal(qty_required) - total_received
       {
-        quantity_over_supply:  amt.negative? ? amt : BigDecimal('0'),
+        quantity_over_supply:  amt.negative? ? amt.abs : BigDecimal('0'),
         quantity_under_supply: amt.positive? ? amt : BigDecimal('0')
       }
     end
 
     def total_delivered_quantities(purchase_order_item_id)
       verified_delivery_ids = DB[:mr_deliveries].where(verified: true).select_map(:id)
-      DB[:mr_delivery_items].where(
+      qty_received          = DB[:mr_delivery_items].where(
         mr_purchase_order_item_id: purchase_order_item_id,
         mr_delivery_id:            verified_delivery_ids
       ).select_map(:quantity_received).sum
+      BigDecimal(qty_received)
     end
 
-    def purchase_order_item(delivery_item_id)
-      po_item_id = DB[:mr_delivery_items].where(
-        id: delivery_item_id
-      ).get(:mr_purchase_order_item_id)
-      DB[:mr_purchase_order_items].where(id: po_item_id)
+    def update_mr_delivery_item(id, attrs)
+      new_attrs = add_over_under_supply_values(attrs.to_h)
+      update(:mr_delivery_items, id, new_attrs)
+    end
+
+    def create_mr_delivery_item(attrs)
+      new_attrs = add_over_under_supply_values(attrs.to_h)
+      create(:mr_delivery_items, new_attrs)
+    end
+
+    def add_over_under_supply_values(attrs)
+      quantities                      = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
+      attrs[:quantity_over_supplied]  = quantities[:quantity_over_supply]
+      attrs[:quantity_under_supplied] = quantities[:quantity_under_supply]
+      attrs
     end
   end
 end

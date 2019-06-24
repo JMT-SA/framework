@@ -376,6 +376,12 @@ class Framework < Roda
           store_last_referer_url(:delivery_items)
           show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItem::Preselect.call(id, purchase_order_id: flash[:purchase_order_id]) }
         end
+        r.on 'quantity_received' do
+          qty_received = params[:changed_value].empty? ? nil : params[:changed_value]
+          quantities   = qty_received ? item_interactor.over_under_supply(qty_received, params[:mr_delivery_item_mr_purchase_order_item_id]) : {}
+          json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_input_value, value: quantities[:quantity_over_supply].to_f),
+                        OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_input_value, value: quantities[:quantity_under_supply].to_f)])
+        end
         r.on 'purchase_order_changed' do
           po_id = params[:changed_value].empty? ? nil : params[:changed_value]
           options_array = po_id ? item_interactor.available_purchase_order_items(params[:changed_value], id) : []
@@ -529,12 +535,6 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      r.on 'quantity_received' do
-        qty_received = params[:changed_value].empty? ? nil : params[:changed_value]
-        quantities   = qty_received ? interactor.over_under_supply(params[:changed_value], id) : {}
-        json_replace_input_value('mr_delivery_item_quantity_over_supplied', quantities[:quantity_over_supply])
-        json_replace_input_value('mr_delivery_item_quantity_under_supplied', quantities[:quantity_under_supply])
-      end
       r.on 'inline_save' do
         check_auth!('replenish', 'edit')
         del_interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})

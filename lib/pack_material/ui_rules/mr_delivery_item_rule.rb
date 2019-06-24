@@ -10,7 +10,8 @@ module UiRules
       common_values_for_fields @mode == :preselect ? preselect_fields : common_fields
 
       set_show_fields if @mode == :show
-      add_behaviours if @mode == :preselect
+      add_preselect_behaviours if @mode == :preselect
+      add_new_item_behaviours if @mode == :new || @mode == :edit
 
       form_name 'mr_delivery_item'
     end
@@ -107,10 +108,17 @@ module UiRules
       @options[:purchase_order_id]
     end
 
-    def add_behaviours
+    def add_preselect_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :purchase_order_id, notify: [{ url: "/pack_material/replenish/mr_deliveries/#{@options[:parent_id]}/mr_delivery_items/purchase_order_changed" }]
-        behaviour.keyup :quantity_received, notify: [{ url: "/pack_material/replenish/mr_delivery_items/#{@options[:id]}/quantity_received" }]
+      end
+    end
+
+    def add_new_item_behaviours
+      delivery_id = @options[:parent_id] || @form_object.mr_delivery_id
+      url         = "/pack_material/replenish/mr_deliveries/#{delivery_id}/mr_delivery_items/quantity_received"
+      behaviours do |behaviour|
+        behaviour.keyup :quantity_received, notify: [{ url: url, param_keys: [:mr_delivery_item_mr_purchase_order_item_id] }]
       end
     end
   end

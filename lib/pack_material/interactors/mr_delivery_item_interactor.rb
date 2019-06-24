@@ -85,6 +85,10 @@ module PackMaterialApp
       repo.purchase_order_id_for_delivery_item(delivery_item_id)
     end
 
+    def over_under_supply(quantity_received, po_item_id)
+      repo.over_under_supply(quantity_received, po_item_id)
+    end
+
     def can_complete_invoice(parent_id)
       TaskPermissionCheck::MrDelivery.call(:complete_invoice, parent_id)
     end

@@ -110,6 +110,7 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :purchase_order_id, notify: [{ url: "/pack_material/replenish/mr_deliveries/#{@options[:parent_id]}/mr_delivery_items/purchase_order_changed" }]
+        behaviour.keyup :quantity_received, notify: [{ url: "/pack_material/replenish/mr_delivery_items/#{@options[:id]}/quantity_received" }]
       end
     end
   end

@@ -529,6 +529,12 @@ class Framework < Roda
         handle_not_found(r)
       end
 
+      r.on 'quantity_received' do
+        qty_received = params[:changed_value].empty? ? nil : params[:changed_value]
+        quantities   = qty_received ? interactor.over_under_supply(params[:changed_value], id) : {}
+        json_replace_input_value('mr_delivery_item_quantity_over_supplied', quantities[:quantity_over_supply])
+        json_replace_input_value('mr_delivery_item_quantity_under_supplied', quantities[:quantity_under_supply])
+      end
       r.on 'inline_save' do
         check_auth!('replenish', 'edit')
         del_interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})

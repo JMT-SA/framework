@@ -611,5 +611,33 @@ module PackMaterialApp
     def ref_no_already_exists?(ref_no)
       exists?(:mr_inventory_transactions, ref_no: ref_no)
     end
+
+    def over_under_supply(quantity_received, delivery_item_id)
+      po_item              = purchase_order_item(delivery_item_id)
+      qty_required         = po_item[:quantity_required] || BigDecimal('0')
+      delivered_quantities = total_delivered_quantities(po_item[:id])
+
+      total_received = delivered_quantities + quantity_received
+      amt            = qty_required - total_received
+      {
+        quantity_over_supply:  amt.negative? ? amt : BigDecimal('0'),
+        quantity_under_supply: amt.positive? ? amt : BigDecimal('0')
+      }
+    end
+
+    def total_delivered_quantities(purchase_order_item_id)
+      verified_delivery_ids = DB[:mr_deliveries].where(verified: true).select_map(:id)
+      DB[:mr_delivery_items].where(
+        mr_purchase_order_item_id: purchase_order_item_id,
+        mr_delivery_id:            verified_delivery_ids
+      ).select_map(:quantity_received).sum
+    end
+
+    def purchase_order_item(delivery_item_id)
+      po_item_id = DB[:mr_delivery_items].where(
+        id: delivery_item_id
+      ).get(:mr_purchase_order_item_id)
+      DB[:mr_purchase_order_items].where(id: po_item_id)
+    end
   end
 end

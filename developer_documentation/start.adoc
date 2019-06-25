@@ -20,10 +20,13 @@ Handy Rake prep tasks
 
 * Run `bundle exec rake developers:setup` to setup a new developer install and to add missing environment variables to `.env.local`.
 * Run `bundle exec rake developers:listenv` to get a list of environment variables and their descriptions.
-* Run `bundle exec rake developers:listenv` to list which environment variables are missing from `.env.local`.
+* Run `bundle exec rake developers:validateenv` to list which environment variables are missing from `.env.local`.
 
 === General
 
+* link:/developer_documentation/overview.adoc[Overview]
++
+Pictoral overview of application.
 * link:/developer_documentation/development_guide.adoc[Development Guide]
 * link:/developer_documentation/cron.adoc[cron jobs]
 * link:/developer_documentation/aliases.adoc[Bash aliases]
@@ -54,6 +57,12 @@ Handy Rake prep tasks
 * link:/developer_documentation/services.adoc[Services]
 * link:/developer_documentation/utility_functions.adoc[Utility functions]
 * link:/developer_documentation/jobs.adoc[Jobs (Que)]
+
+==== Testing
+
+* link:/developer_documentation/test_helpers.adoc[Test helpers]
+* link:/developer_documentation/test_helpers_route.adoc[Test helpers for routes]
+* link:/developer_documentation/test_seeds.adoc[Test seeds]
 
 ////
 === Tutorials

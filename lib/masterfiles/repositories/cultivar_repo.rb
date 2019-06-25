@@ -27,6 +27,7 @@ module MasterfilesApp
     def find_cultivar_group(id)
       hash = find_hash(:cultivar_groups, id)
       return nil if hash.nil?
+
       cultivar_ids = DB[:cultivars].where(cultivar_group_id: id).select_map(:id)
       hash[:cultivar_ids] = cultivar_ids
       CultivarGroup.new(hash)
@@ -35,6 +36,7 @@ module MasterfilesApp
     def find_cultivar(id)
       hash = find_hash(:cultivars, id)
       return nil if hash.nil?
+
       cg_hash = find_hash(:cultivar_groups, hash[:cultivar_group_id])
       hash[:cultivar_group_code] = cg_hash[:cultivar_group_code]
       Cultivar.new(hash)

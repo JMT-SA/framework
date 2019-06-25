@@ -257,7 +257,7 @@ module DevelopmentApp
       end
     end
 
-    class InteractorMaker < BaseService # rubocop:disable Metrics/ClassLength
+    class InteractorMaker < BaseService
       attr_reader :opts
       def initialize(opts)
         @opts = opts
@@ -327,36 +327,36 @@ module DevelopmentApp
                 failed_response(e.message)
               end
 
-              def complete_a_#{opts.singlename}(id, params)
-                res = complete_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
-                if res.success
-                  success_response(res.message, #{opts.singlename}(id))
-                else
-                  failed_response(res.message, #{opts.singlename}(id))
-                end
-              end
+              # def complete_a_#{opts.singlename}(id, params)
+              #   res = complete_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+              #   if res.success
+              #     success_response(res.message, #{opts.singlename}(id))
+              #   else
+              #     failed_response(res.message, #{opts.singlename}(id))
+              #   end
+              # end
 
-              def reopen_a_#{opts.singlename}(id, params)
-                res = reopen_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
-                if res.success
-                  success_response(res.message, #{opts.singlename}(id))
-                else
-                  failed_response(res.message, #{opts.singlename}(id))
-                end
-              end
+              # def reopen_a_#{opts.singlename}(id, params)
+              #   res = reopen_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+              #   if res.success
+              #     success_response(res.message, #{opts.singlename}(id))
+              #   else
+              #     failed_response(res.message, #{opts.singlename}(id))
+              #   end
+              # end
 
-              def approve_or_reject_a_#{opts.singlename}(id, params)
-                res = if params[:approve_action] == 'a'
-                        approve_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
-                      else
-                        reject_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
-                      end
-                if res.success
-                  success_response(res.message, #{opts.singlename}(id))
-                else
-                  failed_response(res.message, #{opts.singlename}(id))
-                end
-              end
+              # def approve_or_reject_a_#{opts.singlename}(id, params)
+              #   res = if params[:approve_action] == 'a'
+              #           approve_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+              #         else
+              #           reject_a_record(:#{opts.table}, id, params.merge(enqueue_job: false))
+              #         end
+              #   if res.success
+              #     success_response(res.message, #{opts.singlename}(id))
+              #   else
+              #     failed_response(res.message, #{opts.singlename}(id))
+              #   end
+              # end
 
               def assert_permission!(task, id = nil)
                 res = TaskPermissionCheck::#{opts.classnames[:class]}.call(task, id)
@@ -403,10 +403,10 @@ module DevelopmentApp
                 CHECKS = {
                   create: :create_check,
                   edit: :edit_check,
-                  delete: :delete_check,
-                  complete: :complete_check,
-                  approve: :approve_check,
-                  reopen: :reopen_check
+                  delete: :delete_check
+                  # complete: :complete_check,
+                  # approve: :approve_check,
+                  # reopen: :reopen_check
                 }.freeze
 
                 def call
@@ -425,43 +425,43 @@ module DevelopmentApp
                 end
 
                 def edit_check
-                  return failed_response '#{opts.classnames[:class]} has been completed' if completed?
+                  # return failed_response '#{opts.classnames[:class]} has been completed' if completed?
 
                   all_ok
                 end
 
                 def delete_check
-                  return failed_response '#{opts.classnames[:class]} has been completed' if completed?
+                  # return failed_response '#{opts.classnames[:class]} has been completed' if completed?
 
                   all_ok
                 end
 
-                def complete_check
-                  return failed_response '#{opts.classnames[:class]} has already been completed' if completed?
+                # def complete_check
+                #   return failed_response '#{opts.classnames[:class]} has already been completed' if completed?
 
-                  all_ok
-                end
+                #   all_ok
+                # end
 
-                def approve_check
-                  return failed_response '#{opts.classnames[:class]} has not been completed' unless completed?
-                  return failed_response '#{opts.classnames[:class]} has already been approved' if approved?
+                # def approve_check
+                #   return failed_response '#{opts.classnames[:class]} has not been completed' unless completed?
+                #   return failed_response '#{opts.classnames[:class]} has already been approved' if approved?
 
-                  all_ok
-                end
+                #   all_ok
+                # end
 
-                def reopen_check
-                  return failed_response '#{opts.classnames[:class]} has not been approved' unless approved?
+                # def reopen_check
+                #   return failed_response '#{opts.classnames[:class]} has not been approved' unless approved?
 
-                  all_ok
-                end
+                #   all_ok
+                # end
 
-                def completed?
-                  @entity.completed
-                end
+                # def completed?
+                #   @entity.completed
+                # end
 
-                def approved?
-                  @entity.approved
-                end
+                # def approved?
+                #   @entity.approved
+                # end
               end
             end
           end
@@ -704,9 +704,6 @@ module DevelopmentApp
         <<~RUBY
           # frozen_string_literal: true
 
-          # rubocop:disable Metrics/ClassLength
-          # rubocop:disable Metrics/BlockLength
-
           class #{opts.classnames[:roda_class]} < Roda
             route '#{opts.program}', '#{opts.applet}' do |r|
               # #{opts.table.upcase.tr('_', ' ')}
@@ -808,9 +805,6 @@ module DevelopmentApp
               #{new_create_routes.chomp.gsub("\n", "\n    ")}
             end
           end
-
-          # rubocop:enable Metrics/ClassLength
-          # rubocop:enable Metrics/BlockLength
         RUBY
       end
 
@@ -958,10 +952,10 @@ module DevelopmentApp
                 common_values_for_fields common_fields
 
                 set_show_fields if %i[show reopen].include? @mode
-                set_complete_fields if @mode == :complete
-                set_approve_fields if @mode == :approve
+                # set_complete_fields if @mode == :complete
+                # set_approve_fields if @mode == :approve
 
-                add_approve_behaviours if @mode == :approve
+                # add_approve_behaviours if @mode == :approve
 
                 form_name '#{opts.singlename}'
               end
@@ -970,17 +964,17 @@ module DevelopmentApp
                 #{show_fields.join(UtilityFunctions.newline_and_spaces(6))}
               end
 
-              def set_approve_fields
-                set_show_fields
-                fields[:approve_action] = { renderer: :select, options: [%w[Approve a], %w[Reject r]], required: true }
-                fields[:reject_reason] = { renderer: :textarea, disabled: true }
-              end
+              # def set_approve_fields
+              #   set_show_fields
+              #   fields[:approve_action] = { renderer: :select, options: [%w[Approve a], %w[Reject r]], required: true }
+              #   fields[:reject_reason] = { renderer: :textarea, disabled: true }
+              # end
 
-              def set_complete_fields
-                set_show_fields
-                user_repo = DevelopmentApp::UserRepo.new
-                fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_#{opts.singlename.upcase}_APPROVERS), caption: 'Email address of person to notify', required: true }
-              end
+              # def set_complete_fields
+              #   set_show_fields
+              #   user_repo = DevelopmentApp::UserRepo.new
+              #   fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_#{opts.singlename.upcase}_APPROVERS), caption: 'Email address of person to notify', required: true }
+              # end
 
               def common_fields
                 {
@@ -1001,13 +995,13 @@ module DevelopmentApp
                 @form_object = OpenStruct.new(#{struct_fields.join(UtilityFunctions.comma_newline_and_spaces(36))})
               end
 
-              private
+              # private
 
-              def add_approve_behaviours
-                behaviours do |behaviour|
-                  behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-                end
-              end
+              # def add_approve_behaviours
+              #   behaviours do |behaviour|
+              #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
+              #   end
+              # end
             end
           end
         RUBY
@@ -1137,9 +1131,6 @@ module DevelopmentApp
 
           require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-          # rubocop:disable Metrics/ClassLength
-          # rubocop:disable Metrics/AbcSize
-
           module #{opts.classnames[:module]}
             class Test#{opts.classnames[:repo]} < MiniTestWithHooks
               def test_for_selects
@@ -1157,8 +1148,6 @@ module DevelopmentApp
               end
             end
           end
-          # rubocop:enable Metrics/ClassLength
-          # rubocop:enable Metrics/AbcSize
         RUBY
       end
 
@@ -1167,9 +1156,6 @@ module DevelopmentApp
           # frozen_string_literal: true
 
           require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
-
-          # rubocop:disable Metrics/ClassLength
-          # rubocop:disable Metrics/AbcSize
 
           module #{opts.classnames[:module]}
             class Test#{opts.classnames[:interactor]} < Minitest::Test
@@ -1186,8 +1172,6 @@ module DevelopmentApp
               end
             end
           end
-          # rubocop:enable Metrics/ClassLength
-          # rubocop:enable Metrics/AbcSize
         RUBY
       end
 
@@ -1220,9 +1204,9 @@ module DevelopmentApp
                 res = #{perm_check}.call(:edit, 1)
                 assert res.success, 'Should be able to edit a #{opts.singlename}'
 
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
-                res = #{perm_check}.call(:edit, 1)
-                refute res.success, 'Should not be able to edit a completed #{opts.singlename}'
+                # #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
+                # res = #{perm_check}.call(:edit, 1)
+                # refute res.success, 'Should not be able to edit a completed #{opts.singlename}'
               end
 
               def test_delete
@@ -1230,44 +1214,44 @@ module DevelopmentApp
                 res = #{perm_check}.call(:delete, 1)
                 assert res.success, 'Should be able to delete a #{opts.singlename}'
 
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
-                res = #{perm_check}.call(:delete, 1)
-                refute res.success, 'Should not be able to delete a completed #{opts.singlename}'
+                # #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
+                # res = #{perm_check}.call(:delete, 1)
+                # refute res.success, 'Should not be able to delete a completed #{opts.singlename}'
               end
 
-              def test_complete
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
-                res = #{perm_check}.call(:complete, 1)
-                assert res.success, 'Should be able to complete a #{opts.singlename}'
+              # def test_complete
+              #   #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+              #   res = #{perm_check}.call(:complete, 1)
+              #   assert res.success, 'Should be able to complete a #{opts.singlename}'
 
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
-                res = #{perm_check}.call(:complete, 1)
-                refute res.success, 'Should not be able to complete an already completed #{opts.singlename}'
-              end
+              #   #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true))
+              #   res = #{perm_check}.call(:complete, 1)
+              #   refute res.success, 'Should not be able to complete an already completed #{opts.singlename}'
+              # end
 
-              def test_approve
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: false))
-                res = #{perm_check}.call(:approve, 1)
-                assert res.success, 'Should be able to approve a completed #{opts.singlename}'
+              # def test_approve
+              #   #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: false))
+              #   res = #{perm_check}.call(:approve, 1)
+              #   assert res.success, 'Should be able to approve a completed #{opts.singlename}'
 
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
-                res = #{perm_check}.call(:approve, 1)
-                refute res.success, 'Should not be able to approve a non-completed #{opts.singlename}'
+              #   #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+              #   res = #{perm_check}.call(:approve, 1)
+              #   refute res.success, 'Should not be able to approve a non-completed #{opts.singlename}'
 
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: true))
-                res = #{perm_check}.call(:approve, 1)
-                refute res.success, 'Should not be able to approve an already approved #{opts.singlename}'
-              end
+              #   #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: true))
+              #   res = #{perm_check}.call(:approve, 1)
+              #   refute res.success, 'Should not be able to approve an already approved #{opts.singlename}'
+              # end
 
-              def test_reopen
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
-                res = #{perm_check}.call(:reopen, 1)
-                refute res.success, 'Should not be able to reopen a #{opts.singlename} that has not been approved'
+              # def test_reopen
+              #   #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity)
+              #   res = #{perm_check}.call(:reopen, 1)
+              #   refute res.success, 'Should not be able to reopen a #{opts.singlename} that has not been approved'
 
-                #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: true))
-                res = #{perm_check}.call(:reopen, 1)
-                assert res.success, 'Should be able to reopen an approved #{opts.singlename}'
-              end
+              #   #{opts.classnames[:module]}::#{opts.classnames[:repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(entity(completed: true, approved: true))
+              #   res = #{perm_check}.call(:reopen, 1)
+              #   assert res.success, 'Should be able to reopen an approved #{opts.singlename}'
+              # end
             end
           end
         RUBY
@@ -1285,7 +1269,7 @@ module DevelopmentApp
             INTERACTOR = #{opts.classnames[:namespaced_interactor]}
 
             def test_edit
-              authorise_pass!
+              authorise_pass! permission_check: #{opts.classnames[:module]}::TaskPermissionCheck::#{opts.classnames[:class]}
               ensure_exists!(INTERACTOR)
               #{opts.classnames[:view_prefix]}::Edit.stub(:call, bland_page) do
                 get '#{base_route}#{opts.table}/1/edit', {}, 'rack.session' => { user_id: 1 }
@@ -1336,7 +1320,7 @@ module DevelopmentApp
             end
 
             def test_delete
-              authorise_pass!
+              authorise_pass! permission_check: #{opts.classnames[:module]}::TaskPermissionCheck::#{opts.classnames[:class]}
               ensure_exists!(INTERACTOR)
               INTERACTOR.any_instance.stubs(:delete_#{opts.singlename}).returns(ok_response)
               delete_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
@@ -1344,7 +1328,7 @@ module DevelopmentApp
             end
 
             def test_delete_fail
-              authorise_pass!
+              authorise_pass! permission_check: #{opts.classnames[:module]}::TaskPermissionCheck::#{opts.classnames[:class]}
               ensure_exists!(INTERACTOR)
               INTERACTOR.any_instance.stubs(:delete_#{opts.singlename}).returns(bad_response)
               delete_as_fetch '#{base_route}#{opts.table}/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }

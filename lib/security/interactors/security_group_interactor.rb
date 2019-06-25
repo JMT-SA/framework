@@ -19,7 +19,6 @@ module SecurityApp
       res = validate_security_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      # res = validate_security_group
       id = nil
       repo.transaction do
         id = repo.create_security_group(res)

@@ -61,7 +61,7 @@ examples:
 # Link via a join table - derived by combining main table and sub table names.
 find_with_association(:security_groups,
                       123,
-                      sub_tables: [{ sub_table: :security_groups,
+                      sub_tables: [{ sub_table: :security_permisions,
                                      uses_join_table: true }],
                       SecurityGroupWithPermissions)
 
@@ -69,7 +69,7 @@ find_with_association(:security_groups,
 # Link via a named join table.
 find_with_association(:security_groups,
                       123,
-                      sub_tables: [{ sub_table: :security_groups,
+                      sub_tables: [{ sub_table: :security_permissions,
                       join_table: :security_groups_security_permissions }])
 
 # Two sub-tables.

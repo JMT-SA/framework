@@ -45,10 +45,11 @@ class RouteTester < Minitest::Test
     )
   end
 
-  def authorise_pass!
+  def authorise_pass!(permission_check: nil)
     DevelopmentApp::UserRepo.any_instance.stubs(:find).returns(base_user)
     SecurityApp::MenuRepo.any_instance.stubs(:functional_area_id_for_name).returns(1)
     SecurityApp::MenuRepo.any_instance.stubs(:authorise?).returns(true)
+    permission_check.any_instance.stubs(:call).returns(ok_response) if permission_check
   end
 
   def authorise_fail!

@@ -51,6 +51,7 @@ module MasterfilesApp
     def create_role(opts = {})
       existing_id = @fixed_table_set[:roles][:"#{opts[:name].downcase}"] if opts[:name]
       return existing_id unless existing_id.nil?
+
       default = {
         name: Faker::Lorem.unique.word,
         active: true

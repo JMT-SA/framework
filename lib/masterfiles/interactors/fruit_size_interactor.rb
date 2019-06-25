@@ -5,6 +5,7 @@ module MasterfilesApp
     def create_std_fruit_size_count(params)
       res = validate_std_fruit_size_count_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @id = fruit_size_repo.create_std_fruit_size_count(res)
       success_response("Created std fruit size count #{std_fruit_size_count.size_count_description}", std_fruit_size_count)
     rescue Sequel::UniqueConstraintViolation
@@ -15,6 +16,7 @@ module MasterfilesApp
       @id = id
       res = validate_std_fruit_size_count_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       fruit_size_repo.update_std_fruit_size_count(id, res)
       success_response("Updated std fruit size count #{std_fruit_size_count.size_count_description}", std_fruit_size_count(false))
     end
@@ -30,6 +32,7 @@ module MasterfilesApp
       params[:std_fruit_size_count_id] = parent_id
       res = validate_fruit_actual_counts_for_pack_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @id = fruit_size_repo.create_fruit_actual_counts_for_pack(res)
       success_response("Created fruit actual counts for pack #{fruit_actual_counts_for_pack.size_count_variation}", fruit_actual_counts_for_pack)
     rescue Sequel::UniqueConstraintViolation
@@ -40,6 +43,7 @@ module MasterfilesApp
       @id = id
       res = validate_fruit_actual_counts_for_pack_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       fruit_size_repo.update_fruit_actual_counts_for_pack(id, res)
       success_response("Updated fruit actual counts for pack #{fruit_actual_counts_for_pack.size_count_variation}", fruit_actual_counts_for_pack(false))
     end
@@ -55,6 +59,7 @@ module MasterfilesApp
       params[:fruit_actual_counts_for_pack_id] = parent_id
       res = validate_fruit_size_reference_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @id = fruit_size_repo.create_fruit_size_reference(res)
       success_response("Created fruit size reference #{fruit_size_reference.size_reference}", fruit_size_reference)
     rescue Sequel::UniqueConstraintViolation
@@ -65,6 +70,7 @@ module MasterfilesApp
       @id = id
       res = validate_fruit_size_reference_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       fruit_size_repo.update_fruit_size_reference(id, res)
       success_response("Updated fruit size reference #{fruit_size_reference.size_reference}", fruit_size_reference(false))
     end

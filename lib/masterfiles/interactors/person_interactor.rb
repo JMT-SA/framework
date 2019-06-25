@@ -7,6 +7,7 @@ module MasterfilesApp
     def create_person(params)
       res = validate_person_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       response = nil
       repo.transaction do
         response = repo.create_person(res)
@@ -25,6 +26,7 @@ module MasterfilesApp
       @person_id = id
       res = validate_person_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       attrs = res.to_h
       role_ids = attrs.delete(:role_ids)
       roles_response = assign_person_roles(@person_id, role_ids)
@@ -49,6 +51,7 @@ module MasterfilesApp
 
     def assign_person_roles(id, role_ids)
       return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
+
       repo.transaction do
         repo.assign_roles(id, role_ids, 'P')
       end
@@ -58,7 +61,7 @@ module MasterfilesApp
     private
 
     def repo
-      @party_repo ||= PartyRepo.new
+      @repo ||= PartyRepo.new
     end
 
     def person(cached = true)

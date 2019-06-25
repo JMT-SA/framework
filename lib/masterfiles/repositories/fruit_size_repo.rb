@@ -37,6 +37,7 @@ module MasterfilesApp
     def delete_basic_pack_code(id)
       dependents = DB[:fruit_actual_counts_for_packs].where(basic_pack_code_id: id).select_map(:id)
       return { error: 'This pack code is in use.' } unless dependents.empty?
+
       DB[:basic_pack_codes].where(id: id).delete
       { success: true }
     end
@@ -44,6 +45,7 @@ module MasterfilesApp
     def delete_standard_pack_code(id)
       dependents = DB[:fruit_actual_counts_for_packs].where(standard_pack_code_id: id).select_map(:id)
       return { error: 'This pack code is in use.' } unless dependents.empty?
+
       DB[:standard_pack_codes].where(id: id).delete
       { success: true }
     end

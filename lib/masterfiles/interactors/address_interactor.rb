@@ -5,6 +5,7 @@ module MasterfilesApp
     def create_address(params)
       res = validate_address_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @address_id = party_repo.create_address(res)
       success_response("Created address #{address.address_line_1}", address)
     rescue Sequel::UniqueConstraintViolation
@@ -15,6 +16,7 @@ module MasterfilesApp
       @address_id = id
       res = validate_address_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       party_repo.update_address(id, res)
       success_response("Updated address #{address.address_line_1}", address(false))
     end

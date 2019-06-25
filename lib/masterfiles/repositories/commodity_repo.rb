@@ -24,6 +24,7 @@ module MasterfilesApp
     def delete_commodity(id)
       dependents = DB[:cultivars].where(commodity_id: id).select_map(:id)
       return { error: 'This commodity is in use.' } unless dependents.empty?
+
       DB[:commodities].where(id: id).delete
       { success: true }
     end
@@ -32,6 +33,7 @@ module MasterfilesApp
       commodities = DB[:commodities].where(commodity_group_id: id).select_map(:id)
       dependents = DB[:cultivars].where(commodity_id: commodities).select_map(:id)
       return { error: 'Some commodities are in use.' } unless dependents.empty?
+
       commodities.each do |comm_id|
         delete_commodity(comm_id)
       end

@@ -48,12 +48,14 @@ module MasterfilesApp
     def find_party(id)
       hash = DB['SELECT parties.* , fn_party_name(?) AS party_name FROM parties WHERE parties.id = ?', id, id].first
       return nil if hash.nil?
+
       Party.new(hash)
     end
 
     def find_party_role(id)
       hash = DB['SELECT party_roles.* , fn_party_role_name(?) AS party_name FROM party_roles WHERE party_roles.id = ?', id, id].first
       return nil if hash.nil?
+
       PartyRole.new(hash)
     end
 
@@ -61,6 +63,7 @@ module MasterfilesApp
       params = attrs.to_h
       role_ids = params.delete(:role_ids)
       return { error: { roles: ['You did not choose a role'] } } if role_ids.empty?
+
       params[:medium_description] = params[:short_description] unless params[:medium_description]
       params[:long_description] = params[:short_description] unless params[:long_description]
       party_id = DB[:parties].insert(party_type: 'O')
@@ -76,6 +79,7 @@ module MasterfilesApp
     def find_organization(id)
       hash = DB[:organizations].where(id: id).first
       return nil if hash.nil?
+
       hash = add_dependent_ids(hash)
       hash = add_party_name(hash)
       hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
@@ -87,6 +91,7 @@ module MasterfilesApp
     def delete_organization(id)
       children = DB[:organizations].where(parent_id: id)
       return { error: 'This organization is set as a parent' } if children.any?
+
       party_id = party_id_from_organization(id)
       DB[:party_roles].where(party_id: party_id).delete
       DB[:organizations].where(id: id).delete
@@ -98,6 +103,7 @@ module MasterfilesApp
       params = attrs.to_h
       role_ids = params.delete(:role_ids)
       return { error: 'Choose at least one role' } if role_ids.empty?
+
       party_id = DB[:parties].insert(party_type: 'P')
       person_id = DB[:people].insert(params.merge(party_id: party_id))
       role_ids.each do |r_id|
@@ -111,6 +117,7 @@ module MasterfilesApp
     def find_person(id)
       hash = find_hash(:people, id)
       return nil if hash.nil?
+
       hash = add_dependent_ids(hash)
       hash = add_party_name(hash)
       hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
@@ -127,6 +134,7 @@ module MasterfilesApp
     def find_contact_method(id)
       hash = DB[:contact_methods].where(id: id).first
       return nil if hash.nil?
+
       contact_method_type_id = hash[:contact_method_type_id]
       contact_method_type_hash = DB[:contact_method_types].where(id: contact_method_type_id).first
       hash[:contact_method_type] = contact_method_type_hash[:contact_method_type]
@@ -136,6 +144,7 @@ module MasterfilesApp
     def find_address(id)
       hash = find_hash(:addresses, id)
       return nil if hash.nil?
+
       address_type_id = hash[:address_type_id]
       address_type_hash = find_hash(:address_types, address_type_id)
       hash[:address_type] = address_type_hash[:address_type]
@@ -264,11 +273,13 @@ module MasterfilesApp
 
       hash = DB[query, AppConst::ROLE_IMPLEMENTATION_OWNER, AppConst::IMPLEMENTATION_OWNER].first
       raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{AppConst::ROLE_IMPLEMENTATION_OWNER}\" is not defined/active" if hash.nil?
+
       MasterfilesApp::PartyRole.new(hash)
     end
 
     def assign_roles(id, role_ids, type = 'O')
       return { error: 'Choose at least one role' } if role_ids.empty?
+
       party_details = party_details_by_type(id, type)
       current_role_ids = party_details[:party_roles].select_map(:role_id)
 

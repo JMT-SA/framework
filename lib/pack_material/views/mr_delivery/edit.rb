@@ -33,10 +33,10 @@ module PackMaterial
                                     style: :button,
                                     behaviour: :popup)
                 section.add_control(control_type: :link,
-                                    text:         'Invoice Info',
-                                    url:          "/pack_material/replenish/mr_deliveries/#{id}/invoice",
-                                    style:        :button,
-                                    behaviour:    :popup)
+                                    text: 'Invoice Info',
+                                    url: "/pack_material/replenish/mr_deliveries/#{id}/invoice",
+                                    style: :button,
+                                    behaviour: :popup)
               end
               section.add_control(control_type: :link,
                                   text: 'Complete Purchase Invoice',
@@ -77,19 +77,16 @@ module PackMaterial
 
             page.section do |section|
               section.add_control(control_type: :link,
-                                  text: 'Goods Returned Note report',
-                                  url: "/pack_material/reports/goods_returned/#{id}",
-                                  loading_window: true,
-                                  style: :button)
-              section.add_control(control_type: :link,
-                                  text: 'Delivery Received Note report',
+                                  text: 'Delivery Receipt Acknowledgement',
                                   url: "/pack_material/reports/delivery_received/#{id}",
                                   loading_window: true,
+                                  visible: rules[:is_verified],
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Waybill Note',
                                   url: "/pack_material/reports/waybill_note/#{id}",
                                   loading_window: true,
+                                  visible: rules[:is_verified],
                                   style: :button)
             end
 

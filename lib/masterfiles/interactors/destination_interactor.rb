@@ -7,6 +7,7 @@ module MasterfilesApp
     def create_region(params)
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         @region_id = repo.create_region(res)
       end
@@ -20,6 +21,7 @@ module MasterfilesApp
       @region_id = id
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_region(id, res)
       end
@@ -44,6 +46,7 @@ module MasterfilesApp
     def create_country(id, params)
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         @country_id = repo.create_country(id, res)
       end
@@ -56,6 +59,7 @@ module MasterfilesApp
       @country_id = id
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_country(id, res)
       end
@@ -79,6 +83,7 @@ module MasterfilesApp
     def create_city(id, params)
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         @city_id = repo.create_city(id, res)
       end
@@ -91,6 +96,7 @@ module MasterfilesApp
       @city_id = id
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_city(id, res)
       end

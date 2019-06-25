@@ -7,6 +7,7 @@ module MasterfilesApp
     def create_location_type(params)
       res = validate_location_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_location_type(res)
@@ -21,6 +22,7 @@ module MasterfilesApp
     def update_location_type(id, params)
       res = validate_location_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_location_type(id, res)
         log_transaction
@@ -38,9 +40,10 @@ module MasterfilesApp
       success_response("Deleted location type #{name}")
     end
 
-    def create_root_location(params)
+    def create_root_location(params) # rubocop:disable Metrics/AbcSize
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_root_location(res)
@@ -54,9 +57,10 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
-    def create_location(parent_id, params)
+    def create_location(parent_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_child_location(parent_id, res)
@@ -70,9 +74,10 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
-    def update_location(id, params)
+    def update_location(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_location(id, res)
         log_transaction
@@ -85,6 +90,7 @@ module MasterfilesApp
 
     def delete_location(id)
       return failed_response('Cannot delete this location - it has sub-locations') if repo.location_has_children(id)
+
       name = location(id).location_long_code
       repo.transaction do
         repo.delete_location(id)
@@ -96,6 +102,7 @@ module MasterfilesApp
     def create_location_assignment(params)
       res = validate_location_assignment_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_location_assignment(res)
@@ -110,6 +117,7 @@ module MasterfilesApp
     def update_location_assignment(id, params)
       res = validate_location_assignment_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_location_assignment(id, res)
         log_transaction
@@ -130,6 +138,7 @@ module MasterfilesApp
     def create_location_storage_type(params)
       res = validate_location_storage_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_location_storage_type(res)
@@ -144,6 +153,7 @@ module MasterfilesApp
     def update_location_storage_type(id, params)
       res = validate_location_storage_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_location_storage_type(id, res)
         log_transaction
@@ -167,6 +177,7 @@ module MasterfilesApp
         res = repo.link_assignments(id, multiselect_ids)
       end
       return res unless res.success
+
       success_response('Assignments linked successfully')
     end
 
@@ -176,18 +187,21 @@ module MasterfilesApp
         res = repo.link_storage_types(id, multiselect_ids)
       end
       return res unless res.success
+
       success_response('Storage types linked successfully')
     end
 
     def location_long_code_suggestion(parent_id, location_type_id)
       res = repo.location_long_code_suggestion(parent_id, location_type_id)
       return res unless res.success
+
       success_response('See location code suggestion', res.instance)
     end
 
     def location_short_code_suggestion(storage_type_id)
       res = repo.suggested_short_code(storage_type_id)
       return res unless res.success
+
       success_response('See location code suggestion', res.instance)
     end
 

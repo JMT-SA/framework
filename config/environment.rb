@@ -7,7 +7,7 @@ else
   Dotenv.load('.env.local', '.env')
 end
 db_name = if ENV.fetch('RACK_ENV') == 'test'
-            ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
+            ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
           else
             ENV.fetch('DATABASE_URL')
           end
@@ -29,7 +29,8 @@ DB.extension :pg_inet
 
 Que.connection = DB
 Que.job_middleware.push(
-  ->(job, &block) {
+  # ->(job, &block) {
+  lambda { |job, &block|
     job.lock_single_instance
     block.call
     job.clear_single_instance

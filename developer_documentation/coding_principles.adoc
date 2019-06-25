@@ -1,0 +1,57 @@
+= Coding principle
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Coding principle
+
+These are the principles to be followed in writing code that uses the Crossbeams framework.
+All applications should use Rubocop to enforce style and grammar rules.
+
+=== Use styling standards
+
+Make it easy for any developer to read and maintain any other developer’s code.
+
+=== Write code in layers
+
+Separate routing, business logic, persistence and UI building.
+
+=== Write short, focused methods
+
+Methods should ideally do one thing in few lines of code.
+They should be written to be maintainable.
+
+=== Clear code rather than clever code
+
+Always write code with an eye to you or someone else being able to understand and maintain it.
+
+=== Isolate database access
+
+Place all database manipulation code in repositories.
+Business logic must use a repository to get data to or from the database.
+
+=== Use value objects
+
+Output from repositories should only contain simple value objects (entities) or basic data types (Integer, String, Array, Hash).
+Avoid using rich model-like objects.
+
+=== Communicate via response objects
+
+Return standard response objects from methods that can be interrogated for success, messages and instance data.
+
+=== Use the job queue for asynchronous work
+
+If a bit of work involves long-running activity and the output of the task does not need to be returned to the user immediately, write a job to do the work.
+
+=== Use services for complex business processes
+
+A task that involves several steps and/or many resources should be done in a service.
+
+=== Make the route code as simple as possible
+
+Code in the routing layer should be restricted to:
+
+* Check authorization
+* Call the view layer
+* Call the interactor layer
+* Return response

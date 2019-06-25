@@ -8,6 +8,7 @@ module MasterfilesApp
     def create_tm_group_type(params)
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         @tm_group_type_id = repo.create_tm_group_type(res)
       end
@@ -20,6 +21,7 @@ module MasterfilesApp
       @tm_group_type_id = id
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_tm_group_type(id, res)
       end
@@ -39,6 +41,7 @@ module MasterfilesApp
     def create_tm_group(params)
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         @tm_group_id = repo.create_tm_group(res)
       end
@@ -52,6 +55,7 @@ module MasterfilesApp
       @tm_group_id = id
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_tm_group(id, res)
       end
@@ -109,6 +113,7 @@ module MasterfilesApp
 
     def link_countries(target_market_id, country_ids)
       return failed_response('You have not selected any countries') unless country_ids
+
       repo.transaction do
         repo.link_countries(target_market_id, country_ids)
       end
@@ -123,6 +128,7 @@ module MasterfilesApp
 
     def link_tm_groups(target_market_id, tm_group_ids)
       return failed_response('You have not selected any target market groups') unless tm_group_ids
+
       repo.transaction do
         repo.link_tm_groups(target_market_id, tm_group_ids)
       end
@@ -138,7 +144,7 @@ module MasterfilesApp
     private
 
     def repo
-      @target_market_repo ||= TargetMarketRepo.new
+      @repo ||= TargetMarketRepo.new
     end
 
     def tm_group_type(cached = true)

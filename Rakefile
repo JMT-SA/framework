@@ -71,7 +71,7 @@ namespace :db do
 
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -85,7 +85,7 @@ namespace :db do
     require 'sequel'
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -104,7 +104,7 @@ namespace :db do
     require 'sequel'
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -123,7 +123,7 @@ namespace :db do
     require 'sequel'
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
-                ENV.fetch('DATABASE_URL').sub(%r{/([^/]+)$}, "/#{ENV.fetch('DATABASE_NAME')}_test")
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -157,10 +157,10 @@ namespace :db do
             #   primary_key :id
             #   foreign_key :some_id, :some_table_name, null: false, key: [:id]
             #
-            #   String :my_uniq_name, size: 255, null: false
-            #   String :user_name, size: 255
-            #   String :password_hash, size: 255, null: false
-            #   String :email, size: 255
+            #   String :my_uniq_name, null: false
+            #   String :user_name
+            #   String :password_hash, null: false
+            #   String :email
             #   TrueClass :active, default: true
             #   DateTime :created_at, null: false
             #   DateTime :updated_at, null: false
@@ -211,7 +211,7 @@ namespace :db do
             extension :pg_triggers
             create_table(:#{nm}, ignore_index_errors: true) do
               primary_key :id
-              # String :code, size: 255, null: false
+              # String :code, null: false
               # TrueClass :active, default: true
               DateTime :created_at, null: false
               DateTime :updated_at, null: false

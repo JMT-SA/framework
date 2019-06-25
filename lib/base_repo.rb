@@ -139,8 +139,8 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # inactive_only: Boolean (Only return inactive rows. The key in the main hash becomes :inactive_sub_table)
   #
   # examples:
-  #     find_with_association(:security_groups, 123, sub_tables: [{ sub_table: :security_groups, uses_join_table: true }], SecurityGroupWithPermissions)
-  #     find_with_association(:security_groups, 123, sub_tables: [{ sub_table: :security_groups, join_table: :security_groups_security_permissions }])
+  #     find_with_association(:security_groups, 123, sub_tables: [{ sub_table: :security_permissions, uses_join_table: true }], wrapper: SecurityGroupWithPermissions)
+  #     find_with_association(:security_groups, 123, sub_tables: [{ sub_table: :security_permissions, join_table: :security_groups_security_permissions }])
   #     find_with_association(:programs, 123, sub_tables: [{ sub_table: :program_functions },
   #                                                        { sub_table: :users, uses_join_table: true, active_only: true, columns: [:id, :user_name] }])
   #

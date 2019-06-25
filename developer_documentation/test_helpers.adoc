@@ -1,0 +1,41 @@
+= Test helpers
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Test helpers
+
+Helpers available during testing.
+
+Include the helpers in your test file with this line:
+[source,ruby]
+----
+require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
+----
+
+=== Current user
+
+Call `current user` in your test to get an instance of a `DevelopmentApp::User` entity.
+
+=== CRUD calls
+
+This helper for Repositories will check that the expected crud calls methods are in place. Your test file must implement a method named `repo` which returns an instance of the repository under test.
+
+Example:
+[source,ruby]
+----
+module MasterfilesApp
+  class TestCommodityRepo < MiniTestWithHooks
+    def test_crud_calls
+      test_crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup
+      test_crud_calls_for :commodities, name: :commodity, wrapper: Commodity
+    end
+
+    private
+
+    def repo
+      CommodityRepo.new
+    end
+  end
+end
+----

@@ -1,0 +1,103 @@
+= Routes
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Routes
+
+Routes should follow a `REST`-ish approach for CRUD actions.
+
+For cases where a form is displayed and then applied, use the same URL for both GET and POST/PATCH calls
+
+=== RESTful routes
+
+|===
+|Method |URL |Action
+
+|GET
+|`/animals/cats`
+|List - display grid (actually done via /lists URL)
+
+|GET
+|`/animals/cats/new`
+|NEW : display form
+
+|POST
+|`/animals/cats`
+|CREATE : process form
+
+|GET
+|`/animals/cats/123/edit`
+|EDIT : display form for cat with id 123
+
+|PATCH
+|`/animals/cats/123`
+|UPDATE : process form data and apply to cat 123
+
+|GET
+|`/animals/cats/123`
+|VIEW : Show data for cat 123
+
+|DELETE
+|`/animals/cats/123`
+|DELETE : Delete cat 123
+
+|===
+
+=== Other routes
+
+|===
+|Method |URL |Action
+
+|GET
+|`/animals/cats/123/feed`
+|Display a form to capture feed data for cat 123
+
+|POST
+|`/animals/cats/123/feed`
+|Process data from form and apply to cat 123
+
+|===
+
+=== Roda routing tree
+
+This example applies all the routes from the tables above.
+
+[source,ruby]
+----
+route 'animals' do |r|
+  r.on 'cats', Integer do |id|
+    r.on 'edit' do   # EDIT   (GET    /animals/cats/123/edit)
+      # Display EDIT form
+    end
+    r.on 'feed' do
+      r.get do       #        (GET    /animals/cats/123/feed)
+        # Display feed form
+      end
+      r.post do      #        (POST   /animals/cats/123/feed)
+        # Apply feed to cat
+      end
+    end
+    r.is do
+      r.get do       # SHOW   (GET    /animals/cats/123)
+        # Display SHOW form
+      end
+      r.patch do     # UPDATE (PATCH  /animals/cats/123)
+        # Update cat
+      end
+      r.delete do    # DELETE (DELETE /animals/cats/123)
+        # Delete cat
+      end
+    end
+  end
+  r.on 'cats' do
+    r.on 'new' do    # NEW    (GET    /animals/cats/new)
+      # Display NEW form
+    end
+    r.post do        # CREATE (POST   /animals/cats)
+      # Create cat
+    end
+ end
+end
+----
+

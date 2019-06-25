@@ -17,6 +17,7 @@ module MasterfilesApp
     def create_label_template(params) # rubocop:disable Metrics/AbcSize
       res = validate_label_template_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_label_template(res)
@@ -33,6 +34,7 @@ module MasterfilesApp
     def update_label_template(id, params)
       res = validate_label_template_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_label_template(id, res)
         log_transaction
@@ -94,6 +96,7 @@ module MasterfilesApp
       end
 
       return OpenStruct.new(messages: var_errs) unless var_errs.empty?
+
       res
     end
 

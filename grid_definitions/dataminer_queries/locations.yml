@@ -399,7 +399,7 @@
   :control_type: :list
   :default_value: 
   :ordered_list: true
-  :ui_priority: 1
+  :ui_priority: 3
   :list_def: SELECT storage_type_code, id FROM location_storage_types ORDER BY storage_type_code
 - :column: locations.location_type_id
   :caption: Location type
@@ -407,7 +407,7 @@
   :control_type: :list
   :default_value: 
   :ordered_list: true
-  :ui_priority: 1
+  :ui_priority: 2
   :list_def: SELECT location_type_code, id FROM location_types ORDER BY location_type_code
 - :column: locations.primary_assignment_id
   :caption: Primary assignment
@@ -415,7 +415,7 @@
   :control_type: :list
   :default_value: 
   :ordered_list: true
-  :ui_priority: 1
+  :ui_priority: 3
   :list_def: SELECT assignment_code, id FROM location_assignments ORDER BY assignment_code
 - :column: locations.location_long_code
   :caption: Location code
@@ -431,5 +431,5 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 3
   :list_def: 

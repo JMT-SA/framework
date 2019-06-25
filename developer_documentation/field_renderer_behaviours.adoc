@@ -205,7 +205,7 @@ Format:
 
 `lose_focus(field_to_observe, conditions = {})`
 
-`field_to_observe` is the name of the input field to observe for key up presses.
+`field_to_observe` is the name of the input field to observe for losing focus.
 
 Conditions:
 

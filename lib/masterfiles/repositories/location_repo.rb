@@ -58,6 +58,7 @@ module MasterfilesApp
                      Sequel[:location_assignments][:assignment_code])
              .where(Sequel[:locations][key] => val).first
       return nil if hash.nil?
+
       Location.new(hash)
     end
 
@@ -76,6 +77,7 @@ module MasterfilesApp
     def location_exists(location_long_code, location_short_code)
       return failed_response(%(Location "#{location_long_code}" already exists)) if exists?(:locations, location_long_code: location_long_code)
       return failed_response(%(Location with short code "#{location_short_code}" already exists)) if !location_short_code.nil? && exists?(:locations, location_short_code: location_short_code)
+
       ok_response
     end
 
@@ -156,6 +158,7 @@ module MasterfilesApp
 
     def link_assignments(id, multiselect_ids)
       return failed_response('Choose at least one assignment') if multiselect_ids.empty?
+
       location = find_location(id)
       return failed_response('The primary assignment must be included in your selection') unless multiselect_ids.include?(location.primary_assignment_id)
 
@@ -171,6 +174,7 @@ module MasterfilesApp
 
     def link_storage_types(id, multiselect_ids)
       return failed_response('Choose at least one storage type') if multiselect_ids.empty?
+
       location = find_location(id)
       return failed_response('The primary storage type must be included in your selection') unless multiselect_ids.include?(location.primary_storage_type_id)
 
@@ -265,6 +269,7 @@ module MasterfilesApp
                        DB[:location_storage_types].where(storage_type_code: storage_type)
                      end
       return failed_response('storage type does not exist') unless storage_type.first
+
       prefix = storage_type.get(:location_short_code_prefix)
       return failed_response('no prefix') unless prefix
 

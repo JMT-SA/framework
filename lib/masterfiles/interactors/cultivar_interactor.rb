@@ -7,6 +7,7 @@ module MasterfilesApp
     def create_cultivar_group(params)
       res = validate_cultivar_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @cultivar_group_id = repo.create_cultivar_group(res)
       success_response("Created cultivar group #{cultivar_group.cultivar_group_code}", cultivar_group)
     rescue Sequel::UniqueConstraintViolation
@@ -17,6 +18,7 @@ module MasterfilesApp
       @cultivar_group_id = id
       res = validate_cultivar_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_cultivar_group(id, res)
       success_response("Updated cultivar group #{cultivar_group.cultivar_group_code}", cultivar_group(false))
     end
@@ -36,6 +38,7 @@ module MasterfilesApp
     def create_cultivar(params)
       res = validate_cultivar_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @cultivar_id = repo.create_cultivar(res)
       success_response("Created cultivar #{cultivar.cultivar_name}", cultivar)
     rescue Sequel::UniqueConstraintViolation
@@ -46,6 +49,7 @@ module MasterfilesApp
       @cultivar_id = id
       res = validate_cultivar_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_cultivar(id, res)
       # instance = cultivar(id)
       # comm_repo = MasterfilesApp::CommodityRepo.new
@@ -64,6 +68,7 @@ module MasterfilesApp
     def create_marketing_variety(cultivar_id, params)
       res = validate_marketing_variety_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @marketing_variety_id = repo.create_marketing_variety(cultivar_id, res)
       success_response("Created marketing variety #{marketing_variety.marketing_variety_code}", marketing_variety)
     rescue Sequel::UniqueConstraintViolation
@@ -74,6 +79,7 @@ module MasterfilesApp
       @marketing_variety_id = id
       res = validate_marketing_variety_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_marketing_variety(id, res)
       success_response("Updated marketing variety #{marketing_variety.marketing_variety_code}", marketing_variety(false))
     end
@@ -101,7 +107,7 @@ module MasterfilesApp
     private
 
     def repo
-      @cultivar_repo ||= CultivarRepo.new
+      @repo ||= CultivarRepo.new
     end
 
     def cultivar_group(cached = true)

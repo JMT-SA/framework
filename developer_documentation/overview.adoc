@@ -1,0 +1,42 @@
+= Overview
+
+:toc:
+:abbr-repl: pass:[<abbr title="Read-Eval-Print-Loop">REPL</abbr>]
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Overview
+
+The system is designed as an application that is loaded inside a web application which uses the `Roda` routing tree gem to handle request endpoints which call into the application.
+
+The application can also be loaded without the routing tree which allows it to be called from the commandline (e.g. a Rake task), the {abbr-repl} `bin/console`, or have other servers (like a TCP server) load it.
+
+.How the code is organised and loaded
+image::High-level components.png[High-level components]
+
+In the typical case, a Rack-enabled webserver (Passenger, Thin, Puma, Webrick etc.) loads `config.ru` which loads `webapp.rb`.
+`webapp.rb` loads `app_loader.rb` which loads the application and then loads the `Roda` routing tree.
+
+The application is made up of shared code (typically in gems or base classes to be inherited) and of applets. Applets are logical groupings of code.
+
+== Applets
+
+Applets are responsible for loading all the code related to a particular domain.
+
+.Applet code organisation
+image::Applet structure.png[Applets]
+
+Applets do not have to define all units -- just what is required.
+
+== Grids
+
+Lists of data are displayed in pages using data grids. These can be any of:
+
+list:: Runs a query and returns all rows.
+lookup:: Runs a query which might be filtered and returns rows -- one of which can be selected.
+search:: Presents a page where the user can fill in parameters before the query is run, returning the filtered rows.
+
+.Data grids
+image::Data Grids.png[Data Grids]
+
+The YAML files allow for defining actions to be taken per row as well as other configurations to be used e.g. in defining a grid as a multiselect grid.

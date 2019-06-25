@@ -8,6 +8,7 @@ module MasterfilesApp
     def create_organization(params)
       res = validate_organization_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       response = nil
       repo.transaction do
         response = repo.create_organization(res)
@@ -26,6 +27,7 @@ module MasterfilesApp
       @organization_id = id
       res = validate_organization_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       attrs = res.to_h
       role_ids = attrs.delete(:role_ids)
       roles_response = assign_organization_roles(id, role_ids)
@@ -55,6 +57,7 @@ module MasterfilesApp
 
     def assign_organization_roles(id, role_ids)
       return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
+
       repo.transaction do
         repo.assign_roles(id, role_ids, 'O')
       end
@@ -64,7 +67,7 @@ module MasterfilesApp
     private
 
     def repo
-      @party_repo ||= PartyRepo.new
+      @repo ||= PartyRepo.new
     end
 
     def organization(cached = true)

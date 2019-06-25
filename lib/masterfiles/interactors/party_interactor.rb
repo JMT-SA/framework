@@ -19,7 +19,7 @@ module MasterfilesApp
     private
 
     def repo
-      @party_repo ||= PartyRepo.new
+      @repo ||= PartyRepo.new
     end
   end
 end

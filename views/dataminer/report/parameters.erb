@@ -21,7 +21,7 @@
       <h3>Choose parameters</h3>
       <select id="select_param">
         <option value="">Select a parameter to apply</option>
-        <%= make_options(@page.report.query_parameter_definitions.map { |qp| [qp.caption, qp.column] }) %>
+        <%= make_options(@page.report.ui_sorted_query_parameter_definitions.map { |qp| [qp.caption, qp.column] }) %>
       </select>
       <div id="qp_form" style="display:inline-block"></div>
       <div id="param_display"></div>

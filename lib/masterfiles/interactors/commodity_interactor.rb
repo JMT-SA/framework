@@ -5,6 +5,7 @@ module MasterfilesApp
     def create_commodity_group(params)
       res = validate_commodity_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @commodity_group_id = repo.create_commodity_group(res)
       success_response("Created commodity group #{commodity_group.code}", commodity_group)
     rescue Sequel::UniqueConstraintViolation
@@ -15,6 +16,7 @@ module MasterfilesApp
       @commodity_group_id = id
       res = validate_commodity_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_commodity_group(id, res)
       success_response("Updated commodity group #{commodity_group.code}", commodity_group(false))
     end
@@ -36,6 +38,7 @@ module MasterfilesApp
     def create_commodity(params)
       res = validate_commodity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       @commodity_id = repo.create_commodity(res)
       success_response("Created commodity #{commodity.code}", commodity)
     rescue Sequel::UniqueConstraintViolation
@@ -46,6 +49,7 @@ module MasterfilesApp
       @commodity_id = id
       res = validate_commodity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_commodity(id, res)
       success_response("Updated commodity #{commodity.code}", commodity(false))
     end
@@ -67,7 +71,7 @@ module MasterfilesApp
     private
 
     def repo
-      @commodity_repo ||= CommodityRepo.new
+      @repo ||= CommodityRepo.new
     end
 
     def commodity_group(cached = true)

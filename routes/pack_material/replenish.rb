@@ -379,8 +379,8 @@ class Framework < Roda
         r.on 'quantity_received_changed' do
           qty_received = params[:changed_value].empty? ? nil : params[:changed_value]
           quantities   = qty_received ? item_interactor.over_under_supply(qty_received, params[:mr_delivery_item_mr_purchase_order_item_id]) : {}
-          json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_input_value, value: quantities[:quantity_over_supply].to_f),
-                        OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_input_value, value: quantities[:quantity_under_supply].to_f)])
+          json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_inner_html, value: quantities[:quantity_over_supply].to_f),
+                        OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_inner_html, value: quantities[:quantity_under_supply].to_f)])
         end
         r.on 'purchase_order_changed' do
           po_id = params[:changed_value].empty? ? nil : params[:changed_value]

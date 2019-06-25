@@ -40,8 +40,10 @@ module PackMaterialApp
       if can_update.success
         res = validate_mr_delivery_item_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
-          repo.update_mr_delivery_item(id, res)
+          attrs = repo.add_over_under_supply_values(res.to_h)
+          repo.update_mr_delivery_item(id, attrs)
           log_transaction
         end
         instance = mr_delivery_item(id)

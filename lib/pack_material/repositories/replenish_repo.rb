@@ -231,9 +231,9 @@ module PackMaterialApp
 
     def delivery_complete_invoice(id, attrs)
       update(:mr_deliveries, id,
-             invoice_error:               false,
-             invoice_completed:           true,
-             erp_purchase_order_number:   attrs[:purchase_order_number],
+             invoice_error: false,
+             invoice_completed: true,
+             erp_purchase_order_number: attrs[:purchase_order_number],
              erp_purchase_invoice_number: attrs[:purchase_invoice_number])
     end
 
@@ -291,10 +291,10 @@ module PackMaterialApp
       po_items = DB[:mr_purchase_order_items].where(mr_purchase_order_id: po_id).all
       po_items.each do |item|
         DB[:mr_delivery_items].insert(
-          mr_delivery_id:            del_id,
+          mr_delivery_id: del_id,
           mr_purchase_order_item_id: item[:id],
-          mr_product_variant_id:     item[:mr_product_variant_id],
-          invoiced_unit_price:       item[:unit_price]
+          mr_product_variant_id: item[:mr_product_variant_id],
+          invoiced_unit_price: item[:unit_price]
         )
       end
       del_id
@@ -348,7 +348,7 @@ module PackMaterialApp
       pv_code, pv_number = pv.get(%i[product_variant_code product_variant_number])
       pv_number          = ConfigRepo.new.format_product_variant_number(pv_number)
       sku                = DB[:mr_skus].where(mr_delivery_item_batch_id: mr_delivery_item_batch_id,
-                                              mr_product_variant_id:     item.get(:mr_product_variant_id))
+                                              mr_product_variant_id: item.get(:mr_product_variant_id))
       sku_number         = sku.get(:sku_number)
       delivery_number    = DB[:mr_deliveries].where(id: item.get(:mr_delivery_id)).get(:delivery_number)
       no_of_prints       = batch.get(:quantity_received) - batch.get(:quantity_putaway)
@@ -573,9 +573,9 @@ module PackMaterialApp
       vat = del_total_vat(id, subtotal)
       {
         subtotal: UtilityFunctions.delimited_number(subtotal),
-        costs:    UtilityFunctions.delimited_number(costs),
-        vat:      UtilityFunctions.delimited_number(vat),
-        total:    UtilityFunctions.delimited_number(subtotal + costs + vat)
+        costs: UtilityFunctions.delimited_number(costs),
+        vat: UtilityFunctions.delimited_number(vat),
+        total: UtilityFunctions.delimited_number(subtotal + costs + vat)
       }
     end
 
@@ -616,29 +616,22 @@ module PackMaterialApp
 
     def over_under_supply(quantity_received, purchase_order_item_id)
       po_item              = DB[:mr_purchase_order_items].where(id: purchase_order_item_id).first
-      qty_required         = po_item[:quantity_required] || 0
+      qty_required         = po_item[:quantity_required] || AppConst::BIG_ZERO
       delivered_quantities = total_delivered_quantities(po_item[:id])
 
       total_received = delivered_quantities + BigDecimal(quantity_received)
-      amt            = BigDecimal(qty_required) - total_received
+      amt            = qty_required - total_received
       {
-        quantity_over_supply:  amt.negative? ? amt.abs : BigDecimal('0'),
-        quantity_under_supply: amt.positive? ? amt : BigDecimal('0')
+        quantity_over_supply: amt.negative? ? amt.abs : AppConst::BIG_ZERO,
+        quantity_under_supply: amt.positive? ? amt : AppConst::BIG_ZERO
       }
     end
 
     def total_delivered_quantities(purchase_order_item_id)
-      verified_delivery_ids = DB[:mr_deliveries].where(verified: true).select_map(:id)
-      qty_received          = DB[:mr_delivery_items].where(
-        mr_purchase_order_item_id: purchase_order_item_id,
-        mr_delivery_id:            verified_delivery_ids
-      ).select_map(:quantity_received).sum
-      BigDecimal(qty_received)
-    end
-
-    def update_mr_delivery_item(id, attrs)
-      new_attrs = add_over_under_supply_values(attrs.to_h)
-      update(:mr_delivery_items, id, new_attrs)
+      qty_received = DB[:mr_delivery_items].join(:mr_deliveries, id: :mr_delivery_id)
+                                           .where(mr_purchase_order_item_id: purchase_order_item_id, verified: true)
+                                           .sum(:quantity_received)
+      BigDecimal(qty_received || '0')
     end
 
     def create_mr_delivery_item(attrs)
@@ -646,6 +639,8 @@ module PackMaterialApp
       create(:mr_delivery_items, new_attrs)
     end
 
+    # @param [Hash] attrs
+    # Should only be updated if the delivery has not yet been verified
     def add_over_under_supply_values(attrs)
       quantities                      = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
       attrs[:quantity_over_supplied]  = quantities[:quantity_over_supply]

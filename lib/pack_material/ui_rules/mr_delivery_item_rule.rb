@@ -19,8 +19,8 @@ module UiRules
     def set_show_fields
       fields[:mr_product_variant_code] = { renderer: :label, with_value: product_variant_code, caption: 'Product Code' }
       fields[:quantity_on_note] = { renderer: :label }
-      fields[:quantity_over_supplied] = { renderer: :label }
-      fields[:quantity_under_supplied] = { renderer: :label }
+      fields[:quantity_over_supplied] = { renderer: :label, caption: 'PO Over Supplied' }
+      fields[:quantity_under_supplied] = { renderer: :label, caption: 'PO Under Supplied' }
       fields[:quantity_received] = { renderer: :label }
       fields[:invoiced_unit_price] = { renderer: :label }
       fields[:remarks] = { renderer: :label }
@@ -33,8 +33,8 @@ module UiRules
         mr_product_variant_id: { renderer: :hidden },
         product_variant_code: { renderer: :label, with_value: product_variant_code },
         quantity_on_note: { renderer: :numeric, required: true },
-        quantity_over_supplied: { renderer: :numeric },
-        quantity_under_supplied: { renderer: :numeric },
+        quantity_over_supplied: { renderer: :label, caption: 'PO Over Supplied' },
+        quantity_under_supplied: { renderer: :label, caption: 'PO Under Supplied' },
         quantity_received: { renderer: :numeric, required: true },
         invoiced_unit_price: { renderer: :numeric },
         remarks: {}

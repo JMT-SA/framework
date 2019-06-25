@@ -30,18 +30,21 @@ module PackMaterialApp
 
       def create?
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
+
         all_ok
       end
 
       def update?
         return failed_response 'Record not found' unless @entity
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
+
         all_ok
       end
 
       def destroy?
         return failed_response 'Record not found' unless @entity
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
+
         all_ok
       end
 

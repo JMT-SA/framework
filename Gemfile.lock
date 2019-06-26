@@ -15,14 +15,6 @@ GIT
       json
 
 GIT
-  remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: cb20d0eaf4a000747bc2c2f7ed2500f238e4758e
-  specs:
-    crossbeams-layout (0.2.2)
-      diffy
-      rouge
-
-GIT
   remote: https://github.com/NoSoft-SA/crossbeams-rack_middleware.git
   revision: 94793ab9dd34bd27ff0abe817fada99ee5c1b53a
   specs:
@@ -39,6 +31,13 @@ GIT
       crossbeams-dataminer
       crossbeams-layout
       roda
+
+PATH
+  remote: /home/james/ra/crossbeams/crossbeams-layout
+  specs:
+    crossbeams-layout (0.2.2)
+      diffy
+      rouge
 
 GEM
   remote: https://rubygems.org/

@@ -392,7 +392,9 @@ const crossbeamsUtils = {
     const select = elem.selectr;
     let nVal = '';
     let nText = '';
-    select.removeAll();
+    const newItems = [];
+    // select.clearChoices();
+    select.removeActiveItems();
     action.replace_options.options.forEach((item) => {
       if (item.constructor === Array) {
         nVal = (item[1] || item[0]);
@@ -401,12 +403,29 @@ const crossbeamsUtils = {
         nVal = item;
         nText = item;
       }
-      select.add({
+      newItems.push({
         value: nVal,
-        text: nText,
+        label: nText,
       });
     });
-    select.setPlaceholder();
+    select.setChoices(newItems, 'value', 'label', true);
+    // select.setPlaceholder();
+
+    // select.removeAll();
+    // action.replace_options.options.forEach((item) => {
+    //   if (item.constructor === Array) {
+    //     nVal = (item[1] || item[0]);
+    //     nText = item[0];
+    //   } else {
+    //     nVal = item;
+    //     nText = item;
+    //   }
+    //   select.add({
+    //     value: nVal,
+    //     text: nText,
+    //   });
+    // });
+    // select.setPlaceholder();
   },
 
   /**
@@ -759,15 +778,77 @@ const crossbeamsUtils = {
     let holdSel;
     let cls = 'cbl-input';
     let isRequired;
+    let searchableOpt;
     // HERE: make choices dropdown...
     sels.forEach((sel) => {
-      isRequired = sel.required;
-      cls = 'cbl-input';
-      if (isRequired) {
-        sel.required = false;
-        cls = 'cbl-input-required';
+      if (sel.selectr) {
+        // Selectr has already been applied...
+      } else {
+        isRequired = sel.required;
+        searchableOpt = sel.dataset.noSearch !== 'Y';
+        cls = 'cbl-input';
+        if (isRequired) {
+          sel.required = false;
+          cls = 'cbl-input-required';
+        }
+        holdSel = new Choices(sel, {
+          searchEnabled: searchableOpt,
+          removeItemButton: true,
+          classNames: {
+            containerOuter: `choices ${cls}`,
+          },
+          shouldSort: false,
+          searchFields: ['label'],
+          fuseOptions: {
+            include: 'score',
+            threshold: 0,
+          },
+        });
+        if (sel.diabled) {
+          holdSel.disable();
+        }
+
+        // changeValues behaviour - check if another element should be
+        // enabled/disabled based on the current selected value.
+        if (sel.dataset && sel.dataset.changeValues) {
+          sel.addEventListener('change', (event) => {
+            sel.dataset.changeValues.split(',').forEach((el) => {
+              const target = document.getElementById(el);
+              if (target && (target.dataset && target.dataset.enableOnValues)) {
+                const vals = target.dataset.enableOnValues;
+                if (_.includes(vals, event.detail.value)) {
+                  target.disabled = false;
+                } else {
+                  target.disabled = true;
+                }
+                if (target.selectr) {
+                  if (target.disabled) {
+                    target.selectr.disable();
+                  } else {
+                    target.selectr.enable();
+                  }
+                }
+              }
+            });
+          });
+        }
+
+        // observeChange behaviour - get rules from select element and
+        // call the supplied url(s).
+        if (sel.dataset && sel.dataset.observeChange) {
+          // holdSel.on('selectr.change', (option) => {
+          sel.addEventListener('change', (event) => {
+            const s = sel.dataset.observeChange;
+            const j = JSON.parse(s);
+            const urls = j.map(el => this.buildObserveChangeUrl(el, event.detail.value));
+
+            urls.forEach(url => this.fetchDropdownChanges(url));
+          });
+        }
+
+        sel.selectr = holdSel; // DO THIS???
       }
-      holdSel = new Choices(sel, { removeItemButton: true, classNames: { containerOuter: `choices ${cls}` } });
+
       // if (sel.selectr) {
       //   // Selectr has already been applied...
       // } else {

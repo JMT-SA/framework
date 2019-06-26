@@ -528,6 +528,11 @@ tr.roweven {
 }
 /* END  : Table row alternate background and hover background */
 
+/* Overides for Choices control */
+div.choices.cbl-input-required div.choices__inner {
+  border-right: thick solid orange;
+}
+
 /* Overides for SelectR control */
 .selectr-container {
   padding: 0;
@@ -535,7 +540,6 @@ tr.roweven {
 .selectr-input {
   width: calc(100% - 4em);
 }
-
 div.selectr-container.cbl-input-required div.selectr-selected {
   border-right: thick solid orange;
 }

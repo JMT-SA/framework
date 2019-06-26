@@ -757,68 +757,78 @@ const crossbeamsUtils = {
   makeSearchableSelects: function makeSearchableSelects() {
     const sels = document.querySelectorAll('.searchable-select');
     let holdSel;
+    let cls = 'cbl-input';
+    let isRequired;
+    // HERE: make choices dropdown...
     sels.forEach((sel) => {
-      if (sel.selectr) {
-        // Selectr has already been applied...
-      } else {
-        const isRequired = sel.required;
-        let cls = 'cbl-input';
-        if (isRequired) {
-          sel.required = false;
-          cls = 'cbl-input-required';
-        }
-        holdSel = new Selectr(sel, {
-          customClass: cls,
-          defaultSelected: true, // should configure via data...
-          // multiple: true,     // should configure via data...
-          allowDeselect: false,
-          clearable: true,       // should configure via data...
-          disabled: sel.disabled,
-          // Work around bug in SelectR (https://github.com/Mobius1/Selectr/issues/72):
-          // HOWEVER on mobile, clicking the select will launch the keyboard....
-          // nativeDropdown: false,
-          width: 'notset',       // stop Selectr from setting width to 100%
-        }); // select that can be searched.
-        // Store a reference on the DOM node.
-        sel.selectr = holdSel;
-
-        // changeValues behaviour - check if another element should be
-        // enabled/disabled based on the current selected value.
-        if (sel.dataset && sel.dataset.changeValues) {
-          holdSel.on('selectr.change', (option) => {
-            sel.dataset.changeValues.split(',').forEach((el) => {
-              const target = document.getElementById(el);
-              if (target && (target.dataset && target.dataset.enableOnValues)) {
-                const vals = target.dataset.enableOnValues;
-                if (_.includes(vals, option.value)) {
-                  target.disabled = false;
-                } else {
-                  target.disabled = true;
-                }
-                if (target.selectr) {
-                  if (target.disabled) {
-                    target.selectr.disable();
-                  } else {
-                    target.selectr.enable();
-                  }
-                }
-              }
-            });
-          });
-        }
-
-        // observeChange behaviour - get rules from select element and
-        // call the supplied url(s).
-        if (sel.dataset && sel.dataset.observeChange) {
-          holdSel.on('selectr.change', (option) => {
-            const s = sel.dataset.observeChange;
-            const j = JSON.parse(s);
-            const urls = j.map(el => this.buildObserveChangeUrl(el, option));
-
-            urls.forEach(url => this.fetchDropdownChanges(url));
-          });
-        }
+      isRequired = sel.required;
+      cls = 'cbl-input';
+      if (isRequired) {
+        sel.required = false;
+        cls = 'cbl-input-required';
       }
+      holdSel = new Choices(sel, { removeItemButton: true, classNames: { containerOuter: `choices ${cls}` } });
+      // if (sel.selectr) {
+      //   // Selectr has already been applied...
+      // } else {
+      //   const isRequired = sel.required;
+      //   let cls = 'cbl-input';
+      //   if (isRequired) {
+      //     sel.required = false;
+      //     cls = 'cbl-input-required';
+      //   }
+      //   holdSel = new Selectr(sel, {
+      //     customClass: cls,
+      //     defaultSelected: true, // should configure via data...
+      //     // multiple: true,     // should configure via data...
+      //     allowDeselect: false,
+      //     clearable: true,       // should configure via data...
+      //     disabled: sel.disabled,
+      //     // Work around bug in SelectR (https://github.com/Mobius1/Selectr/issues/72):
+      //     // HOWEVER on mobile, clicking the select will launch the keyboard....
+      //     // nativeDropdown: false,
+      //     width: 'notset',       // stop Selectr from setting width to 100%
+      //   }); // select that can be searched.
+      //   // Store a reference on the DOM node.
+      //   sel.selectr = holdSel;
+      //
+      //   // changeValues behaviour - check if another element should be
+      //   // enabled/disabled based on the current selected value.
+      //   if (sel.dataset && sel.dataset.changeValues) {
+      //     holdSel.on('selectr.change', (option) => {
+      //       sel.dataset.changeValues.split(',').forEach((el) => {
+      //         const target = document.getElementById(el);
+      //         if (target && (target.dataset && target.dataset.enableOnValues)) {
+      //           const vals = target.dataset.enableOnValues;
+      //           if (_.includes(vals, option.value)) {
+      //             target.disabled = false;
+      //           } else {
+      //             target.disabled = true;
+      //           }
+      //           if (target.selectr) {
+      //             if (target.disabled) {
+      //               target.selectr.disable();
+      //             } else {
+      //               target.selectr.enable();
+      //             }
+      //           }
+      //         }
+      //       });
+      //     });
+      //   }
+      //
+      //   // observeChange behaviour - get rules from select element and
+      //   // call the supplied url(s).
+      //   if (sel.dataset && sel.dataset.observeChange) {
+      //     holdSel.on('selectr.change', (option) => {
+      //       const s = sel.dataset.observeChange;
+      //       const j = JSON.parse(s);
+      //       const urls = j.map(el => this.buildObserveChangeUrl(el, option));
+      //
+      //       urls.forEach(url => this.fetchDropdownChanges(url));
+      //     });
+      //   }
+      // }
     });
   },
 

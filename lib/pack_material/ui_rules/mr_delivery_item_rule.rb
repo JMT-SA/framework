@@ -6,7 +6,7 @@ module UiRules
       @repo = PackMaterialApp::ReplenishRepo.new
       make_form_object
       apply_form_values
-      add_over_under_supply_values if @options && @options[:form_values]
+      add_over_under_supply_values if @options[:form_values]
 
       common_values_for_fields @mode == :preselect ? preselect_fields : common_fields
 
@@ -90,7 +90,7 @@ module UiRules
       hash_quantities = @repo.over_under_supply(@form_object.quantity_received, @form_object.mr_purchase_order_item_id)
 
       %i[quantity_over_supplied quantity_under_supplied].each do |k|
-        @form_object.public_send("#{k}=", hash_quantities[k])
+        @form_object[k] = hash_quantities[k]
       end
     end
 

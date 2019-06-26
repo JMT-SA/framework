@@ -82,9 +82,9 @@ class TestBaseRepo < MiniTestWithHooks
     assert y.id == id
 
     x = assert_raises(RuntimeError) {
-      BaseRepo.new.find!(:users, DevelopmentApp::User, 20)
+      BaseRepo.new.find!(:users, DevelopmentApp::User, 299999)
     }
-    assert_equal 'users: id 20 not found.', x.message
+    assert_equal 'users: id 299999 not found.', x.message
   end
 
   def test_where

@@ -12,7 +12,7 @@ module SecurityApp
     # @param table [Symbol] a table name. Can be :functional_areas, :programs or :program_functions.
     # @return [String] The SQL script.
     def sql_for(table, id)
-      if respond_to?(table)
+      if private_methods.include?(table)
         send(table, id)
       else
         @columns = Hash[dev_repo.table_columns(table)]

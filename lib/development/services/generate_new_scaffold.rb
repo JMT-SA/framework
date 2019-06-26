@@ -1457,7 +1457,7 @@ module DevelopmentApp
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
                 class New
-                  def self.call(#{needs_id}form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+                  def self.call(#{needs_id}form_values: nil, form_errors: nil, remote: true)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :new, form_values: form_values)
                     rules   = ui_rule.compile
 
@@ -1490,7 +1490,7 @@ module DevelopmentApp
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
                 class Edit
-                  def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+                  def self.call(id, form_values: nil, form_errors: nil)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :edit, id: id, form_values: form_values)
                     rules   = ui_rule.compile
 

@@ -6,6 +6,7 @@ module UiRules
       @repo = PackMaterialApp::ReplenishRepo.new
       make_form_object
       apply_form_values
+      add_over_under_supply_values if @options && @options[:form_values]
 
       common_values_for_fields @mode == :preselect ? preselect_fields : common_fields
 
@@ -73,15 +74,24 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(mr_delivery_id:            @options[:parent_id],
+      @form_object = OpenStruct.new(mr_delivery_id: @options[:parent_id],
                                     mr_purchase_order_item_id: @options[:item_id],
-                                    mr_product_variant_id:     product_variant_id,
-                                    quantity_on_note:          nil,
-                                    quantity_over_supplied:    nil,
-                                    quantity_under_supplied:   nil,
-                                    quantity_received:         nil,
-                                    invoiced_unit_price:       unit_price,
-                                    remarks:                   nil)
+                                    mr_product_variant_id: product_variant_id,
+                                    quantity_on_note: nil,
+                                    quantity_over_supplied: nil,
+                                    quantity_under_supplied: nil,
+                                    quantity_received: nil,
+                                    invoiced_unit_price: unit_price,
+                                    remarks: nil)
+    end
+
+    def add_over_under_supply_values
+      @form_object = OpenStruct.new(@form_object)
+      hash_quantities = @repo.over_under_supply(@form_object.quantity_received, @form_object.mr_purchase_order_item_id)
+
+      %i[quantity_over_supplied quantity_under_supplied].each do |k|
+        @form_object.public_send("#{k}=", hash_quantities[k])
+      end
     end
 
     def product_variant_code

@@ -7,7 +7,9 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { LOGSQLTOFILE: 'Dev mode: separate SQL calls out of logs and write to file "log/sql.log"' },
     { LOGFULLMESSERVERCALLS: 'Dev mode: Log full payload of HTTP calls to MesServer. Only do this if debugging.' },
     { RUN_FOR_RMD: 'Dev mode: Force the server to act as if it is being called from a Registered Mobile Device' },
-    { NO_ERR_HANDLE: 'Dev mode: Do not use the error handling built into the framework. Can be useful to debug without mail sending in the output.' }
+    { NO_ERR_HANDLE: 'Dev mode: Do not use the error handling built into the framework. Can be useful to debug without mail sending in the output.' },
+    { PO_ACCOUNT_CODE: 'Purchase Order Account Code Default value for new PO.' },
+    { PO_FIN_OBJECT_CODE: 'Purchase Order Finance Object Code Default value for new PO.' }
   ].freeze
 
   NO_OVERRIDE = [

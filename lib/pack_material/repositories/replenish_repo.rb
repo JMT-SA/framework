@@ -182,22 +182,22 @@ module PackMaterialApp
     end
 
     def po_total_items(id)
-      DB['SELECT SUM(quantity_required * unit_price) AS total FROM mr_purchase_order_items WHERE mr_purchase_order_id = ?', id].single_value || BigDecimal('0')
+      DB['SELECT SUM(quantity_required * unit_price) AS total FROM mr_purchase_order_items WHERE mr_purchase_order_id = ?', id].single_value || AppConst::BIG_ZERO
     end
 
     def po_total_costs(id)
-      DB[:mr_purchase_order_costs].where(mr_purchase_order_id: id).sum(:amount) || BigDecimal('0')
+      DB[:mr_purchase_order_costs].where(mr_purchase_order_id: id).sum(:amount) || AppConst::BIG_ZERO
     end
 
     def po_total_vat(id, subtotal)
-      return BigDecimal('0') if subtotal.zero?
+      return AppConst::BIG_ZERO if subtotal.zero?
 
       factor = po_vat_factor(id)
       subtotal * factor
     end
 
     def po_vat_factor(po_id)
-      DB['SELECT percentage_applicable / 100.0 AS vat_factor FROM mr_vat_types WHERE id = (SELECT mr_vat_type_id FROM mr_purchase_orders WHERE id = ?)', po_id].single_value || BigDecimal('0')
+      DB['SELECT percentage_applicable / 100.0 AS vat_factor FROM mr_vat_types WHERE id = (SELECT mr_vat_type_id FROM mr_purchase_orders WHERE id = ?)', po_id].single_value || AppConst::BIG_ZERO
     end
 
     def mr_purchase_order_items(mr_purchase_order_id)
@@ -580,11 +580,11 @@ module PackMaterialApp
     end
 
     def del_total_items(id)
-      DB['SELECT SUM(quantity_received * invoiced_unit_price) AS total FROM mr_delivery_items WHERE mr_delivery_id = ?', id].single_value || BigDecimal('0')
+      DB['SELECT SUM(quantity_received * invoiced_unit_price) AS total FROM mr_delivery_items WHERE mr_delivery_id = ?', id].single_value || AppConst::BIG_ZERO
     end
 
     def del_total_vat(id, subtotal)
-      return BigDecimal('0') if subtotal.zero?
+      return AppConst::BIG_ZERO if subtotal.zero?
 
       # We take the first Purchase Order we can find for the VAT factor
       po_item_id = DB[:mr_delivery_items].where(mr_delivery_id: id).get(:mr_purchase_order_item_id)
@@ -594,7 +594,7 @@ module PackMaterialApp
     end
 
     def del_total_costs(id)
-      DB[:mr_purchase_invoice_costs].where(mr_delivery_id: id).sum(:amount) || BigDecimal('0')
+      DB[:mr_purchase_invoice_costs].where(mr_delivery_id: id).sum(:amount) || AppConst::BIG_ZERO
     end
 
     def update_current_prices(delivery_id)
@@ -622,8 +622,8 @@ module PackMaterialApp
       total_received = delivered_quantities + BigDecimal(quantity_received)
       amt            = qty_required - total_received
       {
-        quantity_over_supply: amt.negative? ? amt.abs : AppConst::BIG_ZERO,
-        quantity_under_supply: amt.positive? ? amt : AppConst::BIG_ZERO
+        quantity_over_supplied: amt.negative? ? amt.abs : AppConst::BIG_ZERO,
+        quantity_under_supplied: amt.positive? ? amt : AppConst::BIG_ZERO
       }
     end
 
@@ -643,8 +643,8 @@ module PackMaterialApp
     # Should only be updated if the delivery has not yet been verified
     def add_over_under_supply_values(attrs)
       quantities                      = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
-      attrs[:quantity_over_supplied]  = quantities[:quantity_over_supply]
-      attrs[:quantity_under_supplied] = quantities[:quantity_under_supply]
+      attrs[:quantity_over_supplied]  = quantities[:quantity_over_supplied]
+      attrs[:quantity_under_supplied] = quantities[:quantity_under_supplied]
       attrs
     end
   end

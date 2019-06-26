@@ -379,8 +379,8 @@ class Framework < Roda
         r.on 'quantity_received_changed' do
           qty_received = params[:changed_value].empty? ? nil : params[:changed_value]
           quantities   = qty_received ? item_interactor.over_under_supply(qty_received, params[:mr_delivery_item_mr_purchase_order_item_id]) : {}
-          json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_inner_html, value: quantities[:quantity_over_supply].to_f),
-                        OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_inner_html, value: quantities[:quantity_under_supply].to_f)])
+          json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_inner_html, value: quantities[:quantity_over_supplied].to_f),
+                        OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_inner_html, value: quantities[:quantity_under_supplied].to_f)])
         end
         r.on 'purchase_order_changed' do
           po_id = params[:changed_value].empty? ? nil : params[:changed_value]
@@ -415,6 +415,7 @@ class Framework < Roda
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new") do
               PackMaterial::Replenish::MrDeliveryItem::New.call(id,
+                                                                params[:mr_delivery_item][:mr_purchase_order_item_id],
                                                                 form_values: params[:mr_delivery_item],
                                                                 form_errors: res.errors,
                                                                 remote: fetch?(r))
@@ -596,7 +597,11 @@ class Framework < Roda
           if res.success
             redirect_via_json_to_stored_referer(:delivery_items)
           else
-            re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryItem::Edit.call(id, form_values: params[:mr_delivery_item], form_errors: res.errors) }
+            re_show_form(r, res) {
+              PackMaterial::Replenish::MrDeliveryItem::Edit.call(id,
+                                                                 form_values: params[:mr_delivery_item],
+                                                                 form_errors: res.errors)
+            }
           end
         end
         r.delete do    # DELETE

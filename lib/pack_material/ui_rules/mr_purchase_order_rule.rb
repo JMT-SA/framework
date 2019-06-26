@@ -122,16 +122,16 @@ module UiRules
 
     def make_new_form_object
       sup = supplier
-      @form_object = OpenStruct.new(supplier_id:            sup.id,
-                                    supplier_name:          sup.party_name,
-                                    supplier_erp_number:    sup.erp_supplier_number,
-                                    mr_delivery_term_id:    nil,
+      @form_object = OpenStruct.new(supplier_id: sup.id,
+                                    supplier_name: sup.party_name,
+                                    supplier_erp_number: sup.erp_supplier_number,
+                                    mr_delivery_term_id: nil,
                                     supplier_party_role_id: sup.party_role_id,
-                                    mr_vat_type_id:         nil,
-                                    delivery_address_id:    nil,
-                                    purchase_account_code:  77_000,
-                                    fin_object_code:        'PML',
-                                    valid_until:            UtilityFunctions.weeks_since(Time.now, 1))
+                                    mr_vat_type_id: nil,
+                                    delivery_address_id: nil,
+                                    purchase_account_code: AppConst::PO_ACCOUNT_CODE,
+                                    fin_object_code: AppConst::PO_FIN_OBJECT_CODE,
+                                    valid_until: UtilityFunctions.weeks_since(Time.now, 1))
     end
 
     def supplier

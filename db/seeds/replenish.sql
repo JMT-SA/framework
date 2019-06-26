@@ -64,12 +64,3 @@ INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('REMOVE STOCK');
 INSERT INTO business_processes (process) VALUES ('DELIVERIES');
 INSERT INTO business_processes (process) VALUES ('VEHICLE JOBS');
 INSERT INTO business_processes (process) VALUES ('ADHOC TRANSACTIONS');
-
-
--- MR Cost Types
-
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
-                                       AND functional_area_id = (SELECT id FROM functional_areas
-WHERE functional_area_name = 'Pack Material')),
-        'Cost Types', '/list/mr_cost_types', 2);

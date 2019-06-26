@@ -14,9 +14,9 @@ module PackMaterial
               form.view_only!
               form.add_field :mr_product_variant_code
               form.add_field :quantity_on_note
+              form.add_field :quantity_received
               form.add_field :quantity_over_supplied
               form.add_field :quantity_under_supplied
-              form.add_field :quantity_received
               form.add_field :invoiced_unit_price
               form.add_field :remarks
             end

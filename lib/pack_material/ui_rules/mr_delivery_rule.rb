@@ -32,17 +32,17 @@ module UiRules
     def show_fields
       receiving_bay_label = @locations_repo.find_location(@form_object.receipt_location_id)&.location_long_code
       {
-        status:                      { renderer: :label },
-        transporter:                 { renderer: :label },
-        transporter_party_role_id:   { renderer: :hidden },
-        receipt_location_id:         { renderer: :label, with_value: receiving_bay_label, caption: 'Receiving Bay' },
-        driver_name:                 { renderer: :label },
-        client_delivery_ref_number:  { renderer: :label },
-        delivery_number:             { renderer: :label },
-        vehicle_registration:        { renderer: :label },
+        status: { renderer: :label },
+        transporter: { renderer: :label },
+        transporter_party_role_id: { renderer: :hidden },
+        receipt_location_id: { renderer: :label, with_value: receiving_bay_label, caption: 'Receiving Bay' },
+        driver_name: { renderer: :label },
+        client_delivery_ref_number: { renderer: :label },
+        delivery_number: { renderer: :label },
+        vehicle_registration: { renderer: :label },
         supplier_invoice_ref_number: { renderer: :label },
-        supplier_invoice_date:       { renderer: :label },
-        purchase_order_numbers:      { renderer: :label, with_value: purchase_order_numbers }
+        supplier_invoice_date: { renderer: :label },
+        purchase_order_numbers: { renderer: :label, with_value: purchase_order_numbers }
       }
     end
 
@@ -50,8 +50,9 @@ module UiRules
       common_fields.merge(
         mr_purchase_order_id: {
           renderer: :select,
-          options:  @repo.for_select_purchase_orders_with_supplier,
-          caption:  'Purchase Order'
+          prompt: true,
+          options: @repo.for_select_purchase_orders_with_supplier,
+          caption: 'Purchase Order'
         }
       )
     end
@@ -78,15 +79,15 @@ module UiRules
     def invoice_fields
       {
         supplier_invoice_ref_number: { required: true, with_value: @form_object.supplier_invoice_ref_number },
-        supplier_invoice_date:       { subtype: :date, required: true }
+        supplier_invoice_date: { subtype: :date, required: true }
       }
     end
 
     def show_invoice_fields
       {
         supplier_invoice_ref_number: { renderer: :label },
-        supplier_invoice_date:       { renderer: :label },
-        erp_purchase_order_number:   { renderer: :label },
+        supplier_invoice_date: { renderer: :label },
+        erp_purchase_order_number: { renderer: :label },
         erp_purchase_invoice_number: { renderer: :label }
       }
     end
@@ -110,10 +111,10 @@ module UiRules
     def make_new_invoice_form_object
       delivery     = @repo.find_mr_delivery(@options[:id])
       @form_object = if delivery.supplier_invoice_ref_number.nil?
-        OpenStruct.new(supplier_invoice_ref_number:          nil,
+                       OpenStruct.new(supplier_invoice_ref_number: nil,
                                       supplier_invoice_date: UtilityFunctions.weeks_since(Time.now, 1))
-      else
-        delivery
+                     else
+                       delivery
       end
     end
 

@@ -1,7 +1,6 @@
 ---
 :caption: Cost Types
-:sql: SELECT "mr_cost_types"."id", "mr_cost_types"."cost_type_code", fn_current_status('mr_cost_types',
-  "mr_cost_types"."id") AS status FROM "mr_cost_types"
+:sql: SELECT "mr_cost_types"."id", "mr_cost_types"."cost_type_code" FROM "mr_cost_types"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -33,22 +32,6 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 3
-    :caption: Status
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

@@ -41,7 +41,7 @@
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -57,7 +57,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -169,7 +169,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -185,7 +185,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -194,11 +194,11 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-  - :column: mr_purchase_orders.id
-    :caption: purchase_order_id
-    :data_type: :integer
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
+- :column: mr_purchase_orders.id
+  :caption: purchase_order_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

@@ -20,6 +20,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -35,6 +36,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -50,6 +52,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -65,6 +68,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -74,12 +78,13 @@
   quantity_on_note:
     :name: quantity_on_note
     :sequence_no: 5
-    :caption: Quantity on note
+    :caption: Qty on note
     :namespaced_name: mr_delivery_item_batches.quantity_on_note
     :data_type: :number
     :width: 
     :format: :delimited_1000
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -89,12 +94,13 @@
   quantity_received:
     :name: quantity_received
     :sequence_no: 6
-    :caption: Quantity received
+    :caption: Qty received
     :namespaced_name: mr_delivery_item_batches.quantity_received
     :data_type: :number
     :width: 
     :format: :delimited_1000
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -110,6 +116,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -125,6 +132,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -140,6 +148,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -155,6 +164,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false

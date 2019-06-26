@@ -399,7 +399,7 @@
   batch_quantity_on_note:
     :name: batch_quantity_on_note
     :sequence_no: 24
-    :caption: Batch quantity on note
+    :caption: Batch qty on note
     :namespaced_name: mr_delivery_item_batches.quantity_on_note
     :data_type: :string
     :width: 
@@ -415,7 +415,7 @@
   batch_quantity_received:
     :name: batch_quantity_received
     :sequence_no: 25
-    :caption: Batch quantity received
+    :caption: Batch qty received
     :namespaced_name: mr_delivery_item_batches.quantity_received
     :data_type: :string
     :width: 

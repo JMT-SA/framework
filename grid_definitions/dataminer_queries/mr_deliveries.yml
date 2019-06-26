@@ -2,21 +2,22 @@
 :caption: Deliveries
 :sql: "SELECT mr_deliveries.id as id,\r\n       fn_current_status('mr_deliveries',
   id) AS status,\r\n       (SELECT string_agg(purchase_order_number::text, '; ')\r\n
-  \      FROM (SELECT mr_purchase_orders.purchase_order_number\r\n        from mr_purchase_orders\r\n
-  \        JOIN mr_delivery_items mdi on mr_deliveries.id = mdi.mr_delivery_id\r\n
-  \        JOIN mr_purchase_order_items on mdi.mr_purchase_order_item_id = mr_purchase_order_items.id\r\n
-  \        WHERE mr_purchase_orders.id = mr_purchase_order_items.mr_purchase_order_id)
-  sub) as po_nos,\r\n       mr_deliveries.delivery_number,\r\n       mr_deliveries.verified,\r\n
-  \      mr_deliveries.invoice_completed,\r\n       mr_deliveries.putaway_completed,\r\n
-  \      mr_deliveries.receipt_transaction_id,\r\n       mr_deliveries.putaway_transaction_id,\r\n
-  \      mr_deliveries.transporter_party_role_id,\r\n       fn_party_role_name(mr_deliveries.transporter_party_role_id)
-  AS transporter,\r\n       mr_deliveries.client_delivery_ref_number,\r\n       mr_deliveries.driver_name,\r\n
+  \       FROM (SELECT DISTINCT mr_purchase_orders.purchase_order_number\r\n              from
+  mr_purchase_orders\r\n                       JOIN mr_delivery_items mdi on mr_deliveries.id
+  = mdi.mr_delivery_id\r\n                       JOIN mr_purchase_order_items on mdi.mr_purchase_order_item_id
+  = mr_purchase_order_items.id\r\n              WHERE mr_purchase_orders.id = mr_purchase_order_items.mr_purchase_order_id\r\n
+  \           ORDER BY mr_purchase_orders.purchase_order_number) sub) as po_nos,\r\n
+  \      mr_deliveries.delivery_number,\r\n       mr_deliveries.verified,\r\n       mr_deliveries.invoice_completed,\r\n
+  \      mr_deliveries.putaway_completed,\r\n       mr_deliveries.receipt_transaction_id,\r\n
+  \      mr_deliveries.putaway_transaction_id,\r\n       mr_deliveries.transporter_party_role_id,\r\n
+  \      fn_party_role_name(mr_deliveries.transporter_party_role_id) AS transporter,\r\n
+  \      mr_deliveries.client_delivery_ref_number,\r\n       mr_deliveries.driver_name,\r\n
   \      mr_deliveries.vehicle_registration,\r\n       mr_deliveries.supplier_invoice_ref_number,\r\n
   \      mr_deliveries.erp_purchase_order_number,\r\n       mr_deliveries.erp_purchase_invoice_number,\r\n
   \      mr_deliveries.created_at,\r\n       mr_deliveries.updated_at,\r\n       case\r\n
-  \       when mr_deliveries.invoice_error then 'error'\r\n        when (mr_deliveries.verified\r\n
-  \       and not mr_deliveries.putaway_completed) then 'inprogress'\r\n        else
-  null\r\n        end as colour_rule\r\n    FROM mr_deliveries\r\n    ORDER BY mr_deliveries.delivery_number
+  \          when mr_deliveries.invoice_error then 'error'\r\n           when (mr_deliveries.verified\r\n
+  \              and not mr_deliveries.putaway_completed) then 'inprogress'\r\n           else
+  null\r\n           end as colour_rule\r\nFROM mr_deliveries\r\nORDER BY mr_deliveries.delivery_number
   desc"
 :limit: 
 :offset: 
@@ -58,14 +59,14 @@
     :name: po_nos
     :sequence_no: 3
     :caption: PO nos
-    :namespaced_name:
+    :namespaced_name: 
     :data_type: :string
     :width: 80
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -257,7 +258,7 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -268,12 +269,12 @@
     :caption: Erp purchase order number
     :namespaced_name: mr_deliveries.erp_purchase_order_number
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -284,12 +285,12 @@
     :caption: Erp purchase invoice number
     :namespaced_name: mr_deliveries.erp_purchase_invoice_number
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class TestReplenishRepo < MiniTestWithHooks
     include PmProductFactory
@@ -153,7 +150,7 @@ module PackMaterialApp
         mr_purchase_order_id: po,
         mr_product_variant_id: pv2[:id]
       )
-      item_id = DB[:mr_delivery_items].insert(
+      DB[:mr_delivery_items].insert(
         mr_delivery_id: mr_delivery_id,
         mr_product_variant_id: pv2[:id],
         mr_purchase_order_item_id: po_item_id,
@@ -205,13 +202,13 @@ module PackMaterialApp
         quantity_received: 15,
         quantity_putaway: 10
       )
-      batch_one_id = DB[:mr_delivery_item_batches].insert(
+      DB[:mr_delivery_item_batches].insert(
         mr_delivery_item_id: item1_id,
         client_batch_number: 'one',
         quantity_on_note: 5,
         quantity_putaway: 5
       )
-      batch_two_id = DB[:mr_delivery_item_batches].insert(
+      DB[:mr_delivery_item_batches].insert(
         mr_delivery_item_id: item1_id,
         client_batch_number: 'two',
         quantity_on_note: 10,
@@ -258,5 +255,3 @@ module PackMaterialApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

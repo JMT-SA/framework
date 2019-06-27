@@ -4,6 +4,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module PackMaterialApp
   class TestCreateDeliverySKUS < Minitest::Test
+    include Crossbeams::Responses
     def test_initialize
       service = PackMaterialApp::CreateDeliverySKUS.new(1, 'User Name')
 
@@ -19,6 +20,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:resolve_business_process_id).returns(5)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:find_mr_delivery).returns(object)
       PackMaterialApp::CreateMrStock.any_instance.stubs(:call).returns('Stubbed call to CreateMrStock')
+      TaskPermissionCheck::MrDelivery.any_instance.stubs(:call).returns(ok_response)
       service = PackMaterialApp::CreateDeliverySKUS.call(1, 'User Name')
 
       assert_equal 'Stubbed call to CreateMrStock', service

@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class TestCreateMrStock < MiniTestInteractors
     def test_initialize
@@ -59,9 +56,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:transaction_type_id_for).returns(1)
 
-      assert_raises(Sequel::ForeignKeyConstraintViolation) {
-        CreateMrStock.call([1, 2, 3], 7, options)
-      }
+      assert_raises(Sequel::ForeignKeyConstraintViolation) { CreateMrStock.call([1, 2, 3], 7, options) }
     end
 
     def test_delivery_id
@@ -91,9 +86,7 @@ module PackMaterialApp
       second_mocked_method.expect :update_delivery_receipt_id, ok_response, []
       second_mocked_method.expect :get_delivery_sku_quantities, ok_response, []
       CreateMrStock.call([1, 2, 3], 7, options)
-      assert_raises(MockExpectationError) {
-        second_mocked_method.verify
-      }
+      assert_raises(MockExpectationError) { second_mocked_method.verify }
     end
 
     def test_add_sku_location_quantities_fail

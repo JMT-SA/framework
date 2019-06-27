@@ -15,7 +15,7 @@ module UiRules
       form_name 'mr_bulk_stock_adjustment_item'
     end
 
-    def set_show_fields
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:mr_bulk_stock_adjustment_id] = { renderer: :hidden }
       fields[:mr_sku_location_id] = { renderer: :hidden }
       fields[:sku_number] = { renderer: :label }

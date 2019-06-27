@@ -15,7 +15,7 @@ module PackMaterialApp
         @opts   = opts
       end
 
-      def call
+      def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
         return failed_response 'Record not found' unless @entity || task == :create
 
         case task

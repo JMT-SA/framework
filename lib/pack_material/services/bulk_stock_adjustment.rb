@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class BulkStockAdjustmentService < BaseService
     # @param [Integer] bulk_stock_adjustment_id

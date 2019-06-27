@@ -17,6 +17,7 @@ module PackMaterialApp
     def create_mr_cost_type(params)
       res = validate_mr_cost_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_mr_cost_type(res)
@@ -35,6 +36,7 @@ module PackMaterialApp
     def update_mr_cost_type(id, params)
       res = validate_mr_cost_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_mr_cost_type(id, res)
         log_transaction

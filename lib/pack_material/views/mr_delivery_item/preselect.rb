@@ -4,7 +4,7 @@ module PackMaterial
   module Replenish
     module MrDeliveryItem
       class Preselect
-        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true, purchase_order_id: nil)
+        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true, purchase_order_id: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:mr_delivery_item, :preselect, parent_id: parent_id, purchase_order_id: purchase_order_id, form_values: form_values)
           rules   = ui_rule.compile
 

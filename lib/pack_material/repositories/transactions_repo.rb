@@ -66,6 +66,7 @@ module PackMaterialApp
     def create_mr_sku_location(attrs)
       stock_location = DB[:locations].where(id: attrs[:location_id]).get(:can_store_stock)
       return failed_response('Location can not store stock') unless stock_location
+
       create(:mr_sku_locations, attrs)
     end
 
@@ -239,6 +240,7 @@ module PackMaterialApp
                                                        mr_sku_id: attrs[:mr_sku_id],
                                                        location_id: attrs[:location_id])
       return failed_response('Item does not exist') unless item.first
+
       item.update(actual_quantity: attrs[:actual_quantity])
       success_response('ok', item.get(:id))
     end

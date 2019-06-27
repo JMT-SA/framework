@@ -14,16 +14,16 @@ module PackMaterialApp
       end
 
       CHECKS = {
-        create:       :create_check,
-        edit:         :edit_check,
+        create: :create_check,
+        edit: :edit_check,
         adjust_stock: :edit_header_check,
-        edit_header:  :edit_header_check,
-        delete:       :delete_check,
-        complete:     :complete_check,
-        approve:      :approve_check,
-        reopen:       :reopen_check,
-        decline:      :decline_check,
-        sign_off:     :sign_off_check
+        edit_header: :edit_header_check,
+        delete: :delete_check,
+        complete: :complete_check,
+        approve: :approve_check,
+        reopen: :reopen_check,
+        decline: :decline_check,
+        sign_off: :sign_off_check
       }.freeze
 
       def call

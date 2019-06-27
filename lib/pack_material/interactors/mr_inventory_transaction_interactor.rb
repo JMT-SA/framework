@@ -2,20 +2,19 @@
 
 module PackMaterialApp
   class MrInventoryTransactionInteractor < BaseInteractor
-
     def create_adhoc_stock_transaction(sku_location_id, params, type) # rubocop:disable Metrics/AbcSize
       res = validate_adhoc_transaction_params(sku_location_id, params)
       return validation_failed_response(res) if res[:messages]
 
       can_action = TaskPermissionCheck::MrInventoryTransaction.call(type.to_sym,
-                                                                    sku_ids:     res[:sku_ids],
-                                                                    loc_id:      res[:location_id],
+                                                                    sku_ids: res[:sku_ids],
+                                                                    loc_id: res[:location_id],
                                                                     move_loc_id: res[:to_location_id])
       if can_action.success
         repo.transaction do
           opts = {
-            'add'    => { call: ->(attrs) { adhoc_add_stock(attrs) }, message: 'Stock Added for SKU Number: %s' },
-            'move'   => { call: ->(attrs) { adhoc_move_stock(attrs) }, message: 'Stock Moved for SKU Number: %s' },
+            'add' => { call: ->(attrs) { adhoc_add_stock(attrs) }, message: 'Stock Added for SKU Number: %s' },
+            'move' => { call: ->(attrs) { adhoc_move_stock(attrs) }, message: 'Stock Moved for SKU Number: %s' },
             'remove' => { call: ->(attrs) { adhoc_remove_stock(attrs) }, message: 'Stock Removed for SKU Number: %s' }
           }
           resp = opts[type][:call]&.call(res)
@@ -43,7 +42,6 @@ module PackMaterialApp
 
       instance = mr_inventory_transaction(id)
       success_response("Created inventory transaction #{instance.created_by}", instance)
-
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { created_by: ['This inventory transaction already exists'] }))
     end
@@ -99,9 +97,9 @@ module PackMaterialApp
 
       attrs = {
         location_id: loc_id,
-        sku_ids:     sku_ids,
-        user_name:   @user.user_name,
-        quantity:    params[:quantity].to_f
+        sku_ids: sku_ids,
+        user_name: @user.user_name,
+        quantity: params[:quantity].to_f
       }
       params.merge(attrs)
     end

@@ -4,7 +4,7 @@ module PackMaterial
   module Replenish
     module MrDeliveryItemBatch
       class New
-        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:mr_delivery_item_batch, :new, parent_id: parent_id, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -4,7 +4,7 @@ module PackMaterial
   module Replenish
     module MrPurchaseInvoiceCost
       class New
-        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:mr_purchase_invoice_cost, :new, parent_id: parent_id, form_values: form_values)
           rules   = ui_rule.compile
 

@@ -15,8 +15,10 @@ module UiRules
     end
 
     def common_fields
-      unless @form_object.chosen_column_ids.nil?
+      if !@form_object.chosen_column_ids.nil?
         options, var_options = @repo.product_code_column_options(@options[:id], @form_object.product_code_column_ids)
+      else
+        options = var_options = []
       end
       {
         chosen_column_ids: { renderer: :hidden },

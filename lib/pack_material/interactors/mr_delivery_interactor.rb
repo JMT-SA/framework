@@ -40,7 +40,7 @@ module PackMaterialApp
       end
     end
 
-    def update_mr_delivery_purchase_invoice(id, params)
+    def update_mr_delivery_purchase_invoice(id, params) # rubocop:disable Metrics/AbcSize
       add_invoice = TaskPermissionCheck::MrDelivery.call(:add_invoice, id)
       if add_invoice.success
         res = validate_mr_delivery_purchase_invoice_params(params)
@@ -109,7 +109,7 @@ module PackMaterialApp
       end
     end
 
-    def putaway_delivery(attrs)
+    def putaway_delivery(attrs) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, Metrics/AbcSize
       delivery_id = repo.delivery_id_from_number(attrs[:delivery_number])
       can_putaway = TaskPermissionCheck::MrDelivery.call(:putaway, delivery_id)
       if can_putaway.success

@@ -3,17 +3,17 @@
 module PackMaterial
   module Replenish
     module MrDelivery
-      class Edit
+      class Edit # rubocop:disable Metrics/ClassLength
         def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
 
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.add_control(control_type: :link,
                                   text: 'Back to Deliveries',
                                   url: '/list/mr_deliveries',
@@ -90,7 +90,7 @@ module PackMaterial
                                   style: :button)
             end
 
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.show_border!
               unless rules[:is_verified]
                 section.add_control(control_type: :link,

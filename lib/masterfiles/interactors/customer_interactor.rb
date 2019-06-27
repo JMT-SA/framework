@@ -8,6 +8,7 @@ module MasterfilesApp
     def create_customer(params)
       res = validate_new_customer_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       result = nil
       DB.transaction do
         result = repo.create_customer(res)
@@ -26,6 +27,7 @@ module MasterfilesApp
     def update_customer(id, params)
       res = validate_edit_customer_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       result = nil
       DB.transaction do
         result = repo.update_customer(id, res)

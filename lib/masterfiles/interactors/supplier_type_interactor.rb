@@ -5,6 +5,7 @@ module MasterfilesApp
     def create_supplier_type(params)
       res = validate_supplier_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       DB.transaction do
         id = repo.create_supplier_type(res)
@@ -18,6 +19,7 @@ module MasterfilesApp
     def update_supplier_type(id, params)
       res = validate_supplier_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       DB.transaction do
         repo.update_supplier_type(id, res)
       end

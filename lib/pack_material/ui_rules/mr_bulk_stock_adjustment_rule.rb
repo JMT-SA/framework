@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class MrBulkStockAdjustmentRule < Base
+  class MrBulkStockAdjustmentRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo       = PackMaterialApp::TransactionsRepo.new
       @stock_repo = PackMaterialApp::MrStockRepo.new
@@ -35,51 +35,51 @@ module UiRules
     def show_fields
       {
         stock_adjustment_number: { renderer: :label },
-        ref_no:                  { renderer: :label },
-        is_stock_take:           { renderer: :label, as_boolean: true },
-        completed:               { renderer: :label, as_boolean: true },
-        approved:                { renderer: :label, as_boolean: true },
-        signed_off:              { renderer: :label, as_boolean: true },
+        ref_no: { renderer: :label },
+        is_stock_take: { renderer: :label, as_boolean: true },
+        completed: { renderer: :label, as_boolean: true },
+        approved: { renderer: :label, as_boolean: true },
+        signed_off: { renderer: :label, as_boolean: true }
       }
     end
 
     def edit_fields
       {
         stock_adjustment_number: { renderer: :label },
-        ref_no:                  { renderer: :label },
-        is_stock_take:           { renderer: :label, as_boolean: true },
-        completed:               { renderer: :label, as_boolean: true },
-        approved:                { renderer: :label, as_boolean: true },
-        signed_off:              { renderer: :label, as_boolean: true },
+        ref_no: { renderer: :label },
+        is_stock_take: { renderer: :label, as_boolean: true },
+        completed: { renderer: :label, as_boolean: true },
+        approved: { renderer: :label, as_boolean: true },
+        signed_off: { renderer: :label, as_boolean: true }
       }
     end
 
     def header_fields
       {
-        create_transaction_id:   { renderer: :label, caption: 'Create Transaction' },
-        destroy_transaction_id:  { renderer: :label, caption: 'Destroy Transaction' },
+        create_transaction_id: { renderer: :label, caption: 'Create Transaction' },
+        destroy_transaction_id: { renderer: :label, caption: 'Destroy Transaction' },
         stock_adjustment_number: { renderer: :label },
-        is_stock_take:           { renderer: :checkbox },
-        completed:               { renderer: :hidden },
-        approved:                { renderer: :hidden },
-        signed_off:              { renderer: :hidden },
-        business_process_id:     { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
-        ref_no:                  { required: true },
-        sku_numbers_list:        { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
-        location_list:           { renderer: :list, items: locations, caption: 'Location Codes' }
+        is_stock_take: { renderer: :checkbox },
+        completed: { renderer: :hidden },
+        approved: { renderer: :hidden },
+        signed_off: { renderer: :hidden },
+        business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
+        ref_no: { required: true },
+        sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
+        location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
       }
     end
 
     def view_header_fields
       {
         stock_adjustment_number: { renderer: :label },
-        is_stock_take:           { renderer: :label, as_boolean: true },
-        completed:               { renderer: :label, as_boolean: true },
-        approved:                { renderer: :label, as_boolean: true },
-        signed_off:              { renderer: :label, as_boolean: true },
-        ref_no:                  { renderer: :label },
-        sku_numbers_list:        { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
-        location_list:           { renderer: :list, items: locations, caption: 'Location Codes' }
+        is_stock_take: { renderer: :label, as_boolean: true },
+        completed: { renderer: :label, as_boolean: true },
+        approved: { renderer: :label, as_boolean: true },
+        signed_off: { renderer: :label, as_boolean: true },
+        ref_no: { renderer: :label },
+        sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
+        location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
       }
     end
 

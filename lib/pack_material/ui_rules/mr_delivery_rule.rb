@@ -115,7 +115,7 @@ module UiRules
                                       supplier_invoice_date: UtilityFunctions.weeks_since(Time.now, 1))
                      else
                        delivery
-      end
+                     end
     end
 
     def can_verify

@@ -6,6 +6,7 @@ module PackMaterialApp
       params.delete(:product_variant_number)
       res = validate_matres_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       DB.transaction do
         repo.update_matres_product_variant(id, res)
         log_transaction

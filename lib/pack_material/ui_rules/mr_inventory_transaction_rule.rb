@@ -45,12 +45,12 @@ module UiRules
 
     def make_stock_form_object
       @form_object = OpenStruct.new(business_process_id: nil,
-                                    sku_number:          sku_number,
-                                    quantity:            0,
-                                    ref_no:              nil,
-                                    to_location_id:      nil,
-                                    vehicle_id:          nil,
-                                    is_adhoc:            true)
+                                    sku_number: sku_number,
+                                    quantity: 0,
+                                    ref_no: nil,
+                                    to_location_id: nil,
+                                    vehicle_id: nil,
+                                    is_adhoc: true)
     end
 
     def sku_number

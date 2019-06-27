@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  PmProductVariantSchema = Dry::Validation.Params do
+  PmProductVariantSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
@@ -36,7 +36,7 @@ module PackMaterialApp
     optional(:specification_reference, Types::StrippedString).maybe(:str?)
   end
 
-  ClonePmProductVariantSchema = Dry::Validation.Params do
+  ClonePmProductVariantSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure { config.type_specs = true }
 
     required(:pack_material_product_id, :integer).filled(:int?)

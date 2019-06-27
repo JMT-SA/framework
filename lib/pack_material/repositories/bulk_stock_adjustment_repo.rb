@@ -65,8 +65,8 @@ module PackMaterialApp
         mr_bulk_stock_adjustment_id: DB[:mr_bulk_stock_adjustments].where(
           signed_off: false
         ).select_map(:id),
-        location_id:                 location_id,
-        mr_sku_id:                   sku_ids
+        location_id: location_id,
+        mr_sku_id: sku_ids
       ).select_map(:id).any?
     end
 

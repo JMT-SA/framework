@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if :show == @mode
+      set_show_fields if @mode == :show
 
       form_name 'uom_type'
     end

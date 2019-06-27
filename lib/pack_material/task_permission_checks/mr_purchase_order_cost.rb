@@ -30,18 +30,21 @@ module PackMaterialApp
 
       def create?
         return failed_response 'Approved Purchase Order can not be changed' if purchase_order_approved?
+
         all_ok
       end
 
       def update?
         return failed_response 'Record not found' unless @entity
         return failed_response 'Approved Purchase Order can not be changed' if purchase_order_approved?
+
         all_ok
       end
 
       def destroy?
         return failed_response 'Record not found' unless @entity
         return failed_response 'Approved Purchase Order can not be changed' if purchase_order_approved?
+
         all_ok
       end
 

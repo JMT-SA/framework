@@ -20,6 +20,7 @@ module PackMaterialApp
       if can_create.success
         res = validate_mr_purchase_order_cost_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         id = nil
         repo.transaction do
           id = repo.create_mr_purchase_order_cost(res)
@@ -40,6 +41,7 @@ module PackMaterialApp
       if can_update.success
         res = validate_mr_purchase_order_cost_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
           repo.update_mr_purchase_order_cost(id, res)
           log_transaction

@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class TestRemoveMrStock < MiniTestInteractors
     def test_initialize
@@ -54,9 +51,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:update_sku_location_quantity).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:transaction_type_id_for).returns(1)
 
-      assert_raises(Sequel::ForeignKeyConstraintViolation) {
-        RemoveMrStock.call(1, 2, 7, options)
-      }
+      assert_raises(Sequel::ForeignKeyConstraintViolation) { RemoveMrStock.call(1, 2, 7, options) }
     end
 
     def test_create_transaction_per_quantity

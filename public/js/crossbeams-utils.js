@@ -392,7 +392,8 @@ const crossbeamsUtils = {
     const select = elem.selectr;
     let nVal = '';
     let nText = '';
-    select.removeAll();
+    const newItems = [];
+    select.removeActiveItems();
     action.replace_options.options.forEach((item) => {
       if (item.constructor === Array) {
         nVal = (item[1] || item[0]);
@@ -401,12 +402,12 @@ const crossbeamsUtils = {
         nVal = item;
         nText = item;
       }
-      select.add({
+      newItems.push({
         value: nVal,
-        text: nText,
+        label: nText,
       });
     });
-    select.setPlaceholder();
+    select.setChoices(newItems, 'value', 'label', true);
   },
 
   /**
@@ -476,7 +477,7 @@ const crossbeamsUtils = {
     }
     if (elem.selectr) {
       if (String(elem.value) !== String(action.change_select_value.value)) {
-        elem.selectr.setValue(action.change_select_value.value);
+        elem.selectr.setChoiceByValue(String(action.change_select_value.value));
       }
     } else {
       elem.value = action.change_select_value.value;
@@ -757,40 +758,62 @@ const crossbeamsUtils = {
   makeSearchableSelects: function makeSearchableSelects() {
     const sels = document.querySelectorAll('.searchable-select');
     let holdSel;
+    let cls = 'cbl-input';
+    let isRequired;
+    let clearable;
+    let autoHide;
+    let sortItems;
+    let searchableOpt;
     sels.forEach((sel) => {
       if (sel.selectr) {
-        // Selectr has already been applied...
+        // Choices has already been applied...
       } else {
-        const isRequired = sel.required;
-        let cls = 'cbl-input';
+        isRequired = sel.required;
+        searchableOpt = sel.dataset.noSearch !== 'Y';
+        clearable = sel.dataset.clearable === 'true';
+        autoHide = sel.dataset.autoHideSearch === 'Y';
+        sortItems = sel.dataset.sortItems === 'Y';
+        // Do not show a search box if there are 10 or less items.
+        // (This prevents unnecessary keyboard activation on mobile devices)
+        if (searchableOpt && autoHide && sel.options.length < 11) {
+          searchableOpt = false;
+        }
+        cls = 'cbl-input';
         if (isRequired) {
           sel.required = false;
           cls = 'cbl-input-required';
         }
-        holdSel = new Selectr(sel, {
-          customClass: cls,
-          defaultSelected: true, // should configure via data...
-          // multiple: true,     // should configure via data...
-          allowDeselect: false,
-          clearable: true,       // should configure via data...
-          disabled: sel.disabled,
-          // Work around bug in SelectR (https://github.com/Mobius1/Selectr/issues/72):
-          // HOWEVER on mobile, clicking the select will launch the keyboard....
-          // nativeDropdown: false,
-          width: 'notset',       // stop Selectr from setting width to 100%
-        }); // select that can be searched.
-        // Store a reference on the DOM node.
-        sel.selectr = holdSel;
+
+        holdSel = new Choices(sel, {
+          searchEnabled: searchableOpt,
+          searchResultLimit: 100,
+          removeItemButton: clearable,
+          itemSelectText: '',
+          classNames: {
+            containerOuter: `choices ${cls}`,
+            containerInner: 'choices__inner_cbl',
+            highlightedState: 'is-highlighted_cbl',
+          },
+          shouldSort: sortItems,
+          searchFields: ['label'],
+          fuseOptions: {
+            include: 'score',
+            threshold: 0.25,
+          },
+        });
+        if (sel.diabled) {
+          holdSel.disable();
+        }
 
         // changeValues behaviour - check if another element should be
         // enabled/disabled based on the current selected value.
         if (sel.dataset && sel.dataset.changeValues) {
-          holdSel.on('selectr.change', (option) => {
+          sel.addEventListener('change', (event) => {
             sel.dataset.changeValues.split(',').forEach((el) => {
               const target = document.getElementById(el);
               if (target && (target.dataset && target.dataset.enableOnValues)) {
                 const vals = target.dataset.enableOnValues;
-                if (_.includes(vals, option.value)) {
+                if (_.includes(vals, event.detail.value)) {
                   target.disabled = false;
                 } else {
                   target.disabled = true;
@@ -810,14 +833,16 @@ const crossbeamsUtils = {
         // observeChange behaviour - get rules from select element and
         // call the supplied url(s).
         if (sel.dataset && sel.dataset.observeChange) {
-          holdSel.on('selectr.change', (option) => {
+          sel.addEventListener('change', (event) => {
             const s = sel.dataset.observeChange;
             const j = JSON.parse(s);
-            const urls = j.map(el => this.buildObserveChangeUrl(el, option));
+            const urls = j.map(el => this.buildObserveChangeUrl(el, event.detail.value));
 
             urls.forEach(url => this.fetchDropdownChanges(url));
           });
         }
+
+        sel.selectr = holdSel;
       }
     });
   },

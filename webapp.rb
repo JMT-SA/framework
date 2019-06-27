@@ -343,7 +343,7 @@ class Framework < Roda
                                      :rackmid,
                                      :datagrid,
                                      :ag_grid,
-                                     :selectr,
+                                     :choices,
                                      :sortable,
                                      :konva,
                                      :lodash,

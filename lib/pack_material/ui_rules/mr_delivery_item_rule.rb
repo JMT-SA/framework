@@ -49,6 +49,7 @@ module UiRules
           options: @repo.for_select_purchase_orders_with_supplier(purchase_order_id: @options[:purchase_order_id]),
           selected: @options[:purchase_order_id],
           caption: 'Purchase Order',
+          searchable: false,
           required: true,
           prompt: true
         },
@@ -57,6 +58,8 @@ module UiRules
           renderer: :select,
           options: @options[:purchase_order_id] ? available_purchase_order_items : nil,
           caption: 'Item',
+          min_charwidth: 40,
+          searchable: false,
           required: true
         }
       }

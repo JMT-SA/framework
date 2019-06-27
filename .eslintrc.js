@@ -21,6 +21,7 @@ module.exports = {
     "swal": false,
     "agGrid": false,
     "Jackbox": false,
+    "Choices": false,
     "Selectr": false,
     "Sortable": false,
     "multi": false,

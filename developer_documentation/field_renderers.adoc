@@ -401,9 +401,29 @@ Renders a select box.
 and all words start with initial capital letter.
 
 |:searchable
-|Can the items be searched (using Selectr js library)
+|Can the items be searched (using Choices js library)
+|`true` or `false`.
+|`true`. **NB** If the list of items is small, the select will always be set to not be searchable (unless `remove_search_for_small_list` is `false`).
+
+|:remove_search_for_small_list
+|Should the search box be hidden if there are few items in the list?
 |`true` or `false`.
 |`true`.
+
+|:sort_items
+|Should the items be sorted alphabetically. Set this to false if the supplied options are already in a desired sequence (e.g. descending order).
+|`true` or `false`.
+|`true`.
+
+|:native
+|Render a normal HTML `select` tag instead of a decorated `Choices` component.
+|`true` or `false`.
+|`false`.
+
+|:min_charwidth
+|Set the `min-width` css style to force a minimum width. Useful to force modal dialogs to open with a decent width.
+|Integer
+|None.
 
 |:prompt
 |Prompt to show when nothing is selected.

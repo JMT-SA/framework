@@ -14,12 +14,13 @@ module PackMaterialApp
       MrDeliveryItemSchema.call(params)
     end
 
-    def create_mr_delivery_item(parent_id, params)
+    def create_mr_delivery_item(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_delivery_id] = parent_id
       can_create = TaskPermissionCheck::MrDeliveryItem.call(:create, delivery_id: parent_id)
       if can_create.success
         res = validate_mr_delivery_item_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         id = nil
         repo.transaction do
           id = repo.create_mr_delivery_item(res)
@@ -35,7 +36,7 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { remarks: ['This delivery item already exists'] }))
     end
 
-    def update_mr_delivery_item(id, params)
+    def update_mr_delivery_item(id, params) # rubocop:disable Metrics/AbcSize
       can_update = TaskPermissionCheck::MrDeliveryItem.call(:update, id)
       if can_update.success
         res = validate_mr_delivery_item_params(params)

@@ -2,11 +2,12 @@
 
 module PackMaterialApp
   class MrPurchaseOrderInteractor < BaseInteractor
-    def create_mr_purchase_order(params)
+    def create_mr_purchase_order(params) # rubocop:disable Metrics/AbcSize
       can_create = TaskPermissionCheck::MrPurchaseOrder.call(:create)
       if can_create.success
         res = validate_mr_purchase_order_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         id = nil
         repo.transaction do
           id = repo.create_mr_purchase_order(res)
@@ -22,11 +23,12 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { purchase_account_code: ['This purchase order already exists'] }))
     end
 
-    def update_mr_purchase_order(id, params)
+    def update_mr_purchase_order(id, params) # rubocop:disable Metrics/AbcSize
       can_update = TaskPermissionCheck::MrPurchaseOrder.call(:update, id)
       if can_update.success
         res = validate_mr_purchase_order_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
           repo.update_mr_purchase_order(id, res)
           log_transaction
@@ -38,7 +40,7 @@ module PackMaterialApp
       end
     end
 
-    def approve_purchase_order(id)
+    def approve_purchase_order(id) # rubocop:disable Metrics/AbcSize
       can_approve = can_approve_purchase_order(id)
       if can_approve.success
         instance = mr_purchase_order(id)

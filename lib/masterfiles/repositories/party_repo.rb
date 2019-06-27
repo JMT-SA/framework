@@ -452,6 +452,7 @@ module MasterfilesApp
     def find_customer(id)
       hash = find_hash(:customers, id)
       return nil if hash.nil?
+
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
       hash[:customer_type_ids] = customers_customer_type_ids(id)
       hash[:customer_types] = customers_customer_type_names(hash[:customer_type_ids])
@@ -470,6 +471,7 @@ module MasterfilesApp
       opt = by_party_role ? { party_role_id: id } : { id: id }
       hash = where_hash(:suppliers, opt)
       return nil if hash.nil?
+
       hash[:party_name] = DB['SELECT fn_party_role_name(?)', hash[:party_role_id]].single_value
       hash[:supplier_type_ids] = suppliers_supplier_type_ids(id)
       hash[:supplier_types] = suppliers_supplier_type_names(hash[:supplier_type_ids])

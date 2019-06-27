@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class DeliveryPutawayStatusCheck < BaseService
     def initialize(sku_id, quantity, delivery_id)

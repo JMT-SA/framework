@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module UiRules
-  class MrDeliveryItemRule < Base
-    def generate_rules
+  class MrDeliveryItemRule < Base # rubocop:disable Metrics/ClassLength
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = PackMaterialApp::ReplenishRepo.new
       make_form_object
       apply_form_values
@@ -49,6 +49,7 @@ module UiRules
           options: @repo.for_select_purchase_orders_with_supplier(purchase_order_id: @options[:purchase_order_id]),
           selected: @options[:purchase_order_id],
           caption: 'Purchase Order',
+          searchable: false,
           required: true,
           prompt: true
         },
@@ -57,6 +58,8 @@ module UiRules
           renderer: :select,
           options: @options[:purchase_order_id] ? available_purchase_order_items : nil,
           caption: 'Item',
+          min_charwidth: 40,
+          searchable: false,
           required: true
         }
       }

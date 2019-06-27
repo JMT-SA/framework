@@ -93,7 +93,7 @@ class Framework < Roda
                                        code: res.instance[:code],
                                        description: res.instance[:description],
                                        hs_code: res.instance[:hs_code] },
-                            notice:  res.message)
+                            notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::Commodity::Edit.call(id, params[:commodity], res.errors) }
           end
@@ -574,7 +574,7 @@ class Framework < Roda
                                        standard_pack_code_id: res.instance[:standard_pack_code_id],
                                        actual_count_for_pack: res.instance[:actual_count_for_pack],
                                        size_count_variation: res.instance[:size_count_variation] },
-                            notice:  res.message)
+                            notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id, params[:fruit_actual_counts_for_pack], res.errors) }
           end

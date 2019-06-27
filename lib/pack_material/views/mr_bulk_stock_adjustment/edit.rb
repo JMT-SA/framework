@@ -8,12 +8,12 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:mr_bulk_stock_adjustment, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
 
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.add_control(control_type: :link,
                                   text: 'Back to Bulk Stock Adjustments',
                                   url: '/list/mr_bulk_stock_adjustments',
@@ -39,15 +39,15 @@ module PackMaterial
               end
               if rules[:can_sign_off]
                 section.add_control(control_type: :link,
-                                    text:         'Reopen',
-                                    url:          "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/decline",
-                                    prompt:       true,
-                                    style:        :button)
+                                    text: 'Reopen',
+                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/decline",
+                                    prompt: true,
+                                    style: :button)
                 section.add_control(control_type: :link,
-                                    text:         'Sign Off',
-                                    url:          "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/sign_off",
-                                    prompt:       true,
-                                    style:        :button)
+                                    text: 'Sign Off',
+                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/sign_off",
+                                    prompt: true,
+                                    style: :button)
               end
             end
             page.section do |section|

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class MoveMrStock < BaseService
     # @param [Object] sku_id Only one sku per move

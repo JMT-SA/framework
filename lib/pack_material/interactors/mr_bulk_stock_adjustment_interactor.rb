@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize
+
 module PackMaterialApp
   class MrBulkStockAdjustmentInteractor < BaseInteractor
     def repo
@@ -21,6 +24,7 @@ module PackMaterialApp
     def create_mr_bulk_stock_adjustment(params)
       res = validate_mr_bulk_stock_adjustment_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       attrs = res.to_h
       repo.transaction do
@@ -39,6 +43,7 @@ module PackMaterialApp
     def update_mr_bulk_stock_adjustment(id, params)
       res = validate_mr_bulk_stock_adjustment_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_mr_bulk_stock_adjustment(id, res)
         log_transaction
@@ -172,6 +177,7 @@ module PackMaterialApp
 
         location_id = replenish_repo.resolve_location_id_from_scan(params[:location], params[:location_scan_field])
         return failed_response('Location not found, please use location short code') unless location_id
+
         location_id = Integer(location_id)
 
         repo.transaction do
@@ -206,3 +212,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize

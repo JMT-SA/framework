@@ -2,9 +2,6 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class TestMrStockRepo < MiniTestWithHooks
     include PmProductFactory
@@ -52,7 +49,7 @@ module PackMaterialApp
         mr_purchase_order_id: po,
         mr_product_variant_id: pv2[:id]
       )
-      item_id = DB[:mr_delivery_items].insert(
+      DB[:mr_delivery_items].insert(
         mr_delivery_id: mr_delivery_id,
         mr_product_variant_id: pv2[:id],
         mr_purchase_order_item_id: po_item_id
@@ -69,9 +66,13 @@ module PackMaterialApp
       #               .returns(1)
 
       sku_ids = repo.create_skus_for_delivery(mr_delivery_id)
-      assert (sku1 = DB[:mr_skus].where(mr_product_variant_id: pv1[:id], mr_delivery_item_batch_id: batch_one_id).get(:id))
-      assert (sku2 = DB[:mr_skus].where(mr_product_variant_id: pv1[:id], mr_delivery_item_batch_id: batch_two_id).get(:id))
-      assert (sku3 = DB[:mr_skus].where(mr_product_variant_id: pv2[:id], mr_internal_batch_number_id: int_batch_id).get(:id))
+      sku1 = DB[:mr_skus].where(mr_product_variant_id: pv1[:id], mr_delivery_item_batch_id: batch_one_id).get(:id)
+      sku2 = DB[:mr_skus].where(mr_product_variant_id: pv1[:id], mr_delivery_item_batch_id: batch_two_id).get(:id)
+      sku3 = DB[:mr_skus].where(mr_product_variant_id: pv2[:id], mr_internal_batch_number_id: int_batch_id).get(:id)
+
+      assert sku1
+      assert sku2
+      assert sku3
       assert_includes sku_ids, sku1
       assert_includes sku_ids, sku2
       assert_includes sku_ids, sku3
@@ -200,7 +201,7 @@ module PackMaterialApp
         mr_purchase_order_id: po,
         mr_product_variant_id: pv2[:id]
       )
-      item_id = DB[:mr_delivery_items].insert(
+      DB[:mr_delivery_items].insert(
         mr_delivery_id: mr_delivery_id,
         mr_product_variant_id: pv2[:id],
         mr_purchase_order_item_id: po_item_id,
@@ -336,5 +337,3 @@ module PackMaterialApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

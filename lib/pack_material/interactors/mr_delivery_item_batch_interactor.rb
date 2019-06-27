@@ -8,6 +8,7 @@ module PackMaterialApp
       if can_create.success
         res = validate_mr_delivery_item_batch_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         id = nil
         repo.transaction do
           id = repo.create_mr_delivery_item_batch(res)
@@ -23,11 +24,12 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { client_batch_number: ['This delivery item batch already exists'] }))
     end
 
-    def update_mr_delivery_item_batch(id, params)
+    def update_mr_delivery_item_batch(id, params) # rubocop:disable Metrics/AbcSize
       can_update = TaskPermissionCheck::MrDeliveryItemBatch.call(:update, id)
       if can_update.success
         res = validate_mr_delivery_item_batch_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
           repo.update_mr_delivery_item_batch(id, res)
           log_transaction
@@ -57,14 +59,14 @@ module PackMaterialApp
     def print_sku_barcode(params, rmd: false)
       options  = rmd ? params : params[:mr_delivery_item_batch]
       sku_id   = rmd ? repo.sku_ids_from_numbers([params[:sku_number]]).first : params[:mr_sku_id]
-      instance = repo.sku_for_barcode(sku_id:                    sku_id,
-                                      mr_delivery_item_id:       params[:mr_delivery_item_id],
+      instance = repo.sku_for_barcode(sku_id: sku_id,
+                                      mr_delivery_item_id: params[:mr_delivery_item_id],
                                       mr_delivery_item_batch_id: params[:mr_delivery_item_batch_id])
 
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, options)
     end
 
-    def resolve_print_sku_barcode_params(params)
+    def resolve_print_sku_barcode_params(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = validate_print_sku_barcode_params(params)
       return nil unless res.messages.empty?
 

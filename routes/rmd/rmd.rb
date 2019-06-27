@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Framework < Roda
+class Framework < Roda # rubocop:disable Metrics/ClassLength
   # DELIVERIES
   # --------------------------------------------------------------------------
   route 'deliveries', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
@@ -121,13 +121,13 @@ class Framework < Roda
         printers    = @print_repo.select_printers_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE)
         details     = retrieve_from_local_store(:print_rmd_sku_label_options) || {}
         form        = Crossbeams::RMDForm.new(details,
-                                              form_name:        :print_rmd_sku_label,
-                                              progress:         details[:progress],
-                                              notes:            'Please scan the SKU number, then enter the quantity to be printed.',
+                                              form_name: :print_rmd_sku_label,
+                                              progress: details[:progress],
+                                              notes: 'Please scan the SKU number, then enter the quantity to be printed.',
                                               scan_with_camera: @rmd_scan_with_camera,
-                                              caption:          'Print SKU Label',
-                                              action:           '/rmd/printing/sku_label',
-                                              button_caption:   'Print')
+                                              caption: 'Print SKU Label',
+                                              action: '/rmd/printing/sku_label',
+                                              button_caption: 'Print')
         form.add_select(:printer, 'Printer', items: printers, value: printers.first, required: true, prompt: true)
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
         form.add_field(:no_of_prints, 'No of Prints', data_type: 'number')
@@ -145,10 +145,10 @@ class Framework < Roda
           these_params            = params[:print_rmd_sku_label]
           payload[:error_message] = res.message
           payload[:errors]        = res.errors
-          payload.merge!(printer:               these_params[:printer],
-                         sku_number:            these_params[:sku_number],
+          payload.merge!(printer: these_params[:printer],
+                         sku_number: these_params[:sku_number],
                          sku_number_scan_field: these_params[:sku_number_scan_field],
-                         no_of_prints:          these_params[:no_of_prints])
+                         no_of_prints: these_params[:no_of_prints])
         end
 
         store_locally(:print_rmd_sku_label_options, payload)

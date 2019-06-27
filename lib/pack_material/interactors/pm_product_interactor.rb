@@ -8,18 +8,21 @@ module PackMaterialApp
     def create_pm_product(params)
       res = validate_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       pm_product_create(res)
     end
 
     def clone_pm_product(params)
       res = validate_clone_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       pm_product_create(res)
     end
 
     def update_pm_product(id, params)
       res = validate_pm_product_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       resp = nil
       repo.transaction do
         resp = repo.update_pm_product(id, res)
@@ -44,16 +47,20 @@ module PackMaterialApp
     def create_pm_product_variant(parent_id, params)
       params[:pack_material_product_id] = parent_id
       return parent_id_missing unless parent_id
+
       res = validate_pm_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       pm_product_variant_create(res)
     end
 
     def clone_pm_product_variant(parent_id, params)
       params[:pack_material_product_id] = parent_id
       return parent_id_missing unless parent_id
+
       res = validate_clone_pm_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       pm_product_variant_create(res)
     end
 
@@ -75,6 +82,7 @@ module PackMaterialApp
     def update_pm_product_variant(id, params)
       res = validate_pm_product_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_pm_product_variant(id, res)
       end

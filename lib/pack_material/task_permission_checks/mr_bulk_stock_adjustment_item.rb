@@ -44,6 +44,7 @@ module PackMaterialApp
       def parent_fail_check
         return failed_response 'Bulk Stock Adjustment has been completed' if parent_completed?
         return failed_response 'Bulk Stock Adjustment has been approved' if parent_approved?
+
         all_ok
       end
 

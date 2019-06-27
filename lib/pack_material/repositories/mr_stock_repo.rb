@@ -45,6 +45,7 @@ module PackMaterialApp
     def find_or_create_sku(attrs)
       sku_id = DB[:mr_skus].where(attrs).get(:id)
       return sku_id if sku_id
+
       create(:mr_skus, attrs)
     end
 
@@ -73,7 +74,7 @@ module PackMaterialApp
     def resolve_parent_transaction_id(opts)
       if (delivery_id = opts[:delivery_id])
         DB[:mr_deliveries].where(id: delivery_id).get(:putaway_transaction_id)
-      elsif (tripsheet_id = opts[:tripsheet_id])
+        # elsif (tripsheet_id = opts[:tripsheet_id])
         # transaction_for_tripsheet_id(tripsheet_id)
       else
         opts[:parent_transaction_id]
@@ -108,6 +109,7 @@ module PackMaterialApp
 
     def update_delivery_receipt_id(id, receipt_id)
       return failed_response('Delivery does not exist') unless exists?(:mr_deliveries, id: id)
+
       update(:mr_deliveries, id, receipt_transaction_id: receipt_id)
       success_response('ok')
     end
@@ -154,7 +156,8 @@ module PackMaterialApp
 
     def create_sku_location_ids(sku_ids, to_location_id)
       return failed_response('Location does not exist') unless exists?(:locations, id: to_location_id)
-      return failed_response('Location can not store stock') unless is_stock_location?(to_location_id)
+      return failed_response('Location can not store stock') unless stock_location?(to_location_id)
+
       query = <<~SQL
         INSERT INTO mr_sku_locations (mr_sku_id, location_id)
         SELECT mr_skus.id, ?
@@ -170,16 +173,18 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def is_stock_location?(location_id)
+    def stock_location?(location_id)
       DB[:locations].where(id: location_id).get(:can_store_stock)
     end
 
     # @param [Object] sku_quantity_groups qty should be a float
     def add_sku_location_quantities(sku_quantity_groups, to_location_id)
       return failed_response('No SKU quantities given') unless sku_quantity_groups.any?
+
       sku_quantity_groups.each do |grp|
         location = DB[:mr_sku_locations].where(mr_sku_id: grp[:sku_id], location_id: to_location_id)
         return failed_response('No SKUs at location') unless location.first
+
         qty = location.get(:quantity) + grp[:qty]
         location.update(quantity: qty)
       end
@@ -189,6 +194,7 @@ module PackMaterialApp
     def update_sku_location_quantity(sku_id, qty, location_id, add: true)
       location = DB[:mr_sku_locations].where(mr_sku_id: sku_id, location_id: location_id)
       return failed_response('No SKUs at location') unless location.first
+
       existing_qty = location.get(:quantity)
       qty = add ? (existing_qty + qty) : (existing_qty - qty)
       if qty.positive?
@@ -205,12 +211,14 @@ module PackMaterialApp
     def sku_uom_id(sku_id)
       variant_id = DB[:mr_skus].where(id: sku_id).get(:mr_product_variant_id)
       return nil unless variant_id
+
       st_id = DB[:material_resource_product_variants].where(id: variant_id).get(:sub_type_id)
       DB[:material_resource_sub_types].where(id: st_id).get(:inventory_uom_id)
     end
 
     def activate_mr_inventory_transaction(parent_transaction_id)
       return failed_response('Invalid Parent Transaction Id') unless exists?(:mr_inventory_transactions, id: parent_transaction_id)
+
       DB[:mr_inventory_transactions].where(id: parent_transaction_id).update(active: true)
       success_response('ok')
     end

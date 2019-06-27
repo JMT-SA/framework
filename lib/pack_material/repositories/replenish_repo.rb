@@ -601,7 +601,7 @@ module PackMaterialApp
       items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).map { |r| { pv_id: r[:mr_product_variant_id], price: r[:invoiced_unit_price] } }
       items.each do |item|
         product = config_repo.find_matres_product_variant(item[:pv_id])
-        stock_adj_price = product.stock_adj_price > 0 ? product.stock_adj_price : item[:price]
+        stock_adj_price = product.stock_adj_price.positive? ? product.stock_adj_price : item[:price]
         update(:material_resource_product_variants, item[:pv_id], current_price: item[:price], stock_adj_price: stock_adj_price)
       end
     end

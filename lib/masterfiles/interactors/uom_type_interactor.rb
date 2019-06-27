@@ -14,9 +14,10 @@ module MasterfilesApp
       UomTypeSchema.call(params)
     end
 
-    def create_uom_type(params)
+    def create_uom_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_uom_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_uom_type(res)
@@ -33,6 +34,7 @@ module MasterfilesApp
     def update_uom_type(id, params)
       res = validate_uom_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_uom_type(id, res)
         log_transaction

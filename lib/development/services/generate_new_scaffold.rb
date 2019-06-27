@@ -1076,7 +1076,7 @@ module DevelopmentApp
         tm = TableMeta.new(fk[:table])
         required = can_be_null ? '' : ', required: true'
         if tm.active_column_present?
-          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_inactive_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
+          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_select_inactive_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
         else
           "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id').split('_').map(&:capitalize).join(' ')}'#{required} }"
         end

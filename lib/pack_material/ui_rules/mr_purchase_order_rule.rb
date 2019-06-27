@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module UiRules
-  class MrPurchaseOrderRule < Base
-    def generate_rules
+  class MrPurchaseOrderRule < Base # rubocop:disable Metrics/ClassLength
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo       = PackMaterialApp::ReplenishRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       @perm       = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder

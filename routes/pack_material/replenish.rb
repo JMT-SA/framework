@@ -23,7 +23,7 @@ class Framework < Roda
         r.post do        # CREATE
           res = item_interactor.create_mr_purchase_order_item(id, params[:mr_purchase_order_item])
           if res.success
-            row_keys       = %i[
+            row_keys = %i[
               id
               mr_purchase_order_id
               mr_product_variant_id
@@ -289,7 +289,9 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_mr_delivery_term(id, params[:mr_delivery_term])
           if res.success
-            update_grid_row(id, changes: { delivery_term_code: res.instance[:delivery_term_code], is_consignment_stock: res.instance[:is_consignment_stock] },
+            update_grid_row(id,
+                            changes: { delivery_term_code: res.instance[:delivery_term_code],
+                                       is_consignment_stock: res.instance[:is_consignment_stock] },
                             notice: res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryTerm::Edit.call(id, form_values: params[:mr_delivery_term], form_errors: res.errors) }
@@ -597,11 +599,11 @@ class Framework < Roda
           if res.success
             redirect_via_json_to_stored_referer(:delivery_items)
           else
-            re_show_form(r, res) {
+            re_show_form(r, res) do
               PackMaterial::Replenish::MrDeliveryItem::Edit.call(id,
                                                                  form_values: params[:mr_delivery_item],
                                                                  form_errors: res.errors)
-            }
+            end
           end
         end
         r.delete do    # DELETE
@@ -703,7 +705,8 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_mr_cost_type(id, params[:mr_cost_type])
           if res.success
-            update_grid_row(id, changes: { cost_type_code: res.instance[:cost_type_code] },
+            update_grid_row(id,
+                            changes: { cost_type_code: res.instance[:cost_type_code] },
                             notice: res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrCostType::Edit.call(id, form_values: params[:mr_cost_type], form_errors: res.errors) }
@@ -802,7 +805,7 @@ class Framework < Roda
       OpenStruct.new(dom_id: 'po_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
       OpenStruct.new(dom_id: 'po_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
       OpenStruct.new(dom_id: 'po_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
-      OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
+      OpenStruct.new(dom_id: 'po_totals_total', type: :replace_inner_html, value: sub_totals[:total])
     ]
   end
 
@@ -811,7 +814,7 @@ class Framework < Roda
       OpenStruct.new(dom_id: 'del_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
       OpenStruct.new(dom_id: 'del_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
       OpenStruct.new(dom_id: 'del_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
-      OpenStruct.new(dom_id: 'del_totals_total', type: :replace_inner_html, value: sub_totals[:total]),
+      OpenStruct.new(dom_id: 'del_totals_total', type: :replace_inner_html, value: sub_totals[:total])
     ]
   end
 end

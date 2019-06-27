@@ -8,6 +8,7 @@ module PackMaterialApp
     def create_matres_type(params)
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = repo.create_matres_type(res)
       instance = matres_type(id)
       success_response("Created type #{instance.type_name}", instance)
@@ -21,6 +22,7 @@ module PackMaterialApp
     def update_matres_type(id, params)
       res = validate_matres_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       response = repo.update_matres_type(id, res)
       extra = response[:message] ? (', ' + response[:message]) : ''
       instance = matres_type(id)
@@ -36,6 +38,7 @@ module PackMaterialApp
     def create_matres_sub_type(params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = repo.create_matres_sub_type(res)
       instance = matres_sub_type(id)
       success_response("Created sub type #{instance.sub_type_name}", instance)
@@ -46,6 +49,7 @@ module PackMaterialApp
     def update_matres_sub_type(id, params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       result = repo.update_matres_sub_type(id, res)
       if result.success
         instance = matres_sub_type(id)
@@ -67,6 +71,7 @@ module PackMaterialApp
     def update_matres_config(id, params)
       res = validate_matres_sub_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.update_matres_sub_type(id, res)
       success_response('Updated the config')
     end
@@ -94,6 +99,7 @@ module PackMaterialApp
     def create_matres_master_list_item(sub_type_id, params)
       res = validate_matres_master_list_item_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       id = nil
       repo.transaction do
         id = repo.create_matres_sub_type_master_list_item(sub_type_id, res)
@@ -112,6 +118,7 @@ module PackMaterialApp
     def update_matres_master_list_item(id, params)
       res = validate_matres_master_list_item_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_matres_master_list_item(id, res)
       end

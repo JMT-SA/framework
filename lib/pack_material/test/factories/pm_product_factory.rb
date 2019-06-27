@@ -2,6 +2,9 @@
 
 require 'faker'
 
+# rubocop:disable Metrics/ModuleLength
+# rubocop:disable Metrics/AbcSize
+
 module PackMaterialApp
   module PmProductFactory
     # uses ConfigFactory
@@ -170,23 +173,23 @@ module PackMaterialApp
       sku_id = create_mr_sku[:id]
       inventory_uom_id = @fixed_table_set[:uoms][:uom_id]
       default = {
-        mr_bulk_stock_adjustment_id:      bsa_id,
+        mr_bulk_stock_adjustment_id: bsa_id,
         mr_inventory_transaction_item_id: nil,
-        mr_sku_id:                        sku_id,
-        location_id:                      location_id,
-        sku_number:                       1,
-        product_variant_number:           '100105001007',
-        mr_type_name:                     'Testa',
-        mr_sub_type_name:                 'Marketers Suppliers',
-        product_variant_code:             'TS_MS_1_Mar Sup-007',
-        location_long_code:               'PM_B5_MV1',
-        inventory_uom_code:               'each',
-        scan_to_location_long_code:       nil,
-        system_quantity:                  0.0,
-        actual_quantity:                  50.0,
-        stock_take_complete:              false,
-        active:                           true,
-        inventory_uom_id:                 inventory_uom_id
+        mr_sku_id: sku_id,
+        location_id: location_id,
+        sku_number: 1,
+        product_variant_number: '100105001007',
+        mr_type_name: 'Testa',
+        mr_sub_type_name: 'Marketers Suppliers',
+        product_variant_code: 'TS_MS_1_Mar Sup-007',
+        location_long_code: 'PM_B5_MV1',
+        inventory_uom_code: 'each',
+        scan_to_location_long_code: nil,
+        system_quantity: 0.0,
+        actual_quantity: 50.0,
+        stock_take_complete: false,
+        active: true,
+        inventory_uom_id: inventory_uom_id
       }
       attrs = default.merge(opts)
       item_id = DB[:mr_bulk_stock_adjustment_items].insert(attrs)
@@ -197,3 +200,5 @@ module PackMaterialApp
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength
+# rubocop:enable Metrics/AbcSize

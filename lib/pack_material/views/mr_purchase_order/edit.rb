@@ -8,7 +8,7 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:mr_purchase_order, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -25,15 +25,15 @@ module PackMaterial
                                   style: :button,
                                   behaviour: :popup)
               section.add_control(control_type: :link,
-                                  text:         'Approve Purchase Order',
-                                  url:          "/pack_material/replenish/mr_purchase_orders/#{id}/approve_purchase_order",
-                                  prompt:       true,
-                                  id:           'mr_purchase_order_approve_button',
-                                  visible:      rules[:can_approve],
-                                  style:        :button)
+                                  text: 'Approve Purchase Order',
+                                  url: "/pack_material/replenish/mr_purchase_orders/#{id}/approve_purchase_order",
+                                  prompt: true,
+                                  id: 'mr_purchase_order_approve_button',
+                                  visible: rules[:can_approve],
+                                  style: :button)
             end
 
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.show_border!
               section.add_caption 'Purchase Order'
               section.form do |form|

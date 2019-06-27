@@ -8,6 +8,7 @@ module MasterfilesApp
     def create_supplier(params)
       res = validate_new_supplier_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       result = nil
       DB.transaction do
         result = repo.create_supplier(res)
@@ -26,6 +27,7 @@ module MasterfilesApp
     def update_supplier(id, params)
       res = validate_edit_supplier_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
       result = nil
       DB.transaction do
         result = repo.update_supplier(id, res)

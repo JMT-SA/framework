@@ -14,12 +14,13 @@ module PackMaterialApp
       MrPurchaseOrderItemSchema.call(params)
     end
 
-    def create_mr_purchase_order_item(parent_id, params)
+    def create_mr_purchase_order_item(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_purchase_order_id] = parent_id
       can_create = TaskPermissionCheck::MrPurchaseOrderItem.call(:create, purchase_order_id: parent_id)
       if can_create.success
         res = validate_mr_purchase_order_item_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         id = nil
         repo.transaction do
           id = repo.create_mr_purchase_order_item(res)
@@ -35,11 +36,12 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { id: ['This purchase order item already exists'] }))
     end
 
-    def update_mr_purchase_order_item(id, params)
+    def update_mr_purchase_order_item(id, params) # rubocop:disable Metrics/AbcSize
       can_update = TaskPermissionCheck::MrPurchaseOrderItem.call(:update, id)
       if can_update.success
         res = validate_mr_purchase_order_item_params(params)
         return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
           repo.update_mr_purchase_order_item(id, res)
           log_transaction

@@ -67,7 +67,7 @@ module PackMaterialApp
       general_repo.for_select_uoms(where: { uom_type_id: DB[:uom_types].where(code: PackMaterialApp::INVENTORY_UOM_TYPE).get(:id) })
     end
 
-    def create_matres_product_variant_party_role(attrs)
+    def create_matres_product_variant_party_role(attrs) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       message = nil
       message = 'Can not assign both customer and supplier' if attrs[:supplier_id] && attrs[:customer_id]
       message ||= 'Must have customer or supplier' if attrs[:supplier_id].nil? && attrs[:customer_id].nil?
@@ -78,8 +78,6 @@ module PackMaterialApp
 
       role_id = DB[:material_resource_product_variant_party_roles].insert(attrs.to_h)
       success_response('ok', role_id)
-      # rescue Sequel::UniqueConstraintViolation # ???
-      #   validation_failed_response(OpenStruct.new(messages: { base: ['This role link already exists'] }))
     end
 
     # Check if role link to Customer or Supplier exists for applicable Product Variant
@@ -127,6 +125,7 @@ module PackMaterialApp
     def find_matres_type(id)
       hash = find_hash(:material_resource_types, id)
       return nil if hash.nil?
+
       domain = find_hash(:material_resource_domains, hash[:material_resource_domain_id])
       hash[:domain_name] = domain ? domain[:domain_name] : 'unknown domain name'
       MatresType.new(hash)
@@ -156,7 +155,7 @@ module PackMaterialApp
       end
     end
 
-    def delete_matres_sub_type(id)
+    def delete_matres_sub_type(id) # rubocop:disable Metrics/AbcSize
       query = <<~SQL
         SELECT product_table_name
         FROM material_resource_sub_types st
@@ -213,9 +212,10 @@ module PackMaterialApp
       DB[query].map { |rec| [rec[:column_name], rec[:id]] }
     end
 
-    def product_code_column_options(sub_type_id, ids)
+    def product_code_column_options(sub_type_id, ids) # rubocop:disable Metrics/AbcSize
       sub_type = find_matres_sub_type(sub_type_id)
       return [[], []] unless sub_type.product_column_ids
+
       all_product_columns = for_select_material_resource_product_columns
       product_code_options = all_product_columns.select { |i| sub_type.product_column_ids.map(&:to_i).include?(i[1]) }
 
@@ -230,7 +230,7 @@ module PackMaterialApp
       for_select_material_resource_product_columns.select { |i| product_column_ids.include?(i[1]) }
     end
 
-    def update_product_code_configuration(config_id, res)
+    def update_product_code_configuration(config_id, res) # rubocop:disable Metrics/AbcSize
       var_ids = res[:variant_product_code_column_ids].map(&:to_i)
       optional_ids = res[:chosen_column_ids] - res[:columncodes_sorted_ids] - var_ids
       changes = <<~SQL

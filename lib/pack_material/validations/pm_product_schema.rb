@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  PmProductSchema = Dry::Validation.Params do
+  PmProductSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure { config.type_specs = true }
 
     optional(:material_resource_sub_type_id, :integer).filled(:int?)
@@ -36,7 +36,7 @@ module PackMaterialApp
     optional(:party, Types::StrippedString).filled(:str?)
   end
 
-  ClonePmProductSchema = Dry::Validation.Params do
+  ClonePmProductSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure { config.type_specs = true }
 
     required(:material_resource_sub_type_id, :integer).filled(:int?)

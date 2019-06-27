@@ -92,7 +92,8 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_uom(id, params[:uom])
           if res.success
-            update_grid_row(id, changes: { uom_type_id: res.instance[:uom_type_id], uom_code: res.instance[:uom_code] },
+            update_grid_row(id,
+                            changes: { uom_type_id: res.instance[:uom_type_id], uom_code: res.instance[:uom_code] },
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::General::Uom::Edit.call(id, form_values: params[:uom], form_errors: res.errors) }

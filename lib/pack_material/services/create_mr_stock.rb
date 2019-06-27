@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-
 module PackMaterialApp
   class CreateMrStock < BaseService
     # @param [Object] sku_ids
@@ -49,6 +47,7 @@ module PackMaterialApp
       if @delivery_id
         res = @repo.update_delivery_receipt_id(@delivery_id, @parent_transaction_id)
         return res unless res.success
+
         @quantities = @repo.get_delivery_sku_quantities(@delivery_id)
       end
 

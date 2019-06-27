@@ -32,18 +32,21 @@ module PackMaterialApp
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
         return failed_response 'No Delivery Line Item given' unless @delivery_item_id
         return failed_response 'This Product Variant has a fixed batch number' if fixed_batch_number?
+
         all_ok
       end
 
       def update?
         return failed_response 'Record not found' unless @entity
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
+
         all_ok
       end
 
       def destroy?
         return failed_response 'Record not found' unless @entity
         return failed_response 'Verified delivery can not be changed' if delivery_verified?
+
         all_ok
       end
 

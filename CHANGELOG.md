@@ -7,6 +7,11 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+### Changed
+### Fixed
+
+## [0.6.2] - 2019-06-27
+### Added
 - Exceptions are emailed. The recipients and subject prefix can be configured.
 - Inline editing for grids.
 - Tables can have a column named `extended_columns` with JSONB key/values that can be displayed and edited.
@@ -18,7 +23,6 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 - Use the `Choices` js library instead of the `Selectr` library to make `select` tags searchable. This lib works better on mobile devices.
 ### Changed
 - Created RMD utilities route and moved check_barcode to it.
-### Fixed
 
 ## [0.6.0] - 2019-02-01
 ### Added

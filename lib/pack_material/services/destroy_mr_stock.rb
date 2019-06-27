@@ -23,9 +23,28 @@ module PackMaterialApp
       res = @repo.update_sku_location_quantity(@sku_id, @quantity, @location_id, add: false)
       return res unless res.success
 
+      res = set_parent_transaction
+      return res unless res.success
+
+      create_inventory_transaction_item
+    end
+
+    private
+
+    def create_inventory_transaction_item
+      transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
+        mr_inventory_transaction_id: @parent_transaction_id,
+        from_location_id: @location_id,
+        mr_sku_id: @sku_id,
+        inventory_uom_id: @repo.sku_uom_id(@sku_id),
+        quantity: @quantity
+      )
+      success_response('ok', transaction_item_id)
+    end
+
+    def set_parent_transaction
       if @parent_transaction_id
-        res = @repo.activate_mr_inventory_transaction(@parent_transaction_id)
-        return res unless res.success
+        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
       else
         attrs = {
           mr_inventory_transaction_type_id: @repo.transaction_type_id_for('destroy'),
@@ -37,16 +56,8 @@ module PackMaterialApp
           created_by: @opts[:user_name]
         }
         @parent_transaction_id = @transaction_repo.create_mr_inventory_transaction(attrs)
+        ok_response
       end
-
-      transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
-        mr_inventory_transaction_id: @parent_transaction_id,
-        from_location_id: @location_id,
-        mr_sku_id: @sku_id,
-        inventory_uom_id: @repo.sku_uom_id(@sku_id),
-        quantity: @quantity
-      )
-      success_response('ok', transaction_item_id)
     end
   end
 end

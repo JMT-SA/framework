@@ -23,7 +23,7 @@ module PackMaterialApp
       object = OpenStruct.new(ref_no: 'test_ref')
       PackMaterialApp::TransactionsRepo.any_instance.stubs(:find_mr_bulk_stock_adjustment).returns(object)
       service = PackMaterialApp::BulkStockAdjustmentService.new(1, 2, user_name: 'User Name')
-      assert_equal ({ business_process_id: 2, ref_no: 'test_ref', user_name: 'User Name' }), service.attrs
+      assert_equal ({ business_process_id: 2, ref_no: 'test_ref', user_name: 'User Name' }), service.send(:attrs)
     end
 
     def test_fail_on_not_found
@@ -39,9 +39,9 @@ module PackMaterialApp
 
       create_id = 5
       PackMaterialApp::BulkStockAdjustmentRepo.any_instance.stubs(:transaction_id).returns(create_id)
-      assert_equal create_id, service.create_transaction_id(service.attrs)
+      assert_equal create_id, service.send(:create_transaction_id, service.send(:attrs))
       PackMaterialApp::BulkStockAdjustmentRepo.any_instance.stubs(:transaction_id).returns(7)
-      assert_equal create_id, service.create_transaction_id(service.attrs)
+      assert_equal create_id, service.send(:create_transaction_id, service.send(:attrs))
     end
 
     def test_destroy_transaction_id
@@ -51,9 +51,9 @@ module PackMaterialApp
 
       destroy_id = 6
       PackMaterialApp::BulkStockAdjustmentRepo.any_instance.stubs(:transaction_id).returns(destroy_id)
-      assert_equal destroy_id, service.destroy_transaction_id(service.attrs)
+      assert_equal destroy_id, service.send(:destroy_transaction_id, service.send(:attrs))
       PackMaterialApp::BulkStockAdjustmentRepo.any_instance.stubs(:transaction_id).returns(7)
-      assert_equal destroy_id, service.destroy_transaction_id(service.attrs)
+      assert_equal destroy_id, service.send(:destroy_transaction_id, service.send(:attrs))
     end
 
     def test_call

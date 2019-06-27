@@ -210,6 +210,17 @@ module PackMaterialApp
       res = TaskPermissionCheck::MrBulkStockAdjustment.call(task, id, @user)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
+
+    def html_stock_adjustment_progress_report(bulk_stock_adjustment_id, sku_id, location_id)
+      inst = repo.stock_adjustment_progress_report_values(bulk_stock_adjustment_id, sku_id, location_id)
+      <<~HTML
+        Stock Adjustment (#{repo.bulk_stock_adjustment_number_from_id(bulk_stock_adjustment_id)}): #{inst[:done]} of #{inst[:total_items].count} items.<br>
+                           Last scan:<br>
+                           LOC: #{replenish_repo.location_long_code_from_location_id(location_id)}<br>
+        SKU (#{replenish_repo.sku_number_from_id(sku_id)}): #{inst[:product_variant_code]}<br>
+        Qty: was #{UtilityFunctions.delimited_number(inst[:item][:system_quantity])} now #{UtilityFunctions.delimited_number(inst[:item][:actual_quantity])} (#{inst[:item][:inventory_uom_code]})<br>
+      HTML
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength

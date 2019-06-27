@@ -19,17 +19,10 @@ module PackMaterialApp
       res = make_http_call(request_xml)
       formatted_res = format_response(res.instance.body)
 
-      @repo.transaction do
-        if formatted_res.success
-          @replenish_repo.delivery_complete_invoice(@id, formatted_res.instance)
-          @repo.log_status('mr_deliveries', @id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
-        else
-          @replenish_repo.update_mr_delivery(@id, invoice_error: true)
-          @repo.log_status('mr_deliveries', @id, formatted_res.message, user_name: @user_name)
-        end
-        @block&.call
-      end
+      apply_changes_to_db(formatted_res)
     end
+
+    private
 
     def build_xml # rubocop:disable Metrics/AbcSize
       # Deliveries are limited to single suppliers
@@ -90,6 +83,19 @@ module PackMaterialApp
         success_response('ok', instance)
       else
         failed_response(message, instance)
+      end
+    end
+
+    def apply_changes_to_db(formatted_res)
+      @repo.transaction do
+        if formatted_res.success
+          @replenish_repo.delivery_complete_invoice(@id, formatted_res.instance)
+          @repo.log_status('mr_deliveries', @id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
+        else
+          @replenish_repo.update_mr_delivery(@id, invoice_error: true)
+          @repo.log_status('mr_deliveries', @id, formatted_res.message, user_name: @user_name)
+        end
+        @block&.call
       end
     end
   end

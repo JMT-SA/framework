@@ -24,7 +24,6 @@
     <link rel="stylesheet" href="/css/jquery.contextMenu.min.css">
     <link rel="stylesheet" href="/css/menu.css">
     <link rel="stylesheet" href="/css/skin.css">
-    <!-- link rel="stylesheet" href="/css/selectr.min.css" -->
     <link rel="stylesheet" href="/css/choices.min.css">
     <link rel="stylesheet" href="/css/multi.min.css">
     <%= assets(:css) %>
@@ -110,25 +109,15 @@
     <script src="/js/sweetalert2.min.js"></script>
     <script src="/js/Sortable.min.js"></script>
     <script src="/js/crossbeams-local-storage.js"></script>
-    <script src="/js/crossbeams-utils.js?seq=7"></script>
+    <script src="/js/crossbeams-utils.js?seq=8"></script>
     <script src="/js/crossbeams-layout.js?seq=10"></script>
-    <script src="/js/crossbeams-grid-loader.js?seq=12"></script>
-    <script src="/js/crossbeams-data-miner-params.js"></script>
+    <script src="/js/crossbeams-grid-loader.js?seq=13"></script>
+    <script src="/js/crossbeams-data-miner-params.js?seq=1"></script>
     <script src="/js/crossbeams-menu-builder.js?seq=1"></script>
-    <!-- script src="/js/selectr.min.js"></script -->
     <script src="/js/choices.min.js"></script>
     <script src="/js/multi.min.js"></script>
     <script src="/js/a11y-dialog-cbeam.js"></script>
     <script>
-      // Work around bug in SelectR (https://github.com/Mobius1/Selectr/issues/72):
-      // HOWEVER on mobile, clicking the select will launch the keyboard....
-      // Object.defineProperty(Selectr.prototype, 'mobileDevice', {
-      //   get() { return false; },
-      //   set() {},
-      //   enumerable: true,
-      //   configurable: true,
-      // });
-
       let crossbeamsDialogLevel1;
       let crossbeamsDialogLevel2;
       // Prefix all jQuery AJAX post requests with the CSRF token.

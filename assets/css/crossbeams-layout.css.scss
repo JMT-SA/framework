@@ -528,12 +528,60 @@ tr.roweven {
 }
 /* END  : Table row alternate background and hover background */
 
-/* Overides for Choices control */
-div.choices.cbl-input-required div.choices__inner {
+/* START: Choices overrides for select tags */
+.choices {
+  margin-bottom: 0;
+}
+div.choices.cbl-input-required div.choices__inner_cbl {
   border-right: thick solid orange;
 }
+.choices__inner_cbl {
+  display: inline-block;
+  vertical-align: top;
+  width: 100%;
+  background-color: #fff;
+  padding: 7.5px 7.5px 3.75px;
+  border: 1px solid #999;
+  border-radius: 0.25em;
+  overflow: hidden;
+}
+.choices__list--single {
+  padding: 0;
+}
+/* Clear the "Press to Select" area */
+.choices__list--dropdown .choices__item--selectable {
+    padding-right: 10px;
+}
+.choices.is-disabled .choices__inner_cbl,
+.choices.is-disabled .choices__input {
+  background-color: #EAEAEA;
+  cursor: not-allowed;
+  user-select: none;
+}
+.choices[data-type*="select-multiple"] .choices__inner_cbl,
+.choices[data-type*="text"] .choices__inner_cbl {
+  cursor: text;
+}
+.is-focused .choices__inner_cbl,
+.is-open .choices__inner_cbl {
+  border-color: #b7b7b7;
+}
+.is-open .choices__inner_cbl {
+  border-radius: 2.5px 2.5px 0 0;
+}
+.is-flipped.is-open .choices__inner_cbl {
+  border-radius: 0 0 2.5px 2.5px;
+}
+.choices__list--dropdown .choices__item--selectable.is-highlighted_cbl {
+  background-color: #5897fb;
+  color: #fff;
+}
+.choices__list--dropdown .choices__item--selectable.is-highlighted_cbl:after {
+  opacity: .5;
+}
+/* END: Choices overrides */
 
-/* Overides for SelectR control */
+/* Overrides for SelectR control */
 .selectr-container {
   padding: 0;
 }

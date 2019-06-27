@@ -330,9 +330,18 @@ const crossbeamsGridEvents = {
    * Add line item tags to an unordered list element - one for each column name in the grid.
    * @param {string} gridId - the DOM id of the grid.
    * @param {array} colDefs - the column definitions for the grid.
+   * @param {bool} showJump - should the list be shown. (Hide if there is no horizontal scroll bar)
    * @returns {void}
    */
-  makeColumnScrollList: function makeColumnScrollList(gridId, colDefs) {
+  makeColumnScrollList: function makeColumnScrollList(gridId, colDefs, showJump) {
+    const frame = document.getElementById(`${gridId}-frame`);
+    if (showJump) {
+      frame.querySelector('.crossbeams-column-jump').hidden = false;
+    } else {
+      frame.querySelector('.crossbeams-column-jump').hidden = true;
+      return;
+    }
+
     const ul = document.getElementById(`${gridId}-scrollcol`);
     let li;
     colDefs.sort((a, b) => a.headerName.localeCompare(b.headerName)).forEach((col) => {
@@ -1143,8 +1152,12 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
             gridOptions.context.fieldUpdateUrl = httpResult.fieldUpdateUrl;
           }
           crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
-          // TODO: if the grid has no horizontal scrollbar, hide the scroll to column dropdown.
-          crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId, newColDefs);
+          // If the grid has no horizontal scrollbar, hide the scroll to column dropdown.
+          const grdEl = document.getElementById(gridOptions.context.domGridId);
+          const vport = grdEl.querySelector('.ag-body-viewport');
+          crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
+            newColDefs,
+            vport.scrollWidth > vport.offsetWidth);
         }
       }
       return null;

@@ -11,6 +11,7 @@ class LibraryVersions
     datagrid: [:gemver, 'Roda::DataGrid'],
     ag_grid: %i[jsver ag_grid],
     selectr: %i[jsver selectr],
+    choices: %i[jsver choices],
     sweetalert: %i[jsver sweetalert],
     sortable: %i[jsver sortable],
     konva: %i[jsver konva],
@@ -22,6 +23,7 @@ class LibraryVersions
   JS_STRATEGY = {
     ag_grid: ->(s) { s.send :ag_grid_version },
     selectr: ->(s) { s.send :selectr_version },
+    choices: ->(s) { s.send :choices_version },
     sweetalert: ->(s) { s.send :sweetalert_version },
     sortable: ->(s) { s.send :sortable_version },
     konva: ->(s) { s.send :konva_version },
@@ -70,6 +72,10 @@ class LibraryVersions
 
   def selectr_version
     format_lib('Selectr', File.readlines('public/js/selectr.min.js', encoding: 'UTF-8')[1].chomp.split(' ').last)
+  end
+
+  def choices_version
+    format_lib('Choices', File.readlines('public/js/choices.min.js', encoding: 'UTF-8').first.chomp.split(' v').last.split(' |').first)
   end
 
   def sweetalert_version

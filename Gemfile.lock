@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: e8171418afce013c19a29179129eca6f40e51d85
+  revision: b00128985ff3637ba4853f746cdf2782e7e92e91
   specs:
-    crossbeams-dataminer (0.1.6)
+    crossbeams-dataminer (0.1.7)
       pg_query (= 1.0.2)
 
 GIT
@@ -13,6 +13,14 @@ GIT
       dry-configurable
       erubi
       json
+
+GIT
+  remote: https://github.com/NoSoft-SA/crossbeams-layout.git
+  revision: a4434cc6a2c40c364b9caa14134ecb0bd19aa2e9
+  specs:
+    crossbeams-layout (0.3.0)
+      diffy
+      rouge
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-rack_middleware.git
@@ -31,13 +39,6 @@ GIT
       crossbeams-dataminer
       crossbeams-layout
       roda
-
-PATH
-  remote: /home/james/ra/crossbeams/crossbeams-layout
-  specs:
-    crossbeams-layout (0.2.2)
-      diffy
-      rouge
 
 GEM
   remote: https://rubygems.org/
@@ -178,7 +179,7 @@ GEM
     rodauth (1.16.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rouge (3.4.1)
+    rouge (3.5.1)
     rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module UiRules
-  class MrDeliveryItemRule < Base
-    def generate_rules
+  class MrDeliveryItemRule < Base # rubocop:disable Metrics/ClassLength
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = PackMaterialApp::ReplenishRepo.new
       make_form_object
       apply_form_values

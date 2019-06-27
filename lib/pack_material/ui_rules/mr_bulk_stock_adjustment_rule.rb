@@ -2,7 +2,7 @@
 
 module UiRules
   class MrBulkStockAdjustmentRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo       = PackMaterialApp::TransactionsRepo.new
       @stock_repo = PackMaterialApp::MrStockRepo.new
       @perm       = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment

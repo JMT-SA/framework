@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MrDeliveryInteractor < BaseInteractor
-    def create_mr_delivery(params)
+  class MrDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def create_mr_delivery(params) # rubocop:disable Metrics/AbcSize
       can_create = TaskPermissionCheck::MrDelivery.call(:create)
       if can_create.success
         res = validate_mr_delivery_params(params)
@@ -23,7 +23,7 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { base: ['This delivery already exists'] }))
     end
 
-    def update_mr_delivery(id, params)
+    def update_mr_delivery(id, params) # rubocop:disable Metrics/AbcSize
       can_update = TaskPermissionCheck::MrDelivery.call(:update, id)
       if can_update.success
         res = validate_mr_delivery_params(params)

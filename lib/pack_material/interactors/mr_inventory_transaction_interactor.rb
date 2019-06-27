@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MrInventoryTransactionInteractor < BaseInteractor
+  class MrInventoryTransactionInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_adhoc_stock_transaction(sku_location_id, params, type) # rubocop:disable Metrics/AbcSize
       res = validate_adhoc_transaction_params(sku_location_id, params)
       return validation_failed_response(res) if res[:messages]
@@ -29,7 +29,7 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def create_mr_inventory_transaction(params)
+    def create_mr_inventory_transaction(params) # rubocop:disable Metrics/AbcSize
       res = validate_mr_inventory_transaction_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -87,7 +87,7 @@ module PackMaterialApp
       MrInventoryTransactionSchema.call(params)
     end
 
-    def validate_adhoc_transaction_params(sku_location_id, params)
+    def validate_adhoc_transaction_params(sku_location_id, params) # rubocop:disable Metrics/AbcSize
       loc_id = replenish_repo.location_id_from_sku_location_id(sku_location_id)
       return { messages: { location: ['Location can not store stock'] } } unless replenish_repo.location_can_store_stock?(loc_id)
       return { messages: { ref_no: ['Reference Number already exists'] } } if replenish_repo.ref_no_already_exists?(params[:ref_no])

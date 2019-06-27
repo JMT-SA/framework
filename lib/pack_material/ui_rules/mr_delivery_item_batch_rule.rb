@@ -51,7 +51,7 @@ module UiRules
       @form_object = @repo.find_mr_delivery_item_batch(@options[:id])
     end
 
-    def form_object_for_barcode_print # rubocop:disable Metrics/AbcSize
+    def form_object_for_barcode_print # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @rules[:mr_delivery_item_batch_id] = @options[:type] == 'item_batch' ? @options[:id] : nil
       @rules[:delivery_item_id] = @options[:type] == 'internal_batch' ? @options[:id] : nil
       @rules[:mr_sku_id] = @options[:type] == 'none' ? @options[:id] : nil

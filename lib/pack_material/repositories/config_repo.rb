@@ -67,7 +67,7 @@ module PackMaterialApp
       general_repo.for_select_uoms(where: { uom_type_id: DB[:uom_types].where(code: PackMaterialApp::INVENTORY_UOM_TYPE).get(:id) })
     end
 
-    def create_matres_product_variant_party_role(attrs)
+    def create_matres_product_variant_party_role(attrs) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       message = nil
       message = 'Can not assign both customer and supplier' if attrs[:supplier_id] && attrs[:customer_id]
       message ||= 'Must have customer or supplier' if attrs[:supplier_id].nil? && attrs[:customer_id].nil?

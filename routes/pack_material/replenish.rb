@@ -599,11 +599,11 @@ class Framework < Roda
           if res.success
             redirect_via_json_to_stored_referer(:delivery_items)
           else
-            re_show_form(r, res) {
+            re_show_form(r, res) do
               PackMaterial::Replenish::MrDeliveryItem::Edit.call(id,
                                                                  form_values: params[:mr_delivery_item],
                                                                  form_errors: res.errors)
-            }
+            end
           end
         end
         r.delete do    # DELETE

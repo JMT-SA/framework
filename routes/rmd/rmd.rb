@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Framework < Roda
+class Framework < Roda # rubocop:disable Metrics/ClassLength
   # DELIVERIES
   # --------------------------------------------------------------------------
   route 'deliveries', 'rmd' do |r| # rubocop:disable Metrics/BlockLength

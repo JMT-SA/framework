@@ -14,7 +14,7 @@ module PackMaterialApp
       MrPurchaseOrderCostSchema.call(params)
     end
 
-    def create_mr_purchase_order_cost(parent_id, params)
+    def create_mr_purchase_order_cost(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_purchase_order_id] = parent_id
       can_create = TaskPermissionCheck::MrPurchaseOrderCost.call(:create, purchase_order_id: parent_id)
       if can_create.success
@@ -36,7 +36,7 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { id: ['This purchase order cost already exists'] }))
     end
 
-    def update_mr_purchase_order_cost(id, params)
+    def update_mr_purchase_order_cost(id, params) # rubocop:disable Metrics/AbcSize
       can_update = TaskPermissionCheck::MrPurchaseOrderCost.call(:update, id)
       if can_update.success
         res = validate_mr_purchase_order_cost_params(params)

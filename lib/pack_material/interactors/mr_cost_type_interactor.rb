@@ -14,7 +14,7 @@ module PackMaterialApp
       MrCostTypeSchema.call(params)
     end
 
-    def create_mr_cost_type(params)
+    def create_mr_cost_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_mr_cost_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 

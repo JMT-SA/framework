@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module UiRules
-  class MrDeliveryRule < Base
-    def generate_rules
+  class MrDeliveryRule < Base # rubocop:disable Metrics/ClassLength
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = PackMaterialApp::ReplenishRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       @locations_repo = MasterfilesApp::LocationRepo.new

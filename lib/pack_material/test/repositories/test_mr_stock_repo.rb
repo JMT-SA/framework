@@ -107,7 +107,7 @@ module PackMaterialApp
       assert_nil attrs[:owner_party_role_id]
 
       DB[:mr_delivery_terms].update(id: term_id, is_consignment_stock: false)
-      attrs = repo.prep_item_attrs(item, pv[:id])
+      attrs = repo.send(:prep_item_attrs, item, pv[:id])
       assert_equal attrs[:is_consignment_stock], false
       assert_equal attrs[:owner_party_role_id], owner_party_id
     end

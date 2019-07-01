@@ -3,13 +3,16 @@
 module PackMaterialApp
   class MrInventoryTransactionInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_adhoc_stock_transaction(sku_location_id, params, type) # rubocop:disable Metrics/AbcSize
-      res = validate_adhoc_transaction_params(sku_location_id, params)
-      return validation_failed_response(res) if res[:messages]
+      res = validate_adhoc_transaction_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      res = prep_adhoc_transaction_params(sku_location_id, res)
+      return res unless res.success
 
       can_action = TaskPermissionCheck::MrInventoryTransaction.call(type.to_sym,
-                                                                    sku_ids: res[:sku_ids],
-                                                                    loc_id: res[:location_id],
-                                                                    move_loc_id: res[:to_location_id])
+                                                                    sku_ids: res.instance[:sku_ids],
+                                                                    loc_id: res.instance[:location_id],
+                                                                    move_loc_id: res.instance[:to_location_id])
       if can_action.success
         repo.transaction do
           opts = {
@@ -17,10 +20,10 @@ module PackMaterialApp
             'move' => { call: ->(attrs) { adhoc_move_stock(attrs) }, message: 'Stock Moved for SKU Number: %s' },
             'remove' => { call: ->(attrs) { adhoc_remove_stock(attrs) }, message: 'Stock Removed for SKU Number: %s' }
           }
-          resp = opts[type][:call]&.call(res)
+          resp = opts[type][:call]&.call(res.instance)
           return failed_response('Adhoc Transaction Type invalid') if resp.nil?
 
-          success_response(format(opts[type][:message], res[:sku_number]), res[:sku_number])
+          success_response(format(opts[type][:message], res.instance[:sku_number]), res.instance[:sku_number])
         end
       else
         failed_response(can_action.message)
@@ -87,21 +90,19 @@ module PackMaterialApp
       MrInventoryTransactionSchema.call(params)
     end
 
-    def validate_adhoc_transaction_params(sku_location_id, params) # rubocop:disable Metrics/AbcSize
+    def validate_adhoc_transaction_params(params)
+      AdhocTransactionSchema.call(params)
+    end
+
+    def prep_adhoc_transaction_params(sku_location_id, attrs) # rubocop:disable Metrics/AbcSize
       loc_id = replenish_repo.location_id_from_sku_location_id(sku_location_id)
-      return { messages: { location: ['Location can not store stock'] } } unless replenish_repo.location_can_store_stock?(loc_id)
-      return { messages: { ref_no: ['Reference Number already exists'] } } if replenish_repo.ref_no_already_exists?(params[:ref_no])
+      return validation_failed_response(OpenStruct.new(messages: { location: ['Location can not store stock'] })) unless replenish_repo.location_can_store_stock?(loc_id)
+      return validation_failed_response(OpenStruct.new(messages: { ref_no: ['Reference Number already exists'] })) if replenish_repo.ref_no_already_exists?(attrs[:ref_no])
 
-      sku_ids = replenish_repo.sku_ids_from_numbers([params[:sku_number]])
-      return { messages: { sku_number: ['SKU number invalid'] } } unless sku_ids.any?
+      sku_ids = replenish_repo.sku_ids_from_numbers([attrs[:sku_number]])
+      return validation_failed_response(OpenStruct.new(messages: { sku_number: ['SKU number invalid'] })) unless sku_ids.any?
 
-      attrs = {
-        location_id: loc_id,
-        sku_ids: sku_ids,
-        user_name: @user.user_name,
-        quantity: params[:quantity].to_f
-      }
-      params.merge(attrs)
+      success_response('', attrs.to_h.merge(location_id: loc_id, sku_ids: sku_ids, user_name: @user.user_name))
     end
 
     def adhoc_add_stock(attrs)

@@ -135,18 +135,23 @@ module PackMaterialApp
 
     # @return [Array] ['Purchase Order Number - from: Supplier Party Name', :id]
     def for_select_purchase_orders_with_supplier(purchase_order_id: nil)
+      purchase_orders_ds(purchase_order_id)
+        .order(:purchase_order_number)
+        .select(
+          :id,
+          :purchase_order_number,
+          Sequel.function(:fn_party_role_name, :supplier_party_role_id)
+        )
+        .map { |r| [[r[:purchase_order_number], r[:fn_party_role_name]].join(' - from: '), r[:id]] }
+    end
+
+    def purchase_orders_ds(purchase_order_id)
       if purchase_order_id
         supplier_id = DB[:mr_purchase_orders].where(id: purchase_order_id).get(:supplier_party_role_id)
-        purchase_orders = DB[:mr_purchase_orders].where(approved: true, supplier_party_role_id: supplier_id, deliveries_received: false)
+        DB[:mr_purchase_orders].where(approved: true, supplier_party_role_id: supplier_id, deliveries_received: false)
       else
-        purchase_orders = DB[:mr_purchase_orders].where(approved: true, deliveries_received: false)
+        DB[:mr_purchase_orders].where(approved: true, deliveries_received: false)
       end
-      purchase_orders = purchase_orders.order(:purchase_order_number)
-      purchase_orders.select(
-        :id,
-        :purchase_order_number,
-        Sequel.function(:fn_party_role_name, :supplier_party_role_id)
-      ).map { |r| [[r[:purchase_order_number], r[:fn_party_role_name]].join(' - from: '), r[:id]] }
     end
 
     # @return [Array] returns for select with association label name
@@ -598,12 +603,17 @@ module PackMaterialApp
     end
 
     def update_current_prices(delivery_id)
-      items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id).map { |r| { pv_id: r[:mr_product_variant_id], price: r[:invoiced_unit_price] } }
+      items = DB[:mr_delivery_items].where(mr_delivery_id: delivery_id)
+                                    .map { |r| { pv_id: r[:mr_product_variant_id], price: r[:invoiced_unit_price] } }
       items.each do |item|
-        product = config_repo.find_matres_product_variant(item[:pv_id])
-        stock_adj_price = product.stock_adj_price.positive? ? product.stock_adj_price : item[:price]
-        update(:material_resource_product_variants, item[:pv_id], current_price: item[:price], stock_adj_price: stock_adj_price)
+        update_mr_product_variant_current_prices(item)
       end
+    end
+
+    def update_mr_product_variant_current_prices(item)
+      product = config_repo.find_matres_product_variant(item[:pv_id])
+      stock_adj_price = product.stock_adj_price.positive? ? product.stock_adj_price : item[:price]
+      update(:material_resource_product_variants, item[:pv_id], current_price: item[:price], stock_adj_price: stock_adj_price)
     end
 
     def config_repo

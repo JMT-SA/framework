@@ -137,11 +137,13 @@ module PackMaterialApp
 
     def delete_mr_price_adjustment(parent_id, pv_number)
       product_id = DB[:material_resource_product_variants].where(product_variant_number: pv_number).get(:id)
-      item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: parent_id,
-                                                       product_variant_number: pv_number).single_value
+      item = DB[:mr_bulk_stock_adjustment_items].where(
+        mr_bulk_stock_adjustment_id: parent_id,
+        product_variant_number: pv_number
+      ).single_value
       return nil if item
-      DB[:mr_price_adjustments].where(mr_bulk_stock_adjustment_id: parent_id,
-                                      mr_product_variant_id: product_id).delete
+
+      DB[:mr_price_adjustments].where(mr_bulk_stock_adjustment_id: parent_id, mr_product_variant_id: product_id).delete
     end
 
     def system_quantity(attrs)
@@ -302,13 +304,13 @@ module PackMaterialApp
       all(:mr_bulk_stock_adjustment_items, MrBulkStockAdjustmentItem, mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id)
     end
 
-    def set_price_adjustment_inline(id, attrs)
-      # TODO:
-      # Only update price if something was set
-      # def inline_update_delivery_item(id, attrs)
-      #       val = attrs[:column_value].empty? ? nil : attrs[:column_value]
-      #       update(:mr_delivery_items, id, invoiced_unit_price: val)
-      #     end
-    end
+    # def set_price_adjustment_inline(id, attrs)
+    #   val = attrs[:column_value].empty? ? nil : attrs[:column_value] #
+    #   # TODO: Only update price if something was set
+    #   # def inline_update_delivery_item(id, attrs)
+    #   #       val = attrs[:column_value].empty? ? nil : attrs[:column_value]
+    #   #       update(:mr_delivery_items, id, invoiced_unit_price: val)
+    #   #     end
+    # end
   end
 end

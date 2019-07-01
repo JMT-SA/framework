@@ -95,7 +95,7 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def complete_invoice(id)
+    def complete_invoice(id) # rubocop:disable Metrics/AbcSize
       can_complete_invoice = TaskPermissionCheck::MrDelivery.call(:complete_invoice, id)
       if can_complete_invoice.success
         repo.transaction do

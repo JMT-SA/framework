@@ -60,6 +60,7 @@ INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('CREATE STOCK');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('PUTAWAY');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('ADHOC MOVE');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('REMOVE STOCK');
+INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('VALUE STOCK');
 
 INSERT INTO business_processes (process) VALUES ('DELIVERIES');
 INSERT INTO business_processes (process) VALUES ('VEHICLE JOBS');

@@ -251,6 +251,7 @@ class Framework < Roda
           row_keys = %i[
             id
             stock_adjustment_number
+            ref_no
             active
             is_stock_take
             completed

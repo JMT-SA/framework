@@ -3,17 +3,17 @@
 module UiRules
   class MrBulkStockAdjustmentRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-      @repo       = PackMaterialApp::TransactionsRepo.new
+      @repo = PackMaterialApp::TransactionsRepo.new
       @stock_repo = PackMaterialApp::MrStockRepo.new
-      @perm       = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment
+      @perm = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment
       make_form_object
       apply_form_values
 
       if @mode == :edit
         rules[:can_sign_off] = can_sign_off
         rules[:can_complete] = can_complete
-        rules[:can_approve]  = can_approve
-        rules[:show_only]    = @form_object.completed || @form_object.approved
+        rules[:can_approve] = can_approve
+        rules[:show_only] = @form_object.completed || @form_object.approved
       end
 
       common_values_for_fields case @mode

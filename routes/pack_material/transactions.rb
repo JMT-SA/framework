@@ -245,6 +245,16 @@ class Framework < Roda
           end
         end
       end
+      r.on 'price_adjustment', Integer do |price_adj_id|
+        r.on 'inline_price_adjust' do
+          res = interactor.set_price_adjustment_inline(price_adj_id, params)
+          if res.success
+            show_json_notice(res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
       r.post do        # CREATE
         res = interactor.create_mr_bulk_stock_adjustment(params[:mr_bulk_stock_adjustment])
         if res.success

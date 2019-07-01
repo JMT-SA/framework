@@ -21,4 +21,11 @@ module PackMaterialApp
     required(:sku_number_scan_field, Types::StrippedString).maybe(:str?)
     required(:quantity, :integer).filled(:int?)
   end
+
+  MrBulkStockAdjustmentPriceSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:column_name, Types::StrippedString).filled(:str?)
+    required(:column_value, :decimal).filled(:decimal?, gt?: 0)
+  end
 end

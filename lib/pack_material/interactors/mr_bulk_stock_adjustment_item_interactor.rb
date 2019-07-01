@@ -2,22 +2,6 @@
 
 module PackMaterialApp
   class MrBulkStockAdjustmentItemInteractor < BaseInteractor
-    def repo
-      @repo ||= TransactionsRepo.new
-    end
-
-    def mr_bulk_stock_adjustment_item(id)
-      repo.find_mr_bulk_stock_adjustment_item(id)
-    end
-
-    def validate_mr_bulk_stock_adjustment_item_params(params)
-      NewMrBulkStockAdjustmentItemSchema.call(params)
-    end
-
-    def validate_mr_bulk_stock_adjustment_item_update_params(params)
-      UpdateMrBulkStockAdjustmentItemSchema.call(params)
-    end
-
     def create_mr_bulk_stock_adjustment_item(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_bulk_stock_adjustment_id] = parent_id
       res = validate_mr_bulk_stock_adjustment_item_params(params)
@@ -64,8 +48,11 @@ module PackMaterialApp
     end
 
     def inline_update(id, params)
+      res = validate_mr_bulk_stock_adjustment_item_inline_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
-        repo.inline_update_bulk_stock_adjustment_item(id, params)
+        repo.inline_update_bulk_stock_adjustment_item(id, res)
         log_status('mr_bulk_stock_adjustment_items', id, 'INLINE ADJUSTMENT')
         log_transaction
       end
@@ -86,6 +73,28 @@ module PackMaterialApp
 
     def can_complete(parent_id)
       TaskPermissionCheck::MrBulkStockAdjustment.call(:complete, parent_id, @user)
+    end
+
+    def mr_bulk_stock_adjustment_item(id)
+      repo.find_mr_bulk_stock_adjustment_item(id)
+    end
+
+    private
+
+    def repo
+      @repo ||= TransactionsRepo.new
+    end
+
+    def validate_mr_bulk_stock_adjustment_item_params(params)
+      NewMrBulkStockAdjustmentItemSchema.call(params)
+    end
+
+    def validate_mr_bulk_stock_adjustment_item_update_params(params)
+      UpdateMrBulkStockAdjustmentItemSchema.call(params)
+    end
+
+    def validate_mr_bulk_stock_adjustment_item_inline_params(params)
+      MrBulkStockAdjustmentItemInlineSchema.call(params)
     end
   end
 end

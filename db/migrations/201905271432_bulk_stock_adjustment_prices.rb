@@ -1,6 +1,6 @@
 Sequel.migration do
   up do
-    create_table(:mr_price_adjustments, ignore_index_errors: true) do
+    create_table(:mr_bulk_stock_adjustment_prices, ignore_index_errors: true) do
       primary_key :id
       foreign_key :mr_bulk_stock_adjustment_id, :mr_bulk_stock_adjustments, null: false, key: [:id]
       foreign_key :mr_product_variant_id, :material_resource_product_variants, null: false, key: [:id]
@@ -11,6 +11,6 @@ Sequel.migration do
   end
 
   down do
-    drop_table(:mr_price_adjustments)
+    drop_table(:mr_bulk_stock_adjustment_prices)
   end
 end

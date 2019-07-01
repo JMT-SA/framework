@@ -24,4 +24,11 @@ module PackMaterialApp
     required(:actual_quantity, :decimal).maybe(:decimal?)
     required(:stock_take_complete, :bool).maybe(:bool?)
   end
+
+  MrBulkStockAdjustmentItemInlineSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:column_name, Types::StrippedString).filled(:str?)
+    required(:column_value, :decimal).maybe(:decimal?, gt?: 0)
+  end
 end

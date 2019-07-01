@@ -1,10 +1,10 @@
 ---
 :caption: Price Adjustments
-:sql: "SELECT \"mr_price_adjustments\".id,\r\n       fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
+:sql: "SELECT \"mr_bulk_stock_adjustment_prices\".id,\r\n       fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
   as product_variant_number,\r\n       \"material_resource_product_variants\".\"product_variant_code\",\r\n
-  \      mr_price_adjustments.stock_adj_price,\r\n       mr_price_adjustments.mr_bulk_stock_adjustment_id\r\nFROM
-  mr_price_adjustments\r\nJOIN material_resource_product_variants on material_resource_product_variants.id
-  = mr_price_adjustments.mr_product_variant_id"
+  \      mr_bulk_stock_adjustment_prices.stock_adj_price,\r\n       mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id\r\nFROM
+  mr_bulk_stock_adjustment_prices\r\nJOIN material_resource_product_variants on material_resource_product_variants.id
+  = mr_bulk_stock_adjustment_prices.mr_product_variant_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -13,7 +13,7 @@
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: mr_price_adjustments.id
+    :namespaced_name: mr_bulk_stock_adjustment_prices.id
     :data_type: :integer
     :width: 
     :format: 
@@ -61,7 +61,7 @@
     :name: stock_adj_price
     :sequence_no: 4
     :caption: Stock adj price
-    :namespaced_name: mr_price_adjustments.stock_adj_price
+    :namespaced_name: mr_bulk_stock_adjustment_prices.stock_adj_price
     :data_type: :number
     :width: 
     :format: :delimited_1000
@@ -77,7 +77,7 @@
     :name: mr_bulk_stock_adjustment_id
     :sequence_no: 5
     :caption: Mr bulk stock adjustment
-    :namespaced_name: mr_price_adjustments.mr_bulk_stock_adjustment_id
+    :namespaced_name: mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id
     :data_type: :string
     :width: 
     :format: 
@@ -90,11 +90,11 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: mr_price_adjustments.mr_bulk_stock_adjustment_id
-  :caption: Parent Id
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 1
-  :list_def: 
+  - :column: mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id
+    :caption: Parent Id
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:

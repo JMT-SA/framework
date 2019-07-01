@@ -118,12 +118,12 @@ module PackMaterialApp
                        system_quantity: system_qty,
                        location_long_code: DB[:locations].where(id: location_id).get(:location_long_code))
 
-      create_mr_price_adjustment(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id], mr_product_variant_id: mr_product_variant_id)
+      create_mr_bulk_stock_adjustment_prices(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id], mr_product_variant_id: mr_product_variant_id)
       item_id
     end
 
-    def create_mr_price_adjustment(attrs)
-      DB[:mr_price_adjustments].insert(attrs) unless exists?(:mr_price_adjustments, attrs)
+    def create_mr_bulk_stock_adjustment_prices(attrs)
+      DB[:mr_bulk_stock_adjustment_prices].insert(attrs) unless exists?(:mr_bulk_stock_adjustment_prices, attrs)
     end
 
     def delete_mr_bulk_stock_adjustment_item(id)
@@ -132,10 +132,10 @@ module PackMaterialApp
       parent_id = item.get(:mr_bulk_stock_adjustment_id)
 
       item.delete
-      delete_mr_price_adjustment(parent_id, pv_number)
+      delete_mr_bulk_stock_adjustment_prices(parent_id, pv_number)
     end
 
-    def delete_mr_price_adjustment(parent_id, pv_number)
+    def delete_mr_bulk_stock_adjustment_prices(parent_id, pv_number)
       product_id = DB[:material_resource_product_variants].where(product_variant_number: pv_number).get(:id)
       item = DB[:mr_bulk_stock_adjustment_items].where(
         mr_bulk_stock_adjustment_id: parent_id,
@@ -143,7 +143,7 @@ module PackMaterialApp
       ).single_value
       return nil if item
 
-      DB[:mr_price_adjustments].where(mr_bulk_stock_adjustment_id: parent_id, mr_product_variant_id: product_id).delete
+      DB[:mr_bulk_stock_adjustment_prices].where(mr_bulk_stock_adjustment_id: parent_id, mr_product_variant_id:       product_id).delete
     end
 
     def system_quantity(attrs)
@@ -292,8 +292,7 @@ module PackMaterialApp
     end
 
     def inline_update_bulk_stock_adjustment_item(id, attrs)
-      val = attrs[:column_value].empty? ? nil : attrs[:column_value]
-      update(:mr_bulk_stock_adjustment_items, id, "#{attrs[:column_name]}": val)
+      update(:mr_bulk_stock_adjustment_items, id, "#{attrs[:column_name]}": attrs[:column_value])
     end
 
     def replenish_repo
@@ -304,13 +303,9 @@ module PackMaterialApp
       all(:mr_bulk_stock_adjustment_items, MrBulkStockAdjustmentItem, mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id)
     end
 
-    # def set_price_adjustment_inline(id, attrs)
-    #   val = attrs[:column_value].empty? ? nil : attrs[:column_value] #
-    #   # TODO: Only update price if something was set
-    #   # def inline_update_delivery_item(id, attrs)
-    #   #       val = attrs[:column_value].empty? ? nil : attrs[:column_value]
-    #   #       update(:mr_delivery_items, id, invoiced_unit_price: val)
-    #   #     end
-    # end
+    def set_price_adjustment_inline(id, attrs)
+      bsa_price = DB[:mr_bulk_stock_adjustment_prices].where(id: id)
+      bsa_price.update(stock_adj_price: attrs[:column_value])
+    end
   end
 end

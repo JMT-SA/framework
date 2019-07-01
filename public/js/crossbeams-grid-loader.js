@@ -368,6 +368,53 @@ const crossbeamsGridEvents = {
   },
 
   /**
+   * If this grid has a bookmark, make the bookmark button available to jump to the row.
+   * @param {string} gridId - the DOM id of the grid.
+   * @returns {void}
+   */
+  makeRowBookmark: function makeRowBookmark(gridId, updateId = false) {
+    const frame = document.getElementById(`${gridId}-frame`);
+    const btn = frame.querySelector('.crossbeams-row-bookmark');
+
+    if (btn === null) {
+      return;
+    }
+    const rowId = crossbeamsUtils.currentGridRowBookmark();
+    if (rowId === null) {
+      btn.hidden = true;
+      return;
+    }
+    btn.hidden = false;
+    btn.dataset.bookmarkRowId = rowId;
+
+
+    const bkmkClick = function bkmkClick() {
+      const gridOptions = crossbeamsGridStore.getGrid(gridId);
+      const node = gridOptions.api.getRowNode(btn.dataset.bookmarkRowId);
+      if (node === undefined) {
+        btn.hidden = true;
+      } else {
+        gridOptions.api.ensureNodeVisible(node, 'middle');
+        node.setSelected(true);
+        // If this is a tree, the bookmarked row might be collapsed.
+        let currNode = node;
+        while (currNode.parent) {
+          if (!currNode.parent.expanded) {
+            currNode.parent.setExpanded(true);
+          }
+          currNode = currNode.parent;
+        }
+      }
+    };
+
+    if (updateId) {
+      btn.removeEventListener('click', bkmkClick);
+    }
+
+    btn.addEventListener('click', bkmkClick);
+  },
+
+  /**
    * Export a grid to a csv file.
    * @param {string} gridId - the DOM id of the grid.
    * @param {string} fileName - the name to be given to the exported file.
@@ -586,7 +633,7 @@ const crossbeamsGridFormatters = {
       // No show of item
       return null;
     } else if (item.is_submenu) {
-      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true };
+      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null };
       item.items.forEach((subitem) => {
         subKey = crossbeamsGridFormatters.nextChar(subKey);
         subPrefix = `${prefix}${key}_`;
@@ -623,6 +670,7 @@ const crossbeamsGridFormatters = {
       icon: item.icon,
       popup: item.popup,
       loading_window: item.loading_window,
+      row_id: params.data.id,
     };
   },
 
@@ -1158,6 +1206,7 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
             newColDefs,
             vport.scrollWidth > vport.offsetWidth);
+          crossbeamsGridEvents.makeRowBookmark(gridOptions.context.domGridId);
         }
       }
       return null;
@@ -1441,6 +1490,7 @@ document.addEventListener('DOMContentLoaded', () => {
             is_submenu: item.is_submenu,
             popup: item.popup,
             loading_window: item.loading_window,
+            row_id: item.row_id,
             domGridId: gridId,
           };
           if (item.is_submenu) {
@@ -1455,6 +1505,11 @@ document.addEventListener('DOMContentLoaded', () => {
           const item = getItemFromTree(key, items);
           const caller = () => {
             let form = null;
+            // Store current grid row as a bookmark.
+            if (document.querySelector(`#${item.domGridId}-frame .crossbeams-row-bookmark`)) {
+              crossbeamsUtils.recordGridRowBookmark(item.row_id);
+              crossbeamsGridEvents.makeRowBookmark(item.domGridId, true);
+            }
             if (item.method === undefined) {
               if (item.popup) {
                 crossbeamsUtils.recordGridIdForPopup(item.domGridId);

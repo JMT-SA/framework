@@ -158,6 +158,46 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Save a grid's current row id for bookmarking.
+   * Up to 20 grids row ids are cached.
+   * @param {string/integer} rowId - the value of the `id` column of the current row.
+   * @return {void}
+   */
+  recordGridRowBookmark: function recordGridRowBookmark(rowId) {
+    const key = 'gridBookmarks';
+    const url = window.location.pathname;
+    let urlSet = [];
+    if (crossbeamsLocalStorage.hasItem(key)) {
+      urlSet = crossbeamsLocalStorage.getItem(key);
+      if (urlSet.length > 20) {
+        urlSet.shift();
+      }
+      urlSet = urlSet.filter(item => item.url !== url);
+    }
+    urlSet.push({ url, rowId });
+    crossbeamsLocalStorage.setItem(key, urlSet);
+  },
+
+  /**
+   * Get the bookmark for a grid.
+   * @return {string/integer} rowId - the value of the `id` column of the bookmarked row.
+   */
+  currentGridRowBookmark: function currentGridRowBookmark() {
+    const key = 'gridBookmarks';
+    const url = window.location.pathname;
+    const urlSet = crossbeamsLocalStorage.getItem(key);
+
+    if (urlSet === null) {
+      return null;
+    }
+    const result = urlSet.find(elem => elem.url === url);
+    if (result === undefined) {
+      return null;
+    }
+    return result.rowId;
+  },
+
+  /**
    * Replace the content of the active dialog window.
    * @param {string} data - the new content.
    * @returns {void}

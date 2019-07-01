@@ -26,14 +26,45 @@ module PackMaterialApp
       return failed_response('To location does not exist') unless @repo.exists?(:locations, id: @to_location_id)
       return failed_response('From location does not exist') unless @from_location_id && @repo.exists?(:locations, id: @from_location_id)
 
+      res = move_stock
+      return res unless res.success
+
+      res = set_parent_transaction
+      return res unless res.success
+
+      update_dependant_records
+      create_inventory_transaction_item
+    end
+
+    private
+
+    def move_stock
       res = @repo.create_sku_location_ids([@sku_id], @to_location_id)
       res = @repo.update_sku_location_quantity(@sku_id, @quantity, @from_location_id, add: false) if res.success
       res = @repo.update_sku_location_quantity(@sku_id, @quantity, @to_location_id, add: true) if res.success
-      return res unless res.success
+      res
+    end
 
+    def create_inventory_transaction_item
+      transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
+        mr_inventory_transaction_id: @parent_transaction_id,
+        from_location_id: @from_location_id,
+        to_location_id: @to_location_id,
+        mr_sku_id: @sku_id,
+        inventory_uom_id: @repo.sku_uom_id(@sku_id),
+        quantity: @quantity
+      )
+      success_response('ok', transaction_item_id)
+    end
+
+    def update_dependant_records
+      @repo.update_delivery_putaway_id(@opts[:delivery_id], @parent_transaction_id) if @opts[:delivery_id]
+      # @repo.update_vehicle_job_transaction_id(@tripsheet_id, @parent_transaction_id) if @opts[:tripsheet_id] #vehicle_job.material_resource_inventory_transaction_id
+    end
+
+    def set_parent_transaction
       if @parent_transaction_id
-        res = @repo.activate_mr_inventory_transaction(@parent_transaction_id)
-        return res unless res.success
+        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
       else
         type_id = @opts[:is_adhoc] ? @repo.transaction_type_id_for('adhoc') : @repo.transaction_type_id_for('putaway')
         attrs = {
@@ -46,20 +77,8 @@ module PackMaterialApp
           created_by: @opts[:user_name]
         }
         @parent_transaction_id = @transaction_repo.create_mr_inventory_transaction(attrs)
-
-        @repo.update_delivery_putaway_id(@opts[:delivery_id], @parent_transaction_id) if @opts[:delivery_id]
-        # @repo.update_vehicle_job_transaction_id(@tripsheet_id, @parent_transaction_id) if @opts[:tripsheet_id] #vehicle_job.material_resource_inventory_transaction_id
+        ok_response
       end
-
-      transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
-        mr_inventory_transaction_id: @parent_transaction_id,
-        from_location_id: @from_location_id,
-        to_location_id: @to_location_id,
-        mr_sku_id: @sku_id,
-        inventory_uom_id: @repo.sku_uom_id(@sku_id),
-        quantity: @quantity
-      )
-      success_response('ok', transaction_item_id)
     end
   end
 end

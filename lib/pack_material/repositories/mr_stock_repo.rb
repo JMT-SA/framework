@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MrStockRepo < BaseRepo
+  class MrStockRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :business_processes, label: :process,
                                           value: :id,
                                           no_active_check: true,
@@ -19,27 +19,28 @@ module PackMaterialApp
       sku_ids = []
       items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).all
       items.each do |item|
-        pv_id = item[:mr_product_variant_id]
-        pv = DB[:material_resource_product_variants].where(id: pv_id).first
-        fixed = pv[:use_fixed_batch_number]
-        attrs = prep_item_attrs(item, pv_id)
-
-        if fixed
-          attrs[:mr_internal_batch_number_id] = pv[:mr_internal_batch_number_id]
-
-          sku_id = find_or_create_sku(attrs)
-          sku_ids << sku_id
-        else
-          batch_ids = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id]).map(:id)
-          batch_ids.each do |batch_id|
-            attrs[:mr_delivery_item_batch_id] = batch_id
-
-            sku_id = find_or_create_sku(attrs)
-            sku_ids << sku_id
-          end
-        end
+        sku_ids << create_delivery_item_skus(item)
       end
-      sku_ids
+      sku_ids.flatten
+    end
+
+    def create_delivery_item_skus(item) # rubocop:disable Metrics/AbcSize
+      pv_id = item[:mr_product_variant_id]
+      pv = DB[:material_resource_product_variants].where(id: pv_id).first
+      attrs = prep_item_attrs(item, pv_id)
+
+      if pv[:use_fixed_batch_number]
+        attrs[:mr_internal_batch_number_id] = pv[:mr_internal_batch_number_id]
+        find_or_create_sku(attrs)
+      else
+        sku_ids = []
+        batch_ids = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id]).map(:id)
+        batch_ids.each do |batch_id|
+          attrs[:mr_delivery_item_batch_id] = batch_id
+          sku_ids << find_or_create_sku(attrs)
+        end
+        sku_ids
+      end
     end
 
     def find_or_create_sku(attrs)
@@ -54,17 +55,17 @@ module PackMaterialApp
     end
 
     def prep_item_attrs(item, product_variant_id)
-      owner_party_role_id = party_repo.implementation_owner_party_role.id
       term_id, supplier_party_role_id = DB[:mr_purchase_orders].where(
         id: DB[:mr_purchase_order_items].where(
           id: item[:mr_purchase_order_item_id]
         ).get(:mr_purchase_order_id)
-      ).get([:mr_delivery_term_id, :supplier_party_role_id])
-
-      attrs = { mr_product_variant_id: product_variant_id }
-      attrs[:is_consignment_stock] = DB[:mr_delivery_terms].where(id: term_id).get(:is_consignment_stock)
-      attrs[:owner_party_role_id] = attrs[:is_consignment_stock] ? supplier_party_role_id : owner_party_role_id
-      attrs
+      ).get(%i[mr_delivery_term_id supplier_party_role_id])
+      consignment = DB[:mr_delivery_terms].where(id: term_id).get(:is_consignment_stock)
+      {
+        mr_product_variant_id: product_variant_id,
+        owner_party_role_id: consignment ? supplier_party_role_id : party_repo.implementation_owner_party_role.id,
+        is_consignment_stock: consignment
+      }
     end
 
     def find_location_id_by_code(location_long_code)
@@ -122,7 +123,7 @@ module PackMaterialApp
       DB[:mr_deliveries].where(id: id).get(:receipt_transaction_id)
     end
 
-    def get_delivery_sku_quantities(mr_delivery_id)
+    def get_delivery_sku_quantities(mr_delivery_id) # rubocop:disable Metrics/AbcSize
       quantities = []
       items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).all
       items.each do |item|
@@ -191,7 +192,7 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def update_sku_location_quantity(sku_id, qty, location_id, add: true)
+    def update_sku_location_quantity(sku_id, qty, location_id, add: true) # rubocop:disable Metrics/AbcSize
       location = DB[:mr_sku_locations].where(mr_sku_id: sku_id, location_id: location_id)
       return failed_response('No SKUs at location') unless location.first
 

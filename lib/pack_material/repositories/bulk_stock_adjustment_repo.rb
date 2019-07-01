@@ -32,21 +32,12 @@ module PackMaterialApp
     end
 
     def separate_items(bulk_stock_adjustment_id)
-      destroy_stock_items = []
-      create_stock_items = []
-      items = all_hash(:mr_bulk_stock_adjustment_items, mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id)
-      items.each do |item|
+      separated_items = { destroy_stock_items: [], create_stock_items: [] }
+      all_hash(:mr_bulk_stock_adjustment_items, mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id).each do |item|
         sys_qty = system_quantity(item[:mr_sku_id], item[:location_id])
-        if sys_qty > item[:actual_quantity].to_d
-          destroy_stock_items << item
-        else
-          create_stock_items << item
-        end
+        sys_qty > item[:actual_quantity].to_d ? separated_items[:destroy_stock_items] << item : separated_items[:create_stock_items] << item
       end
-      {
-        destroy_stock_items: destroy_stock_items,
-        create_stock_items: create_stock_items
-      }
+      separated_items
     end
 
     # @param [Array] sku_ids

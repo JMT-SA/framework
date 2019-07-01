@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class TransactionsRepo < BaseRepo
+  class TransactionsRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :mr_inventory_transactions,
                      label: :created_by,
                      value: :id,
@@ -85,7 +85,7 @@ module PackMaterialApp
       DB[:mr_bulk_stock_adjustments].where(id: id).delete
     end
 
-    def create_mr_bulk_stock_adjustment_item(attrs)
+    def create_mr_bulk_stock_adjustment_item(attrs) # rubocop:disable Metrics/AbcSize
       sku_id = attrs[:mr_sku_id]
       location_id = attrs[:location_id]
 
@@ -245,25 +245,22 @@ module PackMaterialApp
       success_response('ok', item.get(:id))
     end
 
-    def html_stock_adjustment_progress_report(bulk_stock_adjustment_id, sku_id, location_id)
+    def stock_adjustment_progress_report_values(bulk_stock_adjustment_id, sku_id, location_id) # rubocop:disable Metrics/AbcSize
       return nil unless bulk_stock_adjustment_id && sku_id && location_id
 
       total_items = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id).all
-      done = total_items.reject { |r| r[:actual_quantity].nil? }.count
       sku = DB[:mr_skus].where(id: sku_id).first
-      product_variant_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
-      item = DB[:mr_bulk_stock_adjustment_items].where(
-        mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id,
-        mr_sku_id: sku_id,
-        location_id: location_id
-      ).first
-      <<~HTML
-        Stock Adjustment (#{bulk_stock_adjustment_number_from_id(bulk_stock_adjustment_id)}): #{done} of #{total_items.count} items.<br>
-        Last scan:<br>
-        LOC: #{replenish_repo.location_long_code_from_location_id(location_id)}<br>
-        SKU (#{replenish_repo.sku_number_from_id(sku_id)}): #{product_variant_code}<br>
-        Qty: was #{UtilityFunctions.delimited_number(item[:system_quantity])} now #{UtilityFunctions.delimited_number(item[:actual_quantity])} (#{item[:inventory_uom_code]})<br>
-      HTML
+      {
+        total_items: total_items,
+        done: total_items.reject { |r| r[:actual_quantity].nil? }.count,
+        sku: sku,
+        product_variant_code: DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code),
+        item: DB[:mr_bulk_stock_adjustment_items].where(
+          mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id,
+          mr_sku_id: sku_id,
+          location_id: location_id
+        ).first
+      }
     end
 
     def inline_update_bulk_stock_adjustment_item(id, attrs)

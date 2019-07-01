@@ -27,9 +27,50 @@ module PackMaterialApp
       res = @repo.create_sku_location_ids(@sku_ids, @to_location_id)
       return res unless res.success
 
+      res = set_parent_transaction
+      return res unless res.success
+
+      res = update_delivery_receipt_id
+      return res unless res.success
+
+      res = add_sku_location_quantities
+      return res unless res.success
+
+      create_inventory_transaction_items(parent_transaction_id: @parent_transaction_id, transaction_item_ids: [])
+    end
+
+    private
+
+    def add_sku_location_quantities
+      @quantities = @repo.get_delivery_sku_quantities(@delivery_id) if @delivery_id
+      @repo.add_sku_location_quantities(@quantities, @to_location_id)
+    end
+
+    def update_delivery_receipt_id
+      if @delivery_id
+        @repo.update_delivery_receipt_id(@delivery_id, @parent_transaction_id)
+      else
+        ok_response
+      end
+    end
+
+    def create_inventory_transaction_items(response_hash)
+      @quantities.each do |hsh|
+        transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
+          mr_inventory_transaction_id: @parent_transaction_id,
+          mr_sku_id: hsh[:sku_id],
+          inventory_uom_id: @repo.sku_uom_id(hsh[:sku_id]),
+          to_location_id: @to_location_id,
+          quantity: hsh[:qty]
+        )
+        response_hash[:transaction_item_ids] << hsh.merge(transaction_item_id: transaction_item_id)
+      end
+      success_response('ok', response_hash)
+    end
+
+    def set_parent_transaction
       if @parent_transaction_id
-        res = @repo.activate_mr_inventory_transaction(@parent_transaction_id)
-        return res unless res.success
+        @repo.activate_mr_inventory_transaction(@parent_transaction_id)
       else
         type_id = @repo.transaction_type_id_for('create')
         attrs = {
@@ -42,33 +83,8 @@ module PackMaterialApp
           created_by: @opts[:user_name]
         }
         @parent_transaction_id = @transaction_repo.create_mr_inventory_transaction(attrs)
+        ok_response
       end
-
-      if @delivery_id
-        res = @repo.update_delivery_receipt_id(@delivery_id, @parent_transaction_id)
-        return res unless res.success
-
-        @quantities = @repo.get_delivery_sku_quantities(@delivery_id)
-      end
-
-      res = @repo.add_sku_location_quantities(@quantities, @to_location_id)
-      return res unless res.success
-
-      response_hash = {
-        parent_transaction_id: @parent_transaction_id,
-        transaction_item_ids: []
-      }
-      @quantities.each do |hsh|
-        transaction_item_id = @transaction_repo.create_mr_inventory_transaction_item(
-          mr_inventory_transaction_id: @parent_transaction_id,
-          mr_sku_id: hsh[:sku_id],
-          inventory_uom_id: @repo.sku_uom_id(hsh[:sku_id]),
-          to_location_id: @to_location_id,
-          quantity: hsh[:qty]
-        )
-        response_hash[:transaction_item_ids] << hsh.merge(transaction_item_id: transaction_item_id)
-      end
-      success_response('ok', response_hash)
     end
   end
 end

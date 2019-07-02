@@ -55,91 +55,105 @@
 <p style="height:2em">
 </p>
 
- <% content_for :late_javascript do %>
-<script>
+<% content_for :late_javascript do %>
+  <script>
+    (function() {
+      const translateColDefs = function translateColDefs(columnDefs) {
+        const newColDefs = [];
+        let newCol = {};
+        columnDefs.forEach((col) => {
+          newCol = {};
+          Object.keys(col).forEach((attr) => {
+            if (attr === 'cellRenderer') {
+              newCol[attr] = col[attr]; // Default behaviour is to copy it over.
+              if (col[attr] === 'crossbeamsGridFormatters.testRender') {
+                newCol[attr] = crossbeamsGridFormatters.testRender;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.menuActionsRenderer') {
+                newCol[attr] = crossbeamsGridFormatters.menuActionsRenderer;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas2') {
+                newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas4') {
+                newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.booleanFormatter') {
+                newCol[attr] = crossbeamsGridFormatters.booleanFormatter;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.hrefInlineFormatter') {
+                newCol[attr] = crossbeamsGridFormatters.hrefInlineFormatter;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.hrefSimpleFormatter') {
+                newCol[attr] = crossbeamsGridFormatters.hrefSimpleFormatter;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.hrefSimpleFetchFormatter') {
+                newCol[attr] = crossbeamsGridFormatters.hrefSimpleFetchFormatter;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.hrefPromptFormatter') {
+                newCol[attr] = crossbeamsGridFormatters.hrefPromptFormatter;
+              }
+            } else if (attr === 'valueFormatter') {
+              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas2') {
+                newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
+              }
+              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas4') {
+                newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
+              }
+            } else {
+              newCol[attr] = col[attr];
+            }
+          });
+          newColDefs.push(newCol);
+        });
+        return newColDefs;
+      };
 
-(function() {
-  //var loadGrid;
-  var onBtExport;
+      let colDefs = translateColDefs(<%= @page.col_defs.to_json %>);
+      let rowDefs = <%= @page.row_defs.to_json %>;
+      let grid = document.querySelector('#grd1');
+      let grid_id = grid.getAttribute('id');
+      const sideBar = {
+        toolPanels: [
+          {
+            id: 'columns',
+            labelDefault: 'Columns',
+            labelKey: 'columns',
+            iconKey: 'columns',
+            toolPanel: 'agColumnsToolPanel',
+          },
+          {
+            id: 'filters',
+            labelDefault: 'Filters',
+            labelKey: 'filters',
+            iconKey: 'filter',
+            toolPanel: 'agFiltersToolPanel',
+          },
+        ],
+      };
 
-  translateColDefs = function(columnDefs) {
-    //console.log(columnDefs);
-    var newColDefs = [], col, newCol, fn;
-    for (_i = 0, _len = columnDefs.length; _i < _len; _i++) {
-      col = columnDefs[_i];
-      newCol = {};
-      for(attr in col) {
-        if(attr==='cellRenderer') {
-          //fn = window[col[attr]];
-          //newCol[attr] = fn;
-          //newCol[attr] = eval(col[attr]);
-          if(col[attr] ==='crossbeamsGridFormatters.testRender') {
-            newCol[attr] = crossbeamsGridFormatters.testRender;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas2') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas4') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.booleanFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.booleanFormatter;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.hrefInlineFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.hrefInlineFormatter;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.hrefSimpleFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.hrefSimpleFormatter;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.hrefPromptFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.hrefPromptFormatter;
-          }
-
-        }
-        else if(attr==='valueFormatter') {
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas2') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas4') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
-          }
-        }
-        else if(attr==='cellEditor') {
-          if(col[attr] ==='NumericCellEditor') {
-            newCol[attr] = NumericCellEditor;
-          }
-          else {
-            newCol[attr] = col[attr];
-          }
-        }
-        else {
-          newCol[attr] = col[attr];
-        }
-      }
-      newColDefs.push(newCol);
-    }
-    return newColDefs;
-  };
-
-
-      var grid, gridOptions, grid_id, colDefs, rowDefs;
-      colDefs = translateColDefs(<%= @page.col_defs.to_json %>),
-      rowDefs = <%= @page.row_defs.to_json %>,
-      grid = document.querySelector('#grd1');
-      grid_id = grid.getAttribute('id');
-      //for_print = grid.dataset.gridPrint;
-      gridOptions = {
+      let gridOptions = {
         columnDefs: colDefs,
         rowData: rowDefs,
         context: {
           saveUrl: '<%= @page.save_url %>',
           keyColumn: 'name',
           domGridId: 'grd1'
-              },
+        },
         enableColResize: true,
         enableSorting: true,
         enableFilter: true,
+        rowSelection: 'single',
         enableRangeSelection: true,
+        statusBar: {
+          statusPanels: [
+            // { statusPanel: 'agTotalRowCountComponent', align: 'left' },
+            // { statusPanel: 'agFilteredRowCountComponent' }, - these two include group rows.
+            // { statusPanel: 'agSelectedRowCountComponent' },
+            { statusPanel: 'agAggregationComponent' },
+          ],
+        },
+        sideBar,
         suppressAggFuncInHeader: true,
         onCellValueChanged: function(event) {
           if(event.oldValue === event.newValue) {
@@ -199,16 +213,16 @@
             http.send(formData);
           }
         },
-              };
+      };
 
       new agGrid.Grid(grid, gridOptions);
       crossbeamsGridStore.addGrid(grid_id, gridOptions);
 
-      colDefs = translateColDefs(<%= @page.col_defs_params.to_json %>),
-      rowDefs = <%= @page.row_defs_params.to_json %>,
+      colDefs = translateColDefs(<%= @page.col_defs_params.to_json %>);
+      rowDefs = <%= @page.row_defs_params.to_json %>;
       grid = document.querySelector('#grd2');
       grid_id = grid.getAttribute('id');
-      //for_print = grid.dataset.gridPrint;
+
       gridOptions = {
         columnDefs: colDefs,
         rowData: rowDefs,
@@ -217,12 +231,11 @@
         enableFilter: true,
         enableRangeSelection: true,
         suppressAggFuncInHeader: true,
-              };
+      };
 
       new agGrid.Grid(grid, gridOptions);
       crossbeamsGridStore.addGrid(grid_id, gridOptions);
 
-      //loadGrid(grid, gridOptions);
-  }).call(this);
-</script>
+    }).call(this);
+  </script>
 <% end %>

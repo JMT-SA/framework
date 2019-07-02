@@ -130,6 +130,9 @@ section.crossbeams_layout-fit-height {
 .grid-context-menu {
   line-height: initial;
 }
+ul.context-menu-list.context-menu-root {
+  z-index: 3 !important; /* Ensure context-menu stands above main menu. */
+}
 .ac_icon {
   width: 16px;
   height: 16px;

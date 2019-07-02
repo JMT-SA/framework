@@ -165,7 +165,8 @@ const crossbeamsUtils = {
    */
   recordGridRowBookmark: function recordGridRowBookmark(rowId) {
     const key = 'gridBookmarks';
-    const url = window.location.pathname;
+    // Match the url with queryparams but without host & port
+    const url = window.location.href.replace(window.location.origin, '');
     let urlSet = [];
     if (crossbeamsLocalStorage.hasItem(key)) {
       urlSet = crossbeamsLocalStorage.getItem(key);
@@ -184,7 +185,8 @@ const crossbeamsUtils = {
    */
   currentGridRowBookmark: function currentGridRowBookmark() {
     const key = 'gridBookmarks';
-    const url = window.location.pathname;
+    // Store the url with queryparams but without host & port
+    const url = window.location.href.replace(window.location.origin, '');
     const urlSet = crossbeamsLocalStorage.getItem(key);
 
     if (urlSet === null) {

@@ -5,7 +5,7 @@ module DevelopmentApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:login_name, Types::StrippedString).filled(:str?)
+    optional(:login_name, Types::StrippedString).filled(:str?)
     required(:user_name, Types::StrippedString).maybe(:str?)
     required(:email, Types::StrippedString).maybe(:str?)
   end

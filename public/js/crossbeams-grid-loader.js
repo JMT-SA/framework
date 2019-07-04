@@ -561,6 +561,17 @@ const crossbeamsGridEvents = {
   },
 
   /**
+   * Sort the display of a row's columns while viewing in a popup form
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
+  setSortForRowView: function setSortForRowView(gridId, checkbox) {
+    crossbeamsLocalStorage.setItem('viewGridRowSorted', checkbox.checked);
+    crossbeamsUtils.closePopupDialog();
+    crossbeamsGridEvents.viewSelectedRow(gridId);
+  },
+
+  /**
    * Display the contents of the currently-selected row in a popup form.
    * @param {string} gridId - the id of the grid div element.
    * @returns {void}
@@ -581,9 +592,26 @@ const crossbeamsGridEvents = {
     const hidePrev = rowNode.rowIndex === 0 ? ' disabled' : '';
     const hideNext = rowNode.rowIndex === rows - 1 ? ' disabled' : '';
 
-    const useKeys = gridOptions.columnApi.getAllDisplayedColumns().filter(c => c.colDef.headerName !== '' && c.colDef.headerName !== 'Group').map(c => c.colDef.field);
+    const holdKeys = gridOptions.columnApi.getAllDisplayedColumns().filter(c => c.colDef.headerName !== '' && c.colDef.headerName !== 'Group');
+    let useKeys;
+    const sorted = crossbeamsLocalStorage.getItem('viewGridRowSorted');
+    if (sorted) {
+      useKeys = holdKeys.sort((a, b) => {
+        const nameA = a.colDef.headerName.toUpperCase();
+        const nameB = b.colDef.headerName.toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
 
-    // TODO: - sort keys. (and un-sort)
+        return 0;
+      }).map(c => c.colDef.field);
+    } else {
+      useKeys = holdKeys.map(c => c.colDef.field);
+    }
+
     const content = `<div>
       <button class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsGridEvents.prevRow('${gridId}')"${hidePrev}>
         <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.05 9.293L6.343 10 12 15.657l1.414-1.414L9.172 10l4.242-4.243L12 4.343z"/></svg> Prev
@@ -591,6 +619,7 @@ const crossbeamsGridEvents = {
       <button class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsGridEvents.nextRow('${gridId}')"${hideNext}>
         Next <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z"/></svg>
       </button>
+      <label><input type="checkbox" onchange="crossbeamsGridEvents.setSortForRowView('${gridId}', this)" ${sorted ? 'checked="y"' : ''}> Sort column names</label>
       </div>
       <div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
       <table class="thinbordertable" style="margin:0 0.5em">

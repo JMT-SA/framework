@@ -613,10 +613,10 @@ const crossbeamsGridEvents = {
     }
 
     const content = `<div>
-      <button class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsGridEvents.prevRow('${gridId}')"${hidePrev}>
+      <button class="f6 link dim br2 ph3 pv2 dib white bg-dark-blue" onclick="crossbeamsGridEvents.prevRow('${gridId}')"${hidePrev}>
         <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.05 9.293L6.343 10 12 15.657l1.414-1.414L9.172 10l4.242-4.243L12 4.343z"/></svg> Prev
       </button>
-      <button class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsGridEvents.nextRow('${gridId}')"${hideNext}>
+      <button class="f6 link dim br2 ph3 pv2 dib white bg-dark-blue" onclick="crossbeamsGridEvents.nextRow('${gridId}')"${hideNext}>
         Next <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z"/></svg>
       </button>
       <label><input type="checkbox" onchange="crossbeamsGridEvents.setSortForRowView('${gridId}', this)" ${sorted ? 'checked="y"' : ''}> Sort column names</label>

@@ -512,12 +512,22 @@ const crossbeamsGridEvents = {
       selectedNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
     }
     let found = false;
+    let lastNode = null;
     gridOptions.api.forEachNodeAfterFilterAndSort((node, index) => {
+      if (!node.group) {
+        lastNode = node;
+      }
       if (!found && index === selectedNode.rowIndex - 1) {
-        found = true;
-        node.setSelected(true);
-        crossbeamsUtils.closePopupDialog();
-        crossbeamsGridEvents.viewSelectedRow(gridId);
+        if (!node.group) {
+          lastNode = node;
+        }
+        if (lastNode !== null) {
+          found = true;
+          lastNode.setSelected(true);
+          crossbeamsUtils.closePopupDialog();
+          crossbeamsGridEvents.viewSelectedRow(gridId);
+          gridOptions.api.ensureNodeVisible(lastNode, 'top');
+        }
       }
     });
   },
@@ -539,10 +549,13 @@ const crossbeamsGridEvents = {
     let found = false;
     gridOptions.api.forEachNodeAfterFilterAndSort((node, index) => {
       if (!found && index > selectedNode.rowIndex) {
-        found = true;
-        node.setSelected(true);
-        crossbeamsUtils.closePopupDialog();
-        crossbeamsGridEvents.viewSelectedRow(gridId);
+        if (!node.group) {
+          found = true;
+          node.setSelected(true);
+          crossbeamsUtils.closePopupDialog();
+          crossbeamsGridEvents.viewSelectedRow(gridId);
+          gridOptions.api.ensureNodeVisible(node, 'bottom');
+        }
       }
     });
   },
@@ -585,13 +598,13 @@ const crossbeamsGridEvents = {
       <tr><th>Column</th><th style="min-width:15em">Value</th></tr>
       </thead>
       <tbody>
-      ${useKeys.map(k => `
+      ${useKeys.filter(l => gridOptions.api.getColumnDef(l) !== null).map(k => `
         <tr class="hover-row ${(() => { cnt += 1; return cnt % 2 === 0 ? 'roweven' : 'rowodd'; })()}"><td>
-          ${gridOptions.api.getColumnDef(k).headerName}
-          </td><td class="selected-grid-row-display ${gridOptions.api.getColumnDef(k).cellClass ? gridOptions.api.getColumnDef(k).cellClass : ''}">
+          ${gridOptions.api.getColumnDef(k) && gridOptions.api.getColumnDef(k).headerName}
+          </td><td class="selected-grid-row-display ${gridOptions.api.getColumnDef(k) && gridOptions.api.getColumnDef(k).cellClass ? gridOptions.api.getColumnDef(k).cellClass : ''}">
           ${((data) => {
             const colDef = gridOptions.api.getColumnDef(k);
-            if (data === null) {
+            if (colDef === null || data === null) {
               return '';
             } else if (data === true) {
               return '<span class="ac_icon_check">&nbsp;</span>';

@@ -8,6 +8,10 @@
 .ag-theme-balham .ag-popup-editor {
   z-index: 30 !important;
 }
+/* Style for cells in popup display of selected row */
+.selected-grid-row-display.ag-numeric-cell {
+  text-align: right;
+}
 .gridEditableColumn {
   color: #357edd;
 }

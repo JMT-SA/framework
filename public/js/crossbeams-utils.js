@@ -948,6 +948,22 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Take a value and return it formatted with thousands separators
+   * and a set number of decimals.
+   * @param {string, number} value - the value to format.
+   * @param {integet} precision - the number of decimals to show.
+   * @returns {string, null} - the formatted value or null if the value cannot be formatted.
+   */
+  formatNumberWithCommas: function formatNumberWithCommas(value, precision) {
+    if (!value) { return null; }
+
+    let x = value;
+    if (typeof x === 'string') { x = parseFloat(x); }
+    if (isNaN(x)) { return null; }
+    return x.toLocaleString('en-US', { minimumFractionDigits: precision });
+  },
+
+  /**
    * Return the character code of an event.
    * @param {event} evt - the event.
    * @returns {string} - the keyCode.

@@ -497,6 +497,61 @@ const crossbeamsGridEvents = {
     gridOptions.api.setQuickFilter(event.target.value);
   },
 
+  /**
+   * Select the previous row in the grid while viewing in a popup form
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
+  prevRow: function prevRow(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    const selectedNodes = gridOptions.api.getSelectedNodes();
+    let selectedNode;
+    if (selectedNodes && selectedNodes.length > 0) {
+      selectedNode = selectedNodes[0];
+    } else {
+      selectedNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
+    }
+    let found = false;
+    gridOptions.api.forEachNodeAfterFilterAndSort((node, index) => {
+      if (!found && index === selectedNode.rowIndex - 1) {
+        found = true;
+        node.setSelected(true);
+        crossbeamsUtils.closePopupDialog();
+        crossbeamsGridEvents.viewSelectedRow(gridId);
+      }
+    });
+  },
+
+  /**
+   * Select the next row in the grid while viewing in a popup form
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
+  nextRow: function nextRow(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    const selectedNodes = gridOptions.api.getSelectedNodes();
+    let selectedNode;
+    if (selectedNodes && selectedNodes.length > 0) {
+      selectedNode = selectedNodes[0];
+    } else {
+      selectedNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
+    }
+    let found = false;
+    gridOptions.api.forEachNodeAfterFilterAndSort((node, index) => {
+      if (!found && index > selectedNode.rowIndex) {
+        found = true;
+        node.setSelected(true);
+        crossbeamsUtils.closePopupDialog();
+        crossbeamsGridEvents.viewSelectedRow(gridId);
+      }
+    });
+  },
+
+  /**
+   * Display the contents of the currently-selected row in a popup form.
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
   viewSelectedRow: function viewSelectedRow(gridId) {
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
     let rowNode = gridOptions.api.getSelectedNodes()[0];
@@ -508,30 +563,48 @@ const crossbeamsGridEvents = {
         return null;
       }
     }
+    let rows = 0;
+    gridOptions.api.forEachNodeAfterFilter((n) => { if (!n.group) { rows += 1; } });
+    const hidePrev = rowNode.rowIndex === 0 ? ' disabled' : '';
+    const hideNext = rowNode.rowIndex === rows - 1 ? ' disabled' : '';
+
     const useKeys = gridOptions.columnApi.getAllDisplayedColumns().filter(c => c.colDef.headerName !== '' && c.colDef.headerName !== 'Group').map(c => c.colDef.field);
 
-    // TODO:
-    //       - sort keys. (and un-sort)
-    //       - next/prev navigation of table
-    //       - button in UI
-    //       - skip if data does not have a columndef (e.g. dataminer reports grid)
-    const content = `<div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
+    // TODO: - sort keys. (and un-sort)
+    const content = `<div>
+      <button class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsGridEvents.prevRow('${gridId}')"${hidePrev}>
+        <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.05 9.293L6.343 10 12 15.657l1.414-1.414L9.172 10l4.242-4.243L12 4.343z"/></svg> Prev
+      </button>
+      <button class="f6 link dim br2 ph3 pv2 dib white bg-silver" onclick="crossbeamsGridEvents.nextRow('${gridId}')"${hideNext}>
+        Next <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z"/></svg>
+      </button>
+      </div>
+      <div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
       <table class="thinbordertable" style="margin:0 0.5em">
       <thead>
-      <tr><th>Column</th><th>Value</th></tr>
+      <tr><th>Column</th><th style="min-width:15em">Value</th></tr>
       </thead>
       <tbody>
       ${useKeys.map(k => `
         <tr class="hover-row ${(() => { cnt += 1; return cnt % 2 === 0 ? 'roweven' : 'rowodd'; })()}"><td>
           ${gridOptions.api.getColumnDef(k).headerName}
-          </td><td class="${gridOptions.api.getColumnDef(k).cellClass ? gridOptions.api.getColumnDef(k).cellClass : ''}">
+          </td><td class="selected-grid-row-display ${gridOptions.api.getColumnDef(k).cellClass ? gridOptions.api.getColumnDef(k).cellClass : ''}">
           ${((data) => {
+            const colDef = gridOptions.api.getColumnDef(k);
             if (data === null) {
               return '';
             } else if (data === true) {
               return '<span class="ac_icon_check">&nbsp;</span>';
             } else if (data === false) {
               return '<span class="ac_icon_uncheck">&nbsp;</span>';
+            }
+            if (colDef.valueFormatter) {
+              if (colDef.valueFormatter.name === 'numberWithCommas2') {
+                return crossbeamsUtils.formatNumberWithCommas(data, 2);
+              }
+              if (colDef.valueFormatter.name === 'numberWithCommas4') {
+                return crossbeamsUtils.formatNumberWithCommas(data, 4);
+              }
             }
             return data;
           })(rowNode.data[k])}
@@ -706,35 +779,15 @@ const crossbeamsGridFormatters = {
   // Return a number with thousand separator and at least 2 digits after the decimal.
   numberWithCommas2: function numberWithCommas2(params) {
     if (!params.data) { return null; }
-    if (!params.value) { return null; }
 
-    let x = params.value;
-    let parts = [];
-    if (typeof x === 'string') { x = parseFloat(x); }
-    if (isNaN(x)) { return ''; }
-    x = Math.round((x + 0.00001) * 100) / 100; // Round to 2 digits if longer.
-    parts = x.toString().split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (parts[1] === undefined || parts[1].length === 0) { parts[1] = '00'; }
-    if (parts[1].length === 1) { parts[1] += '0'; }
-    return parts.join('.');
+    return crossbeamsUtils.formatNumberWithCommas(params.value, 2);
   },
 
   // Return a number with thousand separator and at least 4 digits after the decimal.
   numberWithCommas4: function numberWithCommas4(params) {
     if (!params.data) { return null; }
-    if (!params.value) { return null; }
 
-    let x = params.value;
-    let parts = [];
-    if (typeof x === 'string') { x = parseFloat(x); }
-    if (isNaN(x)) { return ''; }
-    x = Math.round((x + 0.0000001) * 10000) / 10000; // Round to 4 digits if longer.
-    parts = x.toString().split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (parts[1] === undefined || parts[1].length === 0) { parts[1] = '0000'; }
-    while (parts[1].length < 4) { parts[1] += '0'; }
-    return parts.join('.');
+    return crossbeamsUtils.formatNumberWithCommas(params.value, 4);
   },
 
   booleanFormatter: function booleanFormatter(params) {

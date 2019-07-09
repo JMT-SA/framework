@@ -8,6 +8,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Dataminer grids now share standard javascript grid logic.
 ### Fixed
 
 ## [0.6.2] - 2019-06-27

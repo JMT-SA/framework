@@ -271,6 +271,10 @@ const crossbeamsGridEvents = {
     errChanges[event.colDef.field] = event.oldValue;
     crossbeamsUtils.recordGridIdForPopup(gridId);
 
+    if (event.context.keyColumn) {
+      form.append('key_name', event.context.keyColumn);
+      form.append('key_val', event.data[event.context.keyColumn]);
+    }
     form.append('column_name', event.colDef.field);
     form.append('column_value', event.newValue);
     form.append('old_value', event.oldValue);
@@ -665,17 +669,19 @@ const crossbeamsGridEvents = {
    */
   promptClick: function promptClick(target) {
     const prompt = target.dataset.prompt;
+    const title = target.textContent && target.textContent;
     const url = target.dataset.url;
     const method = target.dataset.method;
-
-    swal({
-      title: prompt,
-      type: 'warning',
-      showCancelButton: true,
-    }).then(() => {
+    const caller = () => {
       document.body.innerHTML += `<form id="dynForm" action="${url}"
         method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" /><input name="_method" type="hidden" value="${+method}" /></form>`;
       document.getElementById('dynForm').submit();
+    };
+
+    crossbeamsUtils.confirm({
+      prompt,
+      okFunc: caller,
+      title,
     });
     // TODO: make call via AJAX & reload grid? Or http to server to figure it out?.....
     // ALSO: disable link automatically while call is being processed...
@@ -1168,8 +1174,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
   eDetailGrid.addEventListener('DOMMouseScroll', mouseWheelListener);
 };
 
-(function crossbeamsGridLoader() {
-  const translateColDefs = function translateColDefs(columnDefs) {
+const crossbeamsGridStaticLoader = {
+  translateColDefs: (columnDefs) => {
     const newColDefs = [];
     let newCol = {};
     columnDefs.forEach((col) => {
@@ -1249,17 +1255,55 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       newColDefs.push(newCol);
     });
     return newColDefs;
-  };
+  },
 
+  applyGeneralGridUi: (gridOptions, colDefs, fieldUpdateUrl, extraContext) => {
+    let rows = 0;
+    gridOptions.api.forEachLeafNode(() => { rows += 1; });
+    if (fieldUpdateUrl) {
+      gridOptions.context.fieldUpdateUrl = fieldUpdateUrl;
+    }
+    if (extraContext) {
+      Object.assign(gridOptions.context, extraContext);
+    }
+    crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
+    // If the grid has no horizontal scrollbar, hide the scroll to column dropdown.
+    const grdEl = document.getElementById(gridOptions.context.domGridId);
+    const vport = grdEl.querySelector('.ag-body-viewport');
+    crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
+      colDefs,
+      vport.scrollWidth > vport.offsetWidth);
+    crossbeamsGridEvents.makeRowBookmark(gridOptions.context.domGridId);
+  },
+
+  /**
+   * Statically load a grid with column and row values.
+   */
+  loadGrid: (gridId, colDefs, rowDefs) => {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    // find grid
+    const newColDefs = crossbeamsGridStaticLoader.translateColDefs(colDefs);
+    gridOptions.api.setColumnDefs(newColDefs);
+    gridOptions.api.setRowData(rowDefs);
+    crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions, newColDefs);
+  },
+};
+
+(function crossbeamsGridLoader() {
+  /**
+   * Dynamically load a grid.
+   */
   const loadGrid = function loadGrid(grid, gridOptions) {
     const url = grid.getAttribute('data-gridurl');
+    if (url === '') return; // must be loaded statically
+
     const httpRequest = new XMLHttpRequest();
     httpRequest.open('GET', url);
 
     httpRequest.onreadystatechange = () => {
       let httpResult = null;
       let newColDefs = null;
-      let rows = 0;
+
       if (httpRequest.readyState === 4 && httpRequest.status === 200) {
         httpResult = JSON.parse(httpRequest.responseText);
         if (httpResult.exception) {
@@ -1272,18 +1316,22 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           }
           return null;
         }
-        // var midLevelColumnDefs, detailColumnDefs;
+
         if (httpResult.nestedColumnDefs) {
-          newColDefs = translateColDefs(httpResult.nestedColumnDefs['1']);
-          midLevelColumnDefs = translateColDefs(httpResult.nestedColumnDefs['2']);
-          detailColumnDefs = translateColDefs(httpResult.nestedColumnDefs['3']);
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['1']);
+          midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['2']);
+          detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['3']);
         } else {
-          newColDefs = translateColDefs(httpResult.columnDefs);
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.columnDefs);
         }
-        gridOptions.api.setColumnDefs(newColDefs); // TODO.............. ????
+        gridOptions.api.setColumnDefs(newColDefs);
         gridOptions.api.setRowData(httpResult.rowDefs);
         if (!gridOptions.forPrint) {
-          gridOptions.api.forEachLeafNode(() => { rows += 1; });
+          crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
+            newColDefs,
+            httpResult.fieldUpdateUrl,
+            httpResult.extraContext);
+
           if (httpResult.multiselect_ids) {
             gridOptions.api.forEachNode((node) => {
               if (node.data && _.includes(httpResult.multiselect_ids, node.data.id)) {
@@ -1291,17 +1339,6 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
               }
             });
           }
-          if (httpResult.fieldUpdateUrl) {
-            gridOptions.context.fieldUpdateUrl = httpResult.fieldUpdateUrl;
-          }
-          crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
-          // If the grid has no horizontal scrollbar, hide the scroll to column dropdown.
-          const grdEl = document.getElementById(gridOptions.context.domGridId);
-          const vport = grdEl.querySelector('.ag-body-viewport');
-          crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
-            newColDefs,
-            vport.scrollWidth > vport.offsetWidth);
-          crossbeamsGridEvents.makeRowBookmark(gridOptions.context.domGridId);
         }
       }
       return null;

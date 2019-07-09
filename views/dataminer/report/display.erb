@@ -8,153 +8,17 @@
 </section>
 
 <section class="crossbeams-layout crossbeams_layout-fit-height">
-  <div id="grd1-frame" style="flex-grow:1;margin-bottom:4em">
-    <%= Crossbeams::Layout::Renderer::Grid.header('grd1', @page.report.caption, fit_height: true) %>
-    <div id="grd1" style="height: 100%;" class="ag-theme-balham"></div>
-  </div>
+  <% page_config = Crossbeams::Layout::PageConfig.new %>
+  <%= Crossbeams::Layout::Grid.new(page_config, 'grd1', nil, caption: @page.report.caption, fit_height: true, bookmark_row_on_action: false).render %>
 </section>
 
 <% content_for :late_javascript do %>
   <script>
     (function() {
-      const translateColDefs = function translateColDefs(columnDefs) {
-        const newColDefs = [];
-        let newCol = {};
-        columnDefs.forEach((col) => {
-          newCol = {};
-          Object.keys(col).forEach((attr) => {
-            if (attr === 'cellRenderer') {
-              newCol[attr] = col[attr]; // Default behaviour is to copy it over.
-              if (col[attr] === 'crossbeamsGridFormatters.testRender') {
-                newCol[attr] = crossbeamsGridFormatters.testRender;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.menuActionsRenderer') {
-                newCol[attr] = crossbeamsGridFormatters.menuActionsRenderer;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas2') {
-                newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas4') {
-                newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.booleanFormatter') {
-                newCol[attr] = crossbeamsGridFormatters.booleanFormatter;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.hrefInlineFormatter') {
-                newCol[attr] = crossbeamsGridFormatters.hrefInlineFormatter;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.hrefSimpleFormatter') {
-                newCol[attr] = crossbeamsGridFormatters.hrefSimpleFormatter;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.hrefSimpleFetchFormatter') {
-                newCol[attr] = crossbeamsGridFormatters.hrefSimpleFetchFormatter;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.hrefPromptFormatter') {
-                newCol[attr] = crossbeamsGridFormatters.hrefPromptFormatter;
-              }
-            } else if (attr === 'valueFormatter') {
-              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas2') {
-                newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
-              }
-              if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas4') {
-                newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
-              }
-            } else {
-              newCol[attr] = col[attr];
-            }
-          });
-          newColDefs.push(newCol);
-        });
-        return newColDefs;
-      };
+      document.addEventListener('DOMContentLoaded', () => {
+        crossbeamsGridStaticLoader.loadGrid('grd1', <%= @page.col_defs.to_json %>, <%= @page.row_defs.to_json %>);
+      });
 
-
-      const colDefs = translateColDefs(<%= @page.col_defs.to_json %>);
-      const rowDefs = <%= @page.row_defs.to_json %>;
-      const grid = document.querySelector('#grd1');
-      const grid_id = grid.getAttribute('id');
-      const sideBar = {
-        toolPanels: [
-          {
-            id: 'columns',
-            labelDefault: 'Columns',
-            labelKey: 'columns',
-            iconKey: 'columns',
-            toolPanel: 'agColumnsToolPanel',
-          },
-          {
-            id: 'filters',
-            labelDefault: 'Filters',
-            labelKey: 'filters',
-            iconKey: 'filter',
-            toolPanel: 'agFiltersToolPanel',
-          },
-        ],
-      };
-
-      const gridOptions = {
-        context: { domGridId: 'grd1' },
-        columnDefs: colDefs,
-        rowData: rowDefs,
-        enableColResize: true,
-        enableSorting: true,
-        enableFilter: true,
-        rowSelection: 'single',
-        enableRangeSelection: true,
-        statusBar: {
-          statusPanels: [
-            // { statusPanel: 'agTotalRowCountComponent', align: 'left' },
-            // { statusPanel: 'agFilteredRowCountComponent' }, - these two include group rows.
-            // { statusPanel: 'agSelectedRowCountComponent' },
-            { statusPanel: 'agAggregationComponent' },
-          ],
-        },
-        sideBar,
-        suppressAggFuncInHeader: true,
-        getRowClass(params) {
-          if (params.data) {
-            if (params.data.colour_rule) {
-              switch (params.data.colour_rule) {
-                case 'error':
-                  return 'red';
-                case 'warning':
-                  return 'orange';
-                case 'inactive':
-                  return 'gray i';
-                case 'ready':
-                  return 'blue';
-                case 'ok':
-                  return 'green';
-                case 'inprogress':
-                  return 'purple';
-                default:
-                  return params.data.colour_rule;
-              }
-            }
-            if (typeof params.data.active !== 'undefined' && !params.data.active) {
-              return 'gray i';
-            }
-          }
-          return null;
-        },
-        onFilterChanged() {
-          let filterLength = 0;
-          let rows = 0;
-          this.api.forEachLeafNode(() => { rows += 1; });
-          this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
-          crossbeamsGridEvents.displayRowCounts('grd1', filterLength, rows);
-        },
-      };
-
-      // Index rows by the id column...
-      // gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
-      new agGrid.Grid(grid, gridOptions);
-      crossbeamsGridStore.addGrid(grid_id, gridOptions);
-      gridOptions.onFilterChanged();
-      const vport = grid.querySelector('.ag-body-viewport');
-      crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
-        colDefs,
-        vport.scrollWidth > vport.offsetWidth);
     }).call(this);
   </script>
 <% end %>

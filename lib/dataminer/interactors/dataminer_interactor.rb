@@ -226,7 +226,7 @@ module DataminerApp
         mk.col 'data_type', nil, editable: true, cellEditor: 'select', cellEditorParams: {
           values: %w[string boolean integer number date datetime]
         }
-        mk.integer 'width', nil, editable: true, cellEditor: 'NumericCellEditor'
+        mk.integer 'width', nil, editable: true # , cellEditor: 'numericCellEditor', cellEditorType: 'integer'
         mk.col 'format', nil, editable: true, cellEditor: 'select', cellEditorParams: {
           values: ['', 'delimited_1000', 'delimited_1000_4']
         }
@@ -239,7 +239,7 @@ module DataminerApp
         mk.col 'pinned', nil, editable: true, cellEditor: 'select', cellEditorParams: {
           values: ['', 'left', 'right']
         }
-        mk.integer 'group_by_seq', 'Group Seq', tooltip: 'If the grid opens grouped, this is the grouping level', editable: true, cellEditor: 'NumericCellEditor'
+        mk.integer 'group_by_seq', 'Group Seq', tooltip: 'If the grid opens grouped, this is the grouping level', editable: true # , cellEditor: 'numericCellEditor'
         mk.boolean 'group_sum', 'Sum?', editable: true, cellEditor: 'select', cellEditorParams: {
           values: [true, false]
         }
@@ -253,10 +253,11 @@ module DataminerApp
           values: [true, false]
         }
       end
-      page.row_defs = page.report.ordered_columns.map(&:to_hash)
+      page.row_defs = []
+      page.report.ordered_columns.each_with_index { |col, index| page.row_defs << col.to_hash.merge(id: index) }
 
       page.col_defs_params = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
-        mk.href_prompt "'/dataminer/admin/#{id}/parameter/delete/' + data.column + '|delete|Are you sure?|delete'", 'delete_link'
+        mk.href_prompt "'/dataminer/admin/#{id}/parameter/delete/' + data.column + '|delete|Are you sure?|delete'", 'delete_link' #### => Does not handle cancel....
         mk.col 'column'
         mk.col 'caption'
         mk.col 'data_type'
@@ -267,8 +268,8 @@ module DataminerApp
       end
 
       page.row_defs_params = []
-      page.report.query_parameter_definitions.each do |query_def|
-        page.row_defs_params << query_def.to_hash
+      page.report.query_parameter_definitions.each_with_index do |query_def, index|
+        page.row_defs_params << query_def.to_hash.merge(id: index)
       end
       page.save_url = "/dataminer/admin/#{id}/save_param_grid_col/"
       page
@@ -325,8 +326,8 @@ module DataminerApp
     def save_param_grid_col(id, params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       report = repo.lookup_admin_report(id)
       col = report.columns[params[:key_val]]
-      attrib = params[:col_name]
-      value  = params[:col_val]
+      attrib = params[:column_name]
+      value  = params[:column_value]
       value  = nil if value.strip == ''
       # Should validate - width numeric, range... caption cannot be blank...
       # group_sum, avg etc should act as radio grps... --> Create service class to do validation.

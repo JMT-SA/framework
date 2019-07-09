@@ -67,6 +67,8 @@ module DataminerApp
           hs[:width]        = 100 if col.width.nil?
         end
 
+        hs[:cellRenderer] = 'crossbeamsGridFormatters.iconFormatter' if col.name == 'icon'
+
         # hs[:cellClassRules] = {"grid-row-red": "x === 'Fred'"} if col.name == 'author'
 
         page.col_defs << hs

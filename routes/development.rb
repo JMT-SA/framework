@@ -9,6 +9,9 @@ class Framework < Roda
     r.is 'grid_icons' do
       show_page { Development::Documentation::GridIcons.call }
     end
+    r.is 'grid_column_icons' do
+      show_page { Development::Documentation::GridColumnIcons.call }
+    end
     r.is 'layout_icons' do
       show_page { Development::Documentation::LayoutIcons.call }
     end

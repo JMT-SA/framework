@@ -2,18 +2,6 @@
 
 module PackMaterialApp
   class MrDeliveryItemInteractor < BaseInteractor
-    def repo
-      @repo ||= ReplenishRepo.new
-    end
-
-    def mr_delivery_item(id)
-      repo.find_mr_delivery_item(id)
-    end
-
-    def validate_mr_delivery_item_params(params)
-      MrDeliveryItemSchema.call(params)
-    end
-
     def create_mr_delivery_item(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_delivery_id] = parent_id
       can_create = TaskPermissionCheck::MrDeliveryItem.call(:create, delivery_id: parent_id)
@@ -33,7 +21,7 @@ module PackMaterialApp
         failed_response(can_create.message)
       end
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { remarks: ['This delivery item already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { remarks: ['This delivery item already exists.'] }))
     end
 
     def update_mr_delivery_item(id, params) # rubocop:disable Metrics/AbcSize
@@ -43,7 +31,7 @@ module PackMaterialApp
         return validation_failed_response(res) unless res.messages.empty?
 
         repo.transaction do
-          attrs = repo.add_over_under_supply_values(res.to_h)
+          attrs = repo.prepare_delivery_item_quantities(res.to_h)
           repo.update_mr_delivery_item(id, attrs)
           log_transaction
         end
@@ -92,8 +80,32 @@ module PackMaterialApp
       repo.over_under_supply(quantity_received, po_item_id)
     end
 
+    def prepare_delivery_item_quantities(params)
+      res = validate_mr_delivery_item_quantity_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h.transform_keys { |k| k.to_s.delete_prefix('mr_delivery_item_').to_sym }
+      success_response('ok', repo.prepare_delivery_item_quantities(attrs))
+    end
+
     def can_complete_invoice(parent_id)
       TaskPermissionCheck::MrDelivery.call(:complete_invoice, parent_id)
+    end
+
+    def repo
+      @repo ||= ReplenishRepo.new
+    end
+
+    def mr_delivery_item(id)
+      repo.find_mr_delivery_item(id)
+    end
+
+    def validate_mr_delivery_item_params(params)
+      MrDeliveryItemSchema.call(params)
+    end
+
+    def validate_mr_delivery_item_quantity_params(params)
+      MrDeliveryItemQuantitySchema.call(params)
     end
   end
 end

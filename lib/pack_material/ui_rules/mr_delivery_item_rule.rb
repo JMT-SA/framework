@@ -20,9 +20,10 @@ module UiRules
     def set_show_fields
       fields[:mr_product_variant_code] = { renderer: :label, with_value: product_variant_code, caption: 'Product Code' }
       fields[:quantity_on_note] = { renderer: :label }
+      fields[:quantity_received] = { renderer: :label }
+      fields[:quantity_returned] = { renderer: :label }
       fields[:quantity_over_supplied] = { renderer: :label, caption: 'PO Over Supplied' }
       fields[:quantity_under_supplied] = { renderer: :label, caption: 'PO Under Supplied' }
-      fields[:quantity_received] = { renderer: :label }
       fields[:invoiced_unit_price] = { renderer: :label }
       fields[:remarks] = { renderer: :label }
     end
@@ -34,11 +35,13 @@ module UiRules
         mr_product_variant_id: { renderer: :hidden },
         product_variant_code: { renderer: :label, with_value: product_variant_code },
         quantity_on_note: { renderer: :numeric, required: true },
+        quantity_received: { renderer: :numeric, required: true },
+        quantity_returned_label: { renderer: :label, with_value: @form_object.quantity_returned.to_f, caption: 'Quantity Returned' },
+        quantity_returned: { renderer: :hidden },
         quantity_over_supplied: { renderer: :label, caption: 'PO Over Supplied' },
         quantity_under_supplied: { renderer: :label, caption: 'PO Under Supplied' },
-        quantity_received: { renderer: :numeric, required: true },
         invoiced_unit_price: { renderer: :numeric },
-        remarks: {}
+        remarks: { renderer: :textarea, rows: 5 }
       }
     end
 
@@ -51,7 +54,8 @@ module UiRules
           caption: 'Purchase Order',
           searchable: false,
           required: true,
-          prompt: true
+          prompt: true,
+          sort_items: false
         },
         mr_delivery_id: { renderer: :hidden },
         mr_purchase_order_item_id: {
@@ -80,10 +84,11 @@ module UiRules
       @form_object = OpenStruct.new(mr_delivery_id: @options[:parent_id],
                                     mr_purchase_order_item_id: @options[:item_id],
                                     mr_product_variant_id: product_variant_id,
-                                    quantity_on_note: nil,
+                                    quantity_on_note: AppConst::BIG_ZERO,
+                                    quantity_received: AppConst::BIG_ZERO,
+                                    quantity_returned: AppConst::BIG_ZERO,
                                     quantity_over_supplied: nil,
                                     quantity_under_supplied: nil,
-                                    quantity_received: nil,
                                     invoiced_unit_price: unit_price,
                                     remarks: nil)
     end
@@ -129,9 +134,11 @@ module UiRules
 
     def add_new_item_behaviours
       delivery_id = @options[:parent_id] || @form_object.mr_delivery_id
-      url         = "/pack_material/replenish/mr_deliveries/#{delivery_id}/mr_delivery_items/quantity_received_changed"
+      url = "/pack_material/replenish/mr_deliveries/#{delivery_id}/mr_delivery_items/quantities_changed"
+      keys = %i[mr_delivery_item_mr_purchase_order_item_id mr_delivery_item_quantity_received mr_delivery_item_quantity_on_note]
       behaviours do |behaviour|
-        behaviour.keyup :quantity_received, notify: [{ url: url, param_keys: [:mr_delivery_item_mr_purchase_order_item_id] }]
+        behaviour.keyup :quantity_received, notify: [{ url: url, param_keys: keys }]
+        behaviour.keyup :quantity_on_note, notify: [{ url: url, param_keys: keys }]
       end
     end
   end

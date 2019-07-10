@@ -645,16 +645,26 @@ module PackMaterialApp
     end
 
     def create_mr_delivery_item(attrs)
+      create(:mr_delivery_items, prepare_delivery_item_quantities(attrs))
+    end
+
+    # @param [Hash] attrs => quantity_received, quantity_on_note, mr_purchase_order_item_id
+    def prepare_delivery_item_quantities(attrs)
       new_attrs = add_over_under_supply_values(attrs.to_h)
-      create(:mr_delivery_items, new_attrs)
+      calculate_for_qty_returned(new_attrs)
     end
 
     # @param [Hash] attrs
     # Should only be updated if the delivery has not yet been verified
     def add_over_under_supply_values(attrs)
-      quantities                      = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
-      attrs[:quantity_over_supplied]  = quantities[:quantity_over_supplied]
+      quantities = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
+      attrs[:quantity_over_supplied] = quantities[:quantity_over_supplied]
       attrs[:quantity_under_supplied] = quantities[:quantity_under_supplied]
+      attrs
+    end
+
+    def calculate_for_qty_returned(attrs)
+      attrs[:quantity_returned] = attrs[:quantity_on_note] - attrs[:quantity_received]
       attrs
     end
   end

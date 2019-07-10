@@ -52,7 +52,8 @@ module UiRules
           renderer: :select,
           prompt: true,
           options: @repo.for_select_purchase_orders_with_supplier,
-          caption: 'Purchase Order'
+          caption: 'Purchase Order',
+          sort_items: false
         }
       )
     end

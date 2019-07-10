@@ -10,11 +10,11 @@ module UiRules
       apply_form_values
 
       rules[:can_verify] = can_verify unless @mode == :new
-      rules[:can_accept] = can_accept unless @mode == :new
+      rules[:can_accept] = can_accept_over_supply unless @mode == :new
       rules[:can_add_invoice] = can_add_invoice unless @mode == :new
       rules[:can_complete_invoice] = can_complete_invoice unless @mode == :new
       rules[:is_verified] = @form_object.verified if @mode == :edit
-      rules[:is_accepted] = @form_object.accepted_over_supply if @mode == :edit
+      rules[:over_supply_accepted] = @form_object.accepted_over_supply if @mode == :edit
       rules[:invoice_completed] = @form_object.invoice_completed unless @mode == :new
       rules[:del_sub_totals] = @repo.del_sub_totals(@options[:id]) if @mode == :edit
       common_values_for_fields case @mode
@@ -121,8 +121,8 @@ module UiRules
                      end
     end
 
-    def can_accept
-      res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:accept, @options[:id])
+    def can_accept_over_supply
+      res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:accept_over_supply, @options[:id])
       res.success
     end
 

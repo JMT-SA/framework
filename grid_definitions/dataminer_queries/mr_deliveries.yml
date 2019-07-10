@@ -385,11 +385,3 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: mr_deliveries.accepted_over_supply
-  :caption: Accepted Over Supply
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 1
-  :list_def: 

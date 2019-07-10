@@ -29,12 +29,8 @@ module PackMaterial
             # Product Columns
             page.section do |section|
               section.show_border!
-              section.row do |row|
-                row.column do |col|
-                  col.add_text "Assign Product Columns for <strong>#{rules[:sub_type_text]}</strong>"
-                  col.add_grid('productColumnsGrid', grid_def.grid_path, grid_def.render_options)
-                end
-              end
+              section.add_text "Assign Product Columns for <strong>#{rules[:sub_type_text]}</strong>"
+              section.add_grid('productColumnsGrid', grid_def.grid_path, grid_def.render_options)
             end
 
             page.section do |section|

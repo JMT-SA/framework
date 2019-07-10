@@ -420,13 +420,15 @@ class Framework < Roda
             flash[:purchase_order_id] = item_interactor.purchase_order_id_for_delivery_item(res.instance.id)
             r.redirect("/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect")
           else
-            form_errors = move_validation_errors_to_base(res.errors, :received_less_than_on_note, highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received] })
-            form_errors2 = move_validation_errors_to_base(form_errors, :remarks_if_quantity_returned, highlights: { remarks_if_quantity_returned: %i[remarks] })
+            form_errors = move_validation_errors_to_base(res.errors,
+                                                         %i[received_less_than_on_note remarks_if_quantity_returned],
+                                                         highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received],
+                                                                       remarks_if_quantity_returned: %i[remarks] })
             re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new") do
               PackMaterial::Replenish::MrDeliveryItem::New.call(id,
                                                                 params[:mr_delivery_item][:mr_purchase_order_item_id],
                                                                 form_values: params[:mr_delivery_item],
-                                                                form_errors: form_errors2,
+                                                                form_errors: form_errors,
                                                                 remote: fetch?(r))
             end
           end
@@ -434,14 +436,12 @@ class Framework < Roda
       end
       r.on 'accept_over_supply' do   # EDIT
         check_auth!('replenish', 'edit')
-        store_last_referer_url(:delivery_accept)
-        res = interactor.accept_mr_delivery(id)
+        res = interactor.accept_mr_delivery_over_supply(id)
         if res.success
           flash[:notice] = res.message
         else
           flash[:error] = res.message
         end
-        redirect_to_stored_referer(r, :delivery_accept)
       end
       r.on 'verify' do   # EDIT
         check_auth!('replenish', 'edit')
@@ -617,12 +617,14 @@ class Framework < Roda
           if res.success
             redirect_via_json_to_stored_referer(:delivery_items)
           else
-            form_errors = move_validation_errors_to_base(res.errors, :received_less_than_on_note, highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received] })
-            form_errors2 = move_validation_errors_to_base(form_errors, :remarks_if_quantity_returned, highlights: { remarks_if_quantity_returned: %i[remarks] })
+            form_errors = move_validation_errors_to_base(res.errors,
+                                                         %i[received_less_than_on_note remarks_if_quantity_returned],
+                                                         highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received],
+                                                                       remarks_if_quantity_returned: %i[remarks] })
             re_show_form(r, res) do
               PackMaterial::Replenish::MrDeliveryItem::Edit.call(id,
                                                                  form_values: params[:mr_delivery_item],
-                                                                 form_errors: form_errors2)
+                                                                 form_errors: form_errors)
             end
           end
         end

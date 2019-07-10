@@ -23,8 +23,8 @@ module PackMaterialApp
           create_check
         when :update, :delete
           mutable_check
-        when :accept
-          accept_check
+        when :accept_over_supply
+          accept_over_supply_check
         when :verify
           verify_check
         when :putaway
@@ -48,13 +48,13 @@ module PackMaterialApp
 
       def mutable_check
         return failed_response "Verified delivery can not be #{task}d" if verified?
-        return failed_response "Accepted delivery can not be #{task}d" if accepted?
+        return failed_response "Accepted delivery can not be #{task}d" if over_supply_accepted?
 
         all_ok
       end
 
-      def accept_check
-        return failed_response('Delivery Over Supply is already accepted') if accepted?
+      def accept_over_supply_check
+        return failed_response('Delivery Over Supply is already accepted') if over_supply_accepted?
         return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery does not have any over supplied items') unless over_supply?
 
@@ -62,7 +62,7 @@ module PackMaterialApp
       end
 
       def verify_check # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, Metrics/PerceivedComplexity
-        return failed_response('Delivery has over supply and it has not been accepted yet') if over_supply? && !accepted?
+        return failed_response('Delivery has over supply and it has not been accepted yet') if over_supply? && !over_supply_accepted?
         return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery has no items') if no_items?
         return failed_response('Delivery has incomplete items') if incomplete_items?
@@ -139,7 +139,7 @@ module PackMaterialApp
         bsa_repo.any_in_progress?(@opts)
       end
 
-      def accepted?
+      def over_supply_accepted?
         @entity.accepted_over_supply
       end
 

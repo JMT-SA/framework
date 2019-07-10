@@ -8,7 +8,7 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          cannot_edit = rules[:is_verified] || rules[:is_accepted]
+          cannot_edit = rules[:is_verified] || rules[:over_supply_accepted]
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
@@ -20,32 +20,31 @@ module PackMaterial
                                   text: 'Back to Deliveries',
                                   url: '/list/mr_deliveries',
                                   style: :back_button)
-              if rules[:can_verify]
-                section.add_control(control_type: :link,
-                                    text: 'Verify Delivery',
-                                    url: "/pack_material/replenish/mr_deliveries/#{id}/verify",
-                                    prompt: true,
-                                    style: :button)
-              end
+              section.add_control(control_type: :link,
+                                  text: 'Verify Delivery',
+                                  url: "/pack_material/replenish/mr_deliveries/#{id}/verify",
+                                  prompt: true,
+                                  visible: rules[:can_verify],
+                                  style: :button)
               section.add_control(control_type: :link,
                                   text: 'Accept Over Supply',
                                   url: "/pack_material/replenish/mr_deliveries/#{id}/accept_over_supply",
                                   prompt: true,
                                   visible: rules[:can_accept],
                                   style: :button)
-              if rules[:can_add_invoice] || rules[:can_complete_invoice]
-                cost_url = rules[:invoice_completed] ? '/list/mr_purchase_invoice_costs_show' : '/list/mr_purchase_invoice_costs'
-                section.add_control(control_type: :link,
-                                    text: 'Manage Costs',
-                                    url: cost_url + "/with_params?key=standard&mr_delivery_id=#{id}",
-                                    style: :button,
-                                    behaviour: :popup)
-                section.add_control(control_type: :link,
-                                    text: 'Invoice Info',
-                                    url: "/pack_material/replenish/mr_deliveries/#{id}/invoice",
-                                    style: :button,
-                                    behaviour: :popup)
-              end
+              cost_url = rules[:invoice_completed] ? '/list/mr_purchase_invoice_costs_show' : '/list/mr_purchase_invoice_costs'
+              section.add_control(control_type: :link,
+                                  text: 'Manage Costs',
+                                  url: cost_url + "/with_params?key=standard&mr_delivery_id=#{id}",
+                                  style: :button,
+                                  visible: rules[:can_add_invoice] || rules[:can_complete_invoice],
+                                  behaviour: :popup)
+              section.add_control(control_type: :link,
+                                  text: 'Invoice Info',
+                                  url: "/pack_material/replenish/mr_deliveries/#{id}/invoice",
+                                  visible: rules[:can_add_invoice] || rules[:can_complete_invoice],
+                                  style: :button,
+                                  behaviour: :popup)
               section.add_control(control_type: :link,
                                   text: 'Complete Purchase Invoice',
                                   url: "/pack_material/replenish/mr_deliveries/#{id}/complete_invoice",
@@ -66,7 +65,7 @@ module PackMaterial
                 form.row do |row|
                   row.column do |col|
                     col.add_field :delivery_number
-                    col.add_field :waybill_number if rules[:is_accepted]
+                    col.add_field :waybill_number if rules[:over_supply_accepted]
                     col.add_field :purchase_order_numbers
                     col.add_field :transporter
                     col.add_field :status
@@ -95,7 +94,7 @@ module PackMaterial
                                   text: 'Waybill Note',
                                   url: "/pack_material/reports/waybill_note/#{id}",
                                   loading_window: true,
-                                  visible: rules[:is_verified] && rules[:is_accepted],
+                                  visible: rules[:is_verified] && rules[:over_supply_accepted],
                                   style: :button)
             end
 
@@ -114,7 +113,7 @@ module PackMaterial
                                  height: 8,
                                  caption: 'Delivery Line Items')
               end
-              if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed] || rules[:is_accepted]
+              if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed] || rules[:over_supply_accepted]
                 section.add_grid('del_items',
                                  "/list/mr_delivery_items_edit_unit_prices/grid?key=standard&delivery_id=#{id}",
                                  height: 8,

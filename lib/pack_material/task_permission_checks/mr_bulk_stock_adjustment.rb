@@ -53,6 +53,7 @@ module PackMaterialApp
       end
 
       def delete_check
+        return failed_response 'Bulk Stock Adjustment has already been signed off' if signed_off?
         return failed_response 'Bulk Stock Adjustment has already been approved' if approved?
         return failed_response 'Bulk Stock Adjustment has been completed, reopen to delete.' if completed?
 

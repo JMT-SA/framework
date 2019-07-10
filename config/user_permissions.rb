@@ -21,7 +21,8 @@ module Crossbeams
       BASE = {
         WEBAPP => {
           stock_adj: { approve: false, sign_off: false },
-          purchase_order: { approve: false }
+          purchase_order: { approve: false },
+          delivery: { accept: false }
           # stock_adj: { sign_off: false, approve: true, take_out_rubbish: true },
           # invoice: { complete: false, approve: { fruit: true, assets: false } }
         }
@@ -30,7 +31,8 @@ module Crossbeams
       DOCUMENTATION = {
         WEBAPP => {
           stock_adj: { approve: 'Approve a stock adjustment', sign_off: 'Sign off on a stock adjustment' },
-          purchase_order: { approve: 'Approve a purchase order' }
+          purchase_order: { approve: 'Approve a purchase order' },
+          delivery: { accept: 'Accept all Over Supply on any line items for this delivery' }
           # stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
           # invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
         }

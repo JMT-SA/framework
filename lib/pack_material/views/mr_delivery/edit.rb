@@ -8,6 +8,8 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
+          cannot_edit = rules[:is_verified] || rules[:is_accepted]
+
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -25,6 +27,12 @@ module PackMaterial
                                     prompt: true,
                                     style: :button)
               end
+              section.add_control(control_type: :link,
+                                  text: 'Accept Over Supply',
+                                  url: "/pack_material/replenish/mr_deliveries/#{id}/accept_over_supply",
+                                  prompt: true,
+                                  visible: rules[:can_accept],
+                                  style: :button)
               if rules[:can_add_invoice] || rules[:can_complete_invoice]
                 cost_url = rules[:invoice_completed] ? '/list/mr_purchase_invoice_costs_show' : '/list/mr_purchase_invoice_costs'
                 section.add_control(control_type: :link,
@@ -52,21 +60,22 @@ module PackMaterial
               section.add_caption 'Delivery'
               section.form do |form|
                 form.action "/pack_material/replenish/mr_deliveries/#{id}"
-                form.method :update unless rules[:is_verified]
-                form.view_only! if rules[:is_verified]
-                form.no_submit! if rules[:is_verified]
+                form.method :update unless cannot_edit
+                form.view_only! if cannot_edit
+                form.no_submit! if cannot_edit
                 form.row do |row|
                   row.column do |col|
                     col.add_field :delivery_number
+                    col.add_field :waybill_number if rules[:is_accepted]
                     col.add_field :purchase_order_numbers
                     col.add_field :transporter
                     col.add_field :status
                     col.add_field :transporter_party_role_id
                     col.add_field :receipt_location_id
-                    col.add_field :driver_name
                   end
 
                   row.column do |col|
+                    col.add_field :driver_name
                     col.add_field :client_delivery_ref_number
                     col.add_field :vehicle_registration
                     col.add_text del_totals(rules)
@@ -86,13 +95,13 @@ module PackMaterial
                                   text: 'Waybill Note',
                                   url: "/pack_material/reports/waybill_note/#{id}",
                                   loading_window: true,
-                                  visible: rules[:is_verified],
+                                  visible: rules[:is_verified] && rules[:is_accepted],
                                   style: :button)
             end
 
             page.section do |section| # rubocop:disable Metrics/BlockLength
               section.show_border!
-              unless rules[:is_verified]
+              unless cannot_edit
                 section.add_control(control_type: :link,
                                     text: 'New Item',
                                     url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect",
@@ -105,7 +114,7 @@ module PackMaterial
                                  height: 8,
                                  caption: 'Delivery Line Items')
               end
-              if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed]
+              if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed] || rules[:is_accepted]
                 section.add_grid('del_items',
                                  "/list/mr_delivery_items_edit_unit_prices/grid?key=standard&delivery_id=#{id}",
                                  height: 8,

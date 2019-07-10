@@ -58,6 +58,23 @@ module PackMaterialApp
       end
     end
 
+    def accept_mr_delivery(id) # rubocop:disable Metrics/AbcSize
+      can_accept = TaskPermissionCheck::MrDelivery.call(:accept, id)
+      if can_accept.success
+        repo.transaction do
+          repo.accept_mr_delivery(id)
+          log_transaction
+          log_status('mr_deliveries', id, 'ACCEPTED')
+          instance = mr_delivery(id)
+          success_response("Accepted Over Supply for delivery #{instance.delivery_number}", instance)
+        end
+      else
+        failed_response(can_accept.message)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def verify_mr_delivery(id) # rubocop:disable Metrics/AbcSize
       can_verify = TaskPermissionCheck::MrDelivery.call(:verify, id)
       if can_verify.success

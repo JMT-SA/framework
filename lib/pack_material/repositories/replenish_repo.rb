@@ -234,6 +234,12 @@ module PackMaterialApp
       update(:mr_deliveries, id, verified: true)
     end
 
+    def accept_mr_delivery(id)
+      waybill_no = DB[:mr_deliveries].where(id: id).get(:waybill_number)
+      update_with_document_number('doc_seqs_waybill_number', id) unless waybill_no
+      update(:mr_deliveries, id, accepted_over_supply: true)
+    end
+
     def delivery_complete_invoice(id, attrs)
       update(:mr_deliveries, id,
              invoice_error: false,
@@ -252,6 +258,14 @@ module PackMaterialApp
 
         has_batch = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_id).get(:id)
         return true unless has_batch
+      end
+      false
+    end
+
+    def items_with_over_supply(mr_delivery_id)
+      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map(:id).each do |item_id|
+        qty_over_supplied = DB[:mr_delivery_items].where(id: item_id).get(:quantity_over_supplied)
+        return true if qty_over_supplied&.positive?
       end
       false
     end

@@ -2,7 +2,7 @@
 
 module PackMaterialApp
   module TaskPermissionCheck
-    class MrDelivery < BaseService
+    class MrDelivery < BaseService # rubocop:disable Metrics/ClassLength
       attr_reader :task, :entity
       # @param [Symbol] task
       # @param [Integer] delivery_id
@@ -23,6 +23,8 @@ module PackMaterialApp
           create_check
         when :update, :delete
           mutable_check
+        when :accept
+          accept_check
         when :verify
           verify_check
         when :putaway
@@ -46,11 +48,21 @@ module PackMaterialApp
 
       def mutable_check
         return failed_response "Verified delivery can not be #{task}d" if verified?
+        return failed_response "Accepted delivery can not be #{task}d" if accepted?
 
         all_ok
       end
 
-      def verify_check
+      def accept_check
+        return failed_response('Delivery Over Supply is already accepted') if accepted?
+        return failed_response('Delivery is already verified') if verified?
+        return failed_response('Delivery does not have any over supplied items') unless over_supply?
+
+        all_ok
+      end
+
+      def verify_check # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, Metrics/PerceivedComplexity
+        return failed_response('Delivery has over supply and it has not been accepted yet') if over_supply? && !accepted?
         return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery has no items') if no_items?
         return failed_response('Delivery has incomplete items') if incomplete_items?
@@ -125,6 +137,14 @@ module PackMaterialApp
       def bsa_in_progress?
         bsa_repo = BulkStockAdjustmentRepo.new
         bsa_repo.any_in_progress?(@opts)
+      end
+
+      def accepted?
+        @entity.accepted_over_supply
+      end
+
+      def over_supply?
+        @repo.items_with_over_supply(@id)
       end
     end
   end

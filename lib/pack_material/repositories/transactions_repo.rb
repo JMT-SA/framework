@@ -82,6 +82,7 @@ module PackMaterialApp
       DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: id).delete
       DB[:mr_bulk_stock_adjustments_sku_numbers].where(mr_bulk_stock_adjustment_id: id).delete
       DB[:mr_bulk_stock_adjustments_locations].where(mr_bulk_stock_adjustment_id: id).delete
+      DB[:mr_bulk_stock_adjustment_prices].where(mr_bulk_stock_adjustment_id: id).delete
       DB[:mr_bulk_stock_adjustments].where(id: id).delete
     end
 

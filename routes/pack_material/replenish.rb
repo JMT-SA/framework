@@ -385,6 +385,8 @@ class Framework < Roda
                           OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_inner_html, value: res.instance[:quantity_under_supplied].to_f),
                           OpenStruct.new(dom_id: 'mr_delivery_item_quantity_returned', type: :replace_input_value, value: res.instance[:quantity_returned].to_f),
                           OpenStruct.new(dom_id: 'mr_delivery_item_quantity_returned_label', type: :replace_inner_html, value: res.instance[:quantity_returned].to_f)])
+          else
+            blank_json_response
           end
         end
         r.on 'purchase_order_changed' do
@@ -429,6 +431,17 @@ class Framework < Roda
             end
           end
         end
+      end
+      r.on 'accept_over_supply' do   # EDIT
+        check_auth!('replenish', 'edit')
+        store_last_referer_url(:delivery_accept)
+        res = interactor.accept_mr_delivery(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :delivery_accept)
       end
       r.on 'verify' do   # EDIT
         check_auth!('replenish', 'edit')

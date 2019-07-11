@@ -442,6 +442,7 @@ class Framework < Roda
         else
           flash[:error] = res.message
         end
+        r.redirect("/pack_material/replenish/mr_deliveries/#{id}/edit")
       end
       r.on 'verify' do   # EDIT
         check_auth!('replenish', 'edit')

@@ -71,7 +71,7 @@ class TestCoreRoutes < RouteTester
     assert last_response.body.include?('Crossbeams::RackMiddleware')
     assert last_response.body.include?('Roda::DataGrid')
     assert last_response.body.include?('AG-Grid')
-    assert last_response.body.include?('Selectr')
+    assert last_response.body.include?('Choices')
     assert last_response.body.include?('Sortable')
     assert last_response.body.include?('Konva')
     assert last_response.body.include?('Lodash')

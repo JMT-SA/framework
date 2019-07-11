@@ -8,6 +8,10 @@
 .ag-theme-balham .ag-popup-editor {
   z-index: 30 !important;
 }
+/* Style for cells in popup display of selected row */
+.selected-grid-row-display.ag-numeric-cell {
+  text-align: right;
+}
 .gridEditableColumn {
   color: #357edd;
 }
@@ -129,6 +133,9 @@ section.crossbeams_layout-fit-height {
 }
 .grid-context-menu {
   line-height: initial;
+}
+ul.context-menu-list.context-menu-root {
+  z-index: 42 !important; /* Ensure context-menu stands above main menu. */
 }
 .ac_icon {
   width: 16px;

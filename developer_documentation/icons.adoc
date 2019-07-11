@@ -5,15 +5,20 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 == Icons
 
-Icons are used in three ways:
+Icons are used in four ways:
 
 * In grid action list menu items
+* In grid icon columns
 * By using one of the icons defined in Crossbeams::Layout
 * By embedding SVG inline in HTML
 
-=== Grid Icons
+=== Grid Action Menu Icons
 
 link:/development/grid_icons[Grid icon list]
+
+=== Grid Column Icons
+
+link:/development/grid_column_icons[Grid icon column list]
 
 === Layout Icons
 

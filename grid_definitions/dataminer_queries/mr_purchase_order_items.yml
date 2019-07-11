@@ -116,7 +116,7 @@
   quantity_required:
     :name: quantity_required
     :sequence_no: 7
-    :caption: Quantity required
+    :caption: Qty required
     :namespaced_name: mr_purchase_order_items.quantity_required
     :data_type: :number
     :width: 
@@ -148,7 +148,7 @@
   quantity_received:
     :name: quantity_received
     :sequence_no: 9
-    :caption: Quantity received
+    :caption: Qty received
     :namespaced_name: 
     :data_type: :number
     :width: 

@@ -22,6 +22,22 @@ module Crossbeams
                      message: 'Validation error')
     end
 
+    # Alias for validation_failed_response that shows only error messages (no instance).
+    # This is simpler to call if the instance is not required.
+    # Returns:
+    #   - success: false.
+    #   - instance: an empty Hash.
+    #   - errors: the error messages.
+    #   - message: "Validation error".
+    #
+    # e.g. validation_failed_message_response(name: ['required', 'too short'], email: ['required'])
+    #
+    # @param messages [Hash] the validation error messages.
+    # @return [OpenStruct] the response object.
+    def validation_failed_message_response(messages)
+      validation_failed_response(messages: messages)
+    end
+
     # Create a response object with validation errors from more than one source.
     # Returns:
     #   - success: false.

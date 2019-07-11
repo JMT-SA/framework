@@ -4,6 +4,7 @@
   \ FROM users\r\nORDER BY user_name\r\n  "
 :limit: 
 :offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -14,6 +15,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: true
@@ -29,6 +31,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -44,6 +47,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -59,6 +63,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -70,10 +75,11 @@
     :sequence_no: 5
     :caption: Active
     :namespaced_name: active
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -89,6 +95,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -104,6 +111,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -128,7 +136,7 @@
   :data_type: :date
   :control_type: :daterange
   :default_value: 
-  :ordered_list: 
+  :ordered_list: false
   :ui_priority: 1
   :list_def: 
 - :column: login_name
@@ -136,6 +144,6 @@
   :data_type: :string
   :control_type: :text
   :default_value: 
-  :ordered_list: 
+  :ordered_list: false
   :ui_priority: 1
   :list_def: 

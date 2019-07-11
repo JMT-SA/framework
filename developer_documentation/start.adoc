@@ -35,6 +35,7 @@ Pictoral overview of application.
 
 * link:/developer_documentation/app_config.adoc[App Configuration]
 * link:/developer_documentation/routes.adoc[Routing]
+* link:/developer_documentation/response_objects.adoc[Response objects]
 
 ==== UI: grids
 

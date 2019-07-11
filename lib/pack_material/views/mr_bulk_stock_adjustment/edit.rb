@@ -74,25 +74,22 @@ module PackMaterial
 
             page.section do |section|
               section.show_border!
-              section.row do |row|
-                row.column do |col|
-                  if rules[:show_only]
-                    col.add_grid('blk_stck_adj_items',
+
+              if rules[:show_only]
+                section.add_grid('blk_stck_adj_items',
                                  "/list/mr_bulk_stock_adjustment_items_show/grid?key=standard&mr_bulk_stock_adjustment_id=#{id}",
                                  caption: 'Bulk Stock Adjustment Items')
-                  else
-                    col.add_control(control_type: :link,
+              else
+                section.add_control(control_type: :link,
                                     text: 'New Item',
                                     url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/mr_bulk_stock_adjustment_items/new",
                                     style: :button,
                                     behaviour: :popup,
                                     grid_id: 'blk_stck_adj_items',
                                     css_class: 'mb1')
-                    col.add_grid('blk_stck_adj_items',
+                section.add_grid('blk_stck_adj_items',
                                  "/list/mr_bulk_stock_adjustment_items/grid?key=standard&mr_bulk_stock_adjustment_id=#{id}",
                                  caption: 'Bulk Stock Adjustment Items')
-                  end
-                end
               end
             end
           end

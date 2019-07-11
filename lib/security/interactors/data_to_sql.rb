@@ -25,6 +25,8 @@ module SecurityApp
     private
 
     # Store these in config - per application
+    # The subquery is the subquery to be injected in the INSERT statement.
+    # The values gets the key value to be used in the subquery for a particular row.
     LKP_RULES = {
       commodity_group_id: { subquery: 'SELECT id FROM commodity_groups WHERE code = ?', values: 'SELECT code FROM commodity_groups WHERE id = ?' },
       commodity_id: { subquery: 'SELECT id FROM commodities WHERE code = ?', values: 'SELECT code FROM commodities WHERE id = ?' },
@@ -48,13 +50,17 @@ module SecurityApp
       end
     end
 
-    def get_insert_value(rec, col)
+    def get_insert_value(rec, col) # rubocop:disable Metrics/AbcSize
+      return 'NULL' if rec[col].nil?
+
       if LKP_RULES.keys.include?(col)
         lookup(col, rec[col])
       elsif %i[integer decimal float].include?(@columns[col][:type])
         rec[col].to_s
+      elsif @columns[col][:type] == :boolean
+        rec[col].to_s
       else
-        "'#{rec[col].gsub("'", "''")}'" # Need to escape single quotes...
+        "'#{rec[col].to_s.gsub("'", "''")}'" # Need to escape single quotes...
       end
     end
 

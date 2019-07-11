@@ -158,6 +158,48 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Save a grid's current row id for bookmarking.
+   * Up to 20 grids row ids are cached.
+   * @param {string/integer} rowId - the value of the `id` column of the current row.
+   * @return {void}
+   */
+  recordGridRowBookmark: function recordGridRowBookmark(rowId) {
+    const key = 'gridBookmarks';
+    // Match the url with queryparams but without host & port
+    const url = window.location.href.replace(window.location.origin, '');
+    let urlSet = [];
+    if (crossbeamsLocalStorage.hasItem(key)) {
+      urlSet = crossbeamsLocalStorage.getItem(key);
+      if (urlSet.length > 20) {
+        urlSet.shift();
+      }
+      urlSet = urlSet.filter(item => item.url !== url);
+    }
+    urlSet.push({ url, rowId });
+    crossbeamsLocalStorage.setItem(key, urlSet);
+  },
+
+  /**
+   * Get the bookmark for a grid.
+   * @return {string/integer} rowId - the value of the `id` column of the bookmarked row.
+   */
+  currentGridRowBookmark: function currentGridRowBookmark() {
+    const key = 'gridBookmarks';
+    // Store the url with queryparams but without host & port
+    const url = window.location.href.replace(window.location.origin, '');
+    const urlSet = crossbeamsLocalStorage.getItem(key);
+
+    if (urlSet === null) {
+      return null;
+    }
+    const result = urlSet.find(elem => elem.url === url);
+    if (result === undefined) {
+      return null;
+    }
+    return result.rowId;
+  },
+
+  /**
    * Replace the content of the active dialog window.
    * @param {string} data - the new content.
    * @returns {void}
@@ -903,6 +945,22 @@ const crossbeamsUtils = {
       text: prompt,
       type: 'warning',
       showCancelButton: true }).then(okFunc, cancelFunc).catch(swal.noop);
+  },
+
+  /**
+   * Take a value and return it formatted with thousands separators
+   * and a set number of decimals.
+   * @param {string, number} value - the value to format.
+   * @param {integet} precision - the number of decimals to show.
+   * @returns {string, null} - the formatted value or null if the value cannot be formatted.
+   */
+  formatNumberWithCommas: function formatNumberWithCommas(value, precision) {
+    if (!value) { return null; }
+
+    let x = value;
+    if (typeof x === 'string') { x = parseFloat(x); }
+    if (isNaN(x)) { return null; }
+    return x.toLocaleString('en-US', { minimumFractionDigits: precision });
   },
 
   /**

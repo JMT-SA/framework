@@ -65,27 +65,23 @@ module PackMaterial
 
             page.section do |section|
               section.show_border!
-              section.row do |row|
-                row.column do |col|
-                  if rules[:show_only]
-                    col.add_grid('po_items',
+              if rules[:show_only]
+                section.add_grid('po_items',
                                  "/list/mr_purchase_order_items_show/grid?key=standard&purchase_order_id=#{id}",
                                  height: 8,
                                  caption: 'Purchase Order Line Items')
-                  else
-                    col.add_control(control_type: :link,
+              else
+                section.add_control(control_type: :link,
                                     text: 'New Item',
                                     url: "/pack_material/replenish/mr_purchase_orders/#{id}/mr_purchase_order_items/new",
                                     style: :button,
                                     behaviour: :popup,
                                     grid_id: 'po_items',
                                     css_class: 'mb1')
-                    col.add_grid('po_items',
+                section.add_grid('po_items',
                                  "/list/mr_purchase_order_items/grid?key=standard&purchase_order_id=#{id}",
                                  height: 8,
                                  caption: 'Purchase Order Line Items')
-                  end
-                end
               end
             end
           end

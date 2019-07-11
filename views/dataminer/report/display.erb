@@ -8,103 +8,17 @@
 </section>
 
 <section class="crossbeams-layout crossbeams_layout-fit-height">
-  <div id="grd1-frame" style="flex-grow:1;margin-bottom:4em">
-    <%= Crossbeams::Layout::Renderer::Grid.header('grd1', @page.report.caption, fit_height: true) %>
-    <div id="grd1" style="height: 100%;" class="ag-theme-balham"></div>
-  </div>
+  <% page_config = Crossbeams::Layout::PageConfig.new %>
+  <%= Crossbeams::Layout::Grid.new(page_config, 'grd1', nil, caption: @page.report.caption, fit_height: true, bookmark_row_on_action: false).render %>
 </section>
 
- <% content_for :late_javascript do %>
-<script>
+<% content_for :late_javascript do %>
+  <script>
+    (function() {
+      document.addEventListener('DOMContentLoaded', () => {
+        crossbeamsGridStaticLoader.loadGrid('grd1', <%= @page.col_defs.to_json %>, <%= @page.row_defs.to_json %>);
+      });
 
-(function() {
-  //var loadGrid;
-  var onBtExport;
-
-  translateColDefs = function(columnDefs) {
-    //console.log(columnDefs);
-    var newColDefs = [], col, newCol, fn;
-    for (_i = 0, _len = columnDefs.length; _i < _len; _i++) {
-      col = columnDefs[_i];
-      newCol = {};
-      for(attr in col) {
-        if(attr==='cellRenderer') {
-          //fn = window[col[attr]];
-          //newCol[attr] = fn;
-          //newCol[attr] = eval(col[attr]);
-          if(col[attr] ==='crossbeamsGridFormatters.testRender') {
-            newCol[attr] = crossbeamsGridFormatters.testRender;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas2') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas4') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.booleanFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.booleanFormatter;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.hrefInlineFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.hrefInlineFormatter;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.hrefSimpleFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.hrefSimpleFormatter;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.hrefPromptFormatter') {
-            newCol[attr] = crossbeamsGridFormatters.hrefPromptFormatter;
-          }
-
-        }
-        else if(attr==='valueFormatter') {
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas2') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas2;
-          }
-          if(col[attr] ==='crossbeamsGridFormatters.numberWithCommas4') {
-            newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
-          }
-        }
-        else {
-          newCol[attr] = col[attr];
-        }
-      }
-      newColDefs.push(newCol);
-    }
-    return newColDefs;
-  };
-
-
-      var grid, gridOptions, grid_id, colDefs, rowDefs;
-  colDefs = translateColDefs(<%= @page.col_defs.to_json %>),
-  rowDefs = <%= @page.row_defs.to_json %>,
-      grid = document.querySelector('#grd1');
-      grid_id = grid.getAttribute('id');
-      //for_print = grid.dataset.gridPrint;
-      gridOptions = {
-        context: { domGridId: 'grd1' },
-        columnDefs: colDefs,
-        rowData: rowDefs,
-                enableColResize: true,
-                enableSorting: true,
-                enableFilter: true,
-                rowSelection: 'single',
-                enableRangeSelection: true,
-                enableStatusBar: true,
-                suppressAggFuncInHeader: true,
-                onFilterChanged: function () {
-                  let filterLength = 0;
-                  let rows = 0;
-                  this.api.forEachLeafNode((n) => { rows += 1; });
-                  this.api.forEachNodeAfterFilter((n) => { if (!n.group) { filterLength += 1; } });
-                  crossbeamsGridEvents.displayRowCounts('grd1', filterLength, rows);
-                },
-              };
-
-      new agGrid.Grid(grid, gridOptions);
-      crossbeamsGridStore.addGrid(grid_id, gridOptions);
-      // crossbeamsGridEvents.displayRowCounts('grd1', filterLength, rows);
-      gridOptions.onFilterChanged();
-      crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId, colDefs);
-      //loadGrid(grid, gridOptions);
-  }).call(this);
-</script>
+    }).call(this);
+  </script>
 <% end %>

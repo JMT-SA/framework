@@ -1,0 +1,57 @@
+= Response objects
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Response objects
+
+Response objects are defined in the module `Crossbeams::Responses`.
+
+They are used to return a structured response from a method that has the following payload:
+
+success :: A boolean which is true if the method succeeded.
+instance :: Optional. Relevant data.
+errors :: Optional. Specific error messages - typically for validation of fields.
+message :: A message to describe the result.
+
+=== Setup
+
+A class should `include Crossbeams::Responses`. Note that classes inheriting from `BaseRepo`, `BaseInteractor` and `BaseService` already include the module.
+
+Methods in the class can generate crossbeams responses using the methods:
+
+* `success_response`
+* `ok_response`
+* `failed_response`
+* `validation_failed_message_response`
+* `validation_failed_response`
+* `mixed_validation_failed_response`
+
+
+See link:/yarddocthis/lib=cecrossbeams_responses.rb[Crossbeams::Responses methods] for a list of the method definitions described below.
+
+=== Success responses
+
+These are `success_response` and `ok_response`. They always return `success == true` and a `message`.
+Use `ok_response` when you just need to denote success and the `message` is unimportant.
+
+success_response :: Requires a message.
+ok_response :: Returns message 'ok'.
+
+=== Failure response
+
+This method is called `failed_response` and always returns `success == false` and a `message`.
+Can optionally return `instance`.
+
+failed_response :: Requires a failure message.
+
+=== Validation responses
+
+There are three validation responses. They always returns `success == false` and `message == 'Validation error'`.
+The `errors` should always return validation error message(s) per field in error.
+
+validation_failed_message_response :: Use this to just pass the validation errors.
+validation_failed_response :: Use this to pass the validation errors with an instance.
+mixed_validation_failed_response :: Use this to combine two or more validation results.
+
+Validation responses are usually called with a `Dry::Validation::Result` instance, but can also be called with a `Hash` or `OpenStruct`.

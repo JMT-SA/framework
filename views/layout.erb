@@ -108,10 +108,11 @@
     <script src="/js/jquery.contextMenu.min.js"></script>
     <script src="/js/sweetalert2.min.js"></script>
     <script src="/js/Sortable.min.js"></script>
+    <script src="/js/svg-inject.min.js"></script>
     <script src="/js/crossbeams-local-storage.js"></script>
-    <script src="/js/crossbeams-utils.js?seq=8"></script>
+    <script src="/js/crossbeams-utils.js?seq=11"></script>
     <script src="/js/crossbeams-layout.js?seq=10"></script>
-    <script src="/js/crossbeams-grid-loader.js?seq=13"></script>
+    <script src="/js/crossbeams-grid-loader.js?seq=16"></script>
     <script src="/js/crossbeams-data-miner-params.js?seq=1"></script>
     <script src="/js/crossbeams-menu-builder.js?seq=1"></script>
     <script src="/js/choices.min.js"></script>
@@ -120,18 +121,6 @@
     <script>
       let crossbeamsDialogLevel1;
       let crossbeamsDialogLevel2;
-      // Prefix all jQuery AJAX post requests with the CSRF token.
-      const csrf_token = $('meta[name="_csrf"]').attr('content');
-      $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
-        if (options.type.toLowerCase() === 'post') {
-          // initialize `data` to empty string if it does not exist
-          options.data = options.data || '';
-          // add leading ampersand if `data` is non-empty
-          options.data += options.data ? '&' : '';
-          // add _token entry
-          options.data += `_csrf=${csrf_token}`;
-        }
-      });
 
       document.addEventListener('DOMContentLoaded', function () {
         const dialogEl1 = document.getElementById('crossbeams-popup-dialog-level1');

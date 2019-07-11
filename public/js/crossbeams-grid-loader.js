@@ -271,6 +271,10 @@ const crossbeamsGridEvents = {
     errChanges[event.colDef.field] = event.oldValue;
     crossbeamsUtils.recordGridIdForPopup(gridId);
 
+    if (event.context.keyColumn) {
+      form.append('key_name', event.context.keyColumn);
+      form.append('key_val', event.data[event.context.keyColumn]);
+    }
     form.append('column_name', event.colDef.field);
     form.append('column_value', event.newValue);
     form.append('old_value', event.oldValue);
@@ -368,6 +372,53 @@ const crossbeamsGridEvents = {
   },
 
   /**
+   * If this grid has a bookmark, make the bookmark button available to jump to the row.
+   * @param {string} gridId - the DOM id of the grid.
+   * @returns {void}
+   */
+  makeRowBookmark: function makeRowBookmark(gridId, updateId = false) {
+    const frame = document.getElementById(`${gridId}-frame`);
+    const btn = frame.querySelector('.crossbeams-row-bookmark');
+
+    if (btn === null) {
+      return;
+    }
+    const rowId = crossbeamsUtils.currentGridRowBookmark();
+    if (rowId === null) {
+      btn.hidden = true;
+      return;
+    }
+    btn.hidden = false;
+    btn.dataset.bookmarkRowId = rowId;
+
+
+    const bkmkClick = function bkmkClick() {
+      const gridOptions = crossbeamsGridStore.getGrid(gridId);
+      const node = gridOptions.api.getRowNode(btn.dataset.bookmarkRowId);
+      if (node === undefined) {
+        btn.hidden = true;
+      } else {
+        gridOptions.api.ensureNodeVisible(node, 'middle');
+        node.setSelected(true);
+        // If this is a tree, the bookmarked row might be collapsed.
+        let currNode = node;
+        while (currNode.parent) {
+          if (!currNode.parent.expanded) {
+            currNode.parent.setExpanded(true);
+          }
+          currNode = currNode.parent;
+        }
+      }
+    };
+
+    if (updateId) {
+      btn.removeEventListener('click', bkmkClick);
+    }
+
+    btn.addEventListener('click', bkmkClick);
+  },
+
+  /**
    * Export a grid to a csv file.
    * @param {string} gridId - the DOM id of the grid.
    * @param {string} fileName - the name to be given to the exported file.
@@ -450,6 +501,85 @@ const crossbeamsGridEvents = {
     gridOptions.api.setQuickFilter(event.target.value);
   },
 
+  /**
+   * Select the previous row in the grid while viewing in a popup form
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
+  prevRow: function prevRow(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    const selectedNodes = gridOptions.api.getSelectedNodes();
+    let selectedNode;
+    if (selectedNodes && selectedNodes.length > 0) {
+      selectedNode = selectedNodes[0];
+    } else {
+      selectedNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
+    }
+    let found = false;
+    let lastNode = null;
+    gridOptions.api.forEachNodeAfterFilterAndSort((node, index) => {
+      if (!node.group) {
+        lastNode = node;
+      }
+      if (!found && index === selectedNode.rowIndex - 1) {
+        if (!node.group) {
+          lastNode = node;
+        }
+        if (lastNode !== null) {
+          found = true;
+          lastNode.setSelected(true);
+          crossbeamsUtils.closePopupDialog();
+          crossbeamsGridEvents.viewSelectedRow(gridId);
+          gridOptions.api.ensureNodeVisible(lastNode, 'top');
+        }
+      }
+    });
+  },
+
+  /**
+   * Select the next row in the grid while viewing in a popup form
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
+  nextRow: function nextRow(gridId) {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    const selectedNodes = gridOptions.api.getSelectedNodes();
+    let selectedNode;
+    if (selectedNodes && selectedNodes.length > 0) {
+      selectedNode = selectedNodes[0];
+    } else {
+      selectedNode = gridOptions.api.getDisplayedRowAtIndex(gridOptions.api.getFirstDisplayedRow());
+    }
+    let found = false;
+    gridOptions.api.forEachNodeAfterFilterAndSort((node, index) => {
+      if (!found && index > selectedNode.rowIndex) {
+        if (!node.group) {
+          found = true;
+          node.setSelected(true);
+          crossbeamsUtils.closePopupDialog();
+          crossbeamsGridEvents.viewSelectedRow(gridId);
+          gridOptions.api.ensureNodeVisible(node, 'bottom');
+        }
+      }
+    });
+  },
+
+  /**
+   * Sort the display of a row's columns while viewing in a popup form
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
+  setSortForRowView: function setSortForRowView(gridId, checkbox) {
+    crossbeamsLocalStorage.setItem('viewGridRowSorted', checkbox.checked);
+    crossbeamsUtils.closePopupDialog();
+    crossbeamsGridEvents.viewSelectedRow(gridId);
+  },
+
+  /**
+   * Display the contents of the currently-selected row in a popup form.
+   * @param {string} gridId - the id of the grid div element.
+   * @returns {void}
+   */
   viewSelectedRow: function viewSelectedRow(gridId) {
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
     let rowNode = gridOptions.api.getSelectedNodes()[0];
@@ -461,30 +591,66 @@ const crossbeamsGridEvents = {
         return null;
       }
     }
-    const useKeys = gridOptions.columnApi.getAllDisplayedColumns().filter(c => c.colDef.headerName !== '' && c.colDef.headerName !== 'Group').map(c => c.colDef.field);
+    let rows = 0;
+    gridOptions.api.forEachNodeAfterFilter((n) => { if (!n.group) { rows += 1; } });
+    const hidePrev = rowNode.rowIndex === 0 ? ' disabled' : '';
+    const hideNext = rowNode.rowIndex === rows - 1 ? ' disabled' : '';
 
-    // TODO:
-    //       - sort keys. (and un-sort)
-    //       - next/prev navigation of table
-    //       - button in UI
-    //       - skip if data does not have a columndef (e.g. dataminer reports grid)
-    const content = `<div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
+    const holdKeys = gridOptions.columnApi.getAllDisplayedColumns().filter(c => c.colDef.headerName !== '' && c.colDef.headerName !== 'Group');
+    let useKeys;
+    const sorted = crossbeamsLocalStorage.getItem('viewGridRowSorted');
+    if (sorted) {
+      useKeys = holdKeys.sort((a, b) => {
+        const nameA = a.colDef.headerName.toUpperCase();
+        const nameB = b.colDef.headerName.toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        return 0;
+      }).map(c => c.colDef.field);
+    } else {
+      useKeys = holdKeys.map(c => c.colDef.field);
+    }
+
+    const content = `<div>
+      <button class="f6 link dim br2 ph3 pv2 dib white bg-dark-blue" onclick="crossbeamsGridEvents.prevRow('${gridId}')"${hidePrev}>
+        <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.05 9.293L6.343 10 12 15.657l1.414-1.414L9.172 10l4.242-4.243L12 4.343z"/></svg> Prev
+      </button>
+      <button class="f6 link dim br2 ph3 pv2 dib white bg-dark-blue" onclick="crossbeamsGridEvents.nextRow('${gridId}')"${hideNext}>
+        Next <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z"/></svg>
+      </button>
+      <label><input type="checkbox" onchange="crossbeamsGridEvents.setSortForRowView('${gridId}', this)" ${sorted ? 'checked="y"' : ''}> Sort column names</label>
+      </div>
+      <div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
       <table class="thinbordertable" style="margin:0 0.5em">
       <thead>
-      <tr><th>Column</th><th>Value</th></tr>
+      <tr><th>Column</th><th style="min-width:15em">Value</th></tr>
       </thead>
       <tbody>
-      ${useKeys.map(k => `
+      ${useKeys.filter(l => gridOptions.api.getColumnDef(l) !== null).map(k => `
         <tr class="hover-row ${(() => { cnt += 1; return cnt % 2 === 0 ? 'roweven' : 'rowodd'; })()}"><td>
-          ${gridOptions.api.getColumnDef(k).headerName}
-          </td><td class="${gridOptions.api.getColumnDef(k).cellClass ? gridOptions.api.getColumnDef(k).cellClass : ''}">
+          ${gridOptions.api.getColumnDef(k) && gridOptions.api.getColumnDef(k).headerName}
+          </td><td class="selected-grid-row-display ${gridOptions.api.getColumnDef(k) && gridOptions.api.getColumnDef(k).cellClass ? gridOptions.api.getColumnDef(k).cellClass : ''}">
           ${((data) => {
-            if (data === null) {
+            const colDef = gridOptions.api.getColumnDef(k);
+            if (colDef === null || data === null) {
               return '';
             } else if (data === true) {
               return '<span class="ac_icon_check">&nbsp;</span>';
             } else if (data === false) {
               return '<span class="ac_icon_uncheck">&nbsp;</span>';
+            }
+            if (colDef.valueFormatter) {
+              if (colDef.valueFormatter.name === 'numberWithCommas2') {
+                return crossbeamsUtils.formatNumberWithCommas(data, 2);
+              }
+              if (colDef.valueFormatter.name === 'numberWithCommas4') {
+                return crossbeamsUtils.formatNumberWithCommas(data, 4);
+              }
             }
             return data;
           })(rowNode.data[k])}
@@ -503,17 +669,19 @@ const crossbeamsGridEvents = {
    */
   promptClick: function promptClick(target) {
     const prompt = target.dataset.prompt;
+    const title = target.textContent && target.textContent;
     const url = target.dataset.url;
     const method = target.dataset.method;
-
-    swal({
-      title: prompt,
-      type: 'warning',
-      showCancelButton: true,
-    }).then(() => {
+    const caller = () => {
       document.body.innerHTML += `<form id="dynForm" action="${url}"
         method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" /><input name="_method" type="hidden" value="${+method}" /></form>`;
       document.getElementById('dynForm').submit();
+    };
+
+    crossbeamsUtils.confirm({
+      prompt,
+      okFunc: caller,
+      title,
     });
     // TODO: make call via AJAX & reload grid? Or http to server to figure it out?.....
     // ALSO: disable link automatically while call is being processed...
@@ -586,7 +754,7 @@ const crossbeamsGridFormatters = {
       // No show of item
       return null;
     } else if (item.is_submenu) {
-      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true };
+      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null };
       item.items.forEach((subitem) => {
         subKey = crossbeamsGridFormatters.nextChar(subKey);
         subPrefix = `${prefix}${key}_`;
@@ -623,6 +791,7 @@ const crossbeamsGridFormatters = {
       icon: item.icon,
       popup: item.popup,
       loading_window: item.loading_window,
+      row_id: params.data.id,
     };
   },
 
@@ -658,35 +827,15 @@ const crossbeamsGridFormatters = {
   // Return a number with thousand separator and at least 2 digits after the decimal.
   numberWithCommas2: function numberWithCommas2(params) {
     if (!params.data) { return null; }
-    if (!params.value) { return null; }
 
-    let x = params.value;
-    let parts = [];
-    if (typeof x === 'string') { x = parseFloat(x); }
-    if (isNaN(x)) { return ''; }
-    x = Math.round((x + 0.00001) * 100) / 100; // Round to 2 digits if longer.
-    parts = x.toString().split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (parts[1] === undefined || parts[1].length === 0) { parts[1] = '00'; }
-    if (parts[1].length === 1) { parts[1] += '0'; }
-    return parts.join('.');
+    return crossbeamsUtils.formatNumberWithCommas(params.value, 2);
   },
 
   // Return a number with thousand separator and at least 4 digits after the decimal.
   numberWithCommas4: function numberWithCommas4(params) {
     if (!params.data) { return null; }
-    if (!params.value) { return null; }
 
-    let x = params.value;
-    let parts = [];
-    if (typeof x === 'string') { x = parseFloat(x); }
-    if (isNaN(x)) { return ''; }
-    x = Math.round((x + 0.0000001) * 10000) / 10000; // Round to 4 digits if longer.
-    parts = x.toString().split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (parts[1] === undefined || parts[1].length === 0) { parts[1] = '0000'; }
-    while (parts[1].length < 4) { parts[1] += '0'; }
-    return parts.join('.');
+    return crossbeamsUtils.formatNumberWithCommas(params.value, 4);
   },
 
   booleanFormatter: function booleanFormatter(params) {
@@ -699,8 +848,29 @@ const crossbeamsGridFormatters = {
     return '<span class="ac_icon_uncheck">&nbsp;</span>';
   },
 
+  // Format a column to display as an icon.
+  // The column format is: "icon_name[,colour][,indent level]"
+  // - colour defaults to grey
+  // - indent level defaults to 0
+  iconFormatter: function iconFormatter(params) {
+    if (!params.data) { return null; }
+    if (params.value === '' || params.value === null) { return ''; }
+
+    const icoCol = params.value.split(',');
+    if (!icoCol[1]) icoCol.push('gray'); // default colour
+    if (!icoCol[2]) {                    // default indent from "level" column
+      if (params.data.level) {
+        icoCol.push(params.data.level - 1);
+      } else {
+        icoCol.push(0);
+      }
+    }
+    return `<span class="cbl-icon" style="color:${icoCol[1]};margin-left:${icoCol[2] * 0.75}rem">
+        <img src="/app_icons/${icoCol[0]}.svg" onload="SVGInject(this)">
+      </span>`;
+  },
+
   hrefInlineFormatter: function hrefInlineFormatter(params) {
-    // var rainPerTenMm = params.value / 10;
     return `<a href="/books/${params.value}/edit">edit</a>`;
   },
 
@@ -1025,8 +1195,8 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
   eDetailGrid.addEventListener('DOMMouseScroll', mouseWheelListener);
 };
 
-(function crossbeamsGridLoader() {
-  const translateColDefs = function translateColDefs(columnDefs) {
+const crossbeamsGridStaticLoader = {
+  translateColDefs: (columnDefs) => {
     const newColDefs = [];
     let newCol = {};
     columnDefs.forEach((col) => {
@@ -1048,6 +1218,9 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           }
           if (col[attr] === 'crossbeamsGridFormatters.booleanFormatter') {
             newCol[attr] = crossbeamsGridFormatters.booleanFormatter;
+          }
+          if (col[attr] === 'crossbeamsGridFormatters.iconFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.iconFormatter;
           }
           if (col[attr] === 'crossbeamsGridFormatters.hrefInlineFormatter') {
             newCol[attr] = crossbeamsGridFormatters.hrefInlineFormatter;
@@ -1106,17 +1279,55 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
       newColDefs.push(newCol);
     });
     return newColDefs;
-  };
+  },
 
+  applyGeneralGridUi: (gridOptions, colDefs, fieldUpdateUrl, extraContext) => {
+    let rows = 0;
+    gridOptions.api.forEachLeafNode(() => { rows += 1; });
+    if (fieldUpdateUrl) {
+      gridOptions.context.fieldUpdateUrl = fieldUpdateUrl;
+    }
+    if (extraContext) {
+      Object.assign(gridOptions.context, extraContext);
+    }
+    crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
+    // If the grid has no horizontal scrollbar, hide the scroll to column dropdown.
+    const grdEl = document.getElementById(gridOptions.context.domGridId);
+    const vport = grdEl.querySelector('.ag-body-viewport');
+    crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
+      colDefs,
+      vport.scrollWidth > vport.offsetWidth);
+    crossbeamsGridEvents.makeRowBookmark(gridOptions.context.domGridId);
+  },
+
+  /**
+   * Statically load a grid with column and row values.
+   */
+  loadGrid: (gridId, colDefs, rowDefs) => {
+    const gridOptions = crossbeamsGridStore.getGrid(gridId);
+    // find grid
+    const newColDefs = crossbeamsGridStaticLoader.translateColDefs(colDefs);
+    gridOptions.api.setColumnDefs(newColDefs);
+    gridOptions.api.setRowData(rowDefs);
+    crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions, newColDefs);
+  },
+};
+
+(function crossbeamsGridLoader() {
+  /**
+   * Dynamically load a grid.
+   */
   const loadGrid = function loadGrid(grid, gridOptions) {
     const url = grid.getAttribute('data-gridurl');
+    if (url === '') return; // must be loaded statically
+
     const httpRequest = new XMLHttpRequest();
     httpRequest.open('GET', url);
 
     httpRequest.onreadystatechange = () => {
       let httpResult = null;
       let newColDefs = null;
-      let rows = 0;
+
       if (httpRequest.readyState === 4 && httpRequest.status === 200) {
         httpResult = JSON.parse(httpRequest.responseText);
         if (httpResult.exception) {
@@ -1129,18 +1340,22 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
           }
           return null;
         }
-        // var midLevelColumnDefs, detailColumnDefs;
+
         if (httpResult.nestedColumnDefs) {
-          newColDefs = translateColDefs(httpResult.nestedColumnDefs['1']);
-          midLevelColumnDefs = translateColDefs(httpResult.nestedColumnDefs['2']);
-          detailColumnDefs = translateColDefs(httpResult.nestedColumnDefs['3']);
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['1']);
+          midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['2']);
+          detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['3']);
         } else {
-          newColDefs = translateColDefs(httpResult.columnDefs);
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.columnDefs);
         }
-        gridOptions.api.setColumnDefs(newColDefs); // TODO.............. ????
+        gridOptions.api.setColumnDefs(newColDefs);
         gridOptions.api.setRowData(httpResult.rowDefs);
         if (!gridOptions.forPrint) {
-          gridOptions.api.forEachLeafNode(() => { rows += 1; });
+          crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
+            newColDefs,
+            httpResult.fieldUpdateUrl,
+            httpResult.extraContext);
+
           if (httpResult.multiselect_ids) {
             gridOptions.api.forEachNode((node) => {
               if (node.data && _.includes(httpResult.multiselect_ids, node.data.id)) {
@@ -1148,16 +1363,6 @@ Level3PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
               }
             });
           }
-          if (httpResult.fieldUpdateUrl) {
-            gridOptions.context.fieldUpdateUrl = httpResult.fieldUpdateUrl;
-          }
-          crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
-          // If the grid has no horizontal scrollbar, hide the scroll to column dropdown.
-          const grdEl = document.getElementById(gridOptions.context.domGridId);
-          const vport = grdEl.querySelector('.ag-body-viewport');
-          crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
-            newColDefs,
-            vport.scrollWidth > vport.offsetWidth);
         }
       }
       return null;
@@ -1441,6 +1646,7 @@ document.addEventListener('DOMContentLoaded', () => {
             is_submenu: item.is_submenu,
             popup: item.popup,
             loading_window: item.loading_window,
+            row_id: item.row_id,
             domGridId: gridId,
           };
           if (item.is_submenu) {
@@ -1455,6 +1661,11 @@ document.addEventListener('DOMContentLoaded', () => {
           const item = getItemFromTree(key, items);
           const caller = () => {
             let form = null;
+            // Store current grid row as a bookmark.
+            if (document.querySelector(`#${item.domGridId}-frame .crossbeams-row-bookmark`)) {
+              crossbeamsUtils.recordGridRowBookmark(item.row_id);
+              crossbeamsGridEvents.makeRowBookmark(item.domGridId, true);
+            }
             if (item.method === undefined) {
               if (item.popup) {
                 crossbeamsUtils.recordGridIdForPopup(item.domGridId);

@@ -21,42 +21,60 @@ module PackMaterialApp
     def call
       return failed_response('Bulk Stock Adjustment record does not exist') unless @bulk_stock_adj
 
+      apply_stock_changes
+    end
+
+    private
+
+    def apply_stock_changes # rubocop:disable Metrics/AbcSize
       separated_items = @this_repo.separate_items(@bulk_stock_adjustment_id)
       separated_items[:destroy_stock_items].each do |item|
-        sys_qty = @this_repo.system_quantity(item[:mr_sku_id], item[:location_id])
-        qty = sys_qty - item[:actual_quantity].to_d
-        res = RemoveMrStock.call(item[:mr_sku_id],
-                                 item[:location_id],
-                                 qty,
-                                 ref_no: @ref_no,
-                                 parent_transaction_id: destroy_transaction_id(attrs),
-                                 business_process_id: @business_process_id,
-                                 user_name: @opts[:user_name])
-        return failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to destroy stock failed - #{res.message}") unless res.success
+        res = destroy_stock_item(item)
+        return res unless res.success
 
         @this_repo.update_item_transaction_id(item[:id], res.instance)
       end
-
       separated_items[:create_stock_items].each do |item|
-        parent_transaction_id = create_transaction_id(attrs)
-        sys_qty = @this_repo.system_quantity(item[:mr_sku_id], item[:location_id])
-        qty = item[:actual_quantity].to_d - sys_qty
-        res = CreateMrStock.call([item[:mr_sku_id]],
-                                 @business_process_id,
-                                 to_location_id: item[:location_id],
-                                 user_name: @opts[:user_name],
-                                 ref_no: @ref_no,
-                                 parent_transaction_id: parent_transaction_id,
-                                 quantities: [{ sku_id: item[:mr_sku_id], qty: qty }])
-        return failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to create stock failed - #{res.message}") unless res.success
+        res = create_stock_item(item)
+        return res unless res.success
 
         item_transaction_id = res.instance[:transaction_item_ids][0][:transaction_item_id]
         @this_repo.update_item_transaction_id(item[:id], item_transaction_id)
       end
-
+      # Note that @create_transaction_id and @destroy_transaction_id are only created if they should exist
       @this_repo.update_transaction_ids(@bulk_stock_adjustment_id, @create_transaction_id, @destroy_transaction_id)
+      ok_response
+    end
 
-      success_response('ok')
+    def destroy_stock_item(item) # rubocop:disable Metrics/AbcSize
+      sys_qty = @this_repo.system_quantity(item[:mr_sku_id], item[:location_id])
+      qty = sys_qty - item[:actual_quantity].to_d
+      res = RemoveMrStock.call(item[:mr_sku_id],
+                               item[:location_id],
+                               qty,
+                               ref_no: @ref_no,
+                               parent_transaction_id: destroy_transaction_id(attrs),
+                               business_process_id: @business_process_id,
+                               user_name: @opts[:user_name])
+      return res if res.success
+
+      failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to destroy stock failed - #{res.message}")
+    end
+
+    def create_stock_item(item) # rubocop:disable Metrics/AbcSize
+      parent_transaction_id = create_transaction_id(attrs)
+      sys_qty = @this_repo.system_quantity(item[:mr_sku_id], item[:location_id])
+      qty = item[:actual_quantity].to_d - sys_qty
+      res = CreateMrStock.call([item[:mr_sku_id]],
+                               @business_process_id,
+                               to_location_id: item[:location_id],
+                               user_name: @opts[:user_name],
+                               ref_no: @ref_no,
+                               parent_transaction_id: parent_transaction_id,
+                               quantities: [{ sku_id: item[:mr_sku_id], qty: qty }])
+      return res if res.success
+
+      failed_response("Bulk Stock Adjustment Item #{item[:id]}: Attempt to create stock failed - #{res.message}")
     end
 
     def attrs

@@ -117,12 +117,14 @@ class Framework < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            form_errors = move_validation_errors_to_base(res.errors, :location_long_code, highlights: { location_long_code: %i[location_long_code location_short_code] })
-            form_errors2 = move_validation_errors_to_base(form_errors, :receiving_bay_type_location, highlights: { receiving_bay_type_location: %i[location_type_id can_store_stock] })
+            form_errors = move_validation_errors_to_base(res.errors,
+                                                         %i[location_long_code receiving_bay_type_location],
+                                                         highlights: { location_long_code: %i[location_long_code location_short_code],
+                                                                       receiving_bay_type_location: %i[location_type_id can_store_stock] })
             re_show_form(r, res, url: "/masterfiles/locations/locations/#{id}/add_child") do
               Masterfiles::Locations::Location::New.call(id: id,
                                                          form_values: params[:location],
-                                                         form_errors: form_errors2,
+                                                         form_errors: form_errors,
                                                          remote: fetch?(r))
             end
           end
@@ -201,11 +203,13 @@ class Framework < Roda
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         else
-          form_errors = move_validation_errors_to_base(res.errors, :location_long_code, highlights: { location_long_code: %i[location_long_code location_short_code] })
-          form_errors2 = move_validation_errors_to_base(form_errors, :receiving_bay_type_location, highlights: { receiving_bay_type_location: %i[location_type_id can_store_stock] })
+          form_errors = move_validation_errors_to_base(res.errors,
+                                                       %i[location_long_code receiving_bay_type_location],
+                                                       highlights: { location_long_code: %i[location_long_code location_short_code],
+                                                                     receiving_bay_type_location: %i[location_type_id can_store_stock] })
           re_show_form(r, res, url: '/masterfiles/locations/locations/new') do
             Masterfiles::Locations::Location::New.call(form_values: params[:location],
-                                                       form_errors: form_errors2,
+                                                       form_errors: form_errors,
                                                        remote: fetch?(r))
           end
         end

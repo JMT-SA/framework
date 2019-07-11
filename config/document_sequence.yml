@@ -18,6 +18,11 @@ doc_seqs_stock_adjustment_number:
   data_type: :integer
   table: mr_bulk_stock_adjustments
   column: stock_adjustment_number
+doc_seqs_waybill_number:
+  db_sequence_name: doc_seqs_waybill_number
+  data_type: :integer
+  table: mr_deliveries
+  column: waybill_number
 dummy_invoice:
   db_sequence_name: doc_seqs_inv
   data_type: :string

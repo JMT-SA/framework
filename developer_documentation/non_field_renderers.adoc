@@ -50,8 +50,8 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 
 |options - :behaviour
 |How the link behaves when clicked. Can open the url in a new page, can open the url in a popup dialog or can replace an already-open dialog.
-|`:popup` or `:replace_dialog`.
-|n/a
+|`:direct`, `:popup` or `:replace_dialog`.
+|`:direct`
 
 |options - :css_class
 |Extra class string to add to the link's class.

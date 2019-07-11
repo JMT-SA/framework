@@ -13,6 +13,7 @@ module Development
             section.add_control(control_type: :link, text: 'Back to documentation home', url: '/developer_documentation/start.adoc', style: :back_button)
             section.add_control(control_type: :link, text: 'Back to icon documentation', url: '/developer_documentation/icons.adoc', style: :back_button)
             section.add_control(control_type: :link, text: 'Layout icon list', url: '/development/layout_icons', style: :button)
+            section.add_control(control_type: :link, text: 'Grid column icon list', url: '/development/grid_column_icons', style: :button)
             section.add_text <<~HTML, wrapper: :p
               These are the icons that are available to use for grid menu items.<br>
               In a list or search <code>.yml</code> file you would write <code>:icon: add</code>.<br>

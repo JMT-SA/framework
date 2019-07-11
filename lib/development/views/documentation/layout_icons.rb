@@ -3,7 +3,7 @@
 module Development
   module Documentation
     class LayoutIcons
-      def self.call
+      def self.call # rubocop:disable Metrics/AbcSize
         body = Crossbeams::Layout::Icon.available_icons.map { |i| "<li class='pa2'>#{Crossbeams::Layout::Icon.render(i, css_class: 'mr1')} Crossbeams::Layout::Icon.render(<strong>:#{i}</strong>)</li>" }.join
 
         layout = Crossbeams::Layout::Page.build({}) do |page|
@@ -12,6 +12,7 @@ module Development
             section.add_control(control_type: :link, text: 'Back to documentation home', url: '/developer_documentation/start.adoc', style: :back_button)
             section.add_control(control_type: :link, text: 'Back to icon documentation', url: '/developer_documentation/icons.adoc', style: :back_button)
             section.add_control(control_type: :link, text: 'Grid icon list', url: '/development/grid_icons', style: :button)
+            section.add_control(control_type: :link, text: 'Grid column icon list', url: '/development/grid_column_icons', style: :button)
             section.add_text <<~HTML, wrapper: :p
               These are the icons that are available to use in views.<br>
               To render an icon, call Crossbeams::Layout::Icon.render with a symbol matching one of the available icons listed below.

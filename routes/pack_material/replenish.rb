@@ -378,11 +378,16 @@ class Framework < Roda
           store_last_referer_url(:delivery_items)
           show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryItem::Preselect.call(id, purchase_order_id: flash[:purchase_order_id]) }
         end
-        r.on 'quantity_received_changed' do
-          qty_received = params[:changed_value].empty? ? nil : params[:changed_value]
-          quantities   = qty_received ? item_interactor.over_under_supply(qty_received, params[:mr_delivery_item_mr_purchase_order_item_id]) : {}
-          json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_inner_html, value: quantities[:quantity_over_supplied].to_f),
-                        OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_inner_html, value: quantities[:quantity_under_supplied].to_f)])
+        r.on 'quantities_changed' do
+          res = item_interactor.prepare_delivery_item_quantities(params)
+          if res.success
+            json_actions([OpenStruct.new(dom_id: 'mr_delivery_item_quantity_over_supplied', type: :replace_inner_html, value: res.instance[:quantity_over_supplied].to_f),
+                          OpenStruct.new(dom_id: 'mr_delivery_item_quantity_under_supplied', type: :replace_inner_html, value: res.instance[:quantity_under_supplied].to_f),
+                          OpenStruct.new(dom_id: 'mr_delivery_item_quantity_returned', type: :replace_input_value, value: res.instance[:quantity_returned].to_f),
+                          OpenStruct.new(dom_id: 'mr_delivery_item_quantity_returned_label', type: :replace_inner_html, value: res.instance[:quantity_returned].to_f)])
+          else
+            blank_json_response
+          end
         end
         r.on 'purchase_order_changed' do
           po_id = params[:changed_value].empty? ? nil : params[:changed_value]
@@ -415,15 +420,29 @@ class Framework < Roda
             flash[:purchase_order_id] = item_interactor.purchase_order_id_for_delivery_item(res.instance.id)
             r.redirect("/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect")
           else
+            form_errors = move_validation_errors_to_base(res.errors,
+                                                         %i[received_less_than_on_note remarks_if_quantity_returned],
+                                                         highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received],
+                                                                       remarks_if_quantity_returned: %i[remarks] })
             re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new") do
               PackMaterial::Replenish::MrDeliveryItem::New.call(id,
                                                                 params[:mr_delivery_item][:mr_purchase_order_item_id],
                                                                 form_values: params[:mr_delivery_item],
-                                                                form_errors: res.errors,
+                                                                form_errors: form_errors,
                                                                 remote: fetch?(r))
             end
           end
         end
+      end
+      r.on 'accept_over_supply' do   # EDIT
+        check_auth!('replenish', 'edit')
+        res = interactor.accept_mr_delivery_over_supply(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect("/pack_material/replenish/mr_deliveries/#{id}/edit")
       end
       r.on 'verify' do   # EDIT
         check_auth!('replenish', 'edit')
@@ -599,10 +618,14 @@ class Framework < Roda
           if res.success
             redirect_via_json_to_stored_referer(:delivery_items)
           else
+            form_errors = move_validation_errors_to_base(res.errors,
+                                                         %i[received_less_than_on_note remarks_if_quantity_returned],
+                                                         highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received],
+                                                                       remarks_if_quantity_returned: %i[remarks] })
             re_show_form(r, res) do
               PackMaterial::Replenish::MrDeliveryItem::Edit.call(id,
                                                                  form_values: params[:mr_delivery_item],
-                                                                 form_errors: res.errors)
+                                                                 form_errors: form_errors)
             end
           end
         end

@@ -88,7 +88,34 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'edit' do
         @page = interactor.edit_report(id)
-        view('dataminer/admin/edit')
+        r.is do
+          view('dataminer/admin/edit')
+        end
+
+        r.on 'columns_grid' do
+          @page = interactor.edit_report(id)
+
+          {
+            extraContext: { keyColumn: 'name' },
+            multiselect_ids: [],
+            fieldUpdateUrl: @page.save_url,
+            tree: nil,
+            columnDefs: @page.col_defs,
+            rowDefs: @page.row_defs
+          }.to_json
+        end
+
+        r.on 'params_grid' do
+          @page = interactor.edit_report(id)
+
+          {
+            multiselect_ids: [],
+            fieldUpdateUrl: nil,
+            tree: nil,
+            columnDefs: @page.col_defs_params,
+            rowDefs: @page.row_defs_params
+          }.to_json
+        end
       end
 
       r.delete do

@@ -8,8 +8,14 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
-- Dataminer grids now share standard javascript grid logic.
 ### Fixed
+
+## [0.6.3] - 2019-07-11
+### Added
+- Deliveries can record qty returned.
+- Oversupplied deliveries must be accepted before verify can be done.
+### Changed
+- Dataminer grids now share standard javascript grid logic.
 
 ## [0.6.2] - 2019-06-27
 ### Added

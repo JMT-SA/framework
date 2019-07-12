@@ -213,7 +213,7 @@ class Framework < Roda
           else
             flash[:error] = res.message
           end
-          r.redirect "/list/cultivar_marketing_varieties/multi?key=cultivars&id=#{id}"
+          redirect_to_last_grid(r)
         end
       end
       r.on 'marketing_varieties' do

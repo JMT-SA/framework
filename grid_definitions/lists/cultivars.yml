@@ -24,6 +24,7 @@
 - :url: "/list/cultivar_marketing_varieties/multi?key=cultivars&id=$:id$"
   :text: marketing varieties list
   :icon: list
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/cultivars/new"

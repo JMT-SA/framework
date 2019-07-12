@@ -19,9 +19,11 @@
 - :url: "/list/target_market_countries/multi?key=target_markets&id=$:id$"
   :text: countries
   :icon: list
+  :popup: true
 - :url: "/list/target_market_tm_groups/multi?key=target_markets&id=$:id$"
   :text: groups
   :icon: list
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/target_markets/target_markets/new"

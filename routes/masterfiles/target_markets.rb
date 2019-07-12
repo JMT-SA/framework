@@ -141,7 +141,7 @@ class Framework < Roda
           else
             flash[:error] = res.message
           end
-          r.redirect "/list/target_market_countries/multi?key=target_markets&id=#{id}"
+          redirect_to_last_grid(r)
         end
       end
       r.on 'link_tm_groups' do
@@ -153,7 +153,7 @@ class Framework < Roda
           else
             flash[:error] = res.message
           end
-          r.redirect "/list/target_market_tm_groups/multi?key=target_markets&id=#{id}"
+          redirect_to_last_grid(r)
         end
       end
       r.is do

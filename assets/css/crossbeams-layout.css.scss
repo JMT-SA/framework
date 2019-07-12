@@ -349,6 +349,14 @@ div.cbl-input.label-field {
   user-select: none;
   cursor: pointer;
 }
+/* Shorten the label of a field in a third column.
+   This should apply to the 2nd & 3rd labels, but not sure
+   how to acheive this without affecting 2-column layout...
+*/
+// .crossbeams-row div.crossbeams-col:not(:first-of-type) label {
+.crossbeams-row div.crossbeams-col:nth-of-type(3) label {
+  width: 6em;
+}
 
 /* .crossbeams-form input, .crossbeams-form textarea, .crossbeams-form select { */
 .crossbeams-form .cbl-input, .crossbeams-form .cbl-input-required, .crossbeams-form .cbl-copy-wrapper, .crossbeams-form .multi-wrapper, .rodauth .col-sm-10 {
@@ -642,6 +650,9 @@ div.selectr-container.cbl-input-required div.selectr-selected {
   overflow-y: auto;
 }
 
+.dialog-content .label-field {
+  min-width: 5em;
+}
 /* -------------------------------------------------------------------------- *\
  * Extra dialog styling to make it shiny
  * -------------------------------------------------------------------------- */
@@ -656,6 +667,9 @@ div.selectr-container.cbl-input-required div.selectr-selected {
 @media screen and (min-width: 700px) {
   .dialog-content {
     padding: 2em;
+  }
+  .dialog-content .label-field {
+    min-width: 10em;
   }
 }
 

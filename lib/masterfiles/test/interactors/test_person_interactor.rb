@@ -9,7 +9,7 @@ module MasterfilesApp
 
     def test_person
       PartyRepo.any_instance.stubs(:find_person).returns(Person.new(person_attrs))
-      x = interactor.send(:person)
+      x = interactor.send(:person, 1)
       assert x.is_a?(Person)
     end
 

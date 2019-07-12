@@ -1,37 +1,36 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-
 module MasterfilesApp
-  class DestinationInteractor < BaseInteractor
+  class DestinationInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_region(params)
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      id = nil
       repo.transaction do
-        @region_id = repo.create_region(res)
+        id = repo.create_region(res)
       end
-      success_response("Created destination region #{region.destination_region_name}",
-                       region)
+      instance = region(id)
+      success_response("Created destination region #{instance.destination_region_name}",
+                       instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { destination_region_name: ['This destination region already exists'] }))
     end
 
     def update_region(id, params)
-      @region_id = id
       res = validate_region_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_region(id, res)
       end
-      success_response("Updated destination region #{region.destination_region_name}",
-                       region(false))
+      instance = region(id)
+      success_response("Updated destination region #{instance.destination_region_name}",
+                       instance)
     end
 
     def delete_region(id)
-      @region_id = id
-      name = region.destination_region_name
+      name = region(id).destination_region_name
       res = {}
       repo.transaction do
         res = repo.delete_region(id)
@@ -47,28 +46,29 @@ module MasterfilesApp
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      country_id = nil
       repo.transaction do
-        @country_id = repo.create_country(id, res)
+        country_id = repo.create_country(id, res)
       end
-      success_response("Created destination country #{country.country_name}", country)
+      instance = country(country_id)
+      success_response("Created destination country #{instance.country_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { country_name: ['This destination country already exists'] }))
     end
 
     def update_country(id, params)
-      @country_id = id
       res = validate_country_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_country(id, res)
       end
-      success_response("Updated destination country #{country.country_name}", country(false))
+      instance = country(id)
+      success_response("Updated destination country #{instance.country_name}", instance)
     end
 
     def delete_country(id)
-      @country_id = id
-      name = country.country_name
+      name = country(id).country_name
       res = {}
       repo.transaction do
         res = repo.delete_country(id)
@@ -84,28 +84,29 @@ module MasterfilesApp
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      city_id = nil
       repo.transaction do
-        @city_id = repo.create_city(id, res)
+        city_id = repo.create_city(id, res)
       end
-      success_response("Created destination city #{city.city_name}", city)
+      instance = city(city_id)
+      success_response("Created destination city #{instance.city_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { city_name: ['This destination city already exists'] }))
     end
 
     def update_city(id, params)
-      @city_id = id
       res = validate_city_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_city(id, res)
       end
-      success_response("Updated destination city #{city.city_name}", city(false))
+      instance = city(id)
+      success_response("Updated destination city #{instance.city_name}", instance)
     end
 
     def delete_city(id)
-      @city_id = id
-      name = city.city_name
+      name = city(id).city_name
       repo.transaction do
         repo.delete_city(id)
       end
@@ -118,36 +119,24 @@ module MasterfilesApp
       @repo ||= DestinationRepo.new
     end
 
-    def region(cached = true)
-      if cached
-        @region ||= repo.find_region(@region_id)
-      else
-        @region = repo.find_region(@region_id)
-      end
+    def region(id)
+      repo.find_region(id)
     end
 
     def validate_region_params(params)
       RegionSchema.call(params)
     end
 
-    def country(cached = true)
-      if cached
-        @country ||= repo.find_country(@country_id)
-      else
-        @country = repo.find_country(@country_id)
-      end
+    def country(id)
+      repo.find_country(id)
     end
 
     def validate_country_params(params)
       CountrySchema.call(params)
     end
 
-    def city(cached = true)
-      if cached
-        @city ||= repo.find_city(@city_id)
-      else
-        @city = repo.find_city(@city_id)
-      end
+    def city(id)
+      repo.find_city(id)
     end
 
     def validate_city_params(params)
@@ -155,4 +144,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/ClassLength

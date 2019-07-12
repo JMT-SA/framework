@@ -6,12 +6,8 @@ module SecurityApp
       @repo ||= MenuRepo.new
     end
 
-    def program(cached = true)
-      if cached
-        @program ||= repo.find_program(@id)
-      else
-        @program = repo.find_program(@id)
-      end
+    def program(id)
+      repo.find_program(id)
     end
 
     def validate_program_params(params)
@@ -26,24 +22,24 @@ module SecurityApp
       res = validate_program_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @id = repo.create_program(res, webapp)
-      success_response("Created program #{program.program_name}",
-                       program)
+      id = repo.create_program(res, webapp)
+      instance = program(id)
+      success_response("Created program #{instance.program_name}",
+                       instance)
     end
 
     def update_program(id, params)
-      @id = id
       res = validate_edit_program_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.update_program(id, res)
-      success_response("Updated program #{program.program_name}",
-                       program(false))
+      instance = program(id)
+      success_response("Updated program #{instance.program_name}",
+                       instance)
     end
 
     def delete_program(id)
-      @id = id
-      name = program.program_name
+      name = program(id).program_name
       repo.delete_program(id)
       success_response("Deleted program #{name}")
     end

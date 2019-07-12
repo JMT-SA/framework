@@ -83,5 +83,13 @@ module MasterfilesApp
     def target_market_tm_group_ids(target_market_id)
       DB[:target_markets_for_groups].where(target_market_id: target_market_id).select_map(:target_market_group_id).sort
     end
+
+    def target_market_group_names_for(target_market_id)
+      DB[:target_markets_for_groups].join(:target_market_groups, id: :target_market_group_id).where(target_market_id: target_market_id).select_map(:target_market_group_name).sort
+    end
+
+    def destination_country_names_for(target_market_id)
+      DB[:target_markets_for_countries].join(:destination_countries, id: :destination_country_id).where(target_market_id: target_market_id).select_map(:country_name).sort
+    end
   end
 end

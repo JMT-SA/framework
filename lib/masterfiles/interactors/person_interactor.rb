@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class PersonInteractor < BaseInteractor
-    def create_person(params)
+    def create_person(params) # rubocop:disable Metrics/AbcSize
       res = validate_person_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -13,8 +11,8 @@ module MasterfilesApp
         response = repo.create_person(res)
       end
       if response[:id]
-        @person_id = response[:id]
-        success_response("Created person #{person.party_name}", person)
+        instance = person(response[:id])
+        success_response("Created person #{instance.party_name}", instance)
       else
         validation_failed_response(OpenStruct.new(messages: response[:error]))
       end
@@ -22,27 +20,26 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { person: ['This person already exists'] }))
     end
 
-    def update_person(id, params)
-      @person_id = id
+    def update_person(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_person_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       attrs = res.to_h
       role_ids = attrs.delete(:role_ids)
-      roles_response = assign_person_roles(@person_id, role_ids)
+      roles_response = assign_person_roles(id, role_ids)
       if roles_response.success
         repo.transaction do
           repo.update_person(id, attrs)
         end
-        success_response("Updated person #{person.party_name}, #{roles_response.message}", person(false))
+        instance = person(id)
+        success_response("Updated person #{instance.party_name}, #{roles_response.message}", instance)
       else
         validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
       end
     end
 
     def delete_person(id)
-      @person_id = id
-      name = person.party_name
+      name = person(id).party_name
       repo.transaction do
         repo.delete_person(id)
       end
@@ -64,12 +61,8 @@ module MasterfilesApp
       @repo ||= PartyRepo.new
     end
 
-    def person(cached = true)
-      if cached
-        @person ||= repo.find_person(@person_id)
-      else
-        @person = repo.find_person(@person_id)
-      end
+    def person(id)
+      repo.find_person(id)
     end
 
     def validate_person_params(params)
@@ -77,4 +70,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

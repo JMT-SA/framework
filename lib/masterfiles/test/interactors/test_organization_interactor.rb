@@ -11,7 +11,7 @@ module MasterfilesApp
 
     def test_organization
       PartyRepo.any_instance.stubs(:find_organization).returns(Organization.new(organization_attrs))
-      x = interactor.send(:organization)
+      x = interactor.send(:organization, 1)
       assert x.is_a?(Organization)
     end
 

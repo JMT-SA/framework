@@ -10,14 +10,6 @@ module DevelopmentApp
       repo.exists?(entity, event_id: id)
     end
 
-    def logged_action_detail(cached = true)
-      if cached
-        @logged_action_detail ||= repo.find_logged_action_detail(@id)
-      else
-        @logged_action_detail = repo.find_logged_action_detail(@id)
-      end
-    end
-
     def logged_actions_grid(id)
       logged_action = repo.find_logged_action(id)
       row_defs = []

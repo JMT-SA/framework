@@ -2,16 +2,12 @@
 
 module MasterfilesApp
   class StandardPackCodeInteractor < BaseInteractor
-    def fruit_size_repo
-      @fruit_size_repo ||= FruitSizeRepo.new
+    def repo
+      @repo ||= FruitSizeRepo.new
     end
 
-    def standard_pack_code(cached = true)
-      if cached
-        @standard_pack_code ||= fruit_size_repo.find_standard_pack_code(@id)
-      else
-        @standard_pack_code = fruit_size_repo.find_standard_pack_code(@id)
-      end
+    def standard_pack_code(id)
+      repo.find_standard_pack_code(id)
     end
 
     def validate_standard_pack_code_params(params)
@@ -22,27 +18,27 @@ module MasterfilesApp
       res = validate_standard_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @id = fruit_size_repo.create_standard_pack_code(res)
-      success_response("Created standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code)
+      id = repo.create_standard_pack_code(res)
+      instance = standard_pack_code(id)
+      success_response("Created standard pack code #{instance.standard_pack_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { standard_pack_code: ['This standard pack code already exists'] }))
     end
 
     def update_standard_pack_code(id, params)
-      @id = id
       res = validate_standard_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      fruit_size_repo.update_standard_pack_code(id, res)
-      success_response("Updated standard pack code #{standard_pack_code.standard_pack_code}", standard_pack_code(false))
+      repo.update_standard_pack_code(id, res)
+      instance = standard_pack_code(id)
+      success_response("Updated standard pack code #{instance.standard_pack_code}", instance)
     end
 
     def delete_standard_pack_code(id)
-      @id = id
-      name = standard_pack_code.standard_pack_code
+      name = standard_pack_code(id).standard_pack_code
       res = {}
       repo.transaction do
-        res = fruit_size_repo.delete_standard_pack_code(id)
+        res = repo.delete_standard_pack_code(id)
       end
       if res[:error]
         failed_response(res[:error])

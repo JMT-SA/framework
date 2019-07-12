@@ -2,16 +2,12 @@
 
 module MasterfilesApp
   class BasicPackCodeInteractor < BaseInteractor
-    def fruit_size_repo
-      @fruit_size_repo ||= FruitSizeRepo.new
+    def repo
+      @repo ||= FruitSizeRepo.new
     end
 
-    def basic_pack_code(cached = true)
-      if cached
-        @basic_pack_code ||= fruit_size_repo.find_basic_pack_code(@id)
-      else
-        @basic_pack_code = fruit_size_repo.find_basic_pack_code(@id)
-      end
+    def basic_pack_code(id)
+      repo.find_basic_pack_code(id)
     end
 
     def validate_basic_pack_code_params(params)
@@ -22,9 +18,10 @@ module MasterfilesApp
       res = validate_basic_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @id = fruit_size_repo.create_basic_pack_code(res)
-      success_response("Created basic pack code #{basic_pack_code.basic_pack_code}",
-                       basic_pack_code)
+      id = repo.create_basic_pack_code(res)
+      instance = basic_pack_code(id)
+      success_response("Created basic pack code #{instance.basic_pack_code}",
+                       instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { basic_pack_code: ['This basic pack code already exists'] }))
     end
@@ -34,17 +31,17 @@ module MasterfilesApp
       res = validate_basic_pack_code_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      fruit_size_repo.update_basic_pack_code(id, res)
-      success_response("Updated basic pack code #{basic_pack_code.basic_pack_code}",
-                       basic_pack_code(false))
+      repo.update_basic_pack_code(id, res)
+      instance = basic_pack_code(id)
+      success_response("Updated basic pack code #{instance.basic_pack_code}",
+                       instance)
     end
 
     def delete_basic_pack_code(id)
-      @id = id
-      name = basic_pack_code.basic_pack_code
+      name = basic_pack_code(id).basic_pack_code
       res = {}
       repo.transaction do
-        res = fruit_size_repo.delete_basic_pack_code(id)
+        res = repo.delete_basic_pack_code(id)
       end
       if res[:error]
         failed_response(res[:error])

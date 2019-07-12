@@ -25,6 +25,7 @@
 - :url: "/list/destination_cities/with_params?key=standard&destination_cities.destination_country_id=$:id$"
   :text: cities
   :icon: list
+  :popup: true
 :conditions:
   :standard:
     - :col: destination_countries.destination_region_id

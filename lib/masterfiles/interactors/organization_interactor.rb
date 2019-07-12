@@ -14,8 +14,9 @@ module MasterfilesApp
         response = repo.create_organization(res)
       end
       if response[:id]
-        @organization_id = response[:id]
-        success_response("Created organization #{organization.party_name}", organization)
+        id = response[:id]
+        instance = organization(id)
+        success_response("Created organization #{instance.party_name}", instance)
       else
         validation_failed_response(OpenStruct.new(messages: response[:error]))
       end
@@ -24,7 +25,6 @@ module MasterfilesApp
     end
 
     def update_organization(id, params)
-      @organization_id = id
       res = validate_organization_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -35,15 +35,15 @@ module MasterfilesApp
         repo.transaction do
           repo.update_organization(id, attrs)
         end
-        success_response("Updated organization #{organization.party_name}, #{roles_response.message}", organization(false))
+        instance = organization(id)
+        success_response("Updated organization #{instance.party_name}, #{roles_response.message}", instance)
       else
         validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
       end
     end
 
     def delete_organization(id)
-      @organization_id = id
-      name = organization.party_name
+      name = organization(id).party_name
       response = nil
       repo.transaction do
         response = repo.delete_organization(id)
@@ -70,12 +70,8 @@ module MasterfilesApp
       @repo ||= PartyRepo.new
     end
 
-    def organization(cached = true)
-      if cached
-        @organization ||= repo.find_organization(@organization_id)
-      else
-        @organization = repo.find_organization(@organization_id)
-      end
+    def organization(id)
+      repo.find_organization(id)
     end
 
     def validate_organization_params(params)

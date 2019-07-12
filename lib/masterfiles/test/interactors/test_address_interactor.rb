@@ -3,13 +3,13 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestAddressInteractor < Minitest::Test
     def test_party_repo
-      x = interactor.send(:party_repo)
+      x = interactor.send(:repo)
       assert x.is_a?(PartyRepo)
     end
 
     def test_address
       PartyRepo.any_instance.stubs(:find_address).returns(Address.new(address_attrs))
-      x = interactor.send(:address)
+      x = interactor.send(:address, 1)
       assert x.is_a?(Address)
     end
 

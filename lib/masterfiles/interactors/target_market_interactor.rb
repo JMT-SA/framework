@@ -9,29 +9,30 @@ module MasterfilesApp
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      id = nil
       repo.transaction do
-        @tm_group_type_id = repo.create_tm_group_type(res)
+        id = repo.create_tm_group_type(res)
       end
-      success_response("Created target market group type #{tm_group_type.target_market_group_type_code}", tm_group_type)
+      instance = tm_group_type(id)
+      success_response("Created target market group type #{instance.target_market_group_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { target_market_group_type_code: ['This target market group type already exists'] }))
     end
 
     def update_tm_group_type(id, params)
-      @tm_group_type_id = id
       res = validate_tm_group_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_tm_group_type(id, res)
       end
-      success_response("Updated target market group type #{tm_group_type.target_market_group_type_code}",
-                       tm_group_type(false))
+      instance = tm_group_type(id)
+      success_response("Updated target market group type #{instance.target_market_group_type_code}",
+                       instance)
     end
 
     def delete_tm_group_type(id)
-      @tm_group_type_id = id
-      name = tm_group_type.target_market_group_type_code
+      name = tm_group_type(id).target_market_group_type_code
       repo.transaction do
         repo.delete_tm_group_type(id)
       end
@@ -42,29 +43,30 @@ module MasterfilesApp
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      id = nil
       repo.transaction do
-        @tm_group_id = repo.create_tm_group(res)
+        id = repo.create_tm_group(res)
       end
-      success_response("Created target market group #{tm_group.target_market_group_name}",
-                       tm_group)
+      instance = tm_group(id)
+      success_response("Created target market group #{instance.target_market_group_name}",
+                       instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { target_market_group_name: ['This target market group already exists'] }))
     end
 
     def update_tm_group(id, params)
-      @tm_group_id = id
       res = validate_tm_group_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_tm_group(id, res)
       end
-      success_response("Updated target market group #{tm_group.target_market_group_name}", tm_group(false))
+      instance = tm_group(id)
+      success_response("Updated target market group #{instance.target_market_group_name}", instance)
     end
 
     def delete_tm_group(id)
-      @tm_group_id = id
-      name = tm_group.target_market_group_name
+      name = tm_group(id).target_market_group_name
       repo.transaction do
         repo.delete_tm_group(id)
       end
@@ -79,18 +81,19 @@ module MasterfilesApp
       country_ids = res.delete(:country_ids)
       tm_group_ids = res.delete(:tm_group_ids)
 
+      id = nil
       repo.transaction do
-        @target_market_id = repo.create_target_market(res)
+        id = repo.create_target_market(res)
       end
-      country_response = link_countries(@target_market_id, country_ids)
-      tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
-      success_response("Created target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market)
+      country_response = link_countries(id, country_ids)
+      tm_groups_response = link_tm_groups(id, tm_group_ids)
+      instance = target_market(id)
+      success_response("Created target market #{instance.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { target_market_name: ['This target market already exists'] }))
     end
 
     def update_target_market(id, params)
-      @target_market_id = id
       res = validate_target_market_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -98,15 +101,15 @@ module MasterfilesApp
       country_ids = res.delete(:country_ids)
       tm_group_ids = res.delete(:tm_group_ids)
 
-      country_response = link_countries(@target_market_id, country_ids)
-      tm_groups_response = link_tm_groups(@target_market_id, tm_group_ids)
+      country_response = link_countries(id, country_ids)
+      tm_groups_response = link_tm_groups(id, tm_group_ids)
       repo.update_target_market(id, res)
-      success_response("Updated target market #{target_market.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", target_market(false))
+      instance = target_market(id)
+      success_response("Updated target market #{instance.target_market_name}, #{country_response.message}, #{tm_groups_response.message}", instance)
     end
 
     def delete_target_market(id)
-      @target_market_id = id
-      name = target_market.target_market_name
+      name = target_market(id).target_market_name
       repo.delete_target_market(id)
       success_response("Deleted target market #{name}")
     end
@@ -147,36 +150,24 @@ module MasterfilesApp
       @repo ||= TargetMarketRepo.new
     end
 
-    def tm_group_type(cached = true)
-      if cached
-        @tm_group_type ||= repo.find_tm_group_type(@tm_group_type_id)
-      else
-        @tm_group_type = repo.find_tm_group_type(@tm_group_type_id)
-      end
+    def tm_group_type(id)
+      repo.find_tm_group_type(id)
     end
 
     def validate_tm_group_type_params(params)
       TmGroupTypeSchema.call(params)
     end
 
-    def tm_group(cached = true)
-      if cached
-        @tm_group ||= repo.find_tm_group(@tm_group_id)
-      else
-        @tm_group = repo.find_tm_group(@tm_group_id)
-      end
+    def tm_group(id)
+      repo.find_tm_group(id)
     end
 
     def validate_tm_group_params(params)
       TmGroupSchema.call(params)
     end
 
-    def target_market(cached = true)
-      if cached
-        @target_market ||= repo.find_target_market(@target_market_id)
-      else
-        @target_market = repo.find_target_market(@target_market_id)
-      end
+    def target_market(id)
+      repo.find_target_market(id)
     end
 
     def validate_target_market_params(params)

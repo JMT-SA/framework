@@ -6,42 +6,38 @@ module MasterfilesApp
       res = validate_contact_method_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @contact_method_id = party_repo.create_contact_method(res)
-      success_response("Created contact method #{contact_method.contact_method_code}",
-                       contact_method)
+      id = repo.create_contact_method(res)
+      instance = contact_method(id)
+      success_response("Created contact method #{instance.contact_method_code}",
+                       instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { contact_method_code: ['This contact method already exists'] }))
     end
 
     def update_contact_method(id, params)
-      @contact_method_id = id
       res = validate_contact_method_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      party_repo.update_contact_method(id, res)
-      success_response("Updated contact method #{contact_method.contact_method_code}",
-                       contact_method(false))
+      repo.update_contact_method(id, res)
+      instance = contact_method(id)
+      success_response("Updated contact method #{instance.contact_method_code}",
+                       instance)
     end
 
     def delete_contact_method(id)
-      @contact_method_id = id
-      name = contact_method.contact_method_code
-      party_repo.delete_contact_method(id)
+      name = contact_method(id).contact_method_code
+      repo.delete_contact_method(id)
       success_response("Deleted contact method #{name}")
     end
 
     private
 
-    def party_repo
-      @party_repo ||= PartyRepo.new
+    def repo
+      @repo ||= PartyRepo.new
     end
 
-    def contact_method(cached = true)
-      if cached
-        @contact_method ||= party_repo.find_contact_method(@contact_method_id)
-      else
-        @contact_method = party_repo.find_contact_method(@contact_method_id)
-      end
+    def contact_method(id)
+      repo.find_contact_method(id)
     end
 
     def validate_contact_method_params(params)

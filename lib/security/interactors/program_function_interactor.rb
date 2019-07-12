@@ -6,12 +6,8 @@ module SecurityApp
       @repo ||= MenuRepo.new
     end
 
-    def program_function(cached = true)
-      if cached
-        @program_function ||= repo.find_program_function(@id)
-      else
-        @program_function = repo.find_program_function(@id)
-      end
+    def program_function(id)
+      repo.find_program_function(id)
     end
 
     def validate_program_function_params(params)
@@ -22,26 +18,26 @@ module SecurityApp
       res = validate_program_function_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @id = repo.create_program_function(res)
-      success_response("Created program function #{program_function.program_function_name}",
-                       program_function)
+      id = repo.create_program_function(res)
+      instance = program_function(id)
+      success_response("Created program function #{instance.program_function_name}",
+                       instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { code: ['This program function already exists'] }))
     end
 
     def update_program_function(id, params)
-      @id = id
       res = validate_program_function_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.update_program_function(id, res)
-      success_response("Updated program function #{program_function.program_function_name}",
-                       program_function(false))
+      instance = program_function(id)
+      success_response("Updated program function #{instance.program_function_name}",
+                       instance)
     end
 
     def delete_program_function(id)
-      @id = id
-      name = program_function.program_function_name
+      name = program_function(id).program_function_name
       repo.delete_program_function(id)
       success_response("Deleted program function #{name}")
     end

@@ -6,8 +6,9 @@ module MasterfilesApp
       res = validate_address_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @address_id = party_repo.create_address(res)
-      success_response("Created address #{address.address_line_1}", address)
+      id = repo.create_address(res)
+      instance = address(id)
+      success_response("Created address #{instance.address_line_1}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { address_line_1: ['This address already exists'] }))
     end
@@ -17,29 +18,25 @@ module MasterfilesApp
       res = validate_address_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      party_repo.update_address(id, res)
-      success_response("Updated address #{address.address_line_1}", address(false))
+      repo.update_address(id, res)
+      instance = address(id)
+      success_response("Updated address #{instance.address_line_1}", instance)
     end
 
     def delete_address(id)
-      @address_id = id
-      name = address.address_line_1
-      party_repo.delete_address(id)
+      name = address(id).address_line_1
+      repo.delete_address(id)
       success_response("Deleted address #{name}")
     end
 
     private
 
-    def party_repo
-      @party_repo ||= PartyRepo.new
+    def repo
+      @repo ||= PartyRepo.new
     end
 
-    def address(cached = true)
-      if cached
-        @address ||= party_repo.find_address(@address_id)
-      else
-        @address = party_repo.find_address(@address_id)
-      end
+    def address(id)
+      repo.find_address(id)
     end
 
     def validate_address_params(params)

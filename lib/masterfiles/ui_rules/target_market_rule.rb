@@ -17,9 +17,8 @@ module UiRules
 
     def set_show_fields
       fields[:target_market_name] = { renderer: :label }
-      # TODO: add lists here instead of multiselect grids? The grids seem a bit overkill to me
-      # fields[:tm_group_ids] = { renderer: :list, caption: 'Groups', items: }
-      # fields[:country_ids] = { renderer: :list, caption: 'Countries', items: }
+      fields[:tm_group_ids] = { renderer: :list, caption: 'Groups', items: @repo.target_market_group_names_for(@options[:id]) }
+      fields[:country_ids] = { renderer: :list, caption: 'Countries', items: @repo.destination_country_names_for(@options[:id]) }
     end
 
     def common_fields

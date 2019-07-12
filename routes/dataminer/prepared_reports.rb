@@ -63,7 +63,7 @@ class Framework < Roda
       end
 
       r.on 'run' do
-        show_page { DM::Report::Report::GridPage.call("/dataminer/prepared_reports/#{id}/grid/", instance[:report_description]) }
+        show_page { DM::Report::Report::GridPage.call("/dataminer/prepared_reports/#{id}/grid", instance[:report_description]) }
       end
 
       r.on 'run_with_parameters' do

@@ -135,7 +135,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           else
             flash[:error] = res.message
           end
-          r.redirect("/dataminer/admin/#{id}/edit/")
+          r.redirect("/dataminer/admin/#{id}/edit")
         end
       end
       r.on 'change_sql' do
@@ -149,7 +149,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           else
             flash[:error] = res.message
           end
-          r.redirect("/dataminer/admin/#{id}/edit/")
+          r.redirect("/dataminer/admin/#{id}/edit")
         end
       end
       r.on 'reorder_columns' do
@@ -163,7 +163,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           else
             flash[:error] = res.message
           end
-          r.redirect("/dataminer/admin/#{id}/edit/")
+          r.redirect("/dataminer/admin/#{id}/edit")
         end
       end
       r.on 'save_param_grid_col' do # JSON
@@ -183,7 +183,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
             else
               flash[:error] = res.message
             end
-            r.redirect("/dataminer/admin/#{id}/edit/")
+            r.redirect("/dataminer/admin/#{id}/edit")
           end
         end
         r.on 'delete' do
@@ -194,7 +194,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
             else
               flash[:error] = res.message
             end
-            r.redirect("/dataminer/admin/#{id}/edit/")
+            r.redirect("/dataminer/admin/#{id}/edit")
           end
         end
       end

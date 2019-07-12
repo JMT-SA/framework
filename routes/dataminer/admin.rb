@@ -87,13 +87,15 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       id = id.gsub('%20', ' ')
 
       r.on 'edit' do
-        @page = interactor.edit_report(id)
         r.is do
+          @page = interactor.edit_report(id)
+          store_locally(:dm_admin_page, @page)
           view('dataminer/admin/edit')
         end
 
         r.on 'columns_grid' do
-          @page = interactor.edit_report(id)
+          @page = retrieve_from_local_store(:dm_admin_page)
+          store_locally(:dm_admin_page, @page)
 
           {
             extraContext: { keyColumn: 'name' },
@@ -106,7 +108,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.on 'params_grid' do
-          @page = interactor.edit_report(id)
+          # NOTE: This relies on the fact that the params_grid url comes after the
+          #       columns grid url in the page, so it'll be loaded last.
+          #       If that ever changes, the retrieve+store in columns_grid above
+          #       will not work properly!
+          @page = retrieve_from_local_store(:dm_admin_page)
 
           {
             multiselect_ids: [],

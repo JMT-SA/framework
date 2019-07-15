@@ -19,6 +19,8 @@ module UiRules
         product_variant_number: { renderer: :label, required: true },
         old_product_code: {},
         supplier_lead_time: { renderer: :integer, caption: 'Lead Time (days)' },
+        current_price: { renderer: :label },
+        stock_adj_price: { renderer: :label },
         minimum_stock_level: { renderer: :integer },
         re_order_stock_level: { renderer: :integer },
         use_fixed_batch_number: { renderer: :checkbox },

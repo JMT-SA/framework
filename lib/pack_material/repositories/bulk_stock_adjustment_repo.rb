@@ -68,5 +68,18 @@ module PackMaterialApp
     def transaction_repo
       PackMaterialApp::TransactionsRepo.new
     end
+
+    def apply_product_variant_prices(bulk_stock_adjustment_id)
+      return failed_response('No Bulk Stock Adjustment ID') unless bulk_stock_adjustment_id
+
+      prices = DB[:mr_bulk_stock_adjustment_prices].where(mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id)
+      prices.all.map { |r| [r[:mr_product_variant_id], r[:stock_adj_price]] }.each do |v_id, price|
+        next unless price
+
+        variant = DB[:material_resource_product_variants].where(id: v_id)
+        variant.update(stock_adj_price: price)
+      end
+      success_response('ok')
+    end
   end
 end

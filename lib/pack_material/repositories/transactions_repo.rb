@@ -62,6 +62,10 @@ module PackMaterialApp
                           order_by: :id
 
     crud_calls_for :mr_bulk_stock_adjustment_items, name: :mr_bulk_stock_adjustment_item, wrapper: MrBulkStockAdjustmentItem
+    crud_calls_for :mr_bulk_stock_adjustment_prices,
+                   name: :mr_bulk_stock_adjustment_price,
+                   wrapper: MrBulkStockAdjustmentPrice,
+                   exclude: %i[create update delete]
 
     def create_mr_sku_location(attrs)
       stock_location = DB[:locations].where(id: attrs[:location_id]).get(:can_store_stock)
@@ -136,14 +140,18 @@ module PackMaterialApp
     end
 
     def delete_mr_bulk_stock_adjustment_prices(parent_id, pv_number)
-      product_id = DB[:material_resource_product_variants].where(product_variant_number: pv_number).get(:id)
       item = DB[:mr_bulk_stock_adjustment_items].where(
         mr_bulk_stock_adjustment_id: parent_id,
         product_variant_number: pv_number
       ).single_value
       return nil if item
 
-      DB[:mr_bulk_stock_adjustment_prices].where(mr_bulk_stock_adjustment_id: parent_id, mr_product_variant_id:       product_id).delete
+      DB[:mr_bulk_stock_adjustment_prices].where(
+        mr_bulk_stock_adjustment_id: parent_id,
+        mr_product_variant_id: DB[:material_resource_product_variants].where(
+          product_variant_number: pv_number
+        ).get(:id)
+      ).delete
     end
 
     def system_quantity(attrs)

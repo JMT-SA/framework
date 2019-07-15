@@ -4,7 +4,7 @@ module PackMaterial
   module Transactions
     module MrBulkStockAdjustment
       class Edit
-        def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:mr_bulk_stock_adjustment, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 
@@ -25,9 +25,11 @@ module PackMaterial
                                   style: :button,
                                   visible: rules[:can_complete],
                                   id: 'mr_bulk_stock_adjustments_complete_button')
+
+              price_url = rules[:can_manage_prices] ? '/list/mr_bulk_stock_adjustment_prices' : '/list/mr_bulk_stock_adjustment_prices_show'
               section.add_control(control_type: :link,
-                                  text: 'Set Prices',
-                                  url: "/list/mr_bulk_stock_adjustment_prices/with_params?key=standard&mr_bulk_stock_adjustment_id=#{id}",
+                                  text: 'Manage Prices',
+                                  url: price_url + "/with_params?key=standard&mr_bulk_stock_adjustment_id=#{id}",
                                   style: :button,
                                   behaviour: :popup)
               if rules[:can_approve]

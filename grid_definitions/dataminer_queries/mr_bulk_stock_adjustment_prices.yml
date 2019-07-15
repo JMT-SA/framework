@@ -2,9 +2,9 @@
 :caption: Price Adjustments
 :sql: "SELECT \"mr_bulk_stock_adjustment_prices\".id,\r\n       fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
   as product_variant_number,\r\n       \"material_resource_product_variants\".\"product_variant_code\",\r\n
-  \      mr_bulk_stock_adjustment_prices.stock_adj_price,\r\n       mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id\r\nFROM
-  mr_bulk_stock_adjustment_prices\r\nJOIN material_resource_product_variants on material_resource_product_variants.id
-  = mr_bulk_stock_adjustment_prices.mr_product_variant_id"
+  \      \"material_resource_product_variants\".\"current_price\",\r\n       mr_bulk_stock_adjustment_prices.stock_adj_price,\r\n
+  \      mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id\r\nFROM mr_bulk_stock_adjustment_prices\r\nJOIN
+  material_resource_product_variants on material_resource_product_variants.id = mr_bulk_stock_adjustment_prices.mr_product_variant_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -15,7 +15,7 @@
     :caption: Id
     :namespaced_name: mr_bulk_stock_adjustment_prices.id
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -31,7 +31,7 @@
     :caption: Product variant number
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 180
     :format: 
     :hide: false
     :pinned: 
@@ -57,6 +57,22 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  current_price:
+    :name: current_price
+    :sequence_no: 5
+    :caption: Current price
+    :namespaced_name: material_resource_product_variants.current_price
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   stock_adj_price:
     :name: stock_adj_price
     :sequence_no: 4
@@ -75,7 +91,7 @@
     :group_max: false
   mr_bulk_stock_adjustment_id:
     :name: mr_bulk_stock_adjustment_id
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Mr bulk stock adjustment
     :namespaced_name: mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id
     :data_type: :string
@@ -90,11 +106,11 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-  - :column: mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id
-    :caption: Parent Id
-    :data_type: :string
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 1
-    :list_def:
+- :column: mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id
+  :caption: Parent Id
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

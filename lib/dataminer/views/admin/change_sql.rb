@@ -3,7 +3,7 @@
 module DM
   module Admin
     class ChangeSql
-      def self.call(id, form_values = nil, form_errors = nil)
+      def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
         # ui_rule = UiRules::Compiler.new(:user, :edit, id: id, form_values: form_values)
         # rules   = ui_rule.compile
         # report = lookup_admin_report(id) # TODO: create a repo for this...
@@ -18,7 +18,7 @@ module DM
                                      rows: 25 } },
                     name: 'report' }
 
-        layout = Crossbeams::Layout::Page.build(rules) do |page|
+        layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
           # page.form_object ui_rule.form_object
           page.form_object obj
           page.form_values form_values

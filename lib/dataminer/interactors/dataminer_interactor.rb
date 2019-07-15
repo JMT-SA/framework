@@ -353,20 +353,21 @@ module DataminerApp
         send_changes = false
       end
 
-      if value.nil? && attrib == 'caption' # Cannot be nil...
-        res = { status: 'error', message: "Caption for #{params[:key_val]} cannot be blank" }
-      else
-        filename = repo.lookup_file_name(id, true)
-        yp = Crossbeams::Dataminer::YamlPersistor.new(filename)
-        report.save(yp)
-        res = if send_changes
-                { status: 'ok', message: "Changed #{attrib} for #{params[:key_val]}",
-                  changedFields: { group_avg: false, group_min: false, group_max: false, group_none: 'A TEST' } }
-              else
-                { status: 'ok', message: "Changed #{attrib} for #{params[:key_val]}" }
-              end
-      end
-      success_response('OK', res)
+      return failed_response("Caption for #{params[:key_val]} cannot be blank") if value.nil? && attrib == 'caption'
+
+      filename = repo.lookup_file_name(id, true)
+      yp = Crossbeams::Dataminer::YamlPersistor.new(filename)
+      report.save(yp)
+      # res = "Changed #{attrib} for #{params[:key_val]}"
+      # res = if send_changes # TODO: change value of other fields in grid... >> use update_grid_in_place?
+      #         # { status: 'ok', message: "Changed #{attrib} for #{params[:key_val]}",
+      #         #   changedFields: { group_avg: false, group_min: false, group_max: false, group_none: 'A TEST' } }
+      #         { group_avg: false, group_min: false, group_max: false, group_none: 'A TEST' }
+      #       else
+      #         nil # "Changed #{attrib} for #{params[:key_val]}"
+      #       end
+      res = { group_avg: false, group_min: false, group_max: false, group_none: 'A TEST' } if send_changes
+      success_response("Changed #{attrib} for #{params[:key_val]}", res)
     end
 
     def create_parameter(id, params) # rubocop:disable Metrics/AbcSize

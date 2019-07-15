@@ -174,7 +174,15 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
       r.on 'save_param_grid_col' do # JSON
         res = interactor.save_param_grid_col(id, params)
-        res.instance.to_json
+        if res.success
+          if res.instance.nil?
+            show_json_notice(res.instance)
+          else
+            update_grid_row(id, changes: res.instance, notice: res.message)
+          end
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :warn)
+        end
       end
       r.on 'parameter' do
         r.on 'new' do

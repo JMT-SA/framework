@@ -191,6 +191,8 @@ r.on 'inline_save' do # COLUMN EDITED IN GRID
     # OR - if there is no need to provide feedback:
     blank_json_response
   else
+    undo_grid_inline_edit(message: res.message, message_type: :warn)
+    # OR - if it does not matter that the grid still has the value the user entered:
     show_json_error(res.message, status: 200)
   end
 end

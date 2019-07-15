@@ -526,6 +526,17 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
+  # Undo an inline-edit from a grid. Optionally display a message.
+  #
+  # @param message [string] an optional message to display.
+  # @param message_type [symbol] the message style : :info, :error, :warning or :notice
+  # @return [json] the JSON command to undo the edit.
+  def undo_grid_inline_edit(message: nil, message_type: :warn)
+    res = { undoEdit: true }
+    res[:flash] = { message_type => message } unless message.nil?
+    res.to_json
+  end
+
   # Redirect to "Not found" page or return 404 status.
   #
   # @param route [Roda.route] the route.

@@ -27,8 +27,32 @@ module DM
             form.action "/dataminer/admin/#{id}/save_new_sql"
             # form.remote!
             form.method :update
-            form.add_field :id
-            form.add_field :sql
+            form.row do |row|
+              row.column do |col|
+                # col.relative_width = 2-3
+                col.add_field :id
+                col.add_field :sql
+              end
+              row.column do |col|
+                # col.relative_width = 1-3
+                col.fold_up do |fold|
+                  fold.caption 'A few useful SQL snippets'
+                  fold.add_text <<~SQL, syntax: :sql
+                    -- Use row number as id
+                    ROW_NUMBER() OVER() AS id
+
+                    -- Collect several strings into one column
+                    (SELECT string_agg(code, '; ')
+                    FROM (SELECT code
+                          FROM table_two
+                          WHERE table_two.id = table_one.table_two_id) sub) AS all_codes
+
+                    -- Status column
+                    fn_current_status('tablename', tablename.id) AS status
+                  SQL
+                end
+              end
+            end
           end
         end
 

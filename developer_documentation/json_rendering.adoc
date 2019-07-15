@@ -233,3 +233,32 @@ json_replace_list_items(dom_id, items, message: nil, keep_dialog_open: false)
 
 json_clear_form_validation(dom_id, message: nil, keep_dialog_open: false)
 ----
+
+== Other responses
+
+=== Empty (blank) response
+
+When there is no need to do anything at all, you can return a plain JSON success response.
+
+  blank_json_response
+
+This merely responds with status `200`.
+
+=== Undo an inline edit of a grid column
+
+Undo an inline-edit from a grid (e.g. when a validation fails). Optionally display a message.
+
+  undo_grid_inline_edit(message: nil, message_type: :warn)
+
+* `message` is an optional message to display.
+* `message_type` is the message style which can be `:info`, `:error`, `:warning` or `:notice`. Defaults to `:warn`.
+
+[source,ruby]
+----
+res = interactor.method_that_could_fail(params)
+if res.success
+  # ..
+else
+  undo_grid_inline_edit(message: res.message, message_type: :warn)
+end
+----

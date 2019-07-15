@@ -288,7 +288,6 @@ const crossbeamsGridEvents = {
       body: form,
     }).then((response) => {
       if (response.status === 404) {
-        // revert value
         crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
         Jackbox.error('The requested resource was not found', { time: 20 });
         return {};
@@ -298,6 +297,8 @@ const crossbeamsGridEvents = {
       .then((data) => {
         if (data.redirect) {
           window.location = data.redirect;
+        } else if (data.undoEdit) {
+          crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
         } else if (data.actions) {
           crossbeamsUtils.processActions(data.actions);
         } else {
@@ -307,6 +308,12 @@ const crossbeamsGridEvents = {
         if (data.flash) {
           if (data.flash.notice) {
             Jackbox.success(data.flash.notice);
+          }
+          if (data.flash.info) {
+            Jackbox.information(data.flash.info);
+          }
+          if (data.flash.warning) {
+            Jackbox.warning(data.flash.warning);
           }
           if (data.flash.error) {
             crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);

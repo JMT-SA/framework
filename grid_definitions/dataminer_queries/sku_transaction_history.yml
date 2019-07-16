@@ -1,12 +1,13 @@
 ---
 :caption: SKU Transaction History
-:sql: "SELECT\r\n    mr_skus.id,\r\n    mr_skus.sku_number,\r\n    m2.product_variant_code,\r\n
-  \   fn_formatted_product_variant_number(m2.product_variant_number) AS product_variant_number,\r\n
-  \   \"mr_inventory_transaction_items\".id as item_id,\r\n    \"mr_inventory_transaction_items\".quantity,\r\n
-  \   \"mr_inventory_transaction_items\".inventory_uom_id,\r\n    uoms.uom_code,\r\n
-  \   \"mr_inventory_transaction_items\".from_location_id,\r\n    \"mr_inventory_transactions\".\"to_location_id\",\r\n
-  \   from_locations.\"location_long_code\" as from_location_long_code,\r\n    to_locations.\"location_long_code\"
-  as to_location_long_code,\r\n    \"mr_inventory_transactions\".\"ref_no\",\r\n    \"mr_inventory_transactions\".\"id\"
+:sql: "SELECT\r\n    mr_inventory_transaction_items.id,\r\n    mr_skus.sku_number,\r\n
+  \   m2.product_variant_code,\r\n    fn_formatted_product_variant_number(m2.product_variant_number)
+  AS product_variant_number,\r\n    \"mr_inventory_transaction_items\".id as item_id,\r\n
+  \   \"mr_inventory_transaction_items\".quantity,\r\n    \"mr_inventory_transaction_items\".inventory_uom_id,\r\n
+  \   uoms.uom_code,\r\n    \"mr_inventory_transaction_items\".from_location_id,\r\n
+  \   \"mr_inventory_transactions\".\"to_location_id\",\r\n    from_locations.\"location_long_code\"
+  as from_location_long_code,\r\n    to_locations.\"location_long_code\" as to_location_long_code,\r\n
+  \   \"mr_inventory_transactions\".\"ref_no\",\r\n    \"mr_inventory_transactions\".\"id\"
   as transaction_id,\r\n    \"mr_inventory_transactions\".\"created_by\",\r\n    \"mr_inventory_transactions\".\"mr_inventory_transaction_type_id\",\r\n
   \   \"mr_inventory_transaction_types\".\"type_name\",\r\n    \"mr_inventory_transactions\".\"is_adhoc\",\r\n
   \   \"business_processes\".\"process\",\r\n    \"mr_inventory_transactions\".\"active\",\r\n
@@ -30,7 +31,7 @@
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: mr_skus.id
+    :namespaced_name: mr_inventory_transaction_items.id
     :data_type: :integer
     :width: 
     :format: 

@@ -168,7 +168,7 @@ module PackMaterialApp
     end
 
     def create_bulk_stock_adjustment_item(opts = {})
-      bsa_id = create_bulk_stock_adjustment[:id]
+      bsa_id = opts[:mr_bulk_stock_adjustment_id] || create_bulk_stock_adjustment[:id]
       location_id = @fixed_table_set[:locations][:default_id]
       sku_id = create_mr_sku[:id]
       inventory_uom_id = @fixed_table_set[:uoms][:uom_id]

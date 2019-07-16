@@ -323,7 +323,7 @@
     :namespaced_name: mr_delivery_items.invoiced_unit_price
     :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: left
     :groupable: false

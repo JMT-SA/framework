@@ -53,21 +53,21 @@ module PackMaterialApp
         all_ok
       end
 
-      def accept_over_supply_check
+      def accept_over_supply_check # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, Metrics/PerceivedComplexity
         return failed_response('Delivery Over Supply is already accepted') if over_supply_accepted?
         return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery does not have any over supplied items') unless over_supply?
-
-        all_ok
-      end
-
-      def verify_check # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, Metrics/PerceivedComplexity
-        return failed_response('Delivery has over supply and it has not been accepted yet') if over_supply? && !over_supply_accepted?
-        return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery has no items') if no_items?
         return failed_response('Delivery has incomplete items') if incomplete_items?
         return failed_response('Delivery has items without batches') if items_without_batches?
         return failed_response('Delivery batch quantities do not equate to item quantities where applicable') if item_quantities_ignored?
+
+        all_ok
+      end
+
+      def verify_check
+        return failed_response('Delivery is already verified') if verified?
+        return failed_response('Delivery has over supply and it has not been accepted yet') if over_supply? && !over_supply_accepted?
 
         all_ok
       end

@@ -1,0 +1,12 @@
+---
+:dataminer_definition: mr_bulk_stock_adjustment_prices
+:conditions:
+  :standard:
+    - :col: mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id
+      :op: =
+      :val: $:mr_bulk_stock_adjustment_id$
+:edit_rules:
+  :url: "/pack_material/transactions/mr_bulk_stock_adjustments/price_adjustment/$:id$/inline_price_adjust"
+  :editable_fields:
+    stock_adj_price:
+      :editor: :numeric

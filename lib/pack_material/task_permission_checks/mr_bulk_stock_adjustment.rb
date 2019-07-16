@@ -4,13 +4,12 @@ module PackMaterialApp
   module TaskPermissionCheck
     class MrBulkStockAdjustment < BaseService
       attr_reader :task, :entity
-
       def initialize(task, mr_bulk_stock_adjustment_id = nil, current_user = nil)
-        @task   = task
-        @repo   = TransactionsRepo.new
-        @id     = mr_bulk_stock_adjustment_id
+        @task = task
+        @repo = TransactionsRepo.new
+        @id = mr_bulk_stock_adjustment_id
         @entity = @id ? @repo.find_mr_bulk_stock_adjustment(@id) : nil
-        @user   = current_user
+        @user = current_user
       end
 
       CHECKS = {

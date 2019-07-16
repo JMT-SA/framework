@@ -202,6 +202,24 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
+    def set_price_adjustment_inline(id, params)
+      can_update_prices = TaskPermissionCheck::MrBulkStockAdjustmentPrice.call(:update_prices, id)
+      if can_update_prices.success
+        res = validate_mr_bulk_stock_adjustment_price_params(params)
+        return validation_failed_response(res) unless res.messages.empty?
+
+        repo.transaction do
+          repo.set_price_adjustment_inline(id, res)
+          log_transaction
+        end
+        success_response('Adjusted stock adjustment price')
+      else
+        failed_response(can_update_prices.message)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def replenish_repo
       ReplenishRepo.new
     end
@@ -220,6 +238,10 @@ module PackMaterialApp
         SKU (#{replenish_repo.sku_number_from_id(sku_id)}): #{inst[:product_variant_code]}<br>
         Qty: was #{UtilityFunctions.delimited_number(inst[:item][:system_quantity])} now #{UtilityFunctions.delimited_number(inst[:item][:actual_quantity])} (#{inst[:item][:inventory_uom_code]})<br>
       HTML
+    end
+
+    def validate_mr_bulk_stock_adjustment_price_params(params)
+      MrBulkStockAdjustmentPriceSchema.call(params)
     end
   end
 end

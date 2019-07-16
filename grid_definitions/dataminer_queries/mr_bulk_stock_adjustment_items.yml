@@ -73,7 +73,7 @@
     :format: 
     :hide: false
     :pinned:
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

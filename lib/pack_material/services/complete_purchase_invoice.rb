@@ -67,9 +67,7 @@ module PackMaterialApp
     def make_http_call(xml)
       http = Crossbeams::HTTPCalls.new
       res  = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, xml)
-      raise Crossbeams::InfoError, res.message unless res.success
-
-      res
+      res.success ? res : (raise Crossbeams::InfoError, res.message)
     end
 
     def format_response(response)

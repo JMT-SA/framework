@@ -21,6 +21,8 @@ module PackMaterial
               form.add_field :product_variant_number
               form.add_field :old_product_code
               form.add_field :supplier_lead_time
+              form.add_field :current_price
+              form.add_field :stock_adj_price
               form.add_field :minimum_stock_level
               form.add_field :re_order_stock_level
               form.add_field :use_fixed_batch_number

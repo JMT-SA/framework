@@ -21,6 +21,9 @@ module PackMaterialApp
     def call
       return failed_response('Bulk Stock Adjustment record does not exist') unless @bulk_stock_adj
 
+      res = @this_repo.apply_product_variant_prices(@bulk_stock_adjustment_id)
+      return res unless res.success
+
       apply_stock_changes
     end
 

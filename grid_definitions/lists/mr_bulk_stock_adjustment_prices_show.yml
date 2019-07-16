@@ -1,0 +1,7 @@
+---
+:dataminer_definition: mr_bulk_stock_adjustment_prices
+:conditions:
+  :standard:
+    - :col: mr_bulk_stock_adjustment_prices.mr_bulk_stock_adjustment_id
+      :op: =
+      :val: $:mr_bulk_stock_adjustment_id$

@@ -149,7 +149,7 @@ class TestBaseRepo < MiniTestWithHooks
   def test_hash_for_jsonb_col
     hash = {test: 'Test', int: 123, array: [], bool: true, hash: {}}
     result = BaseRepo.new.hash_for_jsonb_col(hash)
-    expected = 'Sequel::Postgres::JSONHash'
+    expected = 'Sequel::Postgres::JSONBHash'
     assert_equal expected, result.class.name
 
     result = BaseRepo.new.hash_for_jsonb_col(nil)

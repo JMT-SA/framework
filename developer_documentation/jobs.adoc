@@ -45,9 +45,25 @@ end
 <5> Any database updates/inserts **must** take place in a transaction which must be kept as _short_ as possible.
 <6> Required: call `finish` or `destroy` here. `destroy` will remove the job's history. This must be inside the transaction.
 
+=== Check for a job that has not yet completed successfully
+
+Use `enqueued_with_args?` to check if a job is already in the queue.
+
+e.g. you need to hide a button (that would enqueue a job) when that job has been submitted but is not yet complete.
+
+[source,ruby]
+----
+PackMaterialApp::TestJob.enqueue(user_name, id: 123, complete: true)
+
+# - later: check if a job with the same parameters is in the queue:
+
+PackMaterialApp::TestJob.enqueued_with_args?(user_name, id: 123, complete: true)
+# => true/false
+----
+
 === Single instance jobs
 
-These are jobs that must run on their own. For example a `PS` stock EDI in transformation. If two PS jobs ran at the same time, you could end up with the earlier PS finishng after thlater one and both change the same pallet. The earlier one could "reset" data on a pallet.
+These are jobs that must run on their own. For example a `PS` stock EDI in transformation. If two PS jobs ran at the same time, you could end up with the earlier PS finishng after the later one and both change the same pallet. The earlier one could "reset" data on a pallet.
 
 If you define a job as a `single instance`, at start it will write a lock file (in `tmp/job_locks`) which will be deleted at the end.
 At start it will also set a retry for 30 seconds if the lock file exists.

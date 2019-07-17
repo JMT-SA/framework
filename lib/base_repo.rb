@@ -232,7 +232,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   def hash_for_jsonb_col(hash)
     return nil if hash.nil?
 
-    Sequel.pg_json(hash)
+    Sequel.pg_jsonb(hash)
   end
 
   # Helper to convert a Ruby Array into a value that postgresql will understand.

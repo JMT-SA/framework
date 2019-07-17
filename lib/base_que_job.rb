@@ -84,4 +84,13 @@ class BaseQueJob < Que::Job
 
     File.delete(lock_file) if File.exist?(lock_file)
   end
+
+  # Is there a job of this class enqueued with these parameters?
+  def self.enqueued_with_args?(*args)
+    !DB[:que_jobs]
+      .where(job_class: name)
+      .where(args: Sequel.pg_jsonb(args))
+      .where(finished_at: nil)
+      .count.nonzero?.nil?
+  end
 end

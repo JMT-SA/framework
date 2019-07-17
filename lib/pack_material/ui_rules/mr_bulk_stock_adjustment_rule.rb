@@ -37,7 +37,7 @@ module UiRules
       {
         stock_adjustment_number: { renderer: :label },
         ref_no: { renderer: :label },
-        is_stock_take: { renderer: :label, as_boolean: true },
+        # is_stock_take: { renderer: :label, as_boolean: true },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
         signed_off: { renderer: :label, as_boolean: true }
@@ -48,7 +48,7 @@ module UiRules
       {
         stock_adjustment_number: { renderer: :label },
         ref_no: { renderer: :label },
-        is_stock_take: { renderer: :label, as_boolean: true },
+        # is_stock_take: { renderer: :label, as_boolean: true },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
         signed_off: { renderer: :label, as_boolean: true }
@@ -60,7 +60,7 @@ module UiRules
         create_transaction_id: { renderer: :label, caption: 'Create Transaction' },
         destroy_transaction_id: { renderer: :label, caption: 'Destroy Transaction' },
         stock_adjustment_number: { renderer: :label },
-        is_stock_take: { renderer: :checkbox },
+        # is_stock_take: { renderer: :checkbox },
         completed: { renderer: :hidden },
         approved: { renderer: :hidden },
         signed_off: { renderer: :hidden },
@@ -74,7 +74,7 @@ module UiRules
     def view_header_fields
       {
         stock_adjustment_number: { renderer: :label },
-        is_stock_take: { renderer: :label, as_boolean: true },
+        # is_stock_take: { renderer: :label, as_boolean: true },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
         signed_off: { renderer: :label, as_boolean: true },
@@ -86,7 +86,7 @@ module UiRules
 
     def new_fields
       {
-        is_stock_take: { renderer: :checkbox },
+        # is_stock_take: { renderer: :checkbox },
         business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
         ref_no: { required: true }
       }
@@ -99,8 +99,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(is_stock_take: nil,
-                                    business_process_id: nil,
+      @form_object = OpenStruct.new(business_process_id: nil,
                                     ref_no: nil)
     end
 

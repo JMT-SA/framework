@@ -25,7 +25,7 @@ module UiRules
       {
         material_resource_product_column_name: { renderer: :label, with_value: prodcol_label, caption: 'Product Column', readonly: true },
         material_resource_product_column_id: { renderer: :hidden, value: product_column_id },
-        short_code: { required: true, force_uppercase: true },
+        short_code: @mode == :edit ? { renderer: :label } : { required: true, force_uppercase: true },
         long_name: {},
         description: {},
         active: { renderer: :checkbox },

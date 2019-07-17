@@ -22,7 +22,7 @@ module PackMaterial
               form.remote!
               form.method :update
               # form.add_field :material_resource_master_list_id
-              # form.add_field :short_code
+              form.add_field :short_code
               form.add_field :long_name
               form.add_field :description
               form.add_field :active

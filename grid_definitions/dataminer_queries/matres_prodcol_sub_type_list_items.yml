@@ -1,18 +1,21 @@
 ---
 :caption: Master List Items for Product Columns
 :sql: "SELECT \"material_resource_product_columns\".\"id\" AS product_column_id,\r\n
-  \ \"material_resource_product_columns\".\"column_name\",\r\n  \"material_resource_master_list_items\".\"id\",\r\n
-  \ \"material_resource_master_list_items\".\"short_code\",\r\n  \"material_resource_master_list_items\".\"description\",\r\n
-  \ \"material_resource_master_list_items\".\"active\",\r\n  \"material_resource_master_list_items\".\"long_name\",\r\n
-  \ \"material_resource_master_list_items\".\"material_resource_master_list_id\" AS
-  master_list_id,\r\n  \"material_resource_master_lists\".\"material_resource_sub_type_id\"
-  AS sub_type_id\r\nFROM \"material_resource_product_columns\"\r\n  LEFT JOIN \"material_resource_master_lists\"
+  \      \"material_resource_product_columns\".\"column_name\",\r\n       \"material_resource_master_list_items\".\"id\",\r\n
+  \      \"material_resource_master_list_items\".\"short_code\",\r\n       \"material_resource_master_list_items\".\"description\",\r\n
+  \      \"material_resource_master_list_items\".\"active\",\r\n       \"material_resource_master_list_items\".\"long_name\",\r\n
+  \      \"material_resource_master_list_items\".\"material_resource_master_list_id\"
+  AS master_list_id,\r\n       \"material_resource_master_lists\".\"material_resource_sub_type_id\"
+  AS sub_type_id,\r\n       exists(select id from pack_material_products where material_resource_sub_type_id
+  = \"material_resource_master_lists\".\"material_resource_sub_type_id\") as has_products\r\nFROM
+  \"material_resource_product_columns\"\r\n         LEFT JOIN \"material_resource_master_lists\"
   ON \"material_resource_master_lists\".\"material_resource_product_column_id\" =
-  \"material_resource_product_columns\".\"id\"\r\n  LEFT JOIN \"material_resource_master_list_items\"
+  \"material_resource_product_columns\".\"id\"\r\n         LEFT JOIN \"material_resource_master_list_items\"
   ON \"material_resource_master_list_items\".\"material_resource_master_list_id\"
   = \"material_resource_master_lists\".\"id\"\r\nWHERE \"material_resource_product_columns\".\"id\"
-  IN (SELECT unnest(\"product_column_ids\")\r\n                    FROM \"material_resource_sub_types\"\r\n
-  \                   WHERE \"id\" = \"material_resource_master_lists\".\"material_resource_sub_type_id\")"
+  IN (SELECT unnest(\"product_column_ids\")\r\n                                                   FROM
+  \"material_resource_sub_types\"\r\n                                                   WHERE
+  \"id\" = \"material_resource_master_lists\".\"material_resource_sub_type_id\")"
 :limit: 
 :offset: 
 :external_settings:
@@ -27,6 +30,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -42,6 +46,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 1
     :group_sum: false
@@ -57,6 +62,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -72,6 +78,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -87,6 +94,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -102,6 +110,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -117,6 +126,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -132,6 +142,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -147,6 +158,23 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_products:
+    :name: has_products
+    :sequence_no: 10
+    :caption: Has products
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -159,7 +187,7 @@
   :data_type: :integer
   :control_type: :text
   :default_value: 
-  :ordered_list: 
+  :ordered_list: false
   :ui_priority: 1
   :list_def: 
 - :column: material_resource_master_lists.material_resource_sub_type_id
@@ -167,6 +195,6 @@
   :data_type: :integer
   :control_type: :text
   :default_value: 
-  :ordered_list: 
+  :ordered_list: false
   :ui_priority: 1
   :list_def: 

@@ -126,6 +126,15 @@ module PackMaterialApp
       success_response("Updated list item #{instance.short_code}", instance)
     end
 
+    def delete_matres_master_list_item(sub_type_id, id)
+      assert_permission!(:delete_master_list_item, sub_type_id)
+      name = matres_master_list_item(id).short_code
+      repo.delete_matres_master_list_item(id)
+      success_response("Deleted master list item #{name}")
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    end
+
     def matres_sub_types_product_column_ids(sub_type_id)
       product_column_ids = repo.find_matres_sub_type(sub_type_id).product_column_ids || []
       if product_column_ids.any?
@@ -167,6 +176,11 @@ module PackMaterialApp
 
     def validate_matres_master_list_item_params(params)
       MatresMasterListItemSchema.call(params)
+    end
+
+    def assert_permission!(task, id = nil)
+      res = TaskPermissionCheck::MatresSubType.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
   end
 end

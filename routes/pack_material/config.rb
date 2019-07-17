@@ -42,7 +42,6 @@ class Framework < Roda
         end
       end
     end
-
     r.on 'material_resource_types' do
       interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
@@ -105,6 +104,16 @@ class Framework < Roda
             update_grid_row(item_id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { PackMaterial::Config::MatresMasterListItem::Edit.call(item_id, params[:matres_master_list_item], res.errors) }
+          end
+        end
+        r.delete do
+          check_auth!('configuration', 'delete')
+          res = interactor.delete_matres_master_list_item(id, item_id)
+          if res.success
+            delete_grid_row(item_id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
           end
         end
       end

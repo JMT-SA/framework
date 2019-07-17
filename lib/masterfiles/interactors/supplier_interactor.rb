@@ -10,7 +10,7 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
 
       result = nil
-      DB.transaction do
+      repo.transaction do
         result = repo.create_supplier(res)
         log_transaction
       end
@@ -29,7 +29,7 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
 
       result = nil
-      DB.transaction do
+      repo.transaction do
         result = repo.update_supplier(id, res)
         log_transaction
       end
@@ -43,7 +43,7 @@ module MasterfilesApp
 
     def delete_supplier(id)
       name = supplier(id).party_name
-      DB.transaction do
+      repo.transaction do
         repo.delete_supplier(id)
         log_transaction
       end

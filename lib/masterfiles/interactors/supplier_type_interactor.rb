@@ -7,7 +7,7 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_supplier_type(res)
       end
       instance = supplier_type(id)
@@ -20,7 +20,7 @@ module MasterfilesApp
       res = validate_supplier_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      DB.transaction do
+      repo.transaction do
         repo.update_supplier_type(id, res)
       end
       instance = supplier_type(id)
@@ -29,7 +29,7 @@ module MasterfilesApp
 
     def delete_supplier_type(id)
       name = supplier_type(id).type_code
-      DB.transaction do
+      repo.transaction do
         repo.delete_supplier_type(id)
       end
       success_response("Deleted supplier type #{name}")

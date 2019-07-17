@@ -11,7 +11,7 @@ module PackMaterialApp
       return validation_failed_response(res) unless res.messages.empty?
 
       result = nil
-      DB.transaction do
+      repo.transaction do
         result = repo.create_matres_product_variant_party_role(res)
         log_transaction
       end
@@ -27,7 +27,7 @@ module PackMaterialApp
       res = validate_update_matres_product_variant_party_role_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      DB.transaction do
+      repo.transaction do
         repo.update_matres_product_variant_party_role(id, res)
         log_transaction
       end
@@ -37,7 +37,7 @@ module PackMaterialApp
 
     def delete_matres_product_variant_party_role(id)
       name = link_name(matres_product_variant_party_role(id))
-      DB.transaction do
+      repo.transaction do
         repo.delete_matres_product_variant_party_role(id)
         log_transaction
       end

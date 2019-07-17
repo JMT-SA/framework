@@ -19,7 +19,7 @@ module DevelopmentApp
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_role(res)
       end
       instance = role(id)
@@ -32,7 +32,7 @@ module DevelopmentApp
       res = validate_role_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      DB.transaction do
+      repo.transaction do
         repo.update_role(id, res)
       end
       instance = role(id)
@@ -41,7 +41,7 @@ module DevelopmentApp
 
     def delete_role(id)
       name = role(id).name
-      DB.transaction do
+      repo.transaction do
         repo.delete_role(id)
       end
       success_response("Deleted role #{name}")

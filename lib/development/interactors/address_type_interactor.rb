@@ -19,7 +19,7 @@ module DevelopmentApp
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
-      DB.transaction do
+      repo.transaction do
         id = repo.create_address_type(res)
       end
       instance = address_type(id)
@@ -32,7 +32,7 @@ module DevelopmentApp
       res = validate_address_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      DB.transaction do
+      repo.transaction do
         repo.update_address_type(id, res)
       end
       instance = address_type(id)
@@ -41,7 +41,7 @@ module DevelopmentApp
 
     def delete_address_type(id)
       name = address_type(id).address_type
-      DB.transaction do
+      repo.transaction do
         repo.delete_address_type(id)
       end
       success_response("Deleted address type #{name}")

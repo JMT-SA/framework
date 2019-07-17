@@ -10,7 +10,7 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
 
       result = nil
-      DB.transaction do
+      repo.transaction do
         result = repo.create_customer(res)
         log_transaction
       end
@@ -29,7 +29,7 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
 
       result = nil
-      DB.transaction do
+      repo.transaction do
         result = repo.update_customer(id, res)
         log_transaction
       end
@@ -43,7 +43,7 @@ module MasterfilesApp
 
     def delete_customer(id)
       name = customer(id).party_name
-      DB.transaction do
+      repo.transaction do
         repo.delete_customer(id)
         log_transaction
       end

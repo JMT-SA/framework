@@ -152,7 +152,7 @@ module UiRules
     end
 
     def already_enqueued?(delivery_id)
-      PackMaterialApp::ERPPurchaseInvoiceJob.enqueued_with_args?(@options[:user].user_name, delivery_id: delivery_id)
+      PackMaterialApp::ERPPurchaseInvoiceJob.enqueued_with_args?(delivery_id: delivery_id)
     end
   end
 end

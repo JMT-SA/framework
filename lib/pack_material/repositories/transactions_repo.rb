@@ -67,6 +67,16 @@ module PackMaterialApp
                    wrapper: MrBulkStockAdjustmentPrice,
                    exclude: %i[create update delete]
 
+    build_for_select :business_processes,
+                     label: :process,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :process
+
+    def for_select_bsa_business_processes
+      for_select_business_processes(where: { id: valid_bulk_stock_adjustment_business_process_ids })
+    end
+
     def create_mr_sku_location(attrs)
       stock_location = DB[:locations].where(id: attrs[:location_id]).get(:can_store_stock)
       return failed_response('Location can not store stock') unless stock_location
@@ -75,7 +85,19 @@ module PackMaterialApp
     end
 
     def create_mr_bulk_stock_adjustment(attrs)
-      create(:mr_bulk_stock_adjustments, business_process_id: attrs[:business_process_id], ref_no: attrs[:ref_no])
+      process_id = attrs[:business_process_id]
+      return failed_response('Business Process is not allowed') unless valid_bulk_stock_adjustment_business_process_ids.include?(process_id)
+
+      create(:mr_bulk_stock_adjustments, business_process_id: process_id, ref_no: attrs[:ref_no])
+    end
+
+    def valid_bulk_stock_adjustment_business_process_ids
+      processes = [
+        AppConst::PROCESS_BULK_STOCK_ADJUSTMENTS,
+        AppConst::PROCESS_STOCK_TAKE,
+        AppConst::PROCESS_STOCK_TAKE_ON
+      ]
+      DB[:business_processes].where(process: processes).map(:id)
     end
 
     def pack_material_storage_type_id

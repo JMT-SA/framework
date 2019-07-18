@@ -4,7 +4,7 @@ module UiRules
   class MrBulkStockAdjustmentRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = PackMaterialApp::TransactionsRepo.new
-      @stock_repo = PackMaterialApp::MrStockRepo.new
+      @transaction_repo = PackMaterialApp::TransactionsRepo.new
       @perm = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment
       make_form_object
       apply_form_values
@@ -64,7 +64,7 @@ module UiRules
         completed: { renderer: :hidden },
         approved: { renderer: :hidden },
         signed_off: { renderer: :hidden },
-        business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
+        business_process_id: { renderer: :select, options: @transaction_repo.for_select_bsa_business_processes, caption: 'Business Process', required: true },
         ref_no: { required: true },
         sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
         location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
@@ -87,7 +87,7 @@ module UiRules
     def new_fields
       {
         # is_stock_take: { renderer: :checkbox },
-        business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
+        business_process_id: { renderer: :select, options: @transaction_repo.for_select_bsa_business_processes, caption: 'Business Process', required: true },
         ref_no: { required: true }
       }
     end

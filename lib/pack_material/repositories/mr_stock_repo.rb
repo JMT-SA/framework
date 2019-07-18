@@ -2,11 +2,6 @@
 
 module PackMaterialApp
   class MrStockRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :business_processes, label: :process,
-                                          value: :id,
-                                          no_active_check: true,
-                                          order_by: :process
-
     def delivery_process_id
       DB[:business_processes].where(process: 'DELIVERIES').select(:id).single_value
     end

@@ -468,7 +468,7 @@ class Framework < Roda
       end
       r.on 'edit' do   # EDIT
         check_auth!('replenish', 'edit')
-        show_page { PackMaterial::Replenish::MrDelivery::Edit.call(id, user: current_user) }
+        show_page { PackMaterial::Replenish::MrDelivery::Edit.call(id) }
       end
 
       r.on 'invoice' do
@@ -498,7 +498,7 @@ class Framework < Roda
       r.is do
         r.get do       # SHOW
           check_auth!('replenish', 'read')
-          show_page { PackMaterial::Replenish::MrDelivery::Edit.call(id, user: current_user) }
+          show_page { PackMaterial::Replenish::MrDelivery::Edit.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_mr_delivery(id, params[:mr_delivery])
@@ -507,7 +507,7 @@ class Framework < Roda
             r.redirect("/pack_material/replenish/mr_deliveries/#{id}/edit")
           else
             re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/edit") do
-              PackMaterial::Replenish::MrDelivery::Edit.call(id, form_values: params[:mr_delivery], form_errors: res.errors, user: current_user)
+              PackMaterial::Replenish::MrDelivery::Edit.call(id, form_values: params[:mr_delivery], form_errors: res.errors)
             end
           end
         end

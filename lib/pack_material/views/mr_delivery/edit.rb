@@ -4,8 +4,8 @@ module PackMaterial
   module Replenish
     module MrDelivery
       class Edit # rubocop:disable Metrics/ClassLength
-        def self.call(id, form_values: nil, form_errors: nil, user: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
-          ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values, user: user)
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+          ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           cannot_edit = rules[:is_verified] || rules[:over_supply_accepted]

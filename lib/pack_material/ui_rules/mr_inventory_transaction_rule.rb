@@ -4,7 +4,7 @@ module UiRules
   class MrInventoryTransactionRule < Base
     def generate_rules
       @repo = PackMaterialApp::TransactionsRepo.new
-      @stock_repo = PackMaterialApp::MrStockRepo.new
+      @transaction_repo = PackMaterialApp::TransactionsRepo.new
       make_form_object
       apply_form_values
 
@@ -21,7 +21,7 @@ module UiRules
     def stock_fields
       {
         sku_number: { required: true },
-        business_process_id: { renderer: :select, options: @stock_repo.for_select_business_processes, caption: 'Business Process', required: true },
+        business_process_id: { renderer: :select, options: @transaction_repo.for_select_business_processes, caption: 'Business Process', required: true },
         to_location_id: { renderer: :hidden },
         vehicle_id: { renderer: :hidden },
         ref_no: {},

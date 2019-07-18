@@ -47,7 +47,8 @@ end
 
 === Check for a job that has not yet completed successfully
 
-Use `enqueued_with_args?` to check if a job is already in the queue.
+Use  `enqueued_with_args?` or `enqueued_with_exact_args?` to check if a job is already in the queue.
+The first method will return true even if the job has been enqueued with an extra parameter. This is especially useful if one of the parameters used to submit the job was the logged-in user and now possibly a different user needs to check the state of the queue.
 
 e.g. you need to hide a button (that would enqueue a job) when that job has been submitted but is not yet complete.
 
@@ -55,9 +56,15 @@ e.g. you need to hide a button (that would enqueue a job) when that job has been
 ----
 PackMaterialApp::TestJob.enqueue(user_name, id: 123, complete: true)
 
-# - later: check if a job with the same parameters is in the queue:
+# - later: check if a job with the same parameters (but maybe a different user)
+#          is in the queue:
 
-PackMaterialApp::TestJob.enqueued_with_args?(user_name, id: 123, complete: true)
+PackMaterialApp::TestJob.enqueued_with_args?(id: 123, complete: true)
+# => true/false
+
+# - Now: check if a job with ALL the same parameters is in the queue:
+
+PackMaterialApp::TestJob.enqueued_with_exact_args?(user_name, id: 123, complete: true)
 # => true/false
 ----
 

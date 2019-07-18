@@ -24,6 +24,7 @@ end
 DB.extension(:connection_validator) # Ensure connections are not lost over time.
 DB.extension :pg_array
 DB.extension :pg_json
+Sequel.extension(:pg_json_ops)
 DB.extension :pg_hstore
 DB.extension :pg_inet
 

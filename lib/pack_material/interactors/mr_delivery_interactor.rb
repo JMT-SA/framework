@@ -98,6 +98,8 @@ module PackMaterialApp
     def complete_invoice(id) # rubocop:disable Metrics/AbcSize
       can_complete_invoice = TaskPermissionCheck::MrDelivery.call(:complete_invoice, id)
       if can_complete_invoice.success
+        return success_response('Delivery Purchase Invoice has already been Queued') if already_enqueued?(id)
+
         repo.transaction do
           repo.update_current_prices(id)
 
@@ -195,6 +197,10 @@ module PackMaterialApp
 
     def validate_mr_delivery_purchase_invoice_params(params)
       MrDeliveryPurchaseInvoiceSchema.call(params)
+    end
+
+    def already_enqueued?(delivery_id)
+      PackMaterialApp::ERPPurchaseInvoiceJob.enqueued_with_args?(@user.user_name, delivery_id: delivery_id)
     end
   end
 end

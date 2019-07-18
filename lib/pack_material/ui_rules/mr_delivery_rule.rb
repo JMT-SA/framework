@@ -2,21 +2,14 @@
 
 module UiRules
   class MrDeliveryRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = PackMaterialApp::ReplenishRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       @locations_repo = MasterfilesApp::LocationRepo.new
       make_form_object
       apply_form_values
+      set_rules unless @mode == :new
 
-      rules[:can_verify] = can_verify unless @mode == :new
-      rules[:can_accept] = can_accept_over_supply unless @mode == :new
-      rules[:can_add_invoice] = can_add_invoice unless @mode == :new
-      rules[:can_complete_invoice] = can_complete_invoice unless @mode == :new
-      rules[:is_verified] = @form_object.verified if @mode == :edit
-      rules[:over_supply_accepted] = @form_object.accepted_over_supply if @mode == :edit
-      rules[:invoice_completed] = @form_object.invoice_completed unless @mode == :new
-      rules[:del_sub_totals] = @repo.del_sub_totals(@options[:id]) if @mode == :edit
       common_values_for_fields case @mode
                                when :new
                                  new_fields
@@ -29,6 +22,17 @@ module UiRules
                                end
 
       form_name 'mr_delivery'
+    end
+
+    def set_rules # rubocop:disable Metrics/AbcSize
+      rules[:can_verify] = can_verify
+      rules[:can_accept] = can_accept_over_supply
+      rules[:can_add_invoice] = can_add_invoice
+      rules[:can_complete_invoice] = can_complete_invoice
+      rules[:invoice_completed] = @form_object.invoice_completed
+      rules[:is_verified] = @form_object.verified
+      rules[:over_supply_accepted] = @form_object.accepted_over_supply
+      rules[:del_sub_totals] = @repo.del_sub_totals(@options[:id])
     end
 
     def show_fields
@@ -138,11 +142,17 @@ module UiRules
 
     def can_complete_invoice
       res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:complete_invoice, @options[:id])
+      return false if @mode == :edit && already_enqueued?(@options[:id])
+
       res.success
     end
 
     def purchase_order_numbers
       @repo.purchase_order_numbers_for_delivery(@options[:id])
+    end
+
+    def already_enqueued?(delivery_id)
+      PackMaterialApp::ERPPurchaseInvoiceJob.enqueued_with_args?(@options[:user].user_name, delivery_id: delivery_id)
     end
   end
 end

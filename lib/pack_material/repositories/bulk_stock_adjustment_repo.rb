@@ -6,10 +6,6 @@ module PackMaterialApp
       transaction_repo.system_quantity(mr_sku_id: mr_sku_id, location_id: location_id)
     end
 
-    def find_business_process_id
-      DB[:business_processes].where(process: AppConst::PROCESS_BULK_STOCK_ADJUSTMENTS).get(:id)
-    end
-
     def update_item_transaction_id(item_id, transaction_id)
       update(:mr_bulk_stock_adjustment_items, item_id, mr_inventory_transaction_item_id: transaction_id)
     end

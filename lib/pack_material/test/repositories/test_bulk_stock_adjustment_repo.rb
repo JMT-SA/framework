@@ -21,11 +21,6 @@ module PackMaterialApp
       assert_equal 5.0, repo.system_quantity(1, 2)
     end
 
-    def test_find_business_process_id
-      id = @fixed_table_set[:processes][:bulk_stock_adjustments_process_id]
-      assert_equal id, repo.find_business_process_id
-    end
-
     def test_transaction_id
       transaction_id = repo.transaction_id('create',
                                            business_process_id: @fixed_table_set[:processes][:bulk_stock_adjustments_process_id],

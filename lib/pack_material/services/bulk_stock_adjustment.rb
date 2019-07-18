@@ -12,7 +12,7 @@ module PackMaterialApp
       @bulk_stock_adjustment_id = bulk_stock_adjustment_id
       @bulk_stock_adj = @transaction_repo.find_mr_bulk_stock_adjustment(bulk_stock_adjustment_id)
       @ref_no = @bulk_stock_adj.ref_no unless @bulk_stock_adj.nil?
-      @business_process_id = business_process_id || @this_repo.find_business_process_id
+      @business_process_id = business_process_id || @bulk_stock_adj.business_process_id
       @opts = opts
       @destroy_transaction_id = nil
       @create_transaction_id = nil

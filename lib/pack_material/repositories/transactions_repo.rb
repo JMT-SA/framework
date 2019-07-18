@@ -75,7 +75,7 @@ module PackMaterialApp
     end
 
     def create_mr_bulk_stock_adjustment(attrs)
-      create(:mr_bulk_stock_adjustments, is_stock_take: attrs[:is_stock_take], ref_no: attrs[:ref_no])
+      create(:mr_bulk_stock_adjustments, business_process_id: attrs[:business_process_id], ref_no: attrs[:ref_no])
     end
 
     def pack_material_storage_type_id

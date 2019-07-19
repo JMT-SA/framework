@@ -107,7 +107,7 @@ module PackMaterialApp
 
     def adhoc_add_stock(attrs)
       CreateMrStock.call(attrs[:sku_ids],
-                         attrs[:business_process_id],
+                         business_process_id: attrs[:business_process_id],
                          to_location_id: attrs[:location_id],
                          user_name: attrs[:user_name],
                          ref_no: attrs[:ref_no],

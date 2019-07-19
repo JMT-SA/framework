@@ -20,7 +20,12 @@ module PackMaterialApp
         @repo.log_status('mr_deliveries', @id, 'SKUS_CREATED')
         business_process_id = @repo.resolve_business_process_id(delivery_id: @id)
 
-        CreateMrStock.call(sku_ids, business_process_id, to_location_id: to_loc_id, delivery_id: @id, user_name: @user_name)
+        CreateMrStock.call(sku_ids,
+                           business_process_id: business_process_id,
+                           to_location_id: to_loc_id,
+                           delivery_id: @id,
+                           user_name: @user_name,
+                           ref_no: @delivery.delivery_number)
       else
         failed_response(bsa_check.message)
       end

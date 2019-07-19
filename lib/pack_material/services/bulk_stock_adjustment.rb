@@ -69,7 +69,7 @@ module PackMaterialApp
       sys_qty = @this_repo.system_quantity(item[:mr_sku_id], item[:location_id])
       qty = item[:actual_quantity].to_d - sys_qty
       res = CreateMrStock.call([item[:mr_sku_id]],
-                               @business_process_id,
+                               business_process_id: @business_process_id,
                                to_location_id: item[:location_id],
                                user_name: @opts[:user_name],
                                ref_no: @ref_no,

@@ -8,15 +8,15 @@ module PackMaterialApp
     #   Contains quantities: [Array] of hashes { sku_id: sku_id, qty: qty }
     #                        Mandatory unless delivery_id present
     #   Contains location_long_code, delivery_id, ref_no, parent_transaction_id
-    def initialize(sku_ids = [], business_process_id = nil, opts = {})
+    def initialize(sku_ids = [], opts = {})
       @repo = MrStockRepo.new
       @transaction_repo = PackMaterialApp::TransactionsRepo.new
       @sku_ids = sku_ids
-      @business_process_id = business_process_id
+      @business_process_id = opts.fetch(:business_process_id)
       @to_location_id = opts.fetch(:to_location_id)
       @delivery_id = opts[:delivery_id]
       @quantities = opts.fetch(:quantities) unless @delivery_id
-      @ref_no = opts[:ref_no]
+      @ref_no = opts.fetch(:ref_no)
       @parent_transaction_id = opts[:parent_transaction_id]
       @opts = opts
     end

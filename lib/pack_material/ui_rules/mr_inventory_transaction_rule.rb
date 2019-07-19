@@ -24,7 +24,7 @@ module UiRules
         business_process_id: { renderer: :select, options: @transaction_repo.for_select_business_processes, caption: 'Business Process', required: true },
         to_location_id: { renderer: :hidden },
         vehicle_id: { renderer: :hidden },
-        ref_no: {},
+        ref_no: { required: true },
         quantity: { renderer: :numeric, required: true },
         is_adhoc: { renderer: :hidden }
       }

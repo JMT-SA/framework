@@ -21,7 +21,7 @@ module PackMaterialApp
     required(:to_location_id, :integer).maybe(:int?)
     optional(:vehicle_id, :integer).maybe(:int?)
     required(:quantity, :decimal).maybe(:decimal?, gt?: 0)
-    required(:ref_no, Types::StrippedString).maybe(:str?)
+    required(:ref_no, Types::StrippedString).filled(:str?)
     required(:is_adhoc, :bool).maybe(:bool?)
   end
 end

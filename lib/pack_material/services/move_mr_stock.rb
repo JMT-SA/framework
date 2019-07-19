@@ -6,7 +6,7 @@ module PackMaterialApp
     # @param [Integer] to_location_id
     # @param [Numeric] quantity, Numeric(7,2)
     # @param [Hash] opts { :delivery_id, :tripsheet_id, :is_adhoc, :business_process_id, :from_location_id, :user_name, :parent_transaction_id }
-    def initialize(sku_id, to_location_id, quantity, opts = {})
+    def initialize(sku_id, to_location_id, quantity, opts = {}) # rubocop:disable Metrics/AbcSize
       @repo = MrStockRepo.new
       @transaction_repo = PackMaterialApp::TransactionsRepo.new
       @replenish_repo = PackMaterialApp::ReplenishRepo.new
@@ -19,7 +19,8 @@ module PackMaterialApp
       @from_location_id = @replenish_repo.find_mr_delivery(@opts[:delivery_id]).receipt_location_id if @opts[:delivery_id]
 
       @parent_transaction_id = @repo.resolve_parent_transaction_id(@opts)
-      @business_process_id = @repo.resolve_business_process_id(@opts)
+      @business_process_id = @repo.resolve_business_process_id(@opts) || opts.fetch(:business_process_id)
+      @ref_no = @repo.resolve_ref_no(@opts) || opts.fetch(:ref_no)
     end
 
     def call
@@ -71,7 +72,7 @@ module PackMaterialApp
           mr_inventory_transaction_type_id: type_id,
           to_location_id: @to_location_id,
           business_process_id: @business_process_id,
-          ref_no: @opts[:ref_no],
+          ref_no: @ref_no,
           active: true,
           is_adhoc: (@opts[:is_adhoc] || false),
           created_by: @opts[:user_name]

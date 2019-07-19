@@ -6,7 +6,7 @@ module PackMaterialApp
   class TestCreateMrStock < MiniTestInteractors
     def test_initialize
       sku_ids = [1, 2, 3]
-      service = CreateMrStock.new(sku_ids, 7, opts)
+      service = CreateMrStock.new(sku_ids, opts)
 
       assert service.instance_variable_get('@repo').is_a?(MrStockRepo)
       assert service.instance_variable_get('@transaction_repo').is_a?(TransactionsRepo)
@@ -21,20 +21,20 @@ module PackMaterialApp
 
       options = opts
       options.delete(:delivery_id)
-      service = CreateMrStock.new(sku_ids, 7, options)
+      service = CreateMrStock.new(sku_ids, options)
 
       assert_equal options[:quantities], service.instance_variable_get('@quantities')
     end
 
     def test_no_sku_ids_fail
-      service = CreateMrStock.call([], 7, opts)
+      service = CreateMrStock.call([], opts)
       refute service.success
       assert_equal 'Stock can not be created without sku_ids', service.message
     end
 
     def test_create_sku_location_ids_fail
       PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(bad_response)
-      service = CreateMrStock.call([1, 2, 3], 7, opts)
+      service = CreateMrStock.call([1, 2, 3], opts)
       refute service.success
       assert_equal 'FAILED', service.message
     end
@@ -44,7 +44,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:activate_mr_inventory_transaction).returns(bad_response(message: failed_message))
 
-      service = CreateMrStock.call([1, 2, 3], 7, opts)
+      service = CreateMrStock.call([1, 2, 3], opts)
       refute service.success
       assert_equal failed_message, service.message
     end
@@ -56,7 +56,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:transaction_type_id_for).returns(1)
 
-      assert_raises(Sequel::ForeignKeyConstraintViolation) { CreateMrStock.call([1, 2, 3], 7, options) }
+      assert_raises(Sequel::ForeignKeyConstraintViolation) { CreateMrStock.call([1, 2, 3], options) }
     end
 
     def test_delivery_id
@@ -66,7 +66,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:activate_mr_inventory_transaction).returns(ok_response)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:update_delivery_receipt_id).returns(bad_response(message: failed_message))
 
-      service = CreateMrStock.call([1, 2, 3], 7, opts)
+      service = CreateMrStock.call([1, 2, 3], opts)
       refute service.success
       assert_equal failed_message, service.message
 
@@ -76,7 +76,7 @@ module PackMaterialApp
       mocked_method.expect :get_delivery_sku_quantities, ok_response, []
       PackMaterialApp::MrStockRepo.any_instance.stubs(:get_delivery_sku_quantities).returns(mocked_method.get_delivery_sku_quantities)
 
-      CreateMrStock.call([1, 2, 3], 7, opts)
+      CreateMrStock.call([1, 2, 3], opts)
       assert mocked_method.verify
 
       # ensure not called if no delivery id
@@ -85,7 +85,7 @@ module PackMaterialApp
       second_mocked_method = MiniTest::Mock.new
       second_mocked_method.expect :update_delivery_receipt_id, ok_response, []
       second_mocked_method.expect :get_delivery_sku_quantities, ok_response, []
-      CreateMrStock.call([1, 2, 3], 7, options)
+      CreateMrStock.call([1, 2, 3], options)
       assert_raises(MockExpectationError) { second_mocked_method.verify }
     end
 
@@ -97,7 +97,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:get_delivery_sku_quantities).returns(true)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:add_sku_location_quantities).returns(bad_response(message: failed_message))
 
-      service = CreateMrStock.call([1, 2, 3], 7, opts)
+      service = CreateMrStock.call([1, 2, 3], opts)
       refute service.success
       assert_equal failed_message, service.message
     end
@@ -112,7 +112,7 @@ module PackMaterialApp
       PackMaterialApp::MrStockRepo.any_instance.stubs(:add_sku_location_quantities).returns(ok_response)
       PackMaterialApp::TransactionsRepo.any_instance.stubs(:create_mr_inventory_transaction_item).returns(15)
 
-      service = CreateMrStock.call([1, 2, 3], 7, opts)
+      service = CreateMrStock.call([1, 2, 3], opts)
       assert service.success
       exp = { parent_transaction_id: 5, transaction_item_ids: [{ sku_id: 5, qty: 5, transaction_item_id: 15 }, { sku_id: 6, qty: 6, transaction_item_id: 15 }] }
       assert_equal exp, service.instance
@@ -121,6 +121,7 @@ module PackMaterialApp
 
     def opts
       {
+        business_process_id: 7,
         to_location_id: 3,
         delivery_id: 4,
         ref_no: 'ref_no',

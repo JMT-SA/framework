@@ -78,14 +78,27 @@ module PackMaterialApp
     end
 
     def resolve_business_process_id(opts)
-      if opts[:delivery_id]
-        DB[:business_processes].where(process: AppConst::PROCESS_DELIVERIES).get(:id)
-      elsif opts[:is_adhoc]
-        DB[:business_processes].where(process: AppConst::PROCESS_ADHOC_TRANSACTIONS).get(:id)
-      elsif opts[:tripsheet_id]
-        DB[:business_processes].where(process: AppConst::PROCESS_VEHICLE_JOBS).get(:id)
-      else
-        opts[:business_process_id]
+      return nil unless opts[:delivery_id] || opts[:is_adhoc] || opts[:tripsheet_id]
+
+      process = if opts[:delivery_id]
+                  AppConst::PROCESS_DELIVERIES
+                elsif opts[:is_adhoc]
+                  AppConst::PROCESS_ADHOC_TRANSACTIONS
+                else
+                  AppConst::PROCESS_VEHICLE_JOBS
+                end
+      DB[:business_processes].where(process: process).get(:id)
+    end
+
+    def resolve_ref_no(opts)
+      return nil unless (del_id = opts[:delivery_id]) || (trip_id = opts[:tripsheet_id])
+
+      if del_id
+        DB[:mr_deliveries].where(id: del_id).get(:delivery_number)
+      elsif trip_id
+        # do nothing here yet
+        # DB[:vehicle_jobs].where(id: trip_id).get(:tripsheet_number)
+        nil
       end
     end
 

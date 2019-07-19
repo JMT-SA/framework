@@ -131,8 +131,8 @@ module PackMaterialApp
 
     def test_resolve_parent_transaction_id
       inv_trans_id = DB[:mr_inventory_transactions].insert(
-        mr_inventory_transaction_type_id: @fixed_table_set[:inventory_transaction_types][:create_stock_id],
-        business_process_id: @fixed_table_set[:processes][:bulk_stock_adjustments_process_id],
+        mr_inventory_transaction_type_id: @fixed_table_set[:inventory_transaction_types][:putaway_id],
+        business_process_id: @fixed_table_set[:processes][:delivery_process_id],
         created_by: 'current user'
       )
       delivery_id = create_mr_delivery(putaway_transaction_id: inv_trans_id)[:id]
@@ -159,7 +159,7 @@ module PackMaterialApp
     def test_update_delivery_receipt_id
       receipt_id = DB[:mr_inventory_transactions].insert(
         mr_inventory_transaction_type_id: @fixed_table_set[:inventory_transaction_types][:create_stock_id],
-        business_process_id: @fixed_table_set[:processes][:bulk_stock_adjustments_process_id],
+        business_process_id: @fixed_table_set[:processes][:delivery_process_id],
         created_by: 'current user'
       )
       delivery_id = create_mr_delivery[:id]

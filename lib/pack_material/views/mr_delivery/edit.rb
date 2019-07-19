@@ -96,6 +96,12 @@ module PackMaterial
                                   loading_window: true,
                                   visible: rules[:is_verified] && rules[:over_supply_accepted],
                                   style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Delivery Purchase Invoice',
+                                  url: "/pack_material/reports/delivery_purchase_invoice/#{id}",
+                                  loading_window: true,
+                                  visible: rules[:invoice_completed],
+                                  style: :button)
             end
 
             page.section do |section| # rubocop:disable Metrics/BlockLength

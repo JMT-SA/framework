@@ -3,7 +3,7 @@
 module PackMaterial
   module Transactions
     module MrBulkStockAdjustment
-      class Edit
+      class Edit # rubocop:disable Metrics/ClassLength
         def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:mr_bulk_stock_adjustment, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
@@ -26,7 +26,7 @@ module PackMaterial
                                   visible: rules[:can_complete],
                                   id: 'mr_bulk_stock_adjustments_complete_button')
 
-              price_url = rules[:can_manage_prices] ? '/list/mr_bulk_stock_adjustment_prices' : '/list/mr_bulk_stock_adjustment_prices_show'
+              price_url = rules[:signed_off] ? '/list/mr_bulk_stock_adjustment_prices_show' : '/list/mr_bulk_stock_adjustment_prices'
               section.add_control(control_type: :link,
                                   text: 'Manage Prices',
                                   url: price_url + "/with_params?key=standard&mr_bulk_stock_adjustment_id=#{id}",
@@ -76,6 +76,21 @@ module PackMaterial
                   end
                 end
               end
+            end
+
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Stock Adjustment Sheet',
+                                  url: "/pack_material/reports/stock_adjustment_sheet/#{id}",
+                                  loading_window: true,
+                                  visible: !rules[:signed_off],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Signed Off Report',
+                                  url: "/pack_material/reports/signed_off_report/#{id}",
+                                  loading_window: true,
+                                  visible: rules[:signed_off],
+                                  style: :button)
             end
 
             page.section do |section|

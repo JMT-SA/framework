@@ -1,8 +1,13 @@
 ---
 :caption: Suppliers
-:sql: "SELECT \"suppliers\".\"id\", \"suppliers\".\"party_role_id\", \"suppliers\".\"erp_supplier_number\",
-  \"suppliers\".\"created_at\", \"suppliers\".\"updated_at\", fn_party_role_name(\"suppliers\".\"party_role_id\")
-  AS party_role \r\nFROM \"suppliers\""
+:sql: "SELECT \"suppliers\".\"id\",\r\n       \"suppliers\".\"party_role_id\",\r\n
+  \      \"suppliers\".\"erp_supplier_number\",\r\n       \"suppliers\".\"created_at\",\r\n
+  \      \"suppliers\".\"updated_at\",\r\n       fn_party_role_name(\"suppliers\".\"party_role_id\")
+  AS party_role,\r\n       (SELECT string_agg(type_code::text, '; ')\r\n        FROM
+  (SELECT DISTINCT supplier_types.type_code\r\n              from supplier_types\r\n
+  \                      join suppliers_supplier_types sst on sst.supplier_type_id
+  = supplier_types.id\r\n                  and sst.supplier_id = suppliers.id) sub)
+  as supplier_types\r\nFROM \"suppliers\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -16,7 +21,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -32,7 +37,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -48,7 +53,7 @@
     :width: 
     :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -64,7 +69,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -80,7 +85,7 @@
     :width: 
     :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -96,7 +101,23 @@
     :width: 
     :format: 
     :hide: false
-    :pinned:
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_types:
+    :name: supplier_types
+    :sequence_no: 7
+    :caption: Supplier types
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

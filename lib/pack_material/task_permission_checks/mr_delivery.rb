@@ -74,6 +74,7 @@ module PackMaterialApp
 
       def putaway_check
         return failed_response('Delivery Putaway has already been completed') if putaway_completed?
+        return failed_response('Delivery has not been verified') unless verified?
 
         all_ok
       end

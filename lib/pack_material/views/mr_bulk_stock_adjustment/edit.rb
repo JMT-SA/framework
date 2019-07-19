@@ -70,7 +70,6 @@ module PackMaterial
                     col.add_field :ref_no
                   end
                   row.column do |col|
-                    # col.add_field :is_stock_take
                     col.add_field :completed
                     col.add_field :approved
                     col.add_field :signed_off

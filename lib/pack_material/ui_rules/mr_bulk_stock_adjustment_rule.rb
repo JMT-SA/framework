@@ -37,7 +37,6 @@ module UiRules
       {
         stock_adjustment_number: { renderer: :label },
         ref_no: { renderer: :label },
-        # is_stock_take: { renderer: :label, as_boolean: true },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
         signed_off: { renderer: :label, as_boolean: true }
@@ -48,7 +47,6 @@ module UiRules
       {
         stock_adjustment_number: { renderer: :label },
         ref_no: { renderer: :label },
-        # is_stock_take: { renderer: :label, as_boolean: true },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
         signed_off: { renderer: :label, as_boolean: true }
@@ -60,7 +58,6 @@ module UiRules
         create_transaction_id: { renderer: :label, caption: 'Create Transaction' },
         destroy_transaction_id: { renderer: :label, caption: 'Destroy Transaction' },
         stock_adjustment_number: { renderer: :label },
-        # is_stock_take: { renderer: :checkbox },
         completed: { renderer: :hidden },
         approved: { renderer: :hidden },
         signed_off: { renderer: :hidden },
@@ -74,7 +71,6 @@ module UiRules
     def view_header_fields
       {
         stock_adjustment_number: { renderer: :label },
-        # is_stock_take: { renderer: :label, as_boolean: true },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
         signed_off: { renderer: :label, as_boolean: true },
@@ -86,7 +82,6 @@ module UiRules
 
     def new_fields
       {
-        # is_stock_take: { renderer: :checkbox },
         business_process_id: { renderer: :select, options: @transaction_repo.for_select_bsa_business_processes, caption: 'Business Process', required: true },
         ref_no: { required: true }
       }

@@ -14,8 +14,6 @@ module PackMaterial
               form.view_only!
               form.add_field :stock_adjustment_number
               form.add_field :ref_no
-              # form.add_field :active
-              # form.add_field :is_stock_take
               form.add_field :completed
               form.add_field :approved
               form.add_field :signed_off

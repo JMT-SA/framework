@@ -18,7 +18,6 @@ module PackMaterial
               form.remote! if remote
               form.add_field :business_process_id
               form.add_field :ref_no
-              # form.add_field :is_stock_take
             end
           end
 

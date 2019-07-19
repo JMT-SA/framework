@@ -3,7 +3,7 @@
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module PackMaterialApp
-  class TestMoveMrStock < MiniTestInteractors
+  class TestMoveMrStock < MiniTestWithHooks
     def test_initialize
       PackMaterialApp::MrStockRepo.any_instance.stubs(:resolve_parent_transaction_id).returns(16)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:resolve_business_process_id).returns(15)

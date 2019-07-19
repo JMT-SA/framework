@@ -158,6 +158,7 @@ module PackMaterialApp
         stock_adjustment_number: 1,
         active: true,
         is_stock_take: false,
+        business_process_id: @fixed_table_set[:processes][:bulk_stock_adjustments_process_id],
         ref_no: 'ref_no'
       }
       attrs = default.merge(opts)

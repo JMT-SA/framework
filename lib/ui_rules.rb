@@ -24,12 +24,13 @@ module UiRules
   end
 
   class Base
-    attr_reader :rules
+    attr_reader :rules, :inflector
     def initialize(mode, authorizer, options)
       @mode        = mode
       @authorizer  = authorizer
       @options     = options
       @form_object = nil
+      @inflector   = Dry::Inflector.new
       @rules       = { fields: {} }
     end
 
@@ -40,7 +41,7 @@ module UiRules
     private
 
     def make_caption(value)
-      value.to_s.split('_').map(&:capitalize).join(' ')
+      inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
     end
 
     def extended_columns(repo, table, edit_mode: true)

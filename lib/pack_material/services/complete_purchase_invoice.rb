@@ -33,6 +33,7 @@ module PackMaterialApp
 
       costs = @repo.costs_for_delivery(@id)
       products = @repo.products_for_delivery(@id)
+      # invoice_total = products.map{ |item| UtilityFunctions.delimited_number((item[:unit_price] || 0)*(item[:quantity] || 0)) }
 
       request_xml = Nokogiri::XML::Builder.new do |xml|
         xml.purchase_invoice do
@@ -40,11 +41,12 @@ module PackMaterialApp
           xml.supplier_invoice_date supplier_invoice_date.to_s
           xml.internal_invoice_number delivery_number
           xml.supplier_code supplier_code
+          # xml.invoice_total invoice_total
           xml.costs do
             costs.each do |cost|
               xml.cost do
                 xml.cost_code cost[:cost_code]
-                xml.amount cost[:amount]
+                xml.amount cost[:amount] # UtilityFunctions.delimited_number(amt)
               end
             end
           end
@@ -53,8 +55,8 @@ module PackMaterialApp
               xml.line_item do
                 xml.product_number line_item[:product_number]
                 xml.product_description line_item[:product_description]
-                xml.unit_price line_item[:unit_price]
-                xml.quantity line_item[:quantity]
+                xml.unit_price line_item[:unit_price] # UtilityFunctions.delimited_number(amt)
+                xml.quantity line_item[:quantity] # UtilityFunctions.delimited_number(amt)
                 xml.purchase_order_number line_item[:purchase_order_number]
               end
             end

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'faker'
-
 # rubocop:disable Metrics/AbcSize
 
 module PackMaterialApp

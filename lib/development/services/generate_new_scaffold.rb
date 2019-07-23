@@ -13,25 +13,26 @@ module DevelopmentApp
                   :nested_route, :new_from_menu, :text_name
 
       def initialize(params, roda_class_name)
-        @roda_class_name  = roda_class_name
-        @inflector        = Dry::Inflector.new
-        @table            = params[:table]
-        @singlename       = @inflector.singularize(params[:short_name])
-        @text_name        = @singlename.split('_').map { |n| @inflector.camelize(n) }.join(' ')
-        @has_short_name   = params[:short_name] != params[:table]
-        @applet           = params[:applet]
-        @new_applet       = @applet == 'other'
-        @applet           = params[:other] if @applet == 'other'
-        @program_text     = params[:program].strip
-        @program          = @program_text.tr(' ', '_')
-        @table_meta       = TableMeta.new(@table)
-        @label_field      = params[:label_field] || @table_meta.likely_label_field
-        @shared_repo_name = params[:shared_repo_name]
-        @nested_route     = params[:nested_route_parent].empty? ? nil : params[:nested_route_parent]
-        @new_from_menu    = params[:new_from_menu].nil? ? false : params[:new_from_menu]
+        @roda_class_name     = roda_class_name
+        @inflector           = Dry::Inflector.new
+        @table               = params[:table]
+        @singlename          = @inflector.singularize(params[:short_name])
+        @text_name           = @singlename.split('_').map { |n| @inflector.camelize(n) }.join(' ')
+        @has_short_name      = params[:short_name] != params[:table]
+        @applet              = params[:applet]
+        @new_applet          = @applet == 'other'
+        @applet              = params[:other] if @applet == 'other'
+        @program_text        = params[:program].strip
+        @program             = @program_text.tr(' ', '_')
+        @table_meta          = TableMeta.new(@table)
+        @label_field         = params[:label_field] || @table_meta.likely_label_field
+        @shared_repo_name    = params[:shared_repo_name]
+        @shared_factory_name = params[:shared_factory_name]
+        @nested_route        = params[:nested_route_parent].empty? ? nil : params[:nested_route_parent]
+        @new_from_menu       = params[:new_from_menu].nil? ? false : params[:new_from_menu]
       end
 
-      def classnames
+      def classnames # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
         modulename    = "#{@applet.split('_').map(&:capitalize).join}App"
         classname     = @inflector.camelize(@singlename)
         applet_klass  = @inflector.camelize(@applet)
@@ -45,6 +46,7 @@ module DevelopmentApp
           text_name: @inflector.singularize(@table).split('_').map(&:capitalize).join(' '),
           schema: "#{classname}Schema",
           repo: "#{@shared_repo_name.nil? || @shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
+          factory: "#{@shared_factory_name.nil? || @shared_factory_name.empty? ? classname : @inflector.camelize(@shared_factory_name.sub(/Factory$/, ''))}Factory",
           namespaced_repo: "#{modulename}::#{@shared_repo_name.nil? || @shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
           interactor: "#{classname}Interactor",
           namespaced_interactor: "#{modulename}::#{classname}Interactor",
@@ -55,6 +57,11 @@ module DevelopmentApp
       def filenames
         repofile = if @shared_repo_name
                      @inflector.underscore(@shared_repo_name.sub(/Repo$/, ''))
+                   else
+                     @singlename
+                   end
+        factfile = if @shared_factory_name
+                     @inflector.underscore(@shared_factory_name.sub(/Factory$/, ''))
                    else
                      @singlename
                    end
@@ -79,6 +86,7 @@ module DevelopmentApp
             reopen: "lib/#{@applet}/views/#{@singlename}/reopen.rb"
           },
           test: {
+            factory: "lib/#{@applet}/test/factories/#{factfile}_factory.rb",
             interactor: "lib/#{@applet}/test/interactors/test_#{@singlename}_interactor.rb",
             permission: "lib/#{@applet}/test/task_permission_checks/test_#{@singlename}.rb",
             repo: "lib/#{@applet}/test/repositories/test_#{repofile}_repo.rb",
@@ -163,6 +171,19 @@ module DevelopmentApp
         jsonb: '{}'
       }.freeze
 
+      FAKER_DATA_LOOKUP = {
+        integer: 'Faker::Number.number',
+        string: 'Faker::Lorem.word',
+        boolean: 'false',
+        float: '1.0',
+        datetime: "'2010-01-01 12:00'",
+        date: "'2010-01-01'",
+        decimal: 'Faker::Number.decimal',
+        integer_array: '[1, 2, 3]',
+        string_array: "['A', 'B', 'C']",
+        jsonb: '{}'
+      }.freeze
+
       VALIDATION_EXPECT_LOOKUP = {
         integer: '(:int?)',
         string: '(:str?)',
@@ -197,6 +218,7 @@ module DevelopmentApp
       }.freeze
 
       def initialize(table)
+        @table           = table
         repo             = DevelopmentApp::DevelopmentRepo.new
         @columns         = repo.table_columns(table)
         @column_names    = repo.table_col_names(table)
@@ -204,6 +226,7 @@ module DevelopmentApp
         @foreigns        = repo.foreign_keys(table)
         @col_lookup      = Hash[@columns]
         @fk_lookup       = {}
+        @inflector       = Dry::Inflector.new
         @foreigns.each { |hs| hs[:columns].each { |c| @fk_lookup[c] = { key: hs[:key], table: hs[:table] } } }
       end
 
@@ -220,6 +243,24 @@ module DevelopmentApp
         col_name || 'id'
       end
 
+      def string_field # rubocop:disable Metrics/PerceivedComplexity , Metrics/CyclomaticComplexity
+        first_col = nil
+        col_name = nil
+        columns.each do |this_name, attrs|
+          next if this_name == :id
+          next if this_name.to_s.end_with?('_id')
+          next unless attrs[:type] == :string
+
+          if first_col.nil?
+            first_col = this_name
+          else
+            col_name = this_name
+            break
+          end
+        end
+        col_name || first_col || 'id'
+      end
+
       def columns_without(ignore_cols)
         @column_names.reject { |c| ignore_cols.include?(c) }
       end
@@ -228,8 +269,16 @@ module DevelopmentApp
         DRY_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
       end
 
-      def column_dummy_data(column)
-        DUMMY_DATA_LOOKUP[@col_lookup[column][:type]] || "'??? (#{@col_lookup[column][:type]})'"
+      def column_dummy_data(column, faker: false, type: nil)
+        if column == likely_label_field
+          'Faker::Lorem.unique.word'
+        elsif fk_lookup[column]
+          "#{@inflector.singularize(fk_lookup[column][:table])}_id"
+        elsif faker
+          FAKER_DATA_LOOKUP[type] || 'nil'
+        else
+          DUMMY_DATA_LOOKUP[@col_lookup[column][:type]] || "'??? (#{@col_lookup[column][:type]})'"
+        end
       end
 
       def column_dry_validation_type(column)
@@ -255,6 +304,23 @@ module DevelopmentApp
       def approved_column_present?
         @column_names.include?(:approved)
       end
+
+      def dependency_tree
+        out = {}
+        out[@table] = []
+        columns.each do |col, attrs|
+          next if attrs[:primary_key]
+
+          hs = { name: col }.merge(attrs)
+          if fk_lookup[col]
+            hs[:ftbl] = fk_lookup[col][:table]
+            this_meta = TableMeta.new(fk_lookup[col][:table])
+            out = out.merge(this_meta.dependency_tree)
+          end
+          out[@table] << hs
+        end
+        out
+      end
     end
 
     class InteractorMaker < BaseService
@@ -269,18 +335,6 @@ module DevelopmentApp
 
           module #{opts.classnames[:module]}
             class #{opts.classnames[:interactor]} < BaseInteractor
-              def repo
-                @repo ||= #{opts.classnames[:repo]}.new
-              end
-
-              def #{opts.singlename}(id)
-                repo.find_#{opts.singlename}(id)
-              end
-
-              def validate_#{opts.singlename}_params(params)
-                #{opts.classnames[:schema]}.call(params)
-              end
-
               def create_#{opts.singlename}(#{needs_id}params)#{add_parent_to_params}
                 res = validate_#{opts.singlename}_params(params)
                 return validation_failed_response(res) unless res.messages.empty?
@@ -361,6 +415,20 @@ module DevelopmentApp
               def assert_permission!(task, id = nil)
                 res = TaskPermissionCheck::#{opts.classnames[:class]}.call(task, id)
                 raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+              end
+
+              private
+
+              def repo
+                @repo ||= #{opts.classnames[:repo]}.new
+              end
+
+              def #{opts.singlename}(id)
+                repo.find_#{opts.singlename}(id)
+              end
+
+              def validate_#{opts.singlename}_params(params)
+                #{opts.classnames[:schema]}.call(params)
               end
             end
           end
@@ -1108,6 +1176,7 @@ module DevelopmentApp
       def call
         {
           interactor: test_interactor,
+          factory: test_factory,
           permission: test_permission,
           repo: test_repo,
           route: test_route
@@ -1152,20 +1221,90 @@ module DevelopmentApp
       end
 
       def test_interactor
+        ent = columnise.join(",\n        ")
+        req_col = opts.table_meta.likely_label_field || '???'
+        str_col = opts.table_meta.string_field
         <<~RUBY
           # frozen_string_literal: true
 
           require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
           module #{opts.classnames[:module]}
-            class Test#{opts.classnames[:interactor]} < Minitest::Test
+            class Test#{opts.classnames[:interactor]} < MiniTestWithHooks
+              include #{opts.classnames[:factory]}
+
               def test_repo
-                repo = interactor.repo
-                # repo = interactor.send(:repo)
+                repo = interactor.send(:repo)
                 assert repo.is_a?(#{opts.classnames[:namespaced_repo]})
               end
 
+              def test_#{opts.singlename}
+                #{opts.classnames[:namespaced_repo]}.any_instance.stubs(:find_#{opts.singlename}).returns(fake_#{opts.singlename})
+                entity = interactor.send(:#{opts.singlename}, 1)
+                assert entity.is_a?(#{opts.classnames[:class]})
+              end
+
+              def test_create
+                attrs = fake_#{opts.singlename}.to_h.reject { |k, _| k == :id }
+                res = interactor.create_#{opts.singlename}(attrs)
+                assert res.success, "\#{res.message} : \#{res.errors.inspect}"
+                assert_instance_of(#{opts.classnames[:class]}, res.instance)
+                assert res.instance.id.nonzero?
+              end
+
+              def test_create_fail
+                attrs = fake_#{opts.singlename}(#{req_col}: nil).to_h.reject { |k, _| k == :id }
+                res = interactor.create_#{opts.singlename}(attrs)
+                refute res.success, 'should fail validation'
+                assert_equal ['must be filled'], res.errors[:#{req_col}]
+              end
+
+              def test_update
+                id = create_#{opts.singlename}
+                attrs = interactor.send(:repo).find_hash(:#{opts.table}, id).reject { |k, _| k == :id }
+                value = attrs[:#{req_col}]
+                attrs[:#{req_col}] = 'a_change'
+                res = interactor.update_#{opts.singlename}(id, attrs)
+                assert res.success, "\#{res.message} : \#{res.errors.inspect}"
+                assert_instance_of(#{opts.classnames[:class]}, res.instance)
+                assert_equal 'a_change', res.instance.#{req_col}
+                refute_equal value, res.instance.#{req_col}
+              end
+
+              def test_update_fail
+                id = create_#{opts.singlename}
+                attrs = interactor.send(:repo).find_hash(:#{opts.table}, id).reject { |k, _| %i[id #{req_col}].include?(k) }
+                value = attrs[:#{str_col}]
+                attrs[:#{str_col}] = 'a_change'
+                res = interactor.update_#{opts.singlename}(id, attrs)
+                refute res.success, "\#{res.message} : \#{res.errors.inspect}"
+                assert_equal ['is missing'], res.errors[:#{req_col}]
+                after = interactor.send(:repo).find_hash(:#{opts.table}, id)
+                refute_equal 'a_change', after[:#{str_col}]
+                assert_equal value, after[:#{str_col}]
+              end
+
+              def test_delete
+                id = create_#{opts.singlename}
+                assert_count_changed(:#{opts.table}, -1) do
+                  res = interactor.delete_#{opts.singlename}(id)
+                  assert res.success, res.message
+                end
+              end
+
+              # New scaffold form to ask for shared factory..
+
               private
+
+              def #{opts.singlename}_attrs
+                #{foreign_ids}{
+                  #{ent}
+                }
+              end
+
+              def fake_#{opts.singlename}(overrides = {})
+                #{opts.classnames[:class]}.new(#{opts.singlename}_attrs.merge(overrides))
+              end
 
               def interactor
                 @interactor ||= #{opts.classnames[:interactor]}.new(current_user, {}, {}, {})
@@ -1173,6 +1312,72 @@ module DevelopmentApp
             end
           end
         RUBY
+      end
+
+      def foreign_ids
+        lkps = []
+        opts.table_meta.column_names.each do |col|
+          lkps << "#{opts.inflector.singularize(opts.table_meta.fk_lookup[col][:table])}_id = create_#{opts.inflector.singularize(opts.table_meta.fk_lookup[col][:table])}" if opts.table_meta.fk_lookup[col]
+        end
+        show_lkp(lkps)
+      end
+
+      def test_factory
+        dependency_tree = opts.table_meta.dependency_tree
+        code_chunks = make_code_chunks(dependency_tree)
+        <<~RUBY
+          # frozen_string_literal: true
+
+          # ========================================================= #
+          # NB. Scaffolds for test factories should be combined       #
+          #     - Otherwise you'll have methods for the same table in #
+          #       several factories.                                  #
+          #     - Rather create a factory for several related tables  #
+          # ========================================================= #
+
+          module #{opts.classnames[:module]}
+            module #{opts.classnames[:factory]}
+              #{code_chunks.join("\n    ")}
+            end
+          end
+        RUBY
+      end
+
+      def make_code_chunks(dependency_tree)
+        out = []
+        dependency_tree.each do |table, fields|
+          lkps = []
+          fields.each do |field|
+            lkps << "#{opts.inflector.singularize(field[:ftbl])}_id = create_#{opts.inflector.singularize(field[:ftbl])}" if field[:ftbl]
+          end
+          s = <<~RUBY
+            def create_#{opts.inflector.singularize(table)}(opts = {})
+                  #{show_lkp(lkps)}default = {
+                    #{fields.map { |f| render_field(f) }.join(",\n        ")}
+                  }
+                  DB[:#{table}].insert(default.merge(opts))
+                end
+          RUBY
+          out << s
+        end
+        out[-1] = out.last.chomp
+        out
+      end
+
+      def show_lkp(lkps)
+        return '' if lkps.empty?
+
+        "#{lkps.join("\n          ")}\n\n      "
+      end
+
+      def render_field(field)
+        if field[:ftbl]
+          "#{field[:name]}: #{opts.inflector.singularize(field[:ftbl])}_id"
+        elsif field[:name] == :active
+          "#{field[:name]}: true"
+        else
+          "#{field[:name]}: #{opts.table_meta.column_dummy_data(field[:name], faker: true, type: field[:type])}"
+        end
       end
 
       def test_permission
@@ -1186,6 +1391,7 @@ module DevelopmentApp
           module #{opts.classnames[:module]}
             class Test#{opts.classnames[:class]}Permission < Minitest::Test
               include Crossbeams::Responses
+              include #{opts.classnames[:factory]}
 
               def entity(attrs = {})
                 base_attrs = {

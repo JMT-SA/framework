@@ -111,6 +111,8 @@ module Development
             page.section do |section|
               section.caption = '<a name="tests">Tests</a>'
               section.hide_caption = false
+              save_snippet_form(section, results[:paths][:test][:factory], results[:test][:factory])
+              section.add_text(results[:test][:factory], syntax: :ruby)
               save_snippet_form(section, results[:paths][:test][:interactor], results[:test][:interactor])
               section.add_text(results[:test][:interactor], syntax: :ruby)
               save_snippet_form(section, results[:paths][:test][:permission], results[:test][:permission])

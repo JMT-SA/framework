@@ -25,6 +25,7 @@ module Development
                 row.column do |col|
                   col.add_field :short_name
                   col.add_field :shared_repo_name
+                  col.add_field :shared_factory_name
                   col.add_field :nested_route_parent
                   col.add_field :new_from_menu
                 end

@@ -10,6 +10,7 @@ module DevelopmentApp
     required(:label_field, Types::StrippedString).maybe(:str?)
     required(:short_name, Types::StrippedString).filled(:str?)
     required(:shared_repo_name, Types::StrippedString).maybe(:str?)
+    required(:shared_factory_name, Types::StrippedString).maybe(:str?)
     required(:nested_route_parent, :string).maybe(:str?)
     required(:new_from_menu, :bool).maybe(:bool?)
 

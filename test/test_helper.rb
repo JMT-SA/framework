@@ -125,3 +125,11 @@ def test_crud_calls_for(table_name, options = {}) # rubocop:disable Metrics/Cycl
   return if skip.include?(:delete)
   assert_respond_to repo, :"delete_#{name}"
 end
+
+# Expect the number of records in table to increase or decrease by change.
+def assert_count_changed(table, change)
+  cnt = DB[table].count
+  yield
+  new_cnt = DB[table].count
+  assert_equal cnt + change, new_cnt, "Expected count for #{table} to change from #{cnt} to #{cnt + change} but count is now #{new_cnt}"
+end

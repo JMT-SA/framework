@@ -1,11 +1,6 @@
 ---
 :dataminer_definition: mr_deliveries
 :actions:
-- :url: "/pack_material/replenish/mr_deliveries/$:id$/verify"
-  :text: verify
-  :icon: check-square
-  :hide_if_true: verified
-  :prompt: Are you sure you want to verify this delivery?
 - :url: "/pack_material/replenish/mr_deliveries/$:id$/edit"
   :text: edit
   :icon: edit

@@ -68,6 +68,8 @@ module PackMaterialApp
       def verify_check
         return failed_response('Delivery is already verified') if verified?
         return failed_response('Delivery has over supply and it has not been accepted yet') if over_supply? && !over_supply_accepted?
+        return failed_response('Delivery has no items') if no_items?
+        return failed_response('Delivery has incomplete items') if incomplete_items?
 
         all_ok
       end

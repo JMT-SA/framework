@@ -1244,7 +1244,7 @@ module DevelopmentApp
                 assert entity.is_a?(#{opts.classnames[:class]})
               end
 
-              def test_create
+              def test_create_#{opts.singlename}
                 attrs = fake_#{opts.singlename}.to_h.reject { |k, _| k == :id }
                 res = interactor.create_#{opts.singlename}(attrs)
                 assert res.success, "\#{res.message} : \#{res.errors.inspect}"
@@ -1252,14 +1252,14 @@ module DevelopmentApp
                 assert res.instance.id.nonzero?
               end
 
-              def test_create_fail
+              def test_create_#{opts.singlename}_fail
                 attrs = fake_#{opts.singlename}(#{req_col}: nil).to_h.reject { |k, _| k == :id }
                 res = interactor.create_#{opts.singlename}(attrs)
                 refute res.success, 'should fail validation'
                 assert_equal ['must be filled'], res.errors[:#{req_col}]
               end
 
-              def test_update
+              def test_update_#{opts.singlename}
                 id = create_#{opts.singlename}
                 attrs = interactor.send(:repo).find_hash(:#{opts.table}, id).reject { |k, _| k == :id }
                 value = attrs[:#{req_col}]
@@ -1271,7 +1271,7 @@ module DevelopmentApp
                 refute_equal value, res.instance.#{req_col}
               end
 
-              def test_update_fail
+              def test_update_#{opts.singlename}_fail
                 id = create_#{opts.singlename}
                 attrs = interactor.send(:repo).find_hash(:#{opts.table}, id).reject { |k, _| %i[id #{req_col}].include?(k) }
                 value = attrs[:#{str_col}]
@@ -1284,15 +1284,13 @@ module DevelopmentApp
                 assert_equal value, after[:#{str_col}]
               end
 
-              def test_delete
+              def test_delete_#{opts.singlename}
                 id = create_#{opts.singlename}
                 assert_count_changed(:#{opts.table}, -1) do
                   res = interactor.delete_#{opts.singlename}(id)
                   assert res.success, res.message
                 end
               end
-
-              # New scaffold form to ask for shared factory..
 
               private
 

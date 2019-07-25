@@ -141,7 +141,7 @@ namespace :db do
     end
   end
 
-  desc 'Rollback one migrations'
+  desc 'Rollback one migration'
   task rollback: :dotenv_with_override do
     require 'sequel'
     Sequel.extension :migration

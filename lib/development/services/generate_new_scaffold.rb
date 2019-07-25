@@ -305,17 +305,18 @@ module DevelopmentApp
         @column_names.include?(:approved)
       end
 
-      def dependency_tree
+      def dependency_tree(lkp_tables = [])
         out = {}
         out[@table] = []
         columns.each do |col, attrs|
           next if attrs[:primary_key]
 
           hs = { name: col }.merge(attrs)
-          if fk_lookup[col]
+          if fk_lookup[col] && !lkp_tables.include?(fk_lookup[col][:table])
+            lkp_tables << fk_lookup[col][:table]
             hs[:ftbl] = fk_lookup[col][:table]
             this_meta = TableMeta.new(fk_lookup[col][:table])
-            out = out.merge(this_meta.dependency_tree)
+            out = out.merge(this_meta.dependency_tree(lkp_tables))
           end
           out[@table] << hs
         end
@@ -1365,7 +1366,7 @@ module DevelopmentApp
       def show_lkp(lkps)
         return '' if lkps.empty?
 
-        "#{lkps.join("\n          ")}\n\n      "
+        "#{lkps.join("\n      ")}\n\n      "
       end
 
       def render_field(field)

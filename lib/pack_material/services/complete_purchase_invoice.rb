@@ -38,7 +38,7 @@ module PackMaterialApp
       supplier_invoice_number = @delivery.supplier_invoice_ref_number
       supplier_invoice_date = @delivery.supplier_invoice_date.to_s
       supplier_code = @repo.get_supplier_erp_number(@id)
-      po_account_code = @replenish_repo.po_account_code_for_delivery(@id)
+      po_account_code = @repo.po_account_code_for_delivery(@id)
 
       costs = @repo.costs_for_delivery(@id)
       products = @repo.products_for_delivery(@id)

@@ -68,10 +68,18 @@ class AppConst
   # The key matches a key in BARCODE_PRINT_RULES. (e.g. :location)
   # The hash for that key is keyed by the value of the BARCODE_SCAN_RULES :field. (e.g. :id)
   # The rules for that field are: the table to read, the field to match the scanned value and the field to display in the form.
+  # If a join is required, specify join: table_name and on: Hash of field on source table: field on target table.
   BARCODE_LOOKUP_RULES = {
     location: {
       id: { table: :locations, field: :id, show_field: :location_long_code },
       location_short_code: { table: :locations, field: :location_short_code, show_field: :location_long_code }
+    },
+    sku: {
+      sku_number: { table: :mr_skus,
+                    field: :sku_number,
+                    show_field: :product_variant_code,
+                    join: :material_resource_product_variants,
+                    on: { id: :mr_product_variant_id } }
     }
   }.freeze
 

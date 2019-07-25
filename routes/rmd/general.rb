@@ -18,7 +18,11 @@ class Framework < Roda
       if rule.nil?
         { showField: 'There is no lookup' }.to_json
       else
-        show_field = DB[rule[:table]].where(rule[:field] => scan_value).get(rule[:show_field])
+        show_field = if rule[:join]
+                       DB[rule[:table]].join(rule[:join], rule[:on]).where(rule[:field] => scan_value).get(rule[:show_field])
+                     else
+                       DB[rule[:table]].where(rule[:field] => scan_value).get(rule[:show_field])
+                     end
         { showField: show_field || 'Not found' }.to_json
       end
     end

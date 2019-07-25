@@ -24,6 +24,15 @@ module PackMaterialApp
         .all
     end
 
+    def po_account_code_for_delivery(delivery_id)
+      DB[:mr_delivery_items]
+        .join(:mr_purchase_order_items, id: :mr_purchase_order_item_id)
+        .join(:mr_purchase_orders, id: :mr_purchase_order_id)
+        .where(mr_delivery_id: delivery_id)
+        .select(:purchase_account_code)
+        .single_value
+    end
+
     def purchase_invoice_cost(cost_id)
       PackMaterialApp::ReplenishRepo.new.find_mr_purchase_invoice_cost(cost_id)
     end

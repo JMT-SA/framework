@@ -38,6 +38,7 @@ module PackMaterialApp
       supplier_invoice_number = @delivery.supplier_invoice_ref_number
       supplier_invoice_date = @delivery.supplier_invoice_date.to_s
       supplier_code = @repo.get_supplier_erp_number(@id)
+      po_account_code = @replenish_repo.po_account_code_for_delivery(@id)
 
       costs = @repo.costs_for_delivery(@id)
       products = @repo.products_for_delivery(@id)
@@ -45,11 +46,12 @@ module PackMaterialApp
       invoice_total = products.sum { |item| (item[:unit_price] || 0) * (item[:quantity] || 0) }
 
       request_xml = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
-        xml.purchase_invoice do
+        xml.purchase_invoice do # rubocop:disable Metrics/BlockLength
           xml.supplier_invoice_number supplier_invoice_number
           xml.supplier_invoice_date supplier_invoice_date.to_s
           xml.internal_invoice_number delivery_number
           xml.supplier_code supplier_code
+          xml.account_code po_account_code
           xml.invoice_total UtilityFunctions.delimited_number(invoice_total, delimiter: '')
           xml.costs do
             costs.each do |cost|

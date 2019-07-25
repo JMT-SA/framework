@@ -18,6 +18,7 @@ module PackMaterial
               form.remote!
               form.method :update
               form.add_field :cost_type_code
+              form.add_field :account_code
             end
           end
 

@@ -1,6 +1,7 @@
 ---
 :caption: Cost Types
-:sql: SELECT "mr_cost_types"."id", "mr_cost_types"."cost_type_code" FROM "mr_cost_types"
+:sql: "SELECT \"mr_cost_types\".\"id\",\r\n\"mr_cost_types\".\"cost_type_code\",\r\n\"mr_cost_types\".\"account_code\"\r\nFROM
+  \"mr_cost_types\"\r\nORDER BY \"mr_cost_types\".\"cost_type_code\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -27,11 +28,27 @@
     :caption: Cost Type Code
     :namespaced_name: mr_cost_types.cost_type_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  account_code:
+    :name: account_code
+    :sequence_no: 3
+    :caption: Account code
+    :namespaced_name: mr_cost_types.account_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

@@ -158,7 +158,7 @@
     :group_max: false
   quantity_on_note:
     :name: quantity_on_note
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Qty on note
     :namespaced_name: mr_delivery_items.quantity_on_note
     :data_type: :number
@@ -174,8 +174,8 @@
     :group_max: false
   quantity_over_supplied:
     :name: quantity_over_supplied
-    :sequence_no: 12
-    :caption: Over Supplied
+    :sequence_no: 13
+    :caption: Over supply
     :namespaced_name: mr_delivery_items.quantity_over_supplied
     :data_type: :number
     :width: 
@@ -190,8 +190,8 @@
     :group_max: false
   quantity_under_supplied:
     :name: quantity_under_supplied
-    :sequence_no: 13
-    :caption: Under Supplied
+    :sequence_no: 14
+    :caption: Under supply
     :namespaced_name: mr_delivery_items.quantity_under_supplied
     :data_type: :number
     :width: 
@@ -206,7 +206,7 @@
     :group_max: false
   quantity_received:
     :name: quantity_received
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Received
     :namespaced_name: mr_delivery_items.quantity_received
     :data_type: :number
@@ -222,7 +222,7 @@
     :group_max: false
   mr_purchase_order_item_id:
     :name: mr_purchase_order_item_id
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Mr purchase order item
     :namespaced_name: mr_delivery_items.mr_purchase_order_item_id
     :data_type: :integer
@@ -254,7 +254,7 @@
     :group_max: false
   supplier:
     :name: supplier
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Supplier
     :namespaced_name: 
     :data_type: :string
@@ -270,7 +270,7 @@
     :group_max: false
   quantity_required:
     :name: quantity_required
-    :sequence_no: 16
+    :sequence_no: 10
     :caption: Qty required
     :namespaced_name: mr_purchase_order_items.quantity_required
     :data_type: :number

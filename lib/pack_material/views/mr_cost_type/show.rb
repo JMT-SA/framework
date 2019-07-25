@@ -14,6 +14,7 @@ module PackMaterial
               # form.caption 'Cost Type'
               form.view_only!
               form.add_field :cost_type_code
+              form.add_field :account_code
             end
           end
 

@@ -17,18 +17,11 @@ module PackMaterialApp
     end
 
     def costs_for_delivery(delivery_id)
-      purchase_invoice_cost_ids = DB[:mr_purchase_invoice_costs].where(mr_delivery_id: delivery_id).map(:id)
-
-      costs = []
-      purchase_invoice_cost_ids.each do |pi_cost_id|
-        pi_cost = purchase_invoice_cost(pi_cost_id)
-        cost = {
-          cost_code: pi_cost.cost_type,
-          amount: pi_cost.amount
-        }
-        costs << cost
-      end
-      costs
+      DB[:mr_purchase_invoice_costs]
+        .join(:mr_cost_types, id: :mr_cost_type_id)
+        .where(mr_delivery_id: delivery_id)
+        .select(:cost_type_code, :amount, :account_code)
+        .all
     end
 
     def purchase_invoice_cost(cost_id)

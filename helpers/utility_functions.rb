@@ -72,7 +72,7 @@ module UtilityFunctions
   # @param value [numeric] the number to be formatted.
   # @param symbol [string] the symbol (R/$ etc) to place on the left. Default is blank.
   # @param delimiter [string] the delimiter between groups of 3. Default is comma.
-  # @param no_deciamls [integer] the number of decimals to display. Default is 2.
+  # @param no_decimals [integer] the number of decimals to display. Default is 2.
   # @return [String] the number with commas after every three digits.
   def delimited_number(value, symbol: '', delimiter: ',', no_decimals: 2)
     val      = value.nil? ? 0.0 : value

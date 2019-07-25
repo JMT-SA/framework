@@ -17,6 +17,7 @@ module PackMaterial
               form.action '/pack_material/replenish/mr_cost_types'
               form.remote! if remote
               form.add_field :cost_type_code
+              form.add_field :account_code
             end
           end
 

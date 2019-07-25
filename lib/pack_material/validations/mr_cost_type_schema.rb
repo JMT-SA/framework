@@ -5,6 +5,7 @@ module PackMaterialApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:cost_type_code, Types::StrippedString).maybe(:str?)
+    required(:cost_type_code, Types::StrippedString).filled(:str?)
+    required(:account_code, Types::StrippedString).filled(:str?)
   end
 end

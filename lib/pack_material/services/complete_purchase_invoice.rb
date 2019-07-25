@@ -2,13 +2,19 @@
 
 module PackMaterialApp
   class CompletePurchaseInvoice < BaseService
-    # @param [Integer] delivery_id
-    def initialize(user_name, delivery_id, block = nil)
+    # Complete a purchase invoice and send XML representation to accounting system.
+    # - use the `just_show_xml` flag to check the XML output without modifying the db.
+    #
+    # @param user_name [string] the user who initiated this task.
+    # @param delivery_id [integer] the delivery's id.
+    # @param just_show_xml [bool] set to true to just return XML from the call without updating the db.
+    def initialize(user_name, delivery_id, just_show_xml = false, block = nil)
       @block = block
       @repo           = PurchaseInvoiceRepo.new
       @replenish_repo = ReplenishRepo.new
       @user_name      = user_name
       @id             = delivery_id
+      @just_show_xml  = just_show_xml
       @delivery       = @repo.find_mr_delivery(@id)
     end
 
@@ -16,6 +22,8 @@ module PackMaterialApp
       return failed_response('Delivery does not exist') unless @repo.exists?(:mr_deliveries, id: @id)
 
       request_xml = build_xml
+      return request_xml if @just_show_xml
+
       res = make_http_call(request_xml)
       formatted_res = format_response(res.instance.body)
 
@@ -33,20 +41,22 @@ module PackMaterialApp
 
       costs = @repo.costs_for_delivery(@id)
       products = @repo.products_for_delivery(@id)
-      # invoice_total = products.map{ |item| UtilityFunctions.delimited_number((item[:unit_price] || 0)*(item[:quantity] || 0)) }
+      invoice_total = products.map { |item| UtilityFunctions.delimited_number((item[:unit_price] || 0) * (item[:quantity] || 0), delimiter: '') }
+      invoice_total = products.sum { |item| (item[:unit_price] || 0) * (item[:quantity] || 0) }
 
-      request_xml = Nokogiri::XML::Builder.new do |xml|
+      request_xml = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
         xml.purchase_invoice do
           xml.supplier_invoice_number supplier_invoice_number
           xml.supplier_invoice_date supplier_invoice_date.to_s
           xml.internal_invoice_number delivery_number
           xml.supplier_code supplier_code
-          # xml.invoice_total invoice_total
+          xml.invoice_total UtilityFunctions.delimited_number(invoice_total, delimiter: '')
           xml.costs do
             costs.each do |cost|
               xml.cost do
-                xml.cost_code cost[:cost_code]
-                xml.amount cost[:amount] # UtilityFunctions.delimited_number(amt)
+                xml.cost_code cost[:cost_type_code]
+                xml.account_code cost[:account_code]
+                xml.amount UtilityFunctions.delimited_number(cost[:amount], delimiter: '')
               end
             end
           end
@@ -55,8 +65,8 @@ module PackMaterialApp
               xml.line_item do
                 xml.product_number line_item[:product_number]
                 xml.product_description line_item[:product_description]
-                xml.unit_price line_item[:unit_price] # UtilityFunctions.delimited_number(amt)
-                xml.quantity line_item[:quantity] # UtilityFunctions.delimited_number(amt)
+                xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '')
+                xml.quantity UtilityFunctions.delimited_number(line_item[:quantity], delimiter: '')
                 xml.purchase_order_number line_item[:purchase_order_number]
               end
             end

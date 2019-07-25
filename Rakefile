@@ -141,6 +141,29 @@ namespace :db do
     end
   end
 
+  desc 'Rollback one migrations'
+  task rollback: :dotenv_with_override do
+    require 'sequel'
+    Sequel.extension :migration
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              else
+                ENV.fetch('DATABASE_URL')
+              end
+    db = Sequel.connect(db_name)
+    migrations = if db.tables.include?(:schema_migrations)
+                   db[:schema_migrations].reverse(:filename).first(2).map { |r| r[:filename] }
+                 else
+                   'No migrations have been run'
+                 end
+    if migrations.is_a? String
+      puts "Unable to rollback - #{migrations}"
+    else
+      puts "Migrating to version #{migrations.last}"
+      Sequel::Migrator.run(db, 'db/migrations', target: migrations.last.to_i)
+    end
+  end
+
   desc 'Create a new, timestamped migration file - use NAME env var for file name suffix.'
   task :new_migration do
     nm = ENV['NAME']

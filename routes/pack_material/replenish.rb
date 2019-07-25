@@ -729,7 +729,7 @@ class Framework < Roda
           res = interactor.update_mr_cost_type(id, params[:mr_cost_type])
           if res.success
             update_grid_row(id,
-                            changes: { cost_type_code: res.instance[:cost_type_code] },
+                            changes: { cost_type_code: res.instance[:cost_type_code], account_code: res.instance[:account_code] },
                             notice: res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrCostType::Edit.call(id, form_values: params[:mr_cost_type], form_errors: res.errors) }
@@ -758,6 +758,7 @@ class Framework < Roda
           row_keys = %i[
             id
             cost_type_code
+            account_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

@@ -116,19 +116,19 @@ module PackMaterial
                                     css_class: 'mb1')
                 section.add_grid('del_items',
                                  "/list/mr_delivery_items/grid?key=standard&delivery_id=#{id}",
-                                 height: 8,
+                                 height: 16,
                                  caption: 'Delivery Line Items')
               end
               if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed] || rules[:over_supply_accepted]
                 section.add_grid('del_items',
                                  "/list/mr_delivery_items_edit_unit_prices/grid?key=standard&delivery_id=#{id}",
-                                 height: 8,
+                                 height: 16,
                                  caption: 'Delivery Line Items')
               end
               if rules[:invoice_completed]
                 section.add_grid('del_items',
                                  "/list/mr_delivery_items_show/grid?key=standard&delivery_id=#{id}",
-                                 height: 8,
+                                 height: 16,
                                  caption: 'Delivery Line Items')
               end
             end

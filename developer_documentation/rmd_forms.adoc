@@ -100,6 +100,11 @@ view(inline: form.render, layout: :layout_rmd)
 |Boolean
 |`false`.
 
+|options - :reset_button
+|Should the form include a reset button to clear inputs to their original values.
+|Boolean
+|`true`.
+
 |===
 
 === Method: add_field

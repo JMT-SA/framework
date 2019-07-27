@@ -26,6 +26,7 @@ module Crossbeams
       @caption = options[:caption]
       @action = options.fetch(:action)
       @button_caption = options[:button_caption]
+      @reset_button = options.fetch(:reset_button, true)
       @fields = []
       @csrf_tag = nil
     end
@@ -121,7 +122,7 @@ module Crossbeams
     def lookup_display(name, options)
       return '' unless options[:lookup]
 
-      %(<div id ="#{form_name}_#{name}_scan_lookup" class="b gray"></div>)
+      %(<div id ="#{form_name}_#{name}_scan_lookup" class="b gray" data-lookup-result="Y"></div>)
     end
 
     def submit_form(options)
@@ -215,8 +216,16 @@ module Crossbeams
     def submit_section
       <<~HTML
         <p>
-          <input type="submit" value="#{button_caption}" data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green" data-rmd-btn="Y">
+          <input type="submit" value="#{button_caption}" data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green" data-rmd-btn="Y"> #{reset_section}
         </p>
+      HTML
+    end
+
+    def reset_section
+      return '' unless @reset_button
+
+      <<~HTML
+        <input type="reset" class="dim br2 pa3 bn white bg-blue ml4" data-reset-rmd-form="Y">
       HTML
     end
 

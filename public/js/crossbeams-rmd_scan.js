@@ -168,7 +168,14 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
       if (event.target.dataset && event.target.dataset.disableWith) {
         preventMultipleSubmits(event.target);
       }
+      // On reset button clicked, clear all lookup results
+      if (event.target.dataset && event.target.dataset.resetRmdForm) {
+        event.target.form.querySelectorAll('[data-lookup-result]').forEach((node) => {
+          node.innerHTML = '';
+        });
+      }
     });
+
     if (cameraScan) {
       cameraScan.addEventListener('click', () => {
         webSocket.send('Type=key248_all');

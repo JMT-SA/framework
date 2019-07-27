@@ -18,6 +18,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                                        scan_with_camera: @rmd_scan_with_camera,
                                        caption: 'Delivery putaway',
                                        action: '/rmd/deliveries/putaways',
+                                       reset_button: true,
                                        button_caption: 'Putaway')
         form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true)
@@ -75,8 +76,8 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                                        action: '/rmd/stock_adjustments/adjust_item',
                                        button_caption: 'Adjust Item')
         form.add_field(:stock_adjustment_number, 'Stock Adjustment', scan: 'key248_all', scan_type: :stock_adjustment)
-        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
-        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location)
+        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true)
+        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, lookup: true)
         form.add_field(:quantity, 'Actual Quantity', data_type: 'number')
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
@@ -129,7 +130,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                                               action: '/rmd/printing/sku_label',
                                               button_caption: 'Print')
         form.add_select(:printer, 'Printer', items: printers, value: printers.first, required: true, prompt: true)
-        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
+        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true)
         form.add_field(:no_of_prints, 'No of Prints', data_type: 'number')
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)

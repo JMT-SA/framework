@@ -385,3 +385,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: mr_deliveries.invoice_completed
+  :caption: Invoice completed
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

@@ -225,7 +225,7 @@ module Crossbeams
       return '' unless @reset_button
 
       <<~HTML
-        <input type="reset" class="dim br2 pa3 bn white bg-blue ml4" data-reset-rmd-form="Y">
+        <input type="reset" class="dim br2 pa3 bn white bg-silver ml4" data-reset-rmd-form="Y">
       HTML
     end
 

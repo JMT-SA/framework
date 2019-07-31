@@ -28,3 +28,12 @@
   :text: New Delivery
   :style: :button
   :behaviour: :popup
+:conditions:
+  :incomplete:
+    - :col: mr_deliveries.invoice_completed
+      :op: =
+      :val: false
+  :completed:
+    - :col: mr_deliveries.invoice_completed
+      :op: =
+      :val: true

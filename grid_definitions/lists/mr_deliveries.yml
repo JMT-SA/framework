@@ -28,6 +28,8 @@
   :text: New Delivery
   :style: :button
   :behaviour: :popup
+  :hide_for_key:
+    - completed
 :conditions:
   :incomplete:
     - :col: mr_deliveries.invoice_completed

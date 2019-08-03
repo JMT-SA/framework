@@ -122,7 +122,10 @@ module Crossbeams
     def lookup_display(name, options)
       return '' unless options[:lookup]
 
-      %(<div id ="#{form_name}_#{name}_scan_lookup" class="b gray" data-lookup-result="Y"></div>)
+      <<~HTML
+        <div id ="#{form_name}_#{name}_scan_lookup" class="b gray" data-lookup-result="Y">#{form_state.fetch(:lookup_values, {})[name] || '&nbsp;'}</div>
+        <input id ="#{form_name}_#{name}_scan_lookup_hidden" type="hidden" data-lookup-hidden="Y" name="lookup_values[#{name}]" value="#{form_state.fetch(:lookup_values, {})[name]}">
+      HTML
     end
 
     def submit_form(options)

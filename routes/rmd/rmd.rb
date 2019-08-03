@@ -46,6 +46,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                          delivery_number: these_params[:delivery_number],
                          delivery_number_scan_field: these_params[:delivery_number_scan_field],
                          quantity: these_params[:quantity])
+          payload.merge!(lookup_values: params[:lookup_values])
         end
 
         store_locally(:delivery_putaway, payload)
@@ -102,6 +103,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                          stock_adjustment_number: these_params[:stock_adjustment_number],
                          stock_adjustment_number_scan_field: these_params[:stock_adjustment_number_scan_field],
                          quantity: these_params[:quantity])
+          payload.merge!(lookup_values: params[:lookup_values])
         end
 
         store_locally(:stock_item_adjustment, payload)
@@ -150,6 +152,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                          sku_number: these_params[:sku_number],
                          sku_number_scan_field: these_params[:sku_number_scan_field],
                          no_of_prints: these_params[:no_of_prints])
+          payload.merge!(lookup_values: params[:lookup_values])
         end
 
         store_locally(:print_rmd_sku_label_options, payload)

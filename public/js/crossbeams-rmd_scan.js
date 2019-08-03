@@ -78,6 +78,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   const lookupScanField = (element, scanPack) => {
     const url = `/rmd/utilities/lookup/${scanPack.scanType}/${scanPack.scanField}/${element.value}`;
     const label = document.getElementById(`${element.id}_scan_lookup`);
+    const hiddenVal = document.getElementById(`${element.id}_scan_lookup_hidden`);
     console.log('lbl', label);
     if (label === null) return null;
 
@@ -111,6 +112,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         }
       } else {
         label.innerHTML = data.showField;
+        hiddenVal.value = data.showField;
       }
     }).catch((data) => {
       console.info('==ERROR==', data); // eslint-disable-line no-console
@@ -171,7 +173,10 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
       // On reset button clicked, clear all lookup results
       if (event.target.dataset && event.target.dataset.resetRmdForm) {
         event.target.form.querySelectorAll('[data-lookup-result]').forEach((node) => {
-          node.innerHTML = '';
+          node.innerHTML = '&nbsp;';
+        });
+        event.target.form.querySelectorAll('[data-lookup-hidden]').forEach((node) => {
+          node.value = '';
         });
       }
     });

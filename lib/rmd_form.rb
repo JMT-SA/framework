@@ -12,18 +12,22 @@ module Crossbeams
     # @param form_state [Hash] state of form (errors, current values)
     # @param options (Hash) options for the form
     # @option options [String] :form_name The name of the form.
+    # @option options [String] :caption The caption for the form.
     # @option options [String] :progress Any progress to display (scanned 1 of 20 etc.)
     # @option options [String] :notes Any Notes to display on the form.
     # @option options [Boolean] :scan_with_camera Should the RMD be able to use the camera to scan. Default is false.
     # @option options [String] :action The URL for the POST action.
     # @option options [String] :button_caption The submit button's caption.
-    def initialize(form_state, options)
+    # @option options [Boolean] :reset_button Should the RMD form include a button to reset form values? Default is true.
+    # @option options [Array] :step_and_total The step number and total no of steps. Optional - only prints if the caption is given.
+    def initialize(form_state, options) # rubocop:disable Metrics/AbcSize
       @form_state = form_state
       @form_name = options.fetch(:form_name)
       @progress = options[:progress]
       @notes = options[:notes]
       @scan_with_camera = options[:scan_with_camera] == true
       @caption = options[:caption]
+      @step_number, @step_count = Array(options[:step_and_total])
       @action = options.fetch(:action)
       @button_caption = options[:button_caption]
       @reset_button = options.fetch(:reset_button, true)
@@ -83,6 +87,25 @@ module Crossbeams
       HTML
     end
 
+    # Add a label field (display-only) to the form.
+    # The field will render as a grey box.
+    # An optional accompanying hidden input can be rendered:
+    #    with name = FORM_NAME[FIELD_NAME]
+    #    and id = FORM_NAME_FIELD_NAME.
+    #
+    # @param name [string] the name of the form field.
+    # @param label [string] the caption for the label to appear beside the input.
+    # @param value [string] the value to be displayed in the label.
+    # @param hidden_value [string] the value of the hidden field. If nil, no hidden field will be generated.
+    # @return [void]
+    def add_label(name, label, value, hidden_value = nil)
+      @fields << <<~HTML
+        <tr><th align="left">#{label}</th>
+        <td><div class="pa2 bg-moon-gray br2">#{value}</div>#{hidden_label(name, hidden_value)}
+        </td></tr>
+      HTML
+    end
+
     # Render the form.
     #
     # @return [String] HTML for the form.
@@ -90,7 +113,7 @@ module Crossbeams
       raise ArgumentError, 'RMDForm: no CSRF tag provided' if csrf_tag.nil?
 
       <<~HTML
-        <h2>#{caption}</h2>
+        <h2>#{caption}#{page_number_and_page_count}</h2>
         <form action="#{action}" method="POST">
           #{error_section}
           #{notes_section}
@@ -113,6 +136,12 @@ module Crossbeams
 
     private
 
+    def page_number_and_page_count
+      return '' if @page_count.nil?
+
+      %(<span class="mid-gray"> &ndash; (step #{@step_number} of #{@step_count})</span>)
+    end
+
     def lookup_data(options)
       return '' unless options[:lookup]
 
@@ -125,6 +154,14 @@ module Crossbeams
       <<~HTML
         <div id ="#{form_name}_#{name}_scan_lookup" class="b gray" data-lookup-result="Y">#{form_state.fetch(:lookup_values, {})[name] || '&nbsp;'}</div>
         <input id ="#{form_name}_#{name}_scan_lookup_hidden" type="hidden" data-lookup-hidden="Y" name="lookup_values[#{name}]" value="#{form_state.fetch(:lookup_values, {})[name]}">
+      HTML
+    end
+
+    def hidden_label(name, value)
+      return '' if value.nil?
+
+      <<~HTML
+        <input id ="#{form_name}_#{name}" type="hidden" name="#{form_name}[#{name}]" value="#{value}">
       HTML
     end
 

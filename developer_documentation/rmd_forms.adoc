@@ -24,6 +24,7 @@ form = Crossbeams::RMDForm.new(details,
                                caption: 'Delivery putaway',
                                action: '/rmd/deliveries/putaways',
                                button_caption: 'Putaway')
+form.add_label(:business_process, 'Business process', 'DELIVERY')
 form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
 form.add_select(:choice, 'Choose', items: items, value: 'my', required: true, prompt: true)
 form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
@@ -67,7 +68,13 @@ view(inline: form.render, layout: :layout_rmd)
 
 |form_state
 |The state of the form
-|Hash. Include current value of fields (and hidden `…_scan_field` values) when applicable. Can include `:errors` Hash and `:error_message` string.
+a|Hash.
+
+Include current value of fields (and hidden `…_scan_field` values) when applicable.
+
+Can include `:errors` Hash and `:error_message` string.
+
+Can also include `lookup_values` - a Hash of fieldname/values for setting the initial value of alookup (used when redisplaying a form with validation errors).
 |None. Required.
 
 |options - :form_name
@@ -83,6 +90,13 @@ view(inline: form.render, layout: :layout_rmd)
 |options - :progress
 |Text to display progress with an operation.
 |String
+|None.
+
+|options - :step_and_total
+|Current step number and total number of steps. Displays with the caption if one has been provided.
+a|Array (2D -- step, total)
+
+e.g. `[1, 2]` is step one of two.
 |None.
 
 |options - :notes
@@ -108,6 +122,19 @@ view(inline: form.render, layout: :layout_rmd)
 |===
 
 === Method: add_field
+
+[source,ruby]
+----
+form.add_field(:from_location, 'From location', scan: 'key248_all',
+               scan_type: :location, lookup: true)
+
+# Returns parameters (if form name was "location"):
+# => {
+# =>   location: { from_location: 'abc',
+# =>               from_location_scan_field: 'id' },
+# =>   lookup_values: { from_location: 'abc' }
+# => }
+----
 
 |===
 |attribute |description |possible values |default
@@ -162,6 +189,17 @@ a|String:
 
 === Method: add_select
 
+[source,ruby]
+----
+form.add_select(:business_process, 'Business process', items: processes,
+                value: processes.first, required: true, prompt: true)
+
+# Returns parameters (if form name was "location"):
+# => {
+# =>   location: { business_process: 'abc' }
+# => }
+----
+
 |===
 |attribute |description |possible values |default
 
@@ -193,6 +231,47 @@ a|String:
 |options - :prompt
 |If `true`, display a generic prompt. If a string, display the string as the prompt.
 |String or Booelan
+|None.
+
+|===
+
+=== Method: add_label
+
+[source,ruby]
+----
+form.add_label(:from_location, 'From location', 'CS1_BY1_RCB2')
+
+# Returns no parameters (no hidden_value provided).
+
+form.add_label(:from_location, 'From location', 'CS1_BY1_RCB2', 37)
+
+# Returns parameters (if form name was "location"):
+# => {
+# =>   location: { from_location: '37' }
+# => }
+----
+
+|===
+|attribute |description |possible values |default
+
+|name
+|The name of the field
+|String
+|None. Required.
+
+|label
+|The label for the field
+|String
+|None. Required.
+
+|value
+|The value to display as a label field
+|String
+|None. Required.
+
+|hidden_value
+|The value to set for a hidden input which will return as a parameter keyed by the field name.
+|String
 |None.
 
 |===

@@ -22,6 +22,9 @@ form = Crossbeams::RMDForm.new(details,
                                notes: 'Please scan the Delivery and the SKU numbers.',
                                scan_with_camera: @rmd_scan_with_camera,
                                caption: 'Delivery putaway',
+                               links: [{ caption: 'Cancel', url: '/back', prompt: 'Ok?' },
+                               reset_button: true,
+                               step_and_total: [1, 2],
                                action: '/rmd/deliveries/putaways',
                                button_caption: 'Putaway')
 form.add_label(:business_process, 'Business process', 'DELIVERY')
@@ -97,6 +100,17 @@ Can also include `lookup_values` - a Hash of fieldname/values for setting the in
 a|Array (2D -- step, total)
 
 e.g. `[1, 2]` is step one of two.
+|None.
+
+|options - :links
+a|Links to display as buttons.
+
+Each hash has:
+
+* `:caption` the button caption.
+* `:url` the url to call.
+* `:prompt` -- optional - if present, the user will need to confirm the click.
+|Array of Hashes
 |None.
 
 |options - :notes

@@ -20,6 +20,7 @@ module Crossbeams
     # @option options [String] :button_caption The submit button's caption.
     # @option options [Boolean] :reset_button Should the RMD form include a button to reset form values? Default is true.
     # @option options [Array] :step_and_total The step number and total no of steps. Optional - only prints if the caption is given.
+    # @option options [Array] :links An array of hashes with { :caption, :url, :prompt (optional) } which provide links to navigate away.
     def initialize(form_state, options) # rubocop:disable Metrics/AbcSize
       @form_state = form_state
       @form_name = options.fetch(:form_name)
@@ -28,6 +29,7 @@ module Crossbeams
       @scan_with_camera = options[:scan_with_camera] == true
       @caption = options[:caption]
       @step_number, @step_count = Array(options[:step_and_total])
+      @links = options[:links] || []
       @action = options.fetch(:action)
       @button_caption = options[:button_caption]
       @reset_button = options.fetch(:reset_button, true)
@@ -256,7 +258,7 @@ module Crossbeams
     def submit_section
       <<~HTML
         <p>
-          <input type="submit" value="#{button_caption}" data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green" data-rmd-btn="Y"> #{reset_section}
+          <input type="submit" value="#{button_caption}" data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"> #{links_section} #{reset_section}
         </p>
       HTML
     end
@@ -267,6 +269,22 @@ module Crossbeams
       <<~HTML
         <input type="reset" class="dim br2 pa3 bn white bg-silver ml4" data-reset-rmd-form="Y">
       HTML
+    end
+
+    def links_section
+      @links.map do |link|
+        caption = link[:caption]
+        url = link[:url]
+        if link[:prompt]
+          <<~HTML
+            <a href="#{url}" class="dim link br2 pa3 bn white bg-dark-blue ml4" data-prompt="#{link[:prompt]}">#{caption}</a>
+          HTML
+        else
+          <<~HTML
+            <a href="#{url}" class="dim link br2 pa3 bn white bg-dark-blue ml4">#{caption}</a>
+          HTML
+        end
+      end.join
     end
 
     def camera_section

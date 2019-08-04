@@ -179,6 +179,17 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
           node.value = '';
         });
       }
+      if (event.target.dataset && event.target.dataset.prompt) {
+        event.stopPropagation();
+        event.preventDefault();
+        swal({
+          title: '',
+          text: event.target.dataset.prompt,
+          type: 'warning',
+          showCancelButton: true }).then(() => {
+            window.location = event.target.href;
+          }, null).catch(swal.noop);
+      }
     });
 
     if (cameraScan) {

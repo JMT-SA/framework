@@ -80,10 +80,11 @@ module Crossbeams
       required = options[:required].nil? || options[:required] ? ' required' : ''
       items = options[:items] || []
       autofocus = autofocus_for_field(name)
+      value = form_state[name] || options[:value]
       @fields << <<~HTML
         <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
         <td><select class="pa2#{field_error_class}" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{required}#{autofocus}>
-          #{make_prompt(options[:prompt])}#{build_options(items, options[:value])}
+          #{make_prompt(options[:prompt])}#{build_options(items, value)}
         </select>
         </td></tr>
       HTML
@@ -150,16 +151,17 @@ module Crossbeams
       ' data-lookup="Y"'
     end
 
-    def lookup_display(name, options)
+    def lookup_display(name, options) # rubocop:disable Metrics/AbcSize
       return '' unless options[:lookup]
 
       <<~HTML
-        <div id ="#{form_name}_#{name}_scan_lookup" class="b gray" data-lookup-result="Y">#{form_state.fetch(:lookup_values, {})[name] || '&nbsp;'}</div>
-        <input id ="#{form_name}_#{name}_scan_lookup_hidden" type="hidden" data-lookup-hidden="Y" name="lookup_values[#{name}]" value="#{form_state.fetch(:lookup_values, {})[name]}">
+        <div id ="#{form_name}_#{name}_scan_lookup" class="b gray" data-lookup-result="Y" data-reset-value="#{form_state.fetch(:lookup_values, {})[name] || '&nbsp;'}">#{form_state.fetch(:lookup_values, {})[name] || '&nbsp;'}</div>
+        <input id ="#{form_name}_#{name}_scan_lookup_hidden" type="hidden" data-lookup-hidden="Y" data-reset-value="#{form_state.fetch(:lookup_values, {})[name] || '&nbsp;'}" name="lookup_values[#{name}]" value="#{form_state.fetch(:lookup_values, {})[name]}">
       HTML
     end
 
-    def hidden_label(name, value)
+    def hidden_label(name, hidden_value)
+      value = hidden_value || form_state[name]
       return '' if value.nil?
 
       <<~HTML

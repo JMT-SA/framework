@@ -235,7 +235,7 @@ form.add_select(:business_process, 'Business process', items: processes,
 |options - :value
 |The current (selected) value.
 |String
-|None.
+|None. If the form's `form_state` has a value for this field, it will be used.
 
 |options - :items
 |The items in the dropdown. Use a Hash to include option groups. Otherwise the array can be one or two dimensional (`[[display, value], [display, value]]`)
@@ -286,6 +286,6 @@ form.add_label(:from_location, 'From location', 'CS1_BY1_RCB2', 37)
 |hidden_value
 |The value to set for a hidden input which will return as a parameter keyed by the field name.
 |String
-|None.
+|None. If the form's `form_state` has a value for this field, it will be used.
 
 |===

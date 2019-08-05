@@ -173,10 +173,10 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
       // On reset button clicked, clear all lookup results
       if (event.target.dataset && event.target.dataset.resetRmdForm) {
         event.target.form.querySelectorAll('[data-lookup-result]').forEach((node) => {
-          node.innerHTML = '&nbsp;';
+          node.innerHTML = node.dataset.resetValue;
         });
         event.target.form.querySelectorAll('[data-lookup-hidden]').forEach((node) => {
-          node.value = '';
+          node.value = node.dataset.resetValue === '&nbsp;' ? '' : node.dataset.resetValue;
         });
       }
       if (event.target.dataset && event.target.dataset.prompt) {

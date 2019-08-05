@@ -140,7 +140,7 @@ module Crossbeams
     private
 
     def page_number_and_page_count
-      return '' if @page_count.nil?
+      return '' if @step_count.nil?
 
       %(<span class="mid-gray"> &ndash; (step #{@step_number} of #{@step_count})</span>)
     end

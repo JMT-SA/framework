@@ -18,7 +18,7 @@ details = retrieve_from_local_store(:delivery_putaway) || {}
 items = %w[one two buckle my shoe]
 form = Crossbeams::RMDForm.new(details,
                                form_name: :putaway,
-                               progress: 'Delivery 123: 3 of 5 items complete' : nil,
+                               progress: 'Delivery 123: 3 of 5 items complete',
                                notes: 'Please scan the Delivery and the SKU numbers.',
                                scan_with_camera: @rmd_scan_with_camera,
                                caption: 'Delivery putaway',

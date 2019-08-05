@@ -18,7 +18,6 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                                        scan_with_camera: @rmd_scan_with_camera,
                                        caption: 'Delivery putaway',
                                        action: '/rmd/deliveries/putaways',
-                                       reset_button: true,
                                        button_caption: 'Putaway')
         form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true)

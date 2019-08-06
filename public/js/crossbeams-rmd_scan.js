@@ -179,6 +179,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
           node.value = node.dataset.resetValue === '&nbsp;' ? '' : node.dataset.resetValue;
         });
       }
+      // On link click, if there is a propmt, display it for the user to confirm.
       if (event.target.dataset && event.target.dataset.prompt) {
         event.stopPropagation();
         event.preventDefault();
@@ -240,20 +241,27 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    */
   const startScanner = () => {
     const wsUrl = 'ws://127.0.0.1:2115';
+    let connectedState = false;
 
     if (webSocket !== undefined && webSocket.readyState !== WebSocket.CLOSED) { return; }
     webSocket = new WebSocket(wsUrl);
 
     webSocket.onopen = function onopen() {
+      connectedState = true;
       publicAPIs.logit('Connected...');
     };
 
     webSocket.onclose = function onclose() {
+      connectedState = false;
       publicAPIs.logit('Connection Closed...');
+      // delay for a second and try again...
+      setTimeout(startScanner, 1000);
     };
 
     webSocket.onerror = function onerror(event) {
-      publicAPIs.logit('Connection ERROR', event);
+      if (connectedState) { // Ignore websocket errors if we are not connected.
+        publicAPIs.logit('Connection ERROR', event);
+      }
     };
 
     webSocket.onmessage = function onmessage(event) {

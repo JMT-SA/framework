@@ -28,7 +28,7 @@ module PackMaterialApp
       @log_repo.log_infodump('complete_purchase_invoice', @id, 'sending_xml', request_xml)
 
       res = make_http_call(request_xml)
-      @log_repo.log_infodump('complete_purchase_invoice', @id, 'response_xml', res.body)
+      @log_repo.log_infodump('complete_purchase_invoice', @id, 'response_xml', res.instance.body)
 
       formatted_res = format_response(res.instance.body)
 

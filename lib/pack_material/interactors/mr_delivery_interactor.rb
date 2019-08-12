@@ -103,7 +103,12 @@ module PackMaterialApp
         repo.transaction do
           repo.update_current_prices(id)
 
-          PackMaterialApp::ERPPurchaseInvoiceJob.enqueue(@user.user_name, delivery_id: id)
+          # NB. a (hopefully) temporary change:
+          #     - call the service directly instead of via a job.
+          #     - the Que gem seems to have an issue where it enqueues, increments the sequence,
+          #       but does not store the que_jobs record (like the transaction rolls back)
+          # PackMaterialApp::ERPPurchaseInvoiceJob.enqueue(@user.user_name, delivery_id: id)
+          PackMaterialApp::CompletePurchaseInvoice.call(@user.user_name, id) # { finish }
           log_transaction
           instance = mr_delivery(id)
           success_response("Delivery #{instance.delivery_number}: Purchase Invoice Queued", instance)

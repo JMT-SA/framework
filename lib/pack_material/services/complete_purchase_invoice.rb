@@ -12,6 +12,7 @@ module PackMaterialApp
       @block = block
       @repo           = PurchaseInvoiceRepo.new
       @replenish_repo = ReplenishRepo.new
+      @log_repo       = DevelopmentApp::LoggingRepo.new
       @user_name      = user_name
       @id             = delivery_id
       @just_show_xml  = just_show_xml
@@ -24,7 +25,11 @@ module PackMaterialApp
       request_xml = build_xml
       return request_xml if @just_show_xml
 
+      @log_repo.log_infodump('complete_purchase_invoice', @id, 'sending_xml', request_xml)
+
       res = make_http_call(request_xml)
+      @log_repo.log_infodump('complete_purchase_invoice', @id, 'response_xml', res.body)
+
       formatted_res = format_response(res.instance.body)
 
       apply_changes_to_db(formatted_res)

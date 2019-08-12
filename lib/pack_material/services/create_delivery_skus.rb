@@ -15,7 +15,7 @@ module PackMaterialApp
       sku_ids   = @repo.create_skus_for_delivery(@id)
       to_loc_id = @delivery.receipt_location_id
 
-      bsa_check = TaskPermissionCheck::MrDelivery.call(:bsa_in_progress_check, @id, sku_ids: sku_ids, loc_id: to_loc_id)
+      bsa_check = TaskPermissionCheck::MrDelivery.call(:bsa_in_progress_check, @id, opts: { sku_ids: sku_ids, loc_id: to_loc_id })
       if bsa_check.success
         @repo.log_status('mr_deliveries', @id, 'SKUS_CREATED')
         business_process_id = @repo.resolve_business_process_id(delivery_id: @id)

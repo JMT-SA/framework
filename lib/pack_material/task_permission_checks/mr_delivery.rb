@@ -7,12 +7,13 @@ module PackMaterialApp
       # @param [Symbol] task
       # @param [Integer] delivery_id
       # @param [Hash] opts ex: { sku_ids: 1, loc_id: 1 }
-      def initialize(task, delivery_id = nil, opts = {})
+      def initialize(task, delivery_id = nil, opts: {}, current_user: nil)
         @task   = task
         @repo   = ReplenishRepo.new
         @id     = delivery_id
         @entity = @id ? @repo.find_mr_delivery(@id) : nil
         @opts   = opts
+        @user   = current_user
       end
 
       def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -25,6 +26,10 @@ module PackMaterialApp
           mutable_check
         when :accept_over_supply
           accept_over_supply_check
+        when :accept_qty_difference
+          accept_qty_difference_check
+        when :review
+          review_check
         when :verify
           verify_check
         when :putaway
@@ -53,25 +58,50 @@ module PackMaterialApp
         all_ok
       end
 
-      def accept_over_supply_check # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, Metrics/PerceivedComplexity
-        return failed_response('Delivery Over Supply is already accepted') if over_supply_accepted?
-        return failed_response('Delivery is already verified') if verified?
-        return failed_response('Delivery does not have any over supplied items') unless over_supply?
-        return failed_response('Delivery has no items') if no_items?
-        return failed_response('Delivery has incomplete items') if incomplete_items?
-        return failed_response('Delivery has items without batches') if items_without_batches?
-        return failed_response('Delivery batch quantities do not equate to item quantities where applicable') if item_quantities_ignored?
+      def accept_over_supply_check
+        fail_message = prerequisite_check
+        fail_message ||= 'User is not allowed to review Deliveries' unless can_user_review?
+        fail_message ||= 'Delivery Over Supply is already accepted' if over_supply_accepted?
+        fail_message ||= 'Delivery does not have any over supplied items' unless over_supply?
+        return failed_response(fail_message) if fail_message
+
+        all_ok
+      end
+
+      def accept_qty_difference_check
+        fail_message = prerequisite_check
+        fail_message ||= 'User is not allowed to review Deliveries' unless can_user_review?
+        fail_message ||= 'Delivery Quantity Difference is already accepted' if qty_difference_accepted?
+        fail_message ||= 'Delivery does not have any items with quantity differences' unless qty_difference?
+        return failed_response(fail_message) if fail_message
 
         all_ok
       end
 
       def verify_check
-        return failed_response('Delivery is already verified') if verified?
-        return failed_response('Delivery has over supply and it has not been accepted yet') if over_supply? && !over_supply_accepted?
-        return failed_response('Delivery has no items') if no_items?
-        return failed_response('Delivery has incomplete items') if incomplete_items?
+        fail_message = prerequisite_check
+        fail_message ||= 'Delivery has over supply and it has not been accepted yet' if over_supply? && !over_supply_accepted?
+        fail_message ||= 'Delivery has quantity differences and it has not been accepted yet' if qty_difference? && !qty_difference_accepted?
+        return failed_response(fail_message) if fail_message
 
         all_ok
+      end
+
+      def review_check
+        fail_message = prerequisite_check
+        fail_message ||= 'User is not allowed to review Deliveries' unless can_user_review?
+        return failed_response(fail_message) if fail_message
+
+        all_ok
+      end
+
+      def prerequisite_check
+        fail_message = verified? ? 'Delivery is already verified' : nil
+        fail_message ||= 'Delivery has no items' if no_items?
+        fail_message ||= 'Delivery has incomplete items' if incomplete_items?
+        fail_message ||= 'Delivery has items without batches' if items_without_batches?
+        fail_message ||= 'Delivery batch quantities do not equate to item quantities where applicable' if item_quantities_ignored?
+        fail_message
       end
 
       def putaway_check
@@ -148,6 +178,18 @@ module PackMaterialApp
 
       def over_supply?
         @repo.items_with_over_supply(@id)
+      end
+
+      def qty_difference_accepted?
+        @entity.accepted_qty_difference
+      end
+
+      def qty_difference?
+        @repo.items_with_qty_difference(@id)
+      end
+
+      def can_user_review?
+        Crossbeams::Config::UserPermissions.can_user?(@user, :delivery, :review)
       end
     end
   end

@@ -67,6 +67,7 @@ class Framework < Roda
         end
 
         r.post do
+          interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path }, {})
           # Validate & update via interactor
           res = OpenStruct.new(success: true, message: 'whatever')
           if res.success

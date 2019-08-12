@@ -22,7 +22,7 @@ module Crossbeams
         WEBAPP => {
           stock_adj: { approve: false, sign_off: false },
           purchase_order: { approve: false },
-          delivery: { accept_over_supply: false }
+          delivery: { review: false, accept_over_supply: false }
           # stock_adj: { sign_off: false, approve: true, take_out_rubbish: true },
           # invoice: { complete: false, approve: { fruit: true, assets: false } }
         }
@@ -32,7 +32,7 @@ module Crossbeams
         WEBAPP => {
           stock_adj: { approve: 'Approve a stock adjustment', sign_off: 'Sign off on a stock adjustment' },
           purchase_order: { approve: 'Approve a purchase order' },
-          delivery: { accept_over_supply: 'Accept all Over Supply on any line items for this delivery' }
+          delivery: { review: 'Review the delivery to accept over supply and quantity differences on line items', accept_over_supply: 'Accept all Over Supply on any line items for this delivery' }
           # stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
           # invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
         }

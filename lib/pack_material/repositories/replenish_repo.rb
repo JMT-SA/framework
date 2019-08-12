@@ -83,6 +83,13 @@ module PackMaterialApp
 
     crud_calls_for :mr_purchase_invoice_costs, name: :mr_purchase_invoice_cost, wrapper: MrPurchaseInvoiceCost
 
+    def find_mr_delivery_item(id)
+      hash = find_hash(:mr_delivery_items, id)
+      amt = hash[:quantity_under_supplied]&.positive? ? -1 * hash[:quantity_under_supplied] : hash[:quantity_over_supplied]
+      hash[:quantity_over_under_supplied] = amt || AppConst::BIG_ZERO
+      MrDeliveryItem.new(hash)
+    end
+
     def find_mr_purchase_order(id)
       find_with_association(:mr_purchase_orders, id,
                             lookup_functions: [{ function: :fn_current_status,
@@ -234,9 +241,11 @@ module PackMaterialApp
       update(:mr_deliveries, id, verified: true)
     end
 
-    def accept_mr_delivery_over_supply(id)
+    def review_mr_delivery(id)
       waybill_no = DB[:mr_deliveries].where(id: id).get(:waybill_number)
-      update(:mr_deliveries, id, accepted_over_supply: true)
+      update(:mr_deliveries, id, reviewed: true)
+      update(:mr_deliveries, id, accepted_over_supply: true) if items_with_over_supply(id)
+      update(:mr_deliveries, id, accepted_qty_difference: true) if items_with_qty_difference(id)
       update_with_document_number('doc_seqs_waybill_number', id) unless waybill_no
     end
 
@@ -264,6 +273,10 @@ module PackMaterialApp
 
     def items_with_over_supply(mr_delivery_id)
       DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).where { quantity_over_supplied > 0 }.get(:id) # rubocop:disable Style/NumericPredicate
+    end
+
+    def items_with_qty_difference(mr_delivery_id)
+      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).where { quantity_difference > 0 }.get(:id) # rubocop:disable Style/NumericPredicate
     end
 
     def item_has_fixed_batch(delivery_item_id)
@@ -640,11 +653,7 @@ module PackMaterialApp
       delivered_quantities = total_delivered_quantities(po_item[:id])
 
       total_received = delivered_quantities + BigDecimal(quantity_received)
-      amt            = qty_required - total_received
-      {
-        quantity_over_supplied: amt.negative? ? amt.abs : AppConst::BIG_ZERO,
-        quantity_under_supplied: amt.positive? ? amt : AppConst::BIG_ZERO
-      }
+      total_received - qty_required
     end
 
     def total_delivered_quantities(purchase_order_item_id)
@@ -654,27 +663,37 @@ module PackMaterialApp
       BigDecimal(qty_received || '0')
     end
 
+    def update_mr_delivery_item(id, attrs)
+      new_attrs = attrs.to_h
+      new_attrs.delete(:quantity_over_under_supplied)
+      update(:mr_delivery_items, id, new_attrs)
+    end
+
     def create_mr_delivery_item(attrs)
-      create(:mr_delivery_items, prepare_delivery_item_quantities(attrs))
+      new_attrs = attrs.to_h
+      new_attrs.delete(:quantity_over_under_supplied)
+      create(:mr_delivery_items, new_attrs)
     end
 
     # @param [Hash] attrs => quantity_received, quantity_on_note, mr_purchase_order_item_id
     def prepare_delivery_item_quantities(attrs)
       new_attrs = add_over_under_supply_values(attrs.to_h)
-      calculate_for_qty_returned(new_attrs)
+      calculate_for_qty_difference(new_attrs)
     end
 
     # @param [Hash] attrs
     # Should only be updated if the delivery has not yet been verified
     def add_over_under_supply_values(attrs)
-      quantities = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
-      attrs[:quantity_over_supplied] = quantities[:quantity_over_supplied]
-      attrs[:quantity_under_supplied] = quantities[:quantity_under_supplied]
+      amt = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
+
+      attrs[:quantity_over_under_supplied] = amt
+      attrs[:quantity_over_supplied] = amt.negative? ? amt.abs : AppConst::BIG_ZERO
+      attrs[:quantity_under_supplied] = amt.positive? ? amt : AppConst::BIG_ZERO
       attrs
     end
 
-    def calculate_for_qty_returned(attrs)
-      attrs[:quantity_returned] = attrs[:quantity_on_note] - attrs[:quantity_received]
+    def calculate_for_qty_difference(attrs)
+      attrs[:quantity_difference] = attrs[:quantity_on_note] - attrs[:quantity_received] - attrs[:quantity_returned]
       attrs
     end
   end

@@ -4,8 +4,8 @@ module PackMaterial
   module Replenish
     module MrDelivery
       class Edit # rubocop:disable Metrics/ClassLength
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
-          ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values)
+        def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+          ui_rule = UiRules::Compiler.new(:mr_delivery, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 
           cannot_edit = rules[:is_verified] || rules[:over_supply_accepted]
@@ -27,10 +27,10 @@ module PackMaterial
                                   visible: rules[:can_verify],
                                   style: :button)
               section.add_control(control_type: :link,
-                                  text: 'Accept Over Supply',
-                                  url: "/pack_material/replenish/mr_deliveries/#{id}/accept_over_supply",
-                                  prompt: true,
-                                  visible: rules[:can_accept],
+                                  text: 'Reviewed',
+                                  url: "/pack_material/replenish/mr_deliveries/#{id}/review",
+                                  prompt: 'I hereby confirm that I have reviewed and accept any over supply and/or quantity differences noted on any of the line items for this delivery.',
+                                  visible: rules[:can_review],
                                   style: :button)
               cost_url = rules[:invoice_completed] ? '/list/mr_purchase_invoice_costs_show' : '/list/mr_purchase_invoice_costs'
               section.add_control(control_type: :link,
@@ -54,6 +54,7 @@ module PackMaterial
                                   style: :button)
             end
 
+            page.add_notice 'Delivery needs to be reviewed', notice_type: :info if rules[:review_required]
             page.section do |section|
               section.show_border!
               section.add_caption 'Delivery'

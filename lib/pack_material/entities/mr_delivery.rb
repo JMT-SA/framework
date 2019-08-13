@@ -16,6 +16,8 @@ module PackMaterialApp
     attribute :supplier_invoice_ref_number, Types::String
     attribute :verified, Types::Bool
     attribute :accepted_over_supply, Types::Bool
+    attribute :accepted_qty_difference, Types::Bool
+    attribute :reviewed, Types::Bool
     attribute :putaway_completed, Types::Bool
     attribute :status, Types::String
     attribute :supplier_invoice_date, Types::DateTime

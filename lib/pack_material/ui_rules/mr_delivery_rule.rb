@@ -6,6 +6,7 @@ module UiRules
       @repo = PackMaterialApp::ReplenishRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       @locations_repo = MasterfilesApp::LocationRepo.new
+      @perm = PackMaterialApp::TaskPermissionCheck::MrDelivery
       make_form_object
       apply_form_values
       set_rules unless @mode == :new
@@ -26,7 +27,8 @@ module UiRules
 
     def set_rules # rubocop:disable Metrics/AbcSize
       rules[:can_verify] = can_verify
-      rules[:can_accept] = can_accept_over_supply
+      rules[:can_review] = can_review
+      rules[:review_required] = review_required
       rules[:can_add_invoice] = can_add_invoice
       rules[:can_complete_invoice] = can_complete_invoice
       rules[:invoice_completed] = @form_object.invoice_completed
@@ -45,6 +47,7 @@ module UiRules
         driver_name: { renderer: :label },
         client_delivery_ref_number: { renderer: :label },
         delivery_number: { renderer: :label },
+        waybill_number: { renderer: :label },
         vehicle_registration: { renderer: :label },
         supplier_invoice_ref_number: { renderer: :label },
         supplier_invoice_date: { renderer: :label },
@@ -125,23 +128,28 @@ module UiRules
                      end
     end
 
-    def can_accept_over_supply
-      res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:accept_over_supply, @options[:id])
+    def can_review
+      res = @perm.call(:review, @options[:id], current_user: @options[:current_user])
+      res.success
+    end
+
+    def review_required
+      res = @perm.call(:review_required, @options[:id])
       res.success
     end
 
     def can_verify
-      res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:verify, @options[:id])
+      res = @perm.call(:verify, @options[:id])
       res.success
     end
 
     def can_add_invoice
-      res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:add_invoice, @options[:id])
+      res = @perm.call(:add_invoice, @options[:id])
       res.success
     end
 
     def can_complete_invoice
-      res = PackMaterialApp::TaskPermissionCheck::MrDelivery.call(:complete_invoice, @options[:id])
+      res = @perm.call(:complete_invoice, @options[:id])
       return false if @mode == :edit && already_enqueued?(@options[:id])
 
       res.success

@@ -9,6 +9,10 @@ module PackMaterialApp
         res = validate_mr_delivery_item_params(params)
         return validation_failed_response(res) unless res.messages.empty?
 
+        new_attrs = repo.prepare_delivery_item_quantities(res)
+        res = validate_mr_delivery_item_params(new_attrs)
+        return validation_failed_response(res) unless res.messages.empty?
+
         id = nil
         repo.transaction do
           id = repo.create_mr_delivery_item(res)
@@ -30,9 +34,12 @@ module PackMaterialApp
         res = validate_mr_delivery_item_params(params)
         return validation_failed_response(res) unless res.messages.empty?
 
+        new_attrs = repo.prepare_delivery_item_quantities(res)
+        res = validate_mr_delivery_item_params(new_attrs)
+        return validation_failed_response(res) unless res.messages.empty?
+
         repo.transaction do
-          attrs = repo.prepare_delivery_item_quantities(res.to_h)
-          repo.update_mr_delivery_item(id, attrs)
+          repo.update_mr_delivery_item(id, res)
           log_transaction
         end
         instance = mr_delivery_item(id)
@@ -74,10 +81,6 @@ module PackMaterialApp
 
     def purchase_order_id_for_delivery_item(delivery_item_id)
       repo.purchase_order_id_for_delivery_item(delivery_item_id)
-    end
-
-    def over_under_supply(quantity_received, po_item_id)
-      repo.over_under_supply(quantity_received, po_item_id)
     end
 
     def prepare_delivery_item_quantities(params)

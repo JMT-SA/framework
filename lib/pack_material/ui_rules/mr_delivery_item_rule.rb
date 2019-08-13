@@ -22,8 +22,8 @@ module UiRules
       fields[:quantity_on_note] = { renderer: :label }
       fields[:quantity_received] = { renderer: :label }
       fields[:quantity_returned] = { renderer: :label }
-      fields[:quantity_over_supplied] = { renderer: :label, caption: 'PO Over Supplied' }
-      fields[:quantity_under_supplied] = { renderer: :label, caption: 'PO Under Supplied' }
+      fields[:quantity_difference] = { renderer: :label }
+      fields[:quantity_over_under_supplied] = { renderer: :label, caption: 'PO Over/Under Supplied' }
       fields[:invoiced_unit_price] = { renderer: :label }
       fields[:remarks] = { renderer: :label }
     end
@@ -36,10 +36,10 @@ module UiRules
         product_variant_code: { renderer: :label, with_value: product_variant_code },
         quantity_on_note: { renderer: :numeric, required: true },
         quantity_received: { renderer: :numeric, required: true },
-        quantity_returned_label: { renderer: :label, with_value: @form_object.quantity_returned.to_f, caption: 'Quantity Returned' },
-        quantity_returned: { renderer: :hidden },
-        quantity_over_supplied: { renderer: :label, caption: 'PO Over Supplied' },
-        quantity_under_supplied: { renderer: :label, caption: 'PO Under Supplied' },
+        quantity_returned: { renderer: :numeric },
+        quantity_difference_label: { renderer: :label, with_value: @form_object.quantity_difference.to_f, caption: 'Quantity Difference' },
+        quantity_difference: { renderer: :hidden },
+        quantity_over_under_supplied: { renderer: :label, caption: 'PO Over/Under Supplied' },
         invoiced_unit_price: { renderer: :numeric },
         remarks: { renderer: :textarea, rows: 5 }
       }
@@ -87,19 +87,15 @@ module UiRules
                                     quantity_on_note: AppConst::BIG_ZERO,
                                     quantity_received: AppConst::BIG_ZERO,
                                     quantity_returned: AppConst::BIG_ZERO,
-                                    quantity_over_supplied: nil,
-                                    quantity_under_supplied: nil,
+                                    quantity_difference: AppConst::BIG_ZERO,
+                                    quantity_over_under_supplied: AppConst::BIG_ZERO,
                                     invoiced_unit_price: unit_price,
                                     remarks: nil)
     end
 
     def add_over_under_supply_values
       @form_object = OpenStruct.new(@form_object)
-      hash_quantities = @repo.over_under_supply(@form_object.quantity_received, @form_object.mr_purchase_order_item_id)
-
-      %i[quantity_over_supplied quantity_under_supplied].each do |k|
-        @form_object[k] = hash_quantities[k]
-      end
+      @form_object[:quantity_over_under_supplied] = @repo.over_under_supply(@form_object.quantity_received, @form_object.mr_purchase_order_item_id)
     end
 
     def product_variant_code
@@ -135,10 +131,17 @@ module UiRules
     def add_new_item_behaviours
       delivery_id = @options[:parent_id] || @form_object.mr_delivery_id
       url = "/pack_material/replenish/mr_deliveries/#{delivery_id}/mr_delivery_items/quantities_changed"
-      keys = %i[mr_delivery_item_mr_purchase_order_item_id mr_delivery_item_quantity_received mr_delivery_item_quantity_on_note]
+      keys = %i[
+        mr_delivery_item_mr_purchase_order_item_id
+        mr_delivery_item_quantity_received
+        mr_delivery_item_quantity_on_note
+        mr_delivery_item_quantity_returned
+        mr_delivery_item_quantity_difference
+      ]
       behaviours do |behaviour|
         behaviour.keyup :quantity_received, notify: [{ url: url, param_keys: keys }]
         behaviour.keyup :quantity_on_note, notify: [{ url: url, param_keys: keys }]
+        behaviour.keyup :quantity_returned, notify: [{ url: url, param_keys: keys }]
       end
     end
   end

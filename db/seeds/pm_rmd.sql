@@ -72,6 +72,24 @@ WHERE functional_area_name = 'RMD')),
         false,
         false);
 
+-- PROGRAM FUNCTION Stock Move
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Stock Adjustments'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'RMD')),
+        'Move',
+        '/rmd/stock/moves/new',
+        5,
+        NULL,
+        false,
+        false);
+
+UPDATE programs p
+SET program_name = 'Stock'
+WHERE p.functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD')
+  AND p.program_name = 'Stock Adjustments';
+
 -- PROGRAM: PRINTING
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('Printing', 3,

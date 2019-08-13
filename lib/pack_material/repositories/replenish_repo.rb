@@ -184,7 +184,7 @@ module PackMaterialApp
     def po_sub_totals(id)
       subtotal = po_total_items(id)
       costs = po_total_costs(id)
-      vat = po_total_vat(id, subtotal)
+      vat = po_total_vat(id, subtotal + costs)
       {
         subtotal: UtilityFunctions.delimited_number(subtotal),
         costs: UtilityFunctions.delimited_number(costs),
@@ -209,7 +209,10 @@ module PackMaterialApp
     end
 
     def po_vat_factor(po_id)
-      DB['SELECT percentage_applicable / 100.0 AS vat_factor FROM mr_vat_types WHERE id = (SELECT mr_vat_type_id FROM mr_purchase_orders WHERE id = ?)', po_id].single_value || AppConst::BIG_ZERO
+      DB[:mr_vat_types].join(:mr_purchase_orders, mr_vat_type_id: :id)
+                       .where(Sequel[:mr_purchase_orders][:id] => po_id)
+                       .select(Sequel[:mr_vat_types][:percentage_applicable])
+                       .map { |r| r[:percentage_applicable] / 100.0 }[0] || AppConst::BIG_ZERO
     end
 
     def mr_purchase_order_items(mr_purchase_order_id)
@@ -598,7 +601,7 @@ module PackMaterialApp
     def del_sub_totals(id)
       subtotal = del_total_items(id)
       costs = del_total_costs(id)
-      vat = del_total_vat(id, subtotal)
+      vat = del_total_vat(id, subtotal + costs)
       {
         subtotal: UtilityFunctions.delimited_number(subtotal),
         costs: UtilityFunctions.delimited_number(costs),

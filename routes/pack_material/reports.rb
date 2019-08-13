@@ -49,7 +49,7 @@ class Framework < Roda
       res = CreateJasperReport.call(report_name: 'stock_adjustment_sheet',
                                     user: current_user.login_name,
                                     file: 'stock_adjustment_sheet',
-                                    params: { delivery_id: id,
+                                    params: { mr_bulk_stock_adjustment_id: id,
                                               keep_file: true })
       if res.success
         change_window_location_via_json(res.instance, request.path)
@@ -62,7 +62,7 @@ class Framework < Roda
       res = CreateJasperReport.call(report_name: 'signed_off_report',
                                     user: current_user.login_name,
                                     file: 'signed_off_report',
-                                    params: { delivery_id: id,
+                                    params: { mr_bulk_stock_adjustment_id: id,
                                               keep_file: true })
       if res.success
         change_window_location_via_json(res.instance, request.path)

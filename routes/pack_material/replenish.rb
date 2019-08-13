@@ -421,8 +421,9 @@ class Framework < Roda
             r.redirect("/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect")
           else
             form_errors = move_validation_errors_to_base(res.errors,
-                                                         %i[received_less_than_on_note remarks_if_quantity_returned remarks_if_quantity_difference],
+                                                         %i[received_less_than_on_note remarks_if_quantity_returned remarks_if_quantity_difference remarks_if_over_supply],
                                                          highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received],
+                                                                       remarks_if_over_supply: %i[remarks],
                                                                        remarks_if_quantity_returned: %i[remarks],
                                                                        remarks_if_quantity_difference: %i[remarks] })
             re_show_form(r, res, url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new") do
@@ -620,8 +621,9 @@ class Framework < Roda
             redirect_via_json_to_stored_referer(:delivery_items)
           else
             form_errors = move_validation_errors_to_base(res.errors,
-                                                         %i[received_less_than_on_note remarks_if_quantity_returned remarks_if_quantity_difference],
+                                                         %i[received_less_than_on_note remarks_if_quantity_returned remarks_if_quantity_difference remarks_if_over_supply],
                                                          highlights: { received_less_than_on_note: %i[quantity_on_note quantity_received],
+                                                                       remarks_if_over_supply: %i[remarks],
                                                                        remarks_if_quantity_returned: %i[remarks],
                                                                        remarks_if_quantity_difference: %i[remarks] })
             re_show_form(r, res) do

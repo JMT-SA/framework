@@ -28,6 +28,7 @@ module UiRules
     def set_rules # rubocop:disable Metrics/AbcSize
       rules[:can_verify] = can_verify
       rules[:can_review] = can_review
+      rules[:review_required] = review_required
       rules[:can_add_invoice] = can_add_invoice
       rules[:can_complete_invoice] = can_complete_invoice
       rules[:invoice_completed] = @form_object.invoice_completed
@@ -129,6 +130,11 @@ module UiRules
 
     def can_review
       res = @perm.call(:review, @options[:id], current_user: @options[:current_user])
+      res.success
+    end
+
+    def review_required
+      res = @perm.call(:review_required, @options[:id])
       res.success
     end
 

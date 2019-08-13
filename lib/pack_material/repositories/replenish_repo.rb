@@ -690,8 +690,8 @@ module PackMaterialApp
       amt = over_under_supply(attrs[:quantity_received], attrs[:mr_purchase_order_item_id])
 
       attrs[:quantity_over_under_supplied] = amt
-      attrs[:quantity_over_supplied] = amt.negative? ? amt.abs : AppConst::BIG_ZERO
-      attrs[:quantity_under_supplied] = amt.positive? ? amt : AppConst::BIG_ZERO
+      attrs[:quantity_over_supplied] = amt.positive? ? amt : AppConst::BIG_ZERO
+      attrs[:quantity_under_supplied] = amt.negative? ? amt.abs : AppConst::BIG_ZERO
       attrs
     end
 

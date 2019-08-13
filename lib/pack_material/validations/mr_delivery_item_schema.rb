@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MrDeliveryItemSchema = Dry::Validation.Params do
+  MrDeliveryItemSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure do
       config.type_specs = true
 
       def self.messages
         super.merge(en: { errors: { received_less_than_on_note: 'Quantity Received must be less than or equal to Quantity on Note.',
+                                    remarks_if_over_supply: 'Remarks are required if there is an over supply',
                                     remarks_if_quantity_difference: 'Remarks are required if there is a quantity difference',
                                     remarks_if_quantity_returned: 'Remarks are required if there is a quantity to be returned' } })
       end
@@ -33,6 +34,9 @@ module PackMaterialApp
     end
     validate(remarks_if_quantity_difference: %i[quantity_difference remarks]) do |diff, remarks|
       diff && diff&.positive? ? !remarks.nil? : true
+    end
+    validate(remarks_if_over_supply: %i[quantity_over_supplied remarks]) do |os, remarks|
+      os && os&.positive? ? !remarks.nil? : true
     end
   end
 

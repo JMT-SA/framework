@@ -30,6 +30,8 @@ module PackMaterialApp
           accept_qty_difference_check
         when :review
           review_check
+        when :review_required
+          review_required_check
         when :verify
           verify_check
         when :putaway
@@ -80,8 +82,7 @@ module PackMaterialApp
 
       def verify_check
         fail_message = prerequisite_check
-        fail_message ||= 'Delivery has over supply and it has not been accepted yet' if over_supply? && !over_supply_accepted?
-        fail_message ||= 'Delivery has quantity differences and it has not been accepted yet' if qty_difference? && !qty_difference_accepted?
+        fail_message ||= 'Delivery must be reviewed' if review_required?
         return failed_response(fail_message) if fail_message
 
         all_ok
@@ -89,7 +90,16 @@ module PackMaterialApp
 
       def review_check
         fail_message = prerequisite_check
+        fail_message ||= 'Nothing to review' unless review_required?
         fail_message ||= 'User is not allowed to review Deliveries' unless can_user_review?
+        return failed_response(fail_message) if fail_message
+
+        all_ok
+      end
+
+      def review_required_check
+        fail_message = prerequisite_check
+        fail_message ||= 'Nothing to review' unless review_required?
         return failed_response(fail_message) if fail_message
 
         all_ok
@@ -129,6 +139,10 @@ module PackMaterialApp
         return failed_response('Purchase Invoice incomplete') if invoice_incomplete?
 
         all_ok
+      end
+
+      def review_required?
+        (over_supply? && !over_supply_accepted?) || (qty_difference? && !qty_difference_accepted?)
       end
 
       def putaway_completed?
@@ -189,6 +203,8 @@ module PackMaterialApp
       end
 
       def can_user_review?
+        return false unless @user
+
         Crossbeams::Config::UserPermissions.can_user?(@user, :delivery, :review)
       end
     end

@@ -54,6 +54,7 @@ module PackMaterial
                                   style: :button)
             end
 
+            page.add_notice 'Delivery needs to be reviewed', notice_type: :info if rules[:review_required]
             page.section do |section|
               section.show_border!
               section.add_caption 'Delivery'

@@ -24,4 +24,27 @@ module PackMaterialApp
     required(:ref_no, Types::StrippedString).filled(:str?)
     required(:is_adhoc, :bool).maybe(:bool?)
   end
+
+  AdhocRmdMoveStockSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:sku_number, :integer).filled(:int?)
+    required(:business_process_id, :integer).filled(:int?)
+    optional(:to_location_id, :integer).filled(:int?)
+    required(:from_location_id, :integer).filled(:int?)
+    required(:quantity, :decimal).filled(:decimal?, gt?: 0)
+    required(:ref_no, Types::StrippedString).filled(:str?)
+  end
+
+  FinalAdhocRmdMoveStockSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:sku_ids, Types::Array).filled { each(:int?) }
+    required(:business_process_id, :integer).filled(:int?)
+    required(:to_location_id, :integer).filled(:int?)
+    required(:quantity, :decimal).filled(:decimal?, gt?: 0)
+    required(:ref_no, Types::StrippedString).filled(:str?)
+    required(:user_name, Types::StrippedString).filled(:str?)
+    required(:location_id, :integer).filled(:int?)
+  end
 end

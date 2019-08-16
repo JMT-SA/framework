@@ -32,44 +32,67 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def create_mr_inventory_transaction(params) # rubocop:disable Metrics/AbcSize
-      res = validate_mr_inventory_transaction_params(params)
+    def validation_for_adhoc_rmd_move_stock(params) # rubocop:disable Metrics/AbcSize
+      from_location_id = replenish_repo.resolve_location_id_from_scan(params[:from_location], params[:from_location_scan_field])
+      return validation_failed_response(from_location: params[:from_location], messages: { from_location: ['Location short code not found'] }) unless from_location_id
+
+      existing_stock = existing_stock?(from_location_id, params[:sku_number])
+      return validation_failed_response(from_location: params[:from_location], messages: { from_location: ["Location does not have existing stock for SKU:#{params[:sku_number]}"] }) unless existing_stock
+
+      params[:from_location_id] = from_location_id
+      params[:business_process_id] = repo.process_id(params[:business_process])
+
+      res = validate_adhoc_rmd_move_stock_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      id = nil
-      repo.transaction do
-        id = repo.create_mr_inventory_transaction(res)
-        log_status('mr_inventory_transactions', id, 'CREATED')
-        log_transaction
-      end
-
-      instance = mr_inventory_transaction(id)
-      success_response("Created inventory transaction #{instance.created_by}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { created_by: ['This inventory transaction already exists'] }))
+      success_response('OK', res)
     end
 
-    def update_mr_inventory_transaction(id, params)
-      res = validate_mr_inventory_transaction_params(params)
+    def adhoc_rmd_move_stock(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      to_location_id = replenish_repo.resolve_location_id_from_scan(params[:to_location], params[:to_location_scan_field])
+      return validation_failed_response(to_location: params[:to_location], messages: { to_location: ['Location short code not found'] }) unless to_location_id
+
+      valid_stock_location = stock_repo.stock_location?(to_location_id)
+      return validation_failed_response(to_location: params[:to_location], messages: { to_location: ['Location can not store stock'] }) unless valid_stock_location
+
+      sku_ids = replenish_repo.sku_ids_from_numbers(params[:sku_number])
+      res = validate_final_adhoc_rmd_move_stock_params(params.merge(sku_ids: sku_ids,
+                                                                    user_name: @user.user_name,
+                                                                    to_location_id: to_location_id,
+                                                                    location_id: params[:from_location_id]))
       return validation_failed_response(res) unless res.messages.empty?
 
-      repo.transaction do
-        repo.update_mr_inventory_transaction(id, res)
-        log_transaction
-      end
+      can_action = TaskPermissionCheck::MrInventoryTransaction.call(:move,
+                                                                    sku_ids: sku_ids,
+                                                                    loc_id: params[:from_location_id],
+                                                                    move_loc_id: to_location_id)
+      if can_action.success
+        # TODO: Should not allow for this to bypass putaways
+        # replenish_repo.delivery_in_progress
+        repo.transaction do
+          log_transaction
+          res = adhoc_move_stock(res)
+          raise Crossbeams::InfoError, res.message unless res.success
 
-      instance = mr_inventory_transaction(id)
-      success_response("Updated inventory transaction #{instance.created_by}", instance)
+          html_report = repo.html_adhoc_stock_move_report(res.instance)
+          success_response('Successful adhoc stock move', OpenStruct.new(transaction_item_id: res.instance, report: html_report))
+        end
+      else
+        failed_response(can_action.message)
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::UniqueConstraintViolation => e
+      failed_response(e.message)
     end
 
-    def delete_mr_inventory_transaction(id)
-      name = mr_inventory_transaction(id).created_by
-      repo.transaction do
-        repo.delete_mr_inventory_transaction(id)
-        log_status('mr_inventory_transactions', id, 'DELETED')
-        log_transaction
-      end
-      success_response("Deleted inventory transaction #{name}")
+    def adhoc_move_business_processes
+      DB[:business_processes].select_map(:process)
+    end
+
+    def existing_stock?(from_location_id, sku_number)
+      sku_id = repo.sku_id_for_sku_number(sku_number)
+      repo.existing_sku_locations_for(sku_id, from_location_id).first
     end
 
     private
@@ -82,6 +105,10 @@ module PackMaterialApp
       @replenish_repo ||= ReplenishRepo.new
     end
 
+    def stock_repo
+      @stock_repo ||= MrStockRepo.new
+    end
+
     def mr_inventory_transaction(id)
       repo.find_mr_inventory_transaction(id)
     end
@@ -92,6 +119,14 @@ module PackMaterialApp
 
     def validate_adhoc_transaction_params(params)
       AdhocTransactionSchema.call(params)
+    end
+
+    def validate_adhoc_rmd_move_stock_params(params)
+      AdhocRmdMoveStockSchema.call(params)
+    end
+
+    def validate_final_adhoc_rmd_move_stock_params(params)
+      FinalAdhocRmdMoveStockSchema.call(params)
     end
 
     def prep_adhoc_transaction_params(sku_location_id, attrs) # rubocop:disable Metrics/AbcSize

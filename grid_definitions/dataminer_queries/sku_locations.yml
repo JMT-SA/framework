@@ -2,13 +2,14 @@
 :caption: SKU locations
 :sql: "SELECT COALESCE(\"mr_sku_locations\".\"id\", \"locations\".\"id\") AS id,\r\n
   \ \"locations\".\"primary_storage_type_id\",\r\n  \"locations\".\"location_long_code\",\r\n
-  \      (SELECT\r\n          CASE\r\n          WHEN mr_skus.sku_number IS NULL THEN
-  array_agg(\"cc\".\"location_long_code\")\r\n          ELSE array_append(array_agg(\"cc\".\"location_long_code\"),
-  mr_skus.sku_number::varchar)\r\n          END AS path\r\n        FROM (SELECT \"c\".\"location_long_code\"\r\n
-  \             FROM \"locations\" c\r\n                JOIN \"tree_locations\" t1
-  ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n              WHERE \"t1\".\"descendant_location_id\"
-  = \"locations\".\"id\"\r\n              ORDER BY \"t1\".\"path_length\" DESC) cc)
-  AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n  fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
+  \ \"locations\".\"location_short_code\",\r\n       (SELECT\r\n          CASE\r\n
+  \         WHEN mr_skus.sku_number IS NULL THEN array_agg(\"cc\".\"location_long_code\")\r\n
+  \         ELSE array_append(array_agg(\"cc\".\"location_long_code\"), mr_skus.sku_number::varchar)\r\n
+  \         END AS path\r\n        FROM (SELECT \"c\".\"location_long_code\"\r\n              FROM
+  \"locations\" c\r\n                JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\n              WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
+  \             ORDER BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n
+  \ fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
   AS product_variant_number,\r\n  \"material_resource_product_variants\".\"product_variant_code\",\r\n
   \ \"mr_sku_locations\".\"quantity\",\r\n  \"mr_deliveries\".delivery_number,\r\n
   \      COALESCE(mr_internal_batch_numbers.\"batch_number\"::text, mr_delivery_item_batches.client_batch_number)
@@ -87,9 +88,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  location_short_code:
+    :name: location_short_code
+    :sequence_no: 4
+    :caption: Location short code
+    :namespaced_name: locations.location_short_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   path_array:
     :name: path_array
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Path array
     :namespaced_name: 
     :data_type: :string
@@ -105,7 +122,7 @@
     :group_max: false
   sku_number:
     :name: sku_number
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Sku number
     :namespaced_name: mr_skus.sku_number
     :data_type: :integer
@@ -121,7 +138,7 @@
     :group_max: false
   product_variant_number:
     :name: product_variant_number
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Product variant number
     :namespaced_name: 
     :data_type: :integer
@@ -137,7 +154,7 @@
     :group_max: false
   product_variant_code:
     :name: product_variant_code
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Product variant code
     :namespaced_name: material_resource_product_variants.product_variant_code
     :data_type: :string
@@ -153,7 +170,7 @@
     :group_max: false
   quantity:
     :name: quantity
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Quantity
     :namespaced_name: mr_sku_locations.quantity
     :data_type: :number
@@ -169,7 +186,7 @@
     :group_max: false
   delivery_number:
     :name: delivery_number
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Delivery number
     :namespaced_name: mr_deliveries.delivery_number
     :data_type: :string
@@ -185,7 +202,7 @@
     :group_max: false
   batch_number:
     :name: batch_number
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Batch number
     :namespaced_name: 
     :data_type: :string
@@ -201,7 +218,7 @@
     :group_max: false
   has_single_container:
     :name: has_single_container
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Has single container
     :namespaced_name: locations.has_single_container
     :data_type: :boolean
@@ -217,7 +234,7 @@
     :group_max: false
   location_type_id:
     :name: location_type_id
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Location type
     :namespaced_name: locations.location_type_id
     :data_type: :integer
@@ -233,7 +250,7 @@
     :group_max: false
   location_type_code:
     :name: location_type_code
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Location type code
     :namespaced_name: location_types.location_type_code
     :data_type: :string
@@ -249,7 +266,7 @@
     :group_max: false
   primary_assignment_id:
     :name: primary_assignment_id
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Primary assignment
     :namespaced_name: locations.primary_assignment_id
     :data_type: :integer
@@ -265,7 +282,7 @@
     :group_max: false
   assignment_code:
     :name: assignment_code
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Assignment code
     :namespaced_name: location_assignments.assignment_code
     :data_type: :string
@@ -281,7 +298,7 @@
     :group_max: false
   location_storage_definition_id:
     :name: location_storage_definition_id
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Location storage definition
     :namespaced_name: locations.location_storage_definition_id
     :data_type: :string
@@ -297,7 +314,7 @@
     :group_max: false
   storage_definition_code:
     :name: storage_definition_code
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Storage definition code
     :namespaced_name: location_storage_definitions.storage_definition_code
     :data_type: :string
@@ -313,7 +330,7 @@
     :group_max: false
   location_description:
     :name: location_description
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Location description
     :namespaced_name: locations.location_description
     :data_type: :string

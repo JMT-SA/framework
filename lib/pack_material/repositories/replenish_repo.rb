@@ -699,5 +699,11 @@ module PackMaterialApp
       attrs[:quantity_difference] = attrs[:quantity_on_note] - attrs[:quantity_received] - attrs[:quantity_returned]
       attrs
     end
+
+    # def delivery_in_progress(sku_ids: [], loc_id: nil, move_loc_id: nil)
+    #   # TODO: If there is a delivery in progress for this sku id I can not allow for a adhoc move from the receiving bay
+    #   deliveries_in_progress = DB[:mr_deliveries].where(putaway_completed: false, verified: true).select_map(:id)
+    #
+    # end
   end
 end

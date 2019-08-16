@@ -253,6 +253,14 @@ module PackMaterialApp
       DB[:mr_skus].where(id: DB[:mr_sku_locations].where(id: sku_location_id).get(:mr_sku_id)).get(:sku_number)
     end
 
+    def existing_sku_locations_for(sku_id, location_id)
+      DB[:mr_sku_locations].where(mr_sku_id: sku_id, location_id: location_id).all
+    end
+
+    def sku_id_for_sku_number(sku_number)
+      DB[:mr_skus].where(sku_number: sku_number).get(:id)
+    end
+
     def allowed_locations
       ancestor_id = DB[:locations].where(location_long_code: 'PM').get(:id)
       descendant_ids = location_repo.descendants_for_ancestor_id(ancestor_id) - [ancestor_id]
@@ -336,6 +344,24 @@ module PackMaterialApp
     def set_price_adjustment_inline(id, attrs)
       bsa_price = DB[:mr_bulk_stock_adjustment_prices].where(id: id)
       bsa_price.update(stock_adj_price: attrs[:column_value])
+    end
+
+    def process_id(process_name)
+      DB[:business_processes].where(process: process_name).get(:id)
+    end
+
+    def html_adhoc_stock_move_report(transaction_item_id)
+      return nil unless transaction_item_id
+
+      item = DB[:mr_inventory_transaction_items].where(id: transaction_item_id)
+      <<~HTML
+        ADHOC STOCK MOVE: Transaction (#{item.get(:mr_inventory_transaction_id)})<br>
+        Last scan details:<br>
+        SKU (#{sku_number_from_id(item.get(:mr_sku_id))})<br>
+        FROM LOC: #{location_long_code_from_location_id(item.get(:from_location_id))}<br>
+        TO LOC: #{location_long_code_from_location_id(item.get(:to_location_id))}<br>
+        QTY: #{item.get(:quantity)} items.<br>
+      HTML
     end
   end
 end

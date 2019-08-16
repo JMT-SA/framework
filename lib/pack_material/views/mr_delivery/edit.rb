@@ -18,7 +18,7 @@ module PackMaterial
             page.section do |section| # rubocop:disable Metrics/BlockLength
               section.add_control(control_type: :link,
                                   text: 'Back to Deliveries',
-                                  url: '/list/mr_deliveries',
+                                  url: "/list/mr_deliveries/with_params?key=#{rules[:invoice_completed] ? 'completed' : 'incomplete'}",
                                   style: :back_button)
               section.add_control(control_type: :link,
                                   text: 'Verify Delivery',

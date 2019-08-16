@@ -357,10 +357,10 @@ module PackMaterialApp
       <<~HTML
         ADHOC STOCK MOVE: Transaction (#{item.get(:mr_inventory_transaction_id)})<br>
         Last scan details:<br>
-        SKU (#{sku_number_from_id(item.get(:mr_sku_id))})<br>
-        FROM LOC: #{location_long_code_from_location_id(item.get(:from_location_id))}<br>
-        TO LOC: #{location_long_code_from_location_id(item.get(:to_location_id))}<br>
-        QTY: #{item.get(:quantity)} items.<br>
+        SKU (#{replenish_repo.sku_number_from_id(item.get(:mr_sku_id))})<br>
+        FROM LOC: #{replenish_repo.location_long_code_from_location_id(item.get(:from_location_id))}<br>
+        TO LOC: #{replenish_repo.location_long_code_from_location_id(item.get(:to_location_id))}<br>
+        QTY: #{UtilityFunctions.delimited_number(item.get(:quantity), delimiter: '')} items.<br>
       HTML
     end
   end

@@ -62,14 +62,7 @@ class Framework < Roda
       r.on 'putaway' do
         r.get do
           details = retrieve_from_local_store(:stock_move) || {}
-
-          # TODO: This should be a schema check
-          lookup_loc = details[:lookup_values][:from_location]
-          from_loc = lookup_loc.nil? || lookup_loc&.empty? ? details[:from_location] : lookup_loc
-
-          lookup_sku = details[:lookup_values][:sku_number]
-          sku_number = lookup_sku.nil? || lookup_sku&.empty? ? details[:sku_number] : lookup_sku
-          store_locally(:stock_move, details.merge(from_location: from_loc, sku_number: sku_number))
+          store_locally(:stock_move, details)
 
           form = Crossbeams::RMDForm.new(details,
                                          form_name: :move,
@@ -81,8 +74,8 @@ class Framework < Roda
                                          action: '/rmd/stock/moves/putaway',
                                          button_caption: 'Putaway')
           form.add_label(:business_process, 'Business process', details[:business_process])
-          form.add_label(:from_location, 'From location', from_loc)
-          form.add_label(:sku_number, 'SKU', sku_number)
+          form.add_label(:from_location, 'From location', details[:from_location])
+          form.add_label(:sku_number, 'SKU', details[:sku_number])
           form.add_label(:quantity, 'Quantity', details[:quantity])
           form.add_label(:ref_no, 'Reference Number', details[:ref_no])
           form.add_field(:to_location, 'To location', scan: 'key248_all', scan_type: :location, lookup: true)

@@ -82,10 +82,8 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
   const searchMenu = (term) => {
     if (term === '') { return []; }
     let matches = [];
-    const interim = [];
-    _.forEach(menuLevels.program_functions, (v) => { interim.push(v); });
-    matches = _.filter(_.flatten(interim),
-      pf => pf.name.toUpperCase().indexOf(term.toUpperCase()) > -1);
+    const interim = Object.values(menuLevels.program_functions) || [];
+    matches = interim.flat().filter(pf => pf.name.toUpperCase().indexOf(term.toUpperCase()) > -1);
     return matches;
   };
 
@@ -108,10 +106,12 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
       let listItems = '';
       let progName = '';
       let funcName = '';
+      let displayName = '';
       results.forEach((menu) => {
         funcName = menuLevels.functional_areas.find(elem => elem.id === menu.func_id).name;
         progName = menuLevels.programs[menu.func_id].find(elem => elem.id === menu.prog_id).name;
-        listItems += `<li><a href="${menu.url}" data-menu-parent="${menu.prog_id}" data-menu-level3="${menu.id}" data-menu-func="${menu.func_id}"><span class="search-menu-result-ancestor">${funcName}/${progName}:</span> ${menu.name}</a></li>`;
+        displayName = menu.group_name ? ` (${menu.group_name}) ` : '';
+        listItems += `<li><a href="${menu.url}" data-menu-parent="${menu.prog_id}" data-menu-level3="${menu.id}" data-menu-func="${menu.func_id}"><span class="search-menu-result-ancestor">${funcName}/${progName}${displayName}:</span> ${menu.name}</a></li>`;
       });
       resultsList.innerHTML = listItems;
       resultsList.style.display = 'block';

@@ -352,8 +352,9 @@ const crossbeamsUtils = {
   getSelectedIdsInStep: function getSelectedIdsInStep(sel, sortedIds) {
     const usedIds = [];
     const out = [];
+    const selAr = Array.from(sel.selectedOptions);
     sortedIds.forEach((id) => {
-      const found = _.find(sel.selectedOptions, ['value', id]);
+      const found = selAr.find(a => a.value === id);
       if (found) {
         out.push(found);
         usedIds.push(id);
@@ -855,7 +856,7 @@ const crossbeamsUtils = {
               const target = document.getElementById(el);
               if (target && (target.dataset && target.dataset.enableOnValues)) {
                 const vals = target.dataset.enableOnValues;
-                if (_.includes(vals, event.detail.value)) {
+                if (vals.includes(event.detail.value)) {
                   target.disabled = false;
                 } else {
                   target.disabled = true;

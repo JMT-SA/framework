@@ -1450,9 +1450,12 @@ const crossbeamsGridStaticLoader = {
         context: { domGridId: gridId },
         columnDefs: null,
         rowData: null,
-        enableColResize: true,
-        enableSorting: true,
-        enableFilter: true,
+        defaultColDef: {
+          resizable: true,
+          sortable: true,
+          filter: true,
+        },
+        enableCharts: true,
         enableRangeSelection: true,
         // enableStatusBar: true,
         sideBar,
@@ -1488,12 +1491,15 @@ const crossbeamsGridStaticLoader = {
     } else {
       gridOptions = {
         context: { domGridId: gridId },
-        // columnDefs: null,
         rowData: null,
-        enableColResize: true,
-        enableSorting: true,
-        enableFilter: true,
+        defaultColDef: {
+          resizable: true,
+          sortable: true,
+          filter: true,
+        },
         rowSelection: 'single',
+        popupParent: document.body,
+        enableCharts: true,
         enableRangeSelection: true,
         // singleClickEdit: true,
         statusBar: {

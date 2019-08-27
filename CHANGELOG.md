@@ -8,6 +8,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Upgrade AG Grid to version 21.
 ### Fixed
 
 ## [0.6.3] - 2019-07-11

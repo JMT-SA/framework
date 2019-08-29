@@ -301,14 +301,25 @@ module PackMaterialApp
                             wrapper: PackMaterialApp::MrBulkStockAdjustmentItem)
     end
 
-    def rmd_update_bulk_stock_adjustment_item(attrs)
+    def rmd_update_bulk_stock_adjustment_item(attrs) # rubocop:disable Metrics/AbcSize
       item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
                                                        mr_sku_id: attrs[:mr_sku_id],
                                                        location_id: attrs[:location_id])
-      return failed_response('Item does not exist') unless item.first
+
+      unless item.first
+        business_process_id = DB[:mr_bulk_stock_adjustments].where(id: attrs[:mr_bulk_stock_adjustment_id]).get(:business_process_id)
+        return failed_response('Item does not exist') unless business_process_id == stock_take_on_business_process_id
+
+        item_id = create_mr_bulk_stock_adjustment_item(attrs)
+        item = DB[:mr_bulk_stock_adjustment_items].where(id: item_id)
+      end
 
       item.update(actual_quantity: attrs[:actual_quantity])
       success_response('ok', item.get(:id))
+    end
+
+    def stock_take_on_business_process_id
+      DB[:business_processes].where(process: AppConst::PROCESS_STOCK_TAKE_ON).get(:id)
     end
 
     def stock_adjustment_progress_report_values(bulk_stock_adjustment_id, sku_id, location_id) # rubocop:disable Metrics/AbcSize

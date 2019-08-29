@@ -5,4 +5,37 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 == Test seeds
 
-Set up database table seeds for various tests requireing database data.
+Set up database table seeds for various tests requiring database data. Especially for masterfile data that may need to be referenced in several tests.
+
+Seed data is inserted into the test database at the start of every test run and removed at the end of every run (rolled back).
+
+Seed methods add elements to a global hash named `@fixed_table_set`. The hash contains keys that map to table names, and each table name contains a hash of named value sets that can be referenced in any test.
+
+=== Creating test seed data
+
+Seed files are stored in `test/db_seeds/` and are ruby files that declare methods on the `MiniTestSeeds` module.
+
+Any method whose name starts with `db_create_` will be run on startup.
+
+Example:
+[source,ruby]
+----
+def db_create_roles
+  mar_id = DB[:roles].insert(name: 'MARKETER')
+  ret_id = DB[:roles].insert(name: 'RETAILER')
+  @fixed_table_set[:roles] = 
+    marketer: { id: mar_id },
+    retailer: { id: ret_id }
+  }
+end
+----
+
+=== Accessing seed data
+
+In your tests you can retrieve whatever is stored in `@fixed_table_set` by the table name and key defined in the seed file:
+
+Example:
+[source,ruby]
+----
+  role_id = @fixed_table_set[:roles][:retailer][:id]
+----

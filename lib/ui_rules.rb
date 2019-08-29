@@ -58,6 +58,15 @@ module UiRules
       end
     end
 
+    def render_icon(icon)
+      return '' if icon.nil?
+
+      icon_parts = icon.split(',')
+      svg = File.read(File.join(ENV['ROOT'], 'public/app_icons', "#{icon_parts.first}.svg"))
+      color = icon_parts[1] || 'gray'
+      %(<div class="crossbeams-field"><label>Icon</label><div class="cbl-input"><span class="cbl-icon" style="color:#{color}">#{svg}</span></div></div>)
+    end
+
     def renderer_for_extcol(repo, config, caption)
       field = { caption: caption }
       if config[:masterlist_key]

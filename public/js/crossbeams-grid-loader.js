@@ -119,7 +119,7 @@ const crossbeamsGridEvents = {
    */
   saveSelectedRows: function saveSelectedRows(gridId, url, canBeCleared, saveMethod) {
     const gridOptions = crossbeamsGridStore.getGrid(gridId);
-    const ids = _.map(gridOptions.api.getSelectedRows(), m => m.id);
+    const ids = gridOptions.api.getSelectedRows().map(m => m.id);
     let msg;
     if (!canBeCleared && ids.length === 0) {
       crossbeamsUtils.alert({ prompt: 'You have not selected any items to submit!', type: 'error' });
@@ -706,6 +706,23 @@ const crossbeamsGridFormatters = {
     return String.fromCharCode(c.charCodeAt(0) + 1);
   },
 
+  // Is the last item in an array of context menu items a separator?
+  lastIsSeparator: (items) => {
+    if (!items[items.length - 1].value) {
+      return false;
+    }
+    return items[items.length - 1].value === '---';
+  },
+
+  // Go through a list of context items and remove any trailing separators.
+  removeTrailingSeparatorItems: (items) => {
+    let cleanItems = items;
+    while (crossbeamsGridFormatters.lastIsSeparator(cleanItems)) {
+      cleanItems = cleanItems.slice(0, -1);
+    }
+    return cleanItems;
+  },
+
   makeContextNode: function makeContextNode(key, prefix, items, item, params) {
     let node = {};
     let urlComponents = [];
@@ -744,7 +761,8 @@ const crossbeamsGridFormatters = {
       }
     }
     if (item.is_separator) {
-      if (items.length > 0 && _.last(items).value !== '---') {
+      // Add a separator - but only if the previous item is not also a separator.
+      if (items.length > 0 && items[items.length - 1].value !== '---') {
         return { key: `${prefix}${key}`, name: item.text, value: '---' };
       }
       return null;
@@ -773,7 +791,7 @@ const crossbeamsGridFormatters = {
           node.items.push(subnode);
         }
       });
-      node.items = _.dropRightWhile(node.items, ['value', '---']);
+      node.items = crossbeamsGridFormatters.removeTrailingSeparatorItems(node.items);
       if (node.items.length > 0) {
         return node;
       }
@@ -823,7 +841,7 @@ const crossbeamsGridFormatters = {
     });
     // If items are hidden, the last item(s) could be separators.
     // Remove them here.
-    items = _.dropRightWhile(items, ['value', '---']);
+    items = crossbeamsGridFormatters.removeTrailingSeparatorItems(items);
     if (items.length === 0) {
       return '';
     }
@@ -1365,7 +1383,7 @@ const crossbeamsGridStaticLoader = {
 
           if (httpResult.multiselect_ids) {
             gridOptions.api.forEachNode((node) => {
-              if (node.data && _.includes(httpResult.multiselect_ids, node.data.id)) {
+              if (node.data && httpResult.multiselect_ids.includes(node.data.id)) {
                 node.setSelected(true);
               }
             });
@@ -1432,9 +1450,12 @@ const crossbeamsGridStaticLoader = {
         context: { domGridId: gridId },
         columnDefs: null,
         rowData: null,
-        enableColResize: true,
-        enableSorting: true,
-        enableFilter: true,
+        defaultColDef: {
+          resizable: true,
+          sortable: true,
+          filter: true,
+        },
+        enableCharts: true,
         enableRangeSelection: true,
         // enableStatusBar: true,
         sideBar,
@@ -1470,12 +1491,15 @@ const crossbeamsGridStaticLoader = {
     } else {
       gridOptions = {
         context: { domGridId: gridId },
-        // columnDefs: null,
         rowData: null,
-        enableColResize: true,
-        enableSorting: true,
-        enableFilter: true,
+        defaultColDef: {
+          resizable: true,
+          sortable: true,
+          filter: true,
+        },
         rowSelection: 'single',
+        popupParent: document.body,
+        enableCharts: true,
         enableRangeSelection: true,
         // singleClickEdit: true,
         statusBar: {

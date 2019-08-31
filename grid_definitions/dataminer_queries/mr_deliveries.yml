@@ -21,7 +21,10 @@
   desc"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    error: There was an error when creating the purchase invoice
+    inprogress: Putaway is in progress
 :columns:
   id:
     :name: id

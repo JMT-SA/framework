@@ -170,7 +170,7 @@ module DataminerApp
       NewReportSchema.call(params)
     end
 
-    def create_report(params) # rubocop:disable Metrics/AbcSize
+    def create_report(params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
       res = validate_new_report_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -186,6 +186,12 @@ module DataminerApp
       page.rpt = Crossbeams::Dataminer::Report.new(page.caption)
       begin
         page.rpt.sql = page.sql
+        colour_key = calculate_colour_key(page.rpt)
+        if colour_key.nil?
+          page.rpt.external_settings.delete(:colour_key)
+        else
+          page.rpt.external_settings[:colour_key] = colour_key
+        end
       rescue StandardError => e
         err = e.message
       end
@@ -300,15 +306,32 @@ module DataminerApp
       failed_response(e.message)
     end
 
-    def save_report_sql(id, params)
+    def save_report_sql(id, params) # rubocop:disable Metrics/AbcSize
       report = repo.lookup_admin_report(id)
       report.sql = params[:report][:sql]
       filename = repo.lookup_file_name(id, true)
-      yp       = Crossbeams::Dataminer::YamlPersistor.new(filename)
+      colour_key = calculate_colour_key(report)
+      if colour_key.nil?
+        report.external_settings.delete(:colour_key)
+      else
+        report.external_settings[:colour_key] = colour_key
+      end
+      yp = Crossbeams::Dataminer::YamlPersistor.new(filename)
       report.save(yp)
       success_response('SQL saved', report)
-    rescue StandardError => e
-      failed_response(e.message)
+    end
+
+    def calculate_colour_key(report)
+      col = report.columns['colour_rule']
+      return nil if col.nil?
+
+      old_values = report.external_settings[:colour_key] || {}
+      css_classes = Hash[col.case_string_values.map { |a| [a, 'No description'] }]
+      css_classes.keys.each do |k|
+        str = old_values[k]
+        css_classes[k] = str unless str.nil?
+      end
+      css_classes
     end
 
     def save_report_column_order(id, params) # rubocop:disable Metrics/AbcSize
@@ -368,6 +391,15 @@ module DataminerApp
       #       end
       res = { group_avg: false, group_min: false, group_max: false, group_none: 'A TEST' } if send_changes
       success_response("Changed #{attrib} for #{params[:key_val]}", res)
+    end
+
+    def save_colour_key_desc(id, params)
+      report = repo.lookup_admin_report(id)
+      report.external_settings[:colour_key][params[:key_val]] = params[:column_value]
+      filename = repo.lookup_file_name(id, true)
+      yp = Crossbeams::Dataminer::YamlPersistor.new(filename)
+      report.save(yp)
+      success_response('Saved new description')
     end
 
     def create_parameter(id, params) # rubocop:disable Metrics/AbcSize

@@ -8,7 +8,9 @@
   LEFT JOIN \"mr_vat_types\" ON \"mr_vat_types\".\"id\" = \"mr_purchase_orders\".\"mr_vat_type_id\""
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    inprogress: Order in progress - not yet completely delivered
 :columns:
   id:
     :name: id

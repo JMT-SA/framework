@@ -98,6 +98,12 @@ module PackMaterialApp
                             wrapper: MrPurchaseOrder)
     end
 
+    def delete_mr_purchase_order(id)
+      DB[:mr_purchase_order_costs].where(mr_purchase_order_id: id).delete
+      DB[:mr_purchase_order_items].where(mr_purchase_order_id: id).delete
+      delete(:mr_purchase_orders, id)
+    end
+
     def find_mr_purchase_order_cost(id)
       find_with_association(:mr_purchase_order_costs, id,
                             parent_tables: [{ parent_table: :mr_cost_types, flatten_columns: { cost_type_code: :cost_type } }],

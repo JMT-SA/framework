@@ -258,6 +258,8 @@ Your queries should preferably return Tachyons classes rather than custom classe
 
 Try to exercise restraint - only colour rows if it will be useful to the user. Not every grid needs to be lit up like a christmas tree!
 
+NOTE: When saving a query via the admin section of a report or grid, if the query includes a column named `colour_rule`, there will be a grid (with inline-editable `description`) available to describe what each colour means. This key is available to the user when the grid is displayed. Make sure you change the default description from `No description`!
+
 Example:
 [source,sql]
 ----

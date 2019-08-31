@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: b00128985ff3637ba4853f746cdf2782e7e92e91
+  revision: c0d846e07f17faa8d422bfa19732ff2d17a5e24b
   specs:
-    crossbeams-dataminer (0.1.7)
+    crossbeams-dataminer (0.1.8)
       pg_query (= 1.0.2)
 
 GIT
@@ -16,9 +16,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: 0b0cc5bb210f9c8c572faa3384ea300f05bf9fda
+  revision: b642d388d3a1065a0f74fee125544fea3f540dde
   specs:
-    crossbeams-layout (0.3.1)
+    crossbeams-layout (0.3.2)
       diffy
       rouge
 
@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 661a9983587c1c3faf5ee371ca99a8a8348e5ebd
+  revision: 3865e5feb2a852783234701c110a14c2df436363
   specs:
-    roda-data_grid (0.2.1)
+    roda-data_grid (0.2.2)
       axlsx
       crossbeams-dataminer
       crossbeams-layout

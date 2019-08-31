@@ -14,6 +14,10 @@
   \ "
 :limit: 
 :offset: 
+:external_settings:
+  :colour_key:
+    inactive: The menu option is not in use (inactive)
+    warning: This menu item restricts access to certain users (users must be assigned)
 :columns:
   functional_area_id:
     :name: functional_area_id

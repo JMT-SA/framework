@@ -93,6 +93,30 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           view('dataminer/admin/edit')
         end
 
+        r.on 'colour_grid' do
+          @page = retrieve_from_local_store(:dm_admin_page)
+          store_locally(:dm_admin_page, @page)
+          rows = []
+          @page.report.external_settings[:colour_key].each do |k, v|
+            rows << { id: k, description: v, colour_rule: k }
+          end
+
+          cols = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+            mk.col 'id', nil, hide: true
+            mk.col 'description', nil, editable: true, width: 500
+            mk.col 'colour_rule'
+          end
+
+          {
+            extraContext: { keyColumn: 'id' },
+            multiselect_ids: [],
+            fieldUpdateUrl: "/dataminer/admin/#{id}/save_colour_key_desc",
+            tree: nil,
+            columnDefs: cols,
+            rowDefs: rows
+          }.to_json
+        end
+
         r.on 'columns_grid' do
           @page = retrieve_from_local_store(:dm_admin_page)
           store_locally(:dm_admin_page, @page)
@@ -180,6 +204,14 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           else
             update_grid_row(id, changes: res.instance, notice: res.message)
           end
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :warn)
+        end
+      end
+      r.on 'save_colour_key_desc' do # JSON
+        res = interactor.save_colour_key_desc(id, params)
+        if res.success
+          show_json_notice(res.message)
         else
           undo_grid_inline_edit(message: res.message, message_type: :warn)
         end

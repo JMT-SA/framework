@@ -28,6 +28,14 @@
   color: #727384;
   vertical-align: sub;
 }
+.crossbeams-colour-key-list {
+  display: none;
+}
+.crossbeams-colour-key:hover ~ .crossbeams-colour-key-list {
+  display: block;
+  position: fixed;
+  z-index: 2;
+}
 .crossbeams-rowcount {
   /* color: white; -- for ag-theme-blue */
   color: #727384;

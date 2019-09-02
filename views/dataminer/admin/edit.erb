@@ -41,6 +41,11 @@
 </section>
 
 <% page_config = Crossbeams::Layout::PageConfig.new %>
+
+<% if @page.report.columns['colour_rule'] %>
+  <%= Crossbeams::Layout::Grid.new(page_config, 'grd0', "/dataminer/admin/#{@page.id}/edit/colour_grid", caption: 'Fill in Colour Key descriptions', height: 10, bookmark_row_on_action: false).render %>
+<% end %>
+
 <%= Crossbeams::Layout::Grid.new(page_config, 'grd1', "/dataminer/admin/#{@page.id}/edit/columns_grid", caption: 'Columns', height: 20, bookmark_row_on_action: false).render %>
 
 <p style="margin-top:5em;">

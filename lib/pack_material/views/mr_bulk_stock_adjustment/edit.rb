@@ -86,6 +86,12 @@ module PackMaterial
                                   visible: !rules[:signed_off],
                                   style: :button)
               section.add_control(control_type: :link,
+                                  text: 'Preliminary Report',
+                                  url: "/pack_material/reports/preliminary_report/#{id}",
+                                  loading_window: true,
+                                  visible: !rules[:signed_off],
+                                  style: :button)
+              section.add_control(control_type: :link,
                                   text: 'Signed Off Report',
                                   url: "/pack_material/reports/signed_off_report/#{id}",
                                   loading_window: true,

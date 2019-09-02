@@ -64,6 +64,15 @@ module PackMaterial
             end
 
             page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Print Purchase Order',
+                                  url: "/pack_material/reports/print_purchase_order/#{id}",
+                                  loading_window: true,
+                                  visible: rules[:show_only],
+                                  style: :button)
+            end
+
+            page.section do |section|
               section.show_border!
               if rules[:show_only]
                 section.add_grid('po_items',

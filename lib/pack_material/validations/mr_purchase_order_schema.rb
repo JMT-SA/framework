@@ -13,5 +13,6 @@ module PackMaterialApp
     required(:fin_object_code, Types::StrippedString).maybe(:str?)
     required(:valid_until, :date_time).maybe(:date_time?)
     # required(:purchase_order_number, :integer).maybe(:int?)
+    required(:remarks, Types::StrippedString).maybe(:str?)
   end
 end

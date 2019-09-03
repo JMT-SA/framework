@@ -50,6 +50,7 @@ module UiRules
         supplier_party_role_id: { renderer: :hidden },
         supplier_name: { renderer: :label, with_value: sup.party_name },
         supplier_erp_number: { renderer: :label, with_value: sup.erp_supplier_number },
+        remarks: { renderer: :label },
         purchase_order_number: { renderer: :label }
       }
     end
@@ -77,7 +78,8 @@ module UiRules
         },
         purchase_account_code: {},
         fin_object_code: {},
-        valid_until: { subtype: :datetime, required: true }
+        valid_until: { subtype: :datetime, required: true },
+        remarks: { renderer: :input, text: true }
       }
     end
 
@@ -131,7 +133,8 @@ module UiRules
                                     delivery_address_id: nil,
                                     purchase_account_code: AppConst::PO_ACCOUNT_CODE,
                                     fin_object_code: AppConst::PO_FIN_OBJECT_CODE,
-                                    valid_until: UtilityFunctions.weeks_since(Time.now, 1))
+                                    valid_until: UtilityFunctions.weeks_since(Time.now, 1),
+                                    remarks: nil)
     end
 
     def supplier

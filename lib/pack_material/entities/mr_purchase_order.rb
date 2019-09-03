@@ -13,5 +13,6 @@ module PackMaterialApp
     attribute :purchase_order_number, Types::Integer
     attribute :approved, Types::Bool
     attribute :status, Types::String
+    attribute :remarks, Types::String
   end
 end

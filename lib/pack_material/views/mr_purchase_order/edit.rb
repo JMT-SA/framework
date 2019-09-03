@@ -48,11 +48,12 @@ module PackMaterial
                     col.add_field :supplier_party_role_id
                     col.add_field :supplier_name
                     col.add_field :supplier_erp_number
-                    col.add_field :mr_delivery_term_id
-                    col.add_field :mr_vat_type_id
+                    col.add_field :remarks
                   end
 
                   row.column do |col|
+                    col.add_field :mr_delivery_term_id
+                    col.add_field :mr_vat_type_id
                     col.add_field :purchase_account_code
                     col.add_field :fin_object_code
                     col.add_field :valid_until

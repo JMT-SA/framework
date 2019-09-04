@@ -70,6 +70,12 @@ module PackMaterial
                                   loading_window: true,
                                   visible: rules[:show_only],
                                   style: :button)
+              section.add_control(control_type: :link,
+                                  text: "#{Crossbeams::Layout::Icon.render(:envelope)} Email Purchase Order",
+                                  url: "/pack_material/reports/email_purchase_order/#{id}",
+                                  behaviour: :popup,
+                                  visible: rules[:show_only],
+                                  style: :button)
             end
 
             page.section do |section|

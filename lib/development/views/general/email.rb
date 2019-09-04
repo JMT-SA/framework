@@ -2,7 +2,7 @@ module Development
   module Generators
     module General
       class Email
-        def self.call
+        def self.call(options = {})
           rules = {
             fields: {
               to: { required: true },
@@ -13,9 +13,10 @@ module Development
             name: 'mail'
           }
           layout = Crossbeams::Layout::Page.build(rules) do |page|
-            page.form_object OpenStruct.new
+            page.form_object OpenStruct.new(options[:email_options])
             page.form do |form|
-              form.action '/development/generators/email_test'
+              form.action options[:action] || '/development/generators/email_test'
+              form.remote! if options[:remote]
               form.form_id 'mail'
               form.add_field :to
               form.add_field :cc

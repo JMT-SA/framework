@@ -75,3 +75,8 @@ param_name: 'false|boolean' # Jasper gets param_name: false
 param_name: false           # Jasper gets param_name: 'false'
 ----
 ====
+
+=== Generate and email a report
+
+There is a job `DevelopmentApp::EmailJasperReport` which will create the report and email the result as an attachment.
+

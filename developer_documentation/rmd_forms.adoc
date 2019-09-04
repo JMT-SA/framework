@@ -22,7 +22,7 @@ form = Crossbeams::RMDForm.new(details,
                                notes: 'Please scan the Delivery and the SKU numbers.',
                                scan_with_camera: @rmd_scan_with_camera,
                                caption: 'Delivery putaway',
-                               links: [{ caption: 'Cancel', url: '/back', prompt: 'Ok?' },
+                               links: [{ caption: 'Cancel', url: '/back', prompt: 'Ok?' }],
                                reset_button: true,
                                step_and_total: [1, 2],
                                action: '/rmd/deliveries/putaways',
@@ -169,9 +169,14 @@ form.add_field(:from_location, 'From location', scan: 'key248_all',
 |`true`
 
 |options - :data_type
-|The datatype of the input (`text`, `date` etc.)
+|The datatype of the input (`text`, `date`, `number` etc.)
 |String
 |`text`
+
+|options - :allow_decimals
+|Only applies to `data_type: 'number'`. If true, the user can input decimals. Ignored for any other data type.
+|Boolean
+|`false` (number input type will only accept integers)
 
 |options - :scan
 |Type of barcode symbology to accept.

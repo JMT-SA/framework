@@ -172,6 +172,11 @@ Must start with ".".
 |true or false
 |false
 
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|true or false
+|false
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -217,6 +222,11 @@ and all words start with initial capital letter.
 |true or false
 |false
 
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|true or false
+|false
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -252,6 +262,11 @@ and all words start with initial capital letter.
 |HTML text
 |None
 
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|true or false
+|false
+
 |:css_class
 |Extra class string to add to the label’s class.
 |String
@@ -281,6 +296,11 @@ and all words start with initial capital letter.
 |The list of items to display. If a two-dimensional array is provided, just the first element is displayed.
 |a one-dimensional or two-diemnsional array
 |None. Required.
+
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|true or false
+|false
 
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
@@ -335,6 +355,11 @@ and all words start with initial capital letter.
 |A single String/Symbol or an Array of Strings/Symbols.
 |None. Optional.
 
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|true or false
+|false
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -362,6 +387,11 @@ and all words start with initial capital letter.
 
 |:required
 |HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain unless the user chooses at least one option.
+|true or false
+|false
+
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
 |true or false
 |false
 
@@ -463,6 +493,11 @@ To display `optgroup` elements, use a Hash and the format must be: `{ group => [
 |true or false
 |false
 
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|true or false
+|false
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -525,6 +560,11 @@ and all words start with initial capital letter.
 
 |:required
 |HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain if no value is provided.
+|true or false
+|false
+
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
 |true or false
 |false
 

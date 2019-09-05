@@ -9,7 +9,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { RUN_FOR_RMD: 'Dev mode: Force the server to act as if it is being called from a Registered Mobile Device' },
     { NO_ERR_HANDLE: 'Dev mode: Do not use the error handling built into the framework. Can be useful to debug without mail sending in the output.' },
     { PO_ACCOUNT_CODE: 'Purchase Order Account Code Default value for new PO.' },
-    { PO_FIN_OBJECT_CODE: 'Purchase Order Finance Object Code Default value for new PO.' }
+    { PO_FIN_OBJECT_CODE: 'Purchase Order Finance Object Code Default value for new PO.' },
+    { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' }
   ].freeze
 
   NO_OVERRIDE = [

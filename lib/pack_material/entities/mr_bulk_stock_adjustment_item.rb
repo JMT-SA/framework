@@ -9,6 +9,7 @@ module PackMaterialApp
     attribute :mr_type_name, Types::String
     attribute :mr_sub_type_name, Types::String
     attribute :product_variant_code, Types::String
+    attribute :old_product_code, Types::String
     attribute :location_long_code, Types::String
     attribute :inventory_uom_id, Types::Integer
     attribute? :inventory_uom_code, Types::String.optional

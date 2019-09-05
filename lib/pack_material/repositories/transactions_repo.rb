@@ -120,6 +120,7 @@ module PackMaterialApp
       variant = DB[:material_resource_product_variants].where(id: mr_product_variant_id)
       product_variant_number = variant.get(:product_variant_number)
       product_variant_code = variant.get(:product_variant_code)
+      old_product_code = variant.get(:old_product_code)
       sub_type_id = variant.get(:sub_type_id)
 
       sub_type = DB[:material_resource_sub_types].where(id: sub_type_id)
@@ -139,6 +140,7 @@ module PackMaterialApp
                        mr_type_name: mr_type_name,
                        mr_sub_type_name: mr_sub_type_name,
                        product_variant_code: product_variant_code,
+                       old_product_code: old_product_code,
                        inventory_uom_id: inventory_uom_id,
                        inventory_uom_code: inventory_uom_code,
                        system_quantity: system_qty,

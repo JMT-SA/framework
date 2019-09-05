@@ -19,7 +19,7 @@ module PackMaterialApp
     required(:location_scan_field, Types::StrippedString).maybe(:str?)
     required(:sku_number, :integer).filled(:int?)
     required(:sku_number_scan_field, Types::StrippedString).maybe(:str?)
-    required(:quantity, :integer).filled(:int?)
+    required(:quantity, :decimal).filled(:decimal?)
   end
 
   MrBulkStockAdjustmentPriceSchema = Dry::Validation.Params do

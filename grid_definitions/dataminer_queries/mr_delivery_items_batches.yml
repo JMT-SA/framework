@@ -34,7 +34,10 @@
   ON \"mr_purchase_orders\".\"id\" = \"mr_purchase_order_items\".\"mr_purchase_order_id\""
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    ok: Delivery has been Putaway
+    inprogress: Delivery has been verified but not yet completed
 :columns:
   delivery_id:
     :name: delivery_id
@@ -640,54 +643,6 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  invoice_completed:
-    :name: invoice_completed
-    :sequence_no: 36
-    :caption: Invoice completed
-    :namespaced_name: mr_deliveries.invoice_completed
-    :data_type: :boolean
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  erp_purchase_order_number:
-    :name: erp_purchase_order_number
-    :sequence_no: 37
-    :caption: ERP purchase order no
-    :namespaced_name: mr_deliveries.erp_purchase_order_number
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  erp_purchase_invoice_number:
-    :name: erp_purchase_invoice_number
-    :sequence_no: 38
-    :caption: ERP purchase invoice no
-    :namespaced_name: mr_deliveries.erp_purchase_invoice_number
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

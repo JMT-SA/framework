@@ -304,18 +304,21 @@ module PackMaterialApp
     def rmd_update_bulk_stock_adjustment_item(attrs) # rubocop:disable Metrics/AbcSize
       item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
                                                        mr_sku_id: attrs[:mr_sku_id],
-                                                       location_id: attrs[:location_id])
+                                                       location_id: attrs[:location_id]).first
+      return failed_response('Item does not exist') unless item || stock_take_on?(attrs)
 
-      unless item.first
-        business_process_id = DB[:mr_bulk_stock_adjustments].where(id: attrs[:mr_bulk_stock_adjustment_id]).get(:business_process_id)
-        return failed_response('Item does not exist') unless business_process_id == stock_take_on_business_process_id
+      item_id = if item.nil?
+                  create_mr_bulk_stock_adjustment_item(attrs)
+                else
+                  item[:id]
+                end
 
-        item_id = create_mr_bulk_stock_adjustment_item(attrs)
-        item = DB[:mr_bulk_stock_adjustment_items].where(id: item_id)
-      end
+      update(:mr_bulk_stock_adjustment_items, item_id, actual_quantity: attrs[:actual_quantity])
+      success_response('ok', item_id)
+    end
 
-      item.update(actual_quantity: attrs[:actual_quantity])
-      success_response('ok', item.get(:id))
+    def stock_take_on?(attrs)
+      DB[:mr_bulk_stock_adjustments].where(id: attrs[:mr_bulk_stock_adjustment_id]).get(:business_process_id) == stock_take_on_business_process_id
     end
 
     def stock_take_on_business_process_id

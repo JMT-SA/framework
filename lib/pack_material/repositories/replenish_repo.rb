@@ -217,8 +217,7 @@ module PackMaterialApp
     def po_vat_factor(po_id)
       DB[:mr_vat_types].join(:mr_purchase_orders, mr_vat_type_id: :id)
                        .where(Sequel[:mr_purchase_orders][:id] => po_id)
-                       .select(Sequel[:mr_vat_types][:percentage_applicable])
-                       .map { |r| r[:percentage_applicable] / 100.0 }[0] || AppConst::BIG_ZERO
+                       .get(Sequel[:mr_vat_types][:percentage_applicable]./100.0) || AppConst::BIG_ZERO
     end
 
     def mr_purchase_order_items(mr_purchase_order_id)
@@ -591,11 +590,11 @@ module PackMaterialApp
       product_variant_code = DB[:material_resource_product_variants].where(id: sku[:mr_product_variant_id]).get(:product_variant_code)
       item = DB[:mr_delivery_items].where(mr_product_variant_id: sku[:mr_product_variant_id], mr_delivery_id: delivery_id)
       <<~HTML
-        Delivery (#{delivery_number_from_id(delivery_id)}): #{done} of #{total_items.count} items.<br>
+        Delivery (#{delivery_number_from_id(delivery_id)}): #{done} of #{total_items.count} line-items completed.<br>
         Last scan:<br>
         LOC: #{location_long_code_from_location_id(to_location_id)}<br>
         SKU (#{sku_number_from_id(sku_id)}): #{product_variant_code}<br>
-        #{item.get(:quantity_putaway).to_i} of #{item.get(:quantity_received).to_i} items.<br>
+        #{item.get(:quantity_putaway).to_i} of #{item.get(:quantity_received).to_i} stock items putaway.<br>
       HTML
     end
 

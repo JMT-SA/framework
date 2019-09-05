@@ -23,6 +23,7 @@ module UiRules
       fields[:mr_type_name] = { renderer: :label, caption: 'Type Name' }
       fields[:mr_sub_type_name] = { renderer: :label, caption: 'Sub Type Name' }
       fields[:product_variant_code] = { renderer: :label }
+      fields[:old_product_code] = { renderer: :label }
       fields[:location_long_code] = { renderer: :label }
       fields[:inventory_uom_code] = { renderer: :label, caption: 'UOM Code' }
       fields[:scan_to_location_long_code] = { renderer: :label }

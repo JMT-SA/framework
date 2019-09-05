@@ -173,7 +173,7 @@ module PackMaterialApp
 
         sku_ids = replenish_repo.sku_ids_from_numbers(params[:sku_number])
         sku_id = sku_ids[0]
-        qty = Integer(params[:quantity])
+        qty = params[:quantity]
 
         location_id = replenish_repo.resolve_location_id_from_scan(params[:location], params[:location_scan_field])
         return failed_response('Location not found, please use location short code') unless location_id

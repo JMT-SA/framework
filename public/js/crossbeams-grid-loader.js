@@ -708,6 +708,9 @@ const crossbeamsGridFormatters = {
 
   // Is the last item in an array of context menu items a separator?
   lastIsSeparator: (items) => {
+    if (!items || items.length < 1) {
+      return false;
+    }
     if (!items[items.length - 1].value) {
       return false;
     }

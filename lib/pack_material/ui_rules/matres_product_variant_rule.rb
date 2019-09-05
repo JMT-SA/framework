@@ -21,8 +21,8 @@ module UiRules
         supplier_lead_time: { renderer: :integer, caption: 'Lead Time (days)' },
         current_price: { renderer: :label },
         stock_adj_price: { renderer: :label },
-        minimum_stock_level: { renderer: :integer },
-        re_order_stock_level: { renderer: :integer },
+        minimum_stock_level: { renderer: :numeric },
+        re_order_stock_level: { renderer: :numeric },
         use_fixed_batch_number: { renderer: :checkbox },
         mr_internal_batch_number_id: { renderer: :select, options: @repo.for_select_mr_internal_batch_numbers, caption: 'Internal Batch Number', prompt: true }
       }

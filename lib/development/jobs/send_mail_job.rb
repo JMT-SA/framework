@@ -3,14 +3,16 @@
 module DevelopmentApp
   class SendMailJob < BaseQueJob
     def run(options = {})
+      from_mail = resolve_sender(options[:from])
+
       mail = Mail.new do
-        from    options.fetch(:from, AppConst::SYSTEM_MAIL_SENDER)
+        from    from_mail
         to      options.fetch(:to)
         subject options.fetch(:subject)
         body    options.fetch(:body)
       end
 
-      mail['cc'] = options[:cc] if options[:cc]
+      cc_and_reply(mail, options)
 
       process_attachments(mail, options)
 
@@ -19,6 +21,26 @@ module DevelopmentApp
     end
 
     private
+
+    # Some email servers will block a user from sending to certain addresses.
+    # If that is the case, the FROM address is set to the system email sender
+    # (which does have permission to send emails) and the REPLY-TO is set to
+    # the user's email address so that the recipient can reply to the correct
+    # email address.
+    def resolve_sender(from)
+      return AppConst::SYSTEM_MAIL_SENDER if from.nil?
+
+      if AppConst::EMAIL_REQUIRES_REPLY_TO
+        AppConst::SYSTEM_MAIL_SENDER
+      else
+        from
+      end
+    end
+
+    def cc_and_reply(mail, options)
+      mail['cc'] = options[:cc] if options[:cc]
+      mail['reply_to'] = options[:from] if options[:from] && AppConst::EMAIL_REQUIRES_REPLY_TO
+    end
 
     def process_attachments(mail, options) # rubocop:disable Metrics/AbcSize
       (options[:attachments] || []).each do |rule|

@@ -46,6 +46,7 @@ module Crossbeams
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
     # @option options [String] :data_type the input type. Defaults to 'text'.
+    # @option options [Boolean] :allow_decimals can a data_type="number" input accept decimals?
     # @option options [String] :scan The type of barcode symbology to accept. e.g. 'key248_all' for any symbology. Omit for input that does not receive a scan result.
     # Possible values are: key248_all (any symbology), key249_3o9 (309), key250_upc (UPC), key251_ean (EAN), key252_2d (2D - QR etc)
     # @option options [Symbol] :scan_type the type of barcode to expect in the field. This must have a matching entry in AppConst::BARCODE_PRINT_RULES.
@@ -58,7 +59,7 @@ module Crossbeams
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}" name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
+        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
     end
@@ -143,6 +144,13 @@ module Crossbeams
       return '' if @step_count.nil?
 
       %(<span class="mid-gray"> &ndash; (step #{@step_number} of #{@step_count})</span>)
+    end
+
+    def decimal_or_int(data_type, options)
+      return '' unless data_type == 'number'
+      return '' unless options[:allow_decimals]
+
+      ' step="any"'
     end
 
     def lookup_data(options)

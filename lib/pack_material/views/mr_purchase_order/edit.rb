@@ -3,7 +3,7 @@
 module PackMaterial
   module Replenish
     module MrPurchaseOrder
-      class Edit
+      class Edit # rubocop:disable Metrics/ClassLength
         def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:mr_purchase_order, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
@@ -48,11 +48,12 @@ module PackMaterial
                     col.add_field :supplier_party_role_id
                     col.add_field :supplier_name
                     col.add_field :supplier_erp_number
-                    col.add_field :mr_delivery_term_id
-                    col.add_field :mr_vat_type_id
+                    col.add_field :remarks
                   end
 
                   row.column do |col|
+                    col.add_field :mr_delivery_term_id
+                    col.add_field :mr_vat_type_id
                     col.add_field :purchase_account_code
                     col.add_field :fin_object_code
                     col.add_field :valid_until
@@ -68,6 +69,12 @@ module PackMaterial
                                   text: 'Print Purchase Order',
                                   url: "/pack_material/reports/print_purchase_order/#{id}",
                                   loading_window: true,
+                                  visible: rules[:show_only],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: "#{Crossbeams::Layout::Icon.render(:envelope)} Email Purchase Order",
+                                  url: "/pack_material/reports/email_purchase_order/#{id}",
+                                  behaviour: :popup,
                                   visible: rules[:show_only],
                                   style: :button)
             end

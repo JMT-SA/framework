@@ -1,6 +1,6 @@
 ---
 :caption: Purchase Orders
-:sql: "SELECT \"mr_purchase_orders\".\"id\",\r\n\"mr_purchase_orders\".\"mr_delivery_term_id\",\r\n\"mr_purchase_orders\".\"approved\",\r\n\"mr_purchase_orders\".\"deliveries_received\",\r\n\"mr_purchase_orders\".\"supplier_party_role_id\",\r\n\"mr_purchase_orders\".\"mr_vat_type_id\",\r\n\"mr_purchase_orders\".\"delivery_address_id\",\r\n\"mr_purchase_orders\".\"purchase_account_code\",\r\n\"mr_purchase_orders\".\"fin_object_code\",\r\n\"mr_purchase_orders\".\"valid_until\",\r\n\"mr_purchase_orders\".\"purchase_order_number\",\r\n\"mr_purchase_orders\".\"created_at\",\r\n\"mr_purchase_orders\".\"updated_at\",\r\n\"addresses\".\"address_line_1\",\r\n\"mr_delivery_terms\".\"delivery_term_code\",\r\n\"mr_vat_types\".\"vat_type_code\",\r\nfn_party_role_name(\"mr_purchase_orders\".\"supplier_party_role_id\")
+:sql: "SELECT \"mr_purchase_orders\".\"id\",\r\n\"mr_purchase_orders\".\"mr_delivery_term_id\",\r\n\"mr_purchase_orders\".\"approved\",\r\n\"mr_purchase_orders\".\"deliveries_received\",\r\n\"mr_purchase_orders\".\"supplier_party_role_id\",\r\n\"mr_purchase_orders\".\"mr_vat_type_id\",\r\n\"mr_purchase_orders\".\"delivery_address_id\",\r\n\"mr_purchase_orders\".\"purchase_account_code\",\r\n\"mr_purchase_orders\".\"fin_object_code\",\r\n\"mr_purchase_orders\".\"valid_until\",\r\n\"mr_purchase_orders\".\"purchase_order_number\",\r\n\"mr_purchase_orders\".\"remarks\",\r\n\"mr_purchase_orders\".\"created_at\",\r\n\"mr_purchase_orders\".\"updated_at\",\r\n\"addresses\".\"address_line_1\",\r\n\"mr_delivery_terms\".\"delivery_term_code\",\r\n\"mr_vat_types\".\"vat_type_code\",\r\nfn_party_role_name(\"mr_purchase_orders\".\"supplier_party_role_id\")
   AS supplier_party_role,\r\ncase\r\n  when (mr_purchase_orders.approved and not mr_purchase_orders.deliveries_received)
   then 'inprogress'\r\n  else null\r\n  end as colour_rule\r\nFROM \"mr_purchase_orders\"
   LEFT JOIN \"addresses\" ON \"addresses\".\"id\" = \"mr_purchase_orders\".\"delivery_address_id\"
@@ -188,9 +188,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 12
+    :caption: Remarks
+    :namespaced_name: mr_purchase_orders.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Created at
     :namespaced_name: mr_purchase_orders.created_at
     :data_type: :datetime
@@ -206,7 +222,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Updated at
     :namespaced_name: mr_purchase_orders.updated_at
     :data_type: :datetime
@@ -222,7 +238,7 @@
     :group_max: false
   address_line_1:
     :name: address_line_1
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Address line 1
     :namespaced_name: addresses.address_line_1
     :data_type: :string
@@ -238,7 +254,7 @@
     :group_max: false
   delivery_term_code:
     :name: delivery_term_code
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Delivery term code
     :namespaced_name: mr_delivery_terms.delivery_term_code
     :data_type: :string
@@ -254,7 +270,7 @@
     :group_max: false
   vat_type_code:
     :name: vat_type_code
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Vat type code
     :namespaced_name: mr_vat_types.vat_type_code
     :data_type: :string
@@ -270,7 +286,7 @@
     :group_max: false
   supplier_party_role:
     :name: supplier_party_role
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Supplier party role
     :namespaced_name: 
     :data_type: :string
@@ -286,7 +302,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

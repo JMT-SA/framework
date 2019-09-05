@@ -21,9 +21,11 @@ class CreateJasperReport < BaseService
   NO_PRINTER = 'no_printer'
 
   def initialize(report_name:, user:, file:, params: {})
+    params = params.dup
     @report_name = report_name
     @user = user
     @keep_file = params.delete(:keep_file)
+    @return_full_path = params.delete(:return_full_path)
     @top_level_dir = params.delete(:top_level_dir) || ''
     @printer = params.delete(:printer) || NO_PRINTER
     @output_file = add_output_path(file)
@@ -47,7 +49,10 @@ class CreateJasperReport < BaseService
   private
 
   def download_file
-    File.relative_path(File.join(ENV['ROOT'], 'public'), "#{@output_file}.#{@file_type.downcase}")
+    file = "#{@output_file}.#{@file_type.downcase}"
+    return file if @return_full_path
+
+    File.relative_path(File.join(ENV['ROOT'], 'public'), file)
   end
 
   def clear_temp_file

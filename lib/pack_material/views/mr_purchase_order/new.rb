@@ -25,7 +25,7 @@ module PackMaterial
               form.add_field :purchase_account_code
               form.add_field :fin_object_code
               form.add_field :valid_until
-              # form.add_field :purchase_order_number
+              form.add_field :remarks
             end
           end
 

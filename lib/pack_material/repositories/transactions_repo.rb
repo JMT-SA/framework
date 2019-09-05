@@ -120,6 +120,7 @@ module PackMaterialApp
       variant = DB[:material_resource_product_variants].where(id: mr_product_variant_id)
       product_variant_number = variant.get(:product_variant_number)
       product_variant_code = variant.get(:product_variant_code)
+      old_product_code = variant.get(:old_product_code)
       sub_type_id = variant.get(:sub_type_id)
 
       sub_type = DB[:material_resource_sub_types].where(id: sub_type_id)
@@ -139,6 +140,7 @@ module PackMaterialApp
                        mr_type_name: mr_type_name,
                        mr_sub_type_name: mr_sub_type_name,
                        product_variant_code: product_variant_code,
+                       old_product_code: old_product_code,
                        inventory_uom_id: inventory_uom_id,
                        inventory_uom_code: inventory_uom_code,
                        system_quantity: system_qty,
@@ -301,21 +303,24 @@ module PackMaterialApp
                             wrapper: PackMaterialApp::MrBulkStockAdjustmentItem)
     end
 
-    def rmd_update_bulk_stock_adjustment_item(attrs) # rubocop:disable Metrics/AbcSize
+    def rmd_update_bulk_stock_adjustment_item(attrs)
       item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
                                                        mr_sku_id: attrs[:mr_sku_id],
-                                                       location_id: attrs[:location_id])
+                                                       location_id: attrs[:location_id]).first
+      return failed_response('Item does not exist') unless item || stock_take_on?(attrs)
 
-      unless item.first
-        business_process_id = DB[:mr_bulk_stock_adjustments].where(id: attrs[:mr_bulk_stock_adjustment_id]).get(:business_process_id)
-        return failed_response('Item does not exist') unless business_process_id == stock_take_on_business_process_id
+      item_id = if item.nil?
+                  create_mr_bulk_stock_adjustment_item(attrs)
+                else
+                  item[:id]
+                end
 
-        item_id = create_mr_bulk_stock_adjustment_item(attrs)
-        item = DB[:mr_bulk_stock_adjustment_items].where(id: item_id)
-      end
+      update(:mr_bulk_stock_adjustment_items, item_id, actual_quantity: attrs[:actual_quantity])
+      success_response('ok', item_id)
+    end
 
-      item.update(actual_quantity: attrs[:actual_quantity])
-      success_response('ok', item.get(:id))
+    def stock_take_on?(attrs)
+      DB[:mr_bulk_stock_adjustments].where(id: attrs[:mr_bulk_stock_adjustment_id]).get(:business_process_id) == stock_take_on_business_process_id
     end
 
     def stock_take_on_business_process_id

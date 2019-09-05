@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Framework < Roda
+class Framework < Roda # rubocop:disable Metrics/ClassLength
   route 'reports', 'pack_material' do |r| # rubocop:disable Metrics/BlockLength
     # MR PURCHASE ORDERS
     # --------------------------------------------------------------------------
@@ -14,6 +14,33 @@ class Framework < Roda
         change_window_location_via_json(res.instance, request.path)
       else
         show_error(res.message, fetch?(r))
+      end
+    end
+
+    r.on 'email_purchase_order', Integer do |id|
+      r.get do
+        interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
+        show_partial_or_page(r) do
+          Development::Generators::General::Email.call(remote: true,
+                                                       email_options: interactor.email_puchase_order_defaults(id, current_user),
+                                                       action: "/pack_material/reports/email_purchase_order/#{id}")
+        end
+      end
+      r.post do
+        opts = {
+          email_settings: params[:mail],
+          user: current_user.login_name,
+          reports: [
+            {
+              report_name: 'print_purchase_order',
+              file: 'purchase_order',
+              report_params: { mr_purchase_order_id: id,
+                               keep_file: true }
+            }
+          ]
+        }
+        DevelopmentApp::EmailJasperReport.enqueue(opts)
+        show_json_notice('Report queued to be generated and sent')
       end
     end
 

@@ -79,6 +79,17 @@ module PackMaterialApp
       TaskPermissionCheck::MrPurchaseOrder.call(:approve, id, @user)
     end
 
+    def email_puchase_order_defaults(id, user)
+      instance = mr_purchase_order(id)
+      party_repo = MasterfilesApp::PartyRepo.new
+      supplier_email = party_repo.email_address_for_party_role(instance.supplier_party_role_id)
+      {
+        to: supplier_email,
+        cc: user.email,
+        subject: "Purchase order #{instance.purchase_order_number}"
+      }
+    end
+
     private
 
     def repo

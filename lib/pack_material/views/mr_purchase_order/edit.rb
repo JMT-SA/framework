@@ -3,7 +3,7 @@
 module PackMaterial
   module Replenish
     module MrPurchaseOrder
-      class Edit
+      class Edit # rubocop:disable Metrics/ClassLength
         def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:mr_purchase_order, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile

@@ -1,5 +1,6 @@
 require 'dotenv'
 require 'que'
+require 'message_bus'
 
 if ENV.fetch('RACK_ENV') == 'test'
   Dotenv.load('.env.test', '.env.local', '.env')
@@ -38,3 +39,5 @@ Que.job_middleware.push(
     nil # Doesn't matter what's returned.
   }
 )
+
+MessageBus.configure(backend: :postgres, backend_options: db_name)

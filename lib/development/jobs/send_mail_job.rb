@@ -2,7 +2,7 @@
 
 module DevelopmentApp
   class SendMailJob < BaseQueJob
-    def run(options = {})
+    def run(options = {}) # rubocop:disable Metrics/AbcSize
       from_mail = resolve_sender(options[:from])
 
       mail = Mail.new do
@@ -17,6 +17,7 @@ module DevelopmentApp
       process_attachments(mail, options)
 
       mail.deliver!
+      send_bus_message("Mail sent: '#{options[:subject]}'", target_user: options[:notify_user]) if options[:notify_user]
       finish
     end
 

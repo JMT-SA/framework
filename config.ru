@@ -24,6 +24,7 @@ if defined?(PhusionPassenger)
   PhusionPassenger.on_event(:starting_worker_process) do |forked|
     if forked
       # We're in smart spawning mode.
+      MessageBus.after_fork
       # - disconnect in the parent so the parent's db connection is not shared in the child processes.
       DB.disconnect
     end

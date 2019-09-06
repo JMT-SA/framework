@@ -24,6 +24,7 @@ Sequel:: Database ORM - link:http://sequel.jeremyevans.net/documentation.html[se
 Dry::Struct:: Define data entities - link:https://dry-rb.org/gems/dry-struct/[dry-struct]
 Dry::Validation:: Define rules for validating inputs - link:https://dry-rb.org/gems/dry-validation/[dry-validation]
 Minitest:: Test runnner - link:https://github.com/seattlerb/minitest[minitest]
+MessageBus:: Async message bus - https://github.com/SamSaffron/message_bus
 
 ==== Javascript libraries
 
@@ -36,6 +37,10 @@ Tachyons:: functional css - link:https://tachyons.io/[Tachyons]
 
 Most classes in code should be tachyons classes (e.g. `class="b blue br3"` (read: bold, blue, border-radius 3) means `font-weight: bold`, `color: blue` `border-radius: .5rem`).
 Custom css should only be written if tachyons does not cover the desired outcome.
+
+==== Other
+
+Jasper Reports:: Reporting environment written in Java - https://community.jaspersoft.com/project/jasperreports-library
 
 === Ruby code
 

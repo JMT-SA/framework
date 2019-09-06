@@ -51,6 +51,7 @@ Pictoral overview of application.
 * link:/developer_documentation/rmd_forms.adoc[RMD Forms]
 * link:/developer_documentation/json_rendering.adoc[JSON rendering]
 * link:/developer_documentation/icons.adoc[Icons]
+* link:/developer_documentation/message_bus.adoc[MessageBus]
 
 ==== Backend
 

@@ -1,0 +1,49 @@
+= Message bus
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Message bus
+
+This application uses the following gems to handle async messages.
+
+MessageBus:: https://github.com/SamSaffron/message_bus
+roda-message_bus:: https://github.com/jeremyevans/roda-message_bus
+
+=== Crossbeams::MessageBus module
+
+The `Crossbeams::MessageBus` module is included in `BaseQueJob` and `BaseService`.
+
+This module provides the following methods:
+
+broadcast:: This sends a message to ALL browsers (except RMD devices).
+send_bus_message:: This can broadcast a message, but can also be directed at a particular logged-in user's browser.
+
+=== broadcast method
+
+Use this method to send a message to all users.
+[source,ruby]
+----
+# Definition
+broadcast(message, message_type: :information)
+
+# Uses:
+broadcast('I want to say something')
+broadcast('I want to say something', message_type: :warning)
+
+# message_type can be :information (default), :warning or :error
+----
+
+=== send_bus_message method
+
+Use this method to send any kind of message, typically for a particular user. Use the `login_name` value of the user record as the target.
+[source,ruby]
+----
+# Definition
+send_bus_message(message, message_type: :information, target_user: 'broadcast')
+
+# Uses:
+send_bus_message('I want to say something')
+send_bus_message('I want to say something', target_user: current_user.login_name)
+send_bus_message('I want to say something', message_type: :error)
+----

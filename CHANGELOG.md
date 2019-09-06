@@ -9,6 +9,7 @@ and this project adheres roughly to [Semantic Versioning](http://semver.org/).
 ### Added
 ### Changed
 - Upgrade AG Grid to version 21.
+- Message Bus to be able to push messages to the browser from the server.
 ### Fixed
 
 ## [0.6.3] - 2019-07-11

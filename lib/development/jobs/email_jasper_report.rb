@@ -8,7 +8,7 @@ module DevelopmentApp
         attachments << build_report(options[:user_name], spec)
       end
 
-      SendMailJob.enqueue(options[:email_settings].merge(attachments: attachments.map { |a| { path: a } }))
+      SendMailJob.enqueue(options[:email_settings].merge(notify_user: options[:user_name], attachments: attachments.map { |a| { path: a } }))
     end
 
     private
@@ -18,7 +18,12 @@ module DevelopmentApp
                                     user: user,
                                     file: spec[:file],
                                     params: spec[:report_params].merge(return_full_path: true))
-      raise "Failed to build report '#{spec[:report_name]}' - #{res.message}" unless res.success
+      unless res.success
+        send_bus_message("Failed to build report '#{spec[:report_name]}' - #{res.message}",
+                         message_type: :error,
+                         target_user: user)
+        raise "Failed to build report '#{spec[:report_name]}' - #{res.message}"
+      end
 
       res.instance
     end

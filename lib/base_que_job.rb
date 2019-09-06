@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class BaseQueJob < Que::Job
+  include Crossbeams::MessageBus
+
   self.queue = AppConst::QUEUE_NAME
 
   Que.error_notifier = proc do |error, job|

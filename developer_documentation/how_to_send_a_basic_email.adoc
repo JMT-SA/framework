@@ -39,18 +39,22 @@ From your code (within a transaction if part of a process that modifies the data
 [source,ruby]
 ----
 DevelopmentApp::SendMailJob.enqueue(to: 'recipient@someplace.com',
-                                    from: 'Abc Jones <abc@def.com>',                      # <1>
+                                    from: 'Abc Jones <abc@def.com>',                  # <1>
                                     subject: 'Test mail job',
                                     body: "Hi there\n\nCheck this out.\n\nJoe Soap",
-                                    cc: 'another@someplace.com',                          # <2>
-                                    attachments: [{ path: '/home/user/place/a_file.pdf' },# <3>
-                                                  { filename: 'invoice_costs.xlsx',       # <4>
+                                    cc: 'another@someplace.com',                      # <2>
+                                    notify_user: current_user.login_name,             # <3>
+                                    attachments: [{ path: '/home/user/abc/file.pdf' },# <4>
+                                                  { filename: 'invoice_costs.xlsx',   # <5>
                                                     content: File.read('costs.xlsx') }])
 ----
 <1> The `from` is not required - it defaults to the `AppConst::SYSTEM_MAIL_SENDER`.
 <2> `cc` is optional.
-<3> An attachment can point to a file on disk.
-<4> An attachment can be provided as `content` with a `filename`. The `mime_type` can be provided, but the `Mail` gem will ususally do a good job of working it out.
+<3> Optional. If `notify_user` is set, a message will be sent to the browser window of the same logged-in user when the mail is sent.
+<4> An attachment can point to a file on disk.
+<5> An attachment can be provided as `content` with a `filename`. The `mime_type` can be provided, but the `Mail` gem will ususally do a good job of working it out.
+
+NOTE: If the environment variable `EMAIL_REQUIRES_REPLY_TO` has been set to 'Y' and a `from` is provided, the `from` will be set to the `AppConst::SYSTEM_MAIL_SENDER` and the `Reply-To` header of the email will be set to the value of `from`. This allows for mail exchange rules that restrict routing for certain users.
 
 NOTE: The `to` and `cc` values can be arrays if there is more than one recipient.
 

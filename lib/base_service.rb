@@ -5,6 +5,7 @@ require 'observer'
 class BaseService
   include Crossbeams::Responses
   include Observable
+  include Crossbeams::MessageBus
 
   class << self
     def call(*args, &block)

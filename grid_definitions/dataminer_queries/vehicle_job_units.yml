@@ -1,0 +1,291 @@
+---
+:caption: Vehicle Job Units
+:sql: "SELECT \"vehicle_job_units\".\"id\",\r\n       \"vehicle_job_units\".\"mr_sku_location_from_id\",\r\n
+  \      \"vehicle_job_units\".\"mr_inventory_transaction_item_id\",\r\n       \"vehicle_job_units\".\"vehicle_job_id\",\r\n
+  \      \"vehicle_job_units\".\"quantity_to_move\",\r\n       \"vehicle_job_units\".\"when_loaded\",\r\n
+  \      \"vehicle_job_units\".\"when_offloaded\",\r\n       \"vehicle_job_units\".\"when_offloading\",\r\n
+  \      \"vehicle_job_units\".\"quantity_moved\",\r\n       \"vehicle_job_units\".\"created_at\",\r\n
+  \      \"vehicle_job_units\".\"updated_at\",\r\n       \"vehicle_job_units\".\"when_loading\",\r\n
+  \      \"mr_inventory_transaction_items\".\"id\" AS mr_inventory_transaction_items_id,\r\n
+  \      \"locations\".\"location_long_code\" AS mr_sku_location_from_location_long_code,\r\n
+  \      fn_current_status('vehicle_job_units', \"vehicle_job_units\".\"id\") AS status\r\nFROM
+  \"vehicle_job_units\"\r\n    LEFT JOIN \"mr_inventory_transaction_items\" ON \"mr_inventory_transaction_items\".\"id\"
+  = \"vehicle_job_units\".\"mr_inventory_transaction_item_id\"\r\n    LEFT JOIN \"locations\"
+  ON \"locations\".\"id\" = \"vehicle_job_units\".\"mr_sku_location_from_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: vehicle_job_units.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_sku_location_from_id:
+    :name: mr_sku_location_from_id
+    :sequence_no: 2
+    :caption: Mr sku location from
+    :namespaced_name: vehicle_job_units.mr_sku_location_from_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_inventory_transaction_item_id:
+    :name: mr_inventory_transaction_item_id
+    :sequence_no: 3
+    :caption: Mr inventory transaction item
+    :namespaced_name: vehicle_job_units.mr_inventory_transaction_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_job_id:
+    :name: vehicle_job_id
+    :sequence_no: 4
+    :caption: Vehicle job
+    :namespaced_name: vehicle_job_units.vehicle_job_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_to_move:
+    :name: quantity_to_move
+    :sequence_no: 5
+    :caption: Quantity to move
+    :namespaced_name: vehicle_job_units.quantity_to_move
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_loaded:
+    :name: when_loaded
+    :sequence_no: 6
+    :caption: When loaded
+    :namespaced_name: vehicle_job_units.when_loaded
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_offloaded:
+    :name: when_offloaded
+    :sequence_no: 7
+    :caption: When offloaded
+    :namespaced_name: vehicle_job_units.when_offloaded
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_offloading:
+    :name: when_offloading
+    :sequence_no: 8
+    :caption: When offloading
+    :namespaced_name: vehicle_job_units.when_offloading
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_moved:
+    :name: quantity_moved
+    :sequence_no: 9
+    :caption: Quantity moved
+    :namespaced_name: vehicle_job_units.quantity_moved
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: vehicle_job_units.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: vehicle_job_units.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_loading:
+    :name: when_loading
+    :sequence_no: 12
+    :caption: When loading
+    :namespaced_name: vehicle_job_units.when_loading
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_inventory_transaction_items_id:
+    :name: mr_inventory_transaction_items_id
+    :sequence_no: 13
+    :caption: Mr inventory transaction items
+    :namespaced_name: mr_inventory_transaction_items.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_sku_location_from_location_long_code:
+    :name: mr_sku_location_from_location_long_code
+    :sequence_no: 14
+    :caption: Mr sku location from location long code
+    :namespaced_name: locations.location_long_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 15
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: vehicle_job_units.mr_sku_location_from_id
+  :caption: Mr sku location from
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT location_long_code, id FROM locations ORDER BY location_long_code
+- :column: vehicle_job_units.mr_inventory_transaction_item_id
+  :caption: Mr inventory transaction item
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM mr_inventory_transaction_items ORDER BY id
+- :column: vehicle_job_units.vehicle_job_id
+  :caption: Vehicle job
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: mr_inventory_transaction_items.id
+  :caption: Mr inventory transaction items
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

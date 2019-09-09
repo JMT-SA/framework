@@ -51,6 +51,7 @@ Optional keys:
 * `columns`: Array of Symbols - one for each desired column. If not present, all columns are returned
 * `uses_join_table`: Boolean - if true, will create a join table name using main_table and sub_table names sorted and joined with "_".
 * `join_table`: String - if present, use this as the join table.
+* `id_keys_column`: Symbol - the name of an integer array column containing ids pointing to records in the sub_table. **NB:** This option cannot be used with `:uses_join_table` or `:join_table`.
 * `active_only`: Boolean (Only return active rows.)
 * `inactive_only`: Boolean (Only return inactive rows. The key in the main hash becomes `:inactive_sub_table`)
 
@@ -83,6 +84,14 @@ find_with_association(:programs,
                                      uses_join_table: true,
                                      active_only: true,
                                      columns: [:id, :user_name] }])
+
+# A sub-table joined from a column of ids.
+# (The orchards table has column `cultivar_ids integer[]`)
+find_with_association(:orchards,
+                      123,
+                      sub_tables: [{ sub_table: :cultivars,
+                                     id_keys_column: :cultivar_ids,
+                                     columns: [:id, :cultivar_name, :description] }])
 ----
 
 === Parent tables

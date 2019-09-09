@@ -780,7 +780,7 @@ const crossbeamsUtils = {
     if (option === null || option === undefined) {
       optVal = '';
     } else {
-      optVal = typeof option === 'string' ? option : option.value;
+      optVal = typeof option === 'string' || typeof option === 'number' ? option : option.value;
     }
     const queryParam = { changed_value: optVal };
     element.param_keys.forEach((key) => {

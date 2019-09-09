@@ -128,6 +128,8 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # Returns nil if the row is not found.
   # Returns a Hash if no wrapper is provided, else an instance of the wrapper class.
   #
+  # SUB TABLES
+  # ----------
   # Each Hash in the sub_tables array must include:
   # sub_table: Symbol - if no other options provided, assumes that the sub table has a column named "main_table_id" and all columns are returned.
   #
@@ -135,6 +137,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # columns: Array of Symbols - one for each desired column. If not present, all columns are returned
   # uses_join_table: Boolean - if true, will create a join table name using main_table and sub_table names sorted and joined with "_".
   # join_table: String - if present, use this as the join table.
+  # id_keys_column: Symbol - the name of an integer array column containing ids pointing to records in the sub_table.
   # active_only: Boolean (Only return active rows.)
   # inactive_only: Boolean (Only return inactive rows. The key in the main hash becomes :inactive_sub_table)
   #
@@ -144,6 +147,8 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #     find_with_association(:programs, 123, sub_tables: [{ sub_table: :program_functions },
   #                                                        { sub_table: :users, uses_join_table: true, active_only: true, columns: [:id, :user_name] }])
   #
+  # PARENT TABLES
+  # -------------
   # Each Hash in the parent_tables array must include:
   # parent_table: Symbol - If no :columns array provided, returns all columns.
   #
@@ -155,6 +160,8 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # examples:
   #     find_with_association(:programs, prog_id, parent_tables: [{ parent_table: :functional_areas, columns: [:functional_area_name] }])
   #
+  # LOOKUP FUNCTIONS
+  # ----------------
   # Each Hash in the lookup_functions array must include:
   # function: Symbol - the name of the function to call.
   # args: Array of Symbols for values from the main table or of literals to be used as arguments for the function.

@@ -81,7 +81,7 @@
     :namespaced_name: material_resource_product_variants.current_price
     :data_type: :number
     :width: 140
-    :format: :delimited_1000
+    :format: :delimited_1000_4
     :hide: false
     :pinned: 
     :groupable: false
@@ -97,7 +97,7 @@
     :namespaced_name: mr_bulk_stock_adjustment_prices.stock_adj_price
     :data_type: :number
     :width: 140
-    :format: :delimited_1000
+    :format: :delimited_1000_4
     :hide: false
     :pinned: 
     :groupable: true

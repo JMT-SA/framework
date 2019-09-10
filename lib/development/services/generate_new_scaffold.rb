@@ -171,16 +171,18 @@ module DevelopmentApp
         jsonb: '{}'
       }.freeze
 
+      FAKER_STRING = 'Faker::Lorem.word'
+      FAKER_UNIQUE_STRING = 'Faker::Lorem.unique.word'
       FAKER_DATA_LOOKUP = {
-        integer: 'Faker::Number.number',
+        integer: 'Faker::Number.number(4)',
         string: 'Faker::Lorem.word',
         boolean: 'false',
         float: '1.0',
         datetime: "'2010-01-01 12:00'",
         date: "'2010-01-01'",
         decimal: 'Faker::Number.decimal',
-        integer_array: '[1, 2, 3]',
-        string_array: "['A', 'B', 'C']",
+        integer_array: 'BaseRepo.new.array_for_db_col([1, 2, 3])',
+        string_array: "BaseRepo.new.array_for_db_col(['A', 'B', 'C'])",
         jsonb: '{}'
       }.freeze
 
@@ -223,6 +225,7 @@ module DevelopmentApp
         @columns         = repo.table_columns(table)
         @column_names    = repo.table_col_names(table)
         @indexed_columns = repo.indexed_columns(table)
+        @unique_columns  = repo.unique_columns(table)
         @foreigns        = repo.foreign_keys(table)
         @col_lookup      = Hash[@columns]
         @fk_lookup       = {}
@@ -275,10 +278,16 @@ module DevelopmentApp
         elsif fk_lookup[column]
           "#{@inflector.singularize(fk_lookup[column][:table])}_id"
         elsif faker
-          FAKER_DATA_LOOKUP[type] || 'nil'
+          faker_data(column, type)
         else
           DUMMY_DATA_LOOKUP[@col_lookup[column][:type]] || "'??? (#{@col_lookup[column][:type]})'"
         end
+      end
+
+      def faker_data(column, type)
+        data = FAKER_DATA_LOOKUP[type] || 'nil'
+        data = FAKER_UNIQUE_STRING if data == FAKER_STRING && @unique_columns.include?(column)
+        data
       end
 
       def column_dry_validation_type(column)
@@ -1352,7 +1361,7 @@ module DevelopmentApp
           s = <<~RUBY
             def create_#{opts.inflector.singularize(table)}(opts = {})
                   #{show_lkp(lkps)}default = {
-                    #{fields.map { |f| render_field(f) }.join(",\n        ")}
+                    #{fields.map { |f| render_field(f, table) }.join(",\n        ")}
                   }
                   DB[:#{table}].insert(default.merge(opts))
                 end
@@ -1369,13 +1378,14 @@ module DevelopmentApp
         "#{lkps.join("\n      ")}\n\n      "
       end
 
-      def render_field(field)
+      def render_field(field, table)
         if field[:ftbl]
           "#{field[:name]}: #{opts.inflector.singularize(field[:ftbl])}_id"
         elsif field[:name] == :active
           "#{field[:name]}: true"
         else
-          "#{field[:name]}: #{opts.table_meta.column_dummy_data(field[:name], faker: true, type: field[:type])}"
+          tab = TableMeta.new(table)
+          "#{field[:name]}: #{tab.column_dummy_data(field[:name], faker: true, type: field[:type])}"
         end
       end
 

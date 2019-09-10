@@ -26,5 +26,10 @@ module DevelopmentApp
         index[:columns].length == 1 ? index[:columns].first : nil
       end.compact
     end
+
+    # Array of columns that require unique values on their own
+    def unique_columns(table)
+      DB.indexes(table).select { |_, index| index[:unique] }.map { |_, index| index[:columns].length == 1 ? index[:columns].first : nil }.compact
+    end
   end
 end

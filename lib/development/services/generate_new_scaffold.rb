@@ -272,10 +272,10 @@ module DevelopmentApp
         DRY_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
       end
 
-      def column_dummy_data(column, faker: false, type: nil)
+      def column_dummy_data(column, faker: false, with_fk: true, type: nil)
         if column == likely_label_field
           'Faker::Lorem.unique.word'
-        elsif fk_lookup[column]
+        elsif with_fk && fk_lookup[column]
           "#{@inflector.singularize(fk_lookup[column][:table])}_id"
         elsif faker
           faker_data(column, type)
@@ -1195,10 +1195,10 @@ module DevelopmentApp
 
       private
 
-      def columnise
+      def columnise(with_fk: true)
         attr = []
         opts.table_meta.columns_without(%i[created_at updated_at active]).each do |col|
-          attr << "#{col}: #{opts.table_meta.column_dummy_data(col)}"
+          attr << "#{col}: #{opts.table_meta.column_dummy_data(col, with_fk: with_fk)}"
         end
         attr << 'active: true' if opts.table_meta.active_column_present?
         attr
@@ -1391,7 +1391,7 @@ module DevelopmentApp
 
       def test_permission
         perm_check = "#{opts.classnames[:module]}::TaskPermissionCheck::#{opts.classnames[:class]}"
-        ent = columnise.join(",\n        ")
+        ent = columnise(with_fk: false).join(",\n        ")
         <<~RUBY
           # frozen_string_literal: true
 

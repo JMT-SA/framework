@@ -21,13 +21,18 @@ Configuration is defined in `config/extended_column_definitions.rb`.
 
 There is a Hash named `EXTENDED_COLUMNS` with keys for table name as a `Symbol`.
 
-Each table name is a Hash with keys for every `CLIENT_CODE` (as a `String`). If there is no entry for the current `CLIENT_CODE`, the table will not have extended columns for that client.
+Each table name is a Hash with keys for every `CLIENT_CODE` (as a `String`). If there is no entry for the current `CLIENT_CODE`, the table will not have extended columns for that client (unless a default is specified).
+
+NOTE: If there is an entry for `AppConst::DEFAULT_KEY`, this will be used if there is no `CLIENT_CODE` entry.
 
 e.g.
 [source,ruby]
 ----
 EXTENDED_COLUMNS = {
   labels: {
+    AppConst::DEFAULT_KEY => {
+      label_type: { type: :string, masterlist_key: 'label_type', required: true }
+    },
     'srcc' => {
       agent: { type: :string, required: true },
       important: { type: :boolean },
@@ -39,8 +44,9 @@ EXTENDED_COLUMNS = {
 
 NOTE: The table name **must** be a `Symbol` and the client code **must** be a `String`. In fact all keys are symbols except for the client code ('srcc' in this example).
 
-==== Validation
+In the above example, all clients except `srcc` will have a column `label_type` in the table, while `srcc` will have `agent`, `important` and `commodity`.
 
+==== Validation
 
 There is a Hash named `VALIDATIONS` with keys for table name as a `Symbol`.
 
@@ -52,6 +58,9 @@ e.g.
 ----
 VALIDATIONS = {
   labels: {
+    AppConst::DEFAULT_KEY => Dry::Validation.Params do
+      required(:label_type).filled(:str?)
+    end,
     'srcc' => Dry::Validation.Params do
       required(:agent).filled(:str?)
       required(:pack_week).filled(:int?, gteq?: 1, lteq?: 52)
@@ -71,6 +80,11 @@ Sequel.migration do
   change do
     extension :pg_json
     add_column :labels, :extended_columns, :jsonb
+
+    # OR - when creating a table from scratch:
+    create_table(:labels, ignore_index_errors: true) do
+      Jsonb :extended_columns
+    end
   end
 end
 ----

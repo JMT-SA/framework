@@ -89,8 +89,13 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       r.on 'edit' do
         r.is do
           @page = interactor.edit_report(id)
-          store_locally(:dm_admin_page, @page)
-          view('dataminer/admin/edit')
+          if @page.success
+            store_locally(:dm_admin_page, @page)
+            view('dataminer/admin/edit')
+          else
+            flash[:error] = @page.message
+            r.redirect '/dataminer/admin'
+          end
         end
 
         r.on 'colour_grid' do

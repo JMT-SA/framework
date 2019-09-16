@@ -81,11 +81,13 @@ Pictoral overview of application.
 * How to link:/developer_documentation/how_to_protect_masterfile_data.adoc[protect masterfile data].
 +
 Block users from changing table data that application code requires.
+* How to link:/developer_documentation/how_to_populate_entity_with_associated_entities.adoc[populate an entity with associated entities].
 
 ==== UI
 
 * How to link:/developer_documentation/how_to_use_multiselect_grid.adoc[use a multiselect grid].
 * How to link:/developer_documentation/how_to_use_lookup_grid.adoc[set up a lookup grid].
+* How to link:/developer_documentation/how_to_test_rmd_scanning.adoc[test RMD scanning].
 
 ==== Config
 
@@ -99,7 +101,6 @@ Client-defined columns for a table.
 
 * How to link:/developer_documentation/how_to_use_repositories.adoc[use repositories].
 * How to link:/developer_documentation/how_to_do_dry_validation.adoc[do dry validation].
-* How to link:/developer_documentation/how_to_populate_entity_with_associated_entities.adoc[populate an entity with associated entities].
 * How to link:/developer_documentation/how_to_produce_a_jasper_report.adoc[produce a jasper report].
 * How to link:/developer_documentation/how_to_send_a_basic_email.adoc[send a basic email via the send mail job].
 * How to link:/developer_documentation/how_to_attach_observers_to_a_service.adoc[attach observers to a service].

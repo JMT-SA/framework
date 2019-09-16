@@ -101,7 +101,7 @@ class BaseInteractor
   # @param params [Hash] the request parameters.
   # @return [OpenStruct] validation results.
   def validate_extended_columns(table, params)
-    validator = Crossbeams::Config::ExtendedColumnDefinitions::VALIDATIONS[table][AppConst::CLIENT_CODE]
+    validator = Crossbeams::Config::ExtendedColumnDefinitions.validation_for(table)
     return OpenStruct.new(messages: {}) unless validator
 
     res = validator.call(select_extended_columns_params(params))

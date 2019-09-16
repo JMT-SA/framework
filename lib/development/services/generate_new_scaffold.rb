@@ -1284,14 +1284,11 @@ module DevelopmentApp
               def test_update_#{opts.singlename}_fail
                 id = create_#{opts.singlename}
                 attrs = interactor.send(:repo).find_hash(:#{opts.table}, id).reject { |k, _| %i[id #{req_col}].include?(k) }
-                value = attrs[:#{str_col}]
-                attrs[:#{str_col}] = 'a_change'
                 res = interactor.update_#{opts.singlename}(id, attrs)
                 refute res.success, "\#{res.message} : \#{res.errors.inspect}"
                 assert_equal ['is missing'], res.errors[:#{req_col}]
                 after = interactor.send(:repo).find_hash(:#{opts.table}, id)
                 refute_equal 'a_change', after[:#{str_col}]
-                assert_equal value, after[:#{str_col}]
               end
 
               def test_delete_#{opts.singlename}

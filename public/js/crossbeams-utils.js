@@ -436,7 +436,6 @@ const crossbeamsUtils = {
     let nVal = '';
     let nText = '';
     const newItems = [];
-    select.removeActiveItems();
     action.replace_options.options.forEach((item) => {
       if (item.constructor === Array) {
         nVal = (item[1] || item[0]);
@@ -450,7 +449,19 @@ const crossbeamsUtils = {
         label: nText,
       });
     });
-    select.setChoices(newItems, 'value', 'label', true);
+
+    if (select) {
+      select.removeActiveItems();
+      select.setChoices(newItems, 'value', 'label', true);
+    } else {
+      while (elem.options.length) elem.remove(0);
+      newItems.forEach((item) => {
+        const option = document.createElement('option');
+        option.value = item.value;
+        option.text = item.label;
+        elem.appendChild(option);
+      });
+    }
   },
 
   /**

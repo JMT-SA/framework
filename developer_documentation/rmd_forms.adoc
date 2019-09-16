@@ -27,6 +27,9 @@ form = Crossbeams::RMDForm.new(details,
                                step_and_total: [1, 2],
                                action: '/rmd/deliveries/putaways',
                                button_caption: 'Putaway')
+form.behaviours do |behaviour|
+  behaviour.keyup :quantity, notify: [{ url: '/rmd/deliveries/quantity_changed' }]
+end
 form.add_label(:business_process, 'Business process', 'DELIVERY')
 form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
 form.add_select(:choice, 'Choose', items: items, value: 'my', required: true, prompt: true)
@@ -45,6 +48,14 @@ view(inline: form.render, layout: :layout_rmd)
 |new
 |form_state (Hash), options (Hash)
 |Initialize the form.
+
+|behaviours
+|block
+a|AJAX behaviours.
+
+(see link:/developer_documentation/field_renderer_behaviours.adoc[Field renderer behaviours])
+
+**NB**. behaviours must be specified before fields are added.
 
 |add_field
 |name (String), label (String), options (Hash)
@@ -204,6 +215,13 @@ a|String:
 |Boolean
 |`false`
 
+|options - :hide_on_load
+a|Should the field be hidden when the form loads - typically to be shown later via a behaviour.
+
+Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{field_name}_row`.
+|Boolean
+|`false`
+
 |===
 
 === Method: add_select
@@ -252,6 +270,13 @@ form.add_select(:business_process, 'Business process', items: processes,
 |String or Booelan
 |None.
 
+|options - :hide_on_load
+a|Should the field be hidden when the form loads - typically to be shown later via a behaviour.
+
+Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{field_name}_row`.
+|Boolean
+|`false`
+
 |===
 
 === Method: add_label
@@ -292,6 +317,13 @@ form.add_label(:from_location, 'From location', 'CS1_BY1_RCB2', 37)
 |The value to set for a hidden input which will return as a parameter keyed by the field name.
 |String
 |None. If the form's `form_state` has a value for this field, it will be used.
+
+|options - :hide_on_load
+a|Should the field be hidden when the form loads - typically to be shown later via a behaviour.
+
+Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{field_name}_row`.
+|Boolean
+|`false`
 
 |===
 

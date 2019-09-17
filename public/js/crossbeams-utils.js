@@ -209,6 +209,7 @@ const crossbeamsUtils = {
     dlg.innerHTML = data;
     crossbeamsUtils.makeMultiSelects();
     crossbeamsUtils.makeSearchableSelects();
+    crossbeamsUtils.applySelectEvents();
     const grids = dlg.querySelectorAll('[data-grid]');
     grids.forEach((grid) => {
       const gridId = grid.getAttribute('id');
@@ -906,6 +907,53 @@ const crossbeamsUtils = {
    * @param {string} id - the id of the DOM element.
    * @returns {void}
    */
+  applySelectEvents: function applySelectEvents() {
+    const sels = document.querySelectorAll('select:not(.searchable-select)');
+    sels.forEach((sel) => {
+      // changeValues behaviour - check if another element should be
+      // enabled/disabled based on the current selected value.
+      if (sel.dataset && sel.dataset.changeValues) {
+        sel.addEventListener('change', (event) => {
+          sel.dataset.changeValues.split(',').forEach((el) => {
+            const target = document.getElementById(el);
+            if (target && (target.dataset && target.dataset.enableOnValues)) {
+              const vals = target.dataset.enableOnValues;
+              if (vals.includes(event.value)) {
+                target.disabled = false;
+              } else {
+                target.disabled = true;
+              }
+              if (target.selectr) {
+                if (target.disabled) {
+                  target.selectr.disable();
+                } else {
+                  target.selectr.enable();
+                }
+              }
+            }
+          });
+        });
+      }
+
+      // observeChange behaviour - get rules from select element and
+      // call the supplied url(s).
+      if (sel.dataset && sel.dataset.observeChange) {
+        sel.addEventListener('change', (event) => {
+          const s = sel.dataset.observeChange;
+          const j = JSON.parse(s);
+          const urls = j.map(el => this.buildObserveChangeUrl(el, event.value));
+
+          urls.forEach(url => this.fetchDropdownChanges(url));
+        });
+      }
+    });
+  },
+
+  /**
+   * Toggle the visibility of en element in the DOM:
+   * @param {string} id - the id of the DOM element.
+   * @returns {void}
+   */
   toggleVisibility: function toggleVisibility(id) {
     const e = document.getElementById(id);
     e.hidden = !e.hidden;
@@ -1224,6 +1272,7 @@ const crossbeamsUtils = {
 
         crossbeamsUtils.makeMultiSelects();
         crossbeamsUtils.makeSearchableSelects();
+        crossbeamsUtils.applySelectEvents();
         const grids = contentDiv.querySelectorAll('[data-grid]');
         grids.forEach((grid) => {
           const gridId = grid.getAttribute('id');

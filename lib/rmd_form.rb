@@ -145,6 +145,74 @@ module Crossbeams
       yield self
     end
 
+    # ---------------------------------------------------------------------------------------------------
+    # BEHAVIOURS - PARTS OF THIS CODE ARE ALSO IN UiRules AND PARTS IN Crossbeams::Layout::Renderer::Base
+    # ---------------------------------------------------------------------------------------------------
+
+    # 1) BEHAVIOUR (UiRules)
+    # ======================
+    def enable(field_to_enable, conditions = {})
+      targets = Array(field_to_enable)
+      observer = conditions[:when] || raise(ArgumentError, 'Enable behaviour requires `when`.')
+      change_values = conditions[:changes_to]
+      @rules << { observer => { change_affects: targets.join(';') } }
+      targets.each do |target|
+        @rules << { target => { enable_on_change: change_values } }
+      end
+    end
+
+    def dropdown_change(field_name, conditions = {})
+      raise(ArgumentError, 'Dropdown change behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        notify: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
+    def populate_from_selected(field_name, conditions = {})
+      @rules << { field_name => {
+        populate_from_selected: (conditions[:populate_from_selected] || []).map do |p|
+          {
+            sortable: p[:sortable]
+          }
+        end
+      } }
+    end
+
+    def keyup(field_name, conditions = {})
+      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        keyup: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
+    def lose_focus(field_name, conditions = {})
+      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        lose_focus: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
     private
 
     def initial_visibilty(options)
@@ -356,70 +424,6 @@ module Crossbeams
     # ---------------------------------------------------------------------------------------------------
     # BEHAVIOURS - PARTS OF THIS CODE ARE ALSO IN UiRules AND PARTS IN Crossbeams::Layout::Renderer::Base
     # ---------------------------------------------------------------------------------------------------
-
-    # 1) BEHAVIOUR (UiRules)
-    # ======================
-    def enable(field_to_enable, conditions = {})
-      targets = Array(field_to_enable)
-      observer = conditions[:when] || raise(ArgumentError, 'Enable behaviour requires `when`.')
-      change_values = conditions[:changes_to]
-      @rules << { observer => { change_affects: targets.join(';') } }
-      targets.each do |target|
-        @rules << { target => { enable_on_change: change_values } }
-      end
-    end
-
-    def dropdown_change(field_name, conditions = {})
-      raise(ArgumentError, 'Dropdown change behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
-
-      @rules << { field_name => {
-        notify: (conditions[:notify] || []).map do |n|
-          {
-            url: n[:url],
-            param_keys: n[:param_keys] || [],
-            param_values: n[:param_values] || {}
-          }
-        end
-      } }
-    end
-
-    def populate_from_selected(field_name, conditions = {})
-      @rules << { field_name => {
-        populate_from_selected: (conditions[:populate_from_selected] || []).map do |p|
-          {
-            sortable: p[:sortable]
-          }
-        end
-      } }
-    end
-
-    def keyup(field_name, conditions = {})
-      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
-
-      @rules << { field_name => {
-        keyup: (conditions[:notify] || []).map do |n|
-          {
-            url: n[:url],
-            param_keys: n[:param_keys] || [],
-            param_values: n[:param_values] || {}
-          }
-        end
-      } }
-    end
-
-    def lose_focus(field_name, conditions = {})
-      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
-
-      @rules << { field_name => {
-        lose_focus: (conditions[:notify] || []).map do |n|
-          {
-            url: n[:url],
-            param_keys: n[:param_keys] || [],
-            param_values: n[:param_values] || {}
-          }
-        end
-      } }
-    end
 
     # 2) BEHAVIOUR (Crossbeams::Layout::Renderer::Base)
     # =================================================

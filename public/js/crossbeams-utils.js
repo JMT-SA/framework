@@ -918,7 +918,7 @@ const crossbeamsUtils = {
             const target = document.getElementById(el);
             if (target && (target.dataset && target.dataset.enableOnValues)) {
               const vals = target.dataset.enableOnValues;
-              if (vals.includes(event.value)) {
+              if (vals.includes(event.target.value)) {
                 target.disabled = false;
               } else {
                 target.disabled = true;
@@ -941,7 +941,7 @@ const crossbeamsUtils = {
         sel.addEventListener('change', (event) => {
           const s = sel.dataset.observeChange;
           const j = JSON.parse(s);
-          const urls = j.map(el => this.buildObserveChangeUrl(el, event.value));
+          const urls = j.map(el => this.buildObserveChangeUrl(el, event.target.value));
 
           urls.forEach(url => this.fetchDropdownChanges(url));
         });

@@ -1799,7 +1799,7 @@ module DevelopmentApp
           module #{opts.classnames[:applet]}
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
-                class Complete
+                class Approve
                   def self.call(id)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :approve, id: id)
                     rules   = ui_rule.compile
@@ -1832,7 +1832,7 @@ module DevelopmentApp
           module #{opts.classnames[:applet]}
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
-                class Complete
+                class Reopen
                   def self.call(id)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :reopen, id: id)
                     rules   = ui_rule.compile

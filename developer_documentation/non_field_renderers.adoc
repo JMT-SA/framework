@@ -311,13 +311,17 @@ Render a table. The table renders with thin borders and highlights each row on h
 e.g.
 [source,ruby]
 ----
-neg_check = ->(a) { a && a.negative? ? 'red' : '' }
+neg_check = ->(a) { a&.negative? ? 'red' : '' }
 
 section.add_table [{ keys: 'a', values: 1, amounts: 22 },
                    { keys: 'b', values: 2, amounts: 33 }],
                    %i[keys values amounts],
                    alignment: { amounts: :right },
                    cell_classes: { amounts: neg_check },
+                   cell_transformers: {
+                     keys: ->(a) { a&.upcase },
+                     amounts: :decimal
+                   },
                    header_captions: { values: 'Value' }
 ----
 
@@ -344,6 +348,22 @@ Or a 2-dimensionial array (in which case there will be no columns or table head)
 |options - :cell_classes
 |A Hash of options
 |`cell_classes: { col: [callable] }`. The hash should only contain columns where you wish to apply logic to determine the css class. The value for each column must be something that responds to `call` - see example above using a lambda. NB. it is crucial to guard agains `nil` values for the column.
+|None.
+
+|options - :cell_transformers
+|A Hash of options that will transform the data in a particular column.
+a|`cell_transformers: { col: [callable/symbol] }`.
+
+The hash should only contain columns where you wish to change the cell value.
+
+Use symbols or a callable object - `:integer` to display a number without decimals, `:decimal` will show 2 decimals and `decimal_4` will show 4 decimals.
+
+Otherwise provide something like `cell_transformers: { a: ->(a) { "==#{a}==" }}` to change "1" to "==1==".
+|None.
+
+|options - :dom_id
+|String
+|If present, the table will be wrapped in a `<div>` with this id. This allows easy replacement of the table from behaviours.
 |None.
 
 |options - :caption

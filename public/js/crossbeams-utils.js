@@ -209,6 +209,7 @@ const crossbeamsUtils = {
     dlg.innerHTML = data;
     crossbeamsUtils.makeMultiSelects();
     crossbeamsUtils.makeSearchableSelects();
+    crossbeamsUtils.applySelectEvents();
     const grids = dlg.querySelectorAll('[data-grid]');
     grids.forEach((grid) => {
       const gridId = grid.getAttribute('id');
@@ -436,7 +437,6 @@ const crossbeamsUtils = {
     let nVal = '';
     let nText = '';
     const newItems = [];
-    select.removeActiveItems();
     action.replace_options.options.forEach((item) => {
       if (item.constructor === Array) {
         nVal = (item[1] || item[0]);
@@ -450,7 +450,19 @@ const crossbeamsUtils = {
         label: nText,
       });
     });
-    select.setChoices(newItems, 'value', 'label', true);
+
+    if (select) {
+      select.removeActiveItems();
+      select.setChoices(newItems, 'value', 'label', true);
+    } else {
+      while (elem.options.length) elem.remove(0);
+      newItems.forEach((item) => {
+        const option = document.createElement('option');
+        option.value = item.value;
+        option.text = item.label;
+        elem.appendChild(option);
+      });
+    }
   },
 
   /**
@@ -780,7 +792,7 @@ const crossbeamsUtils = {
     if (option === null || option === undefined) {
       optVal = '';
     } else {
-      optVal = typeof option === 'string' ? option : option.value;
+      optVal = typeof option === 'string' || typeof option === 'number' ? option : option.value;
     }
     const queryParam = { changed_value: optVal };
     element.param_keys.forEach((key) => {
@@ -886,6 +898,53 @@ const crossbeamsUtils = {
         }
 
         sel.selectr = holdSel;
+      }
+    });
+  },
+
+  /**
+   * Toggle the visibility of en element in the DOM:
+   * @param {string} id - the id of the DOM element.
+   * @returns {void}
+   */
+  applySelectEvents: function applySelectEvents() {
+    const sels = document.querySelectorAll('select:not(.searchable-select)');
+    sels.forEach((sel) => {
+      // changeValues behaviour - check if another element should be
+      // enabled/disabled based on the current selected value.
+      if (sel.dataset && sel.dataset.changeValues) {
+        sel.addEventListener('change', (event) => {
+          sel.dataset.changeValues.split(',').forEach((el) => {
+            const target = document.getElementById(el);
+            if (target && (target.dataset && target.dataset.enableOnValues)) {
+              const vals = target.dataset.enableOnValues;
+              if (vals.includes(event.target.value)) {
+                target.disabled = false;
+              } else {
+                target.disabled = true;
+              }
+              if (target.selectr) {
+                if (target.disabled) {
+                  target.selectr.disable();
+                } else {
+                  target.selectr.enable();
+                }
+              }
+            }
+          });
+        });
+      }
+
+      // observeChange behaviour - get rules from select element and
+      // call the supplied url(s).
+      if (sel.dataset && sel.dataset.observeChange) {
+        sel.addEventListener('change', (event) => {
+          const s = sel.dataset.observeChange;
+          const j = JSON.parse(s);
+          const urls = j.map(el => this.buildObserveChangeUrl(el, event.target.value));
+
+          urls.forEach(url => this.fetchDropdownChanges(url));
+        });
       }
     });
   },
@@ -1213,6 +1272,7 @@ const crossbeamsUtils = {
 
         crossbeamsUtils.makeMultiSelects();
         crossbeamsUtils.makeSearchableSelects();
+        crossbeamsUtils.applySelectEvents();
         const grids = contentDiv.querySelectorAll('[data-grid]');
         grids.forEach((grid) => {
           const gridId = grid.getAttribute('id');

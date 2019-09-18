@@ -44,31 +44,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   };
 
   /**
-   * Disable a button and change its caption.
-   * @param {element} button the button to disable.
-   * @param {string} disabledText the text to use to replace the caption.
-   * @returns {void}
-   */
-  const disableButton = (button, disabledText) => {
-    button.dataset.enableWith = button.value;
-    button.value = disabledText;
-    button.classList.remove('dim');
-    button.classList.add('o-50');
-  };
-
-  /**
-   * Remove disabled state from a button.
-   * @param {element} element the button to re-enable.
-   * @returns {void}
-   */
-  const revertDisabledButton = (element) => {
-    element.disabled = false;
-    element.value = element.dataset.enableWith;
-    element.classList.add('dim');
-    element.classList.remove('o-50');
-  };
-
-  /**
    * Get a lookup value to display on the form
    * next to the field that was scanned.
    * @param {element} the element that has just
@@ -79,7 +54,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     const url = `/rmd/utilities/lookup/${scanPack.scanType}/${scanPack.scanField}/${element.value}`;
     const label = document.getElementById(`${element.id}_scan_lookup`);
     const hiddenVal = document.getElementById(`${element.id}_scan_lookup_hidden`);
-    console.log('lbl', label);
     if (label === null) return null;
 
     fetch(url, {
@@ -121,30 +95,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   };
 
   /**
-   * When an input is invalid according to HTML5 rules and
-   * the submit button has been disabled, we need to re-enable it
-   * so the user can re-submit the form once the error has been
-   * corrected.
-   */
-  document.addEventListener('invalid', (e) => {
-    window.setTimeout(() => {
-      const sel = '[data-disable-with][disabled], [data-briefly-disable-with][disabled]';
-      e.target.form.querySelectorAll(sel).forEach(el => revertDisabledButton(el));
-    }, 0); // Disable the button with a delay so the form still submits...
-  }, true);
-
-  /**
-   * Prevent multiple clicks of submit buttons.
-   * @returns {void}
-   */
-  const preventMultipleSubmits = (element) => {
-    disableButton(element, element.dataset.disableWith);
-    window.setTimeout(() => {
-      element.disabled = true;
-    }, 0); // Disable the button with a delay so the form still submits...
-  };
-
-  /**
    * Event listeners for the RMD page.
    */
   const setupListeners = () => {
@@ -166,10 +116,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
           return;
         }
       }
-      // Disable a button on click
-      if (event.target.dataset && event.target.dataset.disableWith) {
-        preventMultipleSubmits(event.target);
-      }
       // On reset button clicked, clear all lookup results
       if (event.target.dataset && event.target.dataset.resetRmdForm) {
         event.target.form.querySelectorAll('[data-lookup-result]').forEach((node) => {
@@ -178,18 +124,6 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         event.target.form.querySelectorAll('[data-lookup-hidden]').forEach((node) => {
           node.value = node.dataset.resetValue === '&nbsp;' ? '' : node.dataset.resetValue;
         });
-      }
-      // On link click, if there is a propmt, display it for the user to confirm.
-      if (event.target.dataset && event.target.dataset.prompt) {
-        event.stopPropagation();
-        event.preventDefault();
-        swal({
-          title: '',
-          text: event.target.dataset.prompt,
-          type: 'warning',
-          showCancelButton: true }).then(() => {
-            window.location = event.target.href;
-          }, null).catch(swal.noop);
       }
     });
 

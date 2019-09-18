@@ -150,6 +150,7 @@
     // Initialise any selects to be searchable or multi-selects.
     crossbeamsUtils.makeMultiSelects();
     crossbeamsUtils.makeSearchableSelects();
+    crossbeamsUtils.applySelectEvents();
 
     document.body.addEventListener('keydown', (event) => {
       if (event.target.classList.contains('cbl-to-upper') && event.keyCode === 13) {
@@ -319,6 +320,7 @@
               dlgContent.innerHTML = data.replaceDialog.content;
               crossbeamsUtils.makeMultiSelects();
               crossbeamsUtils.makeSearchableSelects();
+              crossbeamsUtils.applySelectEvents();
               const grids = dlgContent.querySelectorAll('[data-grid]');
               grids.forEach((grid) => {
                 const gridId = grid.getAttribute('id');

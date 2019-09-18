@@ -38,6 +38,7 @@ class DataminerConnections
   def databases(without_grids: false)
     list = connections.keys.sort
     list.delete(DataminerApp::ReportRepo::GRID_DEFS) if without_grids
+    list.delete('system') unless AppConst.development?
     list
   end
 end

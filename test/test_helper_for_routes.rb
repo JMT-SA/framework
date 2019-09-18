@@ -130,9 +130,11 @@ class RouteTester < Minitest::Test
     assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
   end
 
-  def expect_ok_redirect(url: DEFAULT_LAST_GRID_URL, has_dummy_content: true)
+  def expect_ok_redirect(url: DEFAULT_LAST_GRID_URL, has_dummy_content: true, follow_redirect: true)
     assert last_response.redirect?, "Expected last response to be redirect (status is #{last_response.status}, location is #{last_response.location}) - from: #{caller.first}"
     assert_equal url, last_response.location, "Expected redirect to '#{url}', was '#{last_response.location}' - from: #{caller.first}"
+    return unless follow_redirect
+
     follow_redirect!
     assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
     assert last_response.body.include?('OK'), "Expected 'OK' in last response - from: #{caller.first}" if has_dummy_content

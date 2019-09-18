@@ -37,7 +37,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
   private
 
   VALID_LKP_KEYS = %i[function args col_name].freeze
-  VALID_SUB_KEYS = %i[sub_table columns join_table uses_join_table active_only inactive_only].freeze
+  VALID_SUB_KEYS = %i[sub_table columns join_table uses_join_table active_only inactive_only id_keys_column].freeze
   VALID_PARENT_KEYS = %i[parent_table columns flatten_columns foreign_key].freeze
 
   def main_table_id
@@ -68,10 +68,11 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def assert_sub_tables_valid!
+  def assert_sub_tables_valid! # rubocop:disable Metrics/AbcSize
     @sub_tables.each do |rule|
       sub_table = rule.fetch(:sub_table)
       raise ArgumentError, "Sub_table #{sub_table} must be a Symbol" unless sub_table.is_a?(Symbol)
+      raise ArgumentError, "Sub_table #{sub_table} cannot be joined via a join table AND an id keys array" if rule.key?(:id_keys_column) && (rule.key?(:join_table) || rule.key?(:uses_join_table))
 
       rule.keys.each { |k| raise ArgumentError, "Unknown sub-table key: #{k}" unless VALID_SUB_KEYS.include?(k) }
       rule.keys.each { |k| validate_sub_table_rule!(k, rule) }
@@ -102,7 +103,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     case key
     when :columns
       validate_columns!(rule)
-    when :join_table, :sub_table
+    when :join_table, :sub_table, :id_keys_column
       raise ArgumentError unless rule[key].is_a?(Symbol)
     else
       raise ArgumentError unless rule[key] == true || rule[key] == false
@@ -185,6 +186,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     @sub_table = sub.fetch(:sub_table)
     @sub_table_id = "#{@inflector.singularize(@sub_table)}_id".to_sym
     @join_table = sub_table_join_table(sub[:uses_join_table], sub[:join_table])
+    @id_keys_column = sub[:id_keys_column]
     sub[:columns] || Sequel.lit('*')
   end
 
@@ -198,6 +200,8 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
   def add_active_sub_table_recs(cols)
     @rec[@sub_table] = if @join_table
                          active_inactive_join_call(cols, true)
+                       elsif @id_keys_column
+                         active_inactive_array_call(cols, true)
                        else
                          active_inactive_belongs_call(cols, true)
                        end
@@ -206,18 +210,32 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
   def add_inactive_sub_table_recs(cols)
     @rec[inactive_key] = if @join_table
                            active_inactive_join_call(cols, false)
+                         elsif @id_keys_column
+                           active_inactive_array_call(cols, true)
                          else
                            active_inactive_belongs_call(cols, false)
                          end
   end
 
-  def active_inactive_belongs_call(cols, active)
+  def active_inactive_belongs_call(cols, active, all: false)
     ds = DB[@sub_table].where(main_table_id => @id).select(*cols)
+    return ds.all if all
+
     active ? ds.where(:active).all : ds.where(active: false).all
   end
 
-  def active_inactive_join_call(cols, active)
+  def active_inactive_join_call(cols, active, all: false)
     ds = DB[@sub_table].where(id: DB[@join_table].where(main_table_id => @id).select(@sub_table_id)).select(*cols)
+    return ds.all if all
+
+    active ? ds.where(:active).all : ds.where(active: false).all
+  end
+
+  def active_inactive_array_call(cols, active, all: false)
+    arr = sub_table_array_ids
+    ds = DB[@sub_table].where(id: arr).select(*cols)
+    return ds.all if all
+
     active ? ds.where(:active).all : ds.where(active: false).all
   end
 
@@ -225,11 +243,17 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     "inactive_#{@sub_table}".to_sym
   end
 
+  def sub_table_array_ids
+    DB[@main_table].where(id: @id).get(@id_keys_column).to_a
+  end
+
   def add_sub_table_recs(cols)
     @rec[@sub_table] = if @join_table
-                         DB[@sub_table].where(id: DB[@join_table].where(main_table_id => @id).select(@sub_table_id)).select(*cols).all
+                         active_inactive_join_call(cols, true, all: true)
+                       elsif @id_keys_column
+                         active_inactive_array_call(cols, true, all: true)
                        else
-                         DB[@sub_table].where(main_table_id => @id).select(*cols).all
+                         active_inactive_belongs_call(cols, true, all: true)
                        end
   end
 end

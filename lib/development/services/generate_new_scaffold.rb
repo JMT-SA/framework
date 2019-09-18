@@ -171,16 +171,18 @@ module DevelopmentApp
         jsonb: '{}'
       }.freeze
 
+      FAKER_STRING = 'Faker::Lorem.word'
+      FAKER_UNIQUE_STRING = 'Faker::Lorem.unique.word'
       FAKER_DATA_LOOKUP = {
-        integer: 'Faker::Number.number',
+        integer: 'Faker::Number.number(4)',
         string: 'Faker::Lorem.word',
         boolean: 'false',
         float: '1.0',
         datetime: "'2010-01-01 12:00'",
         date: "'2010-01-01'",
         decimal: 'Faker::Number.decimal',
-        integer_array: '[1, 2, 3]',
-        string_array: "['A', 'B', 'C']",
+        integer_array: 'BaseRepo.new.array_for_db_col([1, 2, 3])',
+        string_array: "BaseRepo.new.array_for_db_col(['A', 'B', 'C'])",
         jsonb: '{}'
       }.freeze
 
@@ -223,6 +225,7 @@ module DevelopmentApp
         @columns         = repo.table_columns(table)
         @column_names    = repo.table_col_names(table)
         @indexed_columns = repo.indexed_columns(table)
+        @unique_columns  = repo.unique_columns(table)
         @foreigns        = repo.foreign_keys(table)
         @col_lookup      = Hash[@columns]
         @fk_lookup       = {}
@@ -269,16 +272,22 @@ module DevelopmentApp
         DRY_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
       end
 
-      def column_dummy_data(column, faker: false, type: nil)
+      def column_dummy_data(column, faker: false, with_fk: true, type: nil)
         if column == likely_label_field
           'Faker::Lorem.unique.word'
-        elsif fk_lookup[column]
+        elsif with_fk && fk_lookup[column]
           "#{@inflector.singularize(fk_lookup[column][:table])}_id"
         elsif faker
-          FAKER_DATA_LOOKUP[type] || 'nil'
+          faker_data(column, type)
         else
           DUMMY_DATA_LOOKUP[@col_lookup[column][:type]] || "'??? (#{@col_lookup[column][:type]})'"
         end
+      end
+
+      def faker_data(column, type)
+        data = FAKER_DATA_LOOKUP[type] || 'nil'
+        data = FAKER_UNIQUE_STRING if data == FAKER_STRING && @unique_columns.include?(column)
+        data
       end
 
       def column_dry_validation_type(column)
@@ -1186,10 +1195,10 @@ module DevelopmentApp
 
       private
 
-      def columnise
+      def columnise(with_fk: true)
         attr = []
         opts.table_meta.columns_without(%i[created_at updated_at active]).each do |col|
-          attr << "#{col}: #{opts.table_meta.column_dummy_data(col)}"
+          attr << "#{col}: #{opts.table_meta.column_dummy_data(col, with_fk: with_fk)}"
         end
         attr << 'active: true' if opts.table_meta.active_column_present?
         attr
@@ -1275,14 +1284,11 @@ module DevelopmentApp
               def test_update_#{opts.singlename}_fail
                 id = create_#{opts.singlename}
                 attrs = interactor.send(:repo).find_hash(:#{opts.table}, id).reject { |k, _| %i[id #{req_col}].include?(k) }
-                value = attrs[:#{str_col}]
-                attrs[:#{str_col}] = 'a_change'
                 res = interactor.update_#{opts.singlename}(id, attrs)
                 refute res.success, "\#{res.message} : \#{res.errors.inspect}"
                 assert_equal ['is missing'], res.errors[:#{req_col}]
                 after = interactor.send(:repo).find_hash(:#{opts.table}, id)
                 refute_equal 'a_change', after[:#{str_col}]
-                assert_equal value, after[:#{str_col}]
               end
 
               def test_delete_#{opts.singlename}
@@ -1352,7 +1358,7 @@ module DevelopmentApp
           s = <<~RUBY
             def create_#{opts.inflector.singularize(table)}(opts = {})
                   #{show_lkp(lkps)}default = {
-                    #{fields.map { |f| render_field(f) }.join(",\n        ")}
+                    #{fields.map { |f| render_field(f, table) }.join(",\n        ")}
                   }
                   DB[:#{table}].insert(default.merge(opts))
                 end
@@ -1369,19 +1375,20 @@ module DevelopmentApp
         "#{lkps.join("\n      ")}\n\n      "
       end
 
-      def render_field(field)
+      def render_field(field, table)
         if field[:ftbl]
           "#{field[:name]}: #{opts.inflector.singularize(field[:ftbl])}_id"
         elsif field[:name] == :active
           "#{field[:name]}: true"
         else
-          "#{field[:name]}: #{opts.table_meta.column_dummy_data(field[:name], faker: true, type: field[:type])}"
+          tab = TableMeta.new(table)
+          "#{field[:name]}: #{tab.column_dummy_data(field[:name], faker: true, type: field[:type])}"
         end
       end
 
       def test_permission
         perm_check = "#{opts.classnames[:module]}::TaskPermissionCheck::#{opts.classnames[:class]}"
-        ent = columnise.join(",\n        ")
+        ent = columnise(with_fk: false).join(",\n        ")
         <<~RUBY
           # frozen_string_literal: true
 
@@ -1792,7 +1799,7 @@ module DevelopmentApp
           module #{opts.classnames[:applet]}
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
-                class Complete
+                class Approve
                   def self.call(id)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :approve, id: id)
                     rules   = ui_rule.compile
@@ -1825,7 +1832,7 @@ module DevelopmentApp
           module #{opts.classnames[:applet]}
             module #{opts.classnames[:program]}
               module #{opts.classnames[:class]}
-                class Complete
+                class Reopen
                   def self.call(id)
                     ui_rule = UiRules::Compiler.new(:#{opts.singlename}, :reopen, id: id)
                     rules   = ui_rule.compile

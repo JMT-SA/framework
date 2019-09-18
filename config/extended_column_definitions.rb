@@ -24,10 +24,30 @@ module Crossbeams
       # @param table [symbol] the name of the table that has an extended_columns field.
       # @param form [Crossbeams::Form] the form/fold in which to place the fields.
       def self.extended_columns_for_view(table, form)
-        config = EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
+        config = config_for(table)
         return if config.nil?
 
         config.keys.each { |k| form.add_field("extcol_#{k}".to_sym) }
+      end
+
+      # Looks up the configuration rules for an extended column.
+      #
+      # @param table [symbol] the name of the table that has an extended_columns field.
+      # @return config [Hash,nil] the applicable config for the table.
+      def self.config_for(table)
+        config = EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
+        config = EXTENDED_COLUMNS.dig(table, AppConst::DEFAULT_KEY) if config.nil?
+        config
+      end
+
+      # Looks up the validation rules for an extended column.
+      #
+      # @param table [symbol] the name of the table that has an extended_columns field.
+      # @return val [Schema] the applicable validation rules for the table.
+      def self.validation_for(table)
+        val = VALIDATIONS[table][AppConst::CLIENT_CODE]
+        val = VALIDATIONS[table][AppConst::DEFAULT_KEY] if val.nil?
+        val
       end
 
       def verify_config
@@ -55,9 +75,10 @@ module Crossbeams
         errs
       end
 
-      def verify_validation(table, client_code, rule)
+      def verify_validation(table, client_code, rule) # rubocop:disable Metrics/AbcSize
         errs = []
         val = VALIDATIONS[table][client_code]
+        val = VALIDATIONS[table][AppConst::DEFAULT_KEY] if val.nil?
         if val.nil?
           errs << "#{table.inspect}/#{client_code} does not have a validation rule."
         else

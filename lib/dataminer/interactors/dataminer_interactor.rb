@@ -222,7 +222,9 @@ module DataminerApp
     end
 
     def edit_report(id) # rubocop:disable Metrics/AbcSize
-      page = OpenStruct.new(id: id, report: repo.lookup_report(id, true))
+      return failed_response('Cannot edit a system report') if unmodifiable_system_report(id)
+
+      page = OpenStruct.new(success: true, id: id, report: repo.lookup_report(id, true))
 
       page.filename = File.basename(repo.lookup_file_name(id, true))
 
@@ -299,6 +301,8 @@ module DataminerApp
     end
 
     def delete_report(id)
+      return failed_response('Cannot delete a system report') if unmodifiable_system_report(id)
+
       filename = repo.lookup_file_name(id, true)
       File.delete(filename)
       success_response('Report has been deleted')
@@ -504,6 +508,13 @@ module DataminerApp
         # rescue StandardError => e
         #   return "ERROR: #{e.message}"
       end
+    end
+
+    private
+
+    def unmodifiable_system_report(id)
+      rpt_loc = ReportRepo::ReportLocation.new(id)
+      rpt_loc.db == 'system' && AppConst.development?
     end
 
     # ------------------------------------------------------------------------------------------------------

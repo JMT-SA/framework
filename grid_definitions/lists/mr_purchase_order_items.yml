@@ -4,7 +4,7 @@
   - :name: total_price
     :caption: Total price
     :data_type: :number
-    :format: :delimited_1000
+    :format: :delimited_1000_4
     :expression: quantity_required * unit_price
     :position: 9
 :actions:

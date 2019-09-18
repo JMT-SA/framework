@@ -1,0 +1,35 @@
+= How to test RMD scanning
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to test RMD scanning
+
+There are two ways to test RMD scanning:
+
+1. Use a mobile device's camera or its built-in image scanner (if present)
+2. Run a mock websocket that the browser can treat as a source of scan input
+
+=== Mobile device prerequisite
+
+Mobile devices must have the `SoftService.apk` installed which takes scan events and makes them available on a websocket that a browser can talk to.
+
+=== Mobile device with built-in image scanner
+
+Nothing special needs to be done here -- just load an RMD page in the browser and use the built-in scanner to scan something.
+
+=== Mobile device using autofocus camera
+
+In the application, go to the RMD menu and add a record with the ip address of the mobile device.
+Check the option "Scan With Camera".
+
+When the RMD form is displayed on the device, a button "Scan with camera" appears that when clicked will allow you to scan a barcode with the camera.
+
+=== Using a mock websocket
+
+This option allows you to test "scanning" on a desktop/laptop.
+
+In a terminal, navigate to `websocket_scanner_mock` (link:https://github.com/NoSoft-SA/websocket_scanner_mock[github link]) and run `bin/run`.
+This starts a websocket server.
+
+In another terminal, navigate to `websocket_scanner_mock` and run `bin/send` with whatever you want "scanned". e.g. `bin/send LC123` will send `LC123` to the browser page.

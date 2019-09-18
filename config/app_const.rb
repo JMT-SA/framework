@@ -2,6 +2,10 @@
 
 # A class for defining global constants in a central place.
 class AppConst
+  def self.development?
+    ENV['RACK_ENV'] == 'development'
+  end
+
   # Client-specific code
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')

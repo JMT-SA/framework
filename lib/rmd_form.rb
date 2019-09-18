@@ -5,7 +5,7 @@ module Crossbeams
   # specifically for RMDs using the layout_rmd view.
   class RMDForm # rubocop:disable Metrics/ClassLength
     attr_reader :form_state, :form_name, :progress, :notes, :scan_with_camera,
-                :caption, :action, :button_caption, :csrf_tag
+                :caption, :action, :button_caption, :csrf_tag, :rules
 
     # Create a form.
     #
@@ -34,6 +34,7 @@ module Crossbeams
       @button_caption = options[:button_caption]
       @reset_button = options.fetch(:reset_button, true)
       @fields = []
+      @rules = []
       @csrf_tag = nil
     end
 
@@ -58,8 +59,8 @@ module Crossbeams
       required = options[:required].nil? || options[:required] ? ' required' : ''
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
-        <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
+        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
+        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
     end
@@ -83,8 +84,8 @@ module Crossbeams
       autofocus = autofocus_for_field(name)
       value = form_state[name] || options[:value]
       @fields << <<~HTML
-        <tr#{field_error_state}><th align="left">#{label}#{field_error_message}</th>
-        <td><select class="pa2#{field_error_class}" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{required}#{autofocus}>
+        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
+        <td><select class="pa2#{field_error_class}" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{required}#{autofocus} #{render_behaviours}>
           #{make_prompt(options[:prompt])}#{build_options(items, value)}
         </select>
         </td></tr>
@@ -102,9 +103,9 @@ module Crossbeams
     # @param value [string] the value to be displayed in the label.
     # @param hidden_value [string] the value of the hidden field. If nil, no hidden field will be generated.
     # @return [void]
-    def add_label(name, label, value, hidden_value = nil)
+    def add_label(name, label, value, hidden_value = nil, options = {})
       @fields << <<~HTML
-        <tr><th align="left">#{label}</th>
+        <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}><th align="left">#{label}</th>
         <td><div class="pa2 bg-moon-gray br2">#{value}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
       HTML
@@ -138,7 +139,87 @@ module Crossbeams
       @csrf_tag = value
     end
 
+    def behaviours
+      raise ArgumentError, 'Behaviours must be defined before fields' unless @fields.empty?
+
+      yield self
+    end
+
+    # ---------------------------------------------------------------------------------------------------
+    # BEHAVIOURS - PARTS OF THIS CODE ARE ALSO IN UiRules AND PARTS IN Crossbeams::Layout::Renderer::Base
+    # ---------------------------------------------------------------------------------------------------
+
+    # 1) BEHAVIOUR (UiRules)
+    # ======================
+    def enable(field_to_enable, conditions = {})
+      targets = Array(field_to_enable)
+      observer = conditions[:when] || raise(ArgumentError, 'Enable behaviour requires `when`.')
+      change_values = conditions[:changes_to]
+      @rules << { observer => { change_affects: targets.join(';') } }
+      targets.each do |target|
+        @rules << { target => { enable_on_change: change_values } }
+      end
+    end
+
+    def dropdown_change(field_name, conditions = {})
+      raise(ArgumentError, 'Dropdown change behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        notify: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
+    def populate_from_selected(field_name, conditions = {})
+      @rules << { field_name => {
+        populate_from_selected: (conditions[:populate_from_selected] || []).map do |p|
+          {
+            sortable: p[:sortable]
+          }
+        end
+      } }
+    end
+
+    def keyup(field_name, conditions = {})
+      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        keyup: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
+    def lose_focus(field_name, conditions = {})
+      raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        lose_focus: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
     private
+
+    def initial_visibilty(options)
+      return '' unless options[:hide_on_load]
+
+      ' hidden'
+    end
 
     def page_number_and_page_count
       return '' if @step_count.nil?
@@ -338,6 +419,66 @@ module Crossbeams
     def option_string(text, value, selected)
       sel = selected && value.to_s == selected.to_s ? ' selected ' : ''
       "<option value=\"#{CGI.escapeHTML(value.to_s)}\"#{sel}>#{CGI.escapeHTML(text.to_s)}</option>"
+    end
+
+    # ---------------------------------------------------------------------------------------------------
+    # BEHAVIOURS - PARTS OF THIS CODE ARE ALSO IN UiRules AND PARTS IN Crossbeams::Layout::Renderer::Base
+    # ---------------------------------------------------------------------------------------------------
+
+    # 2) BEHAVIOUR (Crossbeams::Layout::Renderer::Base)
+    # =================================================
+
+    # Return behaviour rules for rendering.
+    def render_behaviours # rubocop:disable Metrics/AbcSize
+      return nil if rules.nil?
+
+      res = []
+      rules.each do |element|
+        element.each do |field, rule|
+          res << build_behaviour(rule) if field == @current_field
+        end
+      end
+      return nil if res.empty?
+
+      keys = res.map { |r| r[/\A.+=/].chomp('=') }
+      raise ArgumentError, "Renderer: cannot have more than one of the same behaviour for field \"#{@current_field}\"" unless keys.length == keys.uniq.length
+
+      res.join(' ')
+    end
+
+    def build_behaviour(rule) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      return %(data-change-values="#{split_change_affects(rule[:change_affects])}") if rule[:change_affects]
+      return %(data-enable-on-values="#{rule[:enable_on_change].join(',')}") if rule[:enable_on_change]
+      return %(data-observe-change=#{build_observe_change(rule[:notify])}) if rule[:notify]
+      return %(data-observe-selected=#{build_observe_selected(rule[:populate_from_selected])}) if rule[:populate_from_selected]
+      return %(data-observe-keyup=#{build_observe_change(rule[:keyup])}) if rule[:keyup]
+      return %(data-observe-lose-focus=#{build_observe_change(rule[:lose_focus])}) if rule[:lose_focus]
+    end
+
+    def split_change_affects(change_affects)
+      change_affects.split(';').map { |c| "#{form_name}_#{c}" }.join(',')
+    end
+
+    def build_observe_change(notify_rules)
+      combined = notify_rules.map do |rule|
+        %({"url":"#{rule[:url]}","param_keys":#{param_keys_str(rule)},"param_values":{#{param_values_str(rule)}}})
+      end.join(',')
+      %('[#{combined}]')
+    end
+
+    def build_observe_selected(selected_rules)
+      combined = selected_rules.map do |rule|
+        %({"sortable":"#{rule[:sortable]}"})
+      end.join(',')
+      %('[#{combined}]')
+    end
+
+    def param_keys_str(rule)
+      rule[:param_keys].nil? || rule[:param_keys].empty? ? '[]' : %(["#{rule[:param_keys].join('","')}"])
+    end
+
+    def param_values_str(rule)
+      rule[:param_values].map { |k, v| "\"#{k}\":\"#{v}\"" }.join(',')
     end
   end
 end

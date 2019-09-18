@@ -97,7 +97,16 @@ namespace :devops do
     on roles(:app) do |_|
       upload! 'public/js/ag-enterprise-activation.js', "#{shared_path}/public/js/ag-enterprise-activation.js"
       upload! 'config/mail_settings.rb.example', "#{shared_path}/config/mail_settings.rb"
+
+      # Copy over dataminer connections and automatically set up the "system" connection:
       upload! 'config/dataminer_connections.yml.example', "#{shared_path}/config/dataminer_connections.yml"
+      execute :sed, "-i 's/$DBNAME/#{application}/g' #{shared_path}/config/dataminer_connections.yml"
+      execute :sed, "-i 's/$CURRENT/#{current_path.to_s.gsub('/', '\/')}/g' #{shared_path}/config/dataminer_connections.yml"
+      execute :sed, "-i 's/$SHARED/#{shared_path.to_s.gsub('/', '\/')}/g' #{shared_path}/config/dataminer_connections.yml"
+      execute :mkdir, "#{shared_path}/sys_prepared_reports"
+      execute :mkdir, "#{shared_path}/app_reports"
+      execute :mkdir, "#{shared_path}/app_prepared_reports"
+
       execute :touch, "#{shared_path}/.env.local"
     end
   end

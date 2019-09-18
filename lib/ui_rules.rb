@@ -45,7 +45,7 @@ module UiRules
     end
 
     def extended_columns(repo, table, edit_mode: true)
-      config = Crossbeams::Config::ExtendedColumnDefinitions::EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
+      config = Crossbeams::Config::ExtendedColumnDefinitions.config_for(table)
       return if config.nil?
 
       config.each do |key, defn|
@@ -84,7 +84,7 @@ module UiRules
     end
 
     def apply_extended_column_defaults_to_form_object(table) # rubocop:disable Metrics/AbcSize
-      config = Crossbeams::Config::ExtendedColumnDefinitions::EXTENDED_COLUMNS.dig(table, AppConst::CLIENT_CODE)
+      config = Crossbeams::Config::ExtendedColumnDefinitions.config_for(table)
       return if config.nil?
 
       col_with_default = {}

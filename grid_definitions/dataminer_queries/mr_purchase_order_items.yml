@@ -120,7 +120,7 @@
     :namespaced_name: mr_purchase_order_items.quantity_required
     :data_type: :number
     :width: 
-    :format: :delimited_1000
+    :format: :delimited_1000_4
     :hide: false
     :pinned: 
     :groupable: true
@@ -136,7 +136,7 @@
     :namespaced_name: mr_purchase_order_items.unit_price
     :data_type: :number
     :width: 
-    :format: :delimited_1000
+    :format: :delimited_1000_4
     :hide: false
     :pinned: 
     :groupable: true
@@ -152,7 +152,7 @@
     :namespaced_name: 
     :data_type: :number
     :width: 
-    :format: :delimited_1000
+    :format: :delimited_1000_4
     :hide: false
     :pinned: 
     :groupable: true

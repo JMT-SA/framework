@@ -46,7 +46,7 @@ module PackMaterialApp
 
     def test_create_and_update_sku_location_quantity_fail
       first_failed_message = 'first_fail'
-      second_failed_message = 'second_fail'
+      second_failed_message = 'Insufficient stock at From Location'
       PackMaterialApp::MrStockRepo.any_instance.stubs(:exists?).returns(true)
       PackMaterialApp::MrStockRepo.any_instance.stubs(:create_sku_location_ids).returns(bad_response(message: first_failed_message))
       PackMaterialApp::MrStockRepo.any_instance.stubs(:update_sku_location_quantity).returns(bad_response(message: second_failed_message))

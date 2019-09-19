@@ -307,7 +307,7 @@
     :namespaced_name: mr_purchase_order_items.unit_price
     :data_type: :string
     :width: 
-    :format: 
+    :format: :delimited_1000_4
     :hide: false
     :pinned: 
     :groupable: false
@@ -323,7 +323,7 @@
     :namespaced_name: mr_delivery_items.invoiced_unit_price
     :data_type: :number
     :width: 
-    :format: :delimited_1000
+    :format: :delimited_1000_4
     :hide: false
     :pinned: left
     :groupable: false

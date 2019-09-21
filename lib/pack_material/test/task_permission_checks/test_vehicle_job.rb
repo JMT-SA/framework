@@ -14,8 +14,14 @@ module PackMaterialApp
         departure_location_id: 1,
         tripsheet_number: 1,
         planned_location_id: 1,
+        virtual_location_id: 1,
         when_loaded: '2010-01-01 12:00',
-        when_offloaded: '2010-01-01 12:00'
+        when_offloaded: '2010-01-01 12:00',
+        loaded: false,
+        offloaded: false,
+        load_transaction_id: 1,
+        offload_transaction_id: 1,
+        arrival_confirmed: false
       }
       PackMaterialApp::VehicleJob.new(base_attrs.merge(attrs))
     end

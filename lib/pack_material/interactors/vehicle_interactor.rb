@@ -14,7 +14,7 @@ module PackMaterialApp
       VehicleSchema.call(params)
     end
 
-    def create_vehicle(params)
+    def create_vehicle(params) # rubocop:disable Metrics/AbcSize
       res = validate_vehicle_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 

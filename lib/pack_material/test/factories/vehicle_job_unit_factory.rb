@@ -21,9 +21,13 @@ module PackMaterialApp
         when_loaded: '2010-01-01 12:00',
         when_offloaded: '2010-01-01 12:00',
         when_offloading: '2010-01-01 12:00',
-        quantity_moved: Faker::Number.decimal,
+        quantity_loaded: Faker::Number.decimal,
+        quantity_offloaded: Faker::Number.decimal,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',
+        mr_sku_id: Faker::Number.number,
+        sku_number: Faker::Number.number,
+        location_id: Faker::Number.number,
         when_loading: '2010-01-01 12:00'
       }
       DB[:vehicle_job_units].insert(default.merge(opts))

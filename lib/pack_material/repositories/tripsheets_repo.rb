@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class TripsheetsRepo < BaseRepo
+  class TripsheetsRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :vehicle_types,
                      label: :type_code,
                      value: :id,
@@ -55,5 +55,93 @@ module PackMaterialApp
     def vehicle_jobs_business_process_id
       DB[:business_processes].where(process: AppConst::PROCESS_VEHICLE_JOBS).get(:id)
     end
+
+    def departure_locations
+      loc_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_BUILDING).get(:id)
+      location_repo.for_select_locations(where: { location_type_id: loc_type_id })
+    end
+
+    def location_repo
+      MasterfilesApp::LocationRepo.new
+    end
+
+    def inline_update_vehicle_job_unit(id, attrs)
+      update(:vehicle_job_units, id, "#{attrs[:column_name]}": attrs[:column_value])
+    end
+
+    def create_vehicle_job_unit(attrs)
+      new_attrs = {
+        sku_number: sku_number_for_sku_location(attrs[:mr_sku_location_from_id])
+      }
+      create(:vehicle_job_units, new_attrs.merge(attrs))
+    end
+
+    def link_mr_skus(vehicle_job_id, mr_sku_ids)
+      DB[:vehicle_jobs_sku_numbers].where(vehicle_job_id: vehicle_job_id).delete
+      mr_sku_ids.each do |mr_sku_id|
+        DB[:vehicle_jobs_sku_numbers].insert(vehicle_job_id: vehicle_job_id, mr_sku_id: mr_sku_id)
+      end
+    end
+
+    def link_locations(vehicle_job_id, location_ids)
+      DB[:vehicle_jobs_locations].where(vehicle_job_id: vehicle_job_id).delete
+      location_ids.each do |location_id|
+        DB[:vehicle_jobs_locations].insert(vehicle_job_id: vehicle_job_id, location_id: location_id)
+      end
+    end
+
+    def get_sku_location_info_ids(sku_location_id)
+      sku_location = DB[:mr_sku_locations].where(id: sku_location_id)
+      {
+        sku_number: sku_number_for_sku_location(sku_location_id),
+        sku_id: sku_location.get(:mr_sku_id),
+        location_code: DB[:locations].where(
+          id: sku_location.get(:location_id)
+        ).map { |r| [r[:location_long_code], r[:id]] },
+        location_id: sku_location.get(:location_id),
+        mr_sku_location_id: sku_location_id
+      }
+    end
+
+    def sku_number_for_sku_location(sku_location_id)
+      DB[:mr_skus].where(id: DB[:mr_sku_locations].where(id: sku_location_id).get(:mr_sku_id)).get(:sku_number)
+    end
+
+    def vehicle_job_sku_numbers(vehicle_job_id)
+      DB[:mr_skus].where(
+        id: vehicle_job_sku_ids(vehicle_job_id)
+      ).map { |r| ["#{r[:sku_number]}: #{product_code(r[:mr_product_variant_id])}", r[:id]] }
+    end
+
+    def product_code(product_variant_id)
+      DB[:material_resource_product_variants].where(id: product_variant_id).get(:product_variant_code)
+    end
+
+    def vehicle_job_locations(vehicle_job_id)
+      DB[:locations].where(
+        id: vehicle_job_location_ids(vehicle_job_id)
+      ).map { |r| [r[:location_long_code], r[:id]] }
+    end
+
+    def vehicle_job_location_ids(vehicle_job_id)
+      DB[:vehicle_jobs_locations].where(
+        vehicle_job_id: vehicle_job_id
+      ).select_map(:location_id)
+    end
+
+    def vehicle_job_sku_ids(vehicle_job_id)
+      DB[:vehicle_jobs_sku_numbers].where(
+        vehicle_job_id: vehicle_job_id
+      ).select_map(:mr_sku_id)
+    end
+
+    def load_vehicle_job(id)
+      update(:vehicle_jobs, id, loaded: true)
+    end
+
+    # def approve_vehicle_job(id)
+    # TODO: Confirm arrival && Offload stock to receiving bay
+    #   update(:vehicle_jobs, id, approved: true)
+    # end
   end
 end

@@ -6,16 +6,12 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/pack_material/tripsheets/vehicle_job_units/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
 - :url: "/pack_material/tripsheets/vehicle_job_units/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_present: when_loading
 - :separator: true
 - :url: "/development/statuses/list/vehicle_job_units/$:id$"
   :text: status

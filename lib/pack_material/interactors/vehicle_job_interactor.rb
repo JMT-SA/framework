@@ -2,19 +2,7 @@
 
 module PackMaterialApp
   class VehicleJobInteractor < BaseInteractor
-    def repo
-      @repo ||= TripsheetsRepo.new
-    end
-
-    def vehicle_job(id)
-      repo.find_vehicle_job(id)
-    end
-
-    def validate_vehicle_job_params(params)
-      VehicleJobSchema.call(params)
-    end
-
-    def create_vehicle_job(params)
+    def create_vehicle_job(params) # rubocop:disable Metrics/AbcSize
       res = validate_vehicle_job_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -46,6 +34,41 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
+    def load_vehicle_job(id)
+      assert_permission!(:can_load, id)
+      repo.transaction do
+        log_transaction
+
+        log_status('vehicle_jobs', id, 'LOADED')
+        repo.load_vehicle_job(id)
+
+        instance = vehicle_job(id)
+        success_response('Loaded Vehicle Job', instance)
+      end
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    # def vehicle_job_confirm_arrival(id)
+    # TODO: Offload to receiving bay
+    #   assert_permission!(:approve, id)
+    #   repo.transaction do
+    #     log_transaction
+    #
+    #     log_status('vehicle_jobs', id, 'APPROVED')
+    #     repo.approve_vehicle_job(id)
+    #
+    #     instance = vehicle_job(id)
+    #     success_response('Approved Vehicle Job', instance)
+    #   end
+    # rescue Crossbeams::TaskNotPermittedError => e
+    #   failed_response(e.message)
+    # rescue Crossbeams::InfoError => e
+    #   failed_response(e.message)
+    # end
+
     def delete_vehicle_job(id)
       name = vehicle_job(id).tripsheet_number
       repo.transaction do
@@ -58,40 +81,51 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    # def complete_a_vehicle_job(id, params)
-    #   res = complete_a_record(:vehicle_jobs, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, vehicle_job(id))
-    #   else
-    #     failed_response(res.message, vehicle_job(id))
-    #   end
-    # end
+    def link_mr_skus(id, mr_sku_ids)
+      repo.transaction do
+        repo.link_mr_skus(id, mr_sku_ids)
+      end
+      success_response('SKUs linked successfully', has_skus: mr_sku_ids.any?)
+    end
 
-    # def reopen_a_vehicle_job(id, params)
-    #   res = reopen_a_record(:vehicle_jobs, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, vehicle_job(id))
-    #   else
-    #     failed_response(res.message, vehicle_job(id))
-    #   end
-    # end
+    def link_locations(id, location_ids)
+      repo.transaction do
+        repo.link_locations(id, location_ids)
+      end
+      success_response('Locations linked successfully', has_locations: location_ids.any?)
+    end
 
-    # def approve_or_reject_a_vehicle_job(id, params)
-    #   res = if params[:approve_action] == 'a'
-    #           approve_a_record(:vehicle_jobs, id, params.merge(enqueue_job: false))
-    #         else
-    #           reject_a_record(:vehicle_jobs, id, params.merge(enqueue_job: false))
-    #         end
-    #   if res.success
-    #     success_response(res.message, vehicle_job(id))
-    #   else
-    #     failed_response(res.message, vehicle_job(id))
-    #   end
-    # end
+    def get_sku_location_info_ids(sku_location_id)
+      repo.get_sku_location_info_ids(sku_location_id)
+    end
 
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::VehicleJob.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def can_confirm_arrival(id)
+      res = TaskPermissionCheck::VehicleJob.call(:can_confirm_arrival, id)
+      res.success
+    end
+
+    def can_mark_as_loaded(id)
+      res = TaskPermissionCheck::VehicleJob.call(:can_load, id)
+      res.success
+    end
+
+    private
+
+    def repo
+      @repo ||= TripsheetsRepo.new
+    end
+
+    def vehicle_job(id)
+      repo.find_vehicle_job(id)
+    end
+
+    def validate_vehicle_job_params(params)
+      VehicleJobSchema.call(params)
     end
   end
 end

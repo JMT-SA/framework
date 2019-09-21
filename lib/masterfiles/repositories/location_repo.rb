@@ -12,6 +12,14 @@ module MasterfilesApp
                           label: :location_long_code,
                           value: :id,
                           order_by: :location_long_code
+    build_for_select :locations,
+                     label: :location_long_code,
+                     value: :id,
+                     order_by: :location_long_code
+    build_inactive_select :locations,
+                          label: :location_long_code,
+                          value: :id,
+                          order_by: :location_long_code
 
     build_for_select :location_assignments,
                      label: :assignment_code,

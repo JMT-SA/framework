@@ -38,24 +38,24 @@ class TestVehicleJobRoutes < RouteTester
     expect_permission_error
   end
 
-  def test_update
-    authorise_pass!
-    ensure_exists!(INTERACTOR)
-    row_vals = Hash.new(1)
-    INTERACTOR.any_instance.stubs(:update_vehicle_job).returns(ok_response(instance: row_vals))
-    patch_as_fetch 'pack_material/tripsheets/vehicle_jobs/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_update_grid
-  end
+  # def test_update
+  #   authorise_pass!
+  #   ensure_exists!(INTERACTOR)
+  #   row_vals = Hash.new(1)
+  #   INTERACTOR.any_instance.stubs(:update_vehicle_job).returns(ok_response(instance: row_vals))
+  #   patch_as_fetch 'pack_material/tripsheets/vehicle_jobs/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+  #   expect_json_update_grid
+  # end
 
-  def test_update_fail
-    authorise_pass!
-    ensure_exists!(INTERACTOR)
-    INTERACTOR.any_instance.stubs(:update_vehicle_job).returns(bad_response)
-    PackMaterial::Tripsheets::VehicleJob::Edit.stub(:call, bland_page) do
-      patch_as_fetch 'pack_material/tripsheets/vehicle_jobs/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    end
-    expect_json_replace_dialog(has_error: true)
-  end
+  # def test_update_fail
+  #   authorise_pass!
+  #   ensure_exists!(INTERACTOR)
+  #   INTERACTOR.any_instance.stubs(:update_vehicle_job).returns(bad_response)
+  #   PackMaterial::Tripsheets::VehicleJob::Edit.stub(:call, bland_page) do
+  #     patch_as_fetch 'pack_material/tripsheets/vehicle_jobs/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+  #   end
+  #   expect_json_replace_dialog(has_error: true)
+  # end
 
   def test_delete
     authorise_pass! permission_check: PackMaterialApp::TaskPermissionCheck::VehicleJob

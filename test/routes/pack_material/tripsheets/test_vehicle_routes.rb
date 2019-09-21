@@ -7,7 +7,6 @@ class TestVehicleRoutes < RouteTester
   INTERACTOR = PackMaterialApp::VehicleInteractor
 
   def test_edit
-    authorise_pass! permission_check: PackMaterialApp::TaskPermissionCheck::Vehicle
     ensure_exists!(INTERACTOR)
     PackMaterial::Tripsheets::Vehicle::Edit.stub(:call, bland_page) do
       get 'pack_material/tripsheets/vehicles/1/edit', {}, 'rack.session' => { user_id: 1 }
@@ -58,7 +57,6 @@ class TestVehicleRoutes < RouteTester
   end
 
   def test_delete
-    authorise_pass! permission_check: PackMaterialApp::TaskPermissionCheck::Vehicle
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_vehicle).returns(ok_response)
     delete_as_fetch 'pack_material/tripsheets/vehicles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
@@ -66,7 +64,6 @@ class TestVehicleRoutes < RouteTester
   end
 
   def test_delete_fail
-    authorise_pass! permission_check: PackMaterialApp::TaskPermissionCheck::Vehicle
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_vehicle).returns(bad_response)
     delete_as_fetch 'pack_material/tripsheets/vehicles/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }

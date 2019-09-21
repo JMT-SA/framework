@@ -5,6 +5,17 @@
   :text: edit
   :icon: edit
   :title: Edit
+  :hide_if_false: has_locations, has_skus
+- :url: "/list/vehicle_jobs_mr_skus/multi?key=vehicle_jobs&id=$:id$"
+  :text: SKU Numbers
+  :icon: list
+  :popup: true
+  :hide_if_true: completed
+- :url: "/list/vehicle_jobs_locations/multi?key=vehicle_jobs&id=$:id$&storage_type_id=$:storage_type_id$"
+  :text: Locations
+  :icon: list
+  :popup: true
+  :hide_if_true: completed
 - :url: "/pack_material/tripsheets/vehicle_jobs/$:id$"
   :text: delete
   :icon: delete

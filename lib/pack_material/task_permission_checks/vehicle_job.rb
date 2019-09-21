@@ -14,10 +14,10 @@ module PackMaterialApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
-        delete: :delete_check
-        # complete: :complete_check,
-        # approve: :approve_check,
-        # reopen: :reopen_check
+        delete: :delete_check,
+        can_confirm_arrival: :can_confirm_arrival_check,
+        can_load: :can_load_check,
+        can_offload: :can_offload_check
       }.freeze
 
       def call
@@ -36,43 +36,65 @@ module PackMaterialApp
       end
 
       def edit_check
-        # return failed_response 'VehicleJob has been completed' if completed?
+        return failed_response 'Vehicle Job has already been offloaded' if offloaded?
 
         all_ok
       end
 
       def delete_check
-        # return failed_response 'VehicleJob has been completed' if completed?
+        return failed_response 'Vehicle Job has already been loaded' if loaded?
 
         all_ok
       end
 
-      # def complete_check
-      #   return failed_response 'VehicleJob has already been completed' if completed?
+      def can_confirm_arrival_check
+        return failed_response 'Vehicle Job has no units' if no_units?
+        return failed_response 'Vehicle Job units have not been loaded' if not_yet_loaded_units?
+        return failed_response 'Vehicle Job has already been offloaded' if offloaded?
+        return failed_response 'Vehicle Job does not have a receiving bay set' unless planned_location?
+        return failed_response 'Vehicle Job has not yet been marked as loaded' unless loaded?
 
-      #   all_ok
-      # end
+        all_ok
+      end
 
-      # def approve_check
-      #   return failed_response 'VehicleJob has not been completed' unless completed?
-      #   return failed_response 'VehicleJob has already been approved' if approved?
+      def can_load_check
+        return failed_response 'Vehicle Job has already been marked as loaded' if loaded?
+        return failed_response 'Vehicle Job has no units' if no_units?
+        return failed_response 'Vehicle Job units have not been loaded' if not_yet_loaded_units?
 
-      #   all_ok
-      # end
+        all_ok
+      end
 
-      # def reopen_check
-      #   return failed_response 'VehicleJob has not been approved' unless approved?
+      def can_offload_check
+        return failed_response 'Vehicle Job has not been loaded yet' unless loaded?
+        return failed_response 'Vehicle Job has not arrived yet' unless arrival_confirmed? && planned_location?
 
-      #   all_ok
-      # end
+        all_ok
+      end
 
-      # def completed?
-      #   @entity.completed
-      # end
+      def no_units?
+        @repo.for_select_vehicle_job_units(where: { vehicle_job_id: @id }).none?
+      end
 
-      # def approved?
-      #   @entity.approved
-      # end
+      def not_yet_loaded_units?
+        @repo.for_select_vehicle_job_units(where: { vehicle_job_id: @id, loaded: false }).any?
+      end
+
+      def planned_location?
+        @entity.planned_location_id
+      end
+
+      def arrival_confirmed?
+        @entity.arrival_confirmed
+      end
+
+      def loaded?
+        @entity.loaded
+      end
+
+      def offloaded?
+        @entity.offloaded
+      end
     end
   end
 end

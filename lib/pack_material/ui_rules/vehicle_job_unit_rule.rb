@@ -4,59 +4,67 @@ module UiRules
   class VehicleJobUnitRule < Base
     def generate_rules
       @repo = PackMaterialApp::TripsheetsRepo.new
+      @location_repo = MasterfilesApp::LocationRepo.new
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields case @mode
+                               when :new
+                                 new_fields
+                               when :edit
+                                 edit_fields
+                               when :show
+                                 edit_fields
+                               end
 
       set_show_fields if %i[show reopen].include? @mode
-      # set_complete_fields if @mode == :complete
-      # set_approve_fields if @mode == :approve
-
-      # add_approve_behaviours if @mode == :approve
 
       form_name 'vehicle_job_unit'
     end
 
-    def set_show_fields
-      # mr_sku_location_from_id_label = PackMaterialApp::LocationRepo.new.find_location(@form_object.mr_sku_location_from_id)&.location_long_code
-      mr_sku_location_from_id_label = @repo.find(:locations, PackMaterialApp::Location, @form_object.mr_sku_location_from_id)&.location_long_code
-      # mr_inventory_transaction_item_id_label = PackMaterialApp::MrInventoryTransactionItemRepo.new.find_mr_inventory_transaction_item(@form_object.mr_inventory_transaction_item_id)&.id
-      mr_inventory_transaction_item_id_label = @repo.find(:mr_inventory_transaction_items, PackMaterialApp::MrInventoryTransactionItem, @form_object.mr_inventory_transaction_item_id)&.id
-      fields[:mr_sku_location_from_id] = { renderer: :label, with_value: mr_sku_location_from_id_label, caption: 'Mr Sku Location From' }
-      fields[:mr_inventory_transaction_item_id] = { renderer: :label, with_value: mr_inventory_transaction_item_id_label, caption: 'Mr Inventory Transaction Item' }
+    def set_show_fields # rubocop:disable Metrics/AbcSize
+      # TODO: Update show view
+      # fields[:mr_sku_location_from_id] = { renderer: :label, with_value: mr_sku_location_from_id_label, caption: 'Sku Location From' }
       fields[:vehicle_job_id] = { renderer: :label }
       fields[:quantity_to_move] = { renderer: :label }
       fields[:when_loaded] = { renderer: :label }
       fields[:when_offloaded] = { renderer: :label }
       fields[:when_offloading] = { renderer: :label }
-      fields[:quantity_moved] = { renderer: :label }
+      fields[:quantity_loaded] = { renderer: :label }
+      fields[:quantity_offloaded] = { renderer: :label }
       fields[:when_loading] = { renderer: :label }
+      fields[:mr_sku_id] = { renderer: :label }
+      fields[:sku_number] = { renderer: :label, caption: 'SKU Number' }
+      fields[:location_id] = { renderer: :label }
     end
 
-    # def set_approve_fields
-    #   set_show_fields
-    #   fields[:approve_action] = { renderer: :select, options: [%w[Approve a], %w[Reject r]], required: true }
-    #   fields[:reject_reason] = { renderer: :textarea, disabled: true }
-    # end
-
-    # def set_complete_fields
-    #   set_show_fields
-    #   user_repo = DevelopmentApp::UserRepo.new
-    #   fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_VEHICLE_JOB_UNIT_APPROVERS), caption: 'Email address of person to notify', required: true }
-    # end
-
-    def common_fields
+    def new_fields
       {
-        mr_sku_location_from_id: { renderer: :select, options: PackMaterialApp::LocationRepo.new.for_select_locations, disabled_options: PackMaterialApp::LocationRepo.new.for_select_inactive_locations, caption: 'mr_sku_location_from' },
-        mr_inventory_transaction_item_id: { renderer: :select, options: PackMaterialApp::MrInventoryTransactionItemRepo.new.for_select_mr_inventory_transaction_items, caption: 'Mr Inventory Transaction Item' },
-        vehicle_job_id: {},
-        quantity_to_move: {},
-        when_loaded: {},
-        when_offloaded: {},
-        when_offloading: {},
-        quantity_moved: {},
-        when_loading: {}
+        sku_location_lookup: {
+          renderer: :lookup,
+          lookup_name: :vju_sku_locations,
+          lookup_key: :standard,
+          caption: 'Select SKU Location',
+          param_values: { vehicle_job_id: vehicle_job_id }
+        },
+        mr_sku_location_from_id: { renderer: :hidden },
+        vehicle_job_id: { renderer: :hidden },
+        quantity_to_move: { renderer: :numeric, required: true },
+        mr_sku_id: { renderer: :hidden },
+        sku_number: { readonly: true, required: true },
+        location_id: { renderer: :hidden },
+        location_code: { readonly: true, required: true }
+      }
+    end
+
+    def edit_fields
+      {
+        quantity_loaded: { renderer: :numeric },
+        quantity_offloaded: { renderer: :numeric },
+        when_loaded: { subtype: :datetime },
+        when_offloaded: { subtype: :datetime },
+        when_offloading: { subtype: :datetime },
+        when_loading: { subtype: :datetime }
       }
     end
 
@@ -71,22 +79,29 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(mr_sku_location_from_id: nil,
-                                    mr_inventory_transaction_item_id: nil,
-                                    vehicle_job_id: nil,
+                                    vehicle_job_id: @options[:parent_id],
                                     quantity_to_move: nil,
                                     when_loaded: nil,
                                     when_offloaded: nil,
                                     when_offloading: nil,
-                                    quantity_moved: nil,
+                                    quantity_loaded: nil,
+                                    quantity_offloaded: nil,
+                                    mr_sku_id: nil,
+                                    sku_number: nil,
+                                    location_id: nil,
                                     when_loading: nil)
     end
 
-    # private
+    def vehicle_job_id
+      @options[:parent_id] || @form_object.vehicle_job_id
+    end
 
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
+    def sku_number_options
+      @repo.vehicle_job_sku_numbers(vehicle_job_id)
+    end
+
+    def location_options
+      @repo.vehicle_job_locations(vehicle_job_id)
+    end
   end
 end

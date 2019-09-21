@@ -4,19 +4,26 @@
   \      \"vehicle_jobs\".\"vehicle_id\",\r\n       \"vehicle_jobs\".\"departure_location_id\",\r\n
   \      \"departure_locations\".\"location_long_code\" AS departure_location_long_code,\r\n
   \      \"vehicle_jobs\".\"tripsheet_number\",\r\n       \"vehicle_jobs\".\"planned_location_id\",\r\n
-  \      \"planned_locations\".\"location_long_code\" AS planned_location_long_code,\r\n
-  \      \"vehicle_jobs\".\"when_loaded\",\r\n       \"vehicle_jobs\".\"when_offloaded\",\r\n
+  \      \"vehicle_jobs\".\"virtual_location_id\",\r\n       \"planned_locations\".\"location_long_code\"
+  AS planned_location_long_code,\r\n       \"virtual_locations\".\"location_long_code\"
+  AS virtual_location_long_code,\r\n       \"vehicle_jobs\".\"when_loaded\",\r\n       \"vehicle_jobs\".\"when_offloaded\",\r\n
   \      \"vehicle_jobs\".\"when_loading\",\r\n       \"vehicle_jobs\".\"loaded\",\r\n
   \      \"vehicle_jobs\".\"offloaded\",\r\n       \"vehicle_jobs\".\"load_transaction_id\",\r\n
-  \      \"vehicle_jobs\".\"putaway_transaction_id\",\r\n       \"vehicle_jobs\".\"offload_transaction_id\",\r\n
-  \      \"vehicle_jobs\".\"created_at\",\r\n       \"vehicle_jobs\".\"updated_at\",\r\n
-  \      \"business_processes\".\"process\",\r\n       \"vehicles\".\"vehicle_code\",\r\n
-  \      fn_current_status('vehicle_jobs', \"vehicle_jobs\".\"id\") AS status\r\nFROM
-  \"vehicle_jobs\"\r\n    LEFT JOIN \"business_processes\" ON \"business_processes\".\"id\"
-  = \"vehicle_jobs\".\"business_process_id\"\r\n    LEFT JOIN \"locations\" departure_locations
-  ON departure_locations.\"id\" = \"vehicle_jobs\".\"departure_location_id\"\r\n    LEFT
-  JOIN \"locations\" planned_locations ON planned_locations.\"id\" = \"vehicle_jobs\".\"planned_location_id\"\r\n
-  \   LEFT JOIN \"vehicles\" ON \"vehicles\".\"id\" = \"vehicle_jobs\".\"vehicle_id\""
+  \      \"vehicle_jobs\".\"offload_transaction_id\",\r\n       \"vehicle_jobs\".\"created_at\",\r\n
+  \      \"vehicle_jobs\".\"updated_at\",\r\n       \"business_processes\".\"process\",\r\n
+  \      \"vehicles\".\"vehicle_code\",\r\n       fn_current_status('vehicle_jobs',
+  \"vehicle_jobs\".\"id\") AS status,\r\n       exists(select location_id from crossbeams_framework.public.vehicle_jobs_locations
+  where vehicle_job_id = \"vehicle_jobs\".\"id\") as has_locations,\r\n       exists(select
+  mr_sku_id from crossbeams_framework.public.vehicle_jobs_sku_numbers where vehicle_job_id
+  = \"vehicle_jobs\".\"id\") as has_skus,\r\n       (SELECT id from crossbeams_framework.public.location_storage_types
+  where storage_type_code = 'Pack Material') as storage_type_id\r\nFROM \"vehicle_jobs\"\r\n
+  \        LEFT JOIN \"business_processes\" ON \"business_processes\".\"id\" = \"vehicle_jobs\".\"business_process_id\"\r\n
+  \        LEFT JOIN \"locations\" departure_locations ON departure_locations.\"id\"
+  = \"vehicle_jobs\".\"departure_location_id\"\r\n         LEFT JOIN \"locations\"
+  planned_locations ON planned_locations.\"id\" = \"vehicle_jobs\".\"planned_location_id\"\r\n
+  \        LEFT JOIN \"locations\" virtual_locations ON virtual_locations.\"id\" =
+  \"vehicle_jobs\".\"virtual_location_id\"\r\n         LEFT JOIN \"vehicles\" ON \"vehicles\".\"id\"
+  = \"vehicle_jobs\".\"vehicle_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -133,9 +140,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  virtual_location_id:
+    :name: virtual_location_id
+    :sequence_no: 8
+    :caption: Virtual location
+    :namespaced_name: vehicle_jobs.virtual_location_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   planned_location_long_code:
     :name: planned_location_long_code
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Planned location long code
     :namespaced_name: planned_locations.location_long_code
     :data_type: :string
@@ -149,9 +172,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  virtual_location_long_code:
+    :name: virtual_location_long_code
+    :sequence_no: 10
+    :caption: Virtual location long code
+    :namespaced_name: virtual_locations.location_long_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   when_loaded:
     :name: when_loaded
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: When loaded
     :namespaced_name: vehicle_jobs.when_loaded
     :data_type: :datetime
@@ -167,7 +206,7 @@
     :group_max: false
   when_offloaded:
     :name: when_offloaded
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: When offloaded
     :namespaced_name: vehicle_jobs.when_offloaded
     :data_type: :datetime
@@ -183,7 +222,7 @@
     :group_max: false
   when_loading:
     :name: when_loading
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: When loading
     :namespaced_name: vehicle_jobs.when_loading
     :data_type: :string
@@ -199,7 +238,7 @@
     :group_max: false
   loaded:
     :name: loaded
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Loaded
     :namespaced_name: vehicle_jobs.loaded
     :data_type: :boolean
@@ -215,7 +254,7 @@
     :group_max: false
   offloaded:
     :name: offloaded
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Offloaded
     :namespaced_name: vehicle_jobs.offloaded
     :data_type: :boolean
@@ -231,7 +270,7 @@
     :group_max: false
   load_transaction_id:
     :name: load_transaction_id
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Load transaction
     :namespaced_name: vehicle_jobs.load_transaction_id
     :data_type: :string
@@ -245,25 +284,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  putaway_transaction_id:
-    :name: putaway_transaction_id
-    :sequence_no: 15
-    :caption: Putaway transaction
-    :namespaced_name: vehicle_jobs.putaway_transaction_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   offload_transaction_id:
     :name: offload_transaction_id
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Offload transaction
     :namespaced_name: vehicle_jobs.offload_transaction_id
     :data_type: :string
@@ -279,7 +302,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Created at
     :namespaced_name: vehicle_jobs.created_at
     :data_type: :datetime
@@ -295,7 +318,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Updated at
     :namespaced_name: vehicle_jobs.updated_at
     :data_type: :datetime
@@ -311,7 +334,7 @@
     :group_max: false
   process:
     :name: process
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Process
     :namespaced_name: business_processes.process
     :data_type: :string
@@ -327,7 +350,7 @@
     :group_max: false
   vehicle_code:
     :name: vehicle_code
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Vehicle code
     :namespaced_name: vehicles.vehicle_code
     :data_type: :string
@@ -343,8 +366,56 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_locations:
+    :name: has_locations
+    :sequence_no: 23
+    :caption: Has locations
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_skus:
+    :name: has_skus
+    :sequence_no: 24
+    :caption: Has skus
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  storage_type_id:
+    :name: storage_type_id
+    :sequence_no: 25
+    :caption: Storage type
     :namespaced_name: 
     :data_type: :string
     :width: 

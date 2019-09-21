@@ -160,10 +160,31 @@ class Framework < Roda
         handle_not_found(r)
       end
 
+      r.on 'mark_as_loaded' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:vehicle_job_load)
+        res = interactor.load_vehicle_job(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :vehicle_job_load)
+      end
+      r.on 'confirm_arrival' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:vehicle_job_confirm_arrival)
+        res = interactor.vehicle_job_confirm_arrival(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :vehicle_job_confirm_arrival)
+      end
       r.on 'edit' do   # EDIT
         check_auth!('tripsheets', 'edit')
         interactor.assert_permission!(:edit, id)
-        # show_partial { PackMaterial::Tripsheets::VehicleJob::Edit.call(id) }
         show_page { PackMaterial::Tripsheets::VehicleJob::Edit.call(id, interactor) }
       end
       r.on 'vehicle_job_units' do
@@ -176,17 +197,20 @@ class Framework < Roda
           res = interactor.create_vehicle_job_unit(id, params[:vehicle_job_unit])
           if res.success
             row_keys = %i[
-          id
-          mr_sku_location_from_id
-          mr_inventory_transaction_item_id
-          vehicle_job_id
-          quantity_to_move
-          when_loaded
-          when_offloaded
-          when_offloading
-          quantity_moved
-          when_loading
-        ]
+              id
+              mr_sku_location_from_id
+              vehicle_job_id
+              quantity_to_move
+              when_loaded
+              when_offloaded
+              when_offloading
+              quantity_loaded
+              quantity_offloaded
+              when_loading
+              mr_sku_id
+              sku_number
+              location_id
+            ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
           else
@@ -205,28 +229,6 @@ class Framework < Roda
           check_auth!('tripsheets', 'read')
           show_partial { PackMaterial::Tripsheets::VehicleJob::Show.call(id) }
         end
-        r.patch do     # UPDATE
-          res = interactor.update_vehicle_job(id, params[:vehicle_job])
-          if res.success
-            row_keys = %i[
-              business_process_id
-              vehicle_id
-              departure_location_id
-              tripsheet_number
-              planned_location_id
-              when_loaded
-              when_offloaded
-              loaded
-              offloaded
-              load_transaction_id
-              putaway_transaction_id
-              offload_transaction_id
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
-          else
-            re_show_form(r, res) { PackMaterial::Tripsheets::VehicleJob::Edit.call(id, form_values: params[:vehicle_job], form_errors: res.errors) }
-          end
-        end
         r.delete do    # DELETE
           check_auth!('tripsheets', 'delete')
           interactor.assert_permission!(:delete, id)
@@ -241,6 +243,49 @@ class Framework < Roda
     end
     r.on 'vehicle_jobs' do
       interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'sku_location_lookup_result', Integer do |sku_location_id|
+        result_hash = interactor.get_sku_location_info_ids(sku_location_id)
+        json_actions([OpenStruct.new(type: :change_select_value,
+                                     dom_id: 'vehicle_job_unit_mr_sku_id',
+                                     value: result_hash[:sku_id]),
+                      OpenStruct.new(type: :change_select_value,
+                                     dom_id: 'vehicle_job_unit_sku_number',
+                                     value: result_hash[:sku_number]),
+                      OpenStruct.new(type: :change_select_value,
+                                     dom_id: 'vehicle_job_unit_location_code',
+                                     value: result_hash[:location_code]),
+                      OpenStruct.new(type: :change_select_value,
+                                     dom_id: 'vehicle_job_unit_location_id',
+                                     value: result_hash[:location_id]),
+                      OpenStruct.new(type: :change_select_value,
+                                     dom_id: 'vehicle_job_unit_mr_sku_location_from_id',
+                                     value: result_hash[:mr_sku_location_id])],
+                     'Selected a SKU Location')
+      end
+      r.on 'link_mr_skus', Integer do |id|
+        r.post do
+          res = interactor.link_mr_skus(id, multiselect_grid_choices(params))
+          if res.success
+            update_grid_row(id,
+                            changes: { has_skus: res.instance[:has_skus] },
+                            notice: res.message)
+          else
+            show_json_error(res.message)
+          end
+        end
+      end
+      r.on 'link_locations', Integer do |id|
+        r.post do
+          res = interactor.link_locations(id, multiselect_grid_choices(params))
+          if res.success
+            update_grid_row(id,
+                            changes: { has_locations: res.instance[:has_locations] },
+                            notice: res.message)
+          else
+            show_json_error(res.message)
+          end
+        end
+      end
       r.on 'new' do    # NEW
         check_auth!('tripsheets', 'new')
         show_partial_or_page(r) { PackMaterial::Tripsheets::VehicleJob::New.call(remote: fetch?(r)) }
@@ -255,12 +300,12 @@ class Framework < Roda
             departure_location_id
             tripsheet_number
             planned_location_id
+            virtual_location_id
             when_loaded
             when_offloaded
             loaded
             offloaded
             load_transaction_id
-            putaway_transaction_id
             offload_transaction_id
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
@@ -285,12 +330,24 @@ class Framework < Roda
         handle_not_found(r)
       end
 
-      r.on 'edit' do   # EDIT
+      r.on 'inline_save' do
         check_auth!('tripsheets', 'edit')
-        interactor.assert_permission!(:edit, id)
-        show_partial { PackMaterial::Tripsheets::VehicleJobUnit::Edit.call(id) }
+        res = interactor.inline_update(id, params)
+        if res.success
+          show_json_notice(res.message)
+          parent_interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path }, {})
+          parent_id = interactor.vehicle_job_unit(id)&.vehicle_job_id
+          can_confirm_arrival = parent_interactor.can_confirm_arrival(parent_id)
+          can_mark_as_loaded = parent_interactor.can_mark_as_loaded(parent_id)
+          json_actions([OpenStruct.new(type: can_mark_as_loaded.success ? :show_element : :hide_element,
+                                       dom_id: 'vehicle_job_mark_as_loaded'),
+                        OpenStruct.new(type: can_confirm_arrival.success ? :show_element : :hide_element,
+                                       dom_id: 'vehicle_job_confirm_arrival')],
+                       res.message)
+        else
+          show_json_error(res.message, status: 200)
+        end
       end
-
       r.is do
         r.get do       # SHOW
           check_auth!('tripsheets', 'read')
@@ -301,14 +358,17 @@ class Framework < Roda
           if res.success
             row_keys = %i[
               mr_sku_location_from_id
-              mr_inventory_transaction_item_id
               vehicle_job_id
               quantity_to_move
               when_loaded
               when_offloaded
               when_offloading
-              quantity_moved
+              quantity_loaded
+              quantity_offloaded
               when_loading
+              mr_sku_id
+              sku_number
+              location_id
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

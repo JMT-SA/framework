@@ -38,13 +38,10 @@ module UiRules
         mr_bulk_stock_adjustment_id: { renderer: :hidden },
         sku_location_lookup: {
           renderer: :lookup,
-          lookup_name: :sku_locations,
+          lookup_name: :bsa_sku_locations,
           lookup_key: :standard,
           caption: 'Select SKU Location',
-          param_values: {
-            allowed_sku_numbers: for_lookup_sku_number_options.map { |r| r[0] },
-            allowed_locations: location_options.map { |r| r[1] }
-          }
+          param_values: { mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id }
         },
         mr_sku_id: { renderer: :select, options: sku_number_options, caption: 'SKU Number' },
         location_id: { renderer: :select, options: location_options, caption: 'Location Code' },
@@ -77,10 +74,6 @@ module UiRules
 
     def sku_number_options
       @repo.bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
-    end
-
-    def for_lookup_sku_number_options
-      @repo.for_lookup_bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
     end
 
     def location_options

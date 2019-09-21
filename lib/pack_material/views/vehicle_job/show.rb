@@ -4,7 +4,7 @@ module PackMaterial
   module Tripsheets
     module VehicleJob
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:vehicle_job, :show, id: id)
           rules   = ui_rule.compile
 
@@ -18,6 +18,7 @@ module PackMaterial
               form.add_field :departure_location_id
               form.add_field :tripsheet_number
               form.add_field :planned_location_id
+              form.add_field :virtual_location_id
               form.add_field :when_loaded
               form.add_field :when_offloaded
             end

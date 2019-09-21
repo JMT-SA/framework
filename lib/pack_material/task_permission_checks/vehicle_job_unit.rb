@@ -13,11 +13,8 @@ module PackMaterialApp
 
       CHECKS = {
         create: :create_check,
-        edit: :edit_check,
+        update: :update_check,
         delete: :delete_check
-        # complete: :complete_check,
-        # approve: :approve_check,
-        # reopen: :reopen_check
       }.freeze
 
       def call
@@ -35,44 +32,27 @@ module PackMaterialApp
         all_ok
       end
 
-      def edit_check
-        # return failed_response 'VehicleJobUnit has been completed' if completed?
-
-        all_ok
-      end
-
       def delete_check
-        # return failed_response 'VehicleJobUnit has been completed' if completed?
+        return failed_response 'Vehicle Job Unit has already been loaded' if loaded?
+        return failed_response 'Vehicle Job Unit is already loading' if when_loading?
 
         all_ok
       end
 
-      # def complete_check
-      #   return failed_response 'VehicleJobUnit has already been completed' if completed?
+      def update_check
+        return failed_response 'Vehicle Job Unit has already been loaded' if loaded?
+        return failed_response 'Vehicle Job Unit is already loading' if when_loading?
 
-      #   all_ok
-      # end
+        all_ok
+      end
 
-      # def approve_check
-      #   return failed_response 'VehicleJobUnit has not been completed' unless completed?
-      #   return failed_response 'VehicleJobUnit has already been approved' if approved?
+      def loaded?
+        @entity.loaded
+      end
 
-      #   all_ok
-      # end
-
-      # def reopen_check
-      #   return failed_response 'VehicleJobUnit has not been approved' unless approved?
-
-      #   all_ok
-      # end
-
-      # def completed?
-      #   @entity.completed
-      # end
-
-      # def approved?
-      #   @entity.approved
-      # end
+      def when_loading?
+        !@entity.when_loading.nil?
+      end
     end
   end
 end

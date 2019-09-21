@@ -8,6 +8,7 @@ module PackMaterialApp
     attribute :departure_location_id, Types::Integer
     attribute :tripsheet_number, Types::Integer
     attribute :planned_location_id, Types::Integer
+    attribute :virtual_location_id, Types::Integer
     attribute :when_loaded, Types::DateTime
     attribute :when_offloaded, Types::DateTime
     attribute? :process, Types::String.optional
@@ -17,7 +18,7 @@ module PackMaterialApp
     attribute :loaded, Types::Bool
     attribute :offloaded, Types::Bool
     attribute :load_transaction_id, Types::Integer
-    attribute :putaway_transaction_id, Types::Integer
     attribute :offload_transaction_id, Types::Integer
+    attribute :arrival_confirmed, Types::Bool
   end
 end

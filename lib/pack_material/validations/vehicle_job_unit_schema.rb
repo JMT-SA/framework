@@ -37,4 +37,16 @@ module PackMaterialApp
     required(:column_name, Types::StrippedString).filled(:str?)
     required(:column_value, :decimal).maybe(:decimal?, gt?: 0)
   end
+
+  VehicleJobUnitLoadSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:tripsheet_number, :integer).filled(:int?)
+    required(:tripsheet_number_scan_field, Types::StrippedString).maybe(:str?)
+    required(:location, Types::StrippedString).filled(:str?)
+    required(:location_scan_field, Types::StrippedString).maybe(:str?)
+    required(:sku_number, :integer).filled(:int?)
+    required(:sku_number_scan_field, Types::StrippedString).maybe(:str?)
+    required(:quantity, :decimal).filled(:decimal?)
+  end
 end

@@ -335,13 +335,10 @@ class Framework < Roda
         res = interactor.inline_update(id, params)
         if res.success
           show_json_notice(res.message)
-          parent_interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path }, {})
-          parent_id = interactor.vehicle_job_unit(id)&.vehicle_job_id
-          can_confirm_arrival = parent_interactor.can_confirm_arrival(parent_id)
-          can_mark_as_loaded = parent_interactor.can_mark_as_loaded(parent_id)
-          json_actions([OpenStruct.new(type: can_mark_as_loaded.success ? :show_element : :hide_element,
+          button_permissions = interactor.check_button_permissions(id)
+          json_actions([OpenStruct.new(type: button_permissions[:can_load] ? :show_element : :hide_element,
                                        dom_id: 'vehicle_job_mark_as_loaded'),
-                        OpenStruct.new(type: can_confirm_arrival.success ? :show_element : :hide_element,
+                        OpenStruct.new(type: button_permissions[:can_confirm_arrival] ? :show_element : :hide_element,
                                        dom_id: 'vehicle_job_confirm_arrival')],
                        res.message)
         else

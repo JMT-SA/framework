@@ -104,16 +104,6 @@ module PackMaterialApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def can_confirm_arrival(id)
-      res = TaskPermissionCheck::VehicleJob.call(:can_confirm_arrival, id)
-      res.success
-    end
-
-    def can_mark_as_loaded(id)
-      res = TaskPermissionCheck::VehicleJob.call(:can_load, id)
-      res.success
-    end
-
     private
 
     def repo
@@ -125,7 +115,7 @@ module PackMaterialApp
     end
 
     def validate_vehicle_job_params(params)
-      VehicleJobSchema.call(params)
+      NewVehicleJobSchema.call(params)
     end
   end
 end

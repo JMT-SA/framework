@@ -139,9 +139,52 @@ module PackMaterialApp
       update(:vehicle_jobs, id, loaded: true)
     end
 
+    def vehicle_job_id_from_number(tripsheet_number)
+      DB[:vehicle_jobs].where(tripsheet_number: tripsheet_number).get(:id)
+    end
+
+    def rmd_load_vehicle_unit(attrs) # rubocop:disable Metrics/AbcSize
+      unit = DB[:vehicle_job_units].where(vehicle_job_id: attrs[:vehicle_job_id],
+                                          location_id: attrs[:location_id],
+                                          mr_sku_id: attrs[:mr_sku_id]).first
+      return failed_response('Unit does not exist') unless unit
+
+      new_quantity_loaded = unit[:quantity_loaded] + attrs[:quantity_to_load]
+      exceeded = new_quantity_loaded > unit[:quantity_to_move]
+      return failed_response('Can not exceed quantity to move') if exceeded
+
+      loaded = new_quantity_loaded == unit[:quantity_to_move]
+      update(:vehicle_job_units, unit[:id], quantity_loaded: new_quantity_loaded, loaded: loaded)
+      success_response('ok', unit)
+    end
+
     # def approve_vehicle_job(id)
     # TODO: Confirm arrival && Offload stock to receiving bay
     #   update(:vehicle_jobs, id, approved: true)
     # end
+
+    def vehicle_load_progress_report(vehicle_job_id, sku_id, location_id) # rubocop:disable Metrics/AbcSize
+      return nil unless vehicle_job_id && sku_id && location_id
+
+      total_units = DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id).all
+      sku = DB[:mr_skus].where(id: sku_id)
+      {
+        tripsheet_number: DB[:vehicle_jobs].where(id: vehicle_job_id).get(:tripsheet_number),
+        location_code: replenish_repo.location_long_code_from_location_id(location_id),
+        total_units: total_units.count,
+        done: total_units.reject { |r| r[:actual_quantity].nil? }.count, # ???
+        sku_number: sku.get(:sku_number),
+        product_variant_code: DB[:material_resource_product_variants].where(id: sku.get(:mr_product_variant_id)).get(:product_variant_code),
+        unit: DB[:vehicle_job_units].where(
+          vehicle_job_id: vehicle_job_id,
+          mr_sku_id: sku_id,
+          location_id: location_id
+        ).first
+      }
+    end
+
+    def replenish_repo
+      ReplenishRepo.new
+    end
   end
 end

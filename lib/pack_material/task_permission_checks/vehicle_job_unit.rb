@@ -14,6 +14,7 @@ module PackMaterialApp
       CHECKS = {
         create: :create_check,
         update: :update_check,
+        load: :load_check,
         delete: :delete_check
       }.freeze
 
@@ -46,12 +47,23 @@ module PackMaterialApp
         all_ok
       end
 
+      def load_check
+        return failed_response 'Vehicle Job Unit quantity to move is zero' unless qty_to_move_positive
+        return failed_response 'Vehicle Job Unit has already been loaded' if loaded?
+
+        all_ok
+      end
+
       def loaded?
         @entity.loaded
       end
 
       def when_loading?
         !@entity.when_loading.nil?
+      end
+
+      def qty_to_move_positive
+        @entity.quantity_to_move&.positive?
       end
     end
   end

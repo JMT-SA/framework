@@ -90,6 +90,46 @@ SET program_name = 'Stock'
 WHERE p.functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD')
   AND p.program_name = 'Stock Adjustments';
 
+-- PROGRAM: Vehicle
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Vehicle', 4,
+        (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs
+         WHERE program_name = 'Vehicle'
+           AND functional_area_id = (SELECT id
+                                     FROM functional_areas
+                                     WHERE functional_area_name = 'RMD')),
+        'Framework');
+
+-- PROGRAM FUNCTION Vehicle Load
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Vehicle'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'RMD')),
+        'Load',
+        '/rmd/vehicles/load/new',
+        5,
+        NULL,
+        false,
+        false);
+
+-- PROGRAM FUNCTION Vehicle Offload
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Vehicle'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'RMD')),
+        'Offload',
+        '/rmd/vehicles/offload/new',
+        5,
+        NULL,
+        false,
+        false);
+
 -- PROGRAM: PRINTING
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('Printing', 3,

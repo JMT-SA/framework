@@ -1087,6 +1087,10 @@ module DevelopmentApp
 
       private
 
+      def make_caption(value)
+        opts.inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
+      end
+
       def fields_to_use(for_show = false)
         cols = if for_show
                  %i[id created_at updated_at]
@@ -1121,7 +1125,7 @@ module DevelopmentApp
               "fields[:#{f}] = { renderer: :label }"
             end
           else
-            "fields[:#{f}] = { renderer: :label, with_value: #{f}_label, caption: '#{f.to_s.chomp('_id').split('_').map(&:capitalize).join(' ')}' }"
+            "fields[:#{f}] = { renderer: :label, with_value: #{f}_label, caption: '#{make_caption(f.to_s.chomp('_id'))}' }"
           end
         end
       end
@@ -1154,9 +1158,9 @@ module DevelopmentApp
         tm = TableMeta.new(fk[:table])
         required = can_be_null ? '' : ', required: true'
         if tm.active_column_present?
-          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_select_inactive_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
+          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_select_inactive_#{fk[:table]}, caption: '#{make_caption(field.to_s.chomp('_id'))}'#{required} }"
         else
-          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id').split('_').map(&:capitalize).join(' ')}'#{required} }"
+          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{make_caption(field.to_s.chomp('_id'))}'#{required} }"
         end
       end
 

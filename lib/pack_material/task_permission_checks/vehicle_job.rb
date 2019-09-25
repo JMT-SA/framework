@@ -17,6 +17,7 @@ module PackMaterialApp
         delete: :delete_check,
         can_confirm_arrival: :can_confirm_arrival_check,
         can_load: :can_load_check,
+        can_mark_as_loaded: :can_mark_as_loaded_check,
         can_offload: :can_offload_check
       }.freeze
 
@@ -41,6 +42,14 @@ module PackMaterialApp
         all_ok
       end
 
+      def update_check
+        return failed_response 'Vehicle Job has already been offloaded' if offloaded?
+        return failed_response 'Vehicle Job already has loaded units' if already_loaded_units?
+        # return failed_response 'Vehicle Job has already been offloaded' if offloaded?
+
+        all_ok
+      end
+
       def delete_check
         return failed_response 'Vehicle Job has already been loaded' if loaded?
 
@@ -58,6 +67,13 @@ module PackMaterialApp
       end
 
       def can_load_check
+        return failed_response 'Vehicle Job has already been marked as loaded' if loaded?
+        return failed_response 'Vehicle Job has no units' if no_units?
+
+        all_ok
+      end
+
+      def can_mark_as_loaded_check
         return failed_response 'Vehicle Job has already been marked as loaded' if loaded?
         return failed_response 'Vehicle Job has no units' if no_units?
         return failed_response 'Vehicle Job units have not been loaded' if not_yet_loaded_units?
@@ -78,6 +94,10 @@ module PackMaterialApp
 
       def not_yet_loaded_units?
         @repo.for_select_vehicle_job_units(where: { vehicle_job_id: @id, loaded: false }).any?
+      end
+
+      def already_loaded_units?
+        @repo.for_select_vehicle_job_units(where: { vehicle_job_id: @id, loaded: true }).any?
       end
 
       def planned_location?

@@ -149,18 +149,39 @@ module PackMaterialApp
                                           mr_sku_id: attrs[:mr_sku_id]).first
       return failed_response('Unit does not exist') unless unit
 
-      new_quantity_loaded = unit[:quantity_loaded] + attrs[:quantity_to_load]
+      new_quantity_loaded = (unit[:quantity_loaded] || AppConst::BIG_ZERO) + BigDecimal(attrs[:quantity_to_load])
       exceeded = new_quantity_loaded > unit[:quantity_to_move]
       return failed_response('Can not exceed quantity to move') if exceeded
 
+      vehicle_job = DB[:vehicle_jobs].where(id: attrs[:vehicle_job_id])
+      virtual_location_id = vehicle_job.get(:virtual_location_id)
+      return failed_response('No virtual location set on Vehicle Job') unless virtual_location_id
+
+      res = PackMaterialApp::MoveMrStock.call(attrs[:mr_sku_id],
+                                              virtual_location_id,
+                                              BigDecimal(attrs[:quantity_to_load]),
+                                              vehicle_job_id: attrs[:vehicle_job_id],
+                                              from_location_id: attrs[:location_id],
+                                              user_name: @user.user_name,
+                                              parent_transaction_id: vehicle_job.get(:load_transaction_id))
+      return res unless res.success
+
       loaded = new_quantity_loaded == unit[:quantity_to_move]
       update(:vehicle_job_units, unit[:id], quantity_loaded: new_quantity_loaded, loaded: loaded)
+
+      update_vehicle_loaded(attrs[:vehicle_job_id])
       success_response('ok', unit)
     end
 
-    # def approve_vehicle_job(id)
+    def update_vehicle_loaded(vehicle_job_id)
+      return nil if exists?(:vehicle_job_units, vehicle_job_id: vehicle_job_id, loaded: false)
+
+      update(:vehicle_jobs, vehicle_job_id, loaded: true)
+    end
+
+    # def vehicle_job_confirm_arrival(id)
     # TODO: Confirm arrival && Offload stock to receiving bay
-    #   update(:vehicle_jobs, id, approved: true)
+    #   update(:vehicle_jobs, id, arrival_confirmed: true)
     # end
 
     def vehicle_load_progress_report(vehicle_job_id, sku_id, location_id) # rubocop:disable Metrics/AbcSize

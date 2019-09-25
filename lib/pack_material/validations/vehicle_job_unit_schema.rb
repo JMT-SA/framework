@@ -47,6 +47,6 @@ module PackMaterialApp
     required(:location_scan_field, Types::StrippedString).maybe(:str?)
     required(:sku_number, :integer).filled(:int?)
     required(:sku_number_scan_field, Types::StrippedString).maybe(:str?)
-    required(:quantity, :decimal).filled(:decimal?)
+    required(:quantity, :decimal).filled(:decimal?, gt?: 0)
   end
 end

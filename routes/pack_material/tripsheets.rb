@@ -187,6 +187,17 @@ class Framework < Roda
         interactor.assert_permission!(:edit, id)
         show_page { PackMaterial::Tripsheets::VehicleJob::Edit.call(id, interactor) }
       end
+      r.patch do     # UPDATE
+        res = interactor.update_vehicle_job(id, params[:vehicle_job])
+        if res.success
+          flash[:notice] = res.message
+          r.redirect("/pack_material/tripsheets/vehicle_jobs/#{id}/edit")
+        else
+          re_show_form(r, res, url: "/pack_material/tripsheets/vehicle_jobs/#{id}/edit") do
+            PackMaterial::Tripsheets::VehicleJob::Edit.call(id, current_user, form_values: params[:vehicle_job], form_errors: res.errors)
+          end
+        end
+      end
       r.on 'vehicle_job_units' do
         interactor = PackMaterialApp::VehicleJobUnitInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
@@ -336,7 +347,7 @@ class Framework < Roda
         if res.success
           show_json_notice(res.message)
           button_permissions = interactor.check_button_permissions(id)
-          json_actions([OpenStruct.new(type: button_permissions[:can_load] ? :show_element : :hide_element,
+          json_actions([OpenStruct.new(type: button_permissions[:can_mark_as_loaded] ? :show_element : :hide_element,
                                        dom_id: 'vehicle_job_mark_as_loaded'),
                         OpenStruct.new(type: button_permissions[:can_confirm_arrival] ? :show_element : :hide_element,
                                        dom_id: 'vehicle_job_confirm_arrival')],

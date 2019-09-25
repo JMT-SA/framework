@@ -12,7 +12,7 @@ module UiRules
       apply_form_values
       set_rules unless @mode == :new
 
-      common_values_for_fields common_fields
+      common_values_for_fields can_edit? ? edit_fields : update_fields
 
       set_show_fields if %i[show reopen].include? @mode
 
@@ -24,7 +24,7 @@ module UiRules
       rules[:arrival_confirmed] = arrival_confirmed?
       rules[:can_load] = can_mark_as_loaded?
       rules[:loaded] = loaded?
-      # rules[:cannot_edit] = cannot_edit?
+      rules[:cannot_edit] = !can_edit?
       rules[:completed] = completed?
     end
 
@@ -43,7 +43,7 @@ module UiRules
       fields[:offloaded] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields
+    def edit_fields
       {
         business_process_id: { renderer: :select, options: @transaction_repo.for_select_business_processes, selected: @repo.vehicle_jobs_business_process_id, caption: 'Business Process', required: true },
         vehicle_id: { renderer: :select, options: @repo.for_select_vehicles, caption: 'Vehicle', required: true },
@@ -51,6 +51,22 @@ module UiRules
         tripsheet_number: { renderer: :label },
         planned_location_id: { renderer: :select, options: receiving_bays, caption: 'Planned Location To', prompt: 'Leave blank if same Building' },
         virtual_location_id: { renderer: :select, options: @location_repo.for_select_locations(where: { virtual_location: true }), caption: 'Virtual Location', required: true },
+        when_loaded: { renderer: :label, subtype: :datetime },
+        when_offloaded: { renderer: :label, subtype: :datetime },
+        arrival_confirmed: { renderer: :label, as_boolean: true },
+        loaded: { renderer: :label, as_boolean: true },
+        offloaded: { renderer: :label, as_boolean: true }
+      }
+    end
+
+    def update_fields
+      {
+        business_process_id: { renderer: :label },
+        vehicle_id: { renderer: :label },
+        departure_location_id: { renderer: :label },
+        tripsheet_number: { renderer: :label },
+        planned_location_id: { renderer: :select, options: receiving_bays, caption: 'Planned Location To', prompt: 'Leave blank if same Building' },
+        virtual_location_id: { renderer: :label },
         when_loaded: { renderer: :label, subtype: :datetime },
         when_offloaded: { renderer: :label, subtype: :datetime },
         arrival_confirmed: { renderer: :label, as_boolean: true },
@@ -87,11 +103,11 @@ module UiRules
     end
 
     def can_confirm_arrival?
-      interactor.can_confirm_arrival(@options[:id])
+      interactor.check_permission(:can_confirm_arrival, @options[:id])
     end
 
     def can_mark_as_loaded?
-      interactor.can_mark_as_loaded(@options[:id])
+      interactor.check_permission(:can_mark_as_loaded, @options[:id])
     end
 
     def arrival_confirmed?
@@ -108,6 +124,10 @@ module UiRules
 
     def interactor
       @interactor ||= @options[:interactor]
+    end
+
+    def can_edit?
+      @can_edit ||= interactor.check_permission(:edit, @options[:id])
     end
   end
 end

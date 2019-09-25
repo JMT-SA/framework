@@ -110,6 +110,10 @@ module PackMaterialApp
                     TRANSACTION_TYPE_ADHOC_MOVE
                   when 'destroy'
                     TRANSACTION_TYPE_REMOVE_STOCK
+                  when 'load'
+                    TRANSACTION_TYPE_LOAD_VEHICLE
+                  when 'offload'
+                    TRANSACTION_TYPE_OFFLOAD_VEHICLE
                   else # when 'putaway'
                     TRANSACTION_TYPE_PUTAWAY
                   end
@@ -230,6 +234,11 @@ module PackMaterialApp
 
       DB[:mr_inventory_transactions].where(id: parent_transaction_id).update(active: true)
       success_response('ok')
+    end
+
+    def update_vehicle_job_transaction_id(id, transaction_id, type)
+      update(:vehicle_jobs, id, load_transaction_id: transaction_id) if type == AppConst::TRANSACTION_TYPE_LOAD_VEHICLE
+      update(:vehicle_jobs, id, offload_transaction_id: transaction_id) if type == AppConst::TRANSACTION_TYPE_OFFLOAD_VEHICLE
     end
   end
 end

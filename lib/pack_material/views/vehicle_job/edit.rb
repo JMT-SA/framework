@@ -8,6 +8,8 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:vehicle_job, :edit, id: id, interactor: interactor, form_values: form_values)
           rules   = ui_rule.compile
 
+          cannot_edit = rules[:cannot_edit]
+
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -41,9 +43,9 @@ module PackMaterial
               section.add_caption 'Vehicle Job'
               section.form do |form|
                 form.action "/pack_material/tripsheets/vehicle_jobs/#{id}"
-                form.method :update # TODO: unless cannot_edit
-                form.view_only! # TODO: if cannot_edit
-                form.no_submit! # TODO: if cannot_edit
+                form.method :update unless cannot_edit
+                form.view_only! if cannot_edit
+                form.no_submit! if cannot_edit
                 form.row do |row|
                   row.column do |col|
                     col.add_field :tripsheet_number

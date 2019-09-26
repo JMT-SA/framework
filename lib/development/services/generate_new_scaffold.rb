@@ -22,7 +22,7 @@ module DevelopmentApp
         @applet              = params[:applet]
         @new_applet          = @applet == 'other'
         @applet              = params[:other] if @applet == 'other'
-        @program_text        = params[:program].strip
+        @program_text        = params[:program].tr('_', ' ').strip
         @program             = @program_text.tr(' ', '_')
         @table_meta          = TableMeta.new(@table)
         @label_field         = params[:label_field] || @table_meta.likely_label_field
@@ -190,7 +190,8 @@ module DevelopmentApp
         integer: '(:int?)',
         string: '(:str?)',
         boolean: '(:bool?)',
-        datetime: '(:date_time?)',
+        # datetime: '(:date_time?)',
+        datetime: '(:time?)',
         date: '(:date?)',
         time: '(:time?)',
         float: '(:float?)',
@@ -1087,6 +1088,10 @@ module DevelopmentApp
 
       private
 
+      def make_caption(value)
+        opts.inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
+      end
+
       def fields_to_use(for_show = false)
         cols = if for_show
                  %i[id created_at updated_at]
@@ -1121,7 +1126,7 @@ module DevelopmentApp
               "fields[:#{f}] = { renderer: :label }"
             end
           else
-            "fields[:#{f}] = { renderer: :label, with_value: #{f}_label, caption: '#{f.to_s.chomp('_id').split('_').map(&:capitalize).join(' ')}' }"
+            "fields[:#{f}] = { renderer: :label, with_value: #{f}_label, caption: '#{make_caption(f.to_s.chomp('_id'))}' }"
           end
         end
       end
@@ -1154,9 +1159,9 @@ module DevelopmentApp
         tm = TableMeta.new(fk[:table])
         required = can_be_null ? '' : ', required: true'
         if tm.active_column_present?
-          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_select_inactive_#{fk[:table]}, caption: '#{field.to_s.chomp('_id')}'#{required} }"
+          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, disabled_options: #{fk_repo}.new.for_select_inactive_#{fk[:table]}, caption: '#{make_caption(field.to_s.chomp('_id'))}'#{required} }"
         else
-          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{field.to_s.chomp('_id').split('_').map(&:capitalize).join(' ')}'#{required} }"
+          "#{field}: { renderer: :select, options: #{fk_repo}.new.for_select_#{fk[:table]}, caption: '#{make_caption(field.to_s.chomp('_id'))}'#{required} }"
         end
       end
 
@@ -1233,7 +1238,6 @@ module DevelopmentApp
       def test_interactor
         ent = columnise.join(",\n        ")
         req_col = opts.table_meta.likely_label_field || '???'
-        str_col = opts.table_meta.string_field
         <<~RUBY
           # frozen_string_literal: true
 
@@ -1287,8 +1291,6 @@ module DevelopmentApp
                 res = interactor.update_#{opts.singlename}(id, attrs)
                 refute res.success, "\#{res.message} : \#{res.errors.inspect}"
                 assert_equal ['is missing'], res.errors[:#{req_col}]
-                after = interactor.send(:repo).find_hash(:#{opts.table}, id)
-                refute_equal 'a_change', after[:#{str_col}]
               end
 
               def test_delete_#{opts.singlename}
@@ -2049,50 +2051,54 @@ module DevelopmentApp
         str.split(' ').map(&:capitalize).join(' ')
       end
 
+      def make_caption(value)
+        opts.inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
+      end
+
       def call
         <<~SQL
-          -- FUNCTIONAL AREA #{titleize(opts.applet)}
-          INSERT INTO functional_areas (functional_area_name) VALUES ('#{titleize(opts.applet)}');
+          -- FUNCTIONAL AREA #{make_caption(opts.applet)}
+          INSERT INTO functional_areas (functional_area_name) VALUES ('#{make_caption(opts.applet)}');
 
-          -- PROGRAM: #{titleize(opts.program_text)}
+          -- PROGRAM: #{make_caption(opts.program_text)}
           INSERT INTO programs (program_name, program_sequence, functional_area_id)
-          VALUES ('#{titleize(opts.program_text)}', 1, (SELECT id FROM functional_areas
-                                                        WHERE functional_area_name = '#{titleize(opts.applet)}'));
+          VALUES ('#{make_caption(opts.program_text)}', 1, (SELECT id FROM functional_areas
+                                                        WHERE functional_area_name = '#{make_caption(opts.applet)}'));
 
           -- LINK program to webapp
           INSERT INTO programs_webapps(program_id, webapp) VALUES (
                 (SELECT id FROM programs
-                 WHERE program_name = '#{titleize(opts.program_text)}'
+                 WHERE program_name = '#{make_caption(opts.program_text)}'
                    AND functional_area_id = (SELECT id FROM functional_areas
-                                             WHERE functional_area_name = '#{titleize(opts.applet)}')),
+                                             WHERE functional_area_name = '#{make_caption(opts.applet)}')),
                  '#{opts.classnames[:roda_class]}');
 
           -- NEW menu item
           -- PROGRAM FUNCTION New #{opts.classnames[:class]}
           #{opts.new_from_menu ? '' : '/*'}
           INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-          VALUES ((SELECT id FROM programs WHERE program_name = '#{titleize(opts.program_text)}'
+          VALUES ((SELECT id FROM programs WHERE program_name = '#{make_caption(opts.program_text)}'
                    AND functional_area_id = (SELECT id FROM functional_areas
-                                             WHERE functional_area_name = '#{titleize(opts.applet)}')),
-                   'New #{opts.classnames[:class]}', '/#{opts.applet}/#{opts.program}/#{opts.table}/new', 1);
+                                             WHERE functional_area_name = '#{make_caption(opts.applet)}')),
+                   'New #{make_caption(opts.singlename)}', '/#{opts.applet}/#{opts.program}/#{opts.table}/new', 1);
           #{opts.new_from_menu ? '' : '*/'}
 
           -- LIST menu item
           -- PROGRAM FUNCTION #{opts.table.capitalize}
           INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-          VALUES ((SELECT id FROM programs WHERE program_name = '#{titleize(opts.program_text)}'
+          VALUES ((SELECT id FROM programs WHERE program_name = '#{make_caption(opts.program_text)}'
                    AND functional_area_id = (SELECT id FROM functional_areas
-                                             WHERE functional_area_name = '#{titleize(opts.applet)}')),
-                   '#{opts.table.capitalize}', '/list/#{opts.table}', 2);
+                                             WHERE functional_area_name = '#{make_caption(opts.applet)}')),
+                   'List #{make_caption(opts.table)}', '/list/#{opts.table}', 2);
 
           -- SEARCH menu item
           -- PROGRAM FUNCTION Search #{opts.table.capitalize}
           /*
           INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
-          VALUES ((SELECT id FROM programs WHERE program_name = '#{titleize(opts.program_text)}'
+          VALUES ((SELECT id FROM programs WHERE program_name = '#{make_caption(opts.program_text)}'
                    AND functional_area_id = (SELECT id FROM functional_areas
-                                             WHERE functional_area_name = '#{titleize(opts.applet)}')),
-                   'Search #{opts.table.capitalize}', '/search/#{opts.table}', 2);
+                                             WHERE functional_area_name = '#{make_caption(opts.applet)}')),
+                   'Search #{make_caption(opts.table)}', '/search/#{opts.table}', 2);
           */
         SQL
       end

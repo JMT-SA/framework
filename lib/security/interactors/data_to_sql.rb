@@ -98,14 +98,15 @@ module SecurityApp
       end
     end
 
-    def lookup_party_role(val)
+    def lookup_party_role(val) # rubocop:disable Metrics/AbcSize
       pr = dev_repo.where_hash(:party_roles, id: val)
+      role_name = DB[:roles].where(id: DB[:party_roles].where(id: val).get(:role_id)).first[:name]
       sel = if pr[:organization_id]
               org_code = DB[:organizations].where(id: pr[:organization_id]).get(:short_description)
-              "(SELECT id FROM party_roles WHERE organization_id = (SELECT id FROM organizations WHERE short_description = '#{org_code}'))"
+              "(SELECT id FROM party_roles WHERE organization_id = (SELECT id FROM organizations WHERE short_description = '#{org_code}') AND role_id = (SELECT id FROM roles WHERE name = '#{role_name}'))"
             else
               surname, first_name = DB[:people].where(id: pr[:person_id]).get(%i[surname first_name])
-              "(SELECT id FROM party_roles WHERE person_id = (SELECT id  FROM people WHERE surname = '#{surname}' AND first_name = '#{first_name}'))"
+              "(SELECT id FROM party_roles WHERE person_id = (SELECT id  FROM people WHERE surname = '#{surname}' AND first_name = '#{first_name}') AND role_id = (SELECT id FROM roles WHERE name = '#{role_name}'))"
             end
       sel
     end

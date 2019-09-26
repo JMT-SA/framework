@@ -23,7 +23,7 @@ module UiRules
     end
   end
 
-  class Base
+  class Base # rubocop:disable Metrics/ClassLength
     attr_reader :rules, :inflector
     def initialize(mode, authorizer, options)
       @mode        = mode
@@ -56,6 +56,40 @@ module UiRules
                                            { renderer: :label, caption: caption, as_boolean: defn[:type] == :boolean }
                                          end
       end
+    end
+
+    # Generate HTML for a table of columns from the +@form_object+.
+    def compact_header(columns:, display_columns: 2, header_captions: {}) # rubocop:disable Metrics/AbcSize
+      raise("#{self.class} form object has not been set up before calling 'compact_header`") if @form_object.nil?
+
+      row = 0
+      cells = {}
+      columns.each_with_index do |a, i|
+        row += 1 if (i % display_columns).zero?
+        cells[row] ||= []
+        val = @form_object[a]
+        val = <<~HTML if val.is_a?(TrueClass)
+          <div class="cbl-input dark-green">
+            #{Crossbeams::Layout::Icon.render(:checkon, css_class: 'mr1')}
+          </div>
+        HTML
+        val = <<~HTML if val.is_a?(FalseClass)
+          <div class="cbl-input light-red">
+            #{Crossbeams::Layout::Icon.render(:checkoff, css_class: 'mr1')}
+          </div>
+        HTML
+        cells[row] << %(<td class="b gray">#{header_captions[a] || make_caption(a)}</td><td>#{val}</td>)
+      end
+
+      inner = cells.map do |_, v|
+        %(<tr class="hover-row">#{v.join}</tr>)
+      end.join
+
+      @rules[:compact_header] = <<~HTML
+        <table class="thinbordertable">
+          #{inner}
+        </table>
+      HTML
     end
 
     def render_icon(icon)

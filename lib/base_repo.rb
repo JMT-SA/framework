@@ -88,7 +88,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param id [Integer] the id of the row.
   # @return [Hash, nil] the row as a Hash.
   def find_hash(table_name, id)
-    where_hash(table_name, id: id)
+    where_hash(table_name, id: id.to_s.empty? ? nil : id)
   end
 
   # Find the first row in a table matching some condition.

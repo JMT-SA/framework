@@ -6,7 +6,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     raise ArgumentError unless table_name.is_a?(Symbol)
 
     @main_table = table_name
-    @id = id
+    @id = id.to_s.blank? ? nil : id
     @sub_tables = sub_tables
     @parent_tables = parent_tables
     @lookup_functions = lookup_functions

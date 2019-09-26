@@ -560,6 +560,27 @@ const crossbeamsUtils = {
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
    */
+  setReadonlyInput: function setReadonlyInput(action) {
+    const elem = document.getElementById(action.set_readonly.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.set_readonly.id}"`,
+        title: 'Set Readonly element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.set_readonly.readonly) {
+      elem.readOnly = true;
+    } else {
+      elem.readOnly = false;
+    }
+  },
+  /**
+   * Hide a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
   hideElement: function hideElement(action) {
     const elem = document.getElementById(action.hide_element.id);
     if (elem === null) {
@@ -683,6 +704,9 @@ const crossbeamsUtils = {
       }
       if (action.replace_list_items) {
         crossbeamsUtils.replaceListItems(action);
+      }
+      if (action.set_readonly) {
+        crossbeamsUtils.setReadonlyInput(action);
       }
       if (action.hide_element) {
         crossbeamsUtils.hideElement(action);

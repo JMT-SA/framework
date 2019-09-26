@@ -1,0 +1,128 @@
+= UI rules
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== UI rules
+
+UI rules are executed by views to set up how a view's elements are displayed (e.g. as a checkbox for an edit form, or as a label for a show form)
+
+=== Built-in helpers
+
+These helper methods can be called in application ui_rule classes.
+
+==== make_caption
+
+Takes a string or symbol and "humanizes" it. e.g.
+[source, ruby]
+----
+make_caption(:quality_control)
+# => 'Quality Control'
+----
+
+==== compact_header
+
+Typically used to display header information in a form.
+Applies some parameters to the `form_object` and creates the HTML for a table representation.
+Call the method in the rule file and use the resulting `rules[:compact_header]` in the view to render the table.
+
+Parameters:
+
+columns:: Required. Array of symbols matching attributes in the `form_object`. The columns to display in the table in sequence.
+display_columns:: Optional. Integer - defaults to `2`. The number of columns (combination of `th` for label and `td` for value) to display in the table.
+header_captions:: Optional. Hash in the form `{ column_name: 'Header caption' }`. Only provide captions for columns where the default is not good enough.
+
+e.g.
+[source, ruby]
+----
+compact_header(columns: %i[production_run_code template_name packhouse_code
+                           line_code farm_code puc_code],
+               header_captions: {
+                 production_run_code: 'Run',
+                 template_name: 'Template',
+                 packhouse_code: 'Packhouse',
+                 line_code: 'Line'
+               })
+
+# And in the view:
+page.add_text rules[:compact_header]
+----
+
+==== common_values_for_fields
+
+Specify fields for the form as a Hash - typically fields required for all/most views which can be overridden for some views using the `fields` method below.
+
+e.g.
+[source, ruby]
+----
+common_values_for_fields common_fields
+
+def common_fields
+  {
+    plant_resource_type: { renderer: :select, options: ['a', 'b']},
+    plant_resource_code: { required: true },
+    description: { required: true }
+  }
+end
+----
+
+==== fields
+
+A Hash of the fields for the form, specifying the renderer (see link:/developer_documentation/field_renderers.adoc[Field Renderers]) and applicable options.
+
+The fields will typically be set en masse by the `common_values_for_fields` call and then refined using this method.
+
+e.g.
+[source, ruby]
+----
+fields[:sequence_number] = { renderer: :integer, required: true }
+----
+
+==== form_name
+
+This sets the name of the form. Parameters returned from the form will be namespaced with this value.
+
+e.g.
+[source, ruby]
+----
+form_name 'order'
+
+fields[:customer_code] = { renderer: input }
+
+# => HTML input id    will be : id="order_customer_code"
+# => HTML input name  will be : name="order[customer_code]"
+# => Route parameters will be : { order: { customer_code: "value" } }
+----
+
+==== behaviours
+
+See link:/developer_documentation/field_renderer_behaviours.adoc[Field renderer behaviours]
+
+==== apply_form_values
+
+Call:
+[source,ruby]
+----
+apply_form_values form_values
+----
+This will take the values in `form_values` (if there are any) and apply them to the `form_object`.
+In this way the values a user filled-in can be applied to the form object for re-show in a form (typically when a validation has failed).
+
+==== extended_columns
+
+See link:/developer_documentation/how_to_use_extended_columns.adoc#_updating_and_displaying_extended_columns[Updating and displaying extended columns]
+
+==== apply_extended_column_defaults_to_form_object
+
+See link:/developer_documentation/how_to_use_extended_columns.adoc#_updating_and_displaying_extended_columns[Updating and displaying extended columns]
+
+==== render_icon
+
+Returns HTML to render one of the icons from link:/development/grid_column_icons[Grid icon column list] in the page.
+[source, ruby]
+----
+rules[:icon_render] = render_icon('airplane,red')
+
+# And in the view:
+form.add_text rules[:icon_render]
+----

@@ -120,7 +120,7 @@ field_name: { renderer: :lookup,
 2. _Symbol_ or Array of _Symbols_: Param keys are DOM ids from the form (form_name_field_name). The values in these elements at the time the button is pressed will be available for filtering the query.
 3. _Hash_: Param values - the key/value combinations given will be available for filtering the query.
 4. _Symbol_ or Array of _Symbols_: Hidden fields (prefixed with the form name) will be added to the form and the route will be able to set their values.
-5. _Symbol_: A read-only field named `form_name_display_field` will be added to the form and the route will be able to set the value.
+5. _Symbol_: A read-only field named `form_name_display_field` will be added to the form and the route will be able to set the value. If the `form_object` or `form_values` has an entry for this field, its value will be displayed.
 
 This will display a button in the form with caption 'Press me!'.
 

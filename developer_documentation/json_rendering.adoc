@@ -164,6 +164,16 @@ dom_id: as for `:replace_input_value`.
 
 items: An array of `Strings`.
 
+===== Set the readOnly attribute of an input
+
+Works on a DOM input element with an id.
+
+type: `:set_readonly`.
+
+dom_id: the value of the `id` attribute of the input element in the page.
+
+readonly: (true or false) - if true, the input will be set to readOnly. if false, the input will become editable.
+
 ===== Hide a DOM element
 
 Works on any DOM element with an id.
@@ -231,7 +241,17 @@ json_replace_multi_options(dom_id, options_array, message: nil, keep_dialog_open
 
 json_replace_input_value(dom_id, value, message: nil, keep_dialog_open: false)
 
+json_change_select_value(dom_id, value, message: nil, keep_dialog_open: false)
+
+json_replace_inner_html(dom_id, value, message: nil, keep_dialog_open: false)
+
 json_replace_list_items(dom_id, items, message: nil, keep_dialog_open: false)
+
+json_set_readonly(dom_id, readonly, message: nil, keep_dialog_open: false)
+
+json_hide_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
+
+json_show_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
 
 json_clear_form_validation(dom_id, message: nil, keep_dialog_open: false)
 ----

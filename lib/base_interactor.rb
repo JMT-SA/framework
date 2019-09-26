@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BaseInteractor
+class BaseInteractor # rubocop:disable Metrics/ClassLength
   include Crossbeams::Responses
 
   # Create an Interactor.
@@ -212,5 +212,27 @@ class BaseInteractor
   # @return [void]
   def log_multiple_statuses(table_name, ids, status, comment: nil)
     repo.log_multiple_statuses(table_name, ids, status, user_name: @user.user_name, comment: comment)
+  end
+
+  # When expecting an id value from a `changed_value` parameter,
+  # validate for blank/integer.
+  #
+  # @param params [Hash] the request parameters.
+  # @return [DryValidationResponse]
+  def validate_changed_value_as_int(params)
+    Dry::Validation.Params do
+      required(:changed_value).maybe(:int?)
+    end.call(params)
+  end
+
+  # When expecting a string value from a `changed_value` parameter,
+  # validate for blank/string.
+  #
+  # @param params [Hash] the request parameters.
+  # @return [DryValidationResponse]
+  def validate_changed_value_as_str(params)
+    Dry::Validation.Params do
+      required(:changed_value).maybe(:str?)
+    end.call(params)
   end
 end

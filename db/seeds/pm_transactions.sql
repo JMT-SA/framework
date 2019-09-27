@@ -41,6 +41,7 @@ WHERE functional_area_name = 'Pack Material')),
 INSERT INTO business_processes (process) VALUES ('BULK STOCK ADJUSTMENTS');
 INSERT INTO business_processes (process) VALUES ('STOCK TAKE');
 INSERT INTO business_processes (process) VALUES ('STOCK TAKE ON');
+INSERT INTO business_processes (process) VALUES ('STOCK SALES');
 -- INSERT INTO business_processes (process) VALUES ('CONSUMPTION');
 
 INSERT INTO location_storage_types (storage_type_code, location_short_code_prefix) VALUES ('Pack Material', '01');

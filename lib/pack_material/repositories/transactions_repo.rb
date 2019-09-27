@@ -95,7 +95,8 @@ module PackMaterialApp
       processes = [
         AppConst::PROCESS_BULK_STOCK_ADJUSTMENTS,
         AppConst::PROCESS_STOCK_TAKE,
-        AppConst::PROCESS_STOCK_TAKE_ON
+        AppConst::PROCESS_STOCK_TAKE_ON,
+        AppConst::PROCESS_STOCK_SALES
       ]
       DB[:business_processes].where(process: processes).map(:id)
     end

@@ -1,0 +1,32 @@
+= How to implement a back button
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to implement a back button
+
+When a page is displayed (not  in a dialog) you would usually want to provide a back button for the user.
+Clicking this button should take the user to the page they were on regardless of what it was (could be an edit page or a grid page, even a page that is not part of the same applet).
+
+To make this work without knowing which url to use in the link, do the following:
+
+In the route, pass the result of the `back_button_url` helper as an argument named `back_url`:
+[source, ruby]
+----
+r.get do
+  # ..
+  show_partial_or_page(r) { App::Prog::Det::Show.call(id, back_url: back_button_url) }
+end
+----
+
+In the view use the `back_url` value for the button's url:
+[source, ruby]
+----
+def self.call(id, back_url:)
+  # ..
+  section.add_control(control_type: :link,
+                      text: 'Back',
+                      url: back_url,
+                      style: :back_button)
+----
+

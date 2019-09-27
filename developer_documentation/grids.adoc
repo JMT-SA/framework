@@ -163,7 +163,7 @@ Every time an editable cell is changed, a URL will be called with the row id, th
 <5> The numeric editor does not allow alphabetic characters.
 <6> A select editor **must** have a `values` or `value_sql` setting.
 <7> `values` is an array of values.
-<8> `value_sql` must be a SELECT query. The first column of every row forms the select's options.
+<8> `value_sql` must be a SELECT query. The first column of every row forms the select's options. The query can include parameters from the page (when the list url is a `with_params` type) in the form `$:param_name$`.
 
 NOTE: The field name keys for `editable_fields` are Strings, not Symbols, so they do not get a `:` in front.
 
@@ -240,6 +240,29 @@ ORDER BY (SELECT string_agg("sub"."location_long_code", ';') AS path
             JOIN "tree_locations" tree ON "tree"."ancestor_location_id" = "loc"."id"
             WHERE "tree"."descendant_location_id" = "locations"."id"
             ORDER BY "tree"."path_length" DESC) sub)
+----
+
+=== Grid caption
+
+A `list.yml` file can contain one or more rules for setting the caption of a grid.
+
+Nothing provided:: The caption of the underlying dataminer report will be used.
+grid_caption:: A caption can be provided to be used when neither of the following applies.
+conditions:: Several captions can be provided for use when certain conditions are applied.
+multiselect:: The caption rules as provided within the `multiselect` section apply. See link:/developer_documentation/grid_actions.adoc[Grid actions].
+
+e.g.
+[source,yaml]
+----
+:captions:
+  :grid_caption: This overrides the report caption
+  :conditions:
+    :standard: This will be used for /with_params?key=standard
+    :inactive: This will be used for /with_params?key=inactive
+
+:multiselect:
+  :keyname:
+    :grid_caption: This will be used for /multi?key=keyname
 ----
 
 === Simple row colouring

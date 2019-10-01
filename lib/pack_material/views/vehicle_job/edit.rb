@@ -4,11 +4,9 @@ module PackMaterial
   module Tripsheets
     module VehicleJob
       class Edit
-        def self.call(id, interactor, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, interactor, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:vehicle_job, :edit, id: id, interactor: interactor, form_values: form_values)
           rules   = ui_rule.compile
-
-          cannot_edit = rules[:cannot_edit]
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
@@ -38,6 +36,7 @@ module PackMaterial
 
             page.add_notice 'Please confirm arrival', notice_type: :info if rules[:can_confirm_arrival]
 
+            cannot_edit = rules[:cannot_edit]
             page.section do |section|
               section.show_border!
               section.add_caption 'Vehicle Job'
@@ -78,7 +77,6 @@ module PackMaterial
             page.section do |section| #- rubocop:disable Metrics/BlockLength
               section.show_border!
               if rules[:loaded]
-                # TODO: Once loaded we show a grid to offload the units from
                 section.add_grid('job_units',
                                  "/list/vehicle_job_units_show/grid?key=standard&vehicle_job_id=#{id}",
                                  height: 16,

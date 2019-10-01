@@ -42,14 +42,37 @@ module PackMaterialApp
                                               flatten_columns: { type_code: :type_code } }])
     end
 
-    def find_vehicle_jobs(id)
+    def find_vehicle_job(id)
       find_with_association(:vehicle_jobs, id,
                             wrapper: VehicleJob,
                             parent_tables: [
                               { parent_table: :business_processes, foreign_key: :business_process_id, flatten_columns: { process: :process } },
                               { parent_table: :vehicles, foreign_key: :vehicle_id, flatten_columns: { vehicle_code: :vehicle_code } },
-                              { parent_table: :locations, foreign_key: :departure_location_id, flatten_columns: { location_long_code: :location_long_code } }
+                              { parent_table: :locations, foreign_key: :departure_location_id, flatten_columns: { location_long_code: :departure_location_long_code } },
+                              { parent_table: :locations, foreign_key: :virtual_location_id, flatten_columns: { location_long_code: :virtual_location_long_code } },
+                              { parent_table: :locations, foreign_key: :planned_location_id, flatten_columns: { location_long_code: :planned_location_long_code } }
                             ])
+    end
+
+    def find_vehicle_job_unit(id)
+      find_with_association(:vehicle_job_units, id,
+                            wrapper: VehicleJobUnit,
+                            parent_tables: [
+                              { parent_table: :vehicle_jobs, foreign_key: :vehicle_job_id, flatten_columns: { tripsheet_number: :tripsheet_number } },
+                              { parent_table: :locations, foreign_key: :location_id, flatten_columns: { location_long_code: :from_location_long_code } }
+                            ])
+    end
+
+    def update_planned_location(id, attrs)
+      update(:vehicle_jobs, id, planned_location_id: attrs[:planned_location_id])
+    end
+
+    def confirm_arrival_vehicle_job(id)
+      update(:vehicle_jobs, id, arrival_confirmed: true)
+    end
+
+    def vehicle_job_total_offload_stock(id)
+      all_hash(:vehicle_job_units, vehicle_job_id: id)
     end
 
     def vehicle_jobs_business_process_id
@@ -143,46 +166,67 @@ module PackMaterialApp
       DB[:vehicle_jobs].where(tripsheet_number: tripsheet_number).get(:id)
     end
 
-    def rmd_load_vehicle_unit(attrs) # rubocop:disable Metrics/AbcSize
-      unit = DB[:vehicle_job_units].where(vehicle_job_id: attrs[:vehicle_job_id],
-                                          location_id: attrs[:location_id],
-                                          mr_sku_id: attrs[:mr_sku_id]).first
+    def rmd_load_vehicle_unit(mr_sku_id, quantity_to_load, location_id, vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      unit = DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id,
+                                          location_id: location_id,
+                                          mr_sku_id: mr_sku_id).first
       return failed_response('Unit does not exist') unless unit
 
-      new_quantity_loaded = (unit[:quantity_loaded] || AppConst::BIG_ZERO) + BigDecimal(attrs[:quantity_to_load])
-      exceeded = new_quantity_loaded > unit[:quantity_to_move]
-      return failed_response('Can not exceed quantity to move') if exceeded
+      new_quantity_loaded = (unit[:quantity_loaded] || AppConst::BIG_ZERO) + BigDecimal(quantity_to_load)
+      return failed_response('Can not exceed quantity to move') if new_quantity_loaded > unit[:quantity_to_move]
 
-      vehicle_job = DB[:vehicle_jobs].where(id: attrs[:vehicle_job_id])
-      virtual_location_id = vehicle_job.get(:virtual_location_id)
-      return failed_response('No virtual location set on Vehicle Job') unless virtual_location_id
-
-      res = PackMaterialApp::MoveMrStock.call(attrs[:mr_sku_id],
-                                              virtual_location_id,
-                                              BigDecimal(attrs[:quantity_to_load]),
-                                              vehicle_job_id: attrs[:vehicle_job_id],
-                                              from_location_id: attrs[:location_id],
-                                              user_name: @user.user_name,
-                                              parent_transaction_id: vehicle_job.get(:load_transaction_id))
-      return res unless res.success
+      vehicle_job = DB[:vehicle_jobs].where(id: vehicle_job_id)
+      return failed_response('No virtual location set on Vehicle Job') unless vehicle_job.get(:virtual_location_id)
 
       loaded = new_quantity_loaded == unit[:quantity_to_move]
-      update(:vehicle_job_units, unit[:id], quantity_loaded: new_quantity_loaded, loaded: loaded)
+      update(:vehicle_job_units,
+             unit[:id],
+             quantity_loaded: new_quantity_loaded,
+             loaded: loaded,
+             when_loaded: loaded ? DateTime.now : nil,
+             when_loading: DateTime.now)
+      update_vehicle_loaded(vehicle_job_id)
 
-      update_vehicle_loaded(attrs[:vehicle_job_id])
-      success_response('ok', unit)
+      unit = DB[:vehicle_job_units].where(id: unit[:id]).first
+      success_response('ok', unit: unit, vehicle_job: vehicle_job.first)
     end
 
     def update_vehicle_loaded(vehicle_job_id)
       return nil if exists?(:vehicle_job_units, vehicle_job_id: vehicle_job_id, loaded: false)
 
-      update(:vehicle_jobs, vehicle_job_id, loaded: true)
+      update(:vehicle_jobs, vehicle_job_id, loaded: true, when_loading: DateTime.now)
     end
 
-    # def vehicle_job_confirm_arrival(id)
-    # TODO: Confirm arrival && Offload stock to receiving bay
-    #   update(:vehicle_jobs, id, arrival_confirmed: true)
-    # end
+    def rmd_offload_vehicle_unit(mr_sku_id, qty_to_offload, location_id, vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      unit = DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id,
+                                          location_id: location_id,
+                                          mr_sku_id: mr_sku_id).first
+      return failed_response('Unit does not exist') unless unit
+
+      qty_offloaded = (unit[:quantity_offloaded] || AppConst::BIG_ZERO) + BigDecimal(qty_to_offload)
+      return failed_response('Can not offload more than was loaded') if qty_offloaded > unit[:quantity_loaded]
+
+      vehicle_job = DB[:vehicle_jobs].where(id: vehicle_job_id)
+      return failed_response('No virtual location set on Vehicle Job') unless vehicle_job.get(:virtual_location_id)
+
+      offloaded = qty_offloaded == unit[:quantity_loaded]
+      update(:vehicle_job_units,
+             unit[:id],
+             quantity_offloaded: qty_offloaded,
+             offloaded: offloaded,
+             when_offloaded: offloaded ? DateTime.now : nil,
+             when_offloading: DateTime.now)
+      update_vehicle_offloaded(vehicle_job_id)
+
+      unit = DB[:vehicle_job_units].where(id: unit[:id]).first
+      success_response('ok', unit: unit, vehicle_job: vehicle_job.first)
+    end
+
+    def update_vehicle_offloaded(vehicle_job_id)
+      return nil if exists?(:vehicle_job_units, vehicle_job_id: vehicle_job_id, offloaded: false)
+
+      update(:vehicle_jobs, vehicle_job_id, offloaded: true)
+    end
 
     def vehicle_load_progress_report(vehicle_job_id, sku_id, location_id) # rubocop:disable Metrics/AbcSize
       return nil unless vehicle_job_id && sku_id && location_id
@@ -193,7 +237,8 @@ module PackMaterialApp
         tripsheet_number: DB[:vehicle_jobs].where(id: vehicle_job_id).get(:tripsheet_number),
         location_code: replenish_repo.location_long_code_from_location_id(location_id),
         total_units: total_units.count,
-        done: total_units.reject { |r| r[:actual_quantity].nil? }.count, # ???
+        done_loading: total_units.select { |r| r[:loaded] }.count,
+        done_offloading: total_units.select { |r| r[:offloaded] }.count,
         sku_number: sku.get(:sku_number),
         product_variant_code: DB[:material_resource_product_variants].where(id: sku.get(:mr_product_variant_id)).get(:product_variant_code),
         unit: DB[:vehicle_job_units].where(

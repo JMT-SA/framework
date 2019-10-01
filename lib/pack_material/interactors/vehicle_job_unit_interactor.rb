@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-
 module PackMaterialApp
   class VehicleJobUnitInteractor < BaseInteractor
     def create_vehicle_job_unit(parent_id, params) # rubocop:disable Metrics/AbcSize
-      # TODO: Can edit parent?
-      # params[:mr_delivery_id] = parent_id
-      #       can_create = TaskPermissionCheck::MrDeliveryItem.call(:create, delivery_id: parent_id)
-      #       if can_create.success
+      assert_parent_permission!(:edit_header, parent_id)
       res = validate_new_vehicle_job_unit_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -73,7 +68,7 @@ module PackMaterialApp
     end
 
     def assert_parent_permission!(task, id = nil)
-      res = TaskPermissionCheck::VehicleJob.call(task, id)
+      res = TaskPermissionCheck::VehicleJob.call(task, id, @user)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
@@ -86,7 +81,7 @@ module PackMaterialApp
     end
 
     def assert_parent_permission(task, id = nil)
-      res = TaskPermissionCheck::VehicleJob.call(task, id)
+      res = TaskPermissionCheck::VehicleJob.call(task, id, @user)
       res.success
     end
 
@@ -111,7 +106,5 @@ module PackMaterialApp
     def validate_vehicle_job_unit_inline_params(params)
       VehicleJobUnitInlineSchema.call(params)
     end
-
   end
 end
-# rubocop:enable Metrics/ClassLength

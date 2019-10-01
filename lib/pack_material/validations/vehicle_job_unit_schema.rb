@@ -38,7 +38,7 @@ module PackMaterialApp
     required(:column_value, :decimal).maybe(:decimal?, gt?: 0)
   end
 
-  VehicleJobUnitLoadSchema = Dry::Validation.Params do
+  VehicleJobUnitLoadingSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     required(:tripsheet_number, :integer).filled(:int?)

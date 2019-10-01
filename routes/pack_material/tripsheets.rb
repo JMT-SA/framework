@@ -188,13 +188,17 @@ class Framework < Roda
         show_page { PackMaterial::Tripsheets::VehicleJob::Edit.call(id, interactor) }
       end
       r.patch do     # UPDATE
-        res = interactor.update_vehicle_job(id, params[:vehicle_job])
+        res = if params[:vehicle_job][:vehicle_id]
+                interactor.update_vehicle_job(id, params[:vehicle_job])
+              else
+                interactor.update_planned_location(id, params[:vehicle_job])
+              end
         if res.success
           flash[:notice] = res.message
           r.redirect("/pack_material/tripsheets/vehicle_jobs/#{id}/edit")
         else
           re_show_form(r, res, url: "/pack_material/tripsheets/vehicle_jobs/#{id}/edit") do
-            PackMaterial::Tripsheets::VehicleJob::Edit.call(id, current_user, form_values: params[:vehicle_job], form_errors: res.errors)
+            PackMaterial::Tripsheets::VehicleJob::Edit.call(id, interactor, form_values: params[:vehicle_job], form_errors: res.errors)
           end
         end
       end

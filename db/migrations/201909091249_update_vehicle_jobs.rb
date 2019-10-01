@@ -10,6 +10,7 @@ Sequel.migration do
       add_column :tripsheet_number, String, default: Sequel.function(:nextval, 'doc_seqs_tripsheet_number')
 
       add_column :when_loading, DateTime
+      add_column :when_offloading, DateTime
       add_column :loaded, TrueClass, default: false
       add_column :offloaded, TrueClass, default: false
       add_column :arrival_confirmed, TrueClass, default: false
@@ -56,12 +57,15 @@ Sequel.migration do
 
     run "INSERT INTO location_assignments (assignment_code) VALUES ('VEHICLE TRANSFERS');"
     run "INSERT INTO location_types (location_type_code, short_code) VALUES ('VEHICLE TRANSFERS', 'VEHTR');"
-
+    run "INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('LOAD VEHICLE');"
+    run "INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('OFFLOAD VEHICLE');"
   end
 
   down do
     run "DELETE FROM location_assignments WHERE assignment_code = 'VEHICLE TRANSFERS';"
     run "DELETE FROM location_types WHERE short_code = 'VEHTR';"
+    run "DELETE FROM mr_inventory_transaction_types WHERE type_name = 'LOAD VEHICLE';"
+    run "DELETE FROM mr_inventory_transaction_types WHERE type_name = 'OFFLOAD VEHICLE';"
 
     drop_table(:vehicle_jobs_locations)
     drop_table(:vehicle_jobs_sku_numbers)
@@ -93,6 +97,7 @@ Sequel.migration do
       add_column :trip_sheet_number, String
 
       drop_column :when_loading
+      drop_column :when_offloading
       drop_column :loaded
       drop_column :offloaded
       drop_column :arrival_confirmed

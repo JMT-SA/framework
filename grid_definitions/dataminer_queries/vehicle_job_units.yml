@@ -96,10 +96,10 @@
   sku_number:
     :name: sku_number
     :sequence_no: 6
-    :caption: SKU number
+    :caption: SKU no
     :namespaced_name: vehicle_job_units.sku_number
     :data_type: :string
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -115,7 +115,7 @@
     :caption: Qty to move
     :namespaced_name: vehicle_job_units.quantity_to_move
     :data_type: :number
-    :width: 
+    :width: 130
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -131,7 +131,7 @@
     :caption: Qty loaded
     :namespaced_name: vehicle_job_units.quantity_loaded
     :data_type: :string
-    :width: 
+    :width: 130
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -144,10 +144,10 @@
   quantity_offloaded:
     :name: quantity_offloaded
     :sequence_no: 9
-    :caption: Qty moved
+    :caption: Qty offloaded
     :namespaced_name: vehicle_job_units.quantity_offloaded
     :data_type: :number
-    :width: 
+    :width: 130
     :format: :delimited_1000
     :hide: false
     :pinned: 

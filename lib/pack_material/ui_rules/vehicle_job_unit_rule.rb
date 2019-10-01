@@ -23,19 +23,18 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      # TODO: Update show view
-      # fields[:mr_sku_location_from_id] = { renderer: :label, with_value: mr_sku_location_from_id_label, caption: 'Sku Location From' }
-      fields[:vehicle_job_id] = { renderer: :label }
+      fields[:mr_sku_location_from_id] = { renderer: :hidden }
+      fields[:vehicle_job_id] = { renderer: :label, with_value: @form_object.tripsheet_number }
       fields[:quantity_to_move] = { renderer: :label }
-      fields[:when_loaded] = { renderer: :label }
-      fields[:when_offloaded] = { renderer: :label }
-      fields[:when_offloading] = { renderer: :label }
       fields[:quantity_loaded] = { renderer: :label }
       fields[:quantity_offloaded] = { renderer: :label }
+      fields[:when_loaded] = { renderer: :label }
+      fields[:when_offloaded] = { renderer: :label }
       fields[:when_loading] = { renderer: :label }
-      fields[:mr_sku_id] = { renderer: :label }
+      fields[:when_offloading] = { renderer: :label }
+      fields[:mr_sku_id] = { renderer: :hidden }
       fields[:sku_number] = { renderer: :label, caption: 'SKU Number' }
-      fields[:location_id] = { renderer: :label }
+      fields[:location_id] = { renderer: :label, with_value: @form_object.from_location_long_code, caption: 'From Location' }
     end
 
     def new_fields

@@ -28,4 +28,11 @@ module PackMaterialApp
     # required(:when_loaded, :date_time).maybe(:date_time?)
     # required(:when_offloaded, :date_time).maybe(:date_time?)
   end
+
+  UpdateVehicleJobSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    optional(:id, :integer).filled(:int?)
+    required(:planned_location_id, :integer).maybe(:int?)
+  end
 end

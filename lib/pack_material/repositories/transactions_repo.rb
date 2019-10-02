@@ -187,15 +187,10 @@ module PackMaterialApp
     def get_sku_location_info_ids(sku_location_id)
       sku_location = DB[:mr_sku_locations].where(id: sku_location_id)
       {
+        sku_number: sku_number_for_sku_location(sku_location_id),
         sku_id: sku_location.get(:mr_sku_id),
         location_id: sku_location.get(:location_id)
       }
-    end
-
-    def for_lookup_bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)
-      DB[:mr_skus].where(
-        id: bulk_stock_adjustment_sku_ids(bulk_stock_adjustment_id)
-      ).map { |r| [r[:sku_number], r[:id]] }
     end
 
     def bulk_stock_adjustment_sku_numbers(bulk_stock_adjustment_id)

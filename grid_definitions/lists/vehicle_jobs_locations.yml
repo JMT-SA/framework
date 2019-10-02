@@ -1,0 +1,18 @@
+---
+:dataminer_definition: locations
+:multiselect:
+  :vehicle_jobs:
+    :url: "/pack_material/tripsheets/vehicle_jobs/link_locations/$:id$"
+    :preselect: "SELECT location_id AS id FROM vehicle_jobs_locations WHERE vehicle_job_id = $:id$"
+    :section_caption: Link Locations
+    :can_be_cleared: true
+    :conditions: vehicle_job_locations
+    :multiselect_save_method: remote
+:conditions:
+  :vehicle_job_locations:
+    - :col: locations.primary_storage_type_id
+      :op: =
+      :val: $:storage_type_id$
+    - :col: locations.can_store_stock
+      :op: =
+      :val: true

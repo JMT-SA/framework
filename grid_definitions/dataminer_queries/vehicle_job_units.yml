@@ -1,0 +1,305 @@
+---
+:caption: Tripsheet Items
+:sql: "SELECT \"vehicle_job_units\".\"id\",\r\n       \"vehicle_job_units\".\"mr_sku_location_from_id\",\r\n
+  \      \"vehicle_job_units\".\"vehicle_job_id\",\r\n       \"vehicle_job_units\".\"mr_sku_id\",\r\n
+  \      \"vehicle_job_units\".\"location_id\",\r\n       locations.location_short_code
+  as short_code,\r\n       \"vehicle_job_units\".\"sku_number\",\r\n       \"vehicle_job_units\".\"quantity_to_move\",\r\n
+  \      \"vehicle_job_units\".\"quantity_loaded\",\r\n       \"vehicle_job_units\".\"quantity_offloaded\",\r\n
+  \      \"vehicle_job_units\".\"when_loaded\",\r\n       \"vehicle_job_units\".\"when_offloaded\",\r\n
+  \      \"vehicle_job_units\".\"when_offloading\",\r\n       \"vehicle_job_units\".\"when_loading\",\r\n
+  \      \"vehicle_job_units\".\"created_at\",\r\n       \"vehicle_job_units\".\"updated_at\",\r\n
+  \      fn_current_status('vehicle_job_units', \"vehicle_job_units\".\"id\") AS status\r\nFROM
+  \"vehicle_job_units\"\r\njoin locations on locations.id = vehicle_job_units.location_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: vehicle_job_units.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_sku_location_from_id:
+    :name: mr_sku_location_from_id
+    :sequence_no: 2
+    :caption: SKU location from
+    :namespaced_name: vehicle_job_units.mr_sku_location_from_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_job_id:
+    :name: vehicle_job_id
+    :sequence_no: 3
+    :caption: Vehicle job
+    :namespaced_name: vehicle_job_units.vehicle_job_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_sku_id:
+    :name: mr_sku_id
+    :sequence_no: 4
+    :caption: SKU id
+    :namespaced_name: vehicle_job_units.mr_sku_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_id:
+    :name: location_id
+    :sequence_no: 5
+    :caption: Location
+    :namespaced_name: vehicle_job_units.location_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  short_code:
+    :name: short_code
+    :sequence_no: 6
+    :caption: From Loc SC
+    :namespaced_name: locations.location_short_code
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sku_number:
+    :name: sku_number
+    :sequence_no: 7
+    :caption: SKU no
+    :namespaced_name: vehicle_job_units.sku_number
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_to_move:
+    :name: quantity_to_move
+    :sequence_no: 8
+    :caption: Qty to move
+    :namespaced_name: vehicle_job_units.quantity_to_move
+    :data_type: :number
+    :width: 130
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_loaded:
+    :name: quantity_loaded
+    :sequence_no: 9
+    :caption: Qty loaded
+    :namespaced_name: vehicle_job_units.quantity_loaded
+    :data_type: :string
+    :width: 130
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_offloaded:
+    :name: quantity_offloaded
+    :sequence_no: 10
+    :caption: Qty offloaded
+    :namespaced_name: vehicle_job_units.quantity_offloaded
+    :data_type: :number
+    :width: 130
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_loaded:
+    :name: when_loaded
+    :sequence_no: 11
+    :caption: When loaded
+    :namespaced_name: vehicle_job_units.when_loaded
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_offloaded:
+    :name: when_offloaded
+    :sequence_no: 12
+    :caption: When offloaded
+    :namespaced_name: vehicle_job_units.when_offloaded
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_offloading:
+    :name: when_offloading
+    :sequence_no: 13
+    :caption: When offloading
+    :namespaced_name: vehicle_job_units.when_offloading
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  when_loading:
+    :name: when_loading
+    :sequence_no: 14
+    :caption: When loading
+    :namespaced_name: vehicle_job_units.when_loading
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 15
+    :caption: Created at
+    :namespaced_name: vehicle_job_units.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 16
+    :caption: Updated at
+    :namespaced_name: vehicle_job_units.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 17
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: vehicle_job_units.mr_sku_location_from_id
+  :caption: Mr sku location from
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT location_long_code, id FROM locations ORDER BY location_long_code
+- :column: vehicle_job_units.vehicle_job_id
+  :caption: Vehicle job
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

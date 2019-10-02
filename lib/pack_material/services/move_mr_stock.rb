@@ -5,7 +5,9 @@ module PackMaterialApp
     # @param [Object] sku_id Only one sku per move
     # @param [Integer] to_location_id
     # @param [Numeric] quantity, Numeric(7,2)
-    # @param [Hash] opts { :delivery_id, :tripsheet_id, :is_adhoc, :business_process_id, :from_location_id, :user_name, :parent_transaction_id }
+    # @param [Hash] opts { :delivery_id, :vehicle_job_id, :is_adhoc, :business_process_id, :from_location_id, :user_name, :parent_transaction_id, :transaction_type }
+    # Contains: transaction_type: [String] 'load' || 'offload'
+    #                             Mandatory if vehicle_job_id present
     def initialize(sku_id, to_location_id, quantity, opts = {}) # rubocop:disable Metrics/AbcSize
       @repo = MrStockRepo.new
       @transaction_repo = PackMaterialApp::TransactionsRepo.new
@@ -21,6 +23,7 @@ module PackMaterialApp
       @parent_transaction_id = @repo.resolve_parent_transaction_id(@opts)
       @business_process_id = @repo.resolve_business_process_id(@opts) || opts.fetch(:business_process_id)
       @ref_no = @repo.resolve_ref_no(@opts) || opts.fetch(:ref_no)
+      @transaction_type = @opts[:vehicle_job_id] ? opts.fetch(:transaction_type) : nil
     end
 
     def call
@@ -67,16 +70,15 @@ module PackMaterialApp
 
     def update_dependant_records
       @repo.update_delivery_putaway_id(@opts[:delivery_id], @parent_transaction_id) if @opts[:delivery_id]
-      # @repo.update_vehicle_job_transaction_id(@tripsheet_id, @parent_transaction_id) if @opts[:tripsheet_id] #vehicle_job.material_resource_inventory_transaction_id
+      @repo.update_vehicle_job_transaction_id(@opts[:vehicle_job_id], @parent_transaction_id, @transaction_type) if @opts[:vehicle_job_id]
     end
 
     def set_parent_transaction
       if @parent_transaction_id
         @repo.activate_mr_inventory_transaction(@parent_transaction_id)
       else
-        type_id = @opts[:is_adhoc] ? @repo.transaction_type_id_for('adhoc') : @repo.transaction_type_id_for('putaway')
         attrs = {
-          mr_inventory_transaction_type_id: type_id,
+          mr_inventory_transaction_type_id: transaction_type_id,
           to_location_id: @to_location_id,
           business_process_id: @business_process_id,
           ref_no: @ref_no,
@@ -87,6 +89,14 @@ module PackMaterialApp
         @parent_transaction_id = @transaction_repo.create_mr_inventory_transaction(attrs)
         ok_response
       end
+    end
+
+    def transaction_type_id
+      type = @transaction_type
+      type = 'adhoc' if @opts[:is_adhoc]
+      type ||= 'putaway'
+
+      @repo.transaction_type_id_for(type)
     end
   end
 end

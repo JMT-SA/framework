@@ -1,0 +1,29 @@
+---
+:dataminer_definition: vehicles
+:actions:
+- :url: "/pack_material/tripsheets/vehicles/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/pack_material/tripsheets/vehicles/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/pack_material/tripsheets/vehicles/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/development/statuses/list/vehicles/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/tripsheets/vehicles/new"
+  :text: New Vehicle
+  :style: :button
+  :behaviour: :popup

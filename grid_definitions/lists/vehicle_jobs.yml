@@ -1,0 +1,46 @@
+---
+:dataminer_definition: vehicle_jobs
+:actions:
+- :url: "/pack_material/tripsheets/vehicle_jobs/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_false: has_locations, has_skus
+- :url: "/list/vehicle_jobs_mr_skus/multi?key=vehicle_jobs&id=$:id$"
+  :text: SKU Numbers
+  :icon: list
+  :popup: true
+  :hide_if_true: completed
+- :url: "/list/vehicle_jobs_locations/multi?key=vehicle_jobs&id=$:id$&storage_type_id=$:storage_type_id$"
+  :text: Locations
+  :icon: list
+  :popup: true
+  :hide_if_true: completed
+- :url: "/pack_material/tripsheets/vehicle_jobs/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: loaded
+- :url: "/development/statuses/list/vehicle_jobs/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/tripsheets/vehicle_jobs/new"
+  :text: New Tripsheet
+  :style: :button
+  :behaviour: :popup
+  :hide_for_key:
+    - completed
+:conditions:
+  :incomplete:
+    - :col: vehicle_jobs.offloaded
+      :op: =
+      :val: false
+  :completed:
+    - :col: vehicle_jobs.offloaded
+      :op: =
+      :val: true

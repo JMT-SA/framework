@@ -1,0 +1,24 @@
+---
+:dataminer_definition: vehicle_jobs
+:actions:
+- :url: "/pack_material/tripsheets/vehicle_jobs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/pack_material/tripsheets/vehicle_jobs/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/pack_material/tripsheets/vehicle_jobs/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/tripsheets/vehicle_jobs/new"
+  :text: New Tripsheet
+  :style: :button
+  :behaviour: :popup

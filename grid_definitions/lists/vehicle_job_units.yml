@@ -1,0 +1,36 @@
+---
+:dataminer_definition: vehicle_job_units
+:actions:
+- :url: "/pack_material/tripsheets/vehicle_job_units/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/pack_material/tripsheets/vehicle_job_units/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_present: when_loading
+- :separator: true
+- :url: "/development/statuses/list/vehicle_job_units/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/tripsheets/vehicle_job_units/new"
+  :text: New Tripsheet Item
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: vehicle_job_units.vehicle_job_id
+      :op: =
+      :val: $:vehicle_job_id$
+:edit_rules:
+  :url: "/pack_material/tripsheets/vehicle_job_units/$:id$/inline_save"
+  :editable_fields:
+    quantity_to_move:
+      :editor: :numeric

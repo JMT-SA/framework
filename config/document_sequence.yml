@@ -23,6 +23,11 @@ doc_seqs_waybill_number:
   data_type: :integer
   table: mr_deliveries
   column: waybill_number
+doc_seqs_tripsheet_number:
+  db_sequence_name: doc_seqs_tripsheet_number
+  data_type: :integer
+  table: vehicle_jobs
+  column: tripsheet_number
 dummy_invoice:
   db_sequence_name: doc_seqs_inv
   data_type: :string

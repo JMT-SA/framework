@@ -1,41 +1,29 @@
 ---
 :caption: SKU locations
-:sql: "SELECT COALESCE(\"mr_sku_locations\".\"id\", \"locations\".\"id\") AS id,\r\n
-  \ \"locations\".\"primary_storage_type_id\",\r\n  \"locations\".\"location_long_code\",\r\n
-  \ \"locations\".\"location_short_code\",\r\n       (SELECT\r\n          CASE\r\n
-  \         WHEN mr_skus.sku_number IS NULL THEN array_agg(\"cc\".\"location_long_code\")\r\n
-  \         ELSE array_append(array_agg(\"cc\".\"location_long_code\"), mr_skus.sku_number::varchar)\r\n
-  \         END AS path\r\n        FROM (SELECT \"c\".\"location_long_code\"\r\n              FROM
-  \"locations\" c\r\n                JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
-  = \"c\".\"id\"\r\n              WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
-  \             ORDER BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n  \"mr_skus\".\"sku_number\",\r\n
-  \ fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
-  AS product_variant_number,\r\n  \"material_resource_product_variants\".\"product_variant_code\",\r\n
-  \ \"material_resource_product_variants\".\"old_product_code\",\r\n  \"mr_sku_locations\".\"quantity\",\r\n
-  \ \"mr_deliveries\".delivery_number,\r\n       COALESCE(mr_internal_batch_numbers.\"batch_number\"::text,
-  mr_delivery_item_batches.client_batch_number) AS batch_number,\r\n  \"locations\".\"has_single_container\",\r\n\"locations\".\"location_type_id\",\r\n
-  \ \"location_types\".\"location_type_code\",\r\n  \"locations\".\"primary_assignment_id\",\r\n
-  \ \"location_assignments\".\"assignment_code\",\r\n  \"locations\".\"location_storage_definition_id\",\r\n
-  \ \"location_storage_definitions\".\"storage_definition_code\",\r\n  \"locations\".\"location_description\"\r\nFROM
-  \"locations\"\r\n  JOIN \"location_types\" ON \"location_types\".\"id\" = \"locations\".\"location_type_id\"\r\n
-  \ JOIN \"location_assignments\" ON \"location_assignments\".\"id\" = \"locations\".\"primary_assignment_id\"\r\n
-  \ JOIN \"location_storage_types\" ON \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\n
-  \ JOIN \"mr_sku_locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\n
-  \ JOIN \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
-  \ JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"id\"
-  =\r\n                                               \"mr_skus\".\"mr_product_variant_id\"\r\n
-  \ LEFT JOIN \"location_storage_definitions\" ON \"location_storage_definitions\".\"id\"
-  = \"locations\".\"location_storage_definition_id\"\r\n  LEFT JOIN mr_delivery_item_batches
-  on mr_skus.mr_delivery_item_batch_id = mr_delivery_item_batches.id\r\n  LEFT JOIN
-  mr_delivery_items on mr_delivery_item_batches.mr_delivery_item_id = mr_delivery_items.id\r\n
-  \ LEFT JOIN mr_deliveries on mr_delivery_items.mr_delivery_id = mr_deliveries.id\r\n
-  \ LEFT JOIN mr_internal_batch_numbers on mr_skus.mr_internal_batch_number_id = mr_internal_batch_numbers.id\r\nWHERE
-  \"locations\".\"active\" AND\r\n      \"location_storage_types\".\"storage_type_code\"
-  = 'Pack Material'\r\nORDER BY (SELECT string_agg(\"cc\".\"location_long_code\",
-  ';') AS path\r\n          FROM (SELECT \"c\".\"location_long_code\"\r\n                FROM
-  \"locations\" c\r\n                  JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
-  = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
-  \               ORDER BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
+:sql: "SELECT DISTINCT COALESCE(\"mr_sku_locations\".\"id\", \"locations\".\"id\")
+  AS id,\r\n                \"locations\".\"primary_storage_type_id\",\r\n                \"locations\".\"location_long_code\",\r\n
+  \               \"locations\".\"location_short_code\",\r\n                (SELECT
+  CASE WHEN \"mr_skus\".\"sku_number\" IS NULL THEN array_agg(\"cc\".\"location_long_code\")
+  ELSE array_append(array_agg(\"cc\".\"location_long_code\"),\r\n                                                                                                                             \"mr_skus\".\"sku_number\"::varchar)
+  END AS path FROM (SELECT \"c\".\"location_long_code\" FROM \"locations\" c JOIN
+  \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\" WHERE \"t1\".\"descendant_location_id\"
+  = \"locations\".\"id\" ORDER BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n
+  \               \"mr_skus\".\"sku_number\",\r\n                fn_formatted_product_variant_number(\"material_resource_product_variants\".\"product_variant_number\")
+  AS product_variant_number,\r\n                \"material_resource_product_variants\".\"product_variant_code\",\r\n
+  \               \"material_resource_product_variants\".\"old_product_code\",\r\n
+  \               \"mr_sku_locations\".\"quantity\",\r\n                \"locations\".\"has_single_container\",\r\n
+  \               \"locations\".\"location_type_id\",\r\n                \"location_types\".\"location_type_code\",\r\n
+  \               \"locations\".\"primary_assignment_id\",\r\n                \"location_assignments\".\"assignment_code\",\r\n
+  \               \"locations\".\"location_storage_definition_id\",\r\n                \"location_storage_definitions\".\"storage_definition_code\",\r\n
+  \               \"locations\".\"location_description\"\r\nFROM \"mr_sku_locations\"\r\n
+  \        JOIN \"mr_skus\" ON \"mr_sku_locations\".\"mr_sku_id\" = \"mr_skus\".\"id\"\r\n
+  \        JOIN \"locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\n
+  \        JOIN \"material_resource_product_variants\" ON \"mr_skus\".\"mr_product_variant_id\"
+  = \"material_resource_product_variants\".\"id\"\r\n         JOIN \"location_types\"
+  ON \"locations\".\"location_type_id\" = \"location_types\".\"id\"\r\n         JOIN
+  \"location_assignments\" ON \"locations\".\"primary_assignment_id\" = \"location_assignments\".\"id\"\r\n
+  \        JOIN \"location_storage_definitions\" ON \"locations\".\"location_storage_definition_id\"
+  = \"location_storage_definitions\".\"id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -200,41 +188,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  delivery_number:
-    :name: delivery_number
-    :sequence_no: 11
-    :caption: Delivery number
-    :namespaced_name: mr_deliveries.delivery_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  batch_number:
-    :name: batch_number
-    :sequence_no: 12
-    :caption: Batch number
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   has_single_container:
     :name: has_single_container
-    :sequence_no: 13
+    :sequence_no: 11
     :caption: Has single container
     :namespaced_name: locations.has_single_container
     :data_type: :boolean
@@ -250,7 +206,7 @@
     :group_max: false
   location_type_id:
     :name: location_type_id
-    :sequence_no: 14
+    :sequence_no: 12
     :caption: Location type
     :namespaced_name: locations.location_type_id
     :data_type: :integer
@@ -266,7 +222,7 @@
     :group_max: false
   location_type_code:
     :name: location_type_code
-    :sequence_no: 15
+    :sequence_no: 13
     :caption: Location type code
     :namespaced_name: location_types.location_type_code
     :data_type: :string
@@ -282,7 +238,7 @@
     :group_max: false
   primary_assignment_id:
     :name: primary_assignment_id
-    :sequence_no: 16
+    :sequence_no: 14
     :caption: Primary assignment
     :namespaced_name: locations.primary_assignment_id
     :data_type: :integer
@@ -298,7 +254,7 @@
     :group_max: false
   assignment_code:
     :name: assignment_code
-    :sequence_no: 17
+    :sequence_no: 15
     :caption: Assignment code
     :namespaced_name: location_assignments.assignment_code
     :data_type: :string
@@ -314,7 +270,7 @@
     :group_max: false
   location_storage_definition_id:
     :name: location_storage_definition_id
-    :sequence_no: 18
+    :sequence_no: 16
     :caption: Location storage definition
     :namespaced_name: locations.location_storage_definition_id
     :data_type: :string
@@ -330,7 +286,7 @@
     :group_max: false
   storage_definition_code:
     :name: storage_definition_code
-    :sequence_no: 19
+    :sequence_no: 17
     :caption: Storage definition code
     :namespaced_name: location_storage_definitions.storage_definition_code
     :data_type: :string
@@ -346,7 +302,7 @@
     :group_max: false
   location_description:
     :name: location_description
-    :sequence_no: 20
+    :sequence_no: 18
     :caption: Location description
     :namespaced_name: locations.location_description
     :data_type: :string
@@ -436,6 +392,38 @@
 - :column: mr_sku_locations.location_id
   :caption: Location ID
   :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: mr_bulk_stock_adjustments_locations.mr_bulk_stock_adjustment_id
+  :caption: location bsa id
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: mr_bulk_stock_adjustments_sku_numbers.mr_bulk_stock_adjustment_id
+  :caption: sku number bsa id
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vehicle_jobs_locations.vehicle_job_id
+  :caption: location vj id
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vehicle_jobs_sku_numbers.vehicle_job_id
+  :caption: sku number vj id
+  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: false

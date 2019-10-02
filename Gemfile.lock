@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: e4db96694d0e5c003f3850a5a81bdf1d3d64d51f
+  revision: ad086b4e62a3cf81d83fad04c864fd5d939ca744
   specs:
     crossbeams-layout (0.3.4)
       diffy
@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 3865e5feb2a852783234701c110a14c2df436363
+  revision: 5635b10f70d981d89b6a32769c5f86b5a6915a8c
   specs:
-    roda-data_grid (0.2.2)
+    roda-data_grid (0.2.3)
       axlsx
       crossbeams-dataminer
       crossbeams-layout
@@ -175,7 +175,7 @@ GEM
       ffi (>= 0.5.0, < 2)
     rerun (0.13.0)
       listen (~> 3.0)
-    roda (3.23.0)
+    roda (3.24.0)
       rack
     roda-message_bus (1.0.0)
       message_bus (>= 2.0.0)
@@ -184,7 +184,7 @@ GEM
     rodauth (1.16.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rouge (3.10.0)
+    rouge (3.11.0)
     rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)

@@ -1,0 +1,20 @@
+---
+:dataminer_definition: vju_sku_locations
+#:tree:
+#  :tree_column: path_array
+#  :tree_caption: Location/SKU Hierarchy
+#  :suppress_node_counts: false
+#  :groupDefaultExpanded: 2
+:lookups:
+  :standard:
+    :url: /pack_material/tripsheets/vehicle_jobs/sku_location_lookup_result/$:id$
+    :section_caption: Select a SKU Location Pair
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: vehicle_jobs_sku_numbers.vehicle_job_id
+      :op: =
+      :val: $:vehicle_job_id$
+    - :col: vehicle_jobs_locations.vehicle_job_id
+      :op: =
+      :val: $:vehicle_job_id$

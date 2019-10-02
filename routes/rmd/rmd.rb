@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
 class Framework < Roda # rubocop:disable Metrics/ClassLength
-  # DELIVERIES
+  # DELIVERIES: PUTAWAYS
   # --------------------------------------------------------------------------
   route 'deliveries', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
-    # PUTAWAYS
-    # --------------------------------------------------------------------------
     r.on 'putaways' do # rubocop:disable Metrics/BlockLength
-      # Interactor
       r.on 'new' do    # NEW
-        # check auth...
         details = retrieve_from_local_store(:delivery_putaway) || {}
         form = Crossbeams::RMDForm.new(details,
                                        form_name: :putaway,
@@ -53,16 +49,14 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'status' do
-      view(inline: '<h2>Just a dummy page this...</h2><p>Nothing to see here, keep moving along...</p>', layout: :layout_rmd)
-    end
+    # r.on 'status' do
+    #   view(inline: '<h2>Just a dummy page this...</h2><p>Nothing to see here, keep moving along...</p>', layout: :layout_rmd)
+    # end
   end
 
-  # Bulk Stock Adjustments
+  # Bulk Stock Adjustments: ADJUST ITEM
   # --------------------------------------------------------------------------
   route 'stock_adjustments', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
-    # ADJUST ITEM
-    # --------------------------------------------------------------------------
     r.on 'adjust_item' do # rubocop:disable Metrics/BlockLength
       interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do
@@ -111,11 +105,9 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 
-  # Printing
+  # Printing: PRINT SKU LABEL
   # --------------------------------------------------------------------------
   route 'printing', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
-    # PRINT SKU LABEL
-    # --------------------------------------------------------------------------
     r.on 'sku_label' do # rubocop:disable Metrics/BlockLength
       interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'new' do

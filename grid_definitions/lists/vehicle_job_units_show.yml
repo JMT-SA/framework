@@ -1,0 +1,13 @@
+---
+:dataminer_definition: vehicle_job_units
+:actions:
+- :url: "/pack_material/tripsheets/vehicle_job_units/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:conditions:
+  :standard:
+    - :col: vehicle_job_units.vehicle_job_id
+      :op: =
+      :val: $:vehicle_job_id$

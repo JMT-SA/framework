@@ -267,6 +267,19 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     raise Crossbeams::AuthorizationError unless authorised?(programs, sought_permission, functional_area_id)
   end
 
+  # URL for use in a back button link (using the request's referer).
+  # If the referer is the result of a search query, the back button goes to the
+  # parameters page.
+  #
+  # @return [string] - the URL
+  def back_button_url
+    url = request.referer
+    return '/' if url.nil?
+
+    url = url.sub(%r{/run$}, '?back=y') if url.include?('/search/') && url.end_with?('/run')
+    url
+  end
+
   def set_last_grid_url(url, route = nil)
     session[:last_grid_url] = url unless route && fetch?(route)
   end

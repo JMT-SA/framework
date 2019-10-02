@@ -70,15 +70,15 @@ module PackMaterialApp
     def resolve_parent_transaction_id(opts)
       if (delivery_id = opts[:delivery_id])
         DB[:mr_deliveries].where(id: delivery_id).get(:putaway_transaction_id)
-        # elsif (tripsheet_id = opts[:tripsheet_id])
-        # transaction_for_tripsheet_id(tripsheet_id)
+        # elsif (vehicle_job_id = opts[:vehicle_job_id])
+        # transaction_for_vehicle_job_id(vehicle_job_id)
       else
         opts[:parent_transaction_id]
       end
     end
 
     def resolve_business_process_id(opts)
-      return nil unless opts[:delivery_id] || opts[:is_adhoc] || opts[:tripsheet_id]
+      return nil unless opts[:delivery_id] || opts[:is_adhoc] || opts[:vehicle_job_id]
 
       process = if opts[:delivery_id]
                   AppConst::PROCESS_DELIVERIES
@@ -91,14 +91,10 @@ module PackMaterialApp
     end
 
     def resolve_ref_no(opts)
-      return nil unless (del_id = opts[:delivery_id]) || (trip_id = opts[:tripsheet_id])
-
-      if del_id
+      if (del_id = opts[:delivery_id])
         DB[:mr_deliveries].where(id: del_id).get(:delivery_number)
-      elsif trip_id
-        # do nothing here yet
-        # DB[:vehicle_jobs].where(id: trip_id).get(:tripsheet_number)
-        nil
+      elsif (trip_id = opts[:vehicle_job_id])
+        DB[:vehicle_jobs].where(id: trip_id).get(:tripsheet_number)
       end
     end
 
@@ -110,6 +106,10 @@ module PackMaterialApp
                     TRANSACTION_TYPE_ADHOC_MOVE
                   when 'destroy'
                     TRANSACTION_TYPE_REMOVE_STOCK
+                  when 'load'
+                    TRANSACTION_TYPE_LOAD_VEHICLE
+                  when 'offload'
+                    TRANSACTION_TYPE_OFFLOAD_VEHICLE
                   else # when 'putaway'
                     TRANSACTION_TYPE_PUTAWAY
                   end
@@ -164,8 +164,8 @@ module PackMaterialApp
     end
 
     def create_sku_location_ids(sku_ids, to_location_id)
-      return failed_response('Location does not exist') unless exists?(:locations, id: to_location_id)
-      return failed_response('Location can not store stock') unless stock_location?(to_location_id)
+      return failed_response("Location does not exist (#{to_location_id})") unless exists?(:locations, id: to_location_id)
+      return failed_response("Location can not store stock (#{to_location_id})") unless stock_location?(to_location_id)
 
       query = <<~SQL
         INSERT INTO mr_sku_locations (mr_sku_id, location_id)
@@ -226,10 +226,15 @@ module PackMaterialApp
     end
 
     def activate_mr_inventory_transaction(parent_transaction_id)
-      return failed_response('Invalid Parent Transaction Id') unless exists?(:mr_inventory_transactions, id: parent_transaction_id)
+      return failed_response('Invalid Parent Transaction ID') unless exists?(:mr_inventory_transactions, id: parent_transaction_id)
 
       DB[:mr_inventory_transactions].where(id: parent_transaction_id).update(active: true)
       success_response('ok')
+    end
+
+    def update_vehicle_job_transaction_id(id, transaction_id, type)
+      update(:vehicle_jobs, id, load_transaction_id: transaction_id) if type == 'load'
+      update(:vehicle_jobs, id, offload_transaction_id: transaction_id) if type == 'offload'
     end
   end
 end

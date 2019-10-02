@@ -1,0 +1,15 @@
+---
+:dataminer_definition: bsa_sku_locations
+:lookups:
+  :standard:
+    :url: /pack_material/transactions/mr_bulk_stock_adjustments/sku_location_lookup_result/$:id$
+    :section_caption: Select a SKU Location Pair
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: mr_bulk_stock_adjustments_sku_numbers.mr_bulk_stock_adjustment_id
+      :op: =
+      :val: $:mr_bulk_stock_adjustment_id$
+    - :col: mr_bulk_stock_adjustments_locations.mr_bulk_stock_adjustment_id
+      :op: =
+      :val: $:mr_bulk_stock_adjustment_id$

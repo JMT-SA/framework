@@ -69,7 +69,7 @@ module UiRules
                                       prompt: 'Leave blank if same Building'
                                     }
                                   else
-                                    { renderer: :label }
+                                    { renderer: :label, with_value: @form_object.planned_location_long_code, caption: 'Planned Location To' }
                                   end
       {
         business_process_id: { renderer: :label, with_value: @form_object.process },

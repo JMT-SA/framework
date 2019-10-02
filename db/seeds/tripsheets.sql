@@ -61,14 +61,14 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Tripsheets'
          'Search Vehicles', '/search/vehicles', 2);
 */
 
--- Vehicle Jobs
+-- Tripsheets
 -- NEW menu item
 /*
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Tripsheets'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Pack Material')),
-         'New Vehicle Job', '/pack_material/tripsheets/vehicle_jobs/new', 1);
+         'New Tripsheet', '/pack_material/tripsheets/vehicle_jobs/new', 1);
 */
 
 -- LIST menu item
@@ -76,7 +76,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Tripsheets'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Pack Material')),
-         'Vehicle Jobs', '/list/vehicle_jobs/with_params?key=incomplete', 3);
+         'Tripsheets', '/list/vehicle_jobs/with_params?key=incomplete', 3);
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Tripsheets'
@@ -89,6 +89,6 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Tripsheets'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Pack Material')),
-         'Search Vehicle Jobs', '/search/vehicle_jobs', 4);
+         'Search Tripsheets', '/search/vehicle_jobs', 4);
 
 

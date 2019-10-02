@@ -176,7 +176,7 @@ module PackMaterialApp
       return failed_response('Can not exceed quantity to move') if new_quantity_loaded > unit[:quantity_to_move]
 
       vehicle_job = DB[:vehicle_jobs].where(id: vehicle_job_id)
-      return failed_response('No virtual location set on Vehicle Job') unless vehicle_job.get(:virtual_location_id)
+      return failed_response('No virtual location set on Tripsheet') unless vehicle_job.get(:virtual_location_id)
 
       loaded = new_quantity_loaded == unit[:quantity_to_move]
       update(:vehicle_job_units,
@@ -207,7 +207,7 @@ module PackMaterialApp
       return failed_response('Can not offload more than was loaded') if qty_offloaded > unit[:quantity_loaded]
 
       vehicle_job = DB[:vehicle_jobs].where(id: vehicle_job_id)
-      return failed_response('No virtual location set on Vehicle Job') unless vehicle_job.get(:virtual_location_id)
+      return failed_response('No virtual location set on Tripsheet') unless vehicle_job.get(:virtual_location_id)
 
       offloaded = qty_offloaded == unit[:quantity_loaded]
       update(:vehicle_job_units,
@@ -220,6 +220,26 @@ module PackMaterialApp
 
       unit = DB[:vehicle_job_units].where(id: unit[:id]).first
       success_response('ok', unit: unit, vehicle_job: vehicle_job.first)
+    end
+
+    def full_offload_vehicle_units(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      units = DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id).all
+      return failed_response('No Tripsheet Items') if units.none?
+
+      vehicle_job = DB[:vehicle_jobs].where(id: vehicle_job_id)
+      return failed_response('No virtual location set on Tripsheet') unless vehicle_job.get(:planned_location_id)
+
+      units.each do |unit|
+        now = DateTime.now
+        update(:vehicle_job_units,
+               unit[:id],
+               quantity_offloaded: unit[:quantity_loaded],
+               offloaded: true,
+               when_offloaded: now,
+               when_offloading: now)
+      end
+      update(:vehicle_jobs, vehicle_job_id, offloaded: true)
+      success_response('ok', units: units, vehicle_job: vehicle_job.first)
     end
 
     def update_vehicle_offloaded(vehicle_job_id)

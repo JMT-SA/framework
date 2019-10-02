@@ -14,9 +14,9 @@ module PackMaterialApp
         log_transaction
       end
       instance = vehicle_job_unit(id)
-      success_response("Created vehicle job unit #{instance.id}", instance)
+      success_response("Created Tripsheet Item #{instance.id}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This vehicle job unit already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { id: ['This Tripsheet Item already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,7 +30,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = vehicle_job_unit(id)
-      success_response("Updated vehicle job unit #{instance.id}", instance)
+      success_response("Updated Tripsheet Item #{instance.id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -42,7 +42,7 @@ module PackMaterialApp
         log_status('vehicle_job_units', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted vehicle job unit #{name}")
+      success_response("Deleted Tripsheet Item #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -57,7 +57,7 @@ module PackMaterialApp
         log_status('vehicle_job_units', id, 'INLINE UPDATE')
         log_transaction
       end
-      success_response('Updated vehicle job unit quantity to move')
+      success_response('Updated Tripsheet Item quantity to move')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

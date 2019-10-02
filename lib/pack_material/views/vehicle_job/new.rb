@@ -13,7 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Vehicle Job'
+              form.caption 'New Tripsheet'
               form.action '/pack_material/tripsheets/vehicle_jobs'
               form.remote! if remote
               form.add_field :business_process_id

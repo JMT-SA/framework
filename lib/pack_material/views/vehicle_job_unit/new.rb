@@ -13,7 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Vehicle Job Unit'
+              form.caption 'New Tripsheet Item'
               form.action "/pack_material/tripsheets/vehicle_jobs/#{parent_id}/vehicle_job_units"
               form.remote! if remote
               form.add_field :sku_location_lookup

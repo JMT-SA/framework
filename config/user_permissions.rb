@@ -34,7 +34,7 @@ module Crossbeams
           stock_adj: { approve: 'Approve a stock adjustment', sign_off: 'Sign off on a stock adjustment' },
           purchase_order: { approve: 'Approve a purchase order' },
           delivery: { review: 'Review the delivery to accept over supply and quantity differences on line items' },
-          tripsheets: { confirm_arrival: 'Confirm arrival of the Vehicle Job at the Receiving Bay of the Planned Location' }
+          tripsheets: { confirm_arrival: 'Confirm arrival of the Tripsheet at the Receiving Bay of the Planned Location' }
           # stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
           # invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
         }

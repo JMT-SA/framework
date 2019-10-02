@@ -34,22 +34,22 @@ module PackMaterialApp
       end
 
       def delete_check
-        return failed_response 'Vehicle Job Unit has already been loaded' if loaded?
-        return failed_response 'Vehicle Job Unit is already loading' if when_loading?
+        return failed_response 'Tripsheet Item has already been loaded' if loaded?
+        return failed_response 'Tripsheet Item is already loading' if when_loading?
 
         all_ok
       end
 
       def update_check
-        return failed_response 'Vehicle Job Unit has already been loaded' if loaded?
-        return failed_response 'Vehicle Job Unit is already loading' if when_loading?
+        return failed_response 'Tripsheet Item has already been loaded' if loaded?
+        return failed_response 'Tripsheet Item is already loading' if when_loading?
 
         all_ok
       end
 
       def load_check
-        return failed_response 'Vehicle Job Unit quantity to move is zero' unless qty_to_move_positive
-        return failed_response 'Vehicle Job Unit has already been loaded' if loaded?
+        return failed_response 'Tripsheet Item quantity to move is zero' unless qty_to_move_positive
+        return failed_response 'Tripsheet Item has already been loaded' if loaded?
 
         all_ok
       end

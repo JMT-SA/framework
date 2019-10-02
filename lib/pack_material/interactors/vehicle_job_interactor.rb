@@ -15,9 +15,9 @@ module PackMaterialApp
         log_transaction
       end
       instance = vehicle_job(id)
-      success_response("Created vehicle job #{instance.tripsheet_number}", instance)
+      success_response("Created Tripsheet #{instance.tripsheet_number}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { tripsheet_number: ['This vehicle job already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { tripsheet_number: ['This Tripsheet already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -31,7 +31,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = vehicle_job(id)
-      success_response("Updated vehicle job #{instance.tripsheet_number}", instance)
+      success_response("Updated Tripsheet #{instance.tripsheet_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -45,7 +45,7 @@ module PackMaterialApp
         repo.load_vehicle_job(id)
 
         instance = vehicle_job(id)
-        success_response('Loaded Vehicle Job', instance)
+        success_response('Loaded Tripsheet', instance)
       end
     rescue Crossbeams::TaskNotPermittedError => e
       failed_response(e.message)
@@ -53,16 +53,19 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def vehicle_job_confirm_arrival(id)
+    def vehicle_job_confirm_arrival(id) # rubocop:disable Metrics/AbcSize
       assert_permission!(:confirm_arrival, id)
       repo.transaction do
         log_transaction
-        offload_to_assigned_receiving_bay(id)
+        res = repo.full_offload_vehicle_units(id)
+        raise Crossbeams::InfoError, res.message unless res.success
+
+        offload_to_receiving_bay(id)
         repo.confirm_arrival_vehicle_job(id)
         log_status('vehicle_jobs', id, 'ARRIVAL CONFIRMED')
 
         instance = vehicle_job(id)
-        success_response('Vehicle Job Arrival Confirmed', instance)
+        success_response('Tripsheet Arrival Confirmed and offloaded to receiving bay', instance)
       end
     rescue Crossbeams::TaskNotPermittedError => e
       failed_response(e.message)
@@ -70,7 +73,7 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def offload_to_assigned_receiving_bay(id)
+    def offload_to_receiving_bay(id) # rubocop:disable Metrics/AbcSize
       vehicle_job = vehicle_job(id)
       offload_stock = repo.vehicle_job_total_offload_stock(id)
       offload_stock.each do |stock_unit|
@@ -83,6 +86,8 @@ module PackMaterialApp
                                                 parent_transaction_id: vehicle_job[:offload_transaction_id],
                                                 transaction_type: 'offload')
         raise Crossbeams::InfoError, res.message unless res.success
+
+        log_status('vehicle_job_units', stock_unit[:id], 'OFFLOADED')
       end
     end
 
@@ -93,7 +98,7 @@ module PackMaterialApp
         log_status('vehicle_jobs', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted vehicle job #{name}")
+      success_response("Deleted Tripsheet #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

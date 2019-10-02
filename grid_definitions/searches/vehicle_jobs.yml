@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/tripsheets/vehicle_jobs/new"
-  :text: New Vehicle Job
+  :text: New Tripsheet
   :style: :button
   :behaviour: :popup

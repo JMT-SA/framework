@@ -15,7 +15,7 @@ module PackMaterial
 
             page.section do |section|
               section.add_control(control_type: :link,
-                                  text: 'Back to Vehicle Jobs',
+                                  text: 'Back to Tripsheets',
                                   url: "/list/vehicle_jobs/with_params?key=#{rules[:completed] ? 'completed' : 'incomplete'}", # Add complete toggle
                                   style: :back_button)
               section.add_control(control_type: :link,
@@ -39,7 +39,7 @@ module PackMaterial
             cannot_edit = rules[:cannot_edit]
             page.section do |section|
               section.show_border!
-              section.add_caption 'Vehicle Job'
+              section.add_caption 'Tripsheet'
               section.form do |form|
                 form.action "/pack_material/tripsheets/vehicle_jobs/#{id}"
                 form.method :update unless cannot_edit
@@ -80,7 +80,7 @@ module PackMaterial
                 section.add_grid('job_units',
                                  "/list/vehicle_job_units_show/grid?key=standard&vehicle_job_id=#{id}",
                                  height: 16,
-                                 caption: 'Vehicle Job Units')
+                                 caption: 'Tripsheet Items')
               else
                 section.add_control(control_type: :link,
                                     text: 'New Unit',
@@ -92,7 +92,7 @@ module PackMaterial
                 section.add_grid('job_units',
                                  "/list/vehicle_job_units/grid?key=standard&vehicle_job_id=#{id}",
                                  height: 16,
-                                 caption: 'Vehicle Job Units')
+                                 caption: 'Tripsheet Items')
               end
             end
           end

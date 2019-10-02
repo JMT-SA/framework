@@ -49,7 +49,7 @@ INSERT INTO location_storage_types (storage_type_code, location_short_code_prefi
 -- Tripsheet Grid
 --   Vehicle Types
 --   Vehicles
---   Vehicle Jobs
+--   Tripsheets
 
 
 -- SEARCH menu item

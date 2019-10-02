@@ -44,68 +44,68 @@ module PackMaterialApp
       end
 
       def edit_header_check
-        return failed_response 'Vehicle Job has already been offloaded' if offloaded?
-        return failed_response 'Vehicle Job is loaded' if loaded?
-        return failed_response 'Vehicle Job is loading' if when_loading?
+        return failed_response 'Tripsheet has already been offloaded' if offloaded?
+        return failed_response 'Tripsheet is loaded' if loaded?
+        return failed_response 'Tripsheet is loading' if when_loading?
 
         all_ok
       end
 
       def update_check
-        return failed_response 'Vehicle Job has already been offloaded' if offloaded?
-        return failed_response 'Vehicle Job already has loaded units' if already_loaded_units?
+        return failed_response 'Tripsheet has already been offloaded' if offloaded?
+        return failed_response 'Tripsheet already has loaded units' if already_loaded_units?
 
-        # return failed_response 'Vehicle Job has already been offloaded' if offloaded?
+        # return failed_response 'Tripsheet has already been offloaded' if offloaded?
 
         all_ok
       end
 
       def delete_check
-        return failed_response 'Vehicle Job has already been loaded' if loaded?
+        return failed_response 'Tripsheet has already been loaded' if loaded?
 
         all_ok
       end
 
       def can_confirm_arrival_check
-        return failed_response 'Vehicle Job has no units' if no_units?
-        return failed_response 'Vehicle Job units have not been loaded' if not_yet_loaded_units?
-        return failed_response 'Vehicle Job has already been offloaded' if offloaded?
-        return failed_response 'Vehicle Job does not have a receiving bay set' unless planned_location?
-        return failed_response 'Vehicle Job has not yet been marked as loaded' unless loaded?
+        return failed_response 'Tripsheet has no units' if no_units?
+        return failed_response 'Tripsheet units have not been loaded' if not_yet_loaded_units?
+        return failed_response 'Tripsheet has already been offloaded' if offloaded?
+        return failed_response 'Tripsheet does not have a receiving bay set' unless planned_location?
+        return failed_response 'Tripsheet has not yet been marked as loaded' unless loaded?
 
         all_ok
       end
 
       def can_set_planned_loc_check
-        return failed_response 'Vehicle Job is already being offloaded' if when_offloading?
+        return failed_response 'Tripsheet is already being offloaded' if when_offloading?
 
         all_ok
       end
 
       def can_load_check
-        return failed_response 'Vehicle Job has already been marked as loaded' if loaded?
-        return failed_response 'Vehicle Job has no units' if no_units?
+        return failed_response 'Tripsheet has already been marked as loaded' if loaded?
+        return failed_response 'Tripsheet has no units' if no_units?
 
         all_ok
       end
 
       def can_mark_as_loaded_check
-        return failed_response 'Vehicle Job has already been marked as loaded' if loaded?
-        return failed_response 'Vehicle Job has no units' if no_units?
-        return failed_response 'Vehicle Job units have not been loaded' if not_yet_loaded_units?
+        return failed_response 'Tripsheet has already been marked as loaded' if loaded?
+        return failed_response 'Tripsheet has no units' if no_units?
+        return failed_response 'Tripsheet units have not been loaded' if not_yet_loaded_units?
 
         all_ok
       end
 
       def can_offload_check
-        return failed_response 'Vehicle Job has not been loaded yet' unless loaded?
-        return failed_response 'Vehicle Job has not arrived yet' if planned_location? && !arrival_confirmed?
+        return failed_response 'Tripsheet has not been loaded yet' unless loaded?
+        return failed_response 'Tripsheet has not arrived yet' if planned_location? && !arrival_confirmed?
 
         all_ok
       end
 
       def confirm_arrival_check
-        return failed_response 'User is not allowed to confirm arrival of Vehicle Jobs' unless can_user_confirm_arrival?
+        return failed_response 'User is not allowed to confirm arrival of Tripsheets' unless can_user_confirm_arrival?
 
         all_ok
       end

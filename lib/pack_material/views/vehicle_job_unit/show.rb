@@ -11,7 +11,7 @@ module PackMaterial
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Vehicle Job Unit'
+              # form.caption 'Tripsheet Item'
               form.view_only!
               form.add_field :mr_sku_location_from_id
               form.add_field :vehicle_job_id

@@ -164,8 +164,8 @@ module PackMaterialApp
     end
 
     def create_sku_location_ids(sku_ids, to_location_id)
-      return failed_response('Location does not exist') unless exists?(:locations, id: to_location_id)
-      return failed_response('Location can not store stock') unless stock_location?(to_location_id)
+      return failed_response("Location does not exist (#{to_location_id})") unless exists?(:locations, id: to_location_id)
+      return failed_response("Location can not store stock (#{to_location_id})") unless stock_location?(to_location_id)
 
       query = <<~SQL
         INSERT INTO mr_sku_locations (mr_sku_id, location_id)

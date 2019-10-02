@@ -75,6 +75,7 @@ module PackMaterialApp
 
     def offload_to_receiving_bay(id) # rubocop:disable Metrics/AbcSize
       vehicle_job = vehicle_job(id)
+      offload_transaction_id = vehicle_job[:offload_transaction_id]
       offload_stock = repo.vehicle_job_total_offload_stock(id)
       offload_stock.each do |stock_unit|
         res = PackMaterialApp::MoveMrStock.call(stock_unit[:mr_sku_id],
@@ -83,12 +84,18 @@ module PackMaterialApp
                                                 from_location_id: vehicle_job[:virtual_location_id],
                                                 user_name: @user.user_name,
                                                 vehicle_job_id: id,
-                                                parent_transaction_id: vehicle_job[:offload_transaction_id],
+                                                parent_transaction_id: offload_transaction_id,
                                                 transaction_type: 'offload')
         raise Crossbeams::InfoError, res.message unless res.success
 
+        offload_transaction_id ||= offload_transaction_id(id)
         log_status('vehicle_job_units', stock_unit[:id], 'OFFLOADED')
       end
+    end
+
+    def offload_transaction_id(vehicle_job_id)
+      vehicle_job = vehicle_job(vehicle_job_id)
+      vehicle_job[:offload_transaction_id]
     end
 
     def delete_vehicle_job(id)

@@ -94,7 +94,7 @@ module PackMaterialApp
 
     def create_vehicle_job_unit(attrs)
       new_attrs = {
-        sku_number: sku_number_for_sku_location(attrs[:mr_sku_location_from_id])
+        sku_number: DB[:mr_skus].where(id: DB[:mr_sku_locations].where(id: attrs[:mr_sku_location_from_id]).get(:mr_sku_id)).get(:sku_number)
       }
       create(:vehicle_job_units, new_attrs.merge(attrs))
     end
@@ -179,22 +179,23 @@ module PackMaterialApp
       return failed_response('No virtual location set on Tripsheet') unless vehicle_job.get(:virtual_location_id)
 
       loaded = new_quantity_loaded == unit[:quantity_to_move]
+      loaded_at = DateTime.now
       update(:vehicle_job_units,
              unit[:id],
              quantity_loaded: new_quantity_loaded,
              loaded: loaded,
-             when_loaded: loaded ? DateTime.now : nil,
-             when_loading: DateTime.now)
-      update_vehicle_loaded(vehicle_job_id)
+             when_loaded: loaded ? loaded_at : nil,
+             when_loading: loaded_at)
+      update_vehicle_loaded(vehicle_job_id, loaded_at)
 
       unit = DB[:vehicle_job_units].where(id: unit[:id]).first
       success_response('ok', unit: unit, vehicle_job: vehicle_job.first)
     end
 
-    def update_vehicle_loaded(vehicle_job_id)
+    def update_vehicle_loaded(vehicle_job_id, loaded_at)
       return nil if exists?(:vehicle_job_units, vehicle_job_id: vehicle_job_id, loaded: false)
 
-      update(:vehicle_jobs, vehicle_job_id, loaded: true, when_loading: DateTime.now)
+      update(:vehicle_jobs, vehicle_job_id, loaded: true, when_loading: loaded_at)
     end
 
     def rmd_offload_vehicle_unit(mr_sku_id, qty_to_offload, location_id, vehicle_job_id) # rubocop:disable Metrics/AbcSize
@@ -210,13 +211,14 @@ module PackMaterialApp
       return failed_response('No virtual location set on Tripsheet') unless vehicle_job.get(:virtual_location_id)
 
       offloaded = qty_offloaded == unit[:quantity_loaded]
+      offloaded_at = DateTime.now
       update(:vehicle_job_units,
              unit[:id],
              quantity_offloaded: qty_offloaded,
              offloaded: offloaded,
-             when_offloaded: offloaded ? DateTime.now : nil,
-             when_offloading: DateTime.now)
-      update_vehicle_offloaded(vehicle_job_id)
+             when_offloaded: offloaded ? offloaded_at : nil,
+             when_offloading: offloaded_at)
+      update_vehicle_offloaded(vehicle_job_id, offloaded_at)
 
       unit = DB[:vehicle_job_units].where(id: unit[:id]).first
       success_response('ok', unit: unit, vehicle_job: vehicle_job.first)
@@ -238,14 +240,14 @@ module PackMaterialApp
                when_offloaded: now,
                when_offloading: now)
       end
-      update(:vehicle_jobs, vehicle_job_id, offloaded: true)
+      update(:vehicle_jobs, vehicle_job_id, offloaded: true, when_offloaded: now, when_offloading: now)
       success_response('ok', units: units, vehicle_job: vehicle_job.first)
     end
 
-    def update_vehicle_offloaded(vehicle_job_id)
+    def update_vehicle_offloaded(vehicle_job_id, offloaded_at)
       return nil if exists?(:vehicle_job_units, vehicle_job_id: vehicle_job_id, offloaded: false)
 
-      update(:vehicle_jobs, vehicle_job_id, offloaded: true)
+      update(:vehicle_jobs, vehicle_job_id, offloaded: true, when_offloaded: offloaded_at, when_offloading: offloaded_at)
     end
 
     def vehicle_load_progress_report(vehicle_job_id, sku_id, location_id) # rubocop:disable Metrics/AbcSize

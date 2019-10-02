@@ -4,7 +4,7 @@
   AS id,\r\n                \"locations\".\"primary_storage_type_id\",\r\n                \"locations\".\"location_long_code\",\r\n
   \               \"locations\".\"location_short_code\",\r\n                (SELECT
   CASE WHEN \"mr_skus\".\"sku_number\" IS NULL THEN array_agg(\"cc\".\"location_long_code\")
-  ELSE array_append(array_agg(\"cc\".\"location_long_code\"),\r\n                    \"mr_skus\".\"sku_number\"::varchar)
+  ELSE array_append(array_agg(\"cc\".\"location_long_code\"),\r\n                                                                                                                             \"mr_skus\".\"sku_number\"::varchar)
   END AS path FROM (SELECT \"c\".\"location_long_code\" FROM \"locations\" c JOIN
   \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\" WHERE \"t1\".\"descendant_location_id\"
   = \"locations\".\"id\" ORDER BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n
@@ -15,24 +15,15 @@
   \               \"locations\".\"location_type_id\",\r\n                \"location_types\".\"location_type_code\",\r\n
   \               \"locations\".\"primary_assignment_id\",\r\n                \"location_assignments\".\"assignment_code\",\r\n
   \               \"locations\".\"location_storage_definition_id\",\r\n                \"location_storage_definitions\".\"storage_definition_code\",\r\n
-  \               \"locations\".\"location_description\",\r\n                \"mr_bulk_stock_adjustments_sku_numbers\".\"mr_bulk_stock_adjustment_id\"
-  as sku_number_bsa_id,\r\n                \"mr_bulk_stock_adjustments_locations\".\"mr_bulk_stock_adjustment_id\"
-  as location_bsa_id,\r\n                \"vehicle_jobs_sku_numbers\".\"vehicle_job_id\"
-  as sku_number_vj_id,\r\n                \"vehicle_jobs_locations\".\"vehicle_job_id\"
-  as location_vj_id\r\nFROM \"mr_sku_locations\"\r\n    JOIN \"mr_skus\" ON \"mr_sku_locations\".\"mr_sku_id\"
-  = \"mr_skus\".\"id\"\r\n    JOIN \"locations\" ON \"mr_sku_locations\".\"location_id\"
-  = \"locations\".\"id\"\r\n    JOIN \"material_resource_product_variants\" ON \"mr_skus\".\"mr_product_variant_id\"
-  = \"material_resource_product_variants\".\"id\"\r\n    JOIN \"location_types\" ON
-  \"locations\".\"location_type_id\" = \"location_types\".\"id\"\r\n    JOIN \"location_assignments\"
-  ON \"locations\".\"primary_assignment_id\" = \"location_assignments\".\"id\"\r\n
-  \   JOIN \"location_storage_definitions\" ON \"locations\".\"location_storage_definition_id\"
-  = \"location_storage_definitions\".\"id\"\r\n    LEFT JOIN \"mr_bulk_stock_adjustments_sku_numbers\"
-  ON \"mr_bulk_stock_adjustments_sku_numbers\".\"mr_sku_id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
-  \   LEFT JOIN \"mr_bulk_stock_adjustments_locations\" ON \"mr_bulk_stock_adjustments_locations\".\"location_id\"
-  = \"mr_sku_locations\".\"location_id\"\r\n    LEFT JOIN \"vehicle_jobs_sku_numbers\"
-  ON \"vehicle_jobs_sku_numbers\".\"mr_sku_id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
-  \   LEFT JOIN \"vehicle_jobs_locations\" ON \"vehicle_jobs_locations\".\"location_id\"
-  = \"mr_sku_locations\".\"location_id\""
+  \               \"locations\".\"location_description\"\r\nFROM \"mr_sku_locations\"\r\n
+  \        JOIN \"mr_skus\" ON \"mr_sku_locations\".\"mr_sku_id\" = \"mr_skus\".\"id\"\r\n
+  \        JOIN \"locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\n
+  \        JOIN \"material_resource_product_variants\" ON \"mr_skus\".\"mr_product_variant_id\"
+  = \"material_resource_product_variants\".\"id\"\r\n         JOIN \"location_types\"
+  ON \"locations\".\"location_type_id\" = \"location_types\".\"id\"\r\n         JOIN
+  \"location_assignments\" ON \"locations\".\"primary_assignment_id\" = \"location_assignments\".\"id\"\r\n
+  \        JOIN \"location_storage_definitions\" ON \"locations\".\"location_storage_definition_id\"
+  = \"location_storage_definitions\".\"id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -320,70 +311,6 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  sku_number_bsa_id:
-    :name: sku_number_bsa_id
-    :sequence_no: 19
-    :caption: Sku number bsa
-    :namespaced_name: mr_bulk_stock_adjustments_sku_numbers.mr_bulk_stock_adjustment_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  location_bsa_id:
-    :name: location_bsa_id
-    :sequence_no: 20
-    :caption: Location bsa
-    :namespaced_name: mr_bulk_stock_adjustments_locations.mr_bulk_stock_adjustment_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  sku_number_vj_id:
-    :name: sku_number_vj_id
-    :sequence_no: 21
-    :caption: Sku number vj
-    :namespaced_name: vehicle_jobs_sku_numbers.vehicle_job_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  location_vj_id:
-    :name: location_vj_id
-    :sequence_no: 22
-    :caption: Location vj
-    :namespaced_name: vehicle_jobs_locations.vehicle_job_id
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

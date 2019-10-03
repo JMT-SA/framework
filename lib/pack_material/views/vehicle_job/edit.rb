@@ -37,7 +37,7 @@ module PackMaterial
             page.add_notice 'Please confirm arrival', notice_type: :info if rules[:can_confirm_arrival]
 
             cannot_edit = rules[:cannot_edit]
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.show_border!
               section.add_caption 'Tripsheet'
               section.form do |form|
@@ -48,15 +48,16 @@ module PackMaterial
                 form.row do |row|
                   row.column do |col|
                     col.add_field :tripsheet_number
-                    col.add_field :business_process_id
-                    col.add_field :vehicle_id
                     col.add_field :departure_location_id
+                    col.add_field :virtual_location_id
+                    col.add_field :when_loaded
+                    col.add_field :description
                   end
 
                   row.column do |col|
+                    col.add_field :business_process_id
+                    col.add_field :vehicle_id
                     col.add_field :planned_location_id
-                    col.add_field :virtual_location_id
-                    col.add_field :when_loaded
                     col.add_field :when_offloaded
                     col.add_field :arrival_confirmed
                     col.add_field :loaded

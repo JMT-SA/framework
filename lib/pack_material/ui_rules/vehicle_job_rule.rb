@@ -55,7 +55,8 @@ module UiRules
         when_offloaded: { renderer: :label, subtype: :datetime },
         arrival_confirmed: { renderer: :label, as_boolean: true },
         loaded: { renderer: :label, as_boolean: true },
-        offloaded: { renderer: :label, as_boolean: true }
+        offloaded: { renderer: :label, as_boolean: true },
+        description: { renderer: :textarea, rows: 5 }
       }
     end
 
@@ -82,7 +83,8 @@ module UiRules
         when_offloaded: { renderer: :label, subtype: :datetime },
         arrival_confirmed: { renderer: :label, as_boolean: true },
         loaded: { renderer: :label, as_boolean: true },
-        offloaded: { renderer: :label, as_boolean: true }
+        offloaded: { renderer: :label, as_boolean: true },
+        description: { renderer: :label }
       }
     end
 
@@ -110,7 +112,8 @@ module UiRules
                                     loaded: nil,
                                     offloaded: nil,
                                     arrival_confirmed: nil,
-                                    when_offloaded: nil)
+                                    when_offloaded: nil,
+                                    description: nil)
     end
 
     def can_confirm_arrival?

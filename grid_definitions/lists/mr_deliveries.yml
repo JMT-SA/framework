@@ -39,3 +39,7 @@
     - :col: mr_deliveries.invoice_completed
       :op: =
       :val: true
+:captions:
+  :conditions:
+    :incomplete: Deliveries
+    :completed: Completed Deliveries

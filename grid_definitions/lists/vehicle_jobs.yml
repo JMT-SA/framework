@@ -44,3 +44,7 @@
     - :col: vehicle_jobs.offloaded
       :op: =
       :val: true
+:captions:
+  :conditions:
+    :incomplete: Tripsheets
+    :completed: Completed Tripsheets

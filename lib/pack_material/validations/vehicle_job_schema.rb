@@ -11,6 +11,7 @@ module PackMaterialApp
     # required(:tripsheet_number, :integer).maybe(:int?)
     required(:planned_location_id, :integer).maybe(:int?)
     required(:virtual_location_id, :integer).maybe(:int?)
+    required(:description, Types::StrippedString).maybe(:str?)
     # required(:when_loaded, :date_time).maybe(:date_time?)
     # required(:when_offloaded, :date_time).maybe(:date_time?)
   end
@@ -25,6 +26,7 @@ module PackMaterialApp
     # required(:tripsheet_number, :integer).maybe(:int?)
     required(:planned_location_id, :integer).maybe(:int?)
     required(:virtual_location_id, :integer).maybe(:int?)
+    required(:description, Types::StrippedString).maybe(:str?)
     # required(:when_loaded, :date_time).maybe(:date_time?)
     # required(:when_offloaded, :date_time).maybe(:date_time?)
   end

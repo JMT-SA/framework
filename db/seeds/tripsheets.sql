@@ -82,7 +82,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Tripsheets'
                                    AND functional_area_id = (SELECT id FROM functional_areas
                                                              WHERE functional_area_name = 'Pack Material')),
-        'Completed', '/list/vehicle_jobs/with_params?key=completed', 5);
+        'Completed Tripsheets', '/list/vehicle_jobs/with_params?key=completed', 5);
 
 -- SEARCH menu item
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)

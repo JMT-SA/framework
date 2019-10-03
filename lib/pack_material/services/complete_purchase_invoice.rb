@@ -47,7 +47,6 @@ module PackMaterialApp
 
       costs = @repo.costs_for_delivery(@id)
       products = @repo.products_for_delivery(@id)
-      invoice_total = products.map { |item| UtilityFunctions.delimited_number((item[:unit_price] || 0) * (item[:quantity] || 0), delimiter: '') }
       invoice_total = products.sum { |item| (item[:unit_price] || 0) * (item[:quantity] || 0) }
 
       request_xml = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
@@ -57,13 +56,13 @@ module PackMaterialApp
           xml.internal_invoice_number delivery_number
           xml.supplier_code supplier_code
           xml.account_code po_account_code
-          xml.invoice_total UtilityFunctions.delimited_number(invoice_total, delimiter: '')
+          xml.invoice_total UtilityFunctions.delimited_number(invoice_total, delimiter: '', no_decimals: 5)
           xml.costs do
             costs.each do |cost|
               xml.cost do
                 xml.cost_code cost[:cost_type_code]
                 xml.account_code cost[:account_code]
-                xml.amount UtilityFunctions.delimited_number(cost[:amount], delimiter: '')
+                xml.amount UtilityFunctions.delimited_number(cost[:amount], delimiter: '', no_decimals: 2)
               end
             end
           end
@@ -72,8 +71,8 @@ module PackMaterialApp
               xml.line_item do
                 xml.product_number line_item[:product_number]
                 xml.product_description line_item[:product_description]
-                xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '')
-                xml.quantity UtilityFunctions.delimited_number(line_item[:quantity], delimiter: '')
+                xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '', no_decimals: 5)
+                xml.quantity UtilityFunctions.delimited_number(line_item[:quantity], delimiter: '', no_decimals: 2)
                 xml.purchase_order_number line_item[:purchase_order_number]
               end
             end

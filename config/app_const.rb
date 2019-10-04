@@ -56,6 +56,7 @@ class AppConst
     location: { format: 'LC%d', fields: [:id] },
     sku: { format: 'SK%d', fields: [:sku_number] },
     delivery: { format: 'DN%d', fields: [:delivery_number] },
+    tripsheet: { format: 'TS%d', fields: [:tripsheet_number] },
     stock_adjustment: { format: 'SA%d', fields: [:stock_adjustment_number] }
   }.freeze
 
@@ -65,6 +66,7 @@ class AppConst
     { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
     { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
     { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
+    { regex: '^TS(\\d+)', type: 'tripsheet', field: 'tripsheet_number' },
     { regex: '^SA(\\d+)', type: 'stock_adjustment', field: 'stock_adjustment_number' }
   ].freeze
 

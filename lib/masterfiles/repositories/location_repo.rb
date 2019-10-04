@@ -93,6 +93,20 @@ module MasterfilesApp
       DB[:locations].where(location_long_code: location_long_code).get(:id)
     end
 
+    # Given a location id, find its parent of a particular location type.
+    def find_parent_of_type(location_type_code, location_id)
+      query = <<~SQL
+        SELECT l.id
+        FROM tree_locations t
+        JOIN locations l ON l.id = t.ancestor_location_id AND l.location_type_id = (SELECT id from location_types WHERE location_type_code = ?)
+        WHERE t.descendant_location_id = ?
+      SQL
+      id = DB[query, location_type_code, location_id].get(:id)
+      return failed_response(%(No "#{location_type_code}" found for location "#{location_id}")) if id.nil?
+
+      success_response('ok', id)
+    end
+
     def create_root_location(params)
       id = create_location(params)
       DB[:location_storage_types_locations].insert(location_id: id,

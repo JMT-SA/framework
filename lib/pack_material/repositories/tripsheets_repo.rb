@@ -231,8 +231,8 @@ module PackMaterialApp
       vehicle_job = DB[:vehicle_jobs].where(id: vehicle_job_id)
       return failed_response('No virtual location set on Tripsheet') unless vehicle_job.get(:planned_location_id)
 
+      now = Time.now
       units.each do |unit|
-        now = DateTime.now
         update(:vehicle_job_units,
                unit[:id],
                quantity_offloaded: unit[:quantity_loaded],

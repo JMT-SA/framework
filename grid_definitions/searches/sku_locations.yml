@@ -16,7 +16,7 @@
   :icon: minus-outline
   :title: Remove Stock
   :popup: true
-- :url: "/list/sku_location_transaction_history/with_params?key=standard&sku_number=$:sku_number$"
+- :url: "/list/sku_transaction_history/with_params?key=standard&sku_number=$:sku_number$"
   :text: transaction history
   :icon: view-column
   :title: Transaction History

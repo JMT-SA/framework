@@ -20,7 +20,7 @@ module UiRules
 
     def common_fields
       {
-        type_code: {}
+        type_code: { required: true }
       }
     end
 

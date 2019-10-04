@@ -23,7 +23,7 @@ module UiRules
     def common_fields
       {
         vehicle_type_id: { renderer: :select, options: PackMaterialApp::TripsheetsRepo.new.for_select_vehicle_types, caption: 'Vehicle Type', required: true },
-        vehicle_code: {}
+        vehicle_code: { required: true }
       }
     end
 

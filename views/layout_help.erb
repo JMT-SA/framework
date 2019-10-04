@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_metatag %>
+
+    <title><%= ENV['APP_CAPTION'] %></title>
+
+    <!-- FAVICON start -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <!-- FAVICON end -->
+
+    <link rel="stylesheet" href="/css/tachyons.min.css">
+    <% unless @search_page %>
+      <link rel="stylesheet" href="/css/asciidoc.css">
+    <% end %>
+    <%= assets(:css) %>
+    <style>
+      #container {
+        margin-top: 0;
+      }
+    </style>
+    <%= content_for :late_style %>
+
+    <%= content_for :late_head %>
+  </head>
+  <body class="site" data-utf-8-ensurer="О">
+  <header>
+    <div class="system-name">
+      <span class="dib f5 f4-ns fw6 mt0 mb0 mid-gray">
+        <%= ENV['APP_CAPTION'] %>
+        <div class="dib">
+          <small class="nowrap f6 mt2 mt3-ns pr2 black-70 fw2">v<%= ENV['VERSION'] %></small>
+        </div>
+      </span>
+      <span class="red fw5" style="colour:#ba3925">Help</span>
+    </div>
+  </header>
+    <div id="container" class="container">
+      <form action="/help/search" class="absolute">
+        <input id="search_term" type="search" name="search_term" placeholder="Search help" />
+      </form>
+      <%= yield %>
+    </div>
+
+  </body>
+</html>

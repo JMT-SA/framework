@@ -1,0 +1,78 @@
+= Help system
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Help system
+
+User help is provided in two sections:
+
+System help:: Help related to the system framework (how to use grids, how to log in etc)
+App help:: Help related to the application (specific business domain) running on the framework
+
+Help is accessed from pages using the `Crossbeams::Layout::HelpLink` UI control which will display help in a new page/tab.
+
+=== Writing help
+
+Help documents are written in asciidoc. See link:https://asciidoctor.org/docs/user-manual[Asciidoctor user manual].
+
+A help link will point to a particular asciidoc file which is saved in a path built up like this:
+
+    <ROOT>/help/app/<group>/<help_topic>.adoc    [App help]
+    # OR..
+    <ROOT>/help/system/<group>/<help_topic>.adoc [System help]
+
+Where:
+
+<ROOT>:: is the application root dir.
+<group>:: is an arbitrary name to group documentation together. This affects grouping of help topics on the index page.
+<help_topic>:: is a concise phrase for the help topic (lowercase with underscores).
+
+e.g. `help/app/production/allocate_setups`
+
+If the help topic is quite long and has several headings, it is a good idea to put `:toc:` in the first line so the page will be displayed with a table of contents.
+
+==== Images
+
+Images can be included in help topics, but should be used sparingly. Screenshots should be avoided where possible because they easily become outdated when the UI is altered for any reason (new field added to a form, change of design etc.).
+
+For system help topics, images must be stored in `public/help/system_images` and for app help topics, they must be stored in `public/help/app_images`. Name files carefully so that their name ties them to their help context and they are unique.
+
+Images should typically be `.png` files.
+
+Example:
+    
+    .The image caption here
+    image::the_image_file_name_without_path.png[alt title goes here]
+
+Where the first line starting with a `.` will be displayed below the image as a caption.
+
+The second line is made up of three parts:
+
+* `image::` -- tells asciidoc to display an image
+* `xxx.png` -- the name of the image file and
+* `[xxx]` -- the alt title for the image.
+
+=== Linking to help
+
+To render a help button for `help/app/production/allocate_setups`, create a help link like this:
+[source, ruby]
+----
+# In a page view:
+page.add_help_link path: %i[production allocate_setups]
+
+# In a dialog:
+page.add_help_link path: %i[production allocate_setups], for_dialog: true
+----
+
+For system help, do something similar, but identify the link as system help:
+[source, ruby]
+----
+# In a page view:
+page.add_help_link help_type: :system, path: %i[grids filtering_grid_data]
+
+# In a dialog:
+page.add_help_help_type: :system, link path: %i[grids filtering_grid_data], for_dialog: true
+----
+
+See link:/developer_documentation/non_field_renderers.adoc#_helplink[Help Link]

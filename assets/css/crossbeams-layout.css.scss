@@ -8,6 +8,9 @@
 .ag-theme-balham .ag-popup-editor {
   z-index: 30 !important;
 }
+.ag-theme-balham .ag-rich-select .ag-rich-select-list {
+  width: auto !important;
+}
 /* Style for cells in popup display of selected row */
 .selected-grid-row-display.ag-numeric-cell {
   text-align: right;
@@ -899,22 +902,23 @@ div.cbl-progress-bar-text {
   .cbl-input-required,
   .cbl-copy-wrapper,
   .multi-wrapper,
-  /* input, */
-  select{width: 100%;}
-  input[type="radio"],
-  input[type="checkbox"],
-  input[type="submit"]{
-  width: auto;
+    /* input, */
+    select{width: 100%;}
+    input[type="radio"],
+    input[type="checkbox"],
+    input[type="submit"]{
+    width: auto;
   }
   form .crossbeams-field{
-  display: flex;
-  flex-direction: column;
-  margin: 0 0 6px 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0.25em;
   }
   form .crossbeams-field label{
-  padding: 0 0 5px 0;
-  margin: 10px 0 0 0;
-  text-align: left;
+    padding: 0 0 5px 0;
+    margin: 0;
+    text-align: left;
   }
 }
 @media (max-width: 800px) {

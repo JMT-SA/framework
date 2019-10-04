@@ -270,10 +270,10 @@ This merely responds with status `200`.
 
 Undo an inline-edit from a grid (e.g. when a validation fails). Optionally display a message.
 
-  undo_grid_inline_edit(message: nil, message_type: :warn)
+  undo_grid_inline_edit(message: nil, message_type: :warning)
 
 * `message` is an optional message to display.
-* `message_type` is the message style which can be `:info`, `:error`, `:warning` or `:notice`. Defaults to `:warn`.
+* `message_type` is the message style which can be `:info`, `:error`, `:warning` or `:notice`. Defaults to `:warning`.
 
 [source,ruby]
 ----
@@ -281,6 +281,6 @@ res = interactor.method_that_could_fail(params)
 if res.success
   # ..
 else
-  undo_grid_inline_edit(message: res.message, message_type: :warn)
+  undo_grid_inline_edit(message: res.message, message_type: :warning)
 end
 ----

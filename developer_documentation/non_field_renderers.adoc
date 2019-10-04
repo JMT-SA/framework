@@ -8,6 +8,7 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 The following renderers that do not bind to fields in a form are available:
 
 * <<Link>>
+* <<HelpLink>>
 * <<Text>>
 * <<SortableList>>
 * <<Address>>
@@ -82,6 +83,36 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |Set this to `false` to render the link hidden (with style: `visiblity:hidden`).
 |`Boolean`
 |`true`
+
+|===
+
+=== HelpLink
+
+This page control displays a link in a page. See link:/developer_documentation/help_system.adoc[Help system]
+
+e.g.
+[source,ruby]
+----
+page.add_help_link path: %i[production allocate_setups]
+----
+
+|===
+|attribute |description |possible values |default
+
+|options - :path
+|The components of the path to a help file, starting from `help/app` or `help/system`. The `adoc` part is not required.
+|Array of symbols
+|None. must be provided.
+
+|options - :help_type
+|System or App help
+|String - can be "app" or "system"
+|`app`.
+
+|options - :for_dialog
+|Will the link be rendered in a dialog?
+|Boolean
+|`false`.
 
 |===
 

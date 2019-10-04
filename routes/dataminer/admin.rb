@@ -210,7 +210,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
             update_grid_row(id, changes: res.instance, notice: res.message)
           end
         else
-          undo_grid_inline_edit(message: res.message, message_type: :warn)
+          undo_grid_inline_edit(message: res.message, message_type: :warning)
         end
       end
       r.on 'save_colour_key_desc' do # JSON
@@ -218,7 +218,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           show_json_notice(res.message)
         else
-          undo_grid_inline_edit(message: res.message, message_type: :warn)
+          undo_grid_inline_edit(message: res.message, message_type: :warning)
         end
       end
       r.on 'parameter' do

@@ -234,33 +234,41 @@ module DataminerApp
         mk.col 'caption', nil, editable: true, pinned: 'left'
         mk.col 'namespaced_name'
         mk.col 'data_type', nil, editable: true, cellEditor: 'select', cellEditorParams: {
-          values: %w[string boolean integer number date datetime]
+          values: %w[string boolean integer number date datetime],
+          width: 100
         }
         mk.integer 'width', nil, editable: true # , cellEditor: 'numericCellEditor', cellEditorType: 'integer'
         mk.col 'format', nil, editable: true, cellEditor: 'select', cellEditorParams: {
-          values: ['', 'delimited_1000', 'delimited_1000_4']
+          values: ['', 'delimited_1000', 'delimited_1000_4'],
+          width: 100
         }
         mk.boolean 'hide', 'Hide?', editable: true, cellEditor: 'select', cellEditorParams: {
-          values: [true, false]
+          values: %w[true false],
+          width: 60
         }
         mk.boolean 'groupable', 'Can group by?', editable: true, cellEditor: 'select', cellEditorParams: {
-          values: [true, false]
+          values: %w[true false],
+          width: 60
         }
         mk.col 'pinned', nil, editable: true, cellEditor: 'select', cellEditorParams: {
           values: ['', 'left', 'right']
         }
         mk.integer 'group_by_seq', 'Group Seq', tooltip: 'If the grid opens grouped, this is the grouping level', editable: true # , cellEditor: 'numericCellEditor'
         mk.boolean 'group_sum', 'Sum?', editable: true, cellEditor: 'select', cellEditorParams: {
-          values: [true, false]
+          values: %w[true false],
+          width: 60
         }
         mk.boolean 'group_avg', 'Avg?', editable: true, cellEditor: 'select', cellEditorParams: {
-          values: [true, false]
+          values: %w[true false],
+          width: 60
         }
         mk.boolean 'group_min', 'Min?', editable: true, cellEditor: 'select', cellEditorParams: {
-          values: [true, false]
+          values: %w[true false],
+          width: 60
         }
         mk.boolean 'group_max', 'Max?', editable: true, cellEditor: 'select', cellEditorParams: {
-          values: [true, false]
+          values: %w[true false],
+          width: 60
         }
       end
       page.row_defs = []

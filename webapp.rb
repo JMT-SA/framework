@@ -158,72 +158,15 @@ class Framework < Roda
         <% content_for :late_head do %>
           <link rel="stylesheet" href="/css/asciidoc.css">
         <% end %>
-        <div id="asciidoc-content">
-          #{Asciidoctor.convert(content, safe: :safe, attributes: { 'source-highlighter' => 'coderay', 'coderay-css' => 'style', 'imagesdir' => '/documentation_images' })}
-        </div>
+        #{render_asciidoc(content)}
       HTML
     end
 
     r.on 'search_developer_documentation' do
-      # Requires ag (Silver Searcher) to be installed..
-      out = {}
-      if params[:search_term].strip.empty?
-        term = ''
-      else
-        term = params[:search_term]
-
-        Dir.glob("#{ENV['ROOT']}/developer_documentation/*.adoc").each do |filename|
-          lines = File.foreach(filename).grep(/#{term}/i)
-          next if lines.empty?
-
-          out[filename] = []
-          lines.each do |line|
-            out[filename] << (line.chomp || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow">\1</span>')
-          end
-        end
-
-        # Unlike the method above, this method includes lines of context:
-        # res = `ag -C 2 --nonumber #{term} developer_documentation/`
-        # curr = nil
-        # res.split("\n").each do |t|
-        #   next if t.strip.empty?
-        #   if t == '--'
-        #     out[curr] << '<hr class="light-green mb0">' unless curr.nil?
-        #   else
-        #     fn, = t.split(':')
-        #     str = t.delete_prefix("#{fn}:")
-        #     if fn != curr
-        #       curr = fn
-        #       out[curr] = []
-        #     end
-        #     out[curr] << (str || '').gsub('<', '&lt;').gsub('>', '&gt;').gsub(/(#{term})/i, '<span class="red b bg-light-yellow">\1</span>')
-        #   end
-        # end
-      end
-      got_res = out.empty? ? 'No s' : 'S'
+      search = DocSearch.new(:devdoc)
+      content = search.search_for(params[:search_term])
       @documentation_page = true
-
-      view(inline: <<~HTML)
-        <div class="db f2 mt5">
-          #{got_res}earch results for "<b>#{term}</b>"
-        </div>
-        <p>
-          <a href="/developer_documentation/start.adoc">Back to documentation home</a>
-        </p>
-        <div class="db">
-          #{out.map do |k, v|
-            <<~STR
-              <div class=\"mt3 lh-copy\">
-                <a href=\"#{k.delete_prefix(ENV['ROOT'])}\" class=\"f3 link dim br2 ph3 pv2 dib white bg-dark-blue mb2\">
-                  #{Crossbeams::Layout::Icon.render(:back)} #{k.delete_prefix("#{ENV['ROOT']}/developer_documentation/").delete_suffix('.adoc').tr('_', ' ')}
-                </a>
-                <br>
-                #{v.join('<br>')}
-            STR
-          end.join('<hr class="blue"></div>')}
-          <hr class="blue"></div>
-        </div>
-      HTML
+      view(inline: content)
     end
 
     r.on 'yarddocthis', String do |file|
@@ -390,6 +333,14 @@ class Framework < Roda
 
   status_handler(404) do
     view(inline: '<div class="crossbeams-error-note"><strong>Error</strong><br>The requested resource was not found.</div>')
+  end
+
+  def render_asciidoc(content, image_dir = '/documentation_images')
+    <<~HTML
+      <div id="asciidoc-content">
+        #{Asciidoctor.convert(content, safe: :safe, attributes: { 'source-highlighter' => 'coderay', 'coderay-css' => 'style', 'imagesdir' => image_dir })}
+      </div>
+    HTML
   end
 end
 # rubocop:enable Metrics/ClassLength

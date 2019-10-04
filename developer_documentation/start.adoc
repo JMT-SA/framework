@@ -53,6 +53,7 @@ Pictoral overview of application.
 * link:/developer_documentation/icons.adoc[Icons]
 * link:/developer_documentation/message_bus.adoc[MessageBus]
 * link:/developer_documentation/ui_rules.adoc[UI Rules]
+* link:/developer_documentation/help_system.adoc[Help system]
 
 ==== Backend
 

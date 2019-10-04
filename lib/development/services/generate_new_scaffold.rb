@@ -205,7 +205,8 @@ module DevelopmentApp
         integer: ':integer',
         string: 'Types::StrippedString',
         boolean: ':bool',
-        datetime: ':date_time',
+        # datetime: ':date_time',
+        datetime: ':time',
         date: ':date',
         time: ':time',
         float: ':float',
@@ -698,8 +699,8 @@ module DevelopmentApp
                             popup: true,
                             hide_if_true: 'completed',
                             auth: {
-                              function: opts.applet,
-                              program: opts.program,
+                              function: make_caption(opts.applet),
+                              program: opts.program_text,
                               permission: 'edit'
                             } }
         list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/approve",
@@ -709,8 +710,8 @@ module DevelopmentApp
                             hide_if_false: 'completed',
                             hide_if_true: 'approved',
                             auth: {
-                              function: opts.applet,
-                              program: opts.program,
+                              function: make_caption(opts.applet),
+                              program: opts.program_text,
                               permission: 'approve'
                             } }
         list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/reopen",
@@ -719,8 +720,8 @@ module DevelopmentApp
                             popup: true,
                             hide_if_false: 'approved',
                             auth: {
-                              function: opts.applet,
-                              program: opts.program,
+                              function: make_caption(opts.applet),
+                              program: opts.program_text,
                               permission: 'edit'
                             } }
         list[:actions] << { separator: true }
@@ -736,6 +737,10 @@ module DevelopmentApp
                                   style: :button,
                                   behaviour: :popup }
         list.to_yaml
+      end
+
+      def make_caption(value)
+        opts.inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
       end
     end
 
@@ -985,7 +990,7 @@ module DevelopmentApp
 
       def create_success
         if opts.new_from_menu
-          row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n    ")
+          row_keys = opts.table_meta.columns_without(%i[created_at updated_at]).map(&:to_s).join("\n    ")
           <<~RUBY
             if fetch?(r)
               row_keys = %i[
@@ -999,7 +1004,7 @@ module DevelopmentApp
             end
           RUBY
         else
-          row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n  ")
+          row_keys = opts.table_meta.columns_without(%i[created_at updated_at]).map(&:to_s).join("\n  ")
           <<~RUBY
             row_keys = %i[
               #{row_keys}

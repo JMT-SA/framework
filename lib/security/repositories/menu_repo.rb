@@ -67,7 +67,10 @@ module SecurityApp
     end
 
     def functional_area_id_for_name(functional_area_name)
-      DB[:functional_areas].where(functional_area_name: functional_area_name).first[:id]
+      id = DB[:functional_areas].where(functional_area_name: functional_area_name).get(:id)
+      raise ArgumentError, %(There is no functional area named "#{functional_area_name}") if id.nil?
+
+      id
     end
 
     def create_program(res, webapp)

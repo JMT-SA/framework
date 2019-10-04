@@ -553,7 +553,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param message [string] an optional message to display.
   # @param message_type [symbol] the message style : :info, :error, :warning or :notice
   # @return [json] the JSON command to undo the edit.
-  def undo_grid_inline_edit(message: nil, message_type: :warn)
+  def undo_grid_inline_edit(message: nil, message_type: :warning)
     res = { undoEdit: true }
     res[:flash] = { message_type => message } unless message.nil?
     res.to_json

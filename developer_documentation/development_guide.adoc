@@ -18,7 +18,7 @@ Crossbeams::LabelDesigner:: Design labels in the browser for printing - https://
 
 ==== External gems
 
-Roda:: Webapp route-handling - link:http://roda.jeremyevans.net/documentation.html[roda]
+Roda:: Webapp route-handling - link:http://roda.jeremyevans.net/documentation.html[roda]  and link:https://fiachetti.gitlab.io/mastering-roda[Mastering Roda]
 Rodauth:: Manage login, logout and current user - link:[rodauth]
 Sequel:: Database ORM - link:http://sequel.jeremyevans.net/documentation.html[sequel]
 Dry::Struct:: Define data entities - link:https://dry-rb.org/gems/dry-struct/[dry-struct]

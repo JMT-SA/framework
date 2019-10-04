@@ -21,10 +21,23 @@ module DevelopmentApp
 
     def test_from
       job = DevelopmentApp::SendMailJob.new
-      job.run(from: 'john@place.com', to: 'fred@place.com', subject: 'Mail to test', body: 'A letter')
+      AppConst.stub_const(:EMAIL_REQUIRES_REPLY_TO, false) do
+        job.run(from: 'john@place.com', to: 'fred@place.com', subject: 'Mail to test', body: 'A letter')
+      end
       assert_equal 1, Mail::TestMailer.deliveries.length
       mail = Mail::TestMailer.deliveries.first
       assert_equal 'john@place.com', mail.from.first
+    end
+
+    def test_from_when_reply_to
+      job = DevelopmentApp::SendMailJob.new
+      AppConst.stub_const(:EMAIL_REQUIRES_REPLY_TO, true) do
+        job.run(from: 'john@place.com', to: 'fred@place.com', subject: 'Mail to test', body: 'A letter')
+      end
+      assert_equal 1, Mail::TestMailer.deliveries.length
+      mail = Mail::TestMailer.deliveries.first
+      assert AppConst::SYSTEM_MAIL_SENDER.include?(mail.from.first)
+      assert_equal 'john@place.com', mail.reply_to.first
     end
 
     def test_cc

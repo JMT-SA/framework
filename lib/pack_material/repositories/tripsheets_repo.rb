@@ -65,7 +65,7 @@ module PackMaterialApp
                                                  col_name: :status }],
                             parent_tables: [
                               { parent_table: :vehicle_jobs, foreign_key: :vehicle_job_id, flatten_columns: { tripsheet_number: :tripsheet_number } },
-                              { parent_table: :locations, foreign_key: :location_id, flatten_columns: { location_long_code: :from_location_long_code } }
+                              { parent_table: :locations, foreign_key: :location_id, flatten_columns: { location_short_code: :from_location_short_code } }
                             ])
     end
 

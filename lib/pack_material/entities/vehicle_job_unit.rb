@@ -18,7 +18,7 @@ module PackMaterialApp
     attribute :loaded, Types::Bool
     attribute :offloaded, Types::Bool
     attribute :status, Types::String
-    attribute? :from_location_long_code, Types::String
+    attribute? :from_location_short_code, Types::String
     attribute? :tripsheet_number, Types::Integer
   end
 end

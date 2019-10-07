@@ -226,6 +226,7 @@ class Framework < Roda
               sku_number
               location_id
               status
+              from_location_short_code
             ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
@@ -389,6 +390,7 @@ class Framework < Roda
               sku_number
               location_id
               status
+              from_location_short_code
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

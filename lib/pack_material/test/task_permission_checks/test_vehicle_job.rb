@@ -24,6 +24,7 @@ module PackMaterialApp
         load_transaction_id: 1,
         offload_transaction_id: 1,
         arrival_confirmed: false,
+        status: 'CREATED',
         description: 'description'
       }
       PackMaterialApp::VehicleJob.new(base_attrs.merge(attrs))

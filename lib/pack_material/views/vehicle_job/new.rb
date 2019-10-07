@@ -22,6 +22,7 @@ module PackMaterial
               # form.add_field :tripsheet_number
               form.add_field :planned_location_id
               form.add_field :virtual_location_id
+              form.add_field :description
               # form.add_field :when_loaded
               # form.add_field :when_offloaded
             end

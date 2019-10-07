@@ -22,7 +22,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
         interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
         show_partial_or_page(r) do
           Development::Generators::General::Email.call(remote: true,
-                                                       email_options: interactor.email_puchase_order_defaults(id, current_user),
+                                                       email_options: interactor.email_purchase_order_defaults(id, current_user),
                                                        action: "/pack_material/reports/email_purchase_order/#{id}")
         end
       end
@@ -116,6 +116,21 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                                     user: current_user.login_name,
                                     file: 'preliminary_report',
                                     params: { mr_bulk_stock_adjustment_id: id,
+                                              keep_file: true })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
+    # TRIPSHEETS
+    # ---------------------------------------------------------------------------
+    r.on 'tripsheet', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'tripsheet',
+                                    user: current_user.login_name,
+                                    file: 'tripsheet',
+                                    params: { vehicle_id: id,
                                               keep_file: true })
       if res.success
         change_window_location_via_json(res.instance, request.path)

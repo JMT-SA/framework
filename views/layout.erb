@@ -22,8 +22,6 @@
     <link rel="stylesheet" href="/css/tachyons.min.css">
     <link rel="stylesheet" href="/css/sweetalert2.min.css">
     <link rel="stylesheet" href="/css/jquery.contextMenu.min.css">
-    <link rel="stylesheet" href="/css/menu.css">
-    <link rel="stylesheet" href="/css/skin.css">
     <link rel="stylesheet" href="/css/choices.min.css">
     <link rel="stylesheet" href="/css/multi.min.css">
     <%= assets(:css) %>
@@ -42,9 +40,6 @@
     </div>
       <div id="notification-area">
         <% if current_user %>
-          <input id="menuSearch" type="search" placeholder="Search menu" />
-          <ul id="menuSearchResults">
-          </ul>
           <!-- [current resource] -->
           <% if session[:act_as_user_id] %>
             <span class="ml2 mr2 f6 link mb2 br2 ph3 pv2 dib white bg-silver"><%= actor_user.user_name %> acting as <strong><%= current_user.user_name %></strong></span>
@@ -111,7 +106,7 @@
     <script src="/js/crossbeams-local-storage.js"></script>
     <script src="/js/crossbeams-utils.js?seq=13"></script>
     <script src="/js/crossbeams-layout.js?seq=11"></script>
-    <script src="/js/crossbeams-grid-loader.js?seq=17"></script>
+    <script src="/js/crossbeams-grid-loader.js?seq=18"></script>
     <script src="/js/crossbeams-data-miner-params.js?seq=1"></script>
     <script src="/js/crossbeams-menu-builder.js?seq=1"></script>
     <script src="/js/choices.min.js"></script>
@@ -166,6 +161,31 @@
         }
       });
       // MessageBus handling --- END
+
+      // Responsive Menu -- START
+      const toggleMenu = document.querySelector(".navigation button");
+      const menu = document.querySelector("#menu");
+
+      // Toggle the mobile menu button
+      toggleMenu.addEventListener("click", function () {
+        const open = JSON.parse(toggleMenu.getAttribute("aria-expanded"));
+        toggleMenu.setAttribute("aria-expanded", !open);
+        menu.hidden = !menu.hidden;
+      });
+
+      // Javascript to react to media query change:
+      function menuForMinWidth(mediaQuery) {
+        if (mediaQuery.matches) {
+          menu.hidden = false;
+        } else {
+          menu.hidden = true;
+        }
+      }
+
+      var min45 = window.matchMedia("(min-width: 45rem)")
+      menuForMinWidth(min45) // Call listener function at run time
+      min45.addListener(menuForMinWidth) // Attach listener function on state changes
+      // Responsive Menu -- START
     </script>
     <script src="/js/crossbeams-menu-handler.js"></script>
     <%= content_for :late_javascript %>

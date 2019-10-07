@@ -59,6 +59,7 @@ module PackMaterial
                     col.add_field :vehicle_id
                     col.add_field :planned_location_id
                     col.add_field :when_offloaded
+                    col.add_field :status
                     col.add_field :arrival_confirmed
                     col.add_field :loaded
                     col.add_field :offloaded
@@ -72,6 +73,7 @@ module PackMaterial
                                   text: 'Print Tripsheet',
                                   url: "/pack_material/reports/tripsheet/#{id}",
                                   loading_window: true,
+                                  visible: rules[:print_tripsheet],
                                   style: :button)
             end
 

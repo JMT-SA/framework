@@ -225,6 +225,8 @@ class Framework < Roda
               mr_sku_id
               sku_number
               location_id
+              status
+              from_location_short_code
             ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
@@ -322,6 +324,12 @@ class Framework < Roda
             offloaded
             load_transaction_id
             offload_transaction_id
+            status
+            process
+            vehicle_code
+            departure_location_long_code
+            virtual_location_long_code
+            planned_location_long_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -381,6 +389,8 @@ class Framework < Roda
               mr_sku_id
               sku_number
               location_id
+              status
+              from_location_short_code
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

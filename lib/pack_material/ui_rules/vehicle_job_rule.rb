@@ -27,6 +27,7 @@ module UiRules
       rules[:loaded] = loaded?
       rules[:cannot_edit] = !can_edit? && !can_set_planned_loc?
       rules[:completed] = completed?
+      rules[:print_tripsheet] = print_tripsheet?
     end
 
     # def set_show_fields #- rubocop:disable Metrics/AbcSize
@@ -56,7 +57,8 @@ module UiRules
         arrival_confirmed: { renderer: :label, as_boolean: true },
         loaded: { renderer: :label, as_boolean: true },
         offloaded: { renderer: :label, as_boolean: true },
-        description: { renderer: :textarea, rows: 5 }
+        description: { renderer: :textarea, rows: 5 },
+        status: { renderer: :label }
       }
     end
 
@@ -84,7 +86,8 @@ module UiRules
         arrival_confirmed: { renderer: :label, as_boolean: true },
         loaded: { renderer: :label, as_boolean: true },
         offloaded: { renderer: :label, as_boolean: true },
-        description: { renderer: :label }
+        description: { renderer: :label },
+        status: { renderer: :label }
       }
     end
 
@@ -113,7 +116,8 @@ module UiRules
                                     offloaded: nil,
                                     arrival_confirmed: nil,
                                     when_offloaded: nil,
-                                    description: nil)
+                                    description: nil,
+                                    status: nil)
     end
 
     def can_confirm_arrival?
@@ -152,6 +156,10 @@ module UiRules
 
     def can_update?
       @can_update ||= interactor.check_permission(:update, @options[:id]).success
+    end
+
+    def print_tripsheet?
+      @print_tripsheet ||= interactor.check_permission(:units, @options[:id]).success
     end
   end
 end

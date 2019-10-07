@@ -22,22 +22,6 @@ class TestVehicleJobRoutes < RouteTester
     expect_permission_error
   end
 
-  def test_show
-    authorise_pass!
-    ensure_exists!(INTERACTOR)
-    PackMaterial::Tripsheets::VehicleJob::Show.stub(:call, bland_page) do
-      get 'pack_material/tripsheets/vehicle_jobs/1', {}, 'rack.session' => { user_id: 1 }
-    end
-    expect_bland_page
-  end
-
-  def test_show_fail
-    authorise_fail!
-    ensure_exists!(INTERACTOR)
-    get 'pack_material/tripsheets/vehicle_jobs/1', {}, 'rack.session' => { user_id: 1 }
-    expect_permission_error
-  end
-
   # def test_update
   #   authorise_pass!
   #   ensure_exists!(INTERACTOR)

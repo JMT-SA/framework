@@ -34,7 +34,7 @@ module UiRules
       fields[:when_offloading] = { renderer: :label }
       fields[:mr_sku_id] = { renderer: :hidden }
       fields[:sku_number] = { renderer: :label, caption: 'SKU Number' }
-      fields[:location_id] = { renderer: :label, with_value: @form_object.from_location_long_code, caption: 'From Location' }
+      fields[:location_id] = { renderer: :label, with_value: @form_object.from_location_short_code, caption: 'From Location' }
     end
 
     def new_fields

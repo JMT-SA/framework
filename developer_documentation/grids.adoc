@@ -148,13 +148,14 @@ Every time an editable cell is changed, a URL will be called with the row id, th
       :editor: :numeric                  # <5>
     condition:
       :editor: :select                   # <6>
-      :values:                           # <7>
+      :width: 350                        # <7>
+      :values:                           # <8>
         - Ok
         - Fair
         - Poor
     role:
       :editor: :select
-      :value_sql: SELECT code FROM roles # <8>
+      :value_sql: SELECT code FROM roles # <9>
 ----
 <1> This is required. The url should include `$:id$` which will be replaced with the row's id value.
 <2> This is required. `editable_fields` is a Hash of column names with options for editing.
@@ -162,8 +163,9 @@ Every time an editable cell is changed, a URL will be called with the row id, th
 <4> A textarea editor.
 <5> The numeric editor does not allow alphabetic characters.
 <6> A select editor **must** have a `values` or `value_sql` setting.
-<7> `values` is an array of values.
-<8> `value_sql` must be a SELECT query. The first column of every row forms the select's options. The query can include parameters from the page (when the list url is a `with_params` type) in the form `$:param_name$`.
+<7> `width` is in pixels for setting the width of items. Optional -- the default value is 200.
+<8> `values` is an array of values.
+<9> `value_sql` must be a SELECT query. The first column of every row forms the select's options. The query can include parameters from the page (when the list url is a `with_params` type) in the form `$:param_name$`.
 
 NOTE: The field name keys for `editable_fields` are Strings, not Symbols, so they do not get a `:` in front.
 
@@ -191,7 +193,7 @@ r.on 'inline_save' do # COLUMN EDITED IN GRID
     # OR - if there is no need to provide feedback:
     blank_json_response
   else
-    undo_grid_inline_edit(message: res.message, message_type: :warn)
+    undo_grid_inline_edit(message: res.message, message_type: :warning)
     # OR - if it does not matter that the grid still has the value the user entered:
     show_json_error(res.message, status: 200)
   end

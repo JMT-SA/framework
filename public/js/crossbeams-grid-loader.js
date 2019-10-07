@@ -1279,6 +1279,17 @@ const crossbeamsGridStaticLoader = {
           } else {
             crossbeamsUtils.alert({ prompt: `${col[attr]} is not a recognised cellEditor`, type: 'error' });
           }
+        } else if (attr === 'cellEditorParams') {
+          if (col[attr].selectWidth) {
+            newCol.cellEditorParams = {
+              values: col[attr].values,
+              cellRenderer: function cellRenderer(params) {
+                return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`;
+              },
+            };
+          } else {
+            newCol[attr] = col[attr];
+          }
         } else if (attr === 'cellEditorType') {
           if (['integer'].indexOf(col[attr]) > -1) {
             newCol.cellEditorParams = { dataType: col[attr] };

@@ -26,7 +26,7 @@ class Framework < Roda
                                          button_caption: 'Move')
           form.add_select(:business_process, 'Business process', items: processes, value: processes.first, required: true, prompt: true)
           form.add_field(:from_location, 'From location', scan: 'key248_all', scan_type: :location, lookup: true)
-          form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true)
+          form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
           form.add_field(:quantity, 'Quantity', data_type: 'number')
           form.add_field(:ref_no, 'Reference Number', data_type: 'string')
           form.add_csrf_tag csrf_tag

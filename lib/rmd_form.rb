@@ -47,6 +47,7 @@ module Crossbeams
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
     # @option options [String] :data_type the input type. Defaults to 'text'.
+    # @option options [Integer] :width the input with in rem. Defaults to 12.
     # @option options [Boolean] :allow_decimals can a data_type="number" input accept decimals?
     # @option options [String] :scan The type of barcode symbology to accept. e.g. 'key248_all' for any symbology. Omit for input that does not receive a scan result.
     # Possible values are: key248_all (any symbology), key249_3o9 (309), key250_upc (UPC), key251_ean (EAN), key252_2d (2D - QR etc)
@@ -56,11 +57,12 @@ module Crossbeams
       @current_field = name
       for_scan = options[:scan] ? 'Scan ' : ''
       data_type = options[:data_type] || 'text'
+      width = options[:width] || 12
       required = options[:required].nil? || options[:required] ? ' required' : ''
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
-        <td><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
+        <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
     end
@@ -262,6 +264,23 @@ module Crossbeams
       return '' unless options[:submit_form]
 
       ' data-submit-form="Y"'
+    end
+
+    def clear_button(for_scan)
+      return '' if for_scan.empty?
+
+      <<~HTML
+        <button type="button" title="Clear input" class="pa2 white ba bw1 br1 b--silver dim dib f6 bg-silver rmdClear" data-rmd-clear="y">
+          <svg class="cbl-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M0 10l7-7h13v14H7l-7-7zm14.41 0l2.13-2.12-1.42-1.42L13 8.6l-2.12-2.13-1.42 1.42L11.6 10l-2.13 2.12 1.42 1.42L13 11.4l2.12 2.13 1.42-1.42L14.4 10z"/></svg>
+        </buton>
+      HTML
+    end
+
+    def set_readonly(val, for_scan)
+      return '' if for_scan.empty?
+      return '' if val.nil?
+
+      ' readonly'
     end
 
     # Set autofocus on fields in error, or else on the first field.

@@ -64,6 +64,17 @@
       .crossbeams-success-note p, .crossbeams-info-note p, .crossbeams-warning-note p, .crossbeams-error-note p {
         margin: 0.2em;
       }
+
+      .rmdScanFieldGRoup {
+        display: flex;
+      }
+      /* Look at clipboard button in Layout for styling... */
+      .rmdScanFieldGRoup input {
+        flex: 1;
+      }
+      .rmdScanFieldGRoup button {
+        color: #107FB7;
+      }
     </style>
     <%= content_for :late_head %>
   </head>
@@ -83,7 +94,7 @@
     </div>
     <script src="/js/crossbeams-utils.js?seq=13"></script>
     <script src="/js/crossbeams-layout.js?seq=11"></script>
-    <script src="/js/crossbeams-rmd_scan.js?seq=18" type="text/javascript"></script>
+    <script src="/js/crossbeams-rmd_scan.js?seq=19" type="text/javascript"></script>
     <script src="/js/sweetalert2.min.js" type="text/javascript"></script>
     <script>
 

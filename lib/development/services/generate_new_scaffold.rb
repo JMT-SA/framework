@@ -490,7 +490,7 @@ module DevelopmentApp
                 }.freeze
 
                 def call
-                  return failed_response 'Record not found' unless @entity || task == :create
+                  return failed_response '#{opts.text_name} record not found' unless @entity || task == :create
 
                   check = CHECKS[task]
                   raise ArgumentError, "Task \\"\#{task}\\" is unknown for \#{self.class}" if check.nil?

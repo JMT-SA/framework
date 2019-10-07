@@ -17,7 +17,7 @@ module PackMaterialApp
       end
 
       def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-        return failed_response 'Record not found' unless @entity || task == :create
+        return failed_response 'Delivery record not found' unless @entity || task == :create
 
         case task
         when :create

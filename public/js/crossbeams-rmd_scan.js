@@ -125,6 +125,25 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
           node.value = node.dataset.resetValue === '&nbsp;' ? '' : node.dataset.resetValue;
         });
       }
+      // Clear button clicked - clear the input next to it.
+      if (event.target.closest('[data-rmd-clear]')) {
+        const scanInput = event.target.closest('[data-rmd-clear]');
+        const toClear = scanInput.previousElementSibling;
+        const id = toClear.id;
+        let lkpInput;
+        if (toClear) {
+          toClear.value = null;
+          toClear.readOnly = false;
+          lkpInput = document.getElementById(`${id}_scan_lookup`);
+          if (lkpInput) {
+            lkpInput.innerHTML = '&nbsp;';
+          }
+          lkpInput = document.getElementById(`${id}_scan_lookup_hidden`);
+          if (lkpInput) {
+            lkpInput.value = '';
+          }
+        }
+      }
     });
 
     if (cameraScan) {
@@ -209,6 +228,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         scannableInputs.forEach((e) => {
           if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType)) {
             e.value = scanPack.value;
+            e.readOnly = true;
             const field = document.getElementById(`${e.id}_scan_field`);
             if (field) {
               field.value = scanPack.scanField;

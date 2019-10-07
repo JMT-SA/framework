@@ -15,8 +15,8 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                                        caption: 'Delivery putaway',
                                        action: '/rmd/deliveries/putaways',
                                        button_caption: 'Putaway')
-        form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
-        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true)
+        form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery, data_type: 'number')
+        form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
         form.add_field(:quantity, 'Quantity', data_type: 'number')
         form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, lookup: true)
         form.add_csrf_tag csrf_tag

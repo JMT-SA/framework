@@ -19,6 +19,7 @@ module PackMaterialApp
     attribute :offloaded, Types::Bool
     attribute :arrival_confirmed, Types::Bool
     attribute :description, Types::String
+    attribute :status, Types::String
     attribute? :process, Types::String.optional
     attribute? :vehicle_code, Types::String.optional
     attribute? :departure_location_long_code, Types::String.optional

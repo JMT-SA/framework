@@ -25,7 +25,8 @@ module PackMaterialApp
         confirm_arrival: :confirm_arrival_check,
         can_load: :can_load_check,
         can_mark_as_loaded: :can_mark_as_loaded_check,
-        can_offload: :can_offload_check
+        can_offload: :can_offload_check,
+        units: :units_check
       }.freeze
 
       def call
@@ -106,6 +107,12 @@ module PackMaterialApp
 
       def confirm_arrival_check
         return failed_response 'User is not allowed to confirm arrival of Tripsheets' unless can_user_confirm_arrival?
+
+        all_ok
+      end
+
+      def units_check
+        return failed_response 'Tripsheet has no units' if no_units?
 
         all_ok
       end

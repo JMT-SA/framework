@@ -45,6 +45,9 @@ module PackMaterialApp
     def find_vehicle_job(id)
       find_with_association(:vehicle_jobs, id,
                             wrapper: VehicleJob,
+                            lookup_functions: [{ function: :fn_current_status,
+                                                 args: ['vehicle_jobs', :id],
+                                                 col_name: :status }],
                             parent_tables: [
                               { parent_table: :business_processes, foreign_key: :business_process_id, flatten_columns: { process: :process } },
                               { parent_table: :vehicles, foreign_key: :vehicle_id, flatten_columns: { vehicle_code: :vehicle_code } },
@@ -57,6 +60,9 @@ module PackMaterialApp
     def find_vehicle_job_unit(id)
       find_with_association(:vehicle_job_units, id,
                             wrapper: VehicleJobUnit,
+                            lookup_functions: [{ function: :fn_current_status,
+                                                 args: ['vehicle_job_units', :id],
+                                                 col_name: :status }],
                             parent_tables: [
                               { parent_table: :vehicle_jobs, foreign_key: :vehicle_job_id, flatten_columns: { tripsheet_number: :tripsheet_number } },
                               { parent_table: :locations, foreign_key: :location_id, flatten_columns: { location_long_code: :from_location_long_code } }

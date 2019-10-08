@@ -28,8 +28,9 @@ NewThingSchema = Dry::Validation.Params do
   required(:active, :bool).filled(:bool?)
   required(:multiselected_ids, Types::IntArray).filled { each(:int?) }
 end
-
 ----
+
+NOTE: For date/time that can be blank, you should explicitly specify the coercion to `nil`. e.g. `required(:completed_date, [:nil, :date]).maybe(:date?)`
 
 === Special types
 
@@ -112,6 +113,14 @@ e.g. `{ col: 'some_value' }`
 |Integer
 |`optional(:col, :integer).maybe(:int?)`
 |`{}`
+
+|Y
+|N
+|Date
+|`optional(:col, [:nil, :date]).maybe(:date?)`
+a|`{col: ''}`
+`{col: '2019-01-01'}`
+`{col: nil}`
 
 |Y
 |Y (length > 0)

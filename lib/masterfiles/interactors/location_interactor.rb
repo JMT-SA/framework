@@ -210,6 +210,11 @@ module MasterfilesApp
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_LOCATION_BARCODE, instance, params)
     end
 
+    def preview_location_barcode(id)
+      instance = location(id)
+      LabelPrintingApp::PreviewLabel.call(AppConst::LABEL_LOCATION_BARCODE, instance)
+    end
+
     private
 
     def repo

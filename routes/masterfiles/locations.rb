@@ -97,6 +97,20 @@ class Framework < Roda
         end
       end
 
+      r.on 'preview_barcode' do # BARCODE
+        res = interactor.preview_location_barcode(id)
+        if res.success
+          filepath = Tempfile.open([res.instance.fname, '.png'], 'public/tempfiles') do |f|
+            f.write(res.instance.body)
+            f.path
+          end
+          File.chmod(0o644, filepath) # Ensure web app can read the image.
+          update_dialog_content(content: "<div style='border:2px solid orange'><img src='/#{File.join('tempfiles', File.basename(filepath))}'>i</div>")
+        else
+          { flash: { error: res.message } }.to_json
+        end
+      end
+
       r.on 'primary_storage_type_changed' do
         res = interactor.location_short_code_suggestion(params[:changed_value])
         json_replace_input_value('location_location_short_code', res.success ? res.instance : nil)

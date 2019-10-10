@@ -14,7 +14,6 @@ module PackMaterialApp
       mr_inventory_transaction_item_id = create_mr_inventory_transaction_item
 
       default = {
-        mr_sku_location_from_id: location_id,
         mr_inventory_transaction_item_id: mr_inventory_transaction_item_id,
         vehicle_job_id: Faker::Number.number,
         quantity_to_move: Faker::Number.decimal,
@@ -27,7 +26,7 @@ module PackMaterialApp
         updated_at: '2010-01-01 12:00',
         mr_sku_id: Faker::Number.number,
         sku_number: Faker::Number.number,
-        location_id: Faker::Number.number,
+        location_id: location_id,
         when_loading: '2010-01-01 12:00'
       }
       DB[:vehicle_job_units].insert(default.merge(opts))

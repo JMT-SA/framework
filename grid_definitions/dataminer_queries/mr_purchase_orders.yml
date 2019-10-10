@@ -1,11 +1,26 @@
 ---
 :caption: Purchase Orders
-:sql: "SELECT \"mr_purchase_orders\".\"id\",\r\n\"mr_purchase_orders\".\"mr_delivery_term_id\",\r\n\"mr_purchase_orders\".\"approved\",\r\n\"mr_purchase_orders\".\"deliveries_received\",\r\n\"mr_purchase_orders\".\"supplier_party_role_id\",\r\n\"mr_purchase_orders\".\"mr_vat_type_id\",\r\n\"mr_purchase_orders\".\"delivery_address_id\",\r\n\"mr_purchase_orders\".\"purchase_account_code\",\r\n\"mr_purchase_orders\".\"fin_object_code\",\r\n\"mr_purchase_orders\".\"valid_until\",\r\n\"mr_purchase_orders\".\"purchase_order_number\",\r\n\"mr_purchase_orders\".\"remarks\",\r\n\"mr_purchase_orders\".\"created_at\",\r\n\"mr_purchase_orders\".\"updated_at\",\r\n\"addresses\".\"address_line_1\",\r\n\"mr_delivery_terms\".\"delivery_term_code\",\r\n\"mr_vat_types\".\"vat_type_code\",\r\nfn_party_role_name(\"mr_purchase_orders\".\"supplier_party_role_id\")
-  AS supplier_party_role,\r\ncase\r\n  when (mr_purchase_orders.approved and not mr_purchase_orders.deliveries_received)
-  then 'inprogress'\r\n  else null\r\n  end as colour_rule\r\nFROM \"mr_purchase_orders\"
-  LEFT JOIN \"addresses\" ON \"addresses\".\"id\" = \"mr_purchase_orders\".\"delivery_address_id\"
-  LEFT JOIN \"mr_delivery_terms\" ON \"mr_delivery_terms\".\"id\" = \"mr_purchase_orders\".\"mr_delivery_term_id\"
-  LEFT JOIN \"mr_vat_types\" ON \"mr_vat_types\".\"id\" = \"mr_purchase_orders\".\"mr_vat_type_id\""
+:sql: "SELECT \"mr_purchase_orders\".\"id\",\r\n       \"mr_purchase_orders\".\"supplier_party_role_id\",\r\n
+  \      fn_party_role_name(\"mr_purchase_orders\".\"supplier_party_role_id\") AS
+  supplier_party_role,\r\n       \"mr_purchase_orders\".\"purchase_order_number\",\r\n
+  \      \"mr_purchase_orders\".\"valid_until\",\r\n       \"mr_purchase_orders\".\"approved\",\r\n
+  \      \"mr_purchase_orders\".\"deliveries_received\",\r\n       (SELECT string_agg(delivery_number::text,
+  ';')\r\n       from (select mr_deliveries.delivery_number\r\n           from mr_deliveries\r\n
+  \          join mr_delivery_items mdi on mr_deliveries.id = mdi.mr_delivery_id\r\n
+  \          join mr_purchase_order_items mpoi on mdi.mr_purchase_order_item_id =
+  mpoi.id\r\n           where mr_purchase_orders.id = mpoi.mr_purchase_order_id) sub)
+  as del_nos,\r\n       \"mr_purchase_orders\".\"remarks\",\r\n       \"mr_purchase_orders\".\"mr_vat_type_id\",\r\n
+  \      \"mr_vat_types\".\"vat_type_code\",\r\n       \"mr_purchase_orders\".\"purchase_account_code\",\r\n
+  \      \"mr_purchase_orders\".\"fin_object_code\",\r\n       \"mr_purchase_orders\".\"delivery_address_id\",\r\n
+  \      \"addresses\".\"address_line_1\",\r\n       \"mr_purchase_orders\".\"mr_delivery_term_id\",\r\n
+  \      \"mr_delivery_terms\".\"delivery_term_code\",\r\n       \"mr_purchase_orders\".\"created_at\",\r\n
+  \      \"mr_purchase_orders\".\"updated_at\",\r\n       case\r\n           when
+  (mr_purchase_orders.approved and not mr_purchase_orders.deliveries_received) then
+  'inprogress'\r\n           else null\r\n           end as colour_rule\r\nFROM \"mr_purchase_orders\"\r\n
+  \        LEFT JOIN \"addresses\" ON \"addresses\".\"id\" = \"mr_purchase_orders\".\"delivery_address_id\"\r\n
+  \        LEFT JOIN \"mr_delivery_terms\" ON \"mr_delivery_terms\".\"id\" = \"mr_purchase_orders\".\"mr_delivery_term_id\"\r\n
+  \        LEFT JOIN \"mr_vat_types\" ON \"mr_vat_types\".\"id\" = \"mr_purchase_orders\".\"mr_vat_type_id\"\r\norder
+  by \"mr_purchase_orders\".purchase_order_number"
 :limit: 
 :offset: 
 :external_settings:
@@ -28,57 +43,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  mr_delivery_term_id:
-    :name: mr_delivery_term_id
-    :sequence_no: 2
-    :caption: delivery term
-    :namespaced_name: mr_purchase_orders.mr_delivery_term_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  approved:
-    :name: approved
-    :sequence_no: 3
-    :caption: Approved
-    :namespaced_name: mr_purchase_orders.approved
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  deliveries_received:
-    :name: deliveries_received
-    :sequence_no: 4
-    :caption: Deliveries received
-    :namespaced_name: mr_purchase_orders.deliveries_received
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   supplier_party_role_id:
     :name: supplier_party_role_id
-    :sequence_no: 5
+    :sequence_no: 2
     :caption: Supplier party role
     :namespaced_name: mr_purchase_orders.supplier_party_role_id
     :data_type: :integer
@@ -92,9 +59,121 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  supplier_party_role:
+    :name: supplier_party_role
+    :sequence_no: 3
+    :caption: Supplier
+    :namespaced_name: 
+    :data_type: :string
+    :width: 180
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  purchase_order_number:
+    :name: purchase_order_number
+    :sequence_no: 4
+    :caption: 'No'
+    :namespaced_name: mr_purchase_orders.purchase_order_number
+    :data_type: :integer
+    :width: 60
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  valid_until:
+    :name: valid_until
+    :sequence_no: 5
+    :caption: Valid until
+    :namespaced_name: mr_purchase_orders.valid_until
+    :data_type: :datetime
+    :width: 180
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  approved:
+    :name: approved
+    :sequence_no: 6
+    :caption: Approved
+    :namespaced_name: mr_purchase_orders.approved
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  deliveries_received:
+    :name: deliveries_received
+    :sequence_no: 7
+    :caption: Deliveries received
+    :namespaced_name: mr_purchase_orders.deliveries_received
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  del_nos:
+    :name: del_nos
+    :sequence_no: 8
+    :caption: Del nos
+    :namespaced_name: 
+    :data_type: :string
+    :width: 130
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 9
+    :caption: Remarks
+    :namespaced_name: mr_purchase_orders.remarks
+    :data_type: :string
+    :width: 250
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   mr_vat_type_id:
     :name: mr_vat_type_id
-    :sequence_no: 6
+    :sequence_no: 10
     :caption: Vat Type
     :namespaced_name: mr_purchase_orders.mr_vat_type_id
     :data_type: :integer
@@ -108,9 +187,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  vat_type_code:
+    :name: vat_type_code
+    :sequence_no: 11
+    :caption: VAT
+    :namespaced_name: mr_vat_types.vat_type_code
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  purchase_account_code:
+    :name: purchase_account_code
+    :sequence_no: 12
+    :caption: ACC
+    :namespaced_name: mr_purchase_orders.purchase_account_code
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fin_object_code:
+    :name: fin_object_code
+    :sequence_no: 13
+    :caption: FIN Code
+    :namespaced_name: mr_purchase_orders.fin_object_code
+    :data_type: :string
+    :width: 110
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   delivery_address_id:
     :name: delivery_address_id
-    :sequence_no: 7
+    :sequence_no: 14
     :caption: Delivery address
     :namespaced_name: mr_purchase_orders.delivery_address_id
     :data_type: :integer
@@ -124,13 +251,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  purchase_account_code:
-    :name: purchase_account_code
-    :sequence_no: 8
-    :caption: Purchase account code
-    :namespaced_name: mr_purchase_orders.purchase_account_code
+  address_line_1:
+    :name: address_line_1
+    :sequence_no: 15
+    :caption: Address
+    :namespaced_name: addresses.address_line_1
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -140,65 +267,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  fin_object_code:
-    :name: fin_object_code
-    :sequence_no: 9
-    :caption: Fin object code
-    :namespaced_name: mr_purchase_orders.fin_object_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  valid_until:
-    :name: valid_until
-    :sequence_no: 10
-    :caption: Valid until
-    :namespaced_name: mr_purchase_orders.valid_until
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  purchase_order_number:
-    :name: purchase_order_number
-    :sequence_no: 11
-    :caption: PO Number
-    :namespaced_name: mr_purchase_orders.purchase_order_number
+  mr_delivery_term_id:
+    :name: mr_delivery_term_id
+    :sequence_no: 16
+    :caption: delivery term
+    :namespaced_name: mr_purchase_orders.mr_delivery_term_id
     :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  remarks:
-    :name: remarks
-    :sequence_no: 12
-    :caption: Remarks
-    :namespaced_name: mr_purchase_orders.remarks
+  delivery_term_code:
+    :name: delivery_term_code
+    :sequence_no: 17
+    :caption: Del Term
+    :namespaced_name: mr_delivery_terms.delivery_term_code
     :data_type: :string
-    :width: 
+    :width: 110
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -206,7 +301,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 13
+    :sequence_no: 18
     :caption: Created at
     :namespaced_name: mr_purchase_orders.created_at
     :data_type: :datetime
@@ -222,7 +317,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 14
+    :sequence_no: 19
     :caption: Updated at
     :namespaced_name: mr_purchase_orders.updated_at
     :data_type: :datetime
@@ -236,73 +331,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  address_line_1:
-    :name: address_line_1
-    :sequence_no: 15
-    :caption: Address line 1
-    :namespaced_name: addresses.address_line_1
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  delivery_term_code:
-    :name: delivery_term_code
-    :sequence_no: 16
-    :caption: Delivery term code
-    :namespaced_name: mr_delivery_terms.delivery_term_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  vat_type_code:
-    :name: vat_type_code
-    :sequence_no: 17
-    :caption: Vat type code
-    :namespaced_name: mr_vat_types.vat_type_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  supplier_party_role:
-    :name: supplier_party_role
-    :sequence_no: 18
-    :caption: Supplier party role
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -353,6 +384,14 @@
 - :column: mr_purchase_orders.purchase_order_number
   :caption: Purchase order number
   :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: mr_purchase_orders.deliveries_received
+  :caption: Received
+  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: false

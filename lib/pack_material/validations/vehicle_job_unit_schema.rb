@@ -2,22 +2,31 @@
 
 module PackMaterialApp
   NewVehicleJobUnitSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
+    configure do
+      config.type_specs = true
+
+      def self.messages
+        super.merge(en: { errors: { valid_quantity: 'Quantity to move must be less than or equal to available quantity' } })
+      end
+    end
 
     optional(:id, :integer).filled(:int?)
-    required(:mr_sku_location_from_id, :integer).maybe(:int?)
     required(:vehicle_job_id, :integer).maybe(:int?)
-    required(:quantity_to_move, :decimal).maybe(:decimal?)
+    required(:available_quantity, :decimal).maybe(:decimal?, gt?: 0)
+    required(:quantity_to_move, :decimal).maybe(:decimal?, gt?: 0)
     required(:mr_sku_id, :integer).maybe(:int?)
     # required(:sku_number, :integer).maybe(:int?)
     required(:location_id, :integer).maybe(:int?)
+
+    validate(valid_quantity: %i[available_quantity quantity_to_move]) do |available_quantity, quantity_to_move|
+      available_quantity >= quantity_to_move
+    end
   end
 
   VehicleJobUnitSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:mr_sku_location_from_id, :integer).maybe(:int?)
     required(:vehicle_job_id, :integer).maybe(:int?)
     required(:quantity_to_move, :decimal).maybe(:decimal?)
     required(:when_loaded, :date_time).maybe(:date_time?)

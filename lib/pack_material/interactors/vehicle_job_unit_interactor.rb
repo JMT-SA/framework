@@ -9,7 +9,10 @@ module PackMaterialApp
 
       id = nil
       repo.transaction do
-        id = repo.create_vehicle_job_unit(res)
+        res = repo.create_vehicle_job_unit(res)
+        raise Crossbeams::InfoError, res.message unless res.success
+
+        id = res.instance
         log_status('vehicle_job_units', id, 'CREATED')
         log_transaction
       end

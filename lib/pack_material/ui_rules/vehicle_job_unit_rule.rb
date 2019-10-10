@@ -23,7 +23,6 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:mr_sku_location_from_id] = { renderer: :hidden }
       fields[:vehicle_job_id] = { renderer: :label, with_value: @form_object.tripsheet_number }
       fields[:quantity_to_move] = { renderer: :label }
       fields[:quantity_loaded] = { renderer: :label }
@@ -46,13 +45,14 @@ module UiRules
           caption: 'Select SKU Location',
           param_values: { vehicle_job_id: vehicle_job_id }
         },
-        mr_sku_location_from_id: { renderer: :hidden },
         vehicle_job_id: { renderer: :hidden },
+        available_quantity: { renderer: :hidden },
+        show_available_quantity: { readonly: true, caption: 'Available Quantity' },
         quantity_to_move: { renderer: :numeric, required: true },
         mr_sku_id: { renderer: :hidden },
-        sku_number: { readonly: true, required: true },
+        sku_number: { readonly: true, caption: 'SKU Number' },
         location_id: { renderer: :hidden },
-        location_code: { readonly: true, required: true }
+        location_code: { readonly: true }
       }
     end
 
@@ -77,8 +77,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(mr_sku_location_from_id: nil,
-                                    vehicle_job_id: @options[:parent_id],
+      @form_object = OpenStruct.new(vehicle_job_id: @options[:parent_id],
                                     quantity_to_move: nil,
                                     when_loaded: nil,
                                     when_offloaded: nil,
@@ -87,6 +86,8 @@ module UiRules
                                     quantity_offloaded: nil,
                                     mr_sku_id: nil,
                                     sku_number: nil,
+                                    show_available_quantity: nil,
+                                    available_quantity: nil,
                                     location_id: nil,
                                     when_loading: nil)
     end

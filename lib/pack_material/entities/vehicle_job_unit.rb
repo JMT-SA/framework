@@ -3,7 +3,6 @@
 module PackMaterialApp
   class VehicleJobUnit < Dry::Struct
     attribute :id, Types::Integer
-    attribute :mr_sku_location_from_id, Types::Integer
     attribute :vehicle_job_id, Types::Integer
     attribute :quantity_to_move, Types::Decimal
     attribute :when_loaded, Types::DateTime

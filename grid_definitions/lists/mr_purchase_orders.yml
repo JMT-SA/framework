@@ -20,3 +20,18 @@
   :url: "/pack_material/replenish/mr_purchase_orders/preselect"
   :text: New Purchase Order
   :style: :button
+  :hide_for_key:
+    - completed
+:conditions:
+  :incomplete:
+    - :col: mr_purchase_orders.deliveries_received
+      :op: =
+      :val: false
+  :completed:
+    - :col: mr_purchase_orders.deliveries_received
+      :op: =
+      :val: true
+:captions:
+  :conditions:
+    :incomplete: Purchase Orders
+    :completed: Completed Purchase Orders

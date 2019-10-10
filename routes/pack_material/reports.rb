@@ -130,7 +130,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       res = CreateJasperReport.call(report_name: 'tripsheet',
                                     user: current_user.login_name,
                                     file: 'tripsheet',
-                                    params: { vehicle_id: id,
+                                    params: { vehicle_job_id: id,
                                               keep_file: true })
       if res.success
         change_window_location_via_json(res.instance, request.path)

@@ -15,20 +15,25 @@ INSERT INTO program_functions (program_id, program_function_name, group_name, ur
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
                                        AND functional_area_id = (SELECT id FROM functional_areas
 WHERE functional_area_name = 'Pack Material')),
-        'New Purchase Order', 'Purchase Orders', '/pack_material/replenish/mr_purchase_orders/preselect', 1);
+        'New Purchase Order', 'Purchase Order', '/pack_material/replenish/mr_purchase_orders/preselect', 1);
+--
+-- INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
+-- VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
+--                                        AND functional_area_id = (SELECT id FROM functional_areas
+-- WHERE functional_area_name = 'Pack Material')),
+--         'Search Purchase Orders', 'Purchase Order', '/search/mr_purchase_orders', 1);
 
 INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
-                                       AND functional_area_id = (SELECT id FROM functional_areas
-WHERE functional_area_name = 'Pack Material')),
-        'Purchase Orders', 'Purchase Orders', '/list/mr_purchase_orders', 2);
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'Pack Material')),
+        'Purchase Orders', 'Purchase Order', '/list/mr_purchase_orders/with_params?key=incomplete', 2);
 
 INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
-                                       AND functional_area_id = (SELECT id FROM functional_areas
-WHERE functional_area_name = 'Pack Material')),
-        'Search Purchase Orders', 'Purchase Orders', '/search/mr_purchase_orders', 2);
-
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'Pack Material')),
+        'Completed Purchase Orders', 'Purchase Order', '/list/mr_purchase_orders/with_params?key=completed', 3);
 
 -- Delivery Terms
 INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)

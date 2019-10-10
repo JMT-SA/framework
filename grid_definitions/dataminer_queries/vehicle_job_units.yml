@@ -4,13 +4,16 @@
   \      \"vehicle_job_units\".\"mr_sku_id\",\r\n       \"vehicle_job_units\".\"location_id\",\r\n
   \      fn_current_status('vehicle_job_units', \"vehicle_job_units\".\"id\") AS status,\r\n
   \      \"vehicle_job_units\".\"sku_number\",\r\n       locations.location_short_code
-  as from_location_short_code,\r\n       \"vehicle_job_units\".\"quantity_to_move\",\r\n
-  \      \"vehicle_job_units\".\"quantity_loaded\",\r\n       \"vehicle_job_units\".\"when_loading\",\r\n
-  \      \"vehicle_job_units\".\"when_loaded\",\r\n       \"vehicle_job_units\".\"loaded\",\r\n
-  \      \"vehicle_job_units\".\"quantity_offloaded\",\r\n       \"vehicle_job_units\".\"when_offloading\",\r\n
-  \      \"vehicle_job_units\".\"when_offloaded\",\r\n       \"vehicle_job_units\".\"offloaded\",\r\n
-  \      \"vehicle_job_units\".\"created_at\",\r\n       \"vehicle_job_units\".\"updated_at\"\r\nFROM
-  \"vehicle_job_units\"\r\njoin locations on locations.id = vehicle_job_units.location_id"
+  as from_location_short_code,\r\n\"material_resource_product_variants\".\"product_variant_code\",\r\n
+  \      \"vehicle_job_units\".\"quantity_to_move\",\r\n       \"vehicle_job_units\".\"quantity_loaded\",\r\n
+  \      \"vehicle_job_units\".\"when_loading\",\r\n       \"vehicle_job_units\".\"when_loaded\",\r\n
+  \      \"vehicle_job_units\".\"loaded\",\r\n       \"vehicle_job_units\".\"quantity_offloaded\",\r\n
+  \      \"vehicle_job_units\".\"when_offloading\",\r\n       \"vehicle_job_units\".\"when_offloaded\",\r\n
+  \      \"vehicle_job_units\".\"offloaded\",\r\n       \"vehicle_job_units\".\"created_at\",\r\n
+  \      \"vehicle_job_units\".\"updated_at\"\r\nFROM \"vehicle_job_units\"\r\njoin
+  locations on locations.id = vehicle_job_units.location_id\r\njoin mr_skus on mr_skus.id
+  = \"vehicle_job_units\".\"mr_sku_id\"\r\nJOIN \"material_resource_product_variants\"
+  ON \"mr_skus\".\"mr_product_variant_id\" = \"material_resource_product_variants\".\"id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -117,7 +120,23 @@
     :caption: From Loc SC
     :namespaced_name: locations.location_short_code
     :data_type: :string
-    :width: 
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_code:
+    :name: product_variant_code
+    :sequence_no: 8
+    :caption: Product variant code
+    :namespaced_name: material_resource_product_variants.product_variant_code
+    :data_type: :string
+    :width: 240
     :format: 
     :hide: false
     :pinned: 
@@ -129,7 +148,7 @@
     :group_max: false
   quantity_to_move:
     :name: quantity_to_move
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Qty to move
     :namespaced_name: vehicle_job_units.quantity_to_move
     :data_type: :number
@@ -145,7 +164,7 @@
     :group_max: false
   quantity_loaded:
     :name: quantity_loaded
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Qty loaded
     :namespaced_name: vehicle_job_units.quantity_loaded
     :data_type: :number
@@ -161,7 +180,7 @@
     :group_max: false
   when_loading:
     :name: when_loading
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: When loading
     :namespaced_name: vehicle_job_units.when_loading
     :data_type: :datetime
@@ -177,7 +196,7 @@
     :group_max: false
   when_loaded:
     :name: when_loaded
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: When loaded
     :namespaced_name: vehicle_job_units.when_loaded
     :data_type: :datetime
@@ -193,7 +212,7 @@
     :group_max: false
   loaded:
     :name: loaded
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Loaded
     :namespaced_name: vehicle_job_units.loaded
     :data_type: :boolean
@@ -209,7 +228,7 @@
     :group_max: false
   quantity_offloaded:
     :name: quantity_offloaded
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Qty offloaded
     :namespaced_name: vehicle_job_units.quantity_offloaded
     :data_type: :number
@@ -225,7 +244,7 @@
     :group_max: false
   when_offloading:
     :name: when_offloading
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: When offloading
     :namespaced_name: vehicle_job_units.when_offloading
     :data_type: :datetime
@@ -241,7 +260,7 @@
     :group_max: false
   when_offloaded:
     :name: when_offloaded
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: When offloaded
     :namespaced_name: vehicle_job_units.when_offloaded
     :data_type: :datetime
@@ -257,7 +276,7 @@
     :group_max: false
   offloaded:
     :name: offloaded
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Offloaded
     :namespaced_name: vehicle_job_units.offloaded
     :data_type: :boolean
@@ -273,7 +292,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Created at
     :namespaced_name: vehicle_job_units.created_at
     :data_type: :datetime
@@ -289,7 +308,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Updated at
     :namespaced_name: vehicle_job_units.updated_at
     :data_type: :datetime

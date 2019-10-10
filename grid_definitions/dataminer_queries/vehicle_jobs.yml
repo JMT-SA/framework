@@ -24,7 +24,7 @@
   planned_locations ON planned_locations.\"id\" = \"vehicle_jobs\".\"planned_location_id\"\r\n
   \        LEFT JOIN \"locations\" virtual_locations ON virtual_locations.\"id\" =
   \"vehicle_jobs\".\"virtual_location_id\"\r\n         LEFT JOIN \"vehicles\" ON \"vehicles\".\"id\"
-  = \"vehicle_jobs\".\"vehicle_id\""
+  = \"vehicle_jobs\".\"vehicle_id\"\r\nORDER BY id"
 :limit: 
 :offset: 
 :external_settings: {}

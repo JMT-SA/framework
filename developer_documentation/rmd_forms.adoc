@@ -69,6 +69,10 @@ a|AJAX behaviours.
 |tag
 |Adds CSRF tag to the form.
 
+|add_prev_next_nav
+|url (String), ids (Array), current_id (Integer), options (Hash)
+|Adds buttons for previous and next navigation based on a list of ids and a url.
+
 |render
 |
 |Renders the form
@@ -183,6 +187,11 @@ form.add_field(:from_location, 'From location', scan: 'key248_all',
 |The datatype of the input (`text`, `date`, `number` etc.)
 |String
 |`text`
+
+|options - :force_uppercase
+|Should typed in values be forced to uppercase? **NB** This only applies to typed-in text, not scanned-in text.
+|Boolean
+|`false`
 
 |options - :width
 |The width in `rem` of the input field.
@@ -329,6 +338,49 @@ a|Should the field be hidden when the form loads - typically to be shown later v
 Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{field_name}_row`.
 |Boolean
 |`false`
+
+|===
+
+=== Method: add_prev_next_nav
+
+Adds previous and next buttons to move forward or backward through a list of ids.
+
+NOTE: The list of ids must always be in a consistent order every time the action is called.
+
+[source,ruby]
+----
+form.prev_next_nav('/path/to/resource/$:id$', [1, 2, 3, 4], 3, prev_caption: 'Before')
+# Prev link will have href /path/to/resource/2
+# Next link will have href /path/to/resource/4
+----
+
+|===
+|attribute |description |possible values |default
+
+|url
+|The url to base navigation on. It must include `$:id$` in a position that requires a relevant id.
+|String
+|None. Required.
+
+|ids
+|The sequence of id that can be navigated.
+|Array of Integers
+|None. Required.
+
+|current_id
+|The id from the URL that represents the current page.
+|Integer
+|None. Required.
+
+|options - :prev_caption
+|The caption to display on the previous button (instead of "Previous")
+|String
+|`Previous`
+
+|options - :next_caption
+|The caption to display on the next button (instead of "Next")
+|String
+|`Next`
 
 |===
 

@@ -62,7 +62,7 @@ module Crossbeams
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
-        <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
+        <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}#{field_upper_class(options)}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}#{attr_upper(options)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
     end
@@ -139,6 +139,38 @@ module Crossbeams
     # @return [void]
     def add_csrf_tag(value)
       @csrf_tag = value
+    end
+
+    # Render "previous" and "next" buttons.
+    #
+    # @param url [String] the url with "$:id$" in the place to put the next/prev id.
+    # @param ids [Array] the id numbers in desired sequence.
+    # @param current_id [Integer] the id in the URL of the current page.
+    # @param options (Hash) options for the navigation buttons.
+    # @option options [String] :prev_caption The caption to show on the previous button. Default "Previous"
+    # @option options [String] :next_caption The caption to show on the next button. Default "Next"
+    # @return [void]
+    def add_prev_next_nav(url, ids, current_id, options = {}) # rubocop:disable Metrics/AbcSize
+      curr_index = ids.index(current_id)
+      have_prev = curr_index.positive?
+      have_next = curr_index < ids.length - 1
+      p_caption = options[:prev_caption] || 'Previous'
+      n_caption = options[:next_caption] || 'Next'
+      prev = if have_prev
+               %(<a href="#{url.sub('$:id$', ids[curr_index - 1].to_s)}" class="dim link br2 pa2 bn white bg-dark-blue">&laquo; #{p_caption}</a>)
+             else
+               '&nbsp;'
+             end
+      nex = if have_next
+              %(<a href="#{url.sub('$:id$', ids[curr_index + 1].to_s)}" class="dim link br2 pa2 bn white bg-dark-blue">#{n_caption} &raquo;</a>)
+            else
+              '&nbsp;'
+            end
+      @fields << <<~HTML
+        <tr>
+        <td class="pa2">#{prev}</td><td class="pa2">#{nex}</td>
+        </tr>
+      HTML
     end
 
     def behaviours
@@ -339,6 +371,18 @@ module Crossbeams
       return '' unless val
 
       ' bg-washed-red'
+    end
+
+    def field_upper_class(options)
+      return '' unless options[:force_uppercase]
+
+      ' cbl-to-upper'
+    end
+
+    def attr_upper(options)
+      return '' unless options[:force_uppercase]
+
+      %{ onblur="this.value = this.value.toUpperCase()"}
     end
 
     def error_section

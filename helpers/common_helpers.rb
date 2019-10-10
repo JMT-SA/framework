@@ -624,4 +624,17 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     port = request.port == '80' || request.port.nil? ? '' : ":#{request.port}"
     "http://#{request.host}#{port}/webquery/#{report_id}"
   end
+
+  # Take a Crossbeams::Response and present it as an error message.
+  # For a validation error, the errors are listed in the returned message.
+  #
+  # @param res [Crossbeams::Response] the response object.
+  # @return [String] the formatted message.
+  def unwrap_failed_response(res)
+    if res.errors.empty?
+      res.message
+    else
+      "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}"
+    end
+  end
 end

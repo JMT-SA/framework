@@ -100,7 +100,9 @@ module PackMaterialApp
 
     def create_vehicle_job_unit(attrs)
       new_attrs = {
-        sku_number: DB[:mr_skus].where(id: DB[:mr_sku_locations].where(id: attrs[:mr_sku_location_from_id]).get(:mr_sku_id)).get(:sku_number)
+        sku_number: DB[:mr_skus].where(
+          id: attrs[:mr_sku_id]
+        ).get(:sku_number)
       }
       create(:vehicle_job_units, new_attrs.merge(attrs))
     end

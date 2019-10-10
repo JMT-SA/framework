@@ -17,7 +17,6 @@ module PackMaterial
               form.action "/pack_material/tripsheets/vehicle_jobs/#{parent_id}/vehicle_job_units"
               form.remote! if remote
               form.add_field :sku_location_lookup
-              form.add_field :mr_sku_location_from_id
               form.add_field :vehicle_job_id
               form.add_field :mr_sku_id
               form.add_field :sku_number

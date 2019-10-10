@@ -13,7 +13,6 @@ module PackMaterial
             page.form do |form|
               # form.caption 'Tripsheet Item'
               form.view_only!
-              form.add_field :mr_sku_location_from_id
               form.add_field :vehicle_job_id
               form.add_field :mr_sku_id
               form.add_field :sku_number

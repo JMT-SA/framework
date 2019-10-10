@@ -213,7 +213,6 @@ class Framework < Roda
           if res.success
             row_keys = %i[
               id
-              mr_sku_location_from_id
               vehicle_job_id
               quantity_to_move
               when_loaded
@@ -377,7 +376,6 @@ class Framework < Roda
           res = interactor.update_vehicle_job_unit(id, params[:vehicle_job_unit])
           if res.success
             row_keys = %i[
-              mr_sku_location_from_id
               vehicle_job_id
               quantity_to_move
               when_loaded

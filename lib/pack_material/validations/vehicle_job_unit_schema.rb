@@ -5,7 +5,6 @@ module PackMaterialApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:mr_sku_location_from_id, :integer).maybe(:int?)
     required(:vehicle_job_id, :integer).maybe(:int?)
     required(:quantity_to_move, :decimal).maybe(:decimal?)
     required(:mr_sku_id, :integer).maybe(:int?)
@@ -17,7 +16,6 @@ module PackMaterialApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:mr_sku_location_from_id, :integer).maybe(:int?)
     required(:vehicle_job_id, :integer).maybe(:int?)
     required(:quantity_to_move, :decimal).maybe(:decimal?)
     required(:when_loaded, :date_time).maybe(:date_time?)

@@ -230,10 +230,11 @@ class Framework < Roda
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
           else
+            form_errors = move_validation_errors_to_base(res.errors, :valid_quantity)
             re_show_form(r, res, url: "/pack_material/tripsheets/vehicle_jobs/#{id}/vehicle_job_units/new") do
               PackMaterial::Tripsheets::VehicleJobUnit::New.call(id,
                                                                  form_values: params[:vehicle_job_unit],
-                                                                 form_errors: res.errors,
+                                                                 form_errors: form_errors,
                                                                  remote: fetch?(r))
             end
           end
@@ -267,15 +268,18 @@ class Framework < Roda
                       OpenStruct.new(type: :change_select_value,
                                      dom_id: 'vehicle_job_unit_sku_number',
                                      value: result_hash[:sku_number]),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'vehicle_job_unit_available_quantity',
+                                     value: result_hash[:available_quantity]),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'vehicle_job_unit_show_available_quantity',
+                                     value: UtilityFunctions.delimited_number(result_hash[:available_quantity])),
                       OpenStruct.new(type: :change_select_value,
                                      dom_id: 'vehicle_job_unit_location_code',
                                      value: result_hash[:location_code]),
                       OpenStruct.new(type: :change_select_value,
                                      dom_id: 'vehicle_job_unit_location_id',
-                                     value: result_hash[:location_id]),
-                      OpenStruct.new(type: :change_select_value,
-                                     dom_id: 'vehicle_job_unit_mr_sku_location_from_id',
-                                     value: result_hash[:mr_sku_location_id])],
+                                     value: result_hash[:location_id])],
                      'Selected a SKU Location')
       end
       r.on 'link_mr_skus', Integer do |id|

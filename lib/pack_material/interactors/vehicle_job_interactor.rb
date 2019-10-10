@@ -175,7 +175,7 @@ module PackMaterialApp
         res = repo.rmd_offload_vehicle_unit(attrs[:sku_id], attrs[:qty], attrs[:location_id], job_id)
         raise Crossbeams::InfoError, res.message unless res.success
 
-        unit = res.instance[:unit]
+        units = res.instance[:units]
         vehicle_job = res.instance[:vehicle_job]
         res = PackMaterialApp::MoveMrStock.call(attrs[:sku_id],
                                                 attrs[:location_id],
@@ -187,9 +187,11 @@ module PackMaterialApp
                                                 transaction_type: 'offload')
         raise Crossbeams::InfoError, res.message unless res.success
 
-        log_status('vehicle_job_units', unit[:id], unit[:offloaded] ? 'OFFLOADED' : 'OFFLOADING')
+        units.each do |unit_hash|
+          log_status('vehicle_job_units', unit_hash[:id], unit_hash[:offloaded] ? 'OFFLOADED' : 'OFFLOADING')
+        end
         log_status('vehicle_jobs', job_id, vehicle_job[:offloaded] ? 'OFFLOADED' : 'OFFLOADING')
-        html_report = html_vehicle_offload_progress_report(job_id, attrs[:sku_id], attrs[:location_id])
+        html_report = html_vehicle_offload_progress_report(job_id, attrs[:location_id], attrs[:sku_id])
         success_response('Successful vehicle unit offload', OpenStruct.new(vehicle_job_id: job_id, report: html_report))
       end
     rescue Crossbeams::InfoError => e
@@ -261,27 +263,27 @@ module PackMaterialApp
       VehicleJobUnitLoadingSchema.call(params)
     end
 
-    def html_vehicle_load_progress_report(vehicle_job_id, sku_id, location_id)
-      inst = repo.vehicle_load_progress_report(vehicle_job_id, sku_id, location_id)
+    def html_vehicle_load_progress_report(vehicle_job_id, sku_id, from_loc_id)
+      inst = repo.load_progress_report(vehicle_job_id, sku_id, from_loc_id)
       <<~HTML
         Tripsheet (#{inst[:tripsheet_number]}): #{inst[:done_loading]} of #{inst[:total_units]} units.<br>
         Last scan:<br>
         LOC: #{inst[:location_code]}<br>
         SKU (#{inst[:sku_number]}): #{inst[:product_variant_code]}<br>
-        Qty To Move: #{UtilityFunctions.delimited_number(inst[:unit][:quantity_to_move])}<br>
-        Qty Loaded: #{UtilityFunctions.delimited_number(inst[:unit][:quantity_loaded])}<br>
+        Qty To Move: #{UtilityFunctions.delimited_number(inst[:quantity_to_move])}<br>
+        Qty Loaded: #{UtilityFunctions.delimited_number(inst[:quantity_loaded])}<br>
       HTML
     end
 
-    def html_vehicle_offload_progress_report(vehicle_job_id, sku_id, location_id)
-      inst = repo.vehicle_load_progress_report(vehicle_job_id, sku_id, location_id)
+    def html_vehicle_offload_progress_report(vehicle_job_id, to_location_id, sku_id)
+      inst = repo.offload_progress_report(vehicle_job_id, to_location_id, sku_id)
       <<~HTML
         Tripsheet (#{inst[:tripsheet_number]}): #{inst[:done_offloading]} of #{inst[:total_units]} units.<br>
         Last scan:<br>
         LOC: #{inst[:location_code]}<br>
         SKU (#{inst[:sku_number]}): #{inst[:product_variant_code]}<br>
-        Qty To Move: #{UtilityFunctions.delimited_number(inst[:unit][:quantity_to_move])}<br>
-        Qty Offloaded: #{UtilityFunctions.delimited_number(inst[:unit][:quantity_offloaded])}<br>
+        Qty To Offload: #{UtilityFunctions.delimited_number(inst[:quantity_to_offload])}<br>
+        Qty Offloaded: #{UtilityFunctions.delimited_number(inst[:quantity_offloaded])}<br>
       HTML
     end
   end

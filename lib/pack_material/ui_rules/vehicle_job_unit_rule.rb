@@ -46,11 +46,13 @@ module UiRules
           param_values: { vehicle_job_id: vehicle_job_id }
         },
         vehicle_job_id: { renderer: :hidden },
+        available_quantity: { renderer: :hidden },
+        show_available_quantity: { readonly: true, caption: 'Available Quantity' },
         quantity_to_move: { renderer: :numeric, required: true },
         mr_sku_id: { renderer: :hidden },
-        sku_number: { readonly: true, required: true },
+        sku_number: { readonly: true, caption: 'SKU Number' },
         location_id: { renderer: :hidden },
-        location_code: { readonly: true, required: true }
+        location_code: { readonly: true }
       }
     end
 
@@ -84,6 +86,8 @@ module UiRules
                                     quantity_offloaded: nil,
                                     mr_sku_id: nil,
                                     sku_number: nil,
+                                    show_available_quantity: nil,
+                                    available_quantity: nil,
                                     location_id: nil,
                                     when_loading: nil)
     end

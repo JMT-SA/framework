@@ -18,11 +18,11 @@ module PackMaterial
               form.add_field :sku_number
               form.add_field :location_id
               form.add_field :quantity_to_move
-              form.add_field :quantity_loaded
-              form.add_field :quantity_offloaded
-              form.add_field :when_loaded
-              form.add_field :when_offloading
               form.add_field :when_loading
+              form.add_field :quantity_loaded
+              form.add_field :when_loaded
+              form.add_field :quantity_offloaded
+              form.add_field :when_offloading
               form.add_field :when_offloaded
             end
           end

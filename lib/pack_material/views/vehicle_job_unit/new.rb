@@ -22,6 +22,8 @@ module PackMaterial
               form.add_field :sku_number
               form.add_field :location_id
               form.add_field :location_code
+              form.add_field :available_quantity
+              form.add_field :show_available_quantity
               form.add_field :quantity_to_move
             end
           end

@@ -161,53 +161,41 @@ VALUES ((SELECT id
         false,
         false);
 
--- UPDATE program_functions pf
--- SET program_function_sequence = 1
--- WHERE pf.program_function_name = 'Putaway';
---
--- UPDATE program_functions pf
--- SET program_function_sequence = 2
--- WHERE pf.program_function_name = 'Delivery status';
---
--- UPDATE programs p
--- SET program_sequence = 3
--- WHERE p.functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD')
---   AND p.program_name = 'Stock';
---
--- UPDATE program_functions pf
--- SET program_function_sequence = 1
--- WHERE pf.program_function_name = 'Adjust Item';
---
--- UPDATE program_functions pf
--- SET program_function_sequence = 2
--- WHERE pf.program_function_name = 'Move';
---
--- UPDATE program_functions pf
--- SET program_function_sequence = 1
--- WHERE pf.program_function_name = 'Load';
---
--- UPDATE program_functions pf
--- SET program_function_sequence = 2
--- WHERE pf.program_function_name = 'Offload';
---
--- UPDATE programs p
--- SET program_sequence = 5
--- WHERE p.functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD')
---   AND p.program_name = 'Printing';
---
--- UPDATE program_functions pf
--- SET program_function_sequence = 1
--- WHERE pf.program_function_name = 'SKU Label';
+UPDATE program_functions pf
+SET program_function_sequence = 1
+WHERE pf.program_function_name = 'Putaway';
+UPDATE program_functions pf
+SET program_function_sequence = 2
+WHERE pf.program_function_name = 'Delivery status';
+UPDATE programs p
+SET program_sequence = 3
+WHERE p.functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD')
+  AND p.program_name = 'Stock';
+UPDATE program_functions pf
+SET program_function_sequence = 1
+WHERE pf.program_function_name = 'Adjust Item';
+UPDATE program_functions pf
+SET program_function_sequence = 2
+WHERE pf.program_function_name = 'Move';
+UPDATE program_functions pf
+SET program_function_sequence = 1
+WHERE pf.program_function_name = 'Load';
+UPDATE program_functions pf
+SET program_function_sequence = 2
+WHERE pf.program_function_name = 'Offload';
+UPDATE programs p
+SET program_sequence = 5
+WHERE p.functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'RMD')
+AND p.program_name = 'Printing';
+UPDATE program_functions pf
+SET program_function_sequence = 1
+WHERE pf.program_function_name = 'SKU Label';
 
-
--- Also run:
---
--- INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
--- VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
---                                    AND functional_area_id = (SELECT id FROM functional_areas
---                                                              WHERE functional_area_name = 'Pack Material')),
---         'Completed Purchase Orders', 'Purchase Order', '/list/mr_purchase_orders/with_params?key=completed', 3);
---
--- UPDATE program_functions pf
--- SET url = '/list/mr_purchase_orders/with_params?key=incomplete'
--- WHERE pf.program_function_name = 'Purchase Orders';
+INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'Pack Material')),
+        'Completed Purchase Orders', 'Purchase Order', '/list/mr_purchase_orders/with_params?key=completed', 3);
+UPDATE program_functions pf
+SET url = '/list/mr_purchase_orders/with_params?key=incomplete'
+WHERE pf.program_function_name = 'Purchase Orders';

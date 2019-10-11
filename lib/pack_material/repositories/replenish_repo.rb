@@ -603,15 +603,15 @@ module PackMaterialApp
       update(:mr_delivery_items, id, invoiced_unit_price: val)
     end
 
-    def del_sub_totals(id)
+    def del_sub_totals(id, opts = {})
       subtotal = del_total_items(id)
       costs = del_total_costs(id)
       vat = del_total_vat(id, subtotal + costs)
       {
-        subtotal: UtilityFunctions.delimited_number(subtotal),
-        costs: UtilityFunctions.delimited_number(costs),
-        vat: UtilityFunctions.delimited_number(vat),
-        total: UtilityFunctions.delimited_number(subtotal + costs + vat)
+        subtotal: UtilityFunctions.delimited_number(subtotal, opts),
+        costs: UtilityFunctions.delimited_number(costs, opts),
+        vat: UtilityFunctions.delimited_number(vat, opts),
+        total: UtilityFunctions.delimited_number(subtotal + costs + vat, opts)
       }
     end
 

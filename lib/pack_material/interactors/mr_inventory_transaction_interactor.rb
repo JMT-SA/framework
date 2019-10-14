@@ -56,6 +56,9 @@ module PackMaterialApp
       return validation_failed_response(to_location: params[:to_location], messages: { to_location: ['Location can not store stock'] }) unless valid_stock_location
 
       sku_ids = replenish_repo.sku_ids_from_numbers(params[:sku_number])
+      delivery_number = replenish_repo.delivery_stock(sku_ids[0], params[:from_location_id])
+      return validation_failed_response(to_location: params[:to_location], messages: { to_location: ["Delivery Stock (#{delivery_number}) can not be moved with adhoc transactions"] }) if delivery_number
+
       res = validate_final_adhoc_rmd_move_stock_params(params.merge(sku_ids: sku_ids,
                                                                     user_name: @user.user_name,
                                                                     to_location_id: to_location_id,
@@ -67,8 +70,6 @@ module PackMaterialApp
                                                                     loc_id: params[:from_location_id],
                                                                     move_loc_id: to_location_id)
       if can_action.success
-        # TODO: Should not allow for this to bypass putaways
-        # replenish_repo.delivery_in_progress
         repo.transaction do
           log_transaction
           res = adhoc_move_stock(res)
@@ -107,6 +108,10 @@ module PackMaterialApp
 
     def stock_repo
       @stock_repo ||= MrStockRepo.new
+    end
+
+    def location_repo
+      @location_repo ||= MasterfilesApp::LocationRepo.new
     end
 
     def mr_inventory_transaction(id)

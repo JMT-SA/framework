@@ -3,11 +3,11 @@
 
 link:/developer_documentation/start.adoc[Back to documentation home]
 
-= RMD Forms
+== RMD Forms
 
 RMD forms are special forms for rendering on Registered Mobile Devices (RMD).
 
-They are intenionally far simpler than Crossbeams::Layout pages. They should always be rendered inside `:layout_rmd`.
+They are intentionally far simpler than Crossbeams::Layout pages. They should always be rendered inside `:layout_rmd`.
 
 == Example
 
@@ -34,7 +34,7 @@ form.add_label(:business_process, 'Business process', 'DELIVERY')
 form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery)
 form.add_select(:choice, 'Choose', items: items, value: 'my', required: true, prompt: true)
 form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
-form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location)
+form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, force_uppercase: true)
 form.add_field(:quantity, 'Quantity', data_type: 'number')
 form.add_csrf_tag csrf_tag
 view(inline: form.render, layout: :layout_rmd)
@@ -155,7 +155,7 @@ Each hash has:
 [source,ruby]
 ----
 form.add_field(:from_location, 'From location', scan: 'key248_all',
-               scan_type: :location, lookup: true)
+               scan_type: :location, lookup: true, force_uppercase: true)
 
 # Returns parameters (if form name was "location"):
 # => {

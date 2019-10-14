@@ -705,10 +705,23 @@ module PackMaterialApp
       attrs
     end
 
-    # def delivery_in_progress(sku_ids: [], loc_id: nil, move_loc_id: nil)
-    #   # TODO: If there is a delivery in progress for this sku id I can not allow for a adhoc move from the receiving bay
-    #   deliveries_in_progress = DB[:mr_deliveries].where(putaway_completed: false, verified: true).select_map(:id)
-    #
-    # end
+    def delivery_stock(sku_id, from_loc_id) # rubocop:disable Metrics/AbcSize
+      location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_RECEIVING_BAY).get(:id)
+      rec_bay = DB[:locations].where(id: from_loc_id, location_type_id: location_type_id, can_store_stock: true).first
+      return nil unless rec_bay
+
+      sku = DB[:mr_skus].where(id: sku_id)
+      del_id = if (batch_id = sku.get(:mr_delivery_item_batch_id))
+                 batch = DB[:mr_delivery_item_batches].where(id: batch_id, putaway_completed: false)
+                 DB[:mr_delivery_items].where(id: batch.get(:mr_delivery_item_id)).get(:mr_delivery_id)
+               else
+                 item = DB[:mr_delivery_items].where(
+                   mr_product_variant_id: sku.get(:mr_product_variant_id),
+                   putaway_completed: false
+                 )
+                 item.get(:mr_delivery_id)
+               end
+      del_id ? DB[:mr_deliveries].where(id: del_id).get(:delivery_number) : nil
+    end
   end
 end

@@ -25,7 +25,7 @@ class Framework < Roda
                                          action: '/rmd/stock/moves/new',
                                          button_caption: 'Move')
           form.add_select(:business_process, 'Business process', items: processes, value: processes.first, required: true, prompt: true)
-          form.add_field(:from_location, 'From location', scan: 'key248_all', scan_type: :location, lookup: true)
+          form.add_field(:from_location, 'From location', scan: 'key248_all', scan_type: :location, lookup: true, force_uppercase: true)
           form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
           form.add_field(:quantity, 'Quantity', data_type: 'number')
           form.add_field(:ref_no, 'Reference Number', data_type: 'string')
@@ -78,7 +78,7 @@ class Framework < Roda
           form.add_label(:sku_number, 'SKU', details[:sku_number])
           form.add_label(:quantity, 'Quantity', details[:quantity])
           form.add_label(:ref_no, 'Reference Number', details[:ref_no])
-          form.add_field(:to_location, 'To location', scan: 'key248_all', scan_type: :location, lookup: true)
+          form.add_field(:to_location, 'To location', scan: 'key248_all', scan_type: :location, lookup: true, force_uppercase: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
@@ -99,7 +99,7 @@ class Framework < Roda
           else
             payload = {
               error_message: res.message,
-              errors: res.errors
+              errors: res.errors[:to_location] ? res.errors.merge(to_location: res.errors[:to_location]) : res.errors
             }
             payload.merge!(business_process: details[:business_process],
                            from_location: details[:from_location],

@@ -18,7 +18,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
         form.add_field(:delivery_number, 'Delivery', scan: 'key248_all', scan_type: :delivery, data_type: 'number')
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
         form.add_field(:quantity, 'Quantity', data_type: 'number')
-        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, lookup: true)
+        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, lookup: true, force_uppercase: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
@@ -71,7 +71,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
                                        button_caption: 'Adjust Item')
         form.add_field(:stock_adjustment_number, 'Stock Adjustment', scan: 'key248_all', scan_type: :stock_adjustment, data_type: 'number')
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
-        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, lookup: true)
+        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, lookup: true, force_uppercase: true)
         form.add_field(:quantity, 'Actual Quantity', data_type: 'number', allow_decimals: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)

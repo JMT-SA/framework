@@ -21,7 +21,7 @@ class Framework < Roda
                                        button_caption: 'Load Unit')
         form.add_field(:tripsheet_number, 'Tripsheet', scan: 'key248_all', scan_type: :tripsheet)
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
-        form.add_field(:location, 'From Location', scan: 'key248_all', scan_type: :location, lookup: true)
+        form.add_field(:location, 'From Location', scan: 'key248_all', scan_type: :location, lookup: true, force_uppercase: true)
         form.add_field(:quantity, 'Quantity to Load', data_type: 'number', allow_decimals: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
@@ -68,7 +68,7 @@ class Framework < Roda
                                        button_caption: 'Offload Unit')
         form.add_field(:tripsheet_number, 'Tripsheet', scan: 'key248_all', scan_type: :tripsheet)
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
-        form.add_field(:location, 'To Location', scan: 'key248_all', scan_type: :location, lookup: true)
+        form.add_field(:location, 'To Location', scan: 'key248_all', scan_type: :location, lookup: true, force_uppercase: true)
         form.add_field(:quantity, 'Quantity to Offload', data_type: 'number', allow_decimals: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)

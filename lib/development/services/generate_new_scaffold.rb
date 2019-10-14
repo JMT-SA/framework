@@ -216,6 +216,21 @@ module DevelopmentApp
         string_array: ':array'
       }.freeze
 
+      VALIDATION_OPTIONAL_TYPE_LOOKUP = {
+        # integer: ':integer',
+        # string: 'Types::StrippedString',
+        # boolean: ':bool',
+        # datetime: ':date_time',
+        datetime: '[:nil, :time]',
+        date: '[:nil, :date]',
+        time: '[:nil, :time]',
+        float: '[:nil, :float]',
+        decimal: '[:nil, :decimal]' # ,
+        # jsonb: ':hash',
+        # integer_array: ':array',
+        # string_array: ':array'
+      }.freeze
+
       VALIDATION_ARRAY_LOOKUP = {
         integer_array: ' { each(:int?) }',
         string_array: ' { each(:str?) }'
@@ -292,8 +307,12 @@ module DevelopmentApp
         data
       end
 
-      def column_dry_validation_type(column)
-        VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+      def column_dry_validation_type(column, optional = false)
+        if optional
+          VALIDATION_OPTIONAL_TYPE_LOOKUP[@col_lookup[column][:type]] || VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+        else
+          VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+        end
       end
 
       def column_dry_validation_array_extra(column)
@@ -660,9 +679,9 @@ module DevelopmentApp
           rules = [opts.table_meta.column_dry_validation_expect_type(col), max, opts.table_meta.column_dry_validation_array_extra(col)].compact.join(', ')
           rules = rules.sub(/,\s+{/, ' {')
           attr << if col == :id
-                    "optional(:#{col}, #{opts.table_meta.column_dry_validation_type(col)}).#{fill_opt}#{rules}"
+                    "optional(:#{col}, #{opts.table_meta.column_dry_validation_type(col, detail[:allow_null])}).#{fill_opt}#{rules}"
                   else
-                    "required(:#{col}, #{opts.table_meta.column_dry_validation_type(col)}).#{fill_opt}#{rules}"
+                    "required(:#{col}, #{opts.table_meta.column_dry_validation_type(col, detail[:allow_null])}).#{fill_opt}#{rules}"
                   end
         end
         attr

@@ -47,7 +47,7 @@ module PackMaterialApp
 
       costs = @repo.costs_for_delivery(@id)
       products = @repo.products_for_delivery(@id)
-      invoice_total = products.sum { |item| (item[:unit_price] || 0) * (item[:quantity] || 0) }
+      del_totals = @replenish_repo.del_sub_totals(@id, delimiter: '', no_decimals: 5)
 
       request_xml = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
         xml.purchase_invoice do # rubocop:disable Metrics/BlockLength
@@ -56,13 +56,16 @@ module PackMaterialApp
           xml.internal_invoice_number delivery_number
           xml.supplier_code supplier_code
           xml.account_code po_account_code
-          xml.invoice_total UtilityFunctions.delimited_number(invoice_total, delimiter: '', no_decimals: 5)
+          xml.invoice_total del_totals[:total]
+          xml.subtotal del_totals[:subtotal]
+          xml.vat del_totals[:vat]
           xml.costs do
             costs.each do |cost|
               xml.cost do
                 xml.cost_code cost[:cost_type_code]
                 xml.account_code cost[:account_code]
                 xml.amount UtilityFunctions.delimited_number(cost[:amount], delimiter: '', no_decimals: 2)
+                xml.object 'OTH'
               end
             end
           end

@@ -238,6 +238,15 @@
         event.stopPropagation();
         event.preventDefault();
       }
+      // Help link - open in new window and set to 2/3 the size of the current window.
+      if (event.target.dataset && event.target.dataset.helpLink) {
+        const height = parseInt(window.outerHeight * 0.6, 10);
+        const width = parseInt(window.outerWidth * 0.6, 10);
+        const newWindow = window.open(event.target.href, event.target.target, `resizable,scrollbars,status,height=${height},width=${width}`);
+        newWindow.focus();
+        event.stopPropagation();
+        event.preventDefault();
+      }
       // Remote fetch link
       if (event.target.dataset && event.target.dataset.remoteLink) {
         fetchRemoteLink(event.target.href);

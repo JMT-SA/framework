@@ -14,7 +14,8 @@
   \"mr_skus\".\"mr_product_variant_id\" = \"material_resource_product_variants\".\"id\"\r\n
   \        LEFT JOIN \"vehicle_jobs_sku_numbers\" ON \"vehicle_jobs_sku_numbers\".\"mr_sku_id\"
   = \"mr_sku_locations\".\"mr_sku_id\"\r\n         LEFT JOIN \"vehicle_jobs_locations\"
-  ON \"vehicle_jobs_locations\".\"location_id\" = \"mr_sku_locations\".\"location_id\""
+  ON \"vehicle_jobs_locations\".\"location_id\" = \"mr_sku_locations\".\"location_id\"\r\nWHERE
+  \"locations\".\"active\" AND not locations.restricted"
 :limit: 
 :offset: 
 :external_settings: {}

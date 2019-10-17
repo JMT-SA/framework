@@ -87,7 +87,7 @@ module PackMaterialApp
 
     def departure_locations
       loc_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_BUILDING).get(:id)
-      location_repo.for_select_locations(where: { location_type_id: loc_type_id })
+      location_repo.for_select_locations(where: { location_type_id: loc_type_id, restricted: false })
     end
 
     def location_repo
@@ -199,7 +199,7 @@ module PackMaterialApp
       return failed_response('No virtual location set on Tripsheet') unless vehicle_job.get(:virtual_location_id)
 
       loaded = new_quantity_loaded == unit[:quantity_to_move]
-      loaded_at = DateTime.now
+      loaded_at = Time.now
       update(:vehicle_job_units,
              unit[:id],
              quantity_loaded: new_quantity_loaded,
@@ -215,7 +215,7 @@ module PackMaterialApp
     def update_vehicle_loaded(vehicle_job_id, loaded_at)
       return nil if exists?(:vehicle_job_units, vehicle_job_id: vehicle_job_id, loaded: false)
 
-      update(:vehicle_jobs, vehicle_job_id, loaded: true, when_loading: loaded_at)
+      update(:vehicle_jobs, vehicle_job_id, loaded: true, when_loading: loaded_at, when_loaded: loaded_at)
     end
 
     def rmd_offload_vehicle_unit(mr_sku_id, qty_to_offload, location_id, vehicle_job_id) # rubocop:disable Metrics/AbcSize

@@ -1,28 +1,36 @@
 ---
 :caption: Product Locations
-:sql: "SELECT \"locations\".\"id\", \"locations\".\"primary_storage_type_id\",\r\n\"locations\".\"location_type_id\",
-  \"locations\".\"primary_assignment_id\", \"locations\".\"location_long_code\",\r\n\"locations\".\"location_description\",
-  \r\n(SELECT array_agg(\"cc\".\"location_long_code\") AS path\r\nFROM (SELECT \"c\".\"location_long_code\"\r\nFROM
-  \"locations\" c\r\nJOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
-  = \"c\".\"id\"\r\nWHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER
-  BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n\"material_resource_product_variants\".\"product_variant_number\",\r\n\"material_resource_product_variants\".\"product_variant_code\",\r\nSUM(\"mr_sku_locations\".\"quantity\")
-  AS quantity\r\nFROM \"locations\"\r\nJOIN \"location_types\" ON \"location_types\".\"id\"
-  = \"locations\".\"location_type_id\"\r\nJOIN \"location_assignments\" ON \"location_assignments\".\"id\"
-  = \"locations\".\"primary_assignment_id\"\r\nJOIN \"location_storage_types\" ON
-  \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\nJOIN
-  \"mr_sku_locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\nJOIN
-  \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\nJOIN \"material_resource_product_variants\"
-  ON \"material_resource_product_variants\".\"id\" =\r\n\"mr_skus\".\"mr_product_variant_id\"\r\nWHERE
-  \"locations\".\"active\"\r\nGROUP BY \"locations\".\"id\", \"locations\".\"primary_storage_type_id\",\r\n\"locations\".\"location_type_id\",
-  \"locations\".\"primary_assignment_id\", \"locations\".\"location_long_code\",\r\n\"locations\".\"location_description\",
-  \r\n(SELECT array_agg(\"cc\".\"location_long_code\") AS path\r\nFROM (SELECT \"c\".\"location_long_code\"\r\nFROM
-  \"locations\" c\r\nJOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
-  = \"c\".\"id\"\r\nWHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER
-  BY \"t1\".\"path_length\" DESC) cc),\r\n\"material_resource_product_variants\".\"product_variant_number\",\r\n\"material_resource_product_variants\".\"product_variant_code\"\r\nORDER
-  BY (SELECT string_agg(\"cc\".\"location_long_code\", ';') AS path\r\nFROM (SELECT \"c\".\"location_long_code\"\r\nFROM
-  \"locations\" c\r\nJOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
-  = \"c\".\"id\"\r\nWHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\nORDER
-  BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
+:sql: "SELECT \"locations\".\"id\", \"locations\".\"primary_storage_type_id\",\r\n
+  \      \"locations\".\"location_type_id\", \"locations\".\"primary_assignment_id\",
+  \"locations\".\"location_long_code\",\r\n       \"locations\".\"location_description\",\r\n
+  \      (SELECT array_agg(\"cc\".\"location_long_code\") AS path\r\n        FROM
+  (SELECT \"c\".\"location_long_code\"\r\n              FROM \"locations\" c\r\n                       JOIN
+  \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n              WHERE
+  \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n              ORDER
+  BY \"t1\".\"path_length\" DESC) cc) AS path_array,\r\n       \"material_resource_product_variants\".\"product_variant_number\",\r\n
+  \      \"material_resource_product_variants\".\"product_variant_code\",\r\n       SUM(\"mr_sku_locations\".\"quantity\")
+  AS quantity\r\nFROM \"locations\"\r\n         JOIN \"location_types\" ON \"location_types\".\"id\"
+  = \"locations\".\"location_type_id\"\r\n         JOIN \"location_assignments\" ON
+  \"location_assignments\".\"id\" = \"locations\".\"primary_assignment_id\"\r\n         JOIN
+  \"location_storage_types\" ON \"location_storage_types\".\"id\" = \"locations\".\"primary_storage_type_id\"\r\n
+  \        JOIN \"mr_sku_locations\" ON \"mr_sku_locations\".\"location_id\" = \"locations\".\"id\"\r\n
+  \        JOIN \"mr_skus\" ON \"mr_skus\".\"id\" = \"mr_sku_locations\".\"mr_sku_id\"\r\n
+  \        JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"id\"
+  =\r\n                                                      \"mr_skus\".\"mr_product_variant_id\"\r\nWHERE
+  \"locations\".\"active\" AND not locations.restricted\r\nGROUP BY \"locations\".\"id\",
+  \"locations\".\"primary_storage_type_id\",\r\n         \"locations\".\"location_type_id\",
+  \"locations\".\"primary_assignment_id\", \"locations\".\"location_long_code\",\r\n
+  \        \"locations\".\"location_description\",\r\n         (SELECT array_agg(\"cc\".\"location_long_code\")
+  AS path\r\n          FROM (SELECT \"c\".\"location_long_code\"\r\n                FROM
+  \"locations\" c\r\n                         JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
+  \               ORDER BY \"t1\".\"path_length\" DESC) cc),\r\n         \"material_resource_product_variants\".\"product_variant_number\",\r\n
+  \        \"material_resource_product_variants\".\"product_variant_code\"\r\nORDER
+  BY (SELECT string_agg(\"cc\".\"location_long_code\", ';') AS path\r\n          FROM
+  (SELECT \"c\".\"location_long_code\"\r\n                FROM \"locations\" c\r\n
+  \                        JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\n                WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
+  \               ORDER BY \"t1\".\"path_length\" DESC) cc), \"material_resource_product_variants\".\"product_variant_code\""
 :limit: 
 :offset: 
 :external_settings:
@@ -103,7 +111,7 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

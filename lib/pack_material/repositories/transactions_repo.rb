@@ -260,7 +260,7 @@ module PackMaterialApp
     end
 
     def allowed_locations
-      ancestor_id = DB[:locations].where(location_long_code: 'PM').get(:id)
+      ancestor_id = DB[:locations].where(location_long_code: AppConst::LOCATIONS_PM).get(:id)
       descendant_ids = location_repo.descendants_for_ancestor_id(ancestor_id) - [ancestor_id]
 
       type_id = DB[:location_storage_types].where(storage_type_code: PackMaterialApp::DOMAIN_NAME).get(:id)

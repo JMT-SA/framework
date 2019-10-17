@@ -15,11 +15,12 @@
   location_types ON location_types.id = locations.location_type_id\r\nJOIN location_assignments
   ON location_assignments.id = locations.primary_assignment_id\r\nJOIN location_storage_types
   ON location_storage_types.id = locations.primary_storage_type_id\r\nLEFT JOIN \"location_storage_definitions\"
-  ON \"location_storage_definitions\".\"id\" = \"locations\".\"location_storage_definition_id\"\r\nORDER
-  BY (SELECT string_agg(\"cc\".\"location_long_code\", ';') AS path \r\n    FROM (SELECT
-  \"c\".\"location_long_code\" FROM \"locations\" c JOIN \"tree_locations\" t1 ON
-  \"t1\".\"ancestor_location_id\" = \"c\".\"id\" \r\n    WHERE \"t1\".\"descendant_location_id\"
-  = \"locations\".\"id\" \r\n    ORDER BY \"t1\".\"path_length\" DESC) cc)"
+  ON \"location_storage_definitions\".\"id\" = \"locations\".\"location_storage_definition_id\"\r\nWHERE
+  \"locations\".\"active\" AND not locations.restricted\r\nORDER BY (SELECT string_agg(\"cc\".\"location_long_code\",
+  ';') AS path \r\n    FROM (SELECT \"c\".\"location_long_code\" FROM \"locations\"
+  c JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\" \r\n
+  \   WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\" \r\n    ORDER
+  BY \"t1\".\"path_length\" DESC) cc)\r\n"
 :limit: 
 :offset: 
 :external_settings: {}

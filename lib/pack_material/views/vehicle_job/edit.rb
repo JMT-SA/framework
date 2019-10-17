@@ -51,6 +51,7 @@ module PackMaterial
                     col.add_field :departure_location_id
                     col.add_field :virtual_location_id
                     col.add_field :when_loaded
+                    col.add_field :when_offloaded
                     col.add_field :description
                   end
 
@@ -58,7 +59,6 @@ module PackMaterial
                     col.add_field :business_process_id
                     col.add_field :vehicle_id
                     col.add_field :planned_location_id
-                    col.add_field :when_offloaded
                     col.add_field :status
                     col.add_field :arrival_confirmed
                     col.add_field :loaded

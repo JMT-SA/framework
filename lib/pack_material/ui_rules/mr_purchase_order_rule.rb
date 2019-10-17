@@ -2,7 +2,7 @@
 
 module UiRules
   class MrPurchaseOrderRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo       = PackMaterialApp::ReplenishRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       @perm       = PackMaterialApp::TaskPermissionCheck::MrPurchaseOrder
@@ -12,6 +12,7 @@ module UiRules
       rules[:can_approve]   = can_approve unless @mode == :new || @mode == :preselect
       rules[:po_sub_totals] = @repo.po_sub_totals(@options[:id]) if @mode == :edit
       rules[:show_only]     = @form_object.approved if @mode == :edit
+      rules[:can_mark_as_short_supplied] = can_mark_as_short_supplied if @mode == :edit
 
       common_values_for_fields case @mode
                                when :edit
@@ -144,6 +145,11 @@ module UiRules
 
     def can_approve
       res = @perm.call(:approve, @options[:id], @options[:current_user])
+      res.success
+    end
+
+    def can_mark_as_short_supplied
+      res = @perm.call(:short_supplied, @options[:id], @options[:current_user])
       res.success
     end
   end

@@ -13,12 +13,14 @@ module PackMaterialApp
         @user   = current_user
       end
 
-      def call
+      def call # rubocop:disable Metrics/CyclomaticComplexity
         return failed_response 'Record not found' unless @entity || task == :create
 
         case task
         when :create
           create_check
+        when :short_supplied
+          short_supplied_check
         when :update, :delete
           mutable_check
         when :approve
@@ -49,8 +51,31 @@ module PackMaterialApp
         all_ok
       end
 
+      def short_supplied_check # rubocop:disable Metrics/CyclomaticComplexity
+        return failed_response('User is not allowed to mark as short supplied') unless can_user_short_supply?
+        return failed_response('Purchase Order has no items') if no_items?
+        return failed_response('Purchase Order has not been approved yet') unless approved?
+        return failed_response('Purchase Order has already been completed') if deliveries_received?
+        return failed_response('Purchase Order is already short_supplied') if short_supplied?
+        return failed_response('Purchase Order has not received any deliveries yet') unless deliveries_has_been_received?
+
+        all_ok
+      end
+
       def approved?
         @entity.approved
+      end
+
+      def short_supplied?
+        @entity.short_supplied
+      end
+
+      def deliveries_received?
+        @entity.deliveries_received
+      end
+
+      def deliveries_has_been_received?
+        @repo.deliveries_for_purchase_order_check(@id)
       end
 
       def no_items?
@@ -63,6 +88,10 @@ module PackMaterialApp
 
       def can_user_approve?
         Crossbeams::Config::UserPermissions.can_user?(@user, :purchase_order, :approve)
+      end
+
+      def can_user_short_supply?
+        Crossbeams::Config::UserPermissions.can_user?(@user, :purchase_order, :short_supplied)
       end
     end
   end

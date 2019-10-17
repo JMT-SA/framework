@@ -723,5 +723,10 @@ module PackMaterialApp
                end
       del_id ? DB[:mr_deliveries].where(id: del_id).get(:delivery_number) : nil
     end
+
+    def deliveries_for_purchase_order_check(purchase_order_id)
+      item_ids = mr_purchase_order_items(purchase_order_id)
+      DB[:mr_delivery_items].where(mr_purchase_order_item_id: item_ids).any?
+    end
   end
 end

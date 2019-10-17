@@ -31,6 +31,13 @@ module PackMaterial
                                   id: 'mr_purchase_order_approve_button',
                                   visible: rules[:can_approve],
                                   style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Short Supplied',
+                                  url: "/pack_material/replenish/mr_purchase_orders/#{id}/short_supplied",
+                                  prompt: 'This will force complete the Purchase Order and mark it as short supplied.',
+                                  id: 'mr_purchase_order_short_supplied_button',
+                                  visible: rules[:can_mark_as_short_supplied],
+                                  style: :button)
             end
 
             page.section do |section| # rubocop:disable Metrics/BlockLength

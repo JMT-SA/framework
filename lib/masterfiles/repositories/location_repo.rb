@@ -12,14 +12,6 @@ module MasterfilesApp
                           label: :location_long_code,
                           value: :id,
                           order_by: :location_long_code
-    build_for_select :locations,
-                     label: :location_long_code,
-                     value: :id,
-                     order_by: :location_long_code
-    build_inactive_select :locations,
-                          label: :location_long_code,
-                          value: :id,
-                          order_by: :location_long_code
 
     build_for_select :location_assignments,
                      label: :assignment_code,
@@ -52,7 +44,7 @@ module MasterfilesApp
 
     def for_select_receiving_bays
       location_type_id = DB[:location_types].where(location_type_code: AppConst::LOCATION_TYPES_RECEIVING_BAY).get(:id)
-      for_select_locations(where: { location_type_id: location_type_id, can_store_stock: true })
+      for_select_locations(where: { location_type_id: location_type_id, can_store_stock: true, restricted: false })
     end
 
     def find_location_by(key, val) # rubocop:disable Metrics/AbcSize

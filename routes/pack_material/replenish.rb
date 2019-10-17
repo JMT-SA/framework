@@ -33,7 +33,7 @@ class Framework < Roda
               product_variant_code
               inventory_uom_code
             ]
-            permission_res = interactor.can_approve_purchase_order(id)
+            permission_res = interactor.check_permission(:approve, id)
             type           = permission_res.success ? :show_element : :hide_element
 
             sub_totals = interactor.po_sub_totals(id)
@@ -82,6 +82,16 @@ class Framework < Roda
       r.on 'approve_purchase_order' do   # EDIT
         check_auth!('replenish', 'edit')
         res = interactor.approve_purchase_order(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect("/pack_material/replenish/mr_purchase_orders/#{id}/edit")
+      end
+      r.on 'short_supplied' do   # EDIT
+        check_auth!('replenish', 'edit')
+        res = interactor.short_supplied_purchase_order(id)
         if res.success
           flash[:notice] = res.message
         else
@@ -201,7 +211,7 @@ class Framework < Roda
 
           if res.success
             po_interactor  = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
-            permission_res = po_interactor.can_approve_purchase_order(po_id)
+            permission_res = po_interactor.check_permission(:approve, po_id)
             type           = permission_res.success ? :show_element : :hide_element
 
             sub_totals = interactor.po_sub_totals(parent_id: po_id)

@@ -23,7 +23,8 @@
   ON \"locations\".\"location_type_id\" = \"location_types\".\"id\"\r\n         JOIN
   \"location_assignments\" ON \"locations\".\"primary_assignment_id\" = \"location_assignments\".\"id\"\r\n
   \        JOIN \"location_storage_definitions\" ON \"locations\".\"location_storage_definition_id\"
-  = \"location_storage_definitions\".\"id\""
+  = \"location_storage_definitions\".\"id\"\r\nWHERE \"locations\".\"active\" AND
+  not locations.restricted"
 :limit: 
 :offset: 
 :external_settings: {}

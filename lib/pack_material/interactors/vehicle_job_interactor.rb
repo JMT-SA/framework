@@ -132,12 +132,12 @@ module PackMaterialApp
       res = prepare_for_loading(params)
       return res unless res.success
 
-      attrs = res.instance
+      attrs = res.instance.merge(force_load: (params[:force_load] == 'true'))
       job_id = attrs[:vehicle_job_id]
       assert_permission!(:can_load, job_id)
       repo.transaction do
         log_transaction
-        res = repo.rmd_load_vehicle_unit(attrs[:sku_id], attrs[:qty], attrs[:location_id], job_id)
+        res = repo.rmd_load_vehicle_unit(attrs[:sku_id], attrs[:qty], attrs[:location_id], job_id, attrs[:force_load])
         raise Crossbeams::InfoError, res.message unless res.success
 
         unit = res.instance[:unit]

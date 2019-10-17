@@ -12,6 +12,8 @@ module PackMaterialApp
     attribute :valid_until, Types::DateTime
     attribute :purchase_order_number, Types::Integer
     attribute :approved, Types::Bool
+    attribute :short_supplied, Types::Bool
+    attribute :deliveries_received, Types::Bool
     attribute :status, Types::String
     attribute :remarks, Types::String
   end

@@ -23,6 +23,7 @@ class Framework < Roda
         form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku, lookup: true, data_type: 'number')
         form.add_field(:location, 'From Location', scan: 'key248_all', scan_type: :location, lookup: true, force_uppercase: true)
         form.add_field(:quantity, 'Quantity to Load', data_type: 'number', allow_decimals: true)
+        form.add_select(:force_load, 'Force Load this item', items: [['no', false], ['yes', true]], value: false, required: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
@@ -45,7 +46,8 @@ class Framework < Roda
                          sku_number_scan_field: these_params[:sku_number_scan_field],
                          tripsheet_number: these_params[:tripsheet_number],
                          tripsheet_number_scan_field: these_params[:tripsheet_number_scan_field],
-                         quantity: these_params[:quantity])
+                         quantity: these_params[:quantity],
+                         force_load: these_params[:force_load])
           payload.merge!(lookup_values: params[:lookup_values])
         end
 

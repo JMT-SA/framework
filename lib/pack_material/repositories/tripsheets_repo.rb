@@ -183,7 +183,7 @@ module PackMaterialApp
       DB[:vehicle_jobs].where(tripsheet_number: tripsheet_number).get(:id)
     end
 
-    def rmd_load_vehicle_unit(mr_sku_id, quantity_to_load, location_id, vehicle_job_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def rmd_load_vehicle_unit(mr_sku_id, quantity_to_load, location_id, vehicle_job_id, force_load) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return failed_response('Invalid location, should be within same building') unless validate_location(vehicle_job_id, location_id, false)
 
       unit = DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id,
@@ -203,7 +203,7 @@ module PackMaterialApp
       update(:vehicle_job_units,
              unit[:id],
              quantity_loaded: new_quantity_loaded,
-             loaded: loaded,
+             loaded: force_load || loaded,
              when_loaded: loaded ? loaded_at : nil,
              when_loading: loaded_at)
       update_vehicle_loaded(vehicle_job_id, loaded_at)

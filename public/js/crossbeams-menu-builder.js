@@ -70,7 +70,11 @@ const crossbeamsMenuBuilder = (function crossbeamsMenuBuilder() {
 
     if (id !== null) {
       selected = topLevel.querySelector(`li > a[data-menu-level1="${id}"]`);
-      buildSecondLevelMenu(selected);
+      // If user has been switched, the id might refer to a menu item that
+      // the new user does not have permission for, so skip this step:
+      if (selected) {
+        buildSecondLevelMenu(selected);
+      }
     }
   };
 

@@ -1,0 +1,30 @@
+---
+:dataminer_definition: account_codes
+:actions:
+- :url: "/masterfiles/pack_material/account_codes/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/pack_material/account_codes/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/pack_material/account_codes/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/account_codes/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/pack_material/account_codes/new"
+  :text: New Account Code
+  :style: :button
+  :behaviour: :popup

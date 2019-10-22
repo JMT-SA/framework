@@ -77,7 +77,12 @@ module UiRules
           caption: 'Delivery Address',
           required: true
         },
-        purchase_account_code: {},
+        purchase_account_code: {
+          renderer: :select,
+          options: @general_repo.for_select_account_codes.map { |r| ["#{r[0]} (#{String(r[1])})", r[1]] },
+          selected: AppConst::PO_ACCOUNT_CODE,
+          caption: 'Account Code'
+        },
         fin_object_code: {},
         valid_until: { subtype: :datetime, required: true },
         remarks: { renderer: :input, text: true }
@@ -132,7 +137,7 @@ module UiRules
                                     supplier_party_role_id: sup.party_role_id,
                                     mr_vat_type_id: nil,
                                     delivery_address_id: nil,
-                                    purchase_account_code: AppConst::PO_ACCOUNT_CODE,
+                                    purchase_account_code: nil,
                                     fin_object_code: AppConst::PO_FIN_OBJECT_CODE,
                                     valid_until: UtilityFunctions.weeks_since(Time.now, 1),
                                     remarks: nil)

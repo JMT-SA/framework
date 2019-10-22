@@ -16,7 +16,7 @@ module PackMaterial
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back to Purchase Orders',
-                                  url: '/list/mr_purchase_orders',
+                                  url: "/list/mr_purchase_orders/with_params?key=#{rules[:completed] ? 'completed' : 'incomplete'}",
                                   style: :back_button)
               cost_url = rules[:show_only] ? '/list/mr_purchase_order_costs_show' : '/list/mr_purchase_order_costs'
               section.add_control(control_type: :link,

@@ -124,6 +124,7 @@ module DevelopmentApp
       sources[:view]       = ViewMaker.call(opts)
       sources[:route]      = RouteMaker.call(opts)
       sources[:menu]       = MenuMaker.call(opts)
+      sources[:menu_mig]   = MenuMigrationMaker.call(opts)
       sources[:test]       = TestMaker.call(opts)
       sources[:applet]     = AppletMaker.call(opts) if opts.new_applet
 
@@ -2062,6 +2063,121 @@ module DevelopmentApp
           module #{opts.classnames[:module]}
           end
         RUBY
+      end
+    end
+
+    class MenuMigrationMaker < BaseService
+      attr_reader :opts
+      def initialize(opts)
+        @opts = opts
+      end
+
+      def titleize(str)
+        str.split(' ').map(&:capitalize).join(' ')
+      end
+
+      def make_caption(value)
+        opts.inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
+      end
+
+      def call
+        menu_required = check_for_menu_required
+        case menu_required
+        when :function
+          make_function_menu
+        when :program
+          make_program_menu
+        else
+          make_progfunc_menu
+        end
+      end
+
+      def make_function_menu
+        <<~RUBY
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.applet}]
+
+          # Then run [bundle exec rake menu:migrate]
+
+          Crossbeams::MenuMigrations::Migrator.migration('#{opts.classnames[:roda_class]}') do
+            up do
+              add_functional_area '#{make_caption(opts.applet)}'
+              add_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}', seq: 1
+              #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
+              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+            end
+
+            down do
+              # drop_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}'
+              drop_functional_area '#{make_caption(opts.applet)}'
+            end
+          end
+        RUBY
+      end
+
+      def make_program_menu
+        <<~RUBY
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.program_text}]
+          # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
+
+          # Then run [bundle exec rake menu:migrate]
+
+          Crossbeams::MenuMigrations::Migrator.migration('#{opts.classnames[:roda_class]}') do
+            up do
+              add_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}', seq: 1
+              #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
+              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+            end
+
+            down do
+              # drop_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              drop_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}'
+            end
+          end
+        RUBY
+      end
+
+      def make_progfunc_menu
+        <<~RUBY
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.singlename}]
+          # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
+          # Or add it to the existing migration for program #{make_caption(opts.program_text)}.
+
+          # Then run [bundle exec rake menu:migrate]
+
+          Crossbeams::MenuMigrations::Migrator.migration('#{opts.classnames[:roda_class]}') do
+            up do
+              #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
+              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+            end
+
+            down do
+              # drop_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              drop_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              #{opts.new_from_menu ? '' : '# '}drop_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+            end
+          end
+        RUBY
+      end
+
+      def check_for_menu_required
+        return :function unless DB.select(1).where(DB[:functional_areas].where(functional_area_name: make_caption(opts.applet)).exists).one?
+        return :program unless DB.select(1)
+                                 .where(DB[:programs]
+                                 .where(program_name: make_caption(opts.program_text), functional_area_id: DB[:functional_areas]
+                                 .where(functional_area_name: make_caption(opts.applet))
+                                 .select(:id))
+                                 .exists)
+                                 .one?
+
+        :program_function
       end
     end
 

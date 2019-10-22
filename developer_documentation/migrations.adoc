@@ -29,6 +29,39 @@ e.g. `bundle exec rake db:new_migration NAME=add_title_to_users`.
 
 You would typically use the first for creating a new table and the second for altering a table or creating an index.
 
+=== The golden rules of writing migrations
+
+Down cancels up exactly:: Whatever is done in an `up` migration must be exactly undone in a `down` migration.
+
+Running `db:migrate` followed by `db:rollback` must leave the database in exactly the same state as before.
+
+Files must be named in the correct sequence:: If migration A (a trigger) depends on a column defined in migration B there will be a problem.
+
+This can happen if developer A starts writing a migration for a trigger. Developer B needs to create a new table and writes migration B and pushes it.
+
+Developer A pulls the code and runs the migration. Then developer A realises that the trigger needs to make use of the new table and updates the trigger via an SQL client and saves the working code to the migration.
+
+When developer A pushes this code, user C cannot run migrations because migration A refers to something in migration B. In this case, user A should rename migration A so that it sorts after migration B.
+
+After code is shared, do not update a checked-in migration:: Once a migration has been pushed it should be considered frozen.
+
+Any changes should become part of a new migration.
+
+Exception to above -- down migrations:: You can fix a down migration that has been shared if it is not performing correctly for some reason.
+
+[TIP]
+.Check your migrations
+====
+A good check to do before you push code that includes migrations is to clear and re-create your test database:
+[source,sh]
+----
+RACK_ENV=test bundle exec rake db:migrate[0]
+RACK_ENV=test bundle exec rake db:migrate
+----
+
+If either command above fails you will need to fix something to make your migrations work for everyone.
+====
+
 === Run and rollback migrations
 
 `bundle exec rake db:version` shows the latest version in the db.
@@ -42,6 +75,8 @@ e.g. `bundle exec rake db:migrate[20170101201533]` will:
 
 * undo all the migrations that come after `20170101201533` if the current migration is higher (e.g. `20170101201545`).
 * run all the migrations up to and including `20170101201533` if the current migration is lower (e.g. `20161222201545`).
+
+`bundle exec rake db:rollback` will rollback the last applied migration - whatever it is.
 
 `bundle exec rake db:recent_migrations` lists the 10 most recent migrations in decending order. This is useful to find the version for rolling back migrations.
 

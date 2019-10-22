@@ -177,6 +177,16 @@ Must start with ".".
 |true or false
 |false
 
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -227,6 +237,16 @@ and all words start with initial capital letter.
 |true or false
 |false
 
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -267,6 +287,16 @@ and all words start with initial capital letter.
 |true or false
 |false
 
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
+
 |:css_class
 |Extra class string to add to the label’s class.
 |String
@@ -301,6 +331,16 @@ and all words start with initial capital letter.
 |HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
 |true or false
 |false
+
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
 
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
@@ -360,6 +400,16 @@ and all words start with initial capital letter.
 |true or false
 |false
 
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -394,6 +444,16 @@ and all words start with initial capital letter.
 |HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
 |true or false
 |false
+
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
 
 |:disabled
 |HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
@@ -498,6 +558,16 @@ To display `optgroup` elements, use a Hash and the format must be: `{ group => [
 |true or false
 |false
 
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
+
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
 |HTML text
@@ -567,6 +637,16 @@ and all words start with initial capital letter.
 |HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
 |true or false
 |false
+
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
 
 |:hint
 |Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.

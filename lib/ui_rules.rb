@@ -163,7 +163,11 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h)
 
       @options[:form_values].each do |k, v|
-        @form_object[k] = v
+        @form_object[k] = if v.is_a?(Hash)
+                            v.transform_keys(&:to_s)
+                          else
+                            v
+                          end
       end
     end
   end

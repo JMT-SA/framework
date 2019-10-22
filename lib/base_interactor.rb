@@ -235,4 +235,12 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
       required(:changed_value).maybe(:str?)
     end.call(params)
   end
+
+  # Using an ip address, return a robot HTTP base_url (host + port).
+  #
+  # @param ip [string] the ip address of the robot.
+  # @return [string] the HTTP host address and port for the robot.
+  def robot_print_base_ulr(ip)
+    "http://#{ip}:2080/"
+  end
 end

@@ -93,7 +93,7 @@ end
 
 === Lookup control in a form - rules
 
-1. Basic
+.1. Basic
 
 [source, ruby]
 ----
@@ -103,7 +103,7 @@ field_name: { renderer: :lookup,
 ----
 This will display a button in the form with caption 'Lookup Field Name' and the query referenced in `yaml_file_name.yml` will run without any parameters.
 
-2. Advanced
+.2. Advanced
 
 [source, ruby]
 ----

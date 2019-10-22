@@ -15,6 +15,7 @@ Crossbeams::Layout:: Used to create HTML docs - https://github.com/NoSoft-SA/cro
 Roda::DataGrid:: Used in defining and populating grids - https://github.com/NoSoft-SA/roda-data_grid[roda-data_grid]
 Crossbeams::Dataminer:: Used to define queries with parameters - https://github.com/NoSoft-SA/crossbeams-dataminer[dataminer]
 Crossbeams::LabelDesigner:: Design labels in the browser for printing - https://github.com/NoSoft-SA/crossbeams-label_designer[label_designer]
+Crossbeams::MenuMigrations:: Manage menu systems - https://github.com/NoSoft-SA/crossbeams-menu_migrations[menu_migrations]
 
 ==== External gems
 

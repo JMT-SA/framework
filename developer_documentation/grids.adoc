@@ -33,7 +33,7 @@ This will become a WHERE clause like this: `WHERE order_id = 1`.
 
 ==== 2. As a section of a page
 
-In this case you have a page with a form for header data and a grid for item data. As an example, we use order and order items - where `order_items` has an `order_id` column (belongs_to `id` on `orders`). And we use the same `order_items.yml` fila as above.
+In this case you have a page with a form for header data and a grid for item data. As an example, we use order and order items - where `order_items` has an `order_id` column (belongs_to `id` on `orders`). And we use the same `order_items.yml` file as above.
 
 [source,ruby]
 ----
@@ -366,3 +366,5 @@ The background colours will override the grid's `hover` and `selected` row colou
 
 |grid-row-bg-light-green
 |pass:[<span class="grid-row-bg-light-green">Example background colour as if in a grid row</span>]
+
+|===

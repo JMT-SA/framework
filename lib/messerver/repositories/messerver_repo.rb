@@ -49,8 +49,8 @@ module MesserverApp
       success_response('ok', res.instance.body)
     end
 
-    def print_published_label(label_template_name, vars, quantity, printer)
-      res = post_print_or_preview(print_published_label_uri, label_template_name, vars, quantity, printer)
+    def print_published_label(label_template_name, vars, quantity, printer, host = nil)
+      res = post_print_or_preview(print_published_label_uri(host), label_template_name, vars, quantity, printer)
       unless res.success
         res = if res.instance[:response_code].to_s == '404'
                 failed_response('The label was not found. Has it been published yet?')
@@ -266,8 +266,12 @@ module MesserverApp
       URI.parse("#{AppConst::LABEL_SERVER_URI}LabelFileUpload")
     end
 
-    def print_published_label_uri
-      URI.parse("#{AppConst::LABEL_SERVER_URI}LabelPrint")
+    def print_published_label_uri(host = nil)
+      if host.nil?
+        URI.parse("#{AppConst::LABEL_SERVER_URI}LabelPrint")
+      else
+        URI.parse("#{host}LabelPrint")
+      end
     end
 
     def preview_published_label_uri

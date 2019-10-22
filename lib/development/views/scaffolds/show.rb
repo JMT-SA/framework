@@ -37,7 +37,8 @@ module Development
                 '<a href="#dm_query">Dataminer Query YAML</a>',
                 '<a href="#list">List YAML</a>',
                 '<a href="#search">Search YAML</a>',
-                '<a href="#sql">Optional SQL for inserting menu items</a>'
+                # '<a href="#sql">Optional SQL for inserting menu items</a>',
+                '<a href="#migration">Menu migration for inserting menu items</a>'
               ]
               toc.unshift('<a href="#applet">Applet</a>') if results[:applet]
               section.add_text("<ol><li>#{toc.join('</li><li>')}</ol>")
@@ -164,10 +165,15 @@ module Development
               save_snippet_form(section, results[:paths][:search], results[:search])
               section.add_text(results[:search], syntax: :yaml)
             end
+            # page.section do |section|
+            #   section.caption = '<a name="sql">Optional SQL for inserting menu items</a>'
+            #   section.hide_caption = false
+            #   section.add_text(results[:menu], syntax: :sql)
+            # end
             page.section do |section|
-              section.caption = '<a name="sql">Optional SQL for inserting menu items</a>'
+              section.caption = '<a name="migration">Menu migration for inserting menu items</a>'
               section.hide_caption = false
-              section.add_text(results[:menu], syntax: :sql)
+              section.add_text(results[:menu_mig], syntax: :ruby)
             end
           end
 

@@ -3,7 +3,7 @@
 
 link:/developer_documentation/start.adoc[Back to documentation home]
 
-= Page layout
+== Page layout
 
 Pages are laid out using a DSL which allows nesting of elements like sections, rows, columns and forms.
 

@@ -267,6 +267,13 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     raise Crossbeams::AuthorizationError unless authorised?(programs, sought_permission, functional_area_id)
   end
 
+  # Called by RodAuth after successful login to check if user
+  # has access to the program that the path belongs to.
+  def can_login_to_path?(path, user_id)
+    prog_repo = SecurityApp::MenuRepo.new
+    prog_repo.can_login_to_path?(user_id, path)
+  end
+
   # URL for use in a back button link (using the request's referer).
   # If the referer is the result of a search query, the back button goes to the
   # parameters page.

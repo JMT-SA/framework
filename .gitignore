@@ -36,6 +36,7 @@ public/js/ag-enterprise-activation.js
 ## Rubymine
 .idea/
 .rake_tasks~
+.rakeTasks
 
 ## Vim
 tags
@@ -49,3 +50,8 @@ prestyle.css
 config/mail_settings.rb
 config/dataminer_connections.yml
 prepared_reports/*.yml
+pdf_documentation/*.pdf
+pdf_documentation/*.png
+/app_reports/
+/sys_prepared_reports/
+/app_prepared_reports/

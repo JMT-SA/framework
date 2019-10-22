@@ -11,5 +11,6 @@ Sequel.migration do
     run 'DROP FUNCTION audit.audit_table(regclass);'
     run 'DROP FUNCTION audit.if_modified_func();'
     run 'DROP TABLE audit.logged_actions;'
+    run 'DROP SCHEMA audit;'
   end
 end

@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class LocalStore
-  def initialize(user_id)
+  def initialize(user_id, ip = nil)
     FileUtils.mkpath(File.join(ENV['ROOT'], 'tmp', 'pstore'))
     @user_id = user_id
-    @store = PStore.new(filename)
+    @ip = ip
+    @store = PStore.new(filename, true)
   end
 
   def read_once(key)
@@ -34,6 +35,12 @@ class LocalStore
   private
 
   def filename
-    File.join(ENV['ROOT'], 'tmp', 'pstore', "usr_#{@user_id}")
+    File.join(ENV['ROOT'], 'tmp', 'pstore', "usr_#{@user_id}#{ip_suffix}")
+  end
+
+  def ip_suffix
+    return '' if @ip.nil?
+
+    "_#{@ip.tr('.', '-')}"
   end
 end

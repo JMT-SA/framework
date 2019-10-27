@@ -18,6 +18,7 @@ module Crossbeams
     # @option options [Boolean] :scan_with_camera Should the RMD be able to use the camera to scan. Default is false.
     # @option options [String] :action The URL for the POST action.
     # @option options [String] :button_caption The submit button's caption.
+    # @option options [Boolean] :no_submit Should the RMD form exclude a submit button? Default is false.
     # @option options [Boolean] :reset_button Should the RMD form include a button to reset form values? Default is true.
     # @option options [Array] :step_and_total The step number and total no of steps. Optional - only prints if the caption is given.
     # @option options [Array] :links An array of hashes with { :caption, :url, :prompt (optional) } which provide links to navigate away.
@@ -30,7 +31,8 @@ module Crossbeams
       @caption = options[:caption]
       @step_number, @step_count = Array(options[:step_and_total])
       @links = options[:links] || []
-      @action = options.fetch(:action)
+      @no_submit = options.fetch(:no_submit, false)
+      @action = @no_submit ? '/' : options.fetch(:action)
       @button_caption = options[:button_caption]
       @reset_button = options.fetch(:reset_button, true)
       @fields = []
@@ -110,6 +112,20 @@ module Crossbeams
         <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}><th align="left">#{label}</th>
         <td><div class="pa2 bg-moon-gray br2">#{value}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
+      HTML
+    end
+
+    # Render a section caption in bold that takes up the width of the table.
+    #
+    # @param caption [string] the caption for the section.
+    # @return [void]
+    def add_section_header(caption)
+      raise ArgumentError, 'Section header caption cannot be blank' if caption.nil_or_empty?
+
+      @fields << <<~HTML
+        <tr>
+          <td colspan="2" class="b mid-gray">#{caption}</td>
+        </tr>
       HTML
     end
 
@@ -410,6 +426,9 @@ module Crossbeams
     end
 
     def submit_section
+      return '' if @no_submit && @links.empty?
+      return "<p>#{links_section}</p>" if @no_submit
+
       <<~HTML
         <p>
           <input type="submit" value="#{button_caption}" data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"> #{links_section} #{reset_section}

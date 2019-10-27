@@ -111,7 +111,7 @@ class RouteTester < Minitest::Test
 
   def expect_json_add_to_grid(has_notice: false)
     assert last_response.ok?, "Expected last response to be OK (status is #{last_response.status}) - from: #{caller.first}"
-    assert last_response.body.include?('addRowToGrid'), "Expected 'updateGridRowInPlace' in last response - from: #{caller.first}"
+    assert last_response.body.include?('addRowToGrid'), "Expected 'addRowToGrid' in last response - from: #{caller.first}"
     assert last_response.body.include?('notice'), "Expected last response to include notice flash - from: #{caller.first}" if has_notice
     assert has_json_response, "Expected JSON headers, got '#{last_response.content_type}' - from: #{caller.first}"
   end

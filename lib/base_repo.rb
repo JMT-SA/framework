@@ -91,6 +91,16 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     where_hash(table_name, id: id.to_s.empty? ? nil : id)
   end
 
+  # Get a single value from a record
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param id [Integer] the id of the row.
+  # @param column [Symbol] the column to query.
+  # @return [any] the column value for the matching record.
+  def get(table_name, id, column)
+    DB[table_name].where(id: id).get(column)
+  end
+
   # Find the first row in a table matching some condition.
   # Returns nil if it is not found.
   #

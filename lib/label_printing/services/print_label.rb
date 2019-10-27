@@ -5,13 +5,14 @@ module LabelPrintingApp
   class PrintLabel < BaseService
     include LabelContent
 
-    attr_reader :label_name, :instance, :quantity, :printer_id
+    attr_reader :label_name, :instance, :quantity, :printer_id, :host
 
-    def initialize(label_name, instance, params)
+    def initialize(label_name, instance, params, host = nil)
       @label_name = label_name
       @instance = instance
       @quantity = params[:no_of_prints] || 1
       @printer_id = params[:printer]
+      @host = host
       raise ArgumentError if label_name.nil?
     end
 
@@ -26,13 +27,16 @@ module LabelPrintingApp
     private
 
     def printer_code(printer)
+      # For a robot printing to an attached printer, the default printer is PRN-01
+      return 'PRN-01' if printer.nil?
+
       repo = LabelApp::PrinterRepo.new
       repo.find_hash(:printers, printer)[:printer_code]
     end
 
     def messerver_print(vars, printer_code)
       mes_repo = MesserverApp::MesserverRepo.new
-      mes_repo.print_published_label(label_name, vars, quantity, printer_code)
+      mes_repo.print_published_label(label_name, vars, quantity, printer_code, host)
     end
   end
 end

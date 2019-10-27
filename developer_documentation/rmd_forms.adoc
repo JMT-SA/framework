@@ -148,6 +148,11 @@ Each hash has:
 |Boolean
 |`true`.
 
+|options - :no_submit
+|Should the form be rendered without a submit button? (e.g. for view-only display)
+|Boolean
+|`false`.
+
 |===
 
 === Method: add_field
@@ -382,6 +387,24 @@ form.prev_next_nav('/path/to/resource/$:id$', [1, 2, 3, 4], 3, prev_caption: 'Be
 |String
 |`Next`
 
+|===
+
+== Method: add_section_header
+
+Renders a caption in bold to denote a section of the form.
+
+[source,ruby]
+----
+form.add_section_header('The next part of the form')
+----
+
+|===
+|attribute |description |possible values |default
+
+|caption
+|The text to render as the section caption.
+|String
+|None. Required.
 |===
 
 == Testing

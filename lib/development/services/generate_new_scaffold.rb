@@ -10,9 +10,9 @@ module DevelopmentApp
     class ScaffoldConfig
       attr_reader :inflector, :table, :singlename, :new_applet, :applet, :program,
                   :table_meta, :label_field, :short_name, :has_short_name, :program_text,
-                  :nested_route, :new_from_menu, :text_name
+                  :nested_route, :new_from_menu, :text_name, :services, :jobs
 
-      def initialize(params, roda_class_name)
+      def initialize(params, roda_class_name) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
         @roda_class_name     = roda_class_name
         @inflector           = Dry::Inflector.new
         @table               = params[:table]
@@ -30,6 +30,8 @@ module DevelopmentApp
         @shared_factory_name = params[:shared_factory_name]
         @nested_route        = params[:nested_route_parent].empty? ? nil : params[:nested_route_parent]
         @new_from_menu       = params[:new_from_menu].nil? ? false : params[:new_from_menu]
+        @services            = params[:services].empty? ? [] : params[:services].split(',').map(&:strip)
+        @jobs                = params[:jobs].empty? ? [] : params[:jobs].split(',').map(&:strip)
       end
 
       def classnames # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -37,6 +39,8 @@ module DevelopmentApp
         classname     = @inflector.camelize(@singlename)
         applet_klass  = @inflector.camelize(@applet)
         program_klass = @inflector.camelize(@program)
+        job_classes = jobs.map { |j| class_name(j) }
+        srv_classes = services.map { |j| class_name(j) }
         {
           roda_class: @roda_class_name,
           module: modulename,
@@ -50,8 +54,18 @@ module DevelopmentApp
           namespaced_repo: "#{modulename}::#{@shared_repo_name.nil? || @shared_repo_name.empty? ? classname : @inflector.camelize(@shared_repo_name.sub(/Repo$/, ''))}Repo",
           interactor: "#{classname}Interactor",
           namespaced_interactor: "#{modulename}::#{classname}Interactor",
-          view_prefix: "#{applet_klass}::#{program_klass}::#{classname}"
+          view_prefix: "#{applet_klass}::#{program_klass}::#{classname}",
+          job_classes: job_classes,
+          service_classes: srv_classes
         }
+      end
+
+      def path_name(name)
+        inflector.underscore(name)
+      end
+
+      def class_name(name)
+        inflector.classify(name)
       end
 
       def filenames
@@ -65,6 +79,8 @@ module DevelopmentApp
                    else
                      @singlename
                    end
+        job_paths = jobs.map { |j| "lib/#{@applet}/jobs/#{path_name(j)}.rb" }
+        srv_paths = services.map { |j| "lib/#{@applet}/services/#{path_name(j)}.rb" }
         {
           applet: "lib/applets/#{@applet}_applet.rb",
           dm_query: "grid_definitions/dataminer_queries/#{@table}.yml",
@@ -91,7 +107,9 @@ module DevelopmentApp
             permission: "lib/#{@applet}/test/task_permission_checks/test_#{@singlename}.rb",
             repo: "lib/#{@applet}/test/repositories/test_#{repofile}_repo.rb",
             route: "test/routes/#{@applet}/#{@program}/test_#{@singlename}_routes.rb"
-          }
+          },
+          jobs: job_paths,
+          services: srv_paths
         }
       end
     end
@@ -127,6 +145,8 @@ module DevelopmentApp
       sources[:menu_mig]   = MenuMigrationMaker.call(opts)
       sources[:test]       = TestMaker.call(opts)
       sources[:applet]     = AppletMaker.call(opts) if opts.new_applet
+      sources[:services]   = ServiceMaker.call(opts) unless opts.services.nil?
+      sources[:jobs]       = JobMaker.call(opts) unless opts.jobs.nil?
 
       sources
     end
@@ -1133,8 +1153,8 @@ module DevelopmentApp
           next unless fk
 
           tm = TableMeta.new(fk[:table])
-          singlename  = opts.inflector.singularize(fk[:table].to_s)
-          klassname   = opts.inflector.camelize(singlename)
+          singlename = opts.inflector.singularize(fk[:table].to_s)
+          klassname = opts.inflector.camelize(singlename)
           fk_repo = "#{opts.classnames[:module]}::#{klassname}Repo"
           code = tm.likely_label_field
           flds << "# #{f}_label = #{fk_repo}.new.find_#{singlename}(@form_object.#{f})&.#{code}"
@@ -2037,7 +2057,89 @@ module DevelopmentApp
       end
     end
 
-    # generate a blank service?
+    class ServiceMaker < BaseService
+      attr_reader :opts
+      def initialize(opts)
+        @opts = opts
+      end
+
+      def call
+        files = []
+        opts.classnames[:service_classes].each do |klass|
+          files << text(klass)
+        end
+        files
+      end
+
+      private
+
+      def text(klass)
+        <<~RUBY
+          # frozen_string_literal: true
+
+          module #{opts.classnames[:applet]}
+            class #{klass} < BaseService
+              attr_reader :id, :repo
+
+              def initialize(id)
+                @id = id
+                @repo = #{opts.classnames[:repo]}.new
+              end
+
+              def call
+                repo.do_work
+                success_response('#{klass} was successful')
+              end
+            end
+          end
+        RUBY
+      end
+    end
+
+    class JobMaker < BaseService
+      attr_reader :opts
+      def initialize(opts)
+        @opts = opts
+      end
+
+      def call
+        files = []
+        opts.classnames[:job_classes].each do |klass|
+          files << text(klass)
+        end
+        files
+      end
+
+      private
+
+      def text(klass)
+        <<~RUBY
+          # frozen_string_literal: true
+
+          module #{opts.classnames[:applet]}
+            module Job
+              class #{klass} < BaseQueJob
+                def run(id)
+                  repo = #{opts.classnames[:repo]}.new
+                  thing = repo.find_thing(id)
+
+                  repo.transaction do
+                    do_work
+                    finish
+                  end
+                end
+
+                private
+
+                def do_work
+                  # work..
+                end
+              end
+            end
+          end
+        RUBY
+      end
+    end
 
     class AppletMaker < BaseService
       attr_reader :opts
@@ -2052,9 +2154,9 @@ module DevelopmentApp
           root_dir = File.expand_path('..', __dir__)
           Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].each { |f| require f }
-          # Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].each { |f| require f }
+          #{job_comment}Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }
-          # Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
+          #{srv_comment}Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
           # Dir["\#{root_dir}/#{opts.applet}/task_permission_checks/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }
           Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].each { |f| require f }
@@ -2063,6 +2165,18 @@ module DevelopmentApp
           module #{opts.classnames[:module]}
           end
         RUBY
+      end
+
+      def job_comment
+        return '# ' if opts.jobs.nil?
+
+        ''
+      end
+
+      def srv_comment
+        return '# ' if opts.services.nil?
+
+        ''
       end
     end
 

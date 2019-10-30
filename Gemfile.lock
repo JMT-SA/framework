@@ -23,6 +23,12 @@ GIT
       rouge
 
 GIT
+  remote: https://github.com/NoSoft-SA/crossbeams-menu_migrations.git
+  revision: 4118b8087a8ef499c0261bded8736efa1ce4662b
+  specs:
+    crossbeams-menu_migrations (0.1.0)
+
+GIT
   remote: https://github.com/NoSoft-SA/crossbeams-rack_middleware.git
   revision: 94793ab9dd34bd27ff0abe817fada99ee5c1b53a
   specs:
@@ -229,6 +235,7 @@ DEPENDENCIES
   crossbeams-dataminer!
   crossbeams-label_designer!
   crossbeams-layout!
+  crossbeams-menu_migrations!
   crossbeams-rack_middleware!
   dotenv
   dry-inflector

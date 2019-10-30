@@ -2077,7 +2077,7 @@ module DevelopmentApp
         <<~RUBY
           # frozen_string_literal: true
 
-          module #{opts.classnames[:applet]}
+          module #{opts.classnames[:applet]}App
             class #{klass} < BaseService
               attr_reader :id, :repo
 
@@ -2116,7 +2116,7 @@ module DevelopmentApp
         <<~RUBY
           # frozen_string_literal: true
 
-          module #{opts.classnames[:applet]}
+          module #{opts.classnames[:applet]}App
             module Job
               class #{klass} < BaseQueJob
                 def run(id)

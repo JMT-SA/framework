@@ -138,6 +138,16 @@ Each hash has:
 |String
 |`Submit`.
 
+|options - :button_id
+|DOM id for the submit button. This allows a behaviour to hide/show it.
+|String
+|None.
+
+|options - :button_initially_hidden
+|Render the form with the submit button hidden. This allows a behaviour to hide/show it.
+|Boolean
+|`false`.
+
 |options - :scan_with_camera
 |Should the RMD be able to use the camera to scan.
 |Boolean

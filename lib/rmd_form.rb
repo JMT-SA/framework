@@ -18,6 +18,8 @@ module Crossbeams
     # @option options [Boolean] :scan_with_camera Should the RMD be able to use the camera to scan. Default is false.
     # @option options [String] :action The URL for the POST action.
     # @option options [String] :button_caption The submit button's caption.
+    # @option options [String] :button_id The submit button's DOM id.
+    # @option options [Boolean] :button_initially_hidden Render the form with a hidden submit button.
     # @option options [Boolean] :no_submit Should the RMD form exclude a submit button? Default is false.
     # @option options [Boolean] :reset_button Should the RMD form include a button to reset form values? Default is true.
     # @option options [Array] :step_and_total The step number and total no of steps. Optional - only prints if the caption is given.
@@ -34,6 +36,8 @@ module Crossbeams
       @no_submit = options.fetch(:no_submit, false)
       @action = @no_submit ? '/' : options.fetch(:action)
       @button_caption = options[:button_caption]
+      @button_id = options[:button_id]
+      @button_initially_hidden = options[:button_initially_hidden]
       @reset_button = options.fetch(:reset_button, true)
       @fields = []
       @rules = []
@@ -431,9 +435,21 @@ module Crossbeams
 
       <<~HTML
         <p>
-          <input type="submit" value="#{button_caption}" data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"> #{links_section} #{reset_section}
+          <input type="submit" value="#{button_caption}" #{submit_id_str}data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"#{initial_hide}> #{links_section} #{reset_section}
         </p>
       HTML
+    end
+
+    def initial_hide
+      return '' unless @button_initially_hidden
+
+      ' hidden'
+    end
+
+    def submit_id_str
+      return '' unless @button_id
+
+      %(id="#{@button_id}" )
     end
 
     def reset_section

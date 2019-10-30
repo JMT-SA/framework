@@ -28,6 +28,15 @@ namespace :app do
         puts ''
       end
     end
+
+    desc 'SQL Extract of single Masterfile'
+    task :extract_single, [:table] => [:load_app] do |_, args|
+      table = args.table
+      extractor = SecurityApp::DataToSql.new(nil)
+      puts "-- #{table.to_s.upcase} --"
+      extractor.sql_for(table.to_sym, nil)
+      puts ''
+    end
   end
 
   # Just trying something... TODO: get the rest of the params passed in

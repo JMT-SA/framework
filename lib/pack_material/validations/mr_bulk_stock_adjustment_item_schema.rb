@@ -29,6 +29,6 @@ module PackMaterialApp
     configure { config.type_specs = true }
 
     required(:column_name, Types::StrippedString).filled(:str?)
-    required(:column_value, :decimal).maybe(:decimal?, gt?: 0)
+    required(:column_value, :decimal).maybe(:decimal?, gteq?: 0)
   end
 end

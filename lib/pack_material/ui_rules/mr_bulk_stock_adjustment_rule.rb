@@ -13,6 +13,7 @@ module UiRules
         rules[:can_sign_off] = can_sign_off
         rules[:can_complete] = can_complete
         rules[:can_approve] = can_approve
+        rules[:can_manage_prices] = can_manage_prices
         rules[:show_only] = @form_object.completed || @form_object.approved
         rules[:signed_off] = @form_object.signed_off
       end
@@ -131,6 +132,10 @@ module UiRules
     def can_sign_off
       res = @perm.call(:sign_off, @options[:id], @options[:current_user])
       res.success
+    end
+
+    def can_manage_prices
+      @transaction_repo.stock_take_on?(@options[:id])
     end
   end
 end

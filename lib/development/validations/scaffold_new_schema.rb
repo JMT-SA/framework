@@ -13,6 +13,8 @@ module DevelopmentApp
     required(:shared_factory_name, Types::StrippedString).maybe(:str?)
     required(:nested_route_parent, :string).maybe(:str?)
     required(:new_from_menu, :bool).maybe(:bool?)
+    required(:jobs, :string).maybe(:str?)
+    required(:services, :string).maybe(:str?)
 
     required(:applet, :string).filled(:str?).when(eql?: 'other') do
       value(:other).filled?

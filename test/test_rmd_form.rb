@@ -22,4 +22,14 @@ class TestRMDForm < Minitest::Test
     assert_match(/type="number"/, form.render)
     refute_match(/type="number" step="any"/, form.render)
   end
+
+  def test_no_submit
+    form = make_form
+    form.add_field('test', 'Test', data_type: 'text')
+    assert_match(/type="submit"/, form.render)
+
+    form = make_form({}, action: nil, no_submit: true)
+    form.add_field('test', 'Test', data_type: 'text')
+    refute_match(/type="submit"/, form.render)
+  end
 end

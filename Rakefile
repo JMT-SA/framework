@@ -3,6 +3,7 @@ require 'rake/testtask'
 require 'rake/clean'
 require 'yard'
 require 'rubocop/rake_task'
+require 'crossbeams/menu_migrations'
 
 Dir['./lib/tasks/**/*.rake'].sort.each { |ext| load ext }
 
@@ -61,6 +62,48 @@ namespace :jobs do
     # `{ #{part1} ; #{part2} }`
     `#{part1}`
     `#{part2}`
+  end
+end
+
+namespace :menu do
+  desc 'Run menu migrations'
+  task :migrate, [:version] => :dotenv_with_override do |_, args|
+    require 'sequel'
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              else
+                ENV.fetch('DATABASE_URL')
+              end
+    db = Sequel.connect(db_name)
+    if args[:version]
+      puts "Migrating to version #{args[:version]}"
+      Crossbeams::MenuMigrations::Migrator.run(db, 'db/menu', args[:version].to_i)
+    else
+      puts 'Migrating to latest'
+      Crossbeams::MenuMigrations::Migrator.run(db, 'db/menu')
+    end
+  end
+
+  desc 'Rollback one menu migration'
+  task rollback: :dotenv_with_override do
+    require 'sequel'
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              else
+                ENV.fetch('DATABASE_URL')
+              end
+    db = Sequel.connect(db_name)
+    migrations = if db.tables.include?(:menu_migrations)
+                   db[:menu_migrations].reverse(:filename).first(2).map { |r| r[:filename] }
+                 else
+                   'No migrations have been run'
+                 end
+    if migrations.is_a? String
+      puts "Unable to rollback - #{migrations}"
+    else
+      puts "Migrating to version #{migrations.last}"
+      Crossbeams::MenuMigrations::Migrator.run(db, 'db/menu', migrations.last.to_i)
+    end
   end
 end
 

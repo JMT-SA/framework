@@ -585,22 +585,24 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   #
   # @param key [Symbol] the key to be used for later retrieval.
   # @param value [Object] the value to stash (use simple Objects)
+  # @param ip_address [string] the ip address of the client (defaults to the ip address from the request)
   # @return [void]
-  def store_locally(key, value)
+  def store_locally(key, value, ip_address = nil)
     raise ArgumentError, 'store_locally: key must be a Symbol' unless key.is_a? Symbol
 
-    store = LocalStore.new(current_user.id)
+    store = LocalStore.new(current_user.id, ip_address || request.ip)
     store.write(key, value)
   end
 
   # Return a stored value for the current user from local storage (and remove it - read once).
   #
   # @param key [Symbol] the key that was used when stored.
+  # @param ip_address [string] the ip address of the client (defaults to the ip address from the request)
   # @return [Object] the retrieved value.
-  def retrieve_from_local_store(key)
+  def retrieve_from_local_store(key, ip_address = nil)
     raise ArgumentError, 'store_locally: key must be a Symbol' unless key.is_a? Symbol
 
-    store = LocalStore.new(current_user.id)
+    store = LocalStore.new(current_user.id, ip_address || request.ip)
     store.read_once(key)
   end
 

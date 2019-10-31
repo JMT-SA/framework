@@ -124,4 +124,5 @@ View source code documentation for methods in the following files:
 * link:/yarddocthis/lib=base_service.rb[BaseService methods]
 * link:/yarddocthis/lib=crossbeams_responses.rb[Responses methods]
 * link:/yarddocthis/lib=rmd_form.rb[RMD Form methods]
+* link:/yarddocthis/lib=base_step.rb[BaseStep methods]
 

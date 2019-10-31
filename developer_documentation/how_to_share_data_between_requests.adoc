@@ -105,15 +105,16 @@ end
 
 Sometimes a process can go over several requests - gathering data and user decisions before commiting a change or carrying out an action at the end. In this case you want to store a rich set of data in the backend as you go along and apply at the final stage.
 
-In the front end you might use a link:/developer_documentation/non_field_renderers.adoc#_progressstep[ProgressStep control], and at the backend you'd create a step class that inherits from BaseStep. The step class will typically be used in interactors and should be created in the appropriate interactors directory. It is basically a wrapper around a Hash stored uniquely for the current user and step identifier.
+In the front end you might use a link:/developer_documentation/non_field_renderers.adoc#_progressstep[ProgressStep control], and at the backend you'd create a step class that inherits from link:/yarddocthis/lib=base_step.rb[BaseStep]. The step class will typically be used in interactors and should be created in the appropriate interactors directory. It is basically a wrapper around a Hash stored uniquely for the current user and step identifier.
 
 An example step class:
 [source, ruby]
 ----
 module SomeApp
   class SomeStep < BaseStep
-    def initialize(user)
-      super(user, :some_steps) # The identifier of this step. Ket to user's local store.
+    def initialize(user, ip_address = nil)
+      # :some_steps is the identifier of this step. (Key to user's local store).
+      super(user, :some_steps, ip_address)
     end
 
     def a_description
@@ -123,6 +124,8 @@ module SomeApp
   end
 end
 ----
+
+NOTE: The ip address is optional for creating an instance of `BaseStep`, so you can leave it out if there is a very low probability of two people logged in as the same user performing the same task at the same time.
 
 And sample usage:
 [source, ruby]

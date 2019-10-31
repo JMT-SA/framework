@@ -299,7 +299,7 @@ module PackMaterialApp
                             wrapper: PackMaterialApp::MrBulkStockAdjustmentItem)
     end
 
-    def rmd_update_bulk_stock_adjustment_item(attrs)
+    def rmd_update_bulk_stock_adjustment_item(attrs) # rubocop:disable Metrics/AbcSize
       item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
                                                        mr_sku_id: attrs[:mr_sku_id],
                                                        location_id: attrs[:location_id]).first

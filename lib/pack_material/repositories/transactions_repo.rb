@@ -95,7 +95,7 @@ module PackMaterialApp
       processes = [
         AppConst::PROCESS_BULK_STOCK_ADJUSTMENTS,
         AppConst::PROCESS_STOCK_TAKE,
-        AppConst::PROCESS_STOCK_TAKE_ON,
+        # AppConst::PROCESS_STOCK_TAKE_ON, # NOTE: This is only for initial Stock Take on, this should never be used again
         AppConst::PROCESS_STOCK_SALES
       ]
       DB[:business_processes].where(process: processes).map(:id)
@@ -303,7 +303,7 @@ module PackMaterialApp
       item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
                                                        mr_sku_id: attrs[:mr_sku_id],
                                                        location_id: attrs[:location_id]).first
-      return failed_response('Item does not exist') unless item || stock_take_on?(attrs)
+      return failed_response('Item does not exist') unless item || stock_take_on?(attrs[:mr_bulk_stock_adjustment_id])
 
       item_id = if item.nil?
                   create_mr_bulk_stock_adjustment_item(attrs)
@@ -315,8 +315,8 @@ module PackMaterialApp
       success_response('ok', item_id)
     end
 
-    def stock_take_on?(attrs)
-      DB[:mr_bulk_stock_adjustments].where(id: attrs[:mr_bulk_stock_adjustment_id]).get(:business_process_id) == stock_take_on_business_process_id
+    def stock_take_on?(mr_bulk_stock_adjustment_id)
+      DB[:mr_bulk_stock_adjustments].where(id: mr_bulk_stock_adjustment_id).get(:business_process_id) == stock_take_on_business_process_id
     end
 
     def stock_take_on_business_process_id

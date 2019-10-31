@@ -31,6 +31,7 @@ module PackMaterial
                                   text: 'Manage Prices',
                                   url: price_url + "/with_params?key=standard&mr_bulk_stock_adjustment_id=#{id}",
                                   style: :button,
+                                  visible: rules[:can_manage_prices],
                                   behaviour: :popup)
               if rules[:can_approve]
                 section.add_control(control_type: :link,

@@ -1,29 +1,29 @@
 ---
 :dataminer_definition: material_resource_product_variant_party_roles
 :actions:
-- :url: "/pack_material/material_resource/material_resource_product_variant_party_roles/$:id$"
+- :url: "/pack_material/config/material_resource_product_variant_party_roles/$:id$"
   :text: view
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/pack_material/material_resource/material_resource_product_variant_party_roles/$:id$/edit"
+- :url: "/pack_material/config/material_resource_product_variant_party_roles/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/pack_material/material_resource/material_resource_product_variant_party_roles/$:id$"
+- :url: "/pack_material/config/material_resource_product_variant_party_roles/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/pack_material/material_resource/material_resource_product_variants/$:matres_variant_id$/material_resource_product_variant_party_roles/new?type=customer"
+  :url: "/pack_material/config/material_resource_product_variants/$:matres_variant_id$/material_resource_product_variant_party_roles/new?type=customer"
   :text: Link Customers
   :style: :button
   :behaviour: :popup
 - :control_type: :link
-  :url: "/pack_material/material_resource/material_resource_product_variants/$:matres_variant_id$/material_resource_product_variant_party_roles/new?type=supplier"
+  :url: "/pack_material/config/material_resource_product_variants/$:matres_variant_id$/material_resource_product_variant_party_roles/new?type=supplier"
   :text: Link Suppliers
   :style: :button
   :behaviour: :popup

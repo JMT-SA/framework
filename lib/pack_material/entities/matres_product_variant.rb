@@ -9,8 +9,8 @@ module PackMaterialApp
     attribute :product_variant_code, Types::String
     attribute :old_product_code, Types::String
     attribute :supplier_lead_time, Types::Integer
-    attribute :minimum_stock_level, Types::Integer
-    attribute :re_order_stock_level, Types::Integer
+    attribute :minimum_stock_level, Types::Decimal
+    attribute :re_order_stock_level, Types::Decimal
     attribute :use_fixed_batch_number, Types::Bool
     attribute :internal_batch_number, Types::Integer
     attribute :mr_internal_batch_number_id, Types::Integer

@@ -14,7 +14,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/pack_material/material_resource/material_resource_product_variants/#{parent_id}/material_resource_product_variant_party_roles?type=#{type}"
+              form.action "/pack_material/config/material_resource_product_variants/#{parent_id}/material_resource_product_variant_party_roles?type=#{type}"
               form.remote! if remote
               form.add_field :material_resource_product_variant_id
               form.add_field :product_variant_code

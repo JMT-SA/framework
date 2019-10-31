@@ -2,7 +2,7 @@
 :dataminer_definition: material_resource_product_variants
 :multiselect:
   :variants:
-    :url: "/pack_material/material_resource/link_co_use_material_resource_product_variants/$:id$"
+    :url: "/pack_material/config/link_co_use_material_resource_product_variants/$:id$"
     :preselect: "SELECT co_use_id AS id FROM co_use_material_resource_product_variants WHERE material_resource_product_variant_id = $:id$"
     :section_caption: 'Co-Use Product Codes'
     :can_be_cleared: true

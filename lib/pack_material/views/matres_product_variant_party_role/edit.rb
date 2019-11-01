@@ -13,7 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/pack_material/config/material_resource_product_variant_party_roles/#{id}"
+              form.action "/pack_material/material_resource/material_resource_product_variant_party_roles/#{id}"
               form.remote!
               form.method :update
               form.add_field :material_resource_product_variant_id

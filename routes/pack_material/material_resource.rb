@@ -16,14 +16,14 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('material_resource', 'edit')
+        check_auth!('configuration', 'edit')
         show_partial { PackMaterial::MaterialResource::MatresProductVariant::Edit.call(id) }
       end
       r.on 'material_resource_product_variant_party_roles' do
         # Merge these interactors
         role_interactor = PackMaterialApp::MatresProductVariantPartyRoleInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          check_auth!('material_resource', 'new')
+          check_auth!('configuration', 'new')
           type = params[:type]
           show_partial_or_page(r) { PackMaterial::MaterialResource::MatresProductVariantPartyRole::New.call(id, type) }
         end
@@ -62,7 +62,7 @@ class Framework < Roda
           end
         end
         # r.delete do    # DELETE
-        #   check_auth!('material_resource', 'delete')
+        #   check_auth!('configuration', 'delete')
         #   res = interactor.delete_matres_product_variant(id)
         #   delete_grid_row(id, notice: res.message)
         # end
@@ -79,12 +79,12 @@ class Framework < Roda
       end
 
       r.on 'edit' do   # EDIT
-        check_auth!('material_resource', 'edit')
+        check_auth!('configuration', 'edit')
         show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
-          check_auth!('material_resource', 'read')
+          check_auth!('configuration', 'read')
           show_partial { PackMaterial::MaterialResource::MatresProductVariantPartyRole::Show.call(id) }
         end
         r.patch do     # UPDATE
@@ -105,7 +105,7 @@ class Framework < Roda
           end
         end
         r.delete do    # DELETE
-          check_auth!('material_resource', 'delete')
+          check_auth!('configuration', 'delete')
           res = interactor.delete_matres_product_variant_party_role(id)
           delete_grid_row(id, notice: res.message)
         end

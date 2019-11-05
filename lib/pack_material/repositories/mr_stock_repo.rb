@@ -26,18 +26,13 @@ module PackMaterialApp
 
       if pv[:use_fixed_batch_number]
         attrs[:mr_internal_batch_number_id] = pv[:mr_internal_batch_number_id]
-        sku_id = find_or_create_sku(attrs)
-        DB[:mr_delivery_items].where(id: item[:id]).update(mr_sku_id: sku_id)
-        sku_id
+        find_or_create_sku(attrs)
       else
         sku_ids = []
-        batches = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id])
-        batch_ids = batches.map(:id)
+        batch_ids = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id]).map(:id)
         batch_ids.each do |batch_id|
           attrs[:mr_delivery_item_batch_id] = batch_id
-          sku_id = find_or_create_sku(attrs)
-          DB[:mr_delivery_item_batches].where(id: batch_id).update(mr_sku_id: sku_id)
-          sku_ids << sku_id
+          sku_ids << find_or_create_sku(attrs)
         end
         sku_ids
       end

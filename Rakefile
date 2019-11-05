@@ -110,7 +110,11 @@ end
 namespace :db do
   desc 'Add a new user'
   task :add_user, %i[login_name password user_name] => [:dotenv_with_override] do |_, args|
+    require 'bcrypt'
     raise "\nLogin name cannot include spaces.\n\n" if args[:login_name].include?(' ')
+
+    pwd_hash = args[:password]
+    pwd_hash = BCrypt::Password.create(pwd_hash) unless BCrypt::Password.valid_hash?(pwd_hash)
 
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
@@ -119,7 +123,7 @@ namespace :db do
                 ENV.fetch('DATABASE_URL')
               end
     db = Sequel.connect(db_name)
-    id = db[:users].insert(login_name: args[:login_name], user_name: args[:user_name], password_hash: args[:password])
+    id = db[:users].insert(login_name: args[:login_name], user_name: args[:user_name], password_hash: pwd_hash)
     puts "Created user with id #{id}"
   end
 

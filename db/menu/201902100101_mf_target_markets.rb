@@ -1,7 +1,7 @@
 Crossbeams::MenuMigrations::Migrator.migration('Framework') do
   up do
     add_program 'Target Markets', functional_area: 'Masterfiles', seq: 3
-    add_program_function 'Types', functional_area: 'Masterfiles', program: 'Target Markets', url: '/list/target_market_group_types', group: 'Target Markets'
+    add_program_function 'Group Types', functional_area: 'Masterfiles', program: 'Target Markets', url: '/list/target_market_group_types', group: 'Target Markets'
     add_program_function 'Groups', functional_area: 'Masterfiles', program: 'Target Markets', url: '/list/target_market_groups', group: 'Target Markets', seq: 2
     add_program_function 'Target Markets', functional_area: 'Masterfiles', program: 'Target Markets', url: '/list/target_markets', group: 'Target Markets', seq: 3
     add_program_function 'Regions', functional_area: 'Masterfiles', program: 'Target Markets', url: '/list/destination_regions', group: 'Destination', seq: 4

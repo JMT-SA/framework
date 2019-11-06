@@ -1313,6 +1313,8 @@ const crossbeamsGridStaticLoader = {
             newCol.valueGetter = function valueGetter() {
               return JSON.parse(col[attr]);
             };
+          } else {
+            newCol[attr] = col[attr];
           }
         } else {
           newCol[attr] = col[attr];

@@ -325,7 +325,7 @@ const crossbeamsDataMinerParams = {
       document.querySelector(`#${this.formId} input[name=offset]`).value = stored.offset;
       this.current_values = stored.paramValues;
     }
-    crossbeamsUtils.addJSONVarToForm(this.formId, crossbeamsDataMinerParams.current_values);
+    crossbeamsUtils.addJSONVarToForm(this.formId, crossbeamsDataMinerParams.current_values || []);
     document.querySelector(`#${this.formId}`).submit();
   },
 

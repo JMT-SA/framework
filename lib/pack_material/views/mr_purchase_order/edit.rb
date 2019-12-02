@@ -60,11 +60,12 @@ module PackMaterial
 
                   row.column do |col|
                     col.add_field :mr_delivery_term_id
+                    col.add_field :account_code_id
                     col.add_field :mr_vat_type_id
-                    col.add_field :purchase_account_code
                     col.add_field :fin_object_code
                     col.add_field :valid_until
                     col.add_field :delivery_address_id
+                    col.add_field :is_consignment_stock
                     col.add_text po_totals(rules)
                   end
                 end

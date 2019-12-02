@@ -2,7 +2,7 @@
 :caption: Delivery Items
 :sql: "SELECT mr_deliveries.id AS delivery_id,\r\n  mr_delivery_items.id AS delivery_item_id,\r\n
   \ mr_delivery_items.mr_product_variant_id,\r\n  mr_purchase_orders.purchase_order_number,\r\n
-  \ mr_skus.sku_number,\r\n  material_resource_product_variants.old_product_code,\r\n
+  coalesce(batch_skus.sku_number, mr_skus.sku_number) as sku_number,\r\n  material_resource_product_variants.old_product_code,\r\n
   \ material_resource_product_variants.product_variant_code,\r\n  material_resource_product_variants.product_variant_number,\r\n
   \ material_resource_product_variants.use_fixed_batch_number,\r\n(\"mr_deliveries\".\"verified\"
   OR \"material_resource_product_variants\".\"use_fixed_batch_number\") AS new_batch_not_allowed,\r\n
@@ -16,9 +16,10 @@
   AS internal_batch_number,\r\n  mr_delivery_item_batches.quantity_on_note AS batch_quantity_on_note,\r\n
   \ mr_delivery_item_batches.quantity_received AS batch_quantity_received\r\nFROM
   mr_deliveries\r\nLEFT JOIN mr_delivery_items ON mr_delivery_items.mr_delivery_id
-  = mr_deliveries.id\r\nLEFT JOIN mr_skus ON mr_skus.mr_product_variant_id = mr_delivery_items.mr_product_variant_id\r\nLEFT
+  = mr_deliveries.id\r\nLEFT JOIN mr_skus ON mr_skus.id = mr_delivery_items.mr_sku_id\r\nLEFT
   JOIN mr_delivery_item_batches ON mr_delivery_item_batches.mr_delivery_item_id =
-  mr_delivery_items.id\r\nLEFT JOIN material_resource_product_variants ON material_resource_product_variants.id
+  mr_delivery_items.id\r\nLEFT JOIN mr_skus batch_skus ON batch_skus.id = mr_delivery_item_batches.mr_sku_id\r\nLEFT
+  JOIN material_resource_product_variants ON material_resource_product_variants.id
   = mr_delivery_items.mr_product_variant_id\r\nLEFT JOIN mr_internal_batch_numbers
   ON \"material_resource_product_variants\".\"mr_internal_batch_number_id\" = mr_internal_batch_numbers.id\r\nLEFT
   JOIN mr_purchase_order_items ON mr_purchase_order_items.id = mr_delivery_items.mr_purchase_order_item_id\r\nLEFT
@@ -96,7 +97,7 @@
     :name: sku_number
     :sequence_no: 5
     :caption: SKU no
-    :namespaced_name: mr_skus.sku_number
+    :namespaced_name: 
     :data_type: :string
     :width: 90
     :format: 

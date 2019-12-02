@@ -54,7 +54,10 @@ module PackMaterial
                                   style: :button)
             end
 
-            page.add_notice 'Delivery needs to be reviewed', notice_type: :info if rules[:review_required]
+            notice_messages = []
+            notice_messages << 'Delivery needs to be reviewed.' if rules[:review_required]
+            notice_messages << 'Delivery Items must be received in batches for consignment stock.' if rules[:on_consignment]
+            page.add_notice notice_messages.join(' '), notice_type: :info if rules[:review_required] || rules[:on_consignment]
             page.section do |section|
               section.show_border!
               section.add_caption 'Delivery'

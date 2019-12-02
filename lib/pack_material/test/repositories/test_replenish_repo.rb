@@ -21,9 +21,10 @@ module PackMaterialApp
       ReplenishRepo.any_instance.stubs(:update_purchase_order_statuses).returns('PO STATUSES RUN')
 
       pv = create_material_resource_product_variant
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
+      term_id = DB[:mr_delivery_terms].insert(delivery_term_code: 11)
       po = DB[:mr_purchase_orders].insert(
         purchase_order_number: 5,
+        is_consignment_stock: true,
         mr_delivery_term_id: term_id
       )
       inv_uom_id = @fixed_table_set[:uoms][:uom_id]
@@ -51,9 +52,10 @@ module PackMaterialApp
 
     def test_update_delivery_putaway_quantity
       pv1 = create_material_resource_product_variant
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
+      term_id = DB[:mr_delivery_terms].insert(delivery_term_code: 11)
       po = DB[:mr_purchase_orders].insert(
         purchase_order_number: 5,
+        is_consignment_stock: true,
         mr_delivery_term_id: term_id
       )
       inv_uom_id = @fixed_table_set[:uoms][:uom_id]
@@ -113,9 +115,10 @@ module PackMaterialApp
 
     def test_update_delviery_putaway_statuses
       pv1 = create_material_resource_product_variant
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
+      term_id = DB[:mr_delivery_terms].insert(delivery_term_code: 11)
       po = DB[:mr_purchase_orders].insert(
         purchase_order_number: 5,
+        is_consignment_stock: true,
         mr_delivery_term_id: term_id
       )
       inv_uom_id = @fixed_table_set[:uoms][:uom_id]
@@ -182,8 +185,9 @@ module PackMaterialApp
 
     def test_update_purchase_order_statuses
       pv1 = create_material_resource_product_variant
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
+      term_id = DB[:mr_delivery_terms].insert(delivery_term_code: 11)
       po = DB[:mr_purchase_orders].insert(
+        is_consignment_stock: true,
         purchase_order_number: 5,
         mr_delivery_term_id: term_id
       )

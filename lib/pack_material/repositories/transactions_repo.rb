@@ -96,7 +96,9 @@ module PackMaterialApp
         AppConst::PROCESS_BULK_STOCK_ADJUSTMENTS,
         AppConst::PROCESS_STOCK_TAKE,
         # AppConst::PROCESS_STOCK_TAKE_ON, # NOTE: This is only for initial Stock Take on, this should never be used again
-        AppConst::PROCESS_STOCK_SALES
+        AppConst::PROCESS_STOCK_SALES,
+        AppConst::PROCESS_WASTE_CREATED,
+        AppConst::PROCESS_DESTROYED_FOR_WASTE
       ]
       DB[:business_processes].where(process: processes).map(:id)
     end

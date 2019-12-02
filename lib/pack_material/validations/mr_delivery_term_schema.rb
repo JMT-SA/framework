@@ -6,6 +6,6 @@ module PackMaterialApp
 
     optional(:id, :integer).filled(:int?)
     required(:delivery_term_code, Types::StrippedString).maybe(:str?)
-    required(:is_consignment_stock, :bool).maybe(:bool?)
+    required(:description, Types::StrippedString).maybe(:str?)
   end
 end

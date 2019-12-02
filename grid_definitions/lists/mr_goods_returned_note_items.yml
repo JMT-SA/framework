@@ -1,0 +1,32 @@
+---
+:dataminer_definition: mr_goods_returned_note_items
+:actions:
+- :url: "/pack_material/dispatch/mr_goods_returned_note_items/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/mr_goods_returned_note_items/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/dispatch/mr_goods_returned_note_items/new"
+  :text: New Goods Returned Note Item
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: mr_goods_returned_note_items.mr_goods_returned_note_id
+      :op: =
+      :val: $:mr_goods_returned_note_id$
+:edit_rules:
+  :url: "/pack_material/dispatch/mr_goods_returned_note_items/$:id$/inline_save"
+  :editable_fields:
+    quantity_returned:
+      :editor: :numeric
+    remarks:
+      :editor: :textarea

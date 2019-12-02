@@ -16,7 +16,7 @@ module PackMaterial
               form.action '/pack_material/replenish/mr_delivery_terms'
               form.remote! if remote
               form.add_field :delivery_term_code
-              form.add_field :is_consignment_stock
+              form.add_field :description
             end
           end
 

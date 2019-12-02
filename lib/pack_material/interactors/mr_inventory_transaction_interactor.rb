@@ -88,7 +88,7 @@ module PackMaterialApp
     end
 
     def adhoc_move_business_processes
-      DB[:business_processes].select_map(:process)
+      DB[:business_processes].select_map(:process) - [AppConst::PROCESS_STOCK_TAKE_ON]
     end
 
     def existing_stock?(from_location_id, sku_number)

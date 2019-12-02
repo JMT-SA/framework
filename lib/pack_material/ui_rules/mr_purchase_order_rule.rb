@@ -47,14 +47,15 @@ module UiRules
           renderer: :label,
           caption: 'Delivery Address'
         },
-        purchase_account_code: { renderer: :label },
+        account_code_id: { renderer: :label, with_value: @form_object&.purchase_account_code },
         fin_object_code: { renderer: :label },
         valid_until: { renderer: :label },
         supplier_party_role_id: { renderer: :hidden },
         supplier_name: { renderer: :label, with_value: sup.party_name },
         supplier_erp_number: { renderer: :label, with_value: sup.erp_supplier_number },
         remarks: { renderer: :label },
-        purchase_order_number: { renderer: :label }
+        purchase_order_number: { renderer: :label },
+        is_consignment_stock: { renderer: :label, as_boolean: true }
       }
     end
 
@@ -62,7 +63,7 @@ module UiRules
       {
         mr_delivery_term_id: {
           renderer: :select,
-          options: @repo.for_select_mr_delivery_terms,
+          options: @repo.for_select_delivery_terms_with_descriptions,
           caption: 'Delivery Term',
           required: true
         },
@@ -79,15 +80,16 @@ module UiRules
           caption: 'Delivery Address',
           required: true
         },
-        purchase_account_code: {
+        account_code_id: {
           renderer: :select,
-          options: @general_repo.for_select_account_codes.map { |r| ["#{r[0]} (#{String(r[1])})", r[1]] },
-          selected: AppConst::PO_ACCOUNT_CODE,
+          options: @general_repo.for_select_account_codes_with_descriptions,
+          selected: @form_object&.account_code_id,
           caption: 'Account Code'
         },
         fin_object_code: {},
         valid_until: { subtype: :datetime, required: true },
-        remarks: { renderer: :input, text: true }
+        remarks: { renderer: :textarea },
+        is_consignment_stock: { renderer: :checkbox }
       }
     end
 
@@ -136,13 +138,14 @@ module UiRules
                                     supplier_name: sup.party_name,
                                     supplier_erp_number: sup.erp_supplier_number,
                                     mr_delivery_term_id: nil,
+                                    account_code_id: @general_repo.default_purchase_order_account_code_id,
                                     supplier_party_role_id: sup.party_role_id,
                                     mr_vat_type_id: nil,
                                     delivery_address_id: nil,
-                                    purchase_account_code: nil,
                                     fin_object_code: AppConst::PO_FIN_OBJECT_CODE,
                                     valid_until: UtilityFunctions.weeks_since(Time.now, 1),
-                                    remarks: nil)
+                                    remarks: nil,
+                                    is_consignment_stock: false)
     end
 
     def supplier

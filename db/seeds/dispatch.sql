@@ -38,3 +38,5 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Dispatch'
                                    AND functional_area_id = (SELECT id FROM functional_areas
                                                              WHERE functional_area_name = 'Pack Material')),
         'Shipped Returns', '/list/mr_goods_returned_notes/with_params?key=shipped', 3, 'GRNs');
+
+INSERT INTO business_processes (process) VALUES ('GOODS RETURN');

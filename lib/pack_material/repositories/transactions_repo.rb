@@ -154,7 +154,13 @@ module PackMaterialApp
     end
 
     def create_mr_bulk_stock_adjustment_prices(attrs)
-      DB[:mr_bulk_stock_adjustment_prices].insert(attrs) unless exists?(:mr_bulk_stock_adjustment_prices, attrs)
+      return nil if exists?(:mr_bulk_stock_adjustment_prices, attrs)
+
+      new_attrs = attrs.merge(stock_adj_price: DB[:material_resource_product_variants].where(
+        id: attrs[:mr_product_variant_id]
+      ).get(:current_price))
+
+      DB[:mr_bulk_stock_adjustment_prices].insert(new_attrs)
     end
 
     def delete_mr_bulk_stock_adjustment_item(id)
@@ -317,12 +323,25 @@ module PackMaterialApp
       success_response('ok', item_id)
     end
 
+    def can_manage_bsa_prices?(_bsa_id)
+      true # FIXME: this is temporary so that they can update historical bulk stock adjustment prices as well as do consumption at different prices
+      # stock_take_on?(bsa_id) || waste_creation?(bsa_id)
+    end
+
     def stock_take_on?(mr_bulk_stock_adjustment_id)
       DB[:mr_bulk_stock_adjustments].where(id: mr_bulk_stock_adjustment_id).get(:business_process_id) == stock_take_on_business_process_id
     end
 
     def stock_take_on_business_process_id
       DB[:business_processes].where(process: AppConst::PROCESS_STOCK_TAKE_ON).get(:id)
+    end
+
+    def waste_creation?(mr_bulk_stock_adjustment_id)
+      DB[:mr_bulk_stock_adjustments].where(id: mr_bulk_stock_adjustment_id).get(:business_process_id) == waste_creation_business_process_id
+    end
+
+    def waste_creation_business_process_id
+      DB[:business_processes].where(process: AppConst::PROCESS_WASTE_CREATED).get(:id)
     end
 
     def stock_adjustment_progress_report_values(bulk_stock_adjustment_id, sku_id, location_id) # rubocop:disable Metrics/AbcSize

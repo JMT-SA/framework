@@ -80,21 +80,19 @@ module PackMaterialApp
       grn = DB[:mr_goods_returned_notes].where(id: grn_id)
       item_collection = []
       grn_items = DB[:mr_goods_returned_note_items].where(mr_goods_returned_note_id: grn_id).all
-      # grn_item = DB[:mr_goods_returned_note_items].where(mr_goods_returned_note_id: grn_id).all[0]
       grn_items.each do |grn_item|
         batch_id = grn_item[:mr_delivery_item_batch_id]
         record = batch_id ? DB[:mr_delivery_item_batches].where(id: batch_id) : DB[:mr_delivery_items].where(id: grn_item[:mr_delivery_item_id])
         sku_id = record.get(:mr_sku_id)
+        qty_returned = grn_item[:quantity_returned]
+        item_collection << { sku_id: sku_id, qty: qty_returned }
+        received = record.get(:quantity_received)
+        return failed_response 'Quantity returned can not be more than the quantity received on the delivery item' unless received > qty_returned
+
         avail_qty = DB[:mr_sku_locations].where(location_id: grn.get(:dispatch_location_id), mr_sku_id: sku_id).get(:quantity) || AppConst::BIG_ZERO
+        next if avail_qty > qty_returned
 
-        attrs = {
-          sku_id: sku_id,
-          qty: grn_item[:quantity_returned]
-        }
-        item_collection << attrs
-        next if avail_qty > grn_item[:quantity_returned]
-
-        return failed_response 'Quantity returned can not be more than the quantity received on the delivery item'
+        return failed_response 'Stock to be shipped must be in the dispatch location'
       end
       success_response('OK', item_collection)
     end

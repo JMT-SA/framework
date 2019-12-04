@@ -155,7 +155,7 @@ class Framework < Roda
       end
 
       r.on 'inline_save' do
-        check_auth!('transactions', 'edit')
+        check_auth!('dispatch', 'edit')
         res = interactor.inline_update(id, params)
         if res.success
           parent_id = interactor.mr_goods_returned_note_item(id)&.mr_goods_returned_note_id

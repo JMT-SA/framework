@@ -17,9 +17,6 @@ module PackMaterialApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check
-        # complete: :complete_check,
-        # approve: :approve_check,
-        # reopen: :reopen_check
       }.freeze
 
       def call

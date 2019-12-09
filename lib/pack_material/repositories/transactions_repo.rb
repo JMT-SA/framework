@@ -324,8 +324,7 @@ module PackMaterialApp
     end
 
     def can_manage_bsa_prices?(_bsa_id)
-      true # FIXME: this is temporary so that they can update historical bulk stock adjustment prices as well as do consumption at different prices
-      # stock_take_on?(bsa_id) || waste_creation?(bsa_id)
+      stock_take_on?(bsa_id) || waste_creation?(bsa_id)
     end
 
     def stock_take_on?(mr_bulk_stock_adjustment_id)

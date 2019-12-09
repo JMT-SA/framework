@@ -6,6 +6,7 @@ module UiRules
       @repo = PackMaterialApp::DispatchRepo.new
       @replenish_repo = PackMaterialApp::ReplenishRepo.new
       @perm = PackMaterialApp::TaskPermissionCheck::MrGoodsReturnedNote
+      @purchase_invoice_repo = PackMaterialApp::PurchaseInvoiceRepo.new
       make_form_object
       apply_form_values
       set_rules if @mode == :edit
@@ -24,6 +25,7 @@ module UiRules
       rules[:shipped] = @form_object.shipped
       rules[:can_ship] = can_ship
       rules[:can_complete_invoice] = can_complete_invoice
+      rules[:cn_sub_totals] = @purchase_invoice_repo.cn_sub_totals(@options[:id], delimiter: '', no_decimals: 2)
     end
 
     def new_fields
@@ -67,6 +69,10 @@ module UiRules
     end
 
     private
+
+    def delivery_options
+      @replenish_repo.for_select_mr_deliveries(where: { invoice_completed: true, grn_returned: false })
+    end
 
     def delivery_number
       @replenish_repo.delivery_number_from_id(@form_object.mr_delivery_id)

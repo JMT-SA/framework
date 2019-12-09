@@ -49,7 +49,7 @@ module PackMaterialApp
     def ship_mr_goods_returned_note(id) # rubocop:disable Metrics/AbcSize
       assert_permission!(:can_ship, id)
       repo.transaction do
-        res = repo.validate_grn_stock_levels(id)
+        res = validate_grn_stock_levels(id)
         return res unless res.success
 
         repo.update_with_document_number('doc_seqs_credit_note_number', id)
@@ -66,7 +66,8 @@ module PackMaterialApp
           PackMaterialApp::RemoveMrStock.call(item[:sku_id], loc_id, item[:qty], attrs)
         end
 
-        repo.update(:mr_goods_returned_notes, id, shipped: true)
+        repo.mark_as_shipped(id)
+        repo.update_delivery_grn_status(grn.mr_delivery_id)
         log_status('mr_goods_returned_notes', id, 'SHIPPED')
         log_transaction
       end
@@ -132,6 +133,10 @@ module PackMaterialApp
 
     def validate_new_mr_goods_returned_note_params(params)
       NewMrGoodsReturnedNoteSchema.call(params)
+    end
+
+    def validate_grn_stock_levels(grn_id)
+      repo.validate_grn_stock_levels(grn_id)
     end
 
     def already_enqueued?(grn_id)

@@ -81,14 +81,10 @@ module PackMaterialApp
       item_collection = []
       grn_items = DB[:mr_goods_returned_note_items].where(mr_goods_returned_note_id: grn_id).all
       grn_items.each do |grn_item|
-        batch_id = grn_item[:mr_delivery_item_batch_id]
-        record = batch_id ? DB[:mr_delivery_item_batches].where(id: batch_id) : DB[:mr_delivery_items].where(id: grn_item[:mr_delivery_item_id])
+        record = delivery_item_record(grn_item[:id])
         sku_id = record.get(:mr_sku_id)
         qty_returned = grn_item[:quantity_returned]
         item_collection << { sku_id: sku_id, qty: qty_returned }
-        received = record.get(:quantity_received)
-        return failed_response 'Quantity returned can not be more than the quantity received on the delivery item' unless received > qty_returned
-
         avail_qty = DB[:mr_sku_locations].where(location_id: grn.get(:dispatch_location_id), mr_sku_id: sku_id).get(:quantity) || AppConst::BIG_ZERO
         next if avail_qty > qty_returned
 
@@ -108,12 +104,15 @@ module PackMaterialApp
       delivery = DB[:mr_deliveries].where(id: del_id).first
       collection = []
       items.each do |item|
+        next if item[:grn_returned]
+
         batches = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id]).all
         pv = DB[:material_resource_product_variants].where(id: item[:mr_product_variant_id]).first
         pv_number = pv[:product_variant_code]
         del_no = delivery[:delivery_number]
         if batches.any?
           batches.each do |r|
+            next if r[:grn_returned]
             next if DB[:mr_goods_returned_note_items].where(
               mr_goods_returned_note_id: grn_id,
               mr_delivery_item_batch_id: r[:id]
@@ -144,6 +143,53 @@ module PackMaterialApp
              invoice_completed: true,
              erp_purchase_order_number: attrs[:purchase_order_number],
              erp_purchase_invoice_number: attrs[:purchase_invoice_number])
+    end
+
+    def mark_as_shipped(grn_id)
+      update(:mr_goods_returned_notes, grn_id, shipped: true)
+    end
+
+    def update_delivery_grn_status(del_id) # rubocop:disable Metrics/AbcSize
+      delivery = DB[:mr_deliveries].where(id: del_id)
+      grn_ids = DB[:mr_goods_returned_notes].where(mr_delivery_id: del_id, shipped: true).select_map(&:id)
+      item_ids = DB[:mr_delivery_items].where(mr_delivery_id: del_id).select_map(&:id)
+      batch_ids = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_ids).select_map(&:id)
+
+      # Update batch qty's
+      batch_ids.each do |batch_id|
+        qty_returned = DB[:mr_goods_returned_note_items].where(mr_delivery_item_batch_id: batch_id, mr_goods_returned_note_id: grn_ids).sum(:quantity_returned)
+        batch = DB[:mr_delivery_item_batches].where(id: batch_id)
+        grn_returned = batch.get(:quantity_received) == qty_returned
+        batch.update(grn_qty_returned: qty_returned, grn_returned: grn_returned)
+      end
+
+      # Update item qty's
+      item_ids.each do |item_id|
+        qty_returned = DB[:mr_goods_returned_note_items].where(mr_delivery_item_id: item_id, mr_goods_returned_note_id: grn_ids).sum(:quantity_returned)
+        item = DB[:mr_delivery_items].where(id: item_id)
+        grn_returned = item.get(:quantity_received) == qty_returned
+        item.update(grn_qty_returned: qty_returned, grn_returned: grn_returned)
+      end
+
+      all_grn_returned = !DB[:mr_delivery_items].where(id: item_ids).select_map(&:grn_returned).uniq.include?(false)
+      delivery.update(grn_returned: true) if item_ids && all_grn_returned
+    end
+
+    def validate_grn_quantity_amount(grn_item_id, attrs)
+      new_qty = BigDecimal(attrs[:column_value]) || attrs[:quantity_returned]
+      record = delivery_item_record(grn_item_id)
+      return failed_response('Item has already been returned in full') if record.get(:grn_returned)
+
+      avail_qty = record.get(:quantity_received) - record.get(:grn_qty_returned)
+      return failed_response("Quantity available: #{UtilityFunctions.delimited_number(avail_qty)}") unless new_qty <= avail_qty
+
+      success_response('valid quantity')
+    end
+
+    def delivery_item_record(grn_item_id)
+      grn_item = DB[:mr_goods_returned_note_items].where(id: grn_item_id)
+      batch_id = grn_item.get(:mr_delivery_item_batch_id)
+      batch_id ? DB[:mr_delivery_item_batches].where(id: batch_id) : DB[:mr_delivery_items].where(id: grn_item[:mr_delivery_item_id])
     end
   end
 end

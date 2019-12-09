@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MrGoodsReturnedNoteItemInteractor < BaseInteractor
+  class MrGoodsReturnedNoteItemInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_mr_goods_returned_note_item(parent_id, params) # rubocop:disable Metrics/AbcSize
       assert_permission!(:create, nil, grn_id: parent_id)
       type, id = params[:delivery_item].split('_')
@@ -30,8 +30,11 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def update_mr_goods_returned_note_item(id, params)
+    def update_mr_goods_returned_note_item(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_mr_goods_returned_note_item_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      res = validate_grn_quantity_amount(id, params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
@@ -66,9 +69,14 @@ module PackMaterialApp
       res = remarks ? validate_inline_update_remarks_params(params) : validate_inline_update_quantity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      unless remarks
+        result = validate_grn_quantity_amount(id, params)
+        return result unless result.success
+      end
+
       repo.transaction do
         repo.inline_update_goods_returned_note(id, res)
-        log_status('mr_goods_returned_notes', id, 'INLINE ADJUSTMENT')
+        log_status('mr_goods_returned_note_items', id, 'INLINE ADJUSTMENT')
         log_transaction
       end
       success_response('Updated Goods Returned Note Item')
@@ -108,6 +116,10 @@ module PackMaterialApp
 
     def validate_inline_update_quantity_params(params)
       MrGoodsReturnedNoteItemInlineQuantitySchema.call(params)
+    end
+
+    def validate_grn_quantity_amount(id, params)
+      repo.validate_grn_quantity_amount(id, params)
     end
 
     def validate_inline_update_remarks_params(params)

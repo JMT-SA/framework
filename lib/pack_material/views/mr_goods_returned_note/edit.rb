@@ -51,6 +51,7 @@ module PackMaterial
 
                   row.column do |column|
                     column.add_field :remarks
+                    column.add_text cn_totals(rules)
                   end
                 end
               end
@@ -96,6 +97,18 @@ module PackMaterial
           end
 
           layout
+        end
+
+        def self.cn_totals(rules)
+          <<~HTML
+            <div class="fr">
+            <table><tbody>
+            <tr><th class="tr pr2">Sub-total</th><td class="tr"><span id="del_totals_subtotal">#{rules[:cn_sub_totals][:subtotal]}</span></td></tr>
+            <tr><th class="tr pr2">VAT</th><td class="tr"><span id="del_totals_vat">#{rules[:cn_sub_totals][:vat]}</span></td></tr>
+            <tr><th class="tr pr2">Total</th><td class="tr b bb bt"><span id="del_totals_total">#{rules[:cn_sub_totals][:total]}</span></td></tr>
+            </tbody></table>
+            </div>
+          HTML
         end
       end
     end

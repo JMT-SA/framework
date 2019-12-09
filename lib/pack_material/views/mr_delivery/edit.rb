@@ -111,6 +111,7 @@ module PackMaterial
             page.section do |section| # rubocop:disable Metrics/BlockLength
               section.show_border!
               unless cannot_edit
+                # new_item_url = rules[:on_consignment] ? "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new_item_on_consignment" : "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect"
                 section.add_control(control_type: :link,
                                     text: 'New Item',
                                     url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect",

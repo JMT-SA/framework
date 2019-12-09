@@ -1,21 +1,22 @@
 ---
 :caption: Goods Returned Note Items
-:sql: "SELECT distinct \"mr_goods_returned_note_items\".\"id\",\r\n       \"mr_goods_returned_note_items\".\"mr_goods_returned_note_id\",\r\n
-  \      \"mr_goods_returned_note_items\".\"mr_delivery_item_id\",\r\n       \"mr_goods_returned_note_items\".\"mr_delivery_item_batch_id\",\r\n
-  \      \"mr_goods_returned_note_items\".\"remarks\",\r\n       \"mr_goods_returned_note_items\".\"quantity_returned\",\r\nmr_delivery_items.quantity_received,\r\n
-  \                   coalesce(ms.sku_number, msk.sku_number) as sku_number,\r\n                    material_resource_product_variants.product_variant_code,\r\n
-  \                   material_resource_product_variants.product_variant_number,\r\n
-  \                   fn_current_status('mr_goods_returned_note_items', mr_goods_returned_note_items.id)
-  AS status,\r\n                    mr_goods_returned_note_items.created_at,\r\n                    mr_goods_returned_note_items.updated_at\r\n
-  \                 FROM mr_goods_returned_note_items\r\n                  LEFT JOIN
-  mr_delivery_item_batches ON mr_delivery_item_batches.id = mr_goods_returned_note_items.mr_delivery_item_batch_id\r\n
-  \                 LEFT JOIN mr_delivery_items ON mr_delivery_items.id = mr_goods_returned_note_items.mr_delivery_item_id\r\n
-  \                 LEFT JOIN mr_deliveries on mr_deliveries.id = mr_delivery_items.mr_delivery_id\r\n
-  \                 JOIN mr_goods_returned_notes ON mr_goods_returned_notes.id = mr_goods_returned_note_items.mr_goods_returned_note_id\r\n
-  \                 LEFT JOIN mr_skus ms on mr_delivery_item_batches.id = ms.mr_delivery_item_batch_id\r\n
-  \                 LEFT JOIN mr_skus msk on mr_delivery_items.mr_product_variant_id
-  = msk.mr_product_variant_id\r\n                  LEFT JOIN material_resource_product_variants
-  on mr_delivery_items.mr_product_variant_id = material_resource_product_variants.id"
+:sql: "SELECT distinct \"mr_goods_returned_note_items\".\"id\",\r\n                \"mr_goods_returned_note_items\".\"mr_goods_returned_note_id\",\r\n
+  \               \"mr_goods_returned_note_items\".\"mr_delivery_item_id\",\r\n                \"mr_goods_returned_note_items\".\"mr_delivery_item_batch_id\",\r\n
+  \               \"mr_goods_returned_note_items\".\"remarks\",\r\n                \"mr_goods_returned_note_items\".\"quantity_returned\",\r\n
+  \               coalesce(mr_delivery_item_batches.quantity_received, mr_delivery_items.quantity_received)
+  as quantity_received,\r\n                coalesce(ms.sku_number, msk.sku_number)
+  as sku_number,\r\n                material_resource_product_variants.product_variant_code,\r\n
+  \               material_resource_product_variants.product_variant_number,\r\n                fn_current_status('mr_goods_returned_note_items',
+  mr_goods_returned_note_items.id) AS status,\r\n                mr_goods_returned_note_items.created_at,\r\n
+  \               mr_goods_returned_note_items.updated_at\r\nFROM mr_goods_returned_note_items\r\n
+  \        LEFT JOIN mr_delivery_item_batches ON mr_delivery_item_batches.id = mr_goods_returned_note_items.mr_delivery_item_batch_id\r\n
+  \        LEFT JOIN mr_delivery_items ON mr_delivery_items.id = mr_goods_returned_note_items.mr_delivery_item_id\r\n
+  \        LEFT JOIN mr_deliveries on mr_deliveries.id = mr_delivery_items.mr_delivery_id\r\n
+  \        JOIN mr_goods_returned_notes ON mr_goods_returned_notes.id = mr_goods_returned_note_items.mr_goods_returned_note_id\r\n
+  \        LEFT JOIN mr_skus ms on mr_delivery_item_batches.id = ms.mr_delivery_item_batch_id\r\n
+  \        LEFT JOIN mr_skus msk on mr_delivery_items.mr_product_variant_id = msk.mr_product_variant_id\r\n
+  \        LEFT JOIN material_resource_product_variants on mr_delivery_items.mr_product_variant_id
+  = material_resource_product_variants.id"
 :limit: 
 :offset: 
 :external_settings:
@@ -121,7 +122,7 @@
     :name: quantity_received
     :sequence_no: 7
     :caption: Qty received
-    :namespaced_name: mr_delivery_items.quantity_received
+    :namespaced_name: 
     :data_type: :number
     :width: 120
     :format: :delimited_1000

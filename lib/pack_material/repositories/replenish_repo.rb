@@ -307,9 +307,13 @@ module PackMaterialApp
       items.include?(nil)
     end
 
-    def incomplete_items(mr_delivery_id)
-      items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map { |r| [r[:quantity_on_note], r[:quantity_received]] }
-      items.flatten.include?(nil) || items.flatten.include?(0)
+    def incomplete_items(mr_delivery_id) # rubocop:disable Metrics/AbcSize
+      items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id)
+      batches = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: items.map(:id))
+      item_check = items.map { |r| [r[:quantity_on_note], r[:quantity_received]] }.flatten
+      batch_check = batches.map { |r| [r[:quantity_on_note], r[:quantity_received]] }.flatten
+      all_items = item_check + batch_check
+      (all_items & [nil, 0]).any?
     end
 
     def invalid_on_consignment_items(mr_delivery_id)
@@ -728,7 +732,15 @@ module PackMaterialApp
     def create_mr_delivery_item(attrs)
       new_attrs = attrs.to_h
       new_attrs.delete(:quantity_over_under_supplied)
-      create(:mr_delivery_items, new_attrs)
+
+      consignment = DB[:mr_purchase_orders].where(
+        id: DB[:mr_purchase_order_items].where(
+          id: attrs[:mr_purchase_order_item_id]
+        ).get(:mr_purchase_order_id)
+      ).get(:is_consignment_stock)
+      item_id = create(:mr_delivery_items, new_attrs)
+      DB[:mr_delivery_item_batches].insert(mr_delivery_item_id: item_id, client_batch_number: 'Consignment Stock') if consignment
+      item_id
     end
 
     # @param [Hash] attrs => quantity_received, quantity_on_note, mr_purchase_order_item_id

@@ -2,11 +2,11 @@
 
 module PackMaterialApp
   class WaCostRepo < BaseRepo
-    def generate_wa_costs_report
+    def calculate_wa_costs
       pv_ids = DB[:material_resource_product_variants].select_map(:id)
       pv_ids.each do |pv_id|
-        cost = wa_cost(pv_id)
-        DB[:material_resource_product_variants].where(id: pv_id).update(weighted_average_cost: cost) if cost
+        cost = wa_cost(pv_id) || BigDecimal('0')
+        DB[:material_resource_product_variants].where(id: pv_id).update(weighted_average_cost: cost)
       end
     end
 

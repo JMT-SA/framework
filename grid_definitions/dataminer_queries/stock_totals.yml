@@ -1,10 +1,10 @@
 ---
 :caption: Stock Totals
-:sql: "select mr_skus.sku_number,\r\n       \"material_resource_product_variants\".\"product_variant_code\",\r\n
-  \       \"material_resource_product_variants\".\"old_product_code\",\r\n       (select
-  sum(quantity) from mr_sku_locations where mr_skus.id = mr_sku_locations.mr_sku_id)
-  as total\r\n       from mr_skus\r\njoin material_resource_product_variants on mr_skus.mr_product_variant_id
-  = material_resource_product_variants.id"
+:sql: "select mr_skus.sku_number,\r\n       mrpv.product_variant_code,\r\n       mrpv.old_product_code,\r\n
+  \      (select sum(quantity) from mr_sku_locations where mr_skus.id = mr_sku_locations.mr_sku_id)
+  as total,\r\n       mrpv.weighted_average_cost,\r\n       mrpv.wa_cost_updated_at\r\nfrom
+  mr_skus\r\njoin material_resource_product_variants mrpv on mr_skus.mr_product_variant_id
+  = mrpv.id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -29,7 +29,7 @@
     :name: product_variant_code
     :sequence_no: 2
     :caption: Product variant code
-    :namespaced_name: material_resource_product_variants.product_variant_code
+    :namespaced_name: mrpv.product_variant_code
     :data_type: :string
     :width: 
     :format: 
@@ -45,7 +45,7 @@
     :name: old_product_code
     :sequence_no: 3
     :caption: Old product code
-    :namespaced_name: material_resource_product_variants.old_product_code
+    :namespaced_name: mrpv.old_product_code
     :data_type: :string
     :width: 
     :format: 
@@ -62,6 +62,38 @@
     :sequence_no: 4
     :caption: Total
     :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  weighted_average_cost:
+    :name: weighted_average_cost
+    :sequence_no: 5
+    :caption: Weighted average cost
+    :namespaced_name: mrpv.weighted_average_cost
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  wa_cost_updated_at:
+    :name: wa_cost_updated_at
+    :sequence_no: 6
+    :caption: Wa cost updated at
+    :namespaced_name: mrpv.wa_cost_updated_at
     :data_type: :string
     :width: 
     :format: 

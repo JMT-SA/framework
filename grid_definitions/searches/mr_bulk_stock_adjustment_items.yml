@@ -6,19 +6,3 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/pack_material/transactions/mr_bulk_stock_adjustment_items/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/pack_material/transactions/mr_bulk_stock_adjustment_items/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/pack_material/transactions/mr_bulk_stock_adjustment_items/new"
-  :text: New Bulk Stock Adjustment Item
-  :style: :button
-  :behaviour: :popup

@@ -16,9 +16,3 @@
   :icon: delete
   :is_delete: true
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/pack_material/transactions/mr_bulk_stock_adjustments/new"
-  :text: New Bulk Stock Adjustment
-  :style: :button
-  :behaviour: :popup

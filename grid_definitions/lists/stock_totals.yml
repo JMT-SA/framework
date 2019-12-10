@@ -1,2 +1,7 @@
 ---
 :dataminer_definition: stock_totals
+:page_controls:
+  - :control_type: :link
+    :url: "/pack_material/transactions/recalculate_wa_costs"
+    :text: Recalculate Weighted Avg Costs
+    :style: :button

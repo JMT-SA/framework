@@ -96,6 +96,10 @@ module PackMaterialApp
       repo.existing_sku_locations_for(sku_id, from_location_id).first
     end
 
+    def recalculate_wa_costs
+      WaCostRepo.new.calculate_wa_costs
+    end
+
     private
 
     def repo

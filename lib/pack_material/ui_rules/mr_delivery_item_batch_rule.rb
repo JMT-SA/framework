@@ -38,7 +38,7 @@ module UiRules
     def common_fields
       {
         mr_delivery_item_id: { renderer: :hidden },
-        client_batch_number: {},
+        client_batch_number: { required: true },
         quantity_on_note: { renderer: :numeric, required: true },
         quantity_received: { renderer: :numeric, required: true }
       }

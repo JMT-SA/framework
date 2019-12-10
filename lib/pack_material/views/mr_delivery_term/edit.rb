@@ -17,7 +17,7 @@ module PackMaterial
               form.remote!
               form.method :update
               form.add_field :delivery_term_code
-              form.add_field :is_consignment_stock
+              form.add_field :description
             end
           end
 

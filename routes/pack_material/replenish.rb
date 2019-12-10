@@ -301,7 +301,7 @@ class Framework < Roda
           if res.success
             update_grid_row(id,
                             changes: { delivery_term_code: res.instance[:delivery_term_code],
-                                       is_consignment_stock: res.instance[:is_consignment_stock] },
+                                       description: res.instance[:description] },
                             notice: res.message)
           else
             re_show_form(r, res) { PackMaterial::Replenish::MrDeliveryTerm::Edit.call(id, form_values: params[:mr_delivery_term], form_errors: res.errors) }
@@ -330,7 +330,7 @@ class Framework < Roda
           row_keys = %i[
             id
             delivery_term_code
-            is_consignment_stock
+            description
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -571,23 +571,11 @@ class Framework < Roda
 
       r.on 'inline_save' do
         check_auth!('replenish', 'edit')
-        del_interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
         res = interactor.inline_update(id, params)
+        store_last_referer_url(:delivery_item_inline_update)
         if res.success
-          show_json_notice(res.message)
-
-          parent_id = interactor.mr_delivery_item(id)&.mr_delivery_id
-          permission_res = interactor.can_complete_invoice(parent_id)
-          sub_totals = del_interactor.del_sub_totals(parent_id)
-          if permission_res.success
-            json_actions(del_sub_total_changes(sub_totals) +
-                         [OpenStruct.new(type: :show_element, dom_id: 'mr_delivery_complete_button')],
-                         res.message)
-          else
-            json_actions(del_sub_total_changes(sub_totals) +
-                         [OpenStruct.new(type: :hide_element, dom_id: 'mr_delivery_complete_button')],
-                         res.message)
-          end
+          flash[:notice] = res.message
+          redirect_via_json_to_stored_referer(:delivery_item_inline_update)
         else
           show_json_error(res.message, status: 200)
         end

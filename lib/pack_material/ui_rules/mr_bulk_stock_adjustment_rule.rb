@@ -135,7 +135,7 @@ module UiRules
     end
 
     def can_manage_prices
-      @transaction_repo.stock_take_on?(@options[:id])
+      @transaction_repo.can_manage_bsa_prices?(@options[:id])
     end
   end
 end

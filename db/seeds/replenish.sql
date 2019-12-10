@@ -62,12 +62,6 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
                                     WHERE functional_area_name = 'Pack Material')),
         'Completed Deliveries', 'Deliveries', '/list/mr_deliveries/with_params?key=completed', 5);
 
--- INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
--- VALUES ((SELECT id FROM programs WHERE program_name = 'Replenish'
---                                        AND functional_area_id = (SELECT id FROM functional_areas
--- WHERE functional_area_name = 'Pack Material')),
---         'Delivery Items/Batches', 'Deliveries', '/list/mr_delivery_items_batches', 4);
-
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('CREATE STOCK');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('PUTAWAY');
 INSERT INTO mr_inventory_transaction_types (type_name) VALUES ('ADHOC MOVE');

@@ -5,23 +5,25 @@
   supplier_party_role,\r\n       \"mr_purchase_orders\".\"purchase_order_number\",\r\n
   \      \"mr_purchase_orders\".\"valid_until\",\r\n       \"mr_purchase_orders\".\"approved\",\r\n
   \      \"mr_purchase_orders\".\"deliveries_received\",\r\n       \"mr_purchase_orders\".\"short_supplied\",\r\n
-  \      (SELECT string_agg(delivery_number::text, ';')\r\n       from (select distinct
-  mr_deliveries.delivery_number\r\n           from mr_deliveries\r\n           join
-  mr_delivery_items mdi on mr_deliveries.id = mdi.mr_delivery_id\r\n           join
-  mr_purchase_order_items mpoi on mdi.mr_purchase_order_item_id = mpoi.id\r\n           where
+  \      (SELECT string_agg(delivery_number::text, ';')\r\n        from (select distinct
+  mr_deliveries.delivery_number\r\n              from mr_deliveries\r\n                       join
+  mr_delivery_items mdi on mr_deliveries.id = mdi.mr_delivery_id\r\n                       join
+  mr_purchase_order_items mpoi on mdi.mr_purchase_order_item_id = mpoi.id\r\n              where
   mr_purchase_orders.id = mpoi.mr_purchase_order_id) sub) as del_nos,\r\n       \"mr_purchase_orders\".\"remarks\",\r\n
   \      \"mr_purchase_orders\".\"mr_vat_type_id\",\r\n       \"mr_vat_types\".\"vat_type_code\",\r\n
-  \      \"mr_purchase_orders\".\"purchase_account_code\",\r\n       \"mr_purchase_orders\".\"fin_object_code\",\r\n
+  \      \"mr_purchase_orders\".\"fin_object_code\",\r\n       ac.account_code,\r\n
   \      \"mr_purchase_orders\".\"delivery_address_id\",\r\n       \"addresses\".\"address_line_1\",\r\n
-  \      \"mr_purchase_orders\".\"mr_delivery_term_id\",\r\n       \"mr_delivery_terms\".\"delivery_term_code\",\r\n
+  \      \"mr_purchase_orders\".\"mr_delivery_term_id\",\r\n       \"mr_purchase_orders\".\"account_code_id\",\r\n
+  \      \"mr_delivery_terms\".\"delivery_term_code\",\r\n       mr_purchase_orders.is_consignment_stock,\r\n
   \      \"mr_purchase_orders\".\"created_at\",\r\n       \"mr_purchase_orders\".\"updated_at\",\r\n
   \      case\r\n           when (mr_purchase_orders.approved and not mr_purchase_orders.deliveries_received)
   then 'inprogress'\r\n           else null\r\n           end as colour_rule\r\nFROM
   \"mr_purchase_orders\"\r\n         LEFT JOIN \"addresses\" ON \"addresses\".\"id\"
   = \"mr_purchase_orders\".\"delivery_address_id\"\r\n         LEFT JOIN \"mr_delivery_terms\"
   ON \"mr_delivery_terms\".\"id\" = \"mr_purchase_orders\".\"mr_delivery_term_id\"\r\n
-  \        LEFT JOIN \"mr_vat_types\" ON \"mr_vat_types\".\"id\" = \"mr_purchase_orders\".\"mr_vat_type_id\"\r\norder
-  by \"mr_purchase_orders\".purchase_order_number desc"
+  \        LEFT JOIN \"mr_vat_types\" ON \"mr_vat_types\".\"id\" = \"mr_purchase_orders\".\"mr_vat_type_id\"\r\nLeft
+  join account_codes ac on mr_purchase_orders.account_code_id = ac.id\r\norder by
+  \"mr_purchase_orders\".purchase_order_number desc"
 :limit: 
 :offset: 
 :external_settings:
@@ -220,13 +222,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  purchase_account_code:
-    :name: purchase_account_code
+  fin_object_code:
+    :name: fin_object_code
     :sequence_no: 13
-    :caption: ACC
-    :namespaced_name: mr_purchase_orders.purchase_account_code
+    :caption: FIN Code
+    :namespaced_name: mr_purchase_orders.fin_object_code
     :data_type: :string
-    :width: 90
+    :width: 110
     :format: 
     :hide: false
     :pinned: 
@@ -236,17 +238,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  fin_object_code:
-    :name: fin_object_code
+  account_code:
+    :name: account_code
     :sequence_no: 14
-    :caption: FIN Code
-    :namespaced_name: mr_purchase_orders.fin_object_code
+    :caption: Acc code
+    :namespaced_name: ac.account_code
     :data_type: :string
-    :width: 110
+    :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -300,9 +302,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  account_code_id:
+    :name: account_code_id
+    :sequence_no: 18
+    :caption: Account code
+    :namespaced_name: mr_purchase_orders.account_code_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   delivery_term_code:
     :name: delivery_term_code
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Del Term
     :namespaced_name: mr_delivery_terms.delivery_term_code
     :data_type: :string
@@ -316,9 +334,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  is_consignment_stock:
+    :name: is_consignment_stock
+    :sequence_no: 20
+    :caption: Consignment
+    :namespaced_name: mr_purchase_orders.is_consignment_stock
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 19
+    :sequence_no: 21
     :caption: Created at
     :namespaced_name: mr_purchase_orders.created_at
     :data_type: :datetime
@@ -334,7 +368,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 20
+    :sequence_no: 22
     :caption: Updated at
     :namespaced_name: mr_purchase_orders.updated_at
     :data_type: :datetime
@@ -350,7 +384,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 21
+    :sequence_no: 23
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

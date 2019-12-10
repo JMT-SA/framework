@@ -32,6 +32,8 @@ module PackMaterialApp
           review_check
         when :review_required
           review_required_check
+        when :has_on_consignment_items
+          on_consignment_items_check
         when :verify
           verify_check
         when :putaway
@@ -105,10 +107,11 @@ module PackMaterialApp
         all_ok
       end
 
-      def prerequisite_check
+      def prerequisite_check # rubocop:disable Metrics/CyclomaticComplexity
         fail_message = verified? ? 'Delivery is already verified' : nil
         fail_message ||= 'Delivery has no items' if no_items?
         fail_message ||= 'Delivery has incomplete items' if incomplete_items?
+        fail_message ||= 'Delivery has invalid on consignment type items without batches' if invalid_on_consignment_items?
         fail_message ||= 'Delivery has items without batches' if items_without_batches?
         fail_message ||= 'Delivery batch quantities do not equate to item quantities where applicable' if item_quantities_ignored?
         fail_message
@@ -137,6 +140,12 @@ module PackMaterialApp
         return failed_response('Delivery Purchase Invoice has already been completed') if invoice_completed?
         return failed_response('Delivery has items without prices') if items_without_prices?
         return failed_response('Purchase Invoice incomplete') if invoice_incomplete?
+
+        all_ok
+      end
+
+      def on_consignment_items_check
+        return failed_response('Delivery does not have items on consignment') unless @repo.on_consignment_items(@id)
 
         all_ok
       end
@@ -175,6 +184,10 @@ module PackMaterialApp
 
       def incomplete_items?
         @repo.incomplete_items(@id)
+      end
+
+      def invalid_on_consignment_items?
+        @repo.invalid_on_consignment_items(@id)
       end
 
       def item_quantities_ignored?

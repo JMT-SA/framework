@@ -19,10 +19,11 @@ module PackMaterial
               form.add_field :supplier_name
               form.add_field :supplier_erp_number
               form.add_field :mr_delivery_term_id
+              form.add_field :account_code_id
+              form.add_field :is_consignment_stock
               form.add_field :supplier_party_role_id
               form.add_field :mr_vat_type_id
               form.add_field :delivery_address_id
-              form.add_field :purchase_account_code
               form.add_field :fin_object_code
               form.add_field :valid_until
               form.add_field :remarks

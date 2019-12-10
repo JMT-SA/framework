@@ -13,9 +13,10 @@ module PackMaterialApp
     end
 
     def test_create_skus_for_delivery
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
+      term_id = DB[:mr_delivery_terms].insert(delivery_term_code: 11)
       po = DB[:mr_purchase_orders].insert(
         purchase_order_number: 5,
+        is_consignment_stock: true,
         mr_delivery_term_id: term_id
       )
       mr_delivery_id = create_mr_delivery[:id]
@@ -45,8 +46,13 @@ module PackMaterialApp
 
       int_batch_id = DB[:mr_internal_batch_numbers].insert(batch_number: 2345)
       pv2 = create_material_resource_product_variant(use_fixed_batch_number: true, mr_internal_batch_number_id: int_batch_id)
+      po2 = DB[:mr_purchase_orders].insert(
+        purchase_order_number: 6,
+        is_consignment_stock: false,
+        mr_delivery_term_id: term_id
+      )
       po_item_id = DB[:mr_purchase_order_items].insert(
-        mr_purchase_order_id: po,
+        mr_purchase_order_id: po2,
         mr_product_variant_id: pv2[:id]
       )
       DB[:mr_delivery_items].insert(
@@ -54,7 +60,7 @@ module PackMaterialApp
         mr_product_variant_id: pv2[:id],
         mr_purchase_order_item_id: po_item_id
       )
-      owner_party_id = rand(12)
+      owner_party_id = create_party_role[:id]
       MasterfilesApp::PartyRepo.any_instance.stubs(:implementation_owner_party_role)
                                .returns(OpenStruct.new(id: owner_party_id))
       #
@@ -81,12 +87,13 @@ module PackMaterialApp
 
     def test_prep_item_attrs
       pv = create_material_resource_product_variant
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
+      term_id = DB[:mr_delivery_terms].insert(delivery_term_code: 11)
       owner_party_id = rand(12)
       MasterfilesApp::PartyRepo.any_instance.stubs(:implementation_owner_party_role)
                                .returns(OpenStruct.new(id: owner_party_id))
       po = DB[:mr_purchase_orders].insert(
         purchase_order_number: 5,
+        is_consignment_stock: true,
         mr_delivery_term_id: term_id
       )
       po_item_id = DB[:mr_purchase_order_items].insert(
@@ -106,7 +113,7 @@ module PackMaterialApp
       assert_equal attrs[:is_consignment_stock], true
       assert_nil attrs[:owner_party_role_id]
 
-      DB[:mr_delivery_terms].update(id: term_id, is_consignment_stock: false)
+      DB[:mr_purchase_orders].update(id: po, is_consignment_stock: false)
       attrs = repo.send(:prep_item_attrs, item, pv[:id])
       assert_equal attrs[:is_consignment_stock], false
       assert_equal attrs[:owner_party_role_id], owner_party_id
@@ -169,9 +176,10 @@ module PackMaterialApp
     end
 
     def test_get_delivery_sku_quantities
-      term_id = DB[:mr_delivery_terms].insert(is_consignment_stock: true)
+      term_id = DB[:mr_delivery_terms].insert(delivery_term_code: 11)
       po = DB[:mr_purchase_orders].insert(
         purchase_order_number: 5,
+        is_consignment_stock: true,
         mr_delivery_term_id: term_id
       )
       mr_delivery_id = create_mr_delivery[:id]

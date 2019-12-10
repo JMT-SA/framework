@@ -15,8 +15,3 @@
   :icon: information-solid
   :title: Status
   :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/pack_material/replenish/mr_purchase_orders/preselect"
-  :text: New Purchase Order
-  :style: :button

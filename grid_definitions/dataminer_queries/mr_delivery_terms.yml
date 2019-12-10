@@ -1,6 +1,6 @@
 ---
 :caption: Delivery Terms
-:sql: SELECT "mr_delivery_terms"."id", "mr_delivery_terms"."delivery_term_code", "mr_delivery_terms"."is_consignment_stock"
+:sql: SELECT "mr_delivery_terms"."id", "mr_delivery_terms"."delivery_term_code", "mr_delivery_terms"."description"
   FROM "mr_delivery_terms"
 :limit: 
 :offset: 
@@ -16,6 +16,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -31,22 +32,24 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  is_consignment_stock:
-    :name: is_consignment_stock
+  description:
+    :name: description
     :sequence_no: 3
-    :caption: Is consignment stock
-    :namespaced_name: mr_delivery_terms.is_consignment_stock
-    :data_type: :boolean
+    :caption: Description
+    :namespaced_name: mr_delivery_terms.description
+    :data_type: :string
     :width: 
     :format: 
     :hide: false
-    :groupable: true
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

@@ -1,0 +1,8 @@
+---
+:dataminer_definition: mr_goods_returned_note_items
+:conditions:
+  :standard:
+    - :col: mr_goods_returned_note_items.mr_goods_returned_note_id
+      :op: =
+      :val: $:mr_goods_returned_note_id$
+

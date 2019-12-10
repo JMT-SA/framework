@@ -71,6 +71,8 @@ namespace :menu do
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -89,6 +91,8 @@ namespace :menu do
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -119,6 +123,8 @@ namespace :db do
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -133,6 +139,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -152,6 +160,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -171,6 +181,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -194,6 +206,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -281,12 +295,19 @@ namespace :db do
             extension :pg_triggers
             create_table(:#{nm}, ignore_index_errors: true) do
               primary_key :id
+              # foreign_key :some_id, :some_table_name, null: false, key: [:id]
               # String :code, null: false
+              # String :remarks, text: true
+              # BigDecimal :quantity_type, size: [12,2]
+              # BigDecimal :price_type, size: [17,5]
+              # TrueClass :other_bool, default: false
               # TrueClass :active, default: true
+              # DateTime :other
               DateTime :created_at, null: false
               DateTime :updated_at, null: false
               #
               # index [:code], name: :#{nm}_unique_code, unique: true
+              # index [:some_id], name: :fki_#{nm}_some_table_name
             end
 
             pgt_created_at(:#{nm},

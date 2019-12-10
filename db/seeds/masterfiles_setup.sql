@@ -34,6 +34,12 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Pack Material'
                                    AND functional_area_id = (SELECT id FROM functional_areas
                                                              WHERE functional_area_name = 'Masterfiles')),
+        'Account Codes', '/list/account_codes', 1);
+
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Pack Material'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'Masterfiles')),
         'Cost Types', '/list/mr_cost_types', 2);
 
 -- PARTIES

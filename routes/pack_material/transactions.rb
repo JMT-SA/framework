@@ -5,6 +5,14 @@
 
 class Framework < Roda
   route 'transactions', 'pack_material' do |r|
+    # Recalculate Weighted Average Costs
+    # --------------------------------------------------------------------------
+    r.on 'recalculate_wa_costs' do
+      check_auth!('transactions', 'new')
+      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor.recalculate_wa_costs
+      redirect_to_last_grid(r)
+    end
     # ADHOC STOCK TRANSACTIONS
     # --------------------------------------------------------------------------
     r.on 'adhoc_stock_transactions', Integer do |id|

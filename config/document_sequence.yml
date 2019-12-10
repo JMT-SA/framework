@@ -28,6 +28,11 @@ doc_seqs_tripsheet_number:
   data_type: :integer
   table: vehicle_jobs
   column: tripsheet_number
+doc_seqs_credit_note_number:
+  db_sequence_name: doc_seqs_credit_note_number
+  data_type: :integer
+  table: mr_goods_returned_notes
+  column: credit_note_number
 dummy_invoice:
   db_sequence_name: doc_seqs_inv
   data_type: :string

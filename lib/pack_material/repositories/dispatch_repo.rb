@@ -86,7 +86,7 @@ module PackMaterialApp
         qty_returned = grn_item[:quantity_returned]
         item_collection << { sku_id: sku_id, qty: qty_returned }
         avail_qty = DB[:mr_sku_locations].where(location_id: grn.get(:dispatch_location_id), mr_sku_id: sku_id).get(:quantity) || AppConst::BIG_ZERO
-        next if avail_qty > qty_returned
+        next if avail_qty >= qty_returned
 
         return failed_response 'Stock to be shipped must be in the dispatch location'
       end
@@ -151,9 +151,9 @@ module PackMaterialApp
 
     def update_delivery_grn_status(del_id) # rubocop:disable Metrics/AbcSize
       delivery = DB[:mr_deliveries].where(id: del_id)
-      grn_ids = DB[:mr_goods_returned_notes].where(mr_delivery_id: del_id, shipped: true).select_map(&:id)
-      item_ids = DB[:mr_delivery_items].where(mr_delivery_id: del_id).select_map(&:id)
-      batch_ids = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_ids).select_map(&:id)
+      grn_ids = DB[:mr_goods_returned_notes].where(mr_delivery_id: del_id, shipped: true).map(:id)
+      item_ids = DB[:mr_delivery_items].where(mr_delivery_id: del_id).map(:id)
+      batch_ids = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item_ids).map(:id)
 
       # Update batch qty's
       batch_ids.each do |batch_id|
@@ -171,7 +171,7 @@ module PackMaterialApp
         item.update(grn_qty_returned: qty_returned, grn_returned: grn_returned)
       end
 
-      all_grn_returned = !DB[:mr_delivery_items].where(id: item_ids).select_map(&:grn_returned).uniq.include?(false)
+      all_grn_returned = !DB[:mr_delivery_items].where(id: item_ids).map(:grn_returned).uniq.include?(false)
       delivery.update(grn_returned: true) if item_ids && all_grn_returned
     end
 
@@ -189,7 +189,7 @@ module PackMaterialApp
     def delivery_item_record(grn_item_id)
       grn_item = DB[:mr_goods_returned_note_items].where(id: grn_item_id)
       batch_id = grn_item.get(:mr_delivery_item_batch_id)
-      batch_id ? DB[:mr_delivery_item_batches].where(id: batch_id) : DB[:mr_delivery_items].where(id: grn_item[:mr_delivery_item_id])
+      batch_id ? DB[:mr_delivery_item_batches].where(id: batch_id) : DB[:mr_delivery_items].where(id: grn_item.get(:mr_delivery_item_id))
     end
   end
 end

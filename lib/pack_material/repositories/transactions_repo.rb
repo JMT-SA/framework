@@ -156,10 +156,11 @@ module PackMaterialApp
     def create_mr_bulk_stock_adjustment_prices(attrs)
       return nil if exists?(:mr_bulk_stock_adjustment_prices, attrs)
 
-      new_attrs = attrs.merge(stock_adj_price: DB[:material_resource_product_variants].where(
+      stock_adj_price = DB[:material_resource_product_variants].where(
         id: attrs[:mr_product_variant_id]
-      ).get(:current_price))
+      ).map { |r| r[:current_price] && !r[:current_price].zero? ? r[:current_price] : r[:stock_adj_price] }
 
+      new_attrs = attrs.merge(stock_adj_price: stock_adj_price)
       DB[:mr_bulk_stock_adjustment_prices].insert(new_attrs)
     end
 
@@ -323,7 +324,7 @@ module PackMaterialApp
       success_response('ok', item_id)
     end
 
-    def can_manage_bsa_prices?(_bsa_id)
+    def can_manage_bsa_prices?(bsa_id)
       stock_take_on?(bsa_id) || waste_creation?(bsa_id)
     end
 

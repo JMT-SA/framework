@@ -104,12 +104,10 @@ module PackMaterialApp
 
     def email_credit_note_defaults(id, user)
       instance = mr_goods_returned_note(id)
-      repo = DevelopmentApp::UserRepo.new
-      email_addresses = repo.email_addresses(user_email_group: AppConst::GRN_MAIL_RECIPIENTS)
       {
-        to: email_addresses.map { |r| r[1] }.uniq,
+        to: nil,
         cc: user.email,
-        subject: "Credit Note: #{instance.credit_note_number}"
+        subject: "Goods Returned Note: #{instance.credit_note_number}"
       }
     end
 

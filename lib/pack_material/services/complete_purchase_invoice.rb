@@ -71,11 +71,13 @@ module PackMaterialApp
           xml.pay_term 'CN'
           xml.line_items do
             products.each do |line_item|
-              xml.product_number line_item[:product_number]
-              xml.product_description line_item[:product_description]
-              xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '', no_decimals: 5)
-              xml.quantity UtilityFunctions.delimited_number(line_item[:quantity], delimiter: '', no_decimals: 2)
-              xml.purchase_order_number line_item[:purchase_order_number]
+              xml.line_item do
+                xml.product_number line_item[:product_number]
+                xml.product_description line_item[:product_description]
+                xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '', no_decimals: 5)
+                xml.quantity UtilityFunctions.delimited_number(line_item[:quantity], delimiter: '', no_decimals: 2)
+                xml.purchase_order_number line_item[:purchase_order_number]
+              end
             end
           end
         end

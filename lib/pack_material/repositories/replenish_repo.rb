@@ -52,10 +52,10 @@ module PackMaterialApp
     crud_calls_for :mr_purchase_order_costs, name: :mr_purchase_order_cost, wrapper: MrPurchaseOrderCost
 
     build_for_select :mr_deliveries,
-                     label: :driver_name,
+                     label: :delivery_number,
                      value: :id,
                      no_active_check: true,
-                     order_by: :driver_name
+                     order_by: :delivery_number
 
     crud_calls_for :mr_deliveries, name: :mr_delivery, wrapper: MrDelivery
 
@@ -83,6 +83,12 @@ module PackMaterialApp
 
     crud_calls_for :mr_purchase_invoice_costs, name: :mr_purchase_invoice_cost, wrapper: MrPurchaseInvoiceCost
 
+    def for_select_delivery_terms_with_descriptions
+      DB["SELECT mr_delivery_terms.id,
+                 concat(delivery_term_code, ' (', description, ')') as desc
+        from mr_delivery_terms"].all.map { |r| [r[:desc], r[:id]] }
+    end
+
     def find_mr_delivery_item(id)
       hash = find_hash(:mr_delivery_items, id)
       amt = hash[:quantity_under_supplied]&.positive? ? -1 * hash[:quantity_under_supplied] : hash[:quantity_over_supplied]
@@ -92,6 +98,7 @@ module PackMaterialApp
 
     def find_mr_purchase_order(id)
       find_with_association(:mr_purchase_orders, id,
+                            parent_tables: [{ parent_table: :account_codes, flatten_columns: { account_code: :purchase_account_code } }],
                             lookup_functions: [{ function: :fn_current_status,
                                                  args: ['mr_purchase_orders', :id],
                                                  col_name: :status }],
@@ -300,13 +307,56 @@ module PackMaterialApp
       items.include?(nil)
     end
 
-    def incomplete_items(mr_delivery_id)
-      items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map { |r| [r[:quantity_on_note], r[:quantity_received]] }
-      items.flatten.include?(nil) || items.flatten.include?(0)
+    def incomplete_items(mr_delivery_id) # rubocop:disable Metrics/AbcSize
+      items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id)
+      batches = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: items.map(:id))
+      item_check = items.map { |r| [r[:quantity_on_note], r[:quantity_received]] }.flatten
+      batch_check = batches.map { |r| [r[:quantity_on_note], r[:quantity_received]] }.flatten
+      all_items = item_check + batch_check
+      (all_items & [nil, 0]).any?
+    end
+
+    def invalid_on_consignment_items(mr_delivery_id)
+      items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map { |r| invalid_on_consignment_item(r[:id]) }
+      items.include?(true)
+    end
+
+    def on_consignment_items(mr_delivery_id)
+      DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).map { |r| item_on_consignment(r[:id]) }.include?(true)
+    end
+
+    def item_on_consignment(mr_delivery_item_id)
+      DB[:mr_purchase_orders].where(
+        id: DB[:mr_purchase_order_items].where(
+          id: DB[:mr_delivery_items].where(
+            id: mr_delivery_item_id
+          ).get(:mr_purchase_order_item_id)
+        ).get(:mr_purchase_order_id)
+      ).get(:is_consignment_stock)
+    end
+
+    def invalid_on_consignment_item(mr_delivery_item_id)
+      item_on_consignment(mr_delivery_item_id) && delivery_item_batches(mr_delivery_item_id).none?
     end
 
     def delivery_item_batches(mr_delivery_item_id)
-      where(:mr_delivery_item_batches, MrDeliveryItemBatch, mr_delivery_item_id: mr_delivery_item_id)
+      DB[:mr_delivery_item_batches].where(mr_delivery_item_id: mr_delivery_item_id).all
+    end
+
+    def create_mr_delivery_item_batch(attrs)
+      item_batch_id = create(:mr_delivery_item_batches, attrs)
+      ensure_item_quantities(attrs[:mr_delivery_item_id])
+      item_batch_id
+    end
+
+    def update_mr_delivery_item_batch(id, attrs)
+      update(:mr_delivery_item_batches, id, attrs)
+      ensure_item_quantities(attrs[:mr_delivery_item_id])
+    end
+
+    def ensure_item_quantities(mr_delivery_item_id)
+      sum = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: mr_delivery_item_id).sum(:quantity_received)
+      DB[:mr_delivery_items].where(id: mr_delivery_item_id).update(quantity_received: sum, quantity_on_note: sum)
     end
 
     def batch_quantities_match(mr_delivery_id)
@@ -320,18 +370,20 @@ module PackMaterialApp
       true
     end
 
-    def create_mr_delivery(attrs)
+    def create_mr_delivery(attrs) # rubocop:disable Metrics/AbcSize
       hash     = attrs.to_h
       po_id    = hash.delete(:mr_purchase_order_id)
       del_id   = create(:mr_deliveries, hash)
       po_items = DB[:mr_purchase_order_items].where(mr_purchase_order_id: po_id).all
+      consignment = DB[:mr_purchase_orders].where(id: po_id).get(:is_consignment_stock)
       po_items.each do |item|
-        DB[:mr_delivery_items].insert(
+        item_id = DB[:mr_delivery_items].insert(
           mr_delivery_id: del_id,
           mr_purchase_order_item_id: item[:id],
           mr_product_variant_id: item[:mr_product_variant_id],
           invoiced_unit_price: item[:unit_price]
         )
+        DB[:mr_delivery_item_batches].insert(mr_delivery_item_id: item_id, client_batch_number: 'Consignment Stock') if consignment
       end
       del_id
     end
@@ -680,7 +732,15 @@ module PackMaterialApp
     def create_mr_delivery_item(attrs)
       new_attrs = attrs.to_h
       new_attrs.delete(:quantity_over_under_supplied)
-      create(:mr_delivery_items, new_attrs)
+
+      consignment = DB[:mr_purchase_orders].where(
+        id: DB[:mr_purchase_order_items].where(
+          id: attrs[:mr_purchase_order_item_id]
+        ).get(:mr_purchase_order_id)
+      ).get(:is_consignment_stock)
+      item_id = create(:mr_delivery_items, new_attrs)
+      DB[:mr_delivery_item_batches].insert(mr_delivery_item_id: item_id, client_batch_number: 'Consignment Stock') if consignment
+      item_id
     end
 
     # @param [Hash] attrs => quantity_received, quantity_on_note, mr_purchase_order_item_id

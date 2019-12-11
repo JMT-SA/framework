@@ -88,12 +88,16 @@ module PackMaterialApp
     end
 
     def adhoc_move_business_processes
-      DB[:business_processes].select_map(:process)
+      DB[:business_processes].select_map(:process) - [AppConst::PROCESS_STOCK_TAKE_ON]
     end
 
     def existing_stock?(from_location_id, sku_number)
       sku_id = repo.sku_id_for_sku_number(sku_number)
       repo.existing_sku_locations_for(sku_id, from_location_id).first
+    end
+
+    def recalculate_wa_costs
+      WaCostRepo.new.calculate_wa_costs
     end
 
     private

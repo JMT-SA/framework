@@ -36,14 +36,14 @@
     :name: status
     :sequence_no: 2
     :caption: Status
-    :namespaced_name:
+    :namespaced_name: 
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -54,12 +54,12 @@
     :caption: Ref no
     :namespaced_name: mr_bulk_stock_adjustments.ref_no
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -67,7 +67,7 @@
   stock_adjustment_number:
     :name: stock_adjustment_number
     :sequence_no: 4
-    :caption: Stock adjustment number
+    :caption: SA no
     :namespaced_name: mr_bulk_stock_adjustments.stock_adjustment_number
     :data_type: :integer
     :width: 
@@ -86,7 +86,7 @@
     :caption: Is stock take
     :namespaced_name: mr_bulk_stock_adjustments.is_stock_take
     :data_type: :boolean
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -102,7 +102,7 @@
     :caption: Completed
     :namespaced_name: mr_bulk_stock_adjustments.completed
     :data_type: :boolean
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -123,7 +123,7 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -134,12 +134,12 @@
     :caption: Signed off
     :namespaced_name: mr_bulk_stock_adjustments.signed_off
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

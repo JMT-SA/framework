@@ -27,8 +27,9 @@ Methods in the class can generate crossbeams responses using the methods:
 * `validation_failed_response`
 * `mixed_validation_failed_response`
 
+NOTE: There is also a helper method `unwrap_failed_response` which takes a reponse and returns the message string (including validation errors if present).
 
-See link:/yarddocthis/lib=cecrossbeams_responses.rb[Crossbeams::Responses methods] for a list of the method definitions described below.
+See link:/yarddocthis/lib=crossbeams_responses.rb[Crossbeams::Responses methods] for a list of the method definitions described below.
 
 === Success responses
 
@@ -55,3 +56,9 @@ validation_failed_response :: Use this to pass the validation errors with an ins
 mixed_validation_failed_response :: Use this to combine two or more validation results.
 
 Validation responses are usually called with a `Dry::Validation::Result` instance, but can also be called with a `Hash` or `OpenStruct`.
+
+=== Helpers
+
+Helper methods are provided to make common situations simpler to code.
+
+unwrap_failed_response :: Use this to return the error message (and its validation errors when present) from a response object which has `success == false`.

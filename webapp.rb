@@ -40,6 +40,7 @@ class Framework < Roda
   plugin :json_parser
   plugin :message_bus
   plugin :status_handler
+  plugin :cookies, path: '/'
   plugin :rodauth do
     db DB
     enable :login, :logout # , :change_password
@@ -52,6 +53,12 @@ class Framework < Roda
     accounts_table :vw_active_users # Only active users can login.
     account_password_hash_column :password_hash
     template_opts(layout_opts: { path: 'views/layout_auth.erb' })
+    after_login do
+      # On successful login, see if the user had given a specific path that required the login and redirect to it.
+      path = request.cookies['pre_login_path']
+      response.delete_cookie('pre_login_path')
+      redirect(path) if path && scope.can_login_to_path?(path, account[:id])
+    end
   end
   unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
     plugin :error_mail, to: AppConst::ERROR_MAIL_RECIPIENTS,
@@ -124,18 +131,16 @@ class Framework < Roda
       end
     end
 
-    # OVERRIDE RodAuth's Login form:
-    # r.get 'login' do
-    #   if @registered_mobile_device
-    #     @no_logout = true
-    #     view(:login, layout: 'layout_rmd')
-    #   else
-    #     view(:login)
-    #   end
-    # end
-
-    unless AppConst::BYPASS_LOGIN_ROUTES.any? { |path| request.path == path } # Might have to be more nuanced for params in path...
+    unless AppConst::BYPASS_LOGIN_ROUTES.any? do |path|
+      if path.end_with?('*')
+        request.path.match?(/#{path}/)
+      else
+        request.path == path
+      end
+    end
       r.rodauth
+      # Store this path before login so we can redirect after login. NB. Only a GET request!
+      response.set_cookie('pre_login_path', r.fullpath) unless rodauth.logged_in? || r.path == '/login' || !request.get? || fetch?(r)
       rodauth.require_authentication
       r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
     end

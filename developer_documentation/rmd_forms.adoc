@@ -138,6 +138,16 @@ Each hash has:
 |String
 |`Submit`.
 
+|options - :button_id
+|DOM id for the submit button. This allows a behaviour to hide/show it.
+|String
+|None.
+
+|options - :button_initially_hidden
+|Render the form with the submit button hidden. This allows a behaviour to hide/show it.
+|Boolean
+|`false`.
+
 |options - :scan_with_camera
 |Should the RMD be able to use the camera to scan.
 |Boolean
@@ -147,6 +157,11 @@ Each hash has:
 |Should the form include a reset button to clear inputs to their original values.
 |Boolean
 |`true`.
+
+|options - :no_submit
+|Should the form be rendered without a submit button? (e.g. for view-only display)
+|Boolean
+|`false`.
 
 |===
 
@@ -382,6 +397,24 @@ form.prev_next_nav('/path/to/resource/$:id$', [1, 2, 3, 4], 3, prev_caption: 'Be
 |String
 |`Next`
 
+|===
+
+== Method: add_section_header
+
+Renders a caption in bold to denote a section of the form.
+
+[source,ruby]
+----
+form.add_section_header('The next part of the form')
+----
+
+|===
+|attribute |description |possible values |default
+
+|caption
+|The text to render as the section caption.
+|String
+|None. Required.
 |===
 
 == Testing

@@ -34,7 +34,7 @@ module UiRules
       {
         business_process_id: { renderer: :select,
                                options: @transaction_repo.for_select_business_processes,
-                               selected: @repo.vehicle_jobs_business_process_id,
+                               selected: @form_object.business_process_id,
                                caption: 'Business Process',
                                required: true },
         vehicle_id: { renderer: :select,

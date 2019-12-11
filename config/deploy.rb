@@ -55,6 +55,28 @@ task :migrate do
   end
 end
 
+desc 'Runs rake menu:migrate if migrations are set'
+task :menu_migrate do
+  on primary :db do
+    within release_path do
+      with rack_env: fetch(:rack_env) do
+        execute :rake, 'menu:migrate'
+      end
+    end
+  end
+end
+
+desc 'Runs rake jobs:restart_screen'
+task :restart_que do
+  on primary :db do
+    within release_path do
+      with rack_env: fetch(:rack_env) do
+        execute :rake, 'jobs:restart_screen'
+      end
+    end
+  end
+end
+
 desc 'Runs rake assets:precompile'
 task :precompile do
   on primary :app do
@@ -100,7 +122,7 @@ namespace :devops do
 
       # Copy over dataminer connections and automatically set up the "system" connection:
       upload! 'config/dataminer_connections.yml.example', "#{shared_path}/config/dataminer_connections.yml"
-      execute :sed, "-i 's/$DBNAME/#{application}/g' #{shared_path}/config/dataminer_connections.yml"
+      execute :sed, "-i 's/$DBNAME/#{fetch(:application)}/g' #{shared_path}/config/dataminer_connections.yml"
       execute :sed, "-i 's/$CURRENT/#{current_path.to_s.gsub('/', '\/')}/g' #{shared_path}/config/dataminer_connections.yml"
       execute :sed, "-i 's/$SHARED/#{shared_path.to_s.gsub('/', '\/')}/g' #{shared_path}/config/dataminer_connections.yml"
       execute :mkdir, "#{shared_path}/sys_prepared_reports"
@@ -115,7 +137,8 @@ end
 namespace :deploy do
   after :updated, :migrate_and_precompile do
     invoke 'migrate'
+    # invoke 'menu_migrate'
     invoke 'precompile'
+    invoke 'restart_que'
   end
-  # TODO: if there is a job Que, restart it!
 end

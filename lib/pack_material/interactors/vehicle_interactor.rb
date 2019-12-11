@@ -25,8 +25,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = vehicle(id)
-      success_response("Created vehicle #{instance.vehicle_code}",
-                       instance)
+      success_response("Created vehicle #{instance.vehicle_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { vehicle_code: ['This vehicle already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -42,8 +41,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = vehicle(id)
-      success_response("Updated vehicle #{instance.vehicle_code}",
-                       instance)
+      success_response("Updated vehicle #{instance.vehicle_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

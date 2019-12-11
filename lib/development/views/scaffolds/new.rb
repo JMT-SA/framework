@@ -6,7 +6,7 @@ module Development
           ui_rule = UiRules::Compiler.new(:scaffolds, :new, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -21,6 +21,7 @@ module Development
                   col.add_field :other
                   col.add_field :program
                   col.add_field :label_field
+                  col.add_field :services
                 end
                 row.column do |col|
                   col.add_field :short_name
@@ -28,6 +29,7 @@ module Development
                   col.add_field :shared_factory_name
                   col.add_field :nested_route_parent
                   col.add_field :new_from_menu
+                  col.add_field :jobs
                 end
               end
             end

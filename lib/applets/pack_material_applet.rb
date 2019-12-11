@@ -10,6 +10,7 @@ Dir["#{root_dir}/pack_material/task_permission_checks/*.rb"].each { |f| require 
 Dir["#{root_dir}/pack_material/ui_rules/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/validations/*.rb"].each { |f| require f }
 Dir["#{root_dir}/pack_material/views/**/*.rb"].each { |f| require f }
+Dir["#{root_dir}/pack_material/modules/*.rb"].each { |f| require f }
 
 module PackMaterialApp
   DOMAIN_NAME = 'Pack Material'

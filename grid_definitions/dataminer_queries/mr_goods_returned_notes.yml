@@ -1,0 +1,215 @@
+---
+:caption: Goods Returned Notes
+:sql: "SELECT \"mr_goods_returned_notes\".\"id\",\r\n       \"mr_goods_returned_notes\".\"mr_delivery_id\",\r\n
+  \      \"mr_goods_returned_notes\".\"issue_transaction_id\",\r\n       \"mr_deliveries\".\"delivery_number\",\r\n
+  \      \"mr_goods_returned_notes\".\"credit_note_number\",\r\n       \"mr_goods_returned_notes\".\"shipped\",\r\n
+  \      \"mr_goods_returned_notes\".\"created_by\",\r\n       \"mr_goods_returned_notes\".\"remarks\",\r\n
+  \      \"mr_goods_returned_notes\".\"created_at\",\r\n       \"mr_goods_returned_notes\".\"updated_at\",\r\n
+  \      fn_current_status('mr_goods_returned_notes', \"mr_goods_returned_notes\".\"id\")
+  AS status\r\nFROM \"mr_goods_returned_notes\"\r\n         JOIN \"mr_deliveries\"
+  ON \"mr_deliveries\".\"id\" = \"mr_goods_returned_notes\".\"mr_delivery_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_goods_returned_notes.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_delivery_id:
+    :name: mr_delivery_id
+    :sequence_no: 2
+    :caption: Mr delivery
+    :namespaced_name: mr_goods_returned_notes.mr_delivery_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  issue_transaction_id:
+    :name: issue_transaction_id
+    :sequence_no: 3
+    :caption: Issue transaction
+    :namespaced_name: mr_goods_returned_notes.issue_transaction_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_number:
+    :name: delivery_number
+    :sequence_no: 4
+    :caption: Del No
+    :namespaced_name: mr_deliveries.delivery_number
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  credit_note_number:
+    :name: credit_note_number
+    :sequence_no: 5
+    :caption: CN No
+    :namespaced_name: mr_goods_returned_notes.credit_note_number
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped:
+    :name: shipped
+    :sequence_no: 6
+    :caption: Shipped
+    :namespaced_name: mr_goods_returned_notes.shipped
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 7
+    :caption: Created by
+    :namespaced_name: mr_goods_returned_notes.created_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 8
+    :caption: Remarks
+    :namespaced_name: mr_goods_returned_notes.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: mr_goods_returned_notes.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: mr_goods_returned_notes.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 11
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_goods_returned_notes.mr_delivery_id
+  :caption: Mr delivery
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT driver_name, id FROM mr_deliveries ORDER BY driver_name
+- :column: mr_goods_returned_notes.issue_transaction_id
+  :caption: Issue transaction
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT created_by, id FROM mr_inventory_transactions ORDER BY created_by
+- :column: mr_goods_returned_notes.shipped
+  :caption: Shipped
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

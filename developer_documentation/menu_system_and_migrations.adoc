@@ -1,0 +1,228 @@
+= Menu system and migrations
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Menu system and migrations
+
+This system uses a 3-tier menu system:
+
+Functional areas :: A grouping of programs this will be something like `Security`, `Masterfiles`, `Production` etc.
+Programs:: A grouping of program functions. This is the level at which a user is given access.
+Program functions:: These are the menu items that are associated with URLs. They can also optionally be grouped within the program.
+
+=== Menu migrations
+
+Menu migrations are a way of defining menu items in a way that is consistent across all installations.
+The migrations use the `Crossbeams::MenuMigrations` gem which is heavily influenced by the `Sequel` database migration code.
+
+==== Migration files
+
+Migration files are stored in `db/menu` directory and are named with a prefix of `YYYYMMDDHHMM_`
+
+(e.g. `201907211536_` for a migration created on 21 July 2019 at 15:36).
+
+Migrations are run in ascending order of this prefix, so if one migration depends on another, its prefix must sort after the other.
+
+==== Writing migration files.
+
+Migration files call `Crossbeams::MenuMigrations::Migrator.migration` to do the migration.
+
+The `migration` method, besides a block, takes two parameters - the webapp and a boolean for dry runs which defaults to `false`.
+Pass in `true` to get the migration to print the SQL to be run without actually running it.
+
+Structure of the file:
+[source,ruby]
+----
+Crossbeams::MenuMigrations::Migrator.migration('WebApp', true) do
+  up do
+    # Actions to take when migrating up
+  end
+
+  down do
+    # Actions to take when migrating down (rollback)
+  end
+end
+----
+
+There are nine migration methods:
+
+* `add_functional_area` - creates a `functional_areas` record.
+* `add_program` - creates a `programs` record and a `programs_webapps` record.
+* `add_program_function` - creates a `program_functions` record.
+* `drop_functional_area` - deletes a `functional_areas` record - **and all its dependents**.
+* `drop_program` - deletes a `programs` record - **and all its dependents**.
+* `drop_program_function` - deletes a `program_functions` record - **and all its dependents**.
+* `change_functional_area` - changes aspects of a `functional_areas` record.
+* `change_program` - changes aspects of a `programs` record.
+* `change_program_function` - changes aspects of a `program_functions` record.
+
+Here's a typical example of creating all levels:
+[source,ruby]
+----
+Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
+  up do
+    add_functional_area 'Masterfiles'
+    add_program 'Fruit', functional_area: 'Masterfiles'
+    add_program_function 'Commodities',
+                         functional_area: 'Masterfiles',
+                         program: 'Fruit',
+                         url: '/list/commodities'
+  end
+
+  down do
+    drop_functional_area 'Masterfiles'
+  end
+end
+----
+
+NOTE: The down block only needs to drop the functional area - because it will delete all associated programs and program functions. Make sure you never drop e.g. a functional area that was added in an earlier migration file.
+
+And here's an example of changes:
+[source,ruby]
+----
+Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
+  up do
+    change_functional_area 'Masterfiles', rename: 'Lookups'
+    change_program 'Fruit', functional_area: 'Lookups',
+                            seq: 33, rename: 'Product Definitions'
+    change_program_function 'Commodities',
+                            functional_area: 'Lookups',
+                            program: 'Product Definitions',
+                            seq: 22,
+                            url: '/another/path/here',
+                            group: 'Together',
+                            rename: 'Commodity Groups'
+  end
+
+  down do
+    change_program_function 'Commodity Groups',
+                            functional_area: 'Lookups',
+                            program: 'Product Definitions',
+                            seq: 1,
+                            url: '/list/commodities',
+                            group: nil,
+                            rename: 'Commodities'
+    change_functional_area 'Lookups', rename: 'Masterfiles'
+    change_program 'Product Definitions',
+                   functional_area: 'Masterfiles',
+                   seq: 1,
+                   rename: 'Fruit'
+  end
+end
+----
+Note particularly the order of things in the `down` block:
+
+* The first line uses `functional_area: 'Lookup'`
+* The second line renames the functional area back to `'Masterfiles'`
+* So the third line uses `functional_area: 'Masterfiles'`
+
+=== Migration methods
+
+[source,ruby]
+----
+add_functional_area(key, rmd_menu: false)
+----
+
+* `key` - the functional area name (String, capitalised)
+* `:rmd_menu` - set to true if this menu is only available on RMDs.
+
+[source,ruby]
+----
+drop_functional_area(key)
+----
+
+* `key` - the functional area name (String, capitalised)
+
+[source,ruby]
+----
+change_functional_area(key, options = {})
+----
+
+* `key` - the functional area name (String, capitalised)
+* options:
+** `:rmd_menu` (boolean)
+** `:rename` (string) the new name for the functional area
+
+[source,ruby]
+----
+add_program(key, functional_area:, seq: 1)
+----
+
+* `key` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
+* `:seq` - the program sequence (default 1)
+
+[source,ruby]
+----
+drop_program(key, functional_area:)
+----
+
+* `key` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
+
+[source,ruby]
+----
+change_program(key, options = {})
+----
+
+* `key` - the program name (String, capitalised)
+* options
+** `:functional_area` - the functional area name (String, capitalised)
+** `:seq` - the program sequence
+** `:rename` (string) the new name for the program
+
+[source,ruby]
+----
+add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, restricted: false, show_in_iframe: false)
+----
+
+* `key` - the program function name (String, capitalised)
+* `:program` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
+* `:seq` - the program sequence (default 1)
+* `:group` - the group name (default nil)
+* `:url` - the URL to callfrom this menu item
+* `:restricted` - if true, specific users need to be linked to the item to see it
+* `:show_in_iframe` - if true, render the URL inside an iframe
+
+[source,ruby]
+----
+drop_program_function(key, functional_area:, program:)
+----
+
+* `key` - the program function name (String, capitalised)
+* `:program` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
+
+[source,ruby]
+----
+change_program_function(key, options = {})
+----
+
+* `key` - the program function name (String, capitalised)
+* options
+** `:program` - the program name (String, capitalised)
+** `:functional_area` - the functional area name (String, capitalised)
+** `:seq` - the program sequence
+** `:group` - the group name
+** `:url` - the URL to callfrom this menu item
+** `:restricted` - if true, specific users need to be linked to the item to see it
+** `:show_in_iframe` - if true, render the URL inside an iframe
+** `:rename` (string) the new name for the program function
+
+=== Running migrations
+
+Run menu migrations using `rake`:
+
+`bundle exec rake menu:migrate`:: Run all un-applied migrations in sequence
+`bundle exec rake menu:rollback`:: Run the down migration of the latest applied migration
+`bundle exec rake menu:migrate[201905010101]`:: Run all un-applied migrations in sequence down to (or up to) the prefix in `[]`
+`bundle exec rake menu:migrate[0]`:: Run the down migration of all applied migrations (removes all menu items)
+
+=== Menu permissions
+
+A user can be given permission to see a menu item in one of to ways:
+
+1. The user has been given access to a program (via a record in the `programs_users` table)
+2. The program function has `restricted_user_access` set to true and the user has been given that access (via a record in `program_functions_users` table). Note that the user must also have access to the program this item belongs to.

@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: c0d846e07f17faa8d422bfa19732ff2d17a5e24b
+  revision: 9faad3957e198fa9b330820b2e4de3b159a93991
   specs:
-    crossbeams-dataminer (0.1.8)
-      pg_query (= 1.0.2)
+    crossbeams-dataminer (0.2.0)
+      pg_query (= 1.1.0)
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-label_designer.git
@@ -16,11 +16,17 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: 15680c7c9f794bd5b3dbc89a485e4f497104abda
+  revision: 40b902a3abd397b5ece0dc63c89085a2b7612208
   specs:
-    crossbeams-layout (0.3.4)
+    crossbeams-layout (0.3.5)
       diffy
       rouge
+
+GIT
+  remote: https://github.com/NoSoft-SA/crossbeams-menu_migrations.git
+  revision: 4118b8087a8ef499c0261bded8736efa1ce4662b
+  specs:
+    crossbeams-menu_migrations (0.1.0)
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-rack_middleware.git
@@ -32,7 +38,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 5635b10f70d981d89b6a32769c5f86b5a6915a8c
+  revision: 60bd51123be8a43bf5bc5db3e9ea6b9d8f53d73b
   specs:
     roda-data_grid (0.2.3)
       axlsx
@@ -146,7 +152,7 @@ GEM
     parser (2.6.3.0)
       ast (~> 2.4.0)
     pg (1.0.0)
-    pg_query (1.0.2)
+    pg_query (1.1.0)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -175,7 +181,7 @@ GEM
       ffi (>= 0.5.0, < 2)
     rerun (0.13.0)
       listen (~> 3.0)
-    roda (3.24.0)
+    roda (3.25.0)
       rack
     roda-message_bus (1.0.0)
       message_bus (>= 2.0.0)
@@ -184,7 +190,7 @@ GEM
     rodauth (1.16.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rouge (3.11.1)
+    rouge (3.12.0)
     rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -229,6 +235,7 @@ DEPENDENCIES
   crossbeams-dataminer!
   crossbeams-label_designer!
   crossbeams-layout!
+  crossbeams-menu_migrations!
   crossbeams-rack_middleware!
   dotenv
   dry-inflector

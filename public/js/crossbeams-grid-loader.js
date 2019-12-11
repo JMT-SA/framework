@@ -1308,6 +1308,11 @@ const crossbeamsGridStaticLoader = {
               }
               return result;
             };
+          } else if (col[attr].startsWith('[{')) {
+            // Parse the action menu string:
+            newCol.valueGetter = function valueGetter() {
+              return JSON.parse(col[attr]);
+            };
           } else {
             newCol[attr] = col[attr];
           }

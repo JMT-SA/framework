@@ -4,7 +4,7 @@ module Development
   module Generators
     module Scaffolds
       class Show # rubocop:disable Metrics/ClassLength
-        def self.call(results) # rubocop:disable Metrics/AbcSize
+        def self.call(results) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:scaffolds, :new)
           rules   = ui_rule.compile
 
@@ -37,9 +37,12 @@ module Development
                 '<a href="#dm_query">Dataminer Query YAML</a>',
                 '<a href="#list">List YAML</a>',
                 '<a href="#search">Search YAML</a>',
-                '<a href="#sql">Optional SQL for inserting menu items</a>'
+                # '<a href="#sql">Optional SQL for inserting menu items</a>',
+                '<a href="#migration">Menu migration for inserting menu items</a>'
               ]
               toc.unshift('<a href="#applet">Applet</a>') if results[:applet]
+              toc.push('<a href="#service">Services</a>') unless results[:services].empty?
+              toc.push('<a href="#job">Jobs</a>') unless results[:jobs].empty?
               section.add_text("<ol><li>#{toc.join('</li><li>')}</ol>")
             end
             if results[:applet]
@@ -73,6 +76,26 @@ module Development
               section.hide_caption = false
               save_snippet_form(section, results[:paths][:inter], results[:inter])
               section.add_text(results[:inter], syntax: :ruby)
+            end
+            if results[:services]
+              page.section do |section|
+                section.caption = '<a name="service">Services</a>'
+                section.hide_caption = false
+                results[:services].each_with_index do |service, index|
+                  save_snippet_form(section, results[:paths][:services][index], service)
+                  section.add_text(service, preformatted: true, syntax: :ruby)
+                end
+              end
+            end
+            if results[:jobs]
+              page.section do |section|
+                section.caption = '<a name="job">Jobs</a>'
+                section.hide_caption = false
+                results[:jobs].each_with_index do |job, index|
+                  save_snippet_form(section, results[:paths][:jobs][index], job)
+                  section.add_text(job, preformatted: true, syntax: :ruby)
+                end
+              end
             end
             page.section do |section|
               section.caption = '<a name="permissions">Permissions</a>'
@@ -164,10 +187,15 @@ module Development
               save_snippet_form(section, results[:paths][:search], results[:search])
               section.add_text(results[:search], syntax: :yaml)
             end
+            # page.section do |section|
+            #   section.caption = '<a name="sql">Optional SQL for inserting menu items</a>'
+            #   section.hide_caption = false
+            #   section.add_text(results[:menu], syntax: :sql)
+            # end
             page.section do |section|
-              section.caption = '<a name="sql">Optional SQL for inserting menu items</a>'
+              section.caption = '<a name="migration">Menu migration for inserting menu items</a>'
               section.hide_caption = false
-              section.add_text(results[:menu], syntax: :sql)
+              section.add_text(results[:menu_mig], syntax: :ruby)
             end
           end
 

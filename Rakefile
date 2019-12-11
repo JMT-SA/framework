@@ -3,6 +3,7 @@ require 'rake/testtask'
 require 'rake/clean'
 require 'yard'
 require 'rubocop/rake_task'
+require 'crossbeams/menu_migrations'
 
 Dir['./lib/tasks/**/*.rake'].sort.each { |ext| load ext }
 
@@ -64,19 +65,71 @@ namespace :jobs do
   end
 end
 
-namespace :db do
-  desc 'Add a new user'
-  task :add_user, %i[login_name password user_name] => [:dotenv_with_override] do |_, args|
-    raise "\nLogin name cannot include spaces.\n\n" if args[:login_name].include?(' ')
-
+namespace :menu do
+  desc 'Run menu migrations'
+  task :migrate, [:version] => :dotenv_with_override do |_, args|
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
     db = Sequel.connect(db_name)
-    id = db[:users].insert(login_name: args[:login_name], user_name: args[:user_name], password_hash: args[:password])
+    if args[:version]
+      puts "Migrating to version #{args[:version]}"
+      Crossbeams::MenuMigrations::Migrator.run(db, 'db/menu', args[:version].to_i)
+    else
+      puts 'Migrating to latest'
+      Crossbeams::MenuMigrations::Migrator.run(db, 'db/menu')
+    end
+  end
+
+  desc 'Rollback one menu migration'
+  task rollback: :dotenv_with_override do
+    require 'sequel'
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
+              else
+                ENV.fetch('DATABASE_URL')
+              end
+    db = Sequel.connect(db_name)
+    migrations = if db.tables.include?(:menu_migrations)
+                   db[:menu_migrations].reverse(:filename).first(2).map { |r| r[:filename] }
+                 else
+                   'No migrations have been run'
+                 end
+    if migrations.is_a? String
+      puts "Unable to rollback - #{migrations}"
+    else
+      puts "Migrating to version #{migrations.last}"
+      Crossbeams::MenuMigrations::Migrator.run(db, 'db/menu', migrations.last.to_i)
+    end
+  end
+end
+
+namespace :db do
+  desc 'Add a new user'
+  task :add_user, %i[login_name password user_name] => [:dotenv_with_override] do |_, args|
+    require 'bcrypt'
+    raise "\nLogin name cannot include spaces.\n\n" if args[:login_name].include?(' ')
+
+    pwd_hash = args[:password]
+    pwd_hash = BCrypt::Password.create(pwd_hash) unless BCrypt::Password.valid_hash?(pwd_hash)
+
+    require 'sequel'
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
+              else
+                ENV.fetch('DATABASE_URL')
+              end
+    db = Sequel.connect(db_name)
+    id = db[:users].insert(login_name: args[:login_name], user_name: args[:user_name], password_hash: pwd_hash)
     puts "Created user with id #{id}"
   end
 
@@ -86,6 +139,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -105,6 +160,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -124,6 +181,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -147,6 +206,8 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              elsif ENV.fetch('RACK_ENV') == 'dev'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -234,12 +295,19 @@ namespace :db do
             extension :pg_triggers
             create_table(:#{nm}, ignore_index_errors: true) do
               primary_key :id
+              # foreign_key :some_id, :some_table_name, null: false, key: [:id]
               # String :code, null: false
+              # String :remarks, text: true
+              # BigDecimal :quantity_type, size: [12,2]
+              # BigDecimal :price_type, size: [17,5]
+              # TrueClass :other_bool, default: false
               # TrueClass :active, default: true
+              # DateTime :other
               DateTime :created_at, null: false
               DateTime :updated_at, null: false
               #
               # index [:code], name: :#{nm}_unique_code, unique: true
+              # index [:some_id], name: :fki_#{nm}_some_table_name
             end
 
             pgt_created_at(:#{nm},

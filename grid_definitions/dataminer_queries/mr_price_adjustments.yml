@@ -92,7 +92,7 @@
   mr_bulk_stock_adjustment_id:
     :name: mr_bulk_stock_adjustment_id
     :sequence_no: 6
-    :caption: Mr bulk stock adjustment
+    :caption: bulk stock adjustment
     :namespaced_name: mr_price_adjustments.mr_bulk_stock_adjustment_id
     :data_type: :string
     :width: 

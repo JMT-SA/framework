@@ -31,12 +31,14 @@ gem 'yard'
 gem 'crossbeams-dataminer', git: 'https://github.com/NoSoft-SA/crossbeams-dataminer.git'
 gem 'crossbeams-label_designer', git: 'https://github.com/NoSoft-SA/crossbeams-label_designer.git'
 gem 'crossbeams-layout', git: 'https://github.com/NoSoft-SA/crossbeams-layout.git'
+gem 'crossbeams-menu_migrations', git: 'https://github.com/NoSoft-SA/crossbeams-menu_migrations.git'
 gem 'crossbeams-rack_middleware', git: 'https://github.com/NoSoft-SA/crossbeams-rack_middleware.git'
 gem 'roda-data_grid', git: 'https://github.com/NoSoft-SA/roda-data_grid.git'
 
 # gem 'crossbeams-dataminer',           path: File.expand_path('../crossbeams-dataminer', __dir__)
 # gem 'crossbeams-label_designer',      path: File.expand_path('../crossbeams-label_designer', __dir__)
 # gem 'crossbeams-layout',              path: File.expand_path('../crossbeams-layout', __dir__)
+# gem 'crossbeams-menu_migrations',       path: File.expand_path('../crossbeams-menu_migrations', __dir__)
 # gem 'crossbeams-rack_middleware',     path: File.expand_path('../crossbeams-rack_middleware', __dir__)
 # gem 'roda-data_grid',                 path: File.expand_path('../roda-data_grid', __dir__)
 

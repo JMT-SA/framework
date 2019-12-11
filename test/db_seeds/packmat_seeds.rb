@@ -114,6 +114,7 @@ module MiniTestSeeds
     assignment_id = DB[:location_assignments].insert(assignment_code: 'Assignment Code')
     storage_type_id = DB[:location_storage_types].insert(storage_type_code: PackMaterialApp::DOMAIN_NAME)
     location_type_id = DB[:location_types].insert(location_type_code: 'RECEIVING BAY', short_code: 'RB')
+    disp_loc_type_id = DB[:location_types].where(location_type_code: 'DISPATCH').get(:id)
     default_id = DB[:locations].insert(
       primary_storage_type_id: storage_type_id,
       location_type_id: location_type_id,
@@ -123,11 +124,21 @@ module MiniTestSeeds
       location_short_code: 'RBY',
       can_store_stock: true
     )
+    disp_loc_id = DB[:locations].insert(
+      primary_storage_type_id: storage_type_id,
+      location_type_id: disp_loc_type_id,
+      primary_assignment_id: assignment_id,
+      location_description: 'Default Dispatch Location',
+      location_long_code: 'DISPATCH',
+      location_short_code: 'DISP',
+      can_store_stock: true
+    )
     @fixed_table_set[:locations] = {
       assignment_id: assignment_id,
       storage_type_id: storage_type_id,
       type_id: location_type_id,
-      default_id: default_id
+      default_id: default_id,
+      disp_loc_id: disp_loc_id
     }
   end
 

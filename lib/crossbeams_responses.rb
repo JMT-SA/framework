@@ -108,5 +108,18 @@ module Crossbeams
     def ok_response
       success_response('ok')
     end
+
+    # Take a Crossbeams::Response and present it as an error message.
+    # For a validation error, the errors are listed in the returned message.
+    #
+    # @param res [Crossbeams::Response] the response object.
+    # @return [String] the formatted message.
+    def unwrap_failed_response(res)
+      if res.errors.empty?
+        res.message
+      else
+        "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}"
+      end
+    end
   end
 end

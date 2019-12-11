@@ -4,7 +4,7 @@ module PackMaterial
   module Replenish
     module MrPurchaseOrder
       class Edit # rubocop:disable Metrics/ClassLength
-        def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, current_user, form_values: nil, form_errors: nil) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:mr_purchase_order, :edit, id: id, form_values: form_values, current_user: current_user)
           rules   = ui_rule.compile
 
@@ -16,7 +16,7 @@ module PackMaterial
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back to Purchase Orders',
-                                  url: '/list/mr_purchase_orders',
+                                  url: "/list/mr_purchase_orders/with_params?key=#{rules[:completed] ? 'completed' : 'incomplete'}",
                                   style: :back_button)
               cost_url = rules[:show_only] ? '/list/mr_purchase_order_costs_show' : '/list/mr_purchase_order_costs'
               section.add_control(control_type: :link,
@@ -60,8 +60,9 @@ module PackMaterial
 
                   row.column do |col|
                     col.add_field :mr_delivery_term_id
+                    col.add_field :account_code_id
+                    col.add_field :is_consignment_stock
                     col.add_field :mr_vat_type_id
-                    col.add_field :purchase_account_code
                     col.add_field :fin_object_code
                     col.add_field :valid_until
                     col.add_field :delivery_address_id

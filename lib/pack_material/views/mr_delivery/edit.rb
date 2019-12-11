@@ -54,7 +54,10 @@ module PackMaterial
                                   style: :button)
             end
 
-            page.add_notice 'Delivery needs to be reviewed', notice_type: :info if rules[:review_required]
+            notice_messages = []
+            notice_messages << 'Delivery needs to be reviewed.' if rules[:review_required]
+            notice_messages << 'Delivery Items must be received in batches for consignment stock.' if rules[:on_consignment]
+            page.add_notice notice_messages.join(' '), notice_type: :info if rules[:review_required] || rules[:on_consignment]
             page.section do |section|
               section.show_border!
               section.add_caption 'Delivery'
@@ -108,6 +111,7 @@ module PackMaterial
             page.section do |section| # rubocop:disable Metrics/BlockLength
               section.show_border!
               unless cannot_edit
+                # new_item_url = rules[:on_consignment] ? "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new_item_on_consignment" : "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect"
                 section.add_control(control_type: :link,
                                     text: 'New Item',
                                     url: "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect",

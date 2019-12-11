@@ -8,8 +8,8 @@ Sequel.migration do
 
   down do
     alter_table(:locations) do
+      drop_index [:legacy_barcode], name: :locations_legacy_barcode
       drop_column :legacy_barcode
-      drop_index :legacy_barcode
     end
   end
 end

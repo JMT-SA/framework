@@ -35,6 +35,7 @@ module UiRules
       rules[:is_verified] = @form_object.verified
       rules[:over_supply_accepted] = @form_object.accepted_over_supply
       rules[:del_sub_totals] = @repo.del_sub_totals(@options[:id])
+      rules[:on_consignment] = on_consignment_items
     end
 
     def show_fields
@@ -161,6 +162,11 @@ module UiRules
 
     def already_enqueued?(delivery_id)
       PackMaterialApp::ERPPurchaseInvoiceJob.enqueued_with_args?(delivery_id: delivery_id)
+    end
+
+    def on_consignment_items
+      res = @perm.call(:has_on_consignment_items, @options[:id])
+      res.success
     end
   end
 end

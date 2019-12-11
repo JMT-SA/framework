@@ -25,6 +25,20 @@ module SecurityApp
       !DB[query].first.nil?
     end
 
+    # If a user logged in after entering a specific path, check to see if the user has access to the path.
+    # (NB. this is a vague check: it will only check if the user has access to the program, not what level
+    # of access the user has - that should be taken care of by the authorization checks in the route)
+    def can_login_to_path?(user_id, path)
+      prog_funcs = DB[:program_functions].where(url: path).select(:program_id, :restricted_user_access, :id).all
+      return false if prog_funcs.empty?
+
+      if prog_funcs.any? { |r| r[:restricted_user_access] }
+        can_login_to_restricted_path?(user_id, prog_funcs)
+      else
+        can_login_to_program_path?(user_id, prog_funcs)
+      end
+    end
+
     def program_ids_for(functional_area_id, programs)
       query = <<~SQL
         SELECT id
@@ -230,6 +244,16 @@ module SecurityApp
 
     def existing_user_ids_for_program_function(program_function_id)
       DB[:program_functions_users].where(program_function_id: program_function_id).select_map(:user_id)
+    end
+
+    private
+
+    def can_login_to_restricted_path?(user_id, prog_funcs)
+      DB[:program_functions_users].where(user_id: user_id).where(program_function_id: prog_funcs.map { |p| p[:id] }).count.positive?
+    end
+
+    def can_login_to_program_path?(user_id, prog_funcs)
+      DB[:programs_users].where(user_id: user_id).where(program_id: prog_funcs.map { |p| p[:program_id] }).count.positive?
     end
   end
 end

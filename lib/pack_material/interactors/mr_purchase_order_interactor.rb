@@ -14,7 +14,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_purchase_order(id)
-      success_response("Created purchase order #{instance.purchase_account_code}", instance)
+      success_response("Created purchase order #{instance.purchase_order_number}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { purchase_account_code: ['This purchase order already exists'] }))
     rescue Crossbeams::TaskNotPermittedError => e
@@ -31,7 +31,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_purchase_order(id)
-      success_response("Updated purchase order #{instance.purchase_account_code}", instance)
+      success_response("Updated purchase order #{instance.purchase_order_number}", instance)
     rescue Crossbeams::TaskNotPermittedError => e
       failed_response(e.message)
     end
@@ -64,7 +64,7 @@ module PackMaterialApp
 
     def delete_mr_purchase_order(id)
       assert_permission!(:delete, id)
-      name = mr_purchase_order(id).purchase_account_code
+      name = mr_purchase_order(id).purchase_order_number
       repo.transaction do
         repo.delete_mr_purchase_order(id)
         log_status('mr_purchase_orders', id, 'DELETED')

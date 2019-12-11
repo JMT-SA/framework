@@ -138,20 +138,16 @@ module PackMaterialApp
     def get_delivery_sku_quantities(mr_delivery_id) # rubocop:disable Metrics/AbcSize
       quantities = []
       items = DB[:mr_delivery_items].where(mr_delivery_id: mr_delivery_id).all
+      consignment = DB[:mr_purchase_orders].where(
+        id: DB[:mr_purchase_order_items].where(
+          id: items.first[:mr_purchase_order_item_id]
+        ).get(:mr_purchase_order_id)
+      ).get(:is_consignment_stock)
       items.each do |item|
         pv_id = item[:mr_product_variant_id]
         pv = DB[:material_resource_product_variants].where(id: pv_id).first
-        fixed = pv[:use_fixed_batch_number]
 
-        if fixed
-          int_batch_number = pv[:mr_internal_batch_number_id]
-          qty = item[:quantity_received]
-          sku_id = DB[:mr_skus].where(
-            mr_product_variant_id: pv_id,
-            mr_internal_batch_number_id: int_batch_number
-          ).get(:id)
-          quantities << { sku_id: sku_id, qty: qty }
-        else
+        if consignment || !pv[:use_fixed_batch_number]
           batches = DB[:mr_delivery_item_batches].where(mr_delivery_item_id: item[:id]).all
           batches.each do |batch|
             batch_id = batch[:id]
@@ -162,6 +158,14 @@ module PackMaterialApp
             ).get(:id)
             quantities << { sku_id: sku_id, qty: qty }
           end
+        else
+          int_batch_number = pv[:mr_internal_batch_number_id]
+          qty = item[:quantity_received]
+          sku_id = DB[:mr_skus].where(
+            mr_product_variant_id: pv_id,
+            mr_internal_batch_number_id: int_batch_number
+          ).get(:id)
+          quantities << { sku_id: sku_id, qty: qty }
         end
       end
       quantities

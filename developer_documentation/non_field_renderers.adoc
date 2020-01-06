@@ -632,6 +632,11 @@ page.add_notice('Some text', notice_type: :warning)
 |`String`.
 |The notice_type, capitalised.
 
+|options - :inline_caption
+|The caption can be rendered on the same line as the notice. Default is to render above the text.
+|`true` or `false`.
+|`false`.
+
 |options - :show_caption
 |The caption can be hidden.
 |`true` or `false`.

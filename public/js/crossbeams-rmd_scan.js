@@ -10,6 +10,8 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
   const offlineStatus = document.getElementById('rmd-offline-status');
   const scannableInputs = document.querySelectorAll('[data-scanner]');
   const cameraScan = document.getElementById('cameraScan');
+  const cameraLight = document.getElementById('cameraLight');
+  let cameraLightState = false;
   let webSocket;
 
   //
@@ -149,6 +151,19 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
     if (cameraScan) {
       cameraScan.addEventListener('click', () => {
         webSocket.send('Type=key248_all');
+      });
+    }
+
+    if (cameraLight) {
+      cameraLight.addEventListener('click', () => {
+        // webSocket.send('Type=key253_flashlight'); // toggle?
+        if (cameraLightState) {
+          webSocket.send('Type=key253_flashlight_off');
+          cameraLightState = false;
+        } else {
+          webSocket.send('Type=key253_flashlight_on');
+          cameraLightState = true;
+        }
       });
     }
   };

@@ -250,15 +250,23 @@ const crossbeamsUtils = {
       return response.json();
     }).then((data) => {
       if (data.flash) {
-        // const err = document.getElementById(this.activeDialogError());
-        // err.innerHTML = `<strong>An error occurred:</strong><br>${data.flash.error}`;
-        // err.style.display = 'block';
+        let noteStyle = 'error';
         if (data.flash.type && data.flash.type === 'permission') {
+          noteStyle = 'warning';
           document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">Permission error</span>';
         } else {
           document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">Error</span>';
         }
-        crossbeamsUtils.setDialogContent(data.flash.error);
+        if (data.replaceDialog) {
+          crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+          if (data.flash.type && data.flash.type === 'permission') {
+            Jackbox.warn(data.flash.error, { time: 20 });
+          } else {
+            Jackbox.error(data.flash.error, { time: 20 });
+          }
+        } else {
+          crossbeamsUtils.setDialogContent(`<div class="mt3"><div class="crossbeams-${noteStyle}-note"><p>${data.flash.error}</p></div></div>`);
+        }
         if (data.exception) {
           if (data.backtrace) {
             console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
@@ -556,7 +564,49 @@ const crossbeamsUtils = {
     elem.innerHTML = action.replace_inner_html.value;
   },
   /**
-   * Hide a DOM element.
+   * Set an input element to required or not.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  setRequired: function setRequired(action) {
+    const elem = document.getElementById(action.set_required.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.set_required.id}"`,
+        title: 'Set Required element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.set_required.required) {
+      elem.required = true;
+    } else {
+      elem.required = false;
+    }
+  },
+  /**
+   * Set the checked attribute of an input checkbox element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  setChecked: function setChecked(action) {
+    const elem = document.getElementById(action.set_checked.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.set_checked.id}"`,
+        title: 'Set Checked element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.set_checked.checked) {
+      elem.checked = true;
+    } else {
+      elem.checked = false;
+    }
+  },
+  /**
+   * Make an input element readonly or make it editable.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
    */
@@ -708,6 +758,12 @@ const crossbeamsUtils = {
       if (action.set_readonly) {
         crossbeamsUtils.setReadonlyInput(action);
       }
+      if (action.set_required) {
+        crossbeamsUtils.setRequired(action);
+      }
+      if (action.set_checked) {
+        crossbeamsUtils.setChecked(action);
+      }
       if (action.hide_element) {
         crossbeamsUtils.hideElement(action);
       }
@@ -783,9 +839,12 @@ const crossbeamsUtils = {
    * @returns {void}
    */
   observeInputChange: function observeInputChange(elem, rules) {
-    // const s = elem.dataset.observeChange;
     const j = JSON.parse(rules);
-    const urls = j.map(el => this.buildObserveChangeUrl(el, elem.value));
+    let changedValue = elem.value;
+    if (elem.type && elem.type === 'checkbox') {
+      changedValue = elem.checked ? 't' : 'f';
+    }
+    const urls = j.map(el => this.buildObserveChangeUrl(el, changedValue));
 
     urls.forEach(url => this.fetchDropdownChanges(url));
   },

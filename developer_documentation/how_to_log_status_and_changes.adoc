@@ -9,6 +9,8 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 Status is typically logged by using a method defined on base interactor: `log_status(table_name, id, status, comment: nil)`.
 
+It can also be logged by calling the method on any repo (where the user name should be provided): `repo.log_status(table_name, id, status, comment: nil, user_name: nil)`.
+
 One status can be written to multiple records in a table at the same time using: `log_multiple_statuses(table_name, ids, status, comment: nil)`.
 
 These methods should be called inside a transaction after the actual table update.
@@ -24,8 +26,8 @@ e.g.
 ----
   repo.transaction do
     repo.update_security_group(id, attrs)
-    repo.log_transaction
-    repo.log_status('security_groups', id, 'SOMETHING_CHANGED')
+    log_transaction
+    log_status('security_groups', id, 'SOMETHING_CHANGED')
   end
 ----
 
@@ -109,13 +111,28 @@ To log details, do the following in a route and an interactor:
   # In a route - set the route_url (context can be left out):
   interactor = SecurityApp::SecurityGroupInteractor.new(current_user, {},
                 { route_url: request.path,
+                  request_ip: request.ip,
                   context: 'Something that might be useful' }, {})
 
   # In an interactor:
   repo.transaction do
     repo.update_security_group(id, attrs)
-    repo.log_transaction
+    log_transaction
   end
 ----
 
-NOTE: If a table has been set up (via the triggers) to log data changes, your code _should_ also call `log_transaction` so that the audit trail of which user and URL were involved in a particular change can be retrieved.
+NOTE: If a table has been set up (via the triggers) to log data changes, your code _should_ also call `log_transaction` so that the audit trail of which user, ip address and URL were involved in a particular change can be retrieved.
+
+==== Log action
+
+When logging transaction metadata outside of an interactor, the repo method `log_action` should be used, and all the relevant parameters
+need to be provided `(user_name, context, route_url, request_ip)`
+
+e.g.
+[source,ruby]
+----
+repo.log_action(user_name: current_user.user_name,
+                context: 'create label',
+                route_url: request.path,
+                request_ip: request.ip)
+----

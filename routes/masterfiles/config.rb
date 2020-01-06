@@ -7,7 +7,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     # LABEL TEMPLATES
     # --------------------------------------------------------------------------
     r.on 'label_templates', Integer do |id|
-      interactor = MasterfilesApp::LabelTemplateInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LabelTemplateInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:label_templates, id) do
@@ -74,7 +74,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'label_templates' do
-      interactor = MasterfilesApp::LabelTemplateInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LabelTemplateInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('config', 'new')
         show_partial_or_page(r) { Masterfiles::Config::LabelTemplate::New.call(remote: fetch?(r)) }

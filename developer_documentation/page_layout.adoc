@@ -318,6 +318,10 @@ These are the methods used in building a page layout.
 |
 |Make this a remote form that will be submitted via a javascript `fetch`.
 
+|submit_in_loading_page!
+|
+|Make this form submit as a GET request in a popup "loading" page. Used mainly in filter forms to launch Jasper reports.
+
 |view_only!
 |
 |Make this a view-only form that cannot be submitted, only closed.
@@ -325,6 +329,14 @@ These are the methods used in building a page layout.
 |no_submit!
 |
 |Do not render a submit button in the form.
+
+|button_id
+|String
+|Set the DOM id of the submit button
+
+|initially_hide_button
+|Boolean
+|When `true`, the submit button will be hidden on render. Default is `false`.
 
 |multipart!
 |

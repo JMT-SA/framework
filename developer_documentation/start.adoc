@@ -37,6 +37,7 @@ Pictoral overview of application.
 * link:/developer_documentation/routes.adoc[Routing]
 * link:/developer_documentation/response_objects.adoc[Response objects]
 * link:/developer_documentation/menu_system_and_migrations.adoc[Menu system and migrations]
+* link:/developer_documentation/error_handling.adoc[Error-handling]
 
 ==== UI: grids
 
@@ -125,4 +126,4 @@ View source code documentation for methods in the following files:
 * link:/yarddocthis/lib=crossbeams_responses.rb[Responses methods]
 * link:/yarddocthis/lib=rmd_form.rb[RMD Form methods]
 * link:/yarddocthis/lib=base_step.rb[BaseStep methods]
-
+* link:/yarddocthis/lib=error_mailer.rb[ErrorMailer methods]

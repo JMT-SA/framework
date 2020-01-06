@@ -96,7 +96,7 @@ class TestCountryRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_country).returns(ok_response)
     post_as_fetch 'masterfiles/target_markets/destination_regions/1/destination_countries', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_ok_json_redirect
+    expect_json_response
   end
 
   def test_create_fail

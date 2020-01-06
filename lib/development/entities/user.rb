@@ -9,5 +9,6 @@ module DevelopmentApp
     attribute :email, Types::String
     attribute :active, Types::Bool
     attribute? :permission_tree, Types::JSON::Hash
+    attribute? :profile, Types::JSON::Hash
   end
 end

@@ -12,8 +12,10 @@ module Masterfiles
             page.form_object ui_rule.form_object
             page.form do |form|
               form.view_only!
+              form.add_field :destination_region_id
               form.add_field :region_name
               form.add_field :country_name
+              form.add_field :iso_country_code
             end
           end
 

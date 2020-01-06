@@ -66,6 +66,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     STR
   end
 
+  def list_keys # rubocop:disable Metrics/AbcSize
+    (NO_OVERRIDE.map { |a| a.keys.first } + CAN_OVERRIDE.map { |a| a.keys.first } + MUST_OVERRIDE.map { |a| a.keys.first } + OPTIONAL.map { |a| a.keys.first }).sort.join("\n")
+  end
+
   def root_path
     @root_path ||= File.expand_path('..', __dir__)
   end

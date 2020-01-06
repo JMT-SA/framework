@@ -15,7 +15,7 @@ module LabelPrintingApp
 
     def call
       lbl_required = fields_for_label
-      field_positions = lbl_required.each_with_index.select { |a, _| a == 'carton_label_id' }.map(&:last) # modify for BCD:carton_id ???
+      field_positions = special_field_positions(lbl_required, %w[carton_label_id pick_ref pallet_number])
       vars = values_from(lbl_required)
       build_command_string(vars, field_positions)
     rescue Crossbeams::FrameworkError => e
@@ -27,8 +27,8 @@ module LabelPrintingApp
     def build_command_string(vars, field_positions) # rubocop:disable Metrics/AbcSize
       var_items = []
       vars.values.each_with_index do |v, i|
-        var_items << if field_positions.include?(i)
-                       '<fvalue>$:carton_label_id$</fvalue>'
+        var_items << if field_positions.keys.include?(i)
+                       "<fvalue>#{format_special_field(field_positions[i])}</fvalue>"
                      else
                        "<fvalue>#{v}</fvalue>"
                      end

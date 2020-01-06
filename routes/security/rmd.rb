@@ -7,7 +7,7 @@ class Framework < Roda
     # REGISTERED MOBILE DEVICES
     # --------------------------------------------------------------------------
     r.on 'registered_mobile_devices', Integer do |id|
-      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:registered_mobile_devices, id) do
@@ -29,6 +29,7 @@ class Framework < Roda
             update_grid_row(id, changes: { ip_address: res.instance[:ip_address],
                                            start_page: res.instance[:start_page],
                                            active: res.instance[:active],
+                                           hybrid_device: res.instance[:hybrid_device],
                                            scan_with_camera: res.instance[:scan_with_camera] },
                                 notice: res.message)
           else
@@ -48,7 +49,7 @@ class Framework < Roda
     end
 
     r.on 'registered_mobile_devices' do
-      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('rmd', 'new')
         show_partial_or_page(r) { Security::Rmd::RegisteredMobileDevice::New.call(remote: fetch?(r)) }
@@ -61,6 +62,7 @@ class Framework < Roda
             ip_address
             active
             scan_with_camera
+            hybrid_device
             start_page
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

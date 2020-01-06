@@ -11,6 +11,7 @@ module DevelopmentApp
     attribute :comment, Types::String
     attribute :user_name, Types::String
     attribute? :route_url, Types::String
+    attribute? :request_ip, Types::String
   end
 
   class StatusSummary < Dry::Struct

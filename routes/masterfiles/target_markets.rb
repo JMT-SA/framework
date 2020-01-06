@@ -8,7 +8,7 @@ class Framework < Roda
     # TARGET MARKET GROUP TYPES
     # --------------------------------------------------------------------------
     r.on 'target_market_group_types', Integer do |id|
-      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_market_group_types, id) do
@@ -42,7 +42,7 @@ class Framework < Roda
       end
     end
     r.on 'target_market_group_types' do
-      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::TmGroupType::New.call(remote: fetch?(r)) }
@@ -64,7 +64,7 @@ class Framework < Roda
     # TARGET MARKET GROUPS
     # --------------------------------------------------------------------------
     r.on 'target_market_groups', Integer do |id|
-      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_market_groups, id) do
@@ -99,7 +99,7 @@ class Framework < Roda
       end
     end
     r.on 'target_market_groups' do
-      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::TmGroup::New.call(remote: fetch?(r)) }
@@ -121,7 +121,7 @@ class Framework < Roda
     # TARGET MARKETS
     # --------------------------------------------------------------------------
     r.on 'target_markets', Integer do |id|
-      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:target_markets, id) do
@@ -179,7 +179,7 @@ class Framework < Roda
       end
     end
     r.on 'target_markets' do
-      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TargetMarketInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::TargetMarket::New.call(remote: fetch?(r)) }
@@ -201,7 +201,7 @@ class Framework < Roda
     # DESTINATION REGIONS
     # --------------------------------------------------------------------------
     r.on 'destination_regions', Integer do |id|
-      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:destination_regions, id) do
@@ -212,7 +212,7 @@ class Framework < Roda
         show_partial { Masterfiles::TargetMarkets::Region::Edit.call(id) }
       end
       r.on 'destination_countries' do
-        country_interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+        country_interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('Target Markets', 'new')
           show_partial_or_page(r) { Masterfiles::TargetMarkets::Country::New.call(id, remote: fetch?(r)) }
@@ -220,8 +220,12 @@ class Framework < Roda
         r.post do        # CREATE
           res = country_interactor.create_country(id, params[:country])
           if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            if fetch?(r)
+              show_json_notice(res.message)
+            else
+              flash[:notice] = res.message
+              redirect_to_last_grid(r)
+            end
           else
             re_show_form(r, res, url: "/masterfiles/target_markets/destination_regions/#{id}/destination_countries/new") do
               Masterfiles::TargetMarkets::Country::New.call(id,
@@ -260,7 +264,7 @@ class Framework < Roda
       end
     end
     r.on 'destination_regions' do
-      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('Target Markets', 'new')
         show_partial_or_page(r) { Masterfiles::TargetMarkets::Region::New.call(remote: fetch?(r)) }
@@ -282,7 +286,7 @@ class Framework < Roda
     # DESTINATION COUNTRIES
     # --------------------------------------------------------------------------
     r.on 'destination_countries', Integer do |id|
-      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:destination_countries, id) do
@@ -321,9 +325,15 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_country(id, params[:country])
           if res.success
+            row_keys = %i[
+              id
+              destination_region_id
+              country_name
+              region_name
+              iso_country_code
+            ]
             update_grid_row(id,
-                            changes: { destination_region_id: res.instance[:destination_region_id],
-                                       country_name: res.instance[:country_name] },
+                            changes: select_attributes(res.instance, row_keys),
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::TargetMarkets::Country::Edit.call(id, params[:country], res.errors) }
@@ -340,10 +350,40 @@ class Framework < Roda
         end
       end
     end
+
+    r.on 'destination_countries' do
+      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('target markets', 'new')
+        show_partial_or_page(r) { Masterfiles::TargetMarkets::Country::New.call(nil, remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_country(nil, params[:country])
+        if res.success
+          row_keys = %i[
+            id
+            destination_region_id
+            country_name
+            region_name
+            iso_country_code
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/target_markets/destination_countries/new') do
+            Masterfiles::TargetMarkets::Country::New.call(nil,
+                                                          form_values: params[:country],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
+        end
+      end
+    end
+
     # DESTINATION CITIES
     # --------------------------------------------------------------------------
     r.on 'destination_cities', Integer do |id|
-      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:destination_cities, id) do

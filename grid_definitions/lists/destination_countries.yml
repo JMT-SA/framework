@@ -26,6 +26,12 @@
   :text: cities
   :icon: list
   :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/target_markets/destination_countries/new"
+  :text: New Country
+  :style: :button
+  :behaviour: :popup
 :conditions:
   :standard:
     - :col: destination_countries.destination_region_id

@@ -5,7 +5,7 @@ class Framework < Roda
     # PRINTERS
     # --------------------------------------------------------------------------
     r.on 'printers', Integer do |id|
-      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:printers, id) do
@@ -18,7 +18,7 @@ class Framework < Roda
     end
 
     r.on 'printers' do
-      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'refresh' do
         res = interactor.refresh_printers
         if res.success
@@ -33,7 +33,7 @@ class Framework < Roda
     # PRINTER APPLICATIONS
     # --------------------------------------------------------------------------
     r.on 'printer_applications', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:printer_applications, id) do
@@ -70,7 +70,7 @@ class Framework < Roda
     end
 
     r.on 'printer_applications' do
-      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::PrinterInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('designs', 'new')
         show_partial_or_page(r) { Labels::Printers::PrinterApplication::New.call(remote: fetch?(r)) }

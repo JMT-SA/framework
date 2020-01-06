@@ -11,7 +11,11 @@
    */
   function disableButton(button, disabledText) {
     button.dataset.enableWith = button.value;
-    button.value = disabledText;
+    if (button.value) {
+      button.value = disabledText;
+    } else {
+      button.textContent = disabledText;
+    }
     button.classList.remove('dim');
     button.classList.add('o-50');
   }
@@ -34,7 +38,11 @@
    */
   function revertDisabledButton(element) {
     element.disabled = false;
-    element.value = element.dataset.enableWith;
+    if (element.value) {
+      element.value = element.dataset.enableWith;
+    } else {
+      element.textContent = element.dataset.enableWith;
+    }
     element.classList.add('dim');
     element.classList.remove('o-50');
   }
@@ -168,6 +176,13 @@
       }
     }, false);
 
+    // InputChange - check for observers
+    document.body.addEventListener('change', (event) => {
+      if (event.target.dataset && event.target.dataset.observeInputChange) {
+        crossbeamsUtils.observeInputChange(event.target, event.target.dataset.observeInputChange);
+      }
+    }, false);
+
     // Blur (lose focus) - check for observers
     document.body.addEventListener('blur', (event) => {
       if (event.target.dataset && event.target.dataset.observeLoseFocus) {
@@ -283,10 +298,20 @@
     }, false);
 
     /**
-     * Turn a form into a remote (AJAX) form on submit.
+     * Form submit:
+     * - Submit the form as a GET request in a "loading" page.
+     * - Turn a form into a remote (AJAX) form on submit.
      */
     document.body.addEventListener('submit', (event) => {
-      if (event.target.dataset && event.target.dataset.remote === 'true') {
+      if (event.target.dataset && event.target.dataset.convertToLoading) {
+        const searchParams = new URLSearchParams(new FormData(event.target));
+        const url = `${event.target.action}?${searchParams.toString()}`;
+
+        crossbeamsUtils.loadingWindow(url);
+
+        event.stopPropagation();
+        event.preventDefault();
+      } else if (event.target.dataset && event.target.dataset.remote === 'true') {
         fetch(event.target.action, {
           method: 'POST', // GET?
           credentials: 'same-origin',

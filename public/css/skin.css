@@ -1,3 +1,4 @@
+      @media ( min-width: 40rem ) {
 .Menu, .functional-area-menu ul {
   color: black;
 }
@@ -139,4 +140,5 @@
 }
 .Header .Menu > li > ul > li > a:hover {
   background-color: #d6d6e0;
+}
 }

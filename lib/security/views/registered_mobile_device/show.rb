@@ -16,6 +16,7 @@ module Security
               form.add_field :start_page_program_function_id
               form.add_field :active
               form.add_field :scan_with_camera
+              form.add_field :hybrid_device
             end
           end
 

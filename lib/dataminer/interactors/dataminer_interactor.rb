@@ -129,7 +129,7 @@ module DataminerApp
       rpt_list = if for_grids
                    repo.list_all_grid_reports
                  else
-                   repo.list_all_reports
+                   repo.list_all_reports(true)
                  end
       col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.action_column do |act|
@@ -170,7 +170,7 @@ module DataminerApp
       NewReportSchema.call(params)
     end
 
-    def create_report(params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+    def create_report(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_report_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -184,16 +184,12 @@ module DataminerApp
       repo = ReportRepo.new
 
       page.rpt = Crossbeams::Dataminer::Report.new(page.caption)
-      begin
-        page.rpt.sql = page.sql
-        colour_key = calculate_colour_key(page.rpt)
-        if colour_key.nil?
-          page.rpt.external_settings.delete(:colour_key)
-        else
-          page.rpt.external_settings[:colour_key] = colour_key
-        end
-      rescue StandardError => e
-        err = e.message
+      page.rpt.sql = page.sql
+      colour_key = calculate_colour_key(page.rpt)
+      if colour_key.nil?
+        page.rpt.external_settings.delete(:colour_key)
+      else
+        page.rpt.external_settings[:colour_key] = colour_key
       end
       # Check for existing file name...
       err = 'A file with this name already exists' if File.exist?(File.join(repo.admin_report_path(page.database), page.filename))
@@ -478,9 +474,9 @@ module DataminerApp
       crosstab_hash ||= {}
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
-      parms   = []
+      parms = []
       # Check if this should become an IN parmeter (list of equal checks for a column.
-      eq_sel  = input_parameters.select { |p| p['op'] == '=' }.group_by { |p| p['col'] }
+      eq_sel = input_parameters.select { |p| p['op'] == '=' }.group_by { |p| p['col'] }
       in_sets = {}
       in_keys = []
       eq_sel.each do |col, qp|
@@ -522,7 +518,7 @@ module DataminerApp
 
     def unmodifiable_system_report(id)
       rpt_loc = ReportRepo::ReportLocation.new(id)
-      rpt_loc.db == 'system' && AppConst.development?
+      rpt_loc.db == 'system' && !AppConst.development?
     end
 
     # ------------------------------------------------------------------------------------------------------

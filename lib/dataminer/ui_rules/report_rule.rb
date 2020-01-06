@@ -15,7 +15,7 @@ module UiRules
 
     def common_fields
       {
-        database: { renderer: :select, options: DM_CONNECTIONS.databases(without_grids: true) },
+        database: { renderer: :select, options: DM_CONNECTIONS.databases(without_grids: true, without_system: true) },
         filename: { placeholder: 'filename.yml', required: true },
         caption: {}, # placeholder: 'Caption', required: true },
         sql: { renderer: :textarea, rows: 20 }

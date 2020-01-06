@@ -5,30 +5,6 @@
 
 module DevelopmentApp
   class UserInteractor < BaseInteractor
-    def repo
-      @repo ||= UserRepo.new
-    end
-
-    def user(id)
-      repo.find_user(id)
-    end
-
-    def validate_new_user_params(params)
-      UserNewSchema.call(params)
-    end
-
-    def validate_user_params(params)
-      UserSchema.call(params)
-    end
-
-    def validate_change_user_params(params)
-      UserChangeSchema.call(params)
-    end
-
-    def validate_change_password(params)
-      UserPasswordSchema.call(params)
-    end
-
     def prepare_password(user_validation)
       new_user = user_validation.to_h
       new_user[:password_hash] = BCrypt::Password.create(new_user.delete(:password))
@@ -108,6 +84,10 @@ module DevelopmentApp
                        instance)
     end
 
+    def find_homepage(id)
+      success_response('ok', OpenStruct.new(menu_repo.find_homepage(id)))
+    end
+
     private
 
     def validate_user_permission(params)
@@ -138,6 +118,34 @@ module DevelopmentApp
     def matching_password?(id, password)
       hs = repo.find_hash(:users, id)
       BCrypt::Password.new(hs[:password_hash]) == password
+    end
+
+    def repo
+      @repo ||= UserRepo.new
+    end
+
+    def menu_repo
+      @menu_repo ||= SecurityApp::MenuRepo.new
+    end
+
+    def user(id)
+      repo.find_user(id)
+    end
+
+    def validate_new_user_params(params)
+      UserNewSchema.call(params)
+    end
+
+    def validate_user_params(params)
+      UserSchema.call(params)
+    end
+
+    def validate_change_user_params(params)
+      UserChangeSchema.call(params)
+    end
+
+    def validate_change_password(params)
+      UserPasswordSchema.call(params)
     end
   end
 end

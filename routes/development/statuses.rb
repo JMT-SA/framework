@@ -28,7 +28,7 @@ class Framework < Roda
 
     r.on 'diff', Integer do |id|
       # Use LoggingInteractor for doing diffs from logged actions.
-      interactor = DevelopmentApp::LoggingInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = DevelopmentApp::LoggingInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       left, right = interactor.diff_action(id, from_status_log: true)
       show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
     end

@@ -38,7 +38,8 @@ class CreateJasperReport < BaseService
     log_report_result(result)
 
     if result.to_s.include?('JMT Jasper error:') && (errors = result.split('JMT Jasper error:')).length.positive?
-      failed_response("Jasper printing error: <BR> #{errors[1]}")
+      send_error_mail(result)
+      failed_response("Jasper printing error: <br>#{errors[1]}")
     elsif @mode == 'GENERATE'
       success_response('Report has been generated', download_file)
     else
@@ -47,6 +48,22 @@ class CreateJasperReport < BaseService
   end
 
   private
+
+  def send_error_mail(result)
+    body = <<~STR
+      Jasper report "#{report_name}" did not succeed.
+
+      Error  : #{result.split('JMT Jasper error:')[1]}
+
+      User   : #{user}
+
+      Command: #{command}
+
+      Result : #{result}
+    STR
+    ErrorMailer.send_error_email(subject: "Jasper error for #{report_name}",
+                                 message: body)
+  end
 
   def download_file
     file = "#{@output_file}.#{@file_type.downcase}"

@@ -64,6 +64,7 @@ module DevelopmentApp
         mk.col 'user_name', 'User', width: 200
         mk.col 'context'
         mk.col 'route_url'
+        mk.col 'request_ip'
         make_columns_for(col_names, logged_action.table_name).each do |col|
           mk.col col[:field], nil, col[:options]
         end

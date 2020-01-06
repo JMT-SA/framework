@@ -139,12 +139,22 @@ a|
 |None, unless a `pattern` has been provided.
 
 |:maxlength
-|HTML `maxlength` attribute. This does not affect the input's width, but the number of characters that can be typed in.
+|HTML `maxlength` attribute. This does not affect the input's width, but the number of characters that can be typed in. Only applies to text types of inputs.
 |Any number
 |n/a
 
 |:minlength
-|HTML `minlength` attribute. Validates in the browser that the contents are at least that long.
+|HTML `minlength` attribute. Validates in the browser that the contents are at least that long. Only applies to text types of inputs.
+|Any number
+|n/a
+
+|:maxvalue
+|HTML `max` attribute. For date/time/numeric inputs, restrict to a maximum value.
+|Any number
+|n/a
+
+|:minvalue
+|HTML `min` attribute. For date/time/numeric inputs, restrict to a minimum value.
 |Any number
 |n/a
 

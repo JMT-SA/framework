@@ -78,7 +78,6 @@ module UiRules
       {
         status: { renderer: :hidden },
         transporter: { renderer: :hidden },
-        waybill_number: { renderer: :label },
         transporter_party_role_id: { renderer: :select, options: @party_repo.for_select_party_roles(AppConst::ROLE_TRANSPORTER), caption: 'Transporter' },
         receipt_location_id: { renderer: :select, options: @locations_repo.for_select_receiving_bays, caption: 'Receiving Bay', required: true },
         delivery_number: { renderer: :label, with_value: @form_object.delivery_number },

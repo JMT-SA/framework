@@ -83,6 +83,7 @@ module UiRules
         receipt_location_id: { renderer: :select, options: @locations_repo.for_select_receiving_bays, caption: 'Receiving Bay', required: true },
         delivery_number: { renderer: :label, with_value: @form_object.delivery_number },
         driver_name: { required: true, force_uppercase: true },
+        waybill_number: { renderer: rules[:over_supply_accepted] ? :label : :hidden },
         client_delivery_ref_number: { required: true },
         vehicle_registration: { required: true, force_uppercase: true }
       }

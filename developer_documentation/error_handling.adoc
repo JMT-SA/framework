@@ -1,0 +1,53 @@
+= Error-handling
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Error-handling
+
+TODO: Some general principles, Exception classes, roda errors, jobs, dev mode skip err-handling (pros and cons)
+
+=== ErrorMailer
+
+Sometimes when an exception is raised but handled, we still need to be notified. This is what `ErrorMailer` allows.
+
+There are two methods in this module:
+
+send_exception_email:: Takes a rescued exception instance and sends an appropriately formatted email.
+send_error_email:: Takes a subject and message and sends an email.
+
+See link:/yarddocthis/lib=error_mailer.rb[ErrorMailer methods] for the method definitions.
+
+Here's an example of error-handling including calling the **exception** and **error** methods:
+[source,ruby]
+----
+def json_post(url, params)
+  uri, http = setup_http(url)
+  request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
+  request.body = params.to_json
+
+  log_request(request)
+
+  response = http.request(request)
+  if response.code == '200'
+    success_response(response.code, response)
+  else
+    msg = "An HTTP call responded with error code #{response.code}"
+    ErrorMailer.send_error_email(subject: msg,                      #<1>
+                                 message: response.body)
+  end
+  format_response(response, uri)
+rescue Timeout::Error
+  failed_response('The call to the server timed out.', timeout: true)
+rescue Errno::ECONNREFUSED
+  msg = 'The connection was refused. Perhaps the server is not running.'
+  failed_response(msg, refused: true)
+rescue StandardError => e
+  ErrorMailer.send_exception_email(e,                               #<2>
+                                   subject: self.class.name,
+                                   message: "URI is #{uri}")
+  failed_response("There was an error: #{e.message}")
+end
+----
+<1> Sending an error email when there is no exception, but there is indeed an unexpected or exceptional situation that should be communicated to the developers.
+<2> Send an error email based on the exception itself. This will include a stacktrace.

@@ -65,6 +65,8 @@ module SecurityApp
         rec[col].to_s
       elsif @columns[col][:type] == :boolean
         rec[col].to_s
+      elsif @columns[col][:type] == :jsonb
+        "'#{rec[col].to_s.gsub("'", "''").gsub('=>', ': ')}'" # Need to escape single quotes AND convert ruby hashrocket to JSON colon.
       else
         "'#{rec[col].to_s.gsub("'", "''")}'" # Need to escape single quotes...
       end

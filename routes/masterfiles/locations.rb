@@ -8,7 +8,7 @@ class Framework < Roda
     # LOCATION TYPES
     # --------------------------------------------------------------------------
     r.on 'location_types', Integer do |id|
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:location_types, id) do
@@ -49,7 +49,7 @@ class Framework < Roda
       end
     end
     r.on 'location_types' do
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('locations', 'new')
         show_partial_or_page(r) { Masterfiles::Locations::LocationType::New.call(remote: fetch?(r)) }
@@ -71,7 +71,7 @@ class Framework < Roda
     # LOCATIONS
     # --------------------------------------------------------------------------
     r.on 'locations', Integer do |id|
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:locations, id) do
@@ -206,7 +206,7 @@ class Framework < Roda
       end
     end
     r.on 'locations' do
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('locations', 'new')
         show_partial_or_page(r) { Masterfiles::Locations::Location::New.call(remote: fetch?(r)) }
@@ -232,7 +232,7 @@ class Framework < Roda
     # LOCATION ASSIGNMENTS
     # --------------------------------------------------------------------------
     r.on 'location_assignments', Integer do |id|
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:location_assignments, id) do
@@ -270,7 +270,7 @@ class Framework < Roda
       end
     end
     r.on 'location_assignments' do
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('locations', 'new')
         show_partial_or_page(r) { Masterfiles::Locations::LocationAssignment::New.call(remote: fetch?(r)) }
@@ -291,7 +291,7 @@ class Framework < Roda
     # LOCATION STORAGE TYPES
     # --------------------------------------------------------------------------
     r.on 'location_storage_types', Integer do |id|
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:location_storage_types, id) do
@@ -330,7 +330,7 @@ class Framework < Roda
       end
     end
     r.on 'location_storage_types' do
-      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('locations', 'new')
         show_partial_or_page(r) { Masterfiles::Locations::LocationStorageType::New.call(remote: fetch?(r)) }
@@ -353,7 +353,7 @@ class Framework < Roda
     # LOCATION STORAGE DEFINITIONS
     # --------------------------------------------------------------------------
     r.on 'location_storage_definitions', Integer do |id|
-      interactor = MasterfilesApp::LocationStorageDefinitionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationStorageDefinitionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:location_storage_definitions, id) do
@@ -398,7 +398,7 @@ class Framework < Roda
     end
 
     r.on 'location_storage_definitions' do
-      interactor = MasterfilesApp::LocationStorageDefinitionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::LocationStorageDefinitionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('locations', 'new')
         show_partial_or_page(r) { Masterfiles::Locations::LocationStorageDefinition::New.call(remote: fetch?(r)) }

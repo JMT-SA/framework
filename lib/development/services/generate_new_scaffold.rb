@@ -394,7 +394,7 @@ module DevelopmentApp
                 id = nil
                 repo.transaction do
                   id = repo.create_#{opts.singlename}(res)
-                  log_status('#{opts.table}', id, 'CREATED')
+                  log_status(:#{opts.table}, id, 'CREATED')
                   log_transaction
                 end
                 instance = #{opts.singlename}(id)
@@ -425,7 +425,7 @@ module DevelopmentApp
                 name = #{opts.singlename}(id).#{opts.label_field}
                 repo.transaction do
                   repo.delete_#{opts.singlename}(id)
-                  log_status('#{opts.table}', id, 'DELETED')
+                  log_status(:#{opts.table}, id, 'DELETED')
                   log_transaction
                 end
                 success_response("Deleted #{opts.classnames[:text_name].downcase} \#{name}")
@@ -833,7 +833,7 @@ module DevelopmentApp
               # #{opts.table.upcase.tr('_', ' ')}
               # --------------------------------------------------------------------------
               r.on '#{opts.table}', Integer do |id|
-                interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+                interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
                 # Check for notfound:
                 r.on !interactor.exists?(:#{opts.table}, id) do
@@ -943,7 +943,7 @@ module DevelopmentApp
       def plain_new_routes
         <<~RUBY
           r.on '#{opts.table}' do
-            interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+            interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
             r.on 'new' do    # NEW
               check_auth!('#{opts.program_text}', 'new')#{on_new_lastgrid.chomp}
               show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
@@ -968,7 +968,7 @@ module DevelopmentApp
         <<~RUBY
           r.on '#{opts.nested_route}', Integer do |id|
             r.on '#{opts.table}' do
-              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
               r.on 'new' do    # NEW
                 check_auth!('#{opts.program_text}', 'new')#{on_new_lastgrid.chomp}
                 show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }
@@ -2217,8 +2217,8 @@ module DevelopmentApp
               add_functional_area '#{make_caption(opts.applet)}'
               add_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}', seq: 1
               #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
-              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
-              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+              add_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
             end
 
             down do
@@ -2243,13 +2243,13 @@ module DevelopmentApp
             up do
               add_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}', seq: 1
               #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
-              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
-              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+              add_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
             end
 
             down do
-              # drop_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
-              # drop_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
               # drop_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
               drop_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}'
             end
@@ -2268,13 +2268,13 @@ module DevelopmentApp
           Crossbeams::MenuMigrations::Migrator.migration('#{opts.classnames[:roda_class]}') do
             up do
               #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
-              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
-              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+              add_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
             end
 
             down do
-              # drop_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
-              drop_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              drop_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
               #{opts.new_from_menu ? '' : '# '}drop_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
             end
           end

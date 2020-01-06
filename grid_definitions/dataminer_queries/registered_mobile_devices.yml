@@ -2,10 +2,10 @@
 :caption: Registered Mobile Devices
 :sql: "SELECT \"registered_mobile_devices\".\"id\", \"registered_mobile_devices\".\"ip_address\",
   \r\n\"registered_mobile_devices\".\"start_page_program_function_id\", \"registered_mobile_devices\".\"active\",
-  \r\n\"registered_mobile_devices\".\"scan_with_camera\", \r\n\"registered_mobile_devices\".\"created_at\",
-  \"registered_mobile_devices\".\"updated_at\", \r\n\"program_functions\".\"program_function_name\"
-  AS start_page\r\nFROM \"registered_mobile_devices\" \r\nLEFT JOIN \"program_functions\"
-  ON \"program_functions\".\"id\" = \"registered_mobile_devices\".\"start_page_program_function_id\""
+  \r\n\"registered_mobile_devices\".\"scan_with_camera\", \r\n\"registered_mobile_devices\".\"hybrid_device\",
+  \r\n\"registered_mobile_devices\".\"created_at\", \"registered_mobile_devices\".\"updated_at\",
+  \r\n\"program_functions\".\"program_function_name\" AS start_page\r\nFROM \"registered_mobile_devices\"
+  \r\nLEFT JOIN \"program_functions\" ON \"program_functions\".\"id\" = \"registered_mobile_devices\".\"start_page_program_function_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -19,6 +19,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -34,6 +35,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -49,6 +51,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -64,6 +67,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -76,9 +80,26 @@
     :caption: Scan with camera?
     :namespaced_name: registered_mobile_devices.scan_with_camera
     :data_type: :boolean
-    :width: 
+    :width: 150
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  hybrid_device:
+    :name: hybrid_device
+    :sequence_no: 6
+    :caption: Hybrid device
+    :namespaced_name: registered_mobile_devices.hybrid_device
+    :data_type: :boolean
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -87,13 +108,14 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Created at
     :namespaced_name: registered_mobile_devices.created_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -102,13 +124,14 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Updated at
     :namespaced_name: registered_mobile_devices.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -117,13 +140,14 @@
     :group_max: false
   start_page:
     :name: start_page
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Start page
     :namespaced_name: program_functions.program_function_name
     :data_type: :string
-    :width: 
+    :width: 300
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

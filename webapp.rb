@@ -10,6 +10,7 @@ class Framework < Roda
   include ErrorHelpers
   include MenuHelpers
   include DataminerHelpers
+  include RmdHelpers
 
   use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
@@ -36,7 +37,15 @@ class Framework < Roda
   plugin :flash
   plugin :csrf, raise: true,
                 csrf_header: 'X-CSRF-Token',
-                skip_if: ->(req) { ENV['RACK_ENV'] == 'test' || AppConst::BYPASS_LOGIN_ROUTES.any? { |path| req.path == path } } # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
+                skip_if: ->(req) do # rubocop:disable Style/Lambda
+                  ENV['RACK_ENV'] == 'test' || AppConst::BYPASS_LOGIN_ROUTES.any? do |path|
+                    if path.end_with?('*')
+                      req.path.match?(/#{path}/)
+                    else
+                      req.path == path
+                    end
+                  end
+                end
   plugin :json_parser
   plugin :message_bus
   plugin :status_handler
@@ -88,7 +97,7 @@ class Framework < Roda
     r.on 'webquery', String do |id|
       # A dummy user
       user = DevelopmentApp::User.new(id: 0, login_name: 'webquery', user_name: 'webquery', password_hash: 'dummy', email: nil, active: true)
-      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path }, {})
+      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path, request_ip: request.ip }, {})
       interactor.prepared_report_as_html(id)
     end
 
@@ -96,7 +105,7 @@ class Framework < Roda
     r.on 'xmlreport', String do |id|
       # A dummy user
       user = DevelopmentApp::User.new(id: 0, login_name: 'webquery', user_name: 'webquery', password_hash: 'dummy', email: nil, active: true)
-      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path }, {})
+      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path, request_ip: request.ip }, {})
       interactor.prepared_report_as_xml(id)
     end
     # Do the same as XML?
@@ -147,10 +156,12 @@ class Framework < Roda
 
     r.root do
       # TODO: Config this, and maybe set it up per user.
-      if @registered_mobile_device
+      if @registered_mobile_device && !@hybrid_device
         r.redirect @rmd_start_page || '/rmd/home'
       else
-        r.redirect '/pack_material/summary'
+        page = user_homepage
+        r.redirect page unless page.nil?
+        view(inline: '<p>Welcome<p>')
       end
     end
 

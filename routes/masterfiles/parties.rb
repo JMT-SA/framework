@@ -6,7 +6,7 @@
 class Framework < Roda
   route 'parties', 'masterfiles' do |r|
     r.on 'organizations', Integer do |id|
-      interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:organizations, id) do
@@ -45,7 +45,7 @@ class Framework < Roda
       end
     end
     r.on 'organizations' do
-      interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }
@@ -66,7 +66,7 @@ class Framework < Roda
     end
 
     r.on 'people', Integer do |id|
-      interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:people, id) do
@@ -103,7 +103,7 @@ class Framework < Roda
       end
     end
     r.on 'people' do
-      interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PersonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::Person::New.call(remote: fetch?(r)) }
@@ -124,7 +124,7 @@ class Framework < Roda
     end
 
     r.on 'addresses', Integer do |id|
-      interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:addresses, id) do
@@ -164,7 +164,7 @@ class Framework < Roda
       end
     end
     r.on 'addresses' do
-      interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::AddressInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::Address::New.call(remote: fetch?(r)) }
@@ -185,7 +185,7 @@ class Framework < Roda
     end
 
     r.on 'contact_methods', Integer do |id|
-      interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:contact_methods, id) do
@@ -220,7 +220,7 @@ class Framework < Roda
       end
     end
     r.on 'contact_methods' do
-      interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ContactMethodInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::ContactMethod::New.call(remote: fetch?(r)) }
@@ -242,7 +242,7 @@ class Framework < Roda
 
     r.on 'link_addresses', Integer do |id|
       r.post do
-        interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         res = interactor.link_addresses(id, multiselect_grid_choices(params))
         if res.success
@@ -255,7 +255,7 @@ class Framework < Roda
     end
     r.on 'link_contact_methods', Integer do |id|
       r.post do
-        interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::PartyInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         res = interactor.link_contact_methods(id, multiselect_grid_choices(params))
         if res.success

@@ -29,7 +29,7 @@ module DevelopmentApp
         SELECT a.event_id, a.action_tstamp_tx,
          CASE a.action WHEN 'I' THEN 'INS' WHEN 'U' THEN 'UPD'
           WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,
-         l.user_name, l.context, l.route_url,
+         l.user_name, l.context, l.route_url, l.request_ip,
          a.statement_only, a.row_data, a.changed_fields,
          ROW_NUMBER() OVER() + 1 AS id
         FROM audit.logged_actions a

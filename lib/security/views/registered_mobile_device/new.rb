@@ -4,7 +4,7 @@ module Security
   module Rmd
     module RegisteredMobileDevice
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:registered_mobile_device, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -12,12 +12,14 @@ module Security
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.add_help_link path: %i[rmd rmd_properties], help_type: 'system', for_dialog: remote
             page.form do |form|
               form.action '/security/rmd/registered_mobile_devices'
               form.remote! if remote
               form.add_field :ip_address
               form.add_field :start_page_program_function_id
               form.add_field :scan_with_camera
+              form.add_field :hybrid_device
             end
           end
 

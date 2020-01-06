@@ -18,6 +18,13 @@ module DevelopmentApp
 
     crud_calls_for :user_email_groups, name: :user_email_group, wrapper: UserEmailGroup
 
+    def update_user(id, attrs)
+      new_attrs = attrs.to_h
+      profile_present = new_attrs.keys.include?(:profile)
+      new_attrs[:profile] = hash_for_jsonb_col(attrs[:profile]) if profile_present
+      update(:users, id, new_attrs)
+    end
+
     def delete_or_deactivate_user(id)
       if SecurityApp::MenuRepo.new.existing_prog_ids_for_user(id).empty?
         delete_user(id)

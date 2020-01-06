@@ -110,9 +110,9 @@ module DataminerApp
       lookup_report(id, true)
     end
 
-    def list_all_reports
+    def list_all_reports(for_admin = false)
       report_lookup = {}
-      DM_CONNECTIONS.databases(without_grids: true).each do |key|
+      DM_CONNECTIONS.databases(without_grids: true, without_system: for_admin).each do |key|
         report_lookup.merge!(get_reports_for(key, DM_CONNECTIONS.report_path(key)))
       end
       report_lookup.map { |id, lkp| { id: id, db: lkp[:db], file: lkp[:file], caption: lkp[:caption], crosstab: lkp[:crosstab], external: lkp[:external] } }

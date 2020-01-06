@@ -12,7 +12,7 @@ module UiRules
 
     def common_fields
       {
-        database: { renderer: :select, options: DM_CONNECTIONS.databases(without_grids: true) },
+        database: { renderer: :select, options: DM_CONNECTIONS.databases(without_grids: true, without_system: true) },
         filename: { renderer: :hidden },
         temp_path: { renderer: :hidden },
         yml: { renderer: :hidden },

@@ -4,9 +4,10 @@
   "target_market_groups"."target_market_group_name", "target_market_groups"."created_at",
   "target_market_groups"."updated_at", "target_market_group_types"."target_market_group_type_code"
   FROM "target_market_groups" JOIN "target_market_group_types" ON "target_market_group_types"."id"
-  = "target_market_groups"."target_market_group_type_id"
+  = "target_market_groups"."target_market_group_type_id" ORDER BY "target_market_groups"."target_market_group_name"
 :limit: 
 :offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -17,6 +18,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -32,6 +34,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -47,6 +50,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -62,6 +66,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -77,6 +82,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -92,6 +98,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -108,3 +115,12 @@
   :ui_priority: 1
   :list_def: SELECT target_market_group_type_code, id FROM target_market_group_types
     ORDER BY target_market_group_type_code
+- :column: target_market_groups.id
+  :caption: TM Group id
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT target_market_group_name, id FROM target_market_groups ORDER BY
+    target_market_group_name

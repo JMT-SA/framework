@@ -8,5 +8,6 @@ module DevelopmentApp
     attribute :user_name, Types::String
     attribute :context, Types::String
     attribute :route_url, Types::String
+    attribute :request_ip, Types::String
   end
 end

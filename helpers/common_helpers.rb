@@ -217,6 +217,21 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @current_user ||= DevelopmentApp::UserRepo.new.find(:users, DevelopmentApp::User, session[:act_as_user_id] || session[:user_id])
   end
 
+  def user_homepage
+    return nil unless current_user&.profile
+    return nil if current_user.profile['homepage_id'].nil_or_empty?
+
+    SecurityApp::MenuRepo.new.find_program_function(current_user.profile['homepage_id']).url
+  end
+
+  # A fixed user to be used for logging activities not initiated by users.
+  # e.g. when set in a route that does not require login.
+  #
+  # @return [User] the system user.
+  def system_user
+    DevelopmentApp::User.new(id: nil, login_name: 'system', user_name: 'System', password_hash: nil, email: nil, active: true)
+  end
+
   # The user acting as another user.
   #
   # @return [User, nil] the logged-in user acting as another user.
@@ -433,6 +448,12 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
+  # Change the contents of a currently-displayed dialog.
+  #
+  # @param content [string] the HTML content to be rendered.
+  # @param notice [nil, string] an optional notice to flash in the page.
+  # @param error [nil, string] an optional error message to flash in the page.
+  # @return [JSON] the commands for the front end to apply.
   def update_dialog_content(content:, notice: nil, error: nil)
     res = { replaceDialog: { content: content } }
     res[:flash] = { notice: notice } if notice
@@ -440,12 +461,34 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
-  def dialog_error(content, notice: nil, error: nil)
-    update_dialog_content(content: wrap_content_in_style(content, :error), notice: notice, error: error)
+  # Display an error message in a dialog.
+  #
+  # @param content [string] the error message.
+  # @param notice [nil, string] an optional notice to flash in the page.
+  # @param error [nil, string] an optional error message to flash in the page.
+  # @param hide_caption [boolean] hide the "Error" caption. Default is false.
+  # @return [JSON] the commands for the front end to apply.
+  def dialog_error(content, notice: nil, error: nil, hide_caption: false)
+    if hide_caption
+      update_dialog_content(content: wrap_content_in_style(content, :error, caption: ''), notice: notice, error: error)
+    else
+      update_dialog_content(content: wrap_content_in_style(content, :error), notice: notice, error: error)
+    end
   end
 
-  def dialog_warning(content, notice: nil, error: nil)
-    update_dialog_content(content: wrap_content_in_style(content, :warning), notice: notice, error: error)
+  # Display a warning message in a dialog.
+  #
+  # @param content [string] the warning message.
+  # @param notice [nil, string] an optional notice to flash in the page.
+  # @param error [nil, string] an optional error message to flash in the page.
+  # @param hide_caption [boolean] hide the "Warning" caption. Default is false.
+  # @return [JSON] the commands for the front end to apply.
+  def dialog_warning(content, notice: nil, error: nil, hide_caption: false)
+    if hide_caption
+      update_dialog_content(content: wrap_content_in_style(content, :warning, caption: ''), notice: notice, error: error)
+    else
+      update_dialog_content(content: wrap_content_in_style(content, :warning), notice: notice, error: error)
+    end
   end
 
   def json_replace_select_options(dom_id, options_array, message: nil, keep_dialog_open: false)
@@ -488,6 +531,14 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :clear_form_validation, dom_id: dom_id), message, keep_dialog_open: keep_dialog_open)
   end
 
+  def json_set_required(dom_id, required, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :set_required, dom_id: dom_id, required: required), message, keep_dialog_open: keep_dialog_open)
+  end
+
+  def json_set_checked(dom_id, checked, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :set_checked, dom_id: dom_id, checked: checked), message, keep_dialog_open: keep_dialog_open)
+  end
+
   def build_json_action(action) # rubocop:disable Metrics/AbcSize
     # rubocop:disable Layout/AlignHash
     {
@@ -503,7 +554,11 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs) },
       update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes) },
       delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
-      clear_form_validation:  ->(act) { action_clear_form_validation(act) }
+      clear_form_validation:  ->(act) { action_clear_form_validation(act) },
+      set_required:           ->(act) { action_set_required(act) },
+      set_checked:            ->(act) { action_set_checked(act) }
+      # redirect:               ->(act) { action_redirect(act) }       // url
+      # replace_dialog:         ->(act) { action_replace_dialog(act) } // url
     }[action.type].call(action)
     # rubocop:enable Layout/AlignHash
   end
@@ -547,6 +602,18 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def action_clear_form_validation(action)
     { clear_form_validation: { form_id: action.dom_id } }
   end
+
+  def action_set_required(action)
+    { set_required: { id: action.dom_id, required: action.required } }
+  end
+
+  def action_set_checked(action)
+    { set_checked: { id: action.dom_id, checked: action.checked } }
+  end
+
+  # def action_redirect(action)
+  #   { redirect: { url: action.url } }
+  # end
 
   def json_actions(actions, message = nil, keep_dialog_open: false)
     res = { actions: Array(actions).map { |a| build_json_action(a) } }
@@ -641,9 +708,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [String] the formatted message.
   def unwrap_failed_response(res)
     if res.errors.empty?
-      res.message
+      CGI.escapeHTML(res.message)
     else
-      "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}"
+      "#{CGI.escapeHTML(res.message)} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')}"
     end
   end
 end

@@ -19,6 +19,8 @@ class AppDevTasks
         puts ''
         puts '3. Environment variables'
         setup_env
+        puts '4. Required paths'
+        prep_required_paths
         @logs.unshift "\n----------" unless @logs.empty?
         @logs.push '----------' unless @logs.empty?
         puts @logs.join("\n") unless @logs.empty?
@@ -67,6 +69,15 @@ class AppDevTasks
     FileUtils.touch(target) unless File.exist?(target)
 
     EnvVarRules.new.add_missing_to_local
+  end
+
+  def prep_required_paths
+    linked_dirs = %w[log tmp public/assets public/tempfiles public/downloads/jasper prepared_reports].map do |path|
+      File.join(root_path, path)
+    end
+    paths = FileUtils.mkdir_p(linked_dirs)
+    log 'Setting up paths:'
+    paths.each { |p| log p }
   end
 
   def copy(from, to)

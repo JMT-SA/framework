@@ -36,6 +36,8 @@ form.add_select(:choice, 'Choose', items: items, value: 'my', required: true, pr
 form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
 form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, force_uppercase: true)
 form.add_field(:quantity, 'Quantity', data_type: 'number')
+form.add_toggle(:complete, 'Is this functon complete?')
+form.add_button('Print', '/rmd/deliveries/print', id: 'print_btn')
 form.add_csrf_tag csrf_tag
 view(inline: form.render, layout: :layout_rmd)
 ----
@@ -65,9 +67,21 @@ a|AJAX behaviours.
 |name (String), label (String), options (Hash)
 |Adds a select box to the form.
 
+|add_label
+|name (String), label (String), value (String), hidden_value (String), options (Hash)
+|Adds a label to the form.
+
+|add_toggle
+|name (String), label (String), options (Hash)
+|Adds a toggle (checkbox) to the form.
+
 |add_csrf_tag
 |tag
 |Adds CSRF tag to the form.
+
+|add_section_header
+|caption (String), options (Hash)
+|Adds a section header to the table.
 
 |add_prev_next_nav
 |url (String), ids (Array), current_id (Integer), options (Hash)
@@ -354,6 +368,51 @@ Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{fiel
 |Boolean
 |`false`
 
+|options - :as_table_cell
+|Render this label with a border and styling like Crossbeams::Layout::Table
+|Boolean
+|`false`
+
+|===
+
+=== Method: add_toggle
+
+This adds a checkbox to the form which renders as a toggle switch.
+The toggle will be checked if the field has a value and the value is not `false` and does not start with any of these characters: `F, f, N, n, 0`.
+
+The best way to set the value is to make the field value `true` or `false`, but any of the following: `Yes`, `no`, `t` or `False` would set the state as you would expect.
+
+The returned parameter value is either `t` when checked or `f` when unchecked.
+[source,ruby]
+----
+form.add_toggle(:complete, 'Are you done yet?')
+
+# Returns parameters (if form name was "location"):
+# => {
+# =>   location: { complete: 't' }
+# => }
+----
+
+|===
+|attribute |description |possible values |default
+
+|name
+|The name of the field
+|String
+|None. Required.
+
+|label
+|The label for the field
+|String
+|None. Required.
+
+|options - :hide_on_load
+a|Should the field be hidden when the form loads - typically to be shown later via a behaviour.
+
+Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{field_name}_row`.
+|Boolean
+|`false`
+
 |===
 
 === Method: add_prev_next_nav
@@ -399,7 +458,41 @@ form.prev_next_nav('/path/to/resource/$:id$', [1, 2, 3, 4], 3, prev_caption: 'Be
 
 |===
 
-== Method: add_section_header
+=== Method: add_button
+
+Renders a suplementary button to submit the form to another path.
+
+[source,ruby]
+----
+form.add_button('Click me!', '/path/to/somewhere')
+----
+
+|===
+|attribute |description |possible values |default
+
+|caption
+|The text to render as the button caption.
+|String
+|None. Required.
+
+|action
+|The path to which the form should be submitted when the button is pressed.
+|String
+|None. Required.
+
+|options - :id
+|The DOM id of the button. Use this to dynamically hide/show.
+|String
+|The hash of the `caption` value prefixed with `btn_`.
+
+|options - :hide_on_load
+|Should the button be hidden when the form loads - typically to be shown later via a behaviour.
+|Boolean
+|`false`
+
+|===
+
+=== Method: add_section_header
 
 Renders a caption in bold to denote a section of the form.
 
@@ -415,6 +508,19 @@ form.add_section_header('The next part of the form')
 |The text to render as the section caption.
 |String
 |None. Required.
+
+|options - :id
+|The DOM id of the table row. Use this to dynamically hide/show.
+|String
+|The hash of the `caption` value prefixed with `sh_`.
+
+|options - :hide_on_load
+a|Should the section be hidden when the form loads - typically to be shown later via a behaviour.
+
+Note: the table row (`tr`) is hidden, the id of the row must be provided with the `:id` option.
+|Boolean
+|`false`
+
 |===
 
 == Testing

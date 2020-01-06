@@ -9,7 +9,7 @@ class Framework < Roda
         show_page { Development::Grids::List::List.call }
       end
 
-      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path }, {})
+      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'grid' do
         grid_interactor.list_grids.to_json
@@ -40,7 +40,7 @@ class Framework < Roda
     end
 
     r.on 'grid_page_controls', String, Integer do |list_file, index|
-      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path }, {})
+      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.patch do
         res = grid_interactor.update_page_control(params[:page_control])

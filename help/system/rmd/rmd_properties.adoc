@@ -1,0 +1,17 @@
+== Registered Mobile Device
+
+This form allows you to identify a device for mobile usage (typically for scanning purposes).
+
+A mobile device has the following properties:
+
+Ip Address:: The ip address of the device in question. All RMDs should be set up with fixed ip addresses.
+Start Page:: This is the page that will open after a user logs in. If left blank, the main RMD menu will display. If a device is marked as `hybrid` (see below) this setting is ignored.
+Active:: Must be `true` for the device to behave as a mobile device. Set to `false` to disable the behaviour if required. `False` for this setting has the equivalent effect of the RMD entry not existing.
+Scan with camera:: If `true`, a button appears on all scan forms that allows the user to use the device's camera for scanning instead of the device's own scanner. Use this when operating a tablet or cellphone without built-in scanner. Note: this option can also be toggled from the menu on the device -- useful if the image scanner is not working for some reason.
+Hybrid device:: Set this to `true` for a device (like a tablet) that will use the desktop aspects of the system as well as the RMD aspects.
+
+=== Device notes
+
+For scanning to work, the NoSoft product `SoftService` must be installed _and running_ on the device.
+
+The device should not have two tabs open in the browser on scanning pages, otherwise scanning results are unpredictable as only one connection to `SoftService` will receive scan results.

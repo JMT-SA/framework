@@ -91,14 +91,26 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     where_hash(table_name, id: id.to_s.empty? ? nil : id)
   end
 
-  # Get a single value from a record
+  # Get a single value from a record matching on id
   #
   # @param table_name [Symbol] the db table name.
   # @param id [Integer] the id of the row.
-  # @param column [Symbol] the column to query.
-  # @return [any] the column value for the matching record.
+  # @param column [Symbol] the column (or array of columns) to query.
+  # @return [any] the column value for the matching record or nil.
   def get(table_name, id, column)
     DB[table_name].where(id: id).get(column)
+  end
+
+  # Get a single value from a record given any WHERE clause
+  # NB: only the first record is returned - even when the WHERE clause
+  #     would return more than one row.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param column [Symbol] the column (or array of columns) to query.
+  # @param args [Hash] the where-clause conditions.
+  # @return [any] the column value for the matching record or nil.
+  def get_with_args(table_name, column, args)
+    DB[table_name].where(args).get(column)
   end
 
   # Find the first row in a table matching some condition.
@@ -286,15 +298,17 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param user_name [String] the current user's name.
   # @param context [String] more context about what led to the action.
   # @param route_url [String] the application route that led to the transaction.
-  def log_action(user_name: nil, context: nil, route_url: nil)
+  # @param request_ip [String] the ip address of the client browser.
+  def log_action(user_name: nil, context: nil, route_url: nil, request_ip: nil)
     DB[Sequel[:audit][:logged_action_details]].insert(user_name: user_name,
                                                       context: context,
-                                                      route_url: route_url)
+                                                      route_url: route_url,
+                                                      request_ip: request_ip)
   end
 
   # Log the status of a record.
   #
-  # @param table_name [String] the name of the table.
+  # @param table_name [Symbol, String] the name of the table.
   # @param id [Integer] the id of the record with the changed status.
   # @param status [String] the status to be logged.
   # @param comment [String] extra information about the status change.
@@ -325,7 +339,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
 
   # Log the status of several records.
   #
-  # @param table_name [String] the name of the table.
+  # @param table_name [Symbol] the name of the table.
   # @param in_ids [Array/Integer] the ids of the records with the changed status.
   # @param status [String] the status to be logged.
   # @param comment [String] extra information about the status change.
@@ -371,6 +385,17 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     doc_seq = DocumentSequence.new(document_name)
     # check SQL from DS - is doc non-null????
     DB[doc_seq.next_sequence_update_sql(id)].update
+  end
+
+  # Get the next document sequence number.
+  #
+  # Gets DocumentSequence to return the SQL to run.
+  #
+  # @param document_name [string] the document name (key to document sequence hash)
+  # @return [integer] the new sequence value.
+  def next_document_sequence_number(document_name)
+    doc_seq = DocumentSequence.new(document_name)
+    DB[doc_seq.next_sequence_sql_as_seq].get(:seq)
   end
 
   # Run a query returning an array of column names and an array of data.

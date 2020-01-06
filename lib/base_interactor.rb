@@ -30,7 +30,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   #
   # @return [void]
   def log_transaction
-    repo.log_action(user_name: @user.user_name, context: @context.context, route_url: @context.route_url)
+    repo.log_action(user_name: @user.user_name, context: @context.context, route_url: @context.route_url, request_ip: @context.request_ip)
   end
 
   # Log the status of a record. Uses the context passed to the Interactor constructor.
@@ -44,6 +44,15 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   # @return [void]
   def log_status(table_name, id, status, comment: nil)
     repo.log_status(table_name, id, status, user_name: @user.user_name, comment: comment)
+  end
+
+  # Add context to a message for emailing.
+  # (adds the route and ip address)
+  #
+  # @param message [string] the message to appear in the body of the message
+  # @return [string] the message decorated with path and ip data.
+  def decorate_mail_message(message)
+    "#{message}\n\nRoute: #{@context.route_url}\n\nIP: #{@context.request_ip}"
   end
 
   # Add a created_by key to a changeset and set its value to the current user.
@@ -184,7 +193,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   #
   # @param table_name [symbol] the name of the table
   # @param id [integer] the record id.
-  # @param status_change [symbol] the type of status change.
+  # @param status_change [string] the type of status change.
   # @param opts [Hash] the options.
   # @option opts [Hash] :field_changes The fields and their values to be updated.
   # @option opts [String] :status_text The optional text to record as the status. If not provided, the value of <tt>status_change</tt> will be capitalized and used.
@@ -198,7 +207,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
       log_transaction
       DevelopmentApp::ProcessStateChangeEvent.call(id, table_name, status_change, @user.user_name, opts[:params])
     end
-    success_response((opts[:status_text] || status_change.to_s).capitalize)
+    success_response((opts[:status_text] || status_change.to_s).gsub('_', ' ').capitalize)
   end
 
   # Log the status of multiple records. Uses the context passed to the Interactor constructor.

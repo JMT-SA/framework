@@ -12,6 +12,7 @@ module Security
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.add_help_link path: %i[rmd rmd_properties], help_type: 'system', for_dialog: true
             page.form do |form|
               form.action "/security/rmd/registered_mobile_devices/#{id}"
               form.remote!
@@ -20,6 +21,7 @@ module Security
               form.add_field :start_page_program_function_id
               form.add_field :active
               form.add_field :scan_with_camera
+              form.add_field :hybrid_device
             end
           end
 

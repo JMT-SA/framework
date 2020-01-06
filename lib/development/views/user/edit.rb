@@ -19,6 +19,7 @@ module Development
               form.add_field :login_name
               form.add_field :user_name
               form.add_field :email
+              form.add_field :homepage_id
             end
           end
 

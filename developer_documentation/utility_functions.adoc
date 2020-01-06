@@ -20,6 +20,12 @@ UtilityFunctions.days_ago(Date.today, 3)    # => Date - three days before Date.t
 UtilityFunctions.days_since(Date.today, 3)  # => Date - three days after Date.today.
 ----
 
+Calculate the pick ref for today for a packhouse:
+[source,ruby]
+----
+UtilityFunctions.calculate_pick_ref(9)  # => '3291' (if today is Tuesday in ISO week 13)
+----
+
 === Miscellaneous
 
 Get an ip address from a string that could be an ip address or could contain an ip address as part of a URI.

@@ -137,7 +137,7 @@ end
 namespace :deploy do
   after :updated, :migrate_and_precompile do
     invoke 'migrate'
-    # invoke 'menu_migrate'
+    invoke 'menu_migrate'
     invoke 'precompile'
     invoke 'restart_que'
   end

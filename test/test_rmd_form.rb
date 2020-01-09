@@ -32,4 +32,86 @@ class TestRMDForm < Minitest::Test
     form.add_field('test', 'Test', data_type: 'text')
     refute_match(/type="submit"/, form.render)
   end
+
+  def test_submit_dom_id
+    form = make_form
+    refute_match(/id="the-submit-button"/, form.render)
+
+    form = make_form({}, action: nil, button_id: 'the-submit-button')
+    assert_match(/id="the-submit-button"/, form.render)
+  end
+
+  def test_hide_submit
+    form = make_form
+    assert_match(/data-rmd-btn="Y">/, form.render)
+
+    form = make_form({}, action: nil, button_initially_hidden: true)
+    assert_match(/data-rmd-btn="Y" hidden>/, form.render)
+  end
+
+  def test_section_header
+    form = make_form
+    form.add_section_header('test')
+    assert_match(/>test<\/td/, form.render)
+    assert_match(/id="sh_#{'test'.hash}"/, form.render)
+
+    form = make_form
+    form.add_section_header('test', id: 'this_id_instead')
+    refute_match(/id="sh_#{'test'.hash}"/, form.render)
+    assert_match(/id="this_id_instead"/, form.render)
+  end
+
+  def test_hide_on_load
+    form = make_form
+    form.add_section_header('test')
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_section_header('test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_field('test', 'Test', {})
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_field('test', 'Test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_label('test', 'Test', 'abc')
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_label('test', 'Test', 'abc', nil, hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_select('test', 'Test', {})
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_select('test', 'Test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_toggle('test', 'Test')
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_toggle('test', 'Test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+  end
+
+  def test_toggle
+    form = make_form
+    form.add_toggle(:test, 'Test')
+    assert_match(/<input type="checkbox"/, form.render)
+    assert_match(/value="t">/, form.render)
+
+    form = make_form(test: 't')
+    form.add_toggle(:test, 'Test')
+    assert_match(/<input type="checkbox"/, form.render)
+    assert_match(/value="t" checked>/, form.render)
+  end
 end

@@ -1,9 +1,10 @@
 ---
 :caption: Logged Actions
 :sql: "SELECT a.event_id AS id, a.table_name, a.row_data_id, l.user_name, l.context,\r\n
-  \ l.route_url, a.transaction_id,\r\na.action_tstamp_tx, \r\nCASE a.action WHEN 'I'
-  THEN 'INS' WHEN 'U' THEN 'UPD'\r\n  WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,\r\na.client_query,
-  a.row_data::text AS row_data, a.changed_fields::text AS changed_fields\r\nFROM audit.logged_actions a\r\nLEFT OUTER JOIN audit.logged_action_details
+  \ l.route_url, l.request_ip, a.transaction_id,\r\na.action_tstamp_tx, \r\nCASE a.action
+  WHEN 'I' THEN 'INS' WHEN 'U' THEN 'UPD'\r\n  WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END
+  AS action,\r\na.client_query, a.row_data::text AS row_data, a.changed_fields::text
+  AS changed_fields\r\nFROM audit.logged_actions a\r\nLEFT OUTER JOIN audit.logged_action_details
   l ON l.transaction_id = a.transaction_id AND l.action_tstamp_tx = a.action_tstamp_tx\r\nORDER
   BY a.table_name, a.row_data_id DESC"
 :limit: 
@@ -19,6 +20,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -34,6 +36,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -49,6 +52,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -64,6 +68,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -79,6 +84,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -94,6 +100,23 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  request_ip:
+    :name: request_ip
+    :sequence_no: 7
+    :caption: IP address
+    :namespaced_name: l.request_ip
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -102,13 +125,14 @@
     :group_max: false
   transaction_id:
     :name: transaction_id
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Transaction
     :namespaced_name: a.transaction_id
     :data_type: :integer
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -117,13 +141,14 @@
     :group_max: false
   action_tstamp_tx:
     :name: action_tstamp_tx
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Transaction Time
     :namespaced_name: a.action_tstamp_tx
     :data_type: :datetime
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -132,13 +157,14 @@
     :group_max: false
   action:
     :name: action
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Action
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -147,13 +173,14 @@
     :group_max: false
   client_query:
     :name: client_query
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Client query
     :namespaced_name: a.client_query
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -162,13 +189,14 @@
     :group_max: false
   row_data:
     :name: row_data
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Row data
-    :namespaced_name: a.row_data
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -177,13 +205,14 @@
     :group_max: false
   changed_fields:
     :name: changed_fields
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Changed fields
-    :namespaced_name: a.changed_fields
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -204,6 +233,14 @@
   :data_type: :integer
   :control_type: :text
   :default_value: 
-  :ordered_list: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: l.request_ip
+  :caption: IP Address
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
   :ui_priority: 1
   :list_def: 

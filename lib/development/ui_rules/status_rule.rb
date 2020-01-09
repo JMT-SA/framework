@@ -48,6 +48,7 @@ module UiRules
       fields[:status] = { renderer: :label, with_value: [@form_object[:status], @form_object[:comment]].compact.join(' '), css_class: 'b' }
       fields[:user_name] = { renderer: :label }
       fields[:route_url] = { renderer: :label }
+      fields[:request_ip] = { renderer: :label, caption: 'IP Address' }
       fields[:context] = { renderer: :label }
       rules[:headers] = %i[status user_name action_tstamp_tx]
       rules[:details] = @form_object[:logs]
@@ -59,8 +60,8 @@ module UiRules
     end
 
     def set_detail_fields
-      rules[:cols] = %i[status user_name action_tstamp_tx comment route_url table_name row_data_id]
-      rules[:header_captions] = { action_tstamp_tx: 'Time', row_data_id: 'ID' }
+      rules[:cols] = %i[status user_name action_tstamp_tx comment route_url request_ip table_name row_data_id]
+      rules[:header_captions] = { action_tstamp_tx: 'Time', row_data_id: 'ID', request_ip: 'IP Address' }
     end
 
     def select_fields

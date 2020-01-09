@@ -76,6 +76,16 @@ param_name: false           # Jasper gets param_name: 'false'
 ----
 ====
 
+[NOTE]
+====
+If a report parameter sent to Jasper has to be a date value, it must be expressed like this:
+[source, ruby]
+----
+param_name: "#{attrs[:from_date]} 00:00:00|date" # if Ruby Date
+param_name: "#{attrs[:from_date_time]}|date"     # if Ruby DateTime/Time
+----
+====
+
 === Generate and email a report
 
 There is a job `DevelopmentApp::EmailJasperReport` which will create the report(s) and email the results as an attachment.
@@ -91,7 +101,7 @@ An example from a route:
 ----
 r.on 'email_report', Integer do |id|
   r.get do
-    interactor = TheInteractor.new(current_user, {}, { route_url: request.path }, {})
+    interactor = TheInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     email_opts = interactor.email_report_defaults(id, current_user)
     show_partial_or_page(r) do
       Development::Generators::General::Email.call(remote: true,

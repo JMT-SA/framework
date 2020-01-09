@@ -10,7 +10,7 @@ class Framework < Roda
     # MOVE
     # --------------------------------------------------------------------------
     r.on 'moves' do
-      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         r.get do
           details = retrieve_from_local_store(:stock_move) || {}

@@ -5,14 +5,13 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module DevelopmentApp
   class TestUserInteractor < Minitest::Test
     def test_repo
-      repo = interactor.repo
-      # repo = interactor.send(:repo)
+      repo = interactor.send(:repo)
       assert repo.is_a?(DevelopmentApp::UserRepo)
     end
 
     def test_update
       ok = { user_name: 'ANAME', email: 'email@place.com' }
-      res = interactor.validate_user_params(ok)
+      res = interactor.send(:validate_user_params, ok)
       assert_empty res.errors
 
       not_ok = [
@@ -20,7 +19,7 @@ module DevelopmentApp
         [{ user_name: 'ANAME' }, { email: ['is missing'] }]
       ]
       not_ok.each do |params, expect|
-        res = interactor.validate_user_params(params)
+        res = interactor.send(:validate_user_params, params)
         assert_equal expect, res.errors
       end
     end

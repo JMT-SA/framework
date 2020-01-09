@@ -43,4 +43,12 @@ class BaseStep
   def merge(opts)
     write(read.merge(opts))
   end
+
+  # Clear the step (deletes the key in the LocalStore)
+  #
+  # @return [void]
+  def clear
+    store = LocalStore.new(@user.id, @ip_address)
+    store.delete(@step_key)
+  end
 end

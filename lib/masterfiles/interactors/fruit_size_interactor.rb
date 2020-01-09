@@ -82,6 +82,11 @@ module MasterfilesApp
       success_response("Deleted fruit size reference #{name}")
     end
 
+    def assert_permission!(task, id = nil)
+      res = TaskPermissionCheck::FruitSizeReference.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
     private
 
     def repo

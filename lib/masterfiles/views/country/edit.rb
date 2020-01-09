@@ -18,6 +18,7 @@ module Masterfiles
               form.method :update
               form.add_field :destination_region_id
               form.add_field :country_name
+              form.add_field :iso_country_code
             end
           end
 

@@ -8,7 +8,7 @@ class Framework < Roda
   # --------------------------------------------------------------------------
   route 'vehicles', 'rmd' do |r|
     r.on 'load' do # rubocop:disable Metrics/BlockLength
-      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         details = retrieve_from_local_store(:vehicle_unit_load) || {}
         form = Crossbeams::RMDForm.new(details,
@@ -57,7 +57,7 @@ class Framework < Roda
     end
 
     r.on 'offload' do
-      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         details = retrieve_from_local_store(:vehicle_unit_offload) || {}
         form = Crossbeams::RMDForm.new(details,

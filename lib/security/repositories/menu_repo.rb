@@ -246,6 +246,28 @@ module SecurityApp
       DB[:program_functions_users].where(program_function_id: program_function_id).select_map(:user_id)
     end
 
+    def find_homepage(id)
+      query = <<~SQL
+        SELECT pf.id, CONCAT_WS(': ', f.functional_area_name, p.program_name, pf.group_name, pf.program_function_name) AS menu_text
+        FROM program_functions pf
+        JOIN programs p ON p.id = pf.program_id
+        JOIN functional_areas f ON f.id =  p.functional_area_id
+        WHERE pf.id = ?
+      SQL
+      DB[query, id].first || {}
+    end
+
+    def for_select_homepages
+      query = <<~SQL
+        SELECT CONCAT_WS(': ', f.functional_area_name, p.program_name, pf.group_name, pf.program_function_name) AS menu_text, pf.id
+        FROM program_functions pf
+        JOIN programs p ON p.id = pf.program_id
+        JOIN functional_areas f ON f.id =  p.functional_area_id
+        ORDER BY f.functional_area_name, p.program_name, pf.group_name, pf.program_function_name
+      SQL
+      DB[query].select_map { %i[menu_text id] }
+    end
+
     private
 
     def can_login_to_restricted_path?(user_id, prog_funcs)

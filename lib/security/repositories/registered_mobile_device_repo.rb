@@ -33,7 +33,7 @@ module SecurityApp
     # @return [Crossbeams::Response] a success response will include the start page url (could be nil) as the instance.
     def ip_address_is_rmd?(ip_address)
       hash = DB[:registered_mobile_devices].left_join(:program_functions, id: :start_page_program_function_id)
-                                           .select(:url, :scan_with_camera)
+                                           .select(:url, :scan_with_camera, :hybrid_device)
                                            .where(ip_address: ip_address)
                                            .where(Sequel[:registered_mobile_devices][:active] => true)
                                            .first

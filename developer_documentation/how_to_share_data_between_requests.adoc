@@ -151,4 +151,9 @@ vars = stepper.read
 p vars[:step_no]        # => 2
 p vars[:some_data]      # => "what it is"
 p stepper.a_description # => "On step 2 of 4."
+
+# …
+stepper.clear
+vars = stepper.read
+p vars.nil?             # => true
 ----

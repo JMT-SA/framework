@@ -62,8 +62,12 @@ module MasterfilesApp
       { success: true }
     end
 
-    def create_country(id, attrs)
-      DB[:destination_countries].insert(attrs.to_h.merge(destination_region_id: id))
+    def create_country(region_id, attrs)
+      if region_id.nil?
+        DB[:destination_countries].insert(attrs.to_h)
+      else
+        DB[:destination_countries].insert(attrs.to_h.merge(destination_region_id: region_id))
+      end
     end
 
     def find_city(id)

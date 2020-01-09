@@ -4,6 +4,8 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
   # DELIVERIES: PUTAWAYS
   # --------------------------------------------------------------------------
   route 'deliveries', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+    # PUTAWAYS
+    # --------------------------------------------------------------------------
     r.on 'putaways' do # rubocop:disable Metrics/BlockLength
       r.on 'new' do    # NEW
         details = retrieve_from_local_store(:delivery_putaway) || {}
@@ -24,7 +26,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do        # CREATE
-        interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         res = interactor.putaway_delivery(params[:putaway])
         payload = { progress: nil }
         if res.success
@@ -57,8 +59,10 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
   # Bulk Stock Adjustments: ADJUST ITEM
   # --------------------------------------------------------------------------
   route 'stock_adjustments', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+    # ADJUST ITEM
+    # --------------------------------------------------------------------------
     r.on 'adjust_item' do # rubocop:disable Metrics/BlockLength
-      interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         details = retrieve_from_local_store(:stock_item_adjustment) || {}
         form = Crossbeams::RMDForm.new(details,
@@ -105,11 +109,13 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 
-  # Printing: PRINT SKU LABEL
+  # Printing
   # --------------------------------------------------------------------------
   route 'printing', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+    # PRINT SKU LABEL
+    # --------------------------------------------------------------------------
     r.on 'sku_label' do # rubocop:disable Metrics/BlockLength
-      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         @print_repo = LabelApp::PrinterRepo.new
         printers    = @print_repo.select_printers_for_application(AppConst::PRINT_APP_MR_SKU_BARCODE)

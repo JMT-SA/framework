@@ -8,5 +8,6 @@ module SecurityApp
     attribute :active, Types::Bool
     attribute :scan_with_camera, Types::Bool
     attribute :start_page, Types::String
+    attribute :hybrid_device, Types::Bool
   end
 end

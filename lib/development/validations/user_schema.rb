@@ -8,5 +8,6 @@ module DevelopmentApp
     optional(:login_name, Types::StrippedString).filled(:str?)
     required(:user_name, Types::StrippedString).maybe(:str?)
     required(:email, Types::StrippedString).maybe(:str?)
+    optional(:profile, :hash).maybe(:hash?)
   end
 end

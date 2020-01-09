@@ -19,10 +19,14 @@ module Development
               form.add_field :login_name
               form.add_field :user_name
               form.add_field :email
-              form.add_text 'Change password', wrapper: :b
-              form.add_field :old_password
-              form.add_field :password
-              form.add_field :password_confirmation
+              if rules[:can_change_password]
+                form.add_text 'Change password', wrapper: :b
+                form.add_field :old_password
+                form.add_field :password
+                form.add_field :password_confirmation
+              else
+                form.view_only!
+              end
             end
           end
 

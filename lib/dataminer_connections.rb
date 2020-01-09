@@ -35,11 +35,16 @@ class DataminerConnections
     connections[key].prepared_report_path
   end
 
-  def databases(without_grids: false)
+  def databases(without_grids: false, without_system: false)
     list = connections.keys.sort
     list.delete(DataminerApp::ReportRepo::GRID_DEFS) if without_grids
-    list.delete('system') unless AppConst.development?
+    list.delete('system') if without_system && !AppConst.development?
     list
+  end
+
+  # Disconnect all DB connections
+  def disconnect_all
+    connections.each { |_, conn| conn.disconnect }
   end
 end
 
@@ -74,5 +79,9 @@ class DataminerConnection
     @connected = true
   rescue Sequel::DatabaseConnectionError => e
     @connection_error = e.message
+  end
+
+  def disconnect
+    @db.disconnect
   end
 end

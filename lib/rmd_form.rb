@@ -39,6 +39,7 @@ module Crossbeams
       @button_id = options[:button_id]
       @button_initially_hidden = options[:button_initially_hidden]
       @reset_button = options.fetch(:reset_button, true)
+      @buttons = []
       @fields = []
       @rules = []
       @csrf_tag = nil
@@ -48,18 +49,20 @@ module Crossbeams
     # The field will render as an input with name = FORM_NAME[FIELD_NAME]
     # and id = FORM_NAME_FIELD_NAME.
     #
-    # @param name [string] the name of the form field.
+    # @param name [symbol] the name of the form field.
     # @param label [string] the caption for the label to appear beside the input.
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @option options [String] :data_type the input type. Defaults to 'text'.
     # @option options [Integer] :width the input with in rem. Defaults to 12.
     # @option options [Boolean] :allow_decimals can a data_type="number" input accept decimals?
+    # @option options [Boolean] :submit_form Should the form be submitted automatically after a scan result is placed in theis field?
     # @option options [String] :scan The type of barcode symbology to accept. e.g. 'key248_all' for any symbology. Omit for input that does not receive a scan result.
     # Possible values are: key248_all (any symbology), key249_3o9 (309), key250_upc (UPC), key251_ean (EAN), key252_2d (2D - QR etc)
     # @option options [Symbol] :scan_type the type of barcode to expect in the field. This must have a matching entry in AppConst::BARCODE_PRINT_RULES.
     # @return [void]
-    def add_field(name, label, options) # rubocop:disable Metrics/AbcSize
+    def add_field(name, label, options = {}) # rubocop:disable Metrics/AbcSize
       @current_field = name
       for_scan = options[:scan] ? 'Scan ' : ''
       data_type = options[:data_type] || 'text'
@@ -68,19 +71,45 @@ module Crossbeams
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
-        <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}#{field_upper_class(options)}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}#{attr_upper(options)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
+        <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}#{field_upper_class(options)}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{field_value(form_state[name])}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}#{attr_upper(options)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
     end
+
+    # Add a toggle (checbox) field to the form.
+    # The field will render as a toggle with name = FORM_NAME[FIELD_NAME]
+    # and id = FORM_NAME_FIELD_NAME.
+    # The value returned in params is 't' or 'f'.
+    #
+    # @param name [symbol] the name of the form field.
+    # @param label [string] the caption for the label to appear beside the input.
+    # @param options (Hash) options for the field
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
+    # @return [void]
+    def add_toggle(name, label, options = {}) # rubocop:disable Metrics/AbcSize
+      @current_field = name
+      @fields << <<~HTML
+        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left"><label for="#{form_name}_#{name}">#{label}</label>#{field_error_message}</th>
+        <td>
+            <input name="#{form_name}[#{name}]" type="hidden" value="f">
+          <label class="switch">
+            <input type="checkbox" class="pa2#{field_error_class} toggleCheck" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{render_behaviours} value="t"#{checked(field_value(form_state[name]))}><span class="slider round"></span>
+          </label>
+        </td></tr>
+      HTML
+    end
+
+    # TODO: Add disabled_items to select
 
     # Add a select box to the form.
     # The field will render as an input with name = FORM_NAME[FIELD_NAME]
     # and id = FORM_NAME_FIELD_NAME.
     #
-    # @param name [string] the name of the form field.
+    # @param name [symbol] the name of the form field.
     # @param label [string] the caption for the label to appear beside the select.
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @option options [String] :value the selected value.
     # @option options [String,Boolean] :prompt if true, display a generic prompt. If a string, display the string as prompt.
     # @option options [Array,Hash] :items the select options.
@@ -106,15 +135,20 @@ module Crossbeams
     #    with name = FORM_NAME[FIELD_NAME]
     #    and id = FORM_NAME_FIELD_NAME.
     #
-    # @param name [string] the name of the form field.
+    # @param name [symbol] the name of the form field.
     # @param label [string] the caption for the label to appear beside the input.
     # @param value [string] the value to be displayed in the label.
     # @param hidden_value [string] the value of the hidden field. If nil, no hidden field will be generated.
+    # @param options (Hash) options for the field
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @return [void]
     def add_label(name, label, value, hidden_value = nil, options = {})
+      tr_css_class = options[:as_table_cell] ? ' class="hover-row"' : ''
+      td_css_class = options[:as_table_cell] ? ' class="rmd-table-cell"' : ''
+      div_css_class = options[:as_table_cell] ? '' : ' class="pa2 bg-moon-gray br2"'
       @fields << <<~HTML
-        <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}><th align="left">#{label}</th>
-        <td><div class="pa2 bg-moon-gray br2">#{value}</div>#{hidden_label(name, hidden_value)}
+        <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}#{tr_css_class}><th#{td_css_class} align="left">#{label}</th>
+        <td#{td_css_class}><div#{div_css_class}>#{field_value(value) || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
       HTML
     end
@@ -122,14 +156,39 @@ module Crossbeams
     # Render a section caption in bold that takes up the width of the table.
     #
     # @param caption [string] the caption for the section.
+    # @param options (Hash) options for the header
+    # @option options [String] :id the DOM id of the element
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @return [void]
-    def add_section_header(caption)
+    def add_section_header(caption, options = {})
       raise ArgumentError, 'Section header caption cannot be blank' if caption.nil_or_empty?
 
+      id = options[:id] || "sh_#{caption.hash}"
       @fields << <<~HTML
-        <tr>
+        <tr id="#{id}"#{initial_visibilty(options)}>
           <td colspan="2" class="b mid-gray">#{caption}</td>
         </tr>
+      HTML
+    end
+
+    # Add a button to the form.
+    # This button submits the same form, but to a different url (provided in action param)
+    #
+    # @param caption [string] the caption for the button.
+    # @param action [string] the url target for the form.
+    # @param options (Hash) options for the header
+    # @option options [String] :id the DOM id of the element
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
+    # @return [void]
+    def add_button(caption, action, options = {})
+      raise ArgumentError, 'Button caption cannot be blank' if caption.nil_or_empty?
+      raise ArgumentError, 'Button action cannot be blank' if action.nil_or_empty?
+
+      id = options[:id] || "btn_#{caption.hash}"
+      @buttons << <<~HTML
+        <button id="#{id}" formaction="#{action}" type="submit" data-disable-with="Processing..." class="dim br2 pa3 bn white bg-gray mr3" data-rmd-btn="Y"#{initial_visibilty(options)} />
+          #{caption}
+        </button>
       HTML
     end
 
@@ -253,6 +312,20 @@ module Crossbeams
       } }
     end
 
+    def input_change(field_name, conditions = {})
+      raise(ArgumentError, 'Input change behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        input_change: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
     def lose_focus(field_name, conditions = {})
       raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
 
@@ -268,6 +341,12 @@ module Crossbeams
     end
 
     private
+
+    def field_value(value)
+      return value.to_s('F') if value.is_a?(BigDecimal)
+
+      value
+    end
 
     def initial_visibilty(options)
       return '' unless options[:hide_on_load]
@@ -308,7 +387,7 @@ module Crossbeams
       return '' if value.nil?
 
       <<~HTML
-        <input id ="#{form_name}_#{name}" type="hidden" name="#{form_name}[#{name}]" value="#{value}">
+        <input id ="#{form_name}_#{name}" type="hidden" name="#{form_name}[#{name}]" value="#{field_value(value)}">
       HTML
     end
 
@@ -358,7 +437,7 @@ module Crossbeams
 
     def field_renders
       <<~HTML
-        <table><tbody>
+        <table class="rmd-table"><tbody>
           #{@fields.join("\n")}
         </tbody></table>
       HTML
@@ -406,10 +485,10 @@ module Crossbeams
     end
 
     def error_section
-      show_hide = form_state[:error_message] ? '' : ' style="display:none"'
+      show_hide = form_state[:error_message] ? '' : ' hidden'
       <<~HTML
         <div id="rmd-error" class="brown bg-washed-red ba b--light-red pa3 mw6"#{show_hide}>
-          #{form_state[:error_message]}
+          #{(form_state[:error_message] || '').gsub("\n", '<br>')}
         </div>
       HTML
     end
@@ -426,7 +505,7 @@ module Crossbeams
     def notes_section
       return '' unless notes
 
-      "<p>#{notes}</p>"
+      "<p>#{notes.gsub("\n", '<br>')}</p>"
     end
 
     def submit_section
@@ -435,9 +514,15 @@ module Crossbeams
 
       <<~HTML
         <p>
-          <input type="submit" value="#{button_caption}" #{submit_id_str}data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"#{initial_hide}> #{links_section} #{reset_section}
+          <input type="submit" value="#{button_caption}" #{submit_id_str}data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"#{initial_hide}> #{buttons_section} #{links_section} #{reset_section}
         </p>
       HTML
+    end
+
+    def buttons_section
+      return '' if @buttons.empty?
+
+      @buttons.join(' ')
     end
 
     def initial_hide
@@ -483,6 +568,9 @@ module Crossbeams
         <button id="cameraScan" type="button" class="dim br2 pa3 bn white bg-blue">
           #{Crossbeams::Layout::Icon.render(:camera)} Scan with camera
         </button>
+        <button id="cameraLight" type="button" class="dim br2 pa3 bn white bg-blue">
+          #{Crossbeams::Layout::Icon.render(:show)} Light On/Off
+        </button>
       HTML
     end
 
@@ -519,6 +607,13 @@ module Crossbeams
       "<option value=\"#{CGI.escapeHTML(value.to_s)}\"#{sel}>#{CGI.escapeHTML(text.to_s)}</option>"
     end
 
+    # False if value is nil, false or starts with f, n or 0.
+    # Else true.
+    def checked(value)
+      false_str = value.to_s.match?(/[nf0]/i)
+      value && value != false && !false_str ? ' checked' : ''
+    end
+
     # ---------------------------------------------------------------------------------------------------
     # BEHAVIOURS - PARTS OF THIS CODE ARE ALSO IN UiRules AND PARTS IN Crossbeams::Layout::Renderer::Base
     # ---------------------------------------------------------------------------------------------------
@@ -544,12 +639,13 @@ module Crossbeams
       res.join(' ')
     end
 
-    def build_behaviour(rule) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def build_behaviour(rule) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return %(data-change-values="#{split_change_affects(rule[:change_affects])}") if rule[:change_affects]
       return %(data-enable-on-values="#{rule[:enable_on_change].join(',')}") if rule[:enable_on_change]
-      return %(data-observe-change=#{build_observe_change(rule[:notify])}) if rule[:notify]
       return %(data-observe-selected=#{build_observe_selected(rule[:populate_from_selected])}) if rule[:populate_from_selected]
+      return %(data-observe-change=#{build_observe_change(rule[:notify])}) if rule[:notify]
       return %(data-observe-keyup=#{build_observe_change(rule[:keyup])}) if rule[:keyup]
+      return %(data-observe-input-change=#{build_observe_change(rule[:input_change])}) if rule[:input_change]
       return %(data-observe-lose-focus=#{build_observe_change(rule[:lose_focus])}) if rule[:lose_focus]
     end
 

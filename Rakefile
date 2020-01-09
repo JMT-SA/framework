@@ -109,6 +109,26 @@ namespace :menu do
       Crossbeams::MenuMigrations::Migrator.run(db, 'db/menu', migrations.last.to_i)
     end
   end
+
+  desc 'Create a new, timestamped migration file - use NAME env var for file name suffix.'
+  task :new_migration do
+    nm = ENV['NAME']
+    raise "\nSupply a filename (to create \"#{Time.now.strftime('%Y%m%d%H%M_create_a_table.rb')}\"):\n\n  rake #{Rake.application.top_level_tasks.last} NAME=create_a_table\n\n" if nm.nil?
+
+    fn = Time.now.strftime("%Y%m%d%H%M_#{nm}.rb")
+    File.open(File.join('db/menu', fn), 'w') do |file|
+      file.puts <<~RUBY
+        Crossbeams::MenuMigrations::Migrator.migration('Framework') do
+          up do
+          end
+
+          down do
+          end
+        end
+      RUBY
+    end
+    puts "Created migration #{fn}"
+  end
 end
 
 namespace :db do

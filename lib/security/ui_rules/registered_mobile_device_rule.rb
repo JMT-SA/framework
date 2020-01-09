@@ -20,15 +20,22 @@ module UiRules
       fields[:start_page_program_function_id] = { renderer: :label, with_value: start_page_program_function_id_label, caption: 'Start Page' }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:scan_with_camera] = { renderer: :label, as_boolean: true }
+      fields[:hybrid_device] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
+      hybrid_hint = <<~HTML
+        <h2>Hybrid devices use standard pages as well as scanning pages</h2>
+        <p>Set this to true for a device like a tablet/desktop that will use "normal" pages as well as scan pages.</p>
+        <p>This should never be set to true for a mobile device that is used as a scanning device only.</p>
+      HTML
       @menu_repo = SecurityApp::MenuRepo.new
       {
         ip_address: { pattern: :ipv4_address, required: true },
         start_page_program_function_id: { renderer: :select, options: SecurityApp::MenuRepo.new.program_functions_for_rmd_select, caption: 'Start Page', prompt: true },
         active: { renderer: :checkbox },
-        scan_with_camera: { renderer: :checkbox }
+        scan_with_camera: { renderer: :checkbox },
+        hybrid_device: { renderer: :checkbox, hint: hybrid_hint }
       }
     end
 

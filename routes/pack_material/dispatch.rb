@@ -8,7 +8,7 @@ class Framework < Roda
     # GOODS RETURNED NOTES
     # --------------------------------------------------------------------------
     r.on 'mr_goods_returned_notes', Integer do |id|
-      interactor = PackMaterialApp::MrGoodsReturnedNoteInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrGoodsReturnedNoteInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_goods_returned_notes, id) do
@@ -44,7 +44,7 @@ class Framework < Roda
       end
 
       r.on 'mr_goods_returned_note_items' do
-        item_interactor = PackMaterialApp::MrGoodsReturnedNoteItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+        item_interactor = PackMaterialApp::MrGoodsReturnedNoteItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('dispatch', 'new')
           show_partial_or_page(r) { PackMaterial::Dispatch::MrGoodsReturnedNoteItem::New.call(id, remote: fetch?(r)) }
@@ -106,7 +106,7 @@ class Framework < Roda
     end
 
     r.on 'mr_goods_returned_notes' do
-      interactor = PackMaterialApp::MrGoodsReturnedNoteInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrGoodsReturnedNoteInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('dispatch', 'new')
         set_last_grid_url('/list/mr_goods_returned_notes/with_params?key=unshipped', r)
@@ -147,7 +147,7 @@ class Framework < Roda
     # MR GOODS RETURNED NOTE ITEMS
     # --------------------------------------------------------------------------
     r.on 'mr_goods_returned_note_items', Integer do |id|
-      interactor = PackMaterialApp::MrGoodsReturnedNoteItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrGoodsReturnedNoteItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_goods_returned_note_items, id) do

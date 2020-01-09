@@ -9,14 +9,14 @@ class Framework < Roda
         show_page { Development::Grids::List::List.call }
       end
 
-      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path }, {})
+      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'grid' do
         grid_interactor.list_grids.to_json
       end
 
       r.on 'edit', String do |list_file|
-        # view(inline: "GOT #{list_file} for EDIT<p>#{Development::GridInteractor.new(current_user, {}, { route_url: request.path }, {}).list_definition(list_file).inspect}</p>")
+        # view(inline: "GOT #{list_file} for EDIT<p>#{Development::GridInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).list_definition(list_file).inspect}</p>")
         # Build grids for: controls, actions, multiselects, conditions
         list_def = grid_interactor.list_definition(list_file)
         show_page { Development::Grids::List::Edit.call(list_file, list_def) }
@@ -40,7 +40,7 @@ class Framework < Roda
     end
 
     r.on 'grid_page_controls', String, Integer do |list_file, index|
-      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path }, {})
+      grid_interactor = DevelopmentApp::GridInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.patch do
         res = grid_interactor.update_page_control(params[:page_control])

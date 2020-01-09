@@ -54,6 +54,7 @@ Optional keys:
 * `id_keys_column`: Symbol - the name of an integer array column containing ids pointing to records in the sub_table. **NB:** This option cannot be used with `:uses_join_table` or `:join_table`.
 * `active_only`: Boolean (Only return active rows.)
 * `inactive_only`: Boolean (Only return inactive rows. The key in the main hash becomes `:inactive_sub_table`)
+* `one_to_one`: Use this if the sub table is actually a one-to-one relationship. Hash of Symbol => Symbol - key is the column in the sub-table and value is the new name to be used on the entity.
 
 examples:
 [source,ruby]
@@ -92,6 +93,14 @@ find_with_association(:orchards,
                       sub_tables: [{ sub_table: :cultivars,
                                      id_keys_column: :cultivar_ids,
                                      columns: [:id, :cultivar_name, :description] }])
+
+# A sub-table with a one-to-one relationship.
+# (The orchards table has column `cultivar_ids integer[]`)
+find_with_association(:security_groups,
+                      123,
+                      sub_tables: [{ sub_table: :security_setting,
+                                     one_to_one: { security_setting_type: :security_type,
+                                                   date_set: :security_date }])
 ----
 
 === Parent tables

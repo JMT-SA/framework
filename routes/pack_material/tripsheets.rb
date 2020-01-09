@@ -8,7 +8,7 @@ class Framework < Roda
     # VEHICLE TYPES
     # --------------------------------------------------------------------------
     r.on 'vehicle_types', Integer do |id|
-      interactor = PackMaterialApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:vehicle_types, id) do
@@ -48,7 +48,7 @@ class Framework < Roda
       end
     end
     r.on 'vehicle_types' do
-      interactor = PackMaterialApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('tripsheets', 'new')
         set_last_grid_url('/list/vehicle_types', r)
@@ -81,7 +81,7 @@ class Framework < Roda
     # VEHICLES
     # --------------------------------------------------------------------------
     r.on 'vehicles', Integer do |id|
-      interactor = PackMaterialApp::VehicleInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:vehicles, id) do
@@ -124,7 +124,7 @@ class Framework < Roda
       end
     end
     r.on 'vehicles' do
-      interactor = PackMaterialApp::VehicleInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('tripsheets', 'new')
         show_partial_or_page(r) { PackMaterial::Tripsheets::Vehicle::New.call(remote: fetch?(r)) }
@@ -153,7 +153,7 @@ class Framework < Roda
     # VEHICLE JOBS
     # --------------------------------------------------------------------------
     r.on 'vehicle_jobs', Integer do |id|
-      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:vehicle_jobs, id) do
@@ -203,7 +203,7 @@ class Framework < Roda
         end
       end
       r.on 'vehicle_job_units' do
-        interactor = PackMaterialApp::VehicleJobUnitInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::VehicleJobUnitInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('tripsheets', 'new')
           show_partial_or_page(r) { PackMaterial::Tripsheets::VehicleJobUnit::New.call(id, remote: fetch?(r)) }
@@ -259,7 +259,7 @@ class Framework < Roda
       end
     end
     r.on 'vehicle_jobs' do
-      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'sku_location_lookup_result', Integer do |sku_location_id|
         result_hash = interactor.get_sku_location_info_ids(sku_location_id)
         json_actions([OpenStruct.new(type: :change_select_value,
@@ -349,7 +349,7 @@ class Framework < Roda
     # VEHICLE JOB UNITS
     # --------------------------------------------------------------------------
     r.on 'vehicle_job_units', Integer do |id|
-      interactor = PackMaterialApp::VehicleJobUnitInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::VehicleJobUnitInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:vehicle_job_units, id) do

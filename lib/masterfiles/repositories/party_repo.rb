@@ -88,6 +88,17 @@ module MasterfilesApp
       Organization.new(hash)
     end
 
+    def org_code_for_party_role(id)
+      DB.get(Sequel.function(:fn_party_role_name, id))
+    end
+
+    def find_organization_for_party_role(party_role_id)
+      id = DB[:organizations].where(id: DB[:party_roles].where(id: party_role_id).select(:organization_id)).get(:id)
+      return nil if id.nil?
+
+      find_organization(id)
+    end
+
     def delete_organization(id)
       children = DB[:organizations].where(parent_id: id)
       return { error: 'This organization is set as a parent' } if children.any?
@@ -255,10 +266,15 @@ module MasterfilesApp
       DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
     end
 
+    def party_role_id_from_role_and_party_id(role, party_id)
+      DB[:party_roles].where(role_id: DB[:roles].where(name: role).select(:id), party_id: party_id).select_map(:id).sort
+    end
+
     # Find the party role for the implementation owner.
     # Requires that the ENV variable "IMPLEMENTATION_OWNER" has been correctly set.
     #
     # @return [MasterfilesApp::PartyRole] the party role entity.
+    #
     def implementation_owner_party_role
       query = <<~SQL
         SELECT pr.id, pr.party_id, role_id, organization_id, person_id, pr.active, fn_party_role_name(pr.id) AS party_name
@@ -311,9 +327,13 @@ module MasterfilesApp
       details
     end
 
-    def for_select_party_roles(role = 'TRANSPORTER')
+    def for_select_inactive_party_roles(role = 'TRANSPORTER')
+      for_select_party_roles(role, active: false)
+    end
+
+    def for_select_party_roles(role = 'TRANSPORTER', active: true)
       DB[:party_roles].where(
-        role_id: DB[:roles].where(name: role).select(:id)
+        role_id: DB[:roles].where(name: role).select(:id), active: active
       ).select(
         :id,
         Sequel.function(:fn_party_role_name, :id)
@@ -497,6 +517,15 @@ module MasterfilesApp
         AND contact_method_types.contact_method_type = 'Email'
       SQL
       DB[query].get(:contact_method_code)
+    end
+
+    def find_party_role_from_party_name_for_role(party_role_name, role_name)
+      role_id = DB[:roles].where(name: role_name).get(:id)
+      raise Crossbeams::InfoError, "There is no role named #{role_name}" if role_id.nil?
+
+      DB[:party_roles]
+        .where(role_id: role_id, Sequel.function(:fn_party_role_name, :id) => party_role_name)
+        .get(:id)
     end
 
     private

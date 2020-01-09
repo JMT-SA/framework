@@ -55,6 +55,14 @@ class DocumentSequence
     "SELECT #{string_prefix}nextval('#{rule['db_sequence_name']}')#{string_suffix};"
   end
 
+  # SQL that can be run to generate the next sequence for this document.
+  # Returning the value in the "seq" column.
+  #
+  # @return [string] the SQL to be run.
+  def next_sequence_sql_as_seq
+    "SELECT #{string_prefix}nextval('#{rule['db_sequence_name']}')#{string_suffix} AS seq;"
+  end
+
   # SQL to update a column in a table with the next sequence.
   #
   # @param id [integer] the id of the row to be updated,

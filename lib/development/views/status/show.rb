@@ -25,7 +25,7 @@ module Development
                                     behaviour: :popup,
                                     style: :button)
                   end
-                  cnt = %i[route_url table_name row_data_id].map { |k| "<tr class='hover-row'><th>#{k}</th><td>#{ui_rule.form_object[k]}</td></tr>" }.join
+                  cnt = %i[route_url request_ip table_name row_data_id].map { |k| "<tr class='hover-row'><th>#{k}</th><td>#{ui_rule.form_object[k]}</td></tr>" }.join
                   col.add_text "<table class='thinbordertable'><tbody>#{cnt}</tbody></table>", toggle_button: true, toggle_caption: 'Details'
                   col.add_text '<h3>Status history</h3>'
                   col.add_table(rules[:details], rules[:headers], header_captions: rules[:header_captions])

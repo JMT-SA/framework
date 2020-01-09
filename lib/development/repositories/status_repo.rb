@@ -25,6 +25,7 @@ module DevelopmentApp
                     Sequel[:status_logs][:user_name],
                     Sequel[:logged_action_details][:context],
                     Sequel[:logged_action_details][:route_url],
+                    Sequel[:logged_action_details][:request_ip],
                     Sequel.function(:concat_ws, ' ', :status, :comment).as('status'))
             .first
       return nil if res.nil?
@@ -55,6 +56,7 @@ module DevelopmentApp
       status[:diff_id] = log[:event_id] if log
       if log_det
         status[:route_url] = log_det[:route_url]
+        status[:request_ip] = log_det[:request_ip]
         status[:context] = log_det[:context]
       end
       status

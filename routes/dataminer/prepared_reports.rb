@@ -10,7 +10,7 @@
 
 class Framework < Roda
   route 'prepared_reports', 'dataminer' do |r|
-    interactor = DataminerApp::PreparedReportInteractor.new(current_user, {}, { route_url: request.path }, {})
+    interactor = DataminerApp::PreparedReportInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
     r.on 'new', String do |id|    # NEW
       check_auth!('reports', 'new')

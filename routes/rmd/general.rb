@@ -75,7 +75,7 @@ class Framework < Roda
         if @registered_mobile_device
           form = Crossbeams::RMDForm.new({},
                                          form_name: :camera_scan,
-                                         notes: "The camera scan option is #{@rmd_scan_with_camera ? 'ON' : 'OFF'}",
+                                         notes: rmd_info_message("The camera scan option is #{@rmd_scan_with_camera ? 'ON' : 'OFF'}"),
                                          scan_with_camera: @rmd_scan_with_camera,
                                          caption: 'Toggle camera scan',
                                          action: '/rmd/utilities/toggle_camera',
@@ -88,7 +88,7 @@ class Framework < Roda
         end
       end
       r.post do
-        interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         res = interactor.toggle_camera_scan(request.ip)
         if res.success
           r.redirect '/rmd/utilities/toggle_camera'

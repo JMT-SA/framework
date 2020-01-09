@@ -33,6 +33,7 @@ module UiRules
     end
 
     def set_detail_fields
+      rules[:can_change_password] = Crossbeams::Config::UserPermissions.can_user?(@form_object, :password, :can_be_changed_by_user)
       fields[:old_password] = { subtype: :password }
       set_show_fields
       set_new_fields
@@ -51,7 +52,10 @@ module UiRules
     end
 
     def set_edit_fields
+      menu_options = SecurityApp::MenuRepo.new.for_select_homepages
+      line_options = ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::LINE)
       fields[:login_name] = { renderer: :label }
+      fields[:homepage_id] = { renderer: :select, parent_field: :profile, options: menu_options, prompt: true }
     end
 
     def set_show_fields

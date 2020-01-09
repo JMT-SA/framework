@@ -5,9 +5,10 @@ module MenuHelpers
   end
 
   # Set instance vars related to registered mobile devices.
-  def check_registered_mobile_device
+  def check_registered_mobile_device # rubocop:disable Metrics/AbcSize
     @rmd_start_page = nil
     @rmd_scan_with_camera = false
+    @hybrid_device = true
     @registered_mobile_device = true && return if ENV['RUN_FOR_RMD']
 
     repo = SecurityApp::RegisteredMobileDeviceRepo.new
@@ -16,6 +17,7 @@ module MenuHelpers
       @registered_mobile_device = true
       @rmd_start_page = res.instance.url
       @rmd_scan_with_camera = res.instance.scan_with_camera
+      @hybrid_device = res.instance.hybrid_device
     else
       @registered_mobile_device = false
     end

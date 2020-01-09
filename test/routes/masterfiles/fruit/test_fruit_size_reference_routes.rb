@@ -7,7 +7,7 @@ class TestFruitSizeReferenceRoutes < RouteTester
   INTERACTOR = MasterfilesApp::FruitSizeInteractor
 
   def test_edit
-    authorise_pass!
+    authorise_pass!(permission_check: MasterfilesApp::TaskPermissionCheck::FruitSizeReference)
     ensure_exists!(INTERACTOR)
     Masterfiles::Fruit::FruitSizeReference::Edit.stub(:call, bland_page) do
       get 'masterfiles/fruit/fruit_size_references/1/edit', {}, 'rack.session' => { user_id: 1 }
@@ -59,7 +59,7 @@ class TestFruitSizeReferenceRoutes < RouteTester
   end
 
   def test_delete
-    authorise_pass!
+    authorise_pass!(permission_check: MasterfilesApp::TaskPermissionCheck::FruitSizeReference)
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_fruit_size_reference).returns(ok_response)
     delete_as_fetch 'masterfiles/fruit/fruit_size_references/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }

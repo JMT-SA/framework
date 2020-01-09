@@ -5,7 +5,7 @@ class Framework < Roda
     # ACCOUNT CODES
     # --------------------------------------------------------------------------
     r.on 'account_codes', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::AccountCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::AccountCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:account_codes, id) do
@@ -44,7 +44,7 @@ class Framework < Roda
     end
 
     r.on 'account_codes' do
-      interactor = MasterfilesApp::AccountCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::AccountCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('pack material', 'new')
         show_partial_or_page(r) { Masterfiles::PackMaterial::AccountCode::New.call(remote: fetch?(r)) }

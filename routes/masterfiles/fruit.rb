@@ -553,7 +553,7 @@ class Framework < Roda
         show_partial { Masterfiles::Fruit::FruitActualCountsForPack::Edit.call(id) }
       end
       r.on 'fruit_size_references' do
-        interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('fruit', 'new')
           show_partial_or_page(r) { Masterfiles::Fruit::FruitSizeReference::New.call(id, remote: fetch?(r)) }
@@ -602,7 +602,7 @@ class Framework < Roda
     # FRUIT SIZE REFERENCES
     # --------------------------------------------------------------------------
     r.on 'fruit_size_references', Integer do |id|
-      interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:fruit_size_references, id) do

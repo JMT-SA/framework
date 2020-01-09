@@ -8,7 +8,7 @@ class Framework < Roda
     # MATERIAL RESOURCE PRODUCT VARIANTS
     # --------------------------------------------------------------------------
     r.on 'material_resource_product_variants', Integer do |id|
-      interactor = PackMaterialApp::MatresProductVariantInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MatresProductVariantInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:material_resource_product_variants, id) do
@@ -21,7 +21,7 @@ class Framework < Roda
       end
       r.on 'material_resource_product_variant_party_roles' do
         # Merge these interactors
-        role_interactor = PackMaterialApp::MatresProductVariantPartyRoleInteractor.new(current_user, {}, { route_url: request.path }, {})
+        role_interactor = PackMaterialApp::MatresProductVariantPartyRoleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('configuration', 'new')
           type = params[:type]
@@ -71,7 +71,7 @@ class Framework < Roda
     # MATERIAL RESOURCE PRODUCT VARIANT PARTY ROLES
     # --------------------------------------------------------------------------
     r.on 'material_resource_product_variant_party_roles', Integer do |id|
-      interactor = PackMaterialApp::MatresProductVariantPartyRoleInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MatresProductVariantPartyRoleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:material_resource_product_variant_party_roles, id) do
@@ -113,7 +113,7 @@ class Framework < Roda
     end
     r.on 'link_alternative_material_resource_product_variants', Integer do |id|
       r.post do
-        interactor = PackMaterialApp::MatresProductVariantInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::MatresProductVariantInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         res = interactor.link_alternatives(id, multiselect_grid_choices(params))
         if res.success
@@ -126,7 +126,7 @@ class Framework < Roda
     end
     r.on 'link_co_use_material_resource_product_variants', Integer do |id|
       r.post do
-        interactor = PackMaterialApp::MatresProductVariantInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::MatresProductVariantInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         res = interactor.link_co_use_product_codes(id, multiselect_grid_choices(params))
         if res.success

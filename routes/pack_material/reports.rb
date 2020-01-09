@@ -19,7 +19,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'email_purchase_order', Integer do |id|
       r.get do
-        interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         show_partial_or_page(r) do
           Development::Generators::General::Email.call(remote: true,
                                                        email_options: interactor.email_purchase_order_defaults(id, current_user),
@@ -158,7 +158,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'email_credit_note', Integer do |id|
       r.get do
-        interactor = PackMaterialApp::MrGoodsReturnedNoteInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::MrGoodsReturnedNoteInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         show_partial_or_page(r) do
           Development::Generators::General::Email.call(remote: true,
                                                        email_options: interactor.email_credit_note_defaults(id, current_user),

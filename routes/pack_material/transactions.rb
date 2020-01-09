@@ -9,14 +9,14 @@ class Framework < Roda
     # --------------------------------------------------------------------------
     r.on 'recalculate_wa_costs' do
       check_auth!('transactions', 'new')
-      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       interactor.recalculate_wa_costs
       redirect_to_last_grid(r)
     end
     # ADHOC STOCK TRANSACTIONS
     # --------------------------------------------------------------------------
     r.on 'adhoc_stock_transactions', Integer do |id|
-      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # Check for notfound:
       r.on !interactor.exists?(:mr_sku_locations, id) do
         handle_not_found(r)
@@ -60,7 +60,7 @@ class Framework < Roda
     # MR BULK STOCK ADJUSTMENTS
     # --------------------------------------------------------------------------
     r.on 'mr_bulk_stock_adjustments', Integer do |id|
-      interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_bulk_stock_adjustments, id) do
@@ -147,7 +147,7 @@ class Framework < Roda
       end
 
       r.on 'mr_bulk_stock_adjustment_items' do
-        interactor = PackMaterialApp::MrBulkStockAdjustmentItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::MrBulkStockAdjustmentItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('transactions', 'new')
           show_partial_or_page(r) { PackMaterial::Transactions::MrBulkStockAdjustmentItem::New.call(id, remote: fetch?(r)) }
@@ -214,7 +214,7 @@ class Framework < Roda
     end
 
     r.on 'mr_bulk_stock_adjustments' do
-      interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrBulkStockAdjustmentInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'sku_location_lookup_result', Integer do |sku_location_id|
         result_hash = interactor.get_sku_location_info_ids(sku_location_id)
         json_actions([OpenStruct.new(type: :change_select_value,
@@ -297,7 +297,7 @@ class Framework < Roda
     # MR BULK STOCK ADJUSTMENT ITEMS
     # --------------------------------------------------------------------------
     r.on 'mr_bulk_stock_adjustment_items', Integer do |id|
-      interactor = PackMaterialApp::MrBulkStockAdjustmentItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrBulkStockAdjustmentItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_bulk_stock_adjustment_items, id) do

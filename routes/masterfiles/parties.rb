@@ -268,7 +268,7 @@ class Framework < Roda
     end
 
     r.on 'customer_types', Integer do |id|
-      interactor = MasterfilesApp::CustomerTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CustomerTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:customer_types, id) do
@@ -300,7 +300,7 @@ class Framework < Roda
       end
     end
     r.on 'customer_types' do
-      interactor = MasterfilesApp::CustomerTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CustomerTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::CustomerType::New.call(remote: fetch?(r)) }
@@ -321,7 +321,7 @@ class Framework < Roda
     end
 
     r.on 'customers', Integer do |id|
-      interactor = MasterfilesApp::CustomerInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CustomerInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:customers, id) do
@@ -355,7 +355,7 @@ class Framework < Roda
       end
     end
     r.on 'customers' do
-      interactor = MasterfilesApp::CustomerInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CustomerInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'preselect' do
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::Customer::Preselect.call(remote: fetch?(r)) }
@@ -391,7 +391,7 @@ class Framework < Roda
     end
 
     r.on 'supplier_types', Integer do |id|
-      interactor = MasterfilesApp::SupplierTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SupplierTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:supplier_types, id) do
@@ -425,7 +425,7 @@ class Framework < Roda
       end
     end
     r.on 'supplier_types' do
-      interactor = MasterfilesApp::SupplierTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SupplierTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::SupplierType::New.call(remote: fetch?(r)) }
@@ -446,7 +446,7 @@ class Framework < Roda
     end
 
     r.on 'suppliers', Integer do |id|
-      interactor = MasterfilesApp::SupplierInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SupplierInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:suppliers, id) do
@@ -481,7 +481,7 @@ class Framework < Roda
     end
 
     r.on 'suppliers' do
-      interactor = MasterfilesApp::SupplierInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SupplierInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'preselect' do
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::Supplier::Preselect.call(remote: fetch?(r)) }

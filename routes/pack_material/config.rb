@@ -8,7 +8,7 @@ class Framework < Roda
     # MATERIAL RESOURCE TYPES
     # --------------------------------------------------------------------------
     r.on 'material_resource_types', Integer do |id|
-      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:material_resource_types, id) do
@@ -43,7 +43,7 @@ class Framework < Roda
       end
     end
     r.on 'material_resource_types' do
-      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::MatresType::New.call(remote: fetch?(r)) }
@@ -66,7 +66,7 @@ class Framework < Roda
     # MATERIAL RESOURCE SUB TYPES
     # --------------------------------------------------------------------------
     r.on 'material_resource_sub_types', Integer do |id|
-      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:material_resource_sub_types, id) do
@@ -190,13 +190,13 @@ class Framework < Roda
         end
       end
       r.on 'product_code_columns_selected' do
-        interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         res = interactor.chosen_product_columns(id, params[:changed_value])
         json_replace_multi_options('product_code_columns_variant_product_code_column_ids', res.instance[:variant])
       end
       r.on 'link_product_columns' do
         r.post do
-          interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+          interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           ids = multiselect_grid_choices(params)
           res = interactor.link_product_columns(id, ids)
           json_actions([OpenStruct.new(type: :replace_multi_options, dom_id: 'product_code_columns_product_code_column_ids', options_array: res.instance[:code]),
@@ -240,7 +240,7 @@ class Framework < Roda
       end
     end
     r.on 'material_resource_sub_types' do
-      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::ConfigInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do
         check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::MatresSubType::New.call(remote: fetch?(r)) }
@@ -263,7 +263,7 @@ class Framework < Roda
     # PACK MATERIAL PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_products', Integer do |id|
-      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # check for notfound
       r.on !interactor.exists?(:pack_material_products, id) do
@@ -368,7 +368,7 @@ class Framework < Roda
       end
     end
     r.on 'pack_material_products' do
-      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'preselect' do
         check_auth!('configuration', 'new')
         show_partial_or_page(r) { PackMaterial::Config::PmProduct::Preselect.call(remote: fetch?(r)) }
@@ -416,7 +416,7 @@ class Framework < Roda
     # PACK MATERIAL PRODUCT VARIANTS
     # --------------------------------------------------------------------------
     r.on 'pack_material_product_variants', Integer do |id|
-      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pack_material_product_variants, id) do

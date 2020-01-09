@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 # A class for defining global constants in a central place.
 class AppConst
   def self.development?
@@ -159,3 +161,4 @@ class AppConst
     UG UA AE GB UM US UY UZ VU VE VN VG VI WF EH YE ZM ZW AX
   ].freeze
 end
+# rubocop:enable Metrics/ClassLength

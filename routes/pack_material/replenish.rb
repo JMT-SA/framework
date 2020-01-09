@@ -8,14 +8,14 @@ class Framework < Roda
     # MR PURCHASE ORDERS
     # --------------------------------------------------------------------------
     r.on 'mr_purchase_orders', Integer do |id|
-      interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_purchase_orders, id) do
         handle_not_found(r)
       end
       r.on 'mr_purchase_order_items' do
-        item_interactor = PackMaterialApp::MrPurchaseOrderItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+        item_interactor = PackMaterialApp::MrPurchaseOrderItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('replenish', 'new')
           show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrderItem::New.call(id, remote: fetch?(r)) }
@@ -52,7 +52,7 @@ class Framework < Roda
         end
       end
       r.on 'mr_purchase_order_costs' do
-        cost_interactor = PackMaterialApp::MrPurchaseOrderCostInteractor.new(current_user, {}, { route_url: request.path }, {})
+        cost_interactor = PackMaterialApp::MrPurchaseOrderCostInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('replenish', 'new')
           show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrderCost::New.call(id, remote: fetch?(r)) }
@@ -132,7 +132,7 @@ class Framework < Roda
       end
     end
     r.on 'mr_purchase_orders' do
-      interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'preselect' do
         check_auth!('replenish', 'new')
         show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseOrder::Preselect.call }
@@ -169,7 +169,7 @@ class Framework < Roda
     # MR PURCHASE ORDER ITEMS
     # --------------------------------------------------------------------------
     r.on 'mr_purchase_order_items', Integer do |id|
-      interactor = PackMaterialApp::MrPurchaseOrderItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrPurchaseOrderItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_purchase_order_items, id) do
@@ -210,7 +210,7 @@ class Framework < Roda
           res = interactor.delete_mr_purchase_order_item(id)
 
           if res.success
-            po_interactor  = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
+            po_interactor  = PackMaterialApp::MrPurchaseOrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
             permission_res = po_interactor.check_permission(:approve, po_id)
             type           = permission_res.success ? :show_element : :hide_element
 
@@ -229,7 +229,7 @@ class Framework < Roda
     # MR PURCHASE ORDER COSTS
     # --------------------------------------------------------------------------
     r.on 'mr_purchase_order_costs', Integer do |id|
-      interactor = PackMaterialApp::MrPurchaseOrderCostInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrPurchaseOrderCostInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_purchase_order_costs, id) do
@@ -280,7 +280,7 @@ class Framework < Roda
     # MR DELIVERY TERMS
     # --------------------------------------------------------------------------
     r.on 'mr_delivery_terms', Integer do |id|
-      interactor = PackMaterialApp::MrDeliveryTermInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryTermInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_delivery_terms, id) do
@@ -319,7 +319,7 @@ class Framework < Roda
       end
     end
     r.on 'mr_delivery_terms' do
-      interactor = PackMaterialApp::MrDeliveryTermInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryTermInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('replenish', 'new')
         show_partial_or_page(r) { PackMaterial::Replenish::MrDeliveryTerm::New.call(remote: fetch?(r)) }
@@ -347,7 +347,7 @@ class Framework < Roda
     # MR DELIVERIES
     # --------------------------------------------------------------------------
     r.on 'mr_deliveries', Integer do |id|
-      interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_deliveries, id) do
@@ -355,7 +355,7 @@ class Framework < Roda
       end
 
       r.on 'mr_purchase_invoice_costs' do
-        cost_interactor = PackMaterialApp::MrPurchaseInvoiceCostInteractor.new(current_user, {}, { route_url: request.path }, {})
+        cost_interactor = PackMaterialApp::MrPurchaseInvoiceCostInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('replenish', 'new')
           show_partial_or_page(r) { PackMaterial::Replenish::MrPurchaseInvoiceCost::New.call(id, remote: fetch?(r)) }
@@ -382,7 +382,7 @@ class Framework < Roda
         end
       end
       r.on 'mr_delivery_items' do
-        item_interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+        item_interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'preselect' do
           check_auth!('replenish', 'new')
           store_last_referer_url(:delivery_items)
@@ -535,7 +535,7 @@ class Framework < Roda
       end
     end
     r.on 'mr_deliveries' do
-      interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('replenish', 'new')
         show_partial_or_page(r) { PackMaterial::Replenish::MrDelivery::New.call(remote: fetch?(r)) }
@@ -562,7 +562,7 @@ class Framework < Roda
     # MR DELIVERY ITEMS
     # --------------------------------------------------------------------------
     r.on 'mr_delivery_items', Integer do |id|
-      interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_delivery_items, id) do
@@ -581,7 +581,7 @@ class Framework < Roda
         end
       end
       r.on 'mr_delivery_item_batches' do
-        interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('replenish', 'new')
           store_last_referer_url(:delivery_item_batch)
@@ -647,7 +647,7 @@ class Framework < Roda
     # MR DELIVERY ITEM BATCHES
     # --------------------------------------------------------------------------
     r.on 'mr_delivery_item_batches', Integer do |id|
-      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_delivery_item_batches, id) do
@@ -691,7 +691,7 @@ class Framework < Roda
     # BARCODE
     # --------------------------------------------------------------------------
     r.on 'print_sku_barcode' do
-      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrDeliveryItemBatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.get do
         attrs = interactor.resolve_print_sku_barcode_params(params)
         show_partial { PackMaterial::Replenish::MrDeliveryItemBatch::PrintBarcode.call(attrs[:id], type: attrs[:type]) }
@@ -710,7 +710,7 @@ class Framework < Roda
     # MR COST TYPES
     # --------------------------------------------------------------------------
     r.on 'mr_cost_types', Integer do |id|
-      interactor = PackMaterialApp::MrCostTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrCostTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mr_cost_types, id) do
@@ -749,7 +749,7 @@ class Framework < Roda
       end
     end
     r.on 'mr_cost_types' do
-      interactor = PackMaterialApp::MrCostTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrCostTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('replenish', 'new')
         show_partial_or_page(r) { PackMaterial::Replenish::MrCostType::New.call(remote: fetch?(r)) }
@@ -777,8 +777,8 @@ class Framework < Roda
     # MR PURCHASE INVOICE COSTS
     # --------------------------------------------------------------------------
     r.on 'mr_purchase_invoice_costs', Integer do |id|
-      interactor = PackMaterialApp::MrPurchaseInvoiceCostInteractor.new(current_user, {}, { route_url: request.path }, {})
-      del_interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = PackMaterialApp::MrPurchaseInvoiceCostInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      del_interactor = PackMaterialApp::MrDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # Check for notfound:
       r.on !interactor.exists?(:mr_purchase_invoice_costs, id) do
         handle_not_found(r)

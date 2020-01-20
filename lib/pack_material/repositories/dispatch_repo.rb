@@ -18,6 +18,22 @@ module PackMaterialApp
 
     crud_calls_for :mr_goods_returned_note_items, name: :mr_goods_returned_note_item, wrapper: MrGoodsReturnedNoteItem
 
+    build_for_select :mr_sales_orders,
+                     label: :erp_customer_number,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :erp_customer_number
+
+    crud_calls_for :mr_sales_orders, name: :mr_sales_order, wrapper: MrSalesOrder
+
+    build_for_select :mr_sales_order_items,
+                     label: :remarks,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :remarks
+
+    crud_calls_for :mr_sales_order_items, name: :mr_sales_order_item, wrapper: MrSalesOrderItem
+
     def find_mr_goods_returned_note(id)
       find_with_association(:mr_goods_returned_notes, id,
                             wrapper: MrGoodsReturnedNote,
@@ -28,6 +44,33 @@ module PackMaterialApp
                             ],
                             lookup_functions: [
                               { function: :fn_current_status, args: ['mr_goods_returned_notes', :id], col_name: :status }
+                            ])
+    end
+
+    def find_mr_sales_order(id)
+      find_with_association(:mr_sales_orders, id,
+                            wrapper: MrSalesOrder,
+                            lookup_functions: [
+                              { function: :fn_current_status, args: ['mr_sales_order', :id], col_name: :status }
+                            ])
+    end
+
+    def find_mr_sales_order_item(id)
+      find_with_association(:mr_sales_order_items, id,
+                            wrapper: MrSalesOrderItem,
+                            parent_tables: [
+                              {
+                                parent_table: :material_resource_product_variants,
+                                foreign_key: :mr_product_variant_id,
+                                columns: %i[product_variant_number product_variant_code],
+                                flatten_columns: {
+                                  product_variant_code: :product_variant_code,
+                                  product_variant_number: :product_variant_number
+                                }
+                              }
+                            ],
+                            lookup_functions: [
+                              { function: :fn_current_status, args: ['mr_sales_order_items', :id], col_name: :status }
                             ])
     end
 
@@ -190,6 +233,75 @@ module PackMaterialApp
       grn_item = DB[:mr_goods_returned_note_items].where(id: grn_item_id)
       batch_id = grn_item.get(:mr_delivery_item_batch_id)
       batch_id ? DB[:mr_delivery_item_batches].where(id: batch_id) : DB[:mr_delivery_items].where(id: grn_item.get(:mr_delivery_item_id))
+    end
+
+    def get_mrpv_info(mrpv_id)
+      mrpv = DB[:material_resource_product_variants].where(id: mrpv_id).first
+      {
+        pv_code: mrpv[:product_variant_code],
+        pv_number: mrpv[:product_variant_number]
+      }
+    end
+
+    def inline_update_sales_order_item(id, attrs)
+      update(:mr_sales_order_items, id, unit_price: attrs[:column_value])
+    end
+
+    def validate_mr_sales_order_item_quantity_required(attrs)
+      requested_qty = attrs[:quantity_required]
+      sku_ids = DB[:mr_skus].where(mr_product_variant_id: attrs[:mr_product_variant_id]).select_map(:id)
+      # pv = DB[:material_resource_product_variants].where(id: attrs[:mr_product_variant_id]).first
+      stock = DB[:mr_sku_locations].where(mr_sku_id: sku_ids)
+      # NOTE: We might want to exclude consignment stock here
+      actual_qty = stock.sum(:quantity)
+      return failed_response('We do not have this product in stock') unless actual_qty.positive?
+
+      return failed_response("Quantity available: #{UtilityFunctions.delimited_number(actual_qty)}") unless requested_qty <= actual_qty
+
+      success_response('valid quantity')
+    end
+
+    def validate_sales_stock_levels(so_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      dispatch_location_id = DB[:mr_sales_orders].where(id: so_id).get(:dispatch_location_id)
+      return failed_response('No dispatch location') unless dispatch_location_id
+
+      items = DB[:mr_sales_order_items].where(mr_sales_order_id: so_id).all
+      return failed_response('No Sales Order Items') if items.none?
+
+      item_collection = []
+      items.each do |item|
+        so_item = find_mr_sales_order_item(item[:id])
+        mrpv_id = item[:mr_product_variant_id]
+        qty = item[:quantity_required]
+        sku_ids = DB[:mr_skus].where(mr_product_variant_id: mrpv_id).select_map(:id)
+        stock_items = DB[:mr_sku_locations].order_by(:quantity).where(location_id: dispatch_location_id, mr_sku_id: sku_ids).all
+        return failed_response("No stock for #{so_item.product_variant_code}") if stock_items.none?
+
+        collection = []
+        qty_to_dispatch = 0
+        stock_items.each do |sku_loc|
+          qty_needed = qty - qty_to_dispatch
+          next unless qty_needed.positive?
+
+          qty_used = qty_needed <= sku_loc[:quantity] ? qty_needed : sku_loc[:quantity]
+          collection << { sku_id: sku_loc[:mr_sku_id], qty: qty_used, mrpv_id: mrpv_id }
+          qty_to_dispatch += qty_used
+        end
+        fulfilled = collection.map { |r| r[:qty] }.sum == qty
+        return failed_response("Not enough stock for #{so_item.product_variant_code}") unless fulfilled
+
+        item_collection << collection
+      end
+      success_response('OK', item_collection.flatten)
+    end
+
+    def sales_order_business_process_id
+      DB[:business_processes].where(process: AppConst::PROCESS_SALES_ORDERS).get(:id)
+    end
+
+    def create_mr_sales_order(attrs)
+      customer = DB[:customers].where(party_role_id: attrs[:customer_party_role_id]).first
+      create(:mr_sales_orders, attrs.merge(erp_customer_number: customer[:erp_customer_number]))
     end
   end
 end

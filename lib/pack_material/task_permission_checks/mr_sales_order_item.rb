@@ -6,7 +6,7 @@ module PackMaterialApp
       attr_reader :task, :entity
       def initialize(task, sales_order_item_id = nil, sales_order_id: nil)
         @task = task
-        @repo = SalesRepo.new
+        @repo = DispatchRepo.new
         @id = sales_order_item_id
         @entity = @id ? @repo.find_mr_sales_order_item(@id) : nil
         @sales_order_id = sales_order_id

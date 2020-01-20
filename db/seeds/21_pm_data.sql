@@ -25,3 +25,4 @@ INSERT INTO business_processes (process) VALUES ('STOCK SALES');
 INSERT INTO business_processes (process) VALUES ('VEHICLE JOBS');
 INSERT INTO business_processes (process) VALUES ('WASTE SALES');
 INSERT INTO business_processes (process) VALUES ('WASTE CREATED');
+INSERT INTO business_processes (process) VALUES ('SALES ORDERS');

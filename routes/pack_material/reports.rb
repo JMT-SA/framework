@@ -180,5 +180,22 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
         show_json_notice('Report queued to be generated and sent')
       end
     end
+
+    # SALES ORDER
+    # ---------------------------------------------------------------------------
+    r.on 'print_sales_order', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'sales_order',
+                                    user: current_user.login_name,
+                                    file: 'sales_order',
+                                    params: {
+                                      mr_sales_order_id: id,
+                                      keep_file: true
+                                    })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
   end
 end

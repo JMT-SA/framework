@@ -6,7 +6,7 @@ module PackMaterialApp
 
     def initialize(id)
       @id = id
-      @repo = SalesRepo.new
+      @repo = DispatchRepo.new
     end
 
     def call

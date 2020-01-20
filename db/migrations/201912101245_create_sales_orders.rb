@@ -65,7 +65,7 @@ Sequel.migration do
       # TrueClass :active, default: true
 
       index [:mr_sales_order_id], name: :fki_mr_sales_order_items_mr_sales_orders
-      index [:mr_product_variant_id], name: :fki_mr_sales_order_items_material_resource_product_variants
+      index [:mr_product_variant_id], name: :fki_mr_sales_order_items_material_resource_product_variants, unique: true
       # index [:inventory_uom_id], name: :fki_mr_sales_order_items_uoms
     end
     pgt_created_at(:mr_sales_order_items, :created_at, function_name: :mr_sales_order_items_set_created_at, trigger_name: :set_created_at)

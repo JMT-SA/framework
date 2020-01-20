@@ -6,7 +6,7 @@ module PackMaterialApp
       attr_reader :task, :entity
       def initialize(task, mr_sales_order_id = nil, current_user: nil)
         @task = task
-        @repo = SalesRepo.new
+        @repo = DispatchRepo.new
         @id = mr_sales_order_id
         @entity = @id ? @repo.find_mr_sales_order(@id) : nil
         @user = current_user
@@ -77,7 +77,7 @@ module PackMaterialApp
       def can_user_ship?
         return false unless @user
 
-        Crossbeams::Config::UserPermissions.can_user?(@user, :mr_sales_orders, :ship)
+        Crossbeams::Config::UserPermissions.can_user?(@user, :sales_order, :ship)
       end
 
       def integrated?

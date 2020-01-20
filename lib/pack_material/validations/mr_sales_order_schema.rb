@@ -5,19 +5,23 @@ module PackMaterialApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:customer_party_role_id, :integer).maybe(:int?)
-    required(:dispatch_location_id, :integer).maybe(:int?)
-    required(:issue_transaction_id, :integer).maybe(:int?)
-    required(:vat_type_id, :integer).maybe(:int?)
-    required(:account_code_id, :integer).maybe(:int?)
-    required(:erp_customer_number, Types::StrippedString).maybe(:str?)
-    required(:created_by, Types::StrippedString).maybe(:str?)
+    required(:customer_party_role_id, :integer).filled(:int?)
+    required(:dispatch_location_id, :integer).filled(:int?)
+    optional(:issue_transaction_id, :integer).maybe(:int?)
+    required(:vat_type_id, :integer).filled(:int?)
+    required(:account_code_id, :integer).filled(:int?)
+    optional(:erp_customer_number, Types::StrippedString).filled(:str?)
+    optional(:created_by, Types::StrippedString).maybe(:str?)
     required(:fin_object_code, Types::StrippedString).maybe(:str?)
-    required(:sales_order_number, :integer).maybe(:int?)
-    required(:valid_until, :date_time).maybe(:date_time?)
-    required(:shipped_at, :date_time).maybe(:date_time?)
-    required(:integration_error, :bool).maybe(:bool?)
-    required(:integration_completed, :bool).maybe(:bool?)
-    required(:shipped, :bool).maybe(:bool?)
+    optional(:sales_order_number, :integer).maybe(:int?)
+    required(:valid_until, :date_time).filled(:date_time?)
+    optional(:shipped_at, :date_time).maybe(:date_time?)
+    optional(:integration_error, :bool).maybe(:bool?)
+    optional(:integration_completed, :bool).maybe(:bool?)
+    optional(:shipped, :bool).maybe(:bool?)
+  end
+
+  NewMrSalesOrderSchema = Dry::Validation.Params do
+    required(:customer_party_role_id, :integer).filled(:int?)
   end
 end

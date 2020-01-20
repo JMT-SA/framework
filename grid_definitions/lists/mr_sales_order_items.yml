@@ -14,7 +14,7 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/pack_material/sales/mr_sales_order_items/new"
+  :url: "/pack_material/sales/mr_sales_order/$:mr_sales_order_id$/mr_sales_order_items/new"
   :text: New Sales Order Item
   :style: :button
   :behaviour: :popup
@@ -26,7 +26,5 @@
 :edit_rules:
   :url: "/pack_material/sales/mr_sales_order_items/$:id$/inline_save"
   :editable_fields:
-    quantity_returned:
+    unit_price:
       :editor: :numeric
-    remarks:
-      :editor: :textarea

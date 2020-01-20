@@ -14,9 +14,25 @@ class Framework < Roda
       r.on !interactor.exists?(:mr_sales_orders, id) do
         handle_not_found(r)
       end
-
+      # r.on 'mrpv_location_lookup_result', Integer do |mrpv_id|
+      #   res = interactor.get_mrpv_info(id, mrpv_id)
+      #   if res.success
+      #     json_actions([OpenStruct.new(type: :replace_input_value,
+      #                                  dom_id: 'mr_sales_order_item_mr_product_variant_id',
+      #                                  value: mrpv_id),
+      #                   OpenStruct.new(type: :replace_input_value,
+      #                                  dom_id: 'mr_sales_order_item_mr_product_variant_code',
+      #                                  value: res.instance[:pv_code]),
+      #                   OpenStruct.new(type: :replace_input_value,
+      #                                  dom_id: 'mr_sales_order_item_mr_product_variant_number',
+      #                                  value: res.instance[:pv_number])],
+      #                  'Selected Product Variant')
+      #   else
+      #     show_json_error(res.message, status: 200)
+      #   end
+      # end
       r.on 'complete_invoice' do
-        check_auth!('sales', 'edit')
+        check_auth!('dispatch', 'edit')
         store_last_referer_url(:sale_complete_invoice)
         res = interactor.complete_invoice(id)
         if res.success
@@ -27,13 +43,13 @@ class Framework < Roda
         redirect_to_stored_referer(r, :sale_complete_invoice)
       end
       r.on 'edit' do   # EDIT
-        check_auth!('sales', 'edit')
+        check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_page { PackMaterial::Sales::MrSalesOrder::Edit.call(id, current_user, interactor: interactor) }
+        show_page { PackMaterial::Dispatch::MrSalesOrder::Edit.call(id, current_user, interactor: interactor) }
       end
 
       r.on 'ship_goods' do
-        check_auth!('sales', 'edit')
+        check_auth!('dispatch', 'edit')
         res = interactor.ship_mr_sales_order(id)
         if res.success
           flash[:notice] = res.message
@@ -46,31 +62,19 @@ class Framework < Roda
       r.on 'mr_sales_order_items' do
         item_interactor = PackMaterialApp::MrSalesOrderItemInteractor.new(current_user, {}, { route_url: request.path }, {})
         r.on 'new' do    # NEW
-          check_auth!('sales', 'new')
-          show_partial_or_page(r) { PackMaterial::Sales::MrSalesOrderItem::New.call(id, remote: fetch?(r)) }
+          check_auth!('dispatch', 'new')
+          show_partial_or_page(r) { PackMaterial::Dispatch::MrSalesOrderItem::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = item_interactor.create_mr_sales_order_item(id, params[:mr_sales_order_item])
           if res.success
-            row_keys = %i[
-              id
-              mr_sales_order_id
-              mr_delivery_item_id
-              mr_delivery_item_batch_id
-              remarks
-              quantity_returned
-              status
-              product_variant_code
-              product_variant_number
-              sku_number
-            ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys), notice: res.message)
+            redirect_via_json("/pack_material/sales/mr_sales_orders/#{id}/edit")
           else
             re_show_form(r, res, url: "/pack_material/sales/mr_sales_orders/#{id}/mr_sales_order_items/new") do
-              PackMaterial::Sales::MrSalesOrderItem::New.call(id,
-                                                              form_values: params[:mr_sales_order_item],
-                                                              form_errors: res.errors,
-                                                              remote: fetch?(r))
+              PackMaterial::Dispatch::MrSalesOrderItem::New.call(id,
+                                                                 form_values: params[:mr_sales_order_item],
+                                                                 form_errors: res.errors,
+                                                                 remote: fetch?(r))
             end
           end
         end
@@ -78,26 +82,26 @@ class Framework < Roda
 
       r.is do
         r.get do       # SHOW
-          check_auth!('sales', 'read')
-          show_partial { PackMaterial::Sales::MrSalesOrder::Show.call(id) }
+          check_auth!('dispatch', 'read')
+          show_partial { PackMaterial::Dispatch::MrSalesOrder::Show.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_mr_sales_order(id, params[:mr_sales_order])
           if res.success
             flash[:notice] = res.message
-            r.redirect("/pack_material/sales/mr_sales_orders/#{id}/edit")
+            redirect_via_json("/pack_material/sales/mr_sales_orders/#{id}/edit")
           else
             re_show_form(r, res, url: "/pack_material/sales/mr_sales_orders/#{id}/edit") do
-              PackMaterial::Sales::MrSalesOrder::Edit.call(id,
-                                                           current_user,
-                                                           form_values: params[:mr_sales_order],
-                                                           form_errors: res.errors,
-                                                           interactor: interactor)
+              PackMaterial::Dispatch::MrSalesOrder::Edit.call(id,
+                                                              current_user,
+                                                              form_values: params[:mr_sales_order],
+                                                              form_errors: res.errors,
+                                                              interactor: interactor)
             end
           end
         end
         r.delete do    # DELETE
-          check_auth!('sales', 'delete')
+          check_auth!('dispatch', 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_mr_sales_order(id)
           if res.success
@@ -111,10 +115,23 @@ class Framework < Roda
 
     r.on 'mr_sales_orders' do
       interactor = PackMaterialApp::MrSalesOrderInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'mrpv_location_lookup_result', Integer do |mrpv_id|
+        res = interactor.get_mrpv_info(mrpv_id)
+        json_actions([OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'mr_sales_order_item_mr_product_variant_id',
+                                     value: mrpv_id),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'mr_sales_order_item_mr_product_variant_code',
+                                     value: res[:pv_code]),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'mr_sales_order_item_mr_product_variant_number',
+                                     value: res[:pv_number])],
+                     'Selected Product Variant')
+      end
       r.on 'new' do    # NEW
-        check_auth!('sales', 'new')
+        check_auth!('dispatch', 'new')
         set_last_grid_url('/list/mr_sales_orders/with_params?key=unshipped', r)
-        show_partial_or_page(r) { PackMaterial::Sales::MrSalesOrder::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Dispatch::MrSalesOrder::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.create_mr_sales_order(params[:mr_sales_order])
@@ -122,15 +139,20 @@ class Framework < Roda
           if fetch?(r)
             row_keys = %i[
               id
-              mr_delivery_id
-              delivery_number
-              credit_note_number
+              customer_party_role_id
+              dispatch_location_id
               issue_transaction_id
-              sales_location_id
+              vat_type_id
+              account_code_id
+              erp_customer_number
               created_by
+              fin_object_code
+              sales_order_number
+              valid_until
+              shipped_at
+              integration_error
+              integration_completed
               shipped
-              remarks
-              status
             ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
@@ -140,9 +162,9 @@ class Framework < Roda
           end
         else
           re_show_form(r, res, url: '/pack_material/sales/mr_sales_orders/new') do
-            PackMaterial::Sales::MrSalesOrder::New.call(form_values: params[:mr_sales_order],
-                                                        form_errors: res.errors,
-                                                        remote: fetch?(r))
+            PackMaterial::Dispatch::MrSalesOrder::New.call(form_values: params[:mr_sales_order],
+                                                           form_errors: res.errors,
+                                                           remote: fetch?(r))
           end
         end
       end
@@ -159,7 +181,7 @@ class Framework < Roda
       end
 
       r.on 'inline_save' do
-        check_auth!('sales', 'edit')
+        check_auth!('dispatch', 'edit')
         res = interactor.inline_update(id, params)
         if res.success
           parent_id = interactor.mr_sales_order_item(id)&.mr_sales_order_id
@@ -178,23 +200,23 @@ class Framework < Roda
           res = interactor.update_mr_sales_order_item(id, params[:mr_sales_order_item])
           if res.success
             row_keys = %i[
+              id
               mr_sales_order_id
-              mr_delivery_item_id
-              mr_delivery_item_batch_id
+              mr_product_variant_id
+              quantity_required
+              unit_price
               remarks
-              quantity_returned
-              status
               product_variant_code
               product_variant_number
               sku_number
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { PackMaterial::Sales::MrSalesOrderItem::Edit.call(id, form_values: params[:mr_sales_order_item], form_errors: res.errors, interactor: interactor) }
+            re_show_form(r, res) { PackMaterial::Dispatch::MrSalesOrderItem::Edit.call(id, form_values: params[:mr_sales_order_item], form_errors: res.errors, interactor: interactor) }
           end
         end
         r.delete do    # DELETE
-          check_auth!('sales', 'delete')
+          check_auth!('dispatch', 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_mr_sales_order_item(id)
           if res.success

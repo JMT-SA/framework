@@ -49,6 +49,8 @@ module PackMaterialApp
           xml.invoice_total so_totals[:total]
           xml.subtotal so_totals[:subtotal]
           xml.vat so_totals[:vat]
+          xml.object 'PGM'
+          xml.location 'PMAT'
           xml.costs do
             costs.each do |cost|
               xml.cost do
@@ -68,8 +70,6 @@ module PackMaterialApp
                 xml.line_total line_item[:line_total]
                 xml.cost UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
                 xml.fifo UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
-                xml.object 'PGM'
-                xml.location 'PMAT'
               end
             end
           end

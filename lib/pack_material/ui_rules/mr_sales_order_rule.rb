@@ -11,8 +11,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      rules[:shipped] = @form_object.shipped unless @mode == :new
-      rules[:can_ship] = can_ship
+      set_rules unless @mode == :new
 
       common_values_for_fields case @mode
                                when :new
@@ -22,6 +21,15 @@ module UiRules
                                end
 
       form_name 'mr_sales_order'
+    end
+
+    def set_rules
+      rules[:shipped] = @form_object.shipped unless @mode == :new
+      rules[:can_ship] = can_ship
+      rules[:ready_to_ship] = ready_to_ship
+      rules[:invoice_completed] = @form_object.integration_completed
+      rules[:can_complete_invoice] = can_complete_invoice
+      rules[:so_sub_totals] = @repo.so_sub_totals(@options[:id]) unless @mode == :new
     end
 
     def show_fields
@@ -44,11 +52,10 @@ module UiRules
 
     def edit_fields
       fields = {
-        dispatch_location_id: { renderer: :select, options: @repo.dispatch_locations, selected: @form_object.dispatch_location_id, readonly: @form_object.shipped },
-        vat_type_id: { renderer: :select, options: @replenish_repo.for_select_mr_vat_types, caption: 'Vat Type', required: true },
-        account_code_id: { renderer: :select, options: @general_repo.for_select_account_codes_with_descriptions, selected: @form_object&.account_code_id, caption: 'Account Code' },
-        fin_object_code: {},
-        valid_until: { subtype: :date, required: true }
+        dispatch_location_id: { renderer: :select, options: @repo.dispatch_locations, selected: @form_object&.dispatch_location_id, readonly: @form_object.shipped, required: true, prompt: true },
+        vat_type_id: { renderer: :select, options: @replenish_repo.for_select_mr_vat_types, selected: @form_object&.vat_type_id, caption: 'Vat Type', required: true, prompt: true },
+        account_code_id: { renderer: :select, options: @general_repo.for_select_account_codes_with_descriptions, selected: @form_object&.account_code_id, caption: 'Account Code', required: true, prompt: true },
+        fin_object_code: {}
       }
       fields.merge(common_fields)
     end
@@ -62,8 +69,10 @@ module UiRules
         sales_order_number: { renderer: :label },
         shipped_at: { renderer: :label },
         integration_error: { renderer: :hidden },
-        integration_completed: { renderer: :label, as_boolean: true },
-        shipped: { renderer: :label, as_boolean: true }
+        integration_completed: { renderer: :label, as_boolean: true, caption: 'Sent to ERP system' },
+        shipped: { renderer: :label, as_boolean: true },
+        erp_invoice_number: { renderer: :label },
+        status: { renderer: :label }
       }
     end
 
@@ -77,9 +86,25 @@ module UiRules
 
     private
 
+    def ready_to_ship
+      res = @perm.call(:ready_to_ship, @options[:id])
+      res.success
+    end
+
     def can_ship
       res = @perm.call(:can_ship, @options[:id], current_user: @options[:current_user])
       res.success
+    end
+
+    def can_complete_invoice
+      res = @perm.call(:integrate, @options[:id], current_user: @options[:current_user])
+      return false if @mode == :edit && already_enqueued?(@options[:id])
+
+      res.success
+    end
+
+    def already_enqueued?(mr_sales_order_id)
+      PackMaterialApp::ERPPurchaseInvoiceJob.enqueued_with_args?(mr_sales_order_id: mr_sales_order_id)
     end
 
     # def add_approve_behaviours

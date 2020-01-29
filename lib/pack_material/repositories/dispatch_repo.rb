@@ -34,12 +34,32 @@ module PackMaterialApp
 
     crud_calls_for :mr_sales_order_items, name: :mr_sales_order_item, wrapper: MrSalesOrderItem
 
+    build_for_select :sales_order_costs,
+                     label: :id,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :id
+
+    crud_calls_for :sales_order_costs, name: :sales_order_cost, wrapper: SalesOrderCost
+
+    def find_sales_order_cost(id)
+      find_with_association(:sales_order_costs, id,
+                            wrapper: SalesOrderCost,
+                            parent_tables: [
+                              {
+                                parent_table: :mr_cost_types,
+                                columns: [:cost_type_code],
+                                flatten_columns: { cost_type_code: :cost_type_code }
+                              }
+                            ])
+    end
+
     def find_mr_goods_returned_note(id)
       find_with_association(:mr_goods_returned_notes, id,
                             wrapper: MrGoodsReturnedNote,
                             parent_tables: [
                               { parent_table: :mr_deliveries,
-                                columns: :delivery_number,
+                                columns: [:delivery_number],
                                 flatten_columns: { delivery_number: :delivery_number } }
                             ],
                             lookup_functions: [
@@ -50,8 +70,15 @@ module PackMaterialApp
     def find_mr_sales_order(id)
       find_with_association(:mr_sales_orders, id,
                             wrapper: MrSalesOrder,
+                            parent_tables: [
+                              {
+                                parent_table: :account_codes,
+                                columns: [:account_code],
+                                flatten_columns: { account_code: :account_code }
+                              }
+                            ],
                             lookup_functions: [
-                              { function: :fn_current_status, args: ['mr_sales_order', :id], col_name: :status }
+                              { function: :fn_current_status, args: ['mr_sales_orders', :id], col_name: :status }
                             ])
     end
 
@@ -239,7 +266,8 @@ module PackMaterialApp
       mrpv = DB[:material_resource_product_variants].where(id: mrpv_id).first
       {
         pv_code: mrpv[:product_variant_code],
-        pv_number: mrpv[:product_variant_number]
+        pv_number: mrpv[:product_variant_number],
+        pv_wa_cost: mrpv[:weighted_average_cost]
       }
     end
 
@@ -275,7 +303,7 @@ module PackMaterialApp
         qty = item[:quantity_required]
         sku_ids = DB[:mr_skus].where(mr_product_variant_id: mrpv_id).select_map(:id)
         stock_items = DB[:mr_sku_locations].order_by(:quantity).where(location_id: dispatch_location_id, mr_sku_id: sku_ids).all
-        return failed_response("No stock for #{so_item.product_variant_code}") if stock_items.none?
+        return failed_response("No stock for #{so_item.product_variant_code} at dispatch location.") if stock_items.none?
 
         collection = []
         qty_to_dispatch = 0
@@ -302,6 +330,68 @@ module PackMaterialApp
     def create_mr_sales_order(attrs)
       customer = DB[:customers].where(party_role_id: attrs[:customer_party_role_id]).first
       create(:mr_sales_orders, attrs.merge(erp_customer_number: customer[:erp_customer_number]))
+    end
+
+    def create_mr_sales_order_item(attrs)
+      wa_cost = DB[:material_resource_product_variants].where(id: attrs[:mr_product_variant_id]).get(:weighted_average_cost)
+      create(:mr_sales_order_items, attrs.to_h.merge(unit_price: wa_cost))
+    end
+
+    def so_sub_totals(id, opts = {})
+      subtotal = so_total_items(id)
+      costs = so_total_costs(id)
+      vat = so_total_vat(id, subtotal + costs)
+      {
+        subtotal: UtilityFunctions.delimited_number(subtotal, opts),
+        costs: UtilityFunctions.delimited_number(costs, opts),
+        vat: UtilityFunctions.delimited_number(vat, opts),
+        total: UtilityFunctions.delimited_number(subtotal + costs + vat, opts)
+      }
+    end
+
+    def so_total_items(id)
+      DB['SELECT SUM(quantity_required * unit_price) AS total FROM mr_sales_order_items WHERE mr_sales_order_id = ?', id].single_value || AppConst::BIG_ZERO
+    end
+
+    def so_total_vat(id, subtotal)
+      return AppConst::BIG_ZERO if subtotal.zero?
+
+      mr_vat_type_id = DB[:mr_sales_orders].where(id: id).get(:vat_type_id)
+      factor = DB[:mr_vat_types].where(id: mr_vat_type_id).get(Sequel[:mr_vat_types][:percentage_applicable]./100.0) || AppConst::BIG_ZERO
+      subtotal * factor
+    end
+
+    def so_total_costs(id)
+      DB[:sales_order_costs].where(mr_sales_order_id: id).sum(:amount) || AppConst::BIG_ZERO
+    end
+
+    def so_costs(mr_sales_order_id)
+      DB[:sales_order_costs]
+        .join(:mr_cost_types, id: :mr_cost_type_id)
+        .join(:mr_sales_orders, id: Sequel[:sales_order_costs][:mr_sales_order_id])
+        .join(:account_codes, id: Sequel[:mr_sales_orders][:account_code_id])
+        .where(mr_sales_order_id: mr_sales_order_id)
+        .select(:cost_type_code, :amount, Sequel[:account_codes][:account_code])
+        .all
+    end
+
+    def products_for_sales_order(mr_sales_order_id)
+      DB[:mr_sales_order_items]
+        .join(:material_resource_product_variants, id: :mr_product_variant_id)
+        .where(mr_sales_order_id: mr_sales_order_id)
+        .select(:quantity_required,
+                :unit_price,
+                :product_variant_code,
+                :weighted_average_cost,
+                (Sequel[:mr_sales_order_items][:quantity_required] * Sequel[:mr_sales_order_items][:unit_price]).as(:line_total))
+        .all
+    end
+
+    def so_complete_invoice(id, attrs)
+      update(:mr_sales_orders, id,
+             integration_error: false,
+             integration_completed: true,
+             erp_invoice_number: attrs[:purchase_invoice_number])
     end
   end
 end

@@ -14,23 +14,34 @@ class Framework < Roda
       r.on !interactor.exists?(:mr_sales_orders, id) do
         handle_not_found(r)
       end
-      # r.on 'mrpv_location_lookup_result', Integer do |mrpv_id|
-      #   res = interactor.get_mrpv_info(id, mrpv_id)
-      #   if res.success
-      #     json_actions([OpenStruct.new(type: :replace_input_value,
-      #                                  dom_id: 'mr_sales_order_item_mr_product_variant_id',
-      #                                  value: mrpv_id),
-      #                   OpenStruct.new(type: :replace_input_value,
-      #                                  dom_id: 'mr_sales_order_item_mr_product_variant_code',
-      #                                  value: res.instance[:pv_code]),
-      #                   OpenStruct.new(type: :replace_input_value,
-      #                                  dom_id: 'mr_sales_order_item_mr_product_variant_number',
-      #                                  value: res.instance[:pv_number])],
-      #                  'Selected Product Variant')
-      #   else
-      #     show_json_error(res.message, status: 200)
-      #   end
-      # end
+      r.on 'sales_order_costs' do
+        interactor = PackMaterialApp::SalesOrderCostInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        r.on 'new' do    # NEW
+          check_auth!('dispatch', 'new')
+          show_partial_or_page(r) { PackMaterial::Dispatch::SalesOrderCost::New.call(id, remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = interactor.create_sales_order_cost(id, params[:sales_order_cost])
+          if res.success
+            row_keys = %i[
+              id
+              mr_sales_order_id
+              mr_cost_type_id
+              cost_type_code
+              amount
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
+          else
+            re_show_form(r, res, url: "/pack_material/dispatch/mr_sales_orders/#{id}/sales_order_costs/new") do
+              PackMaterial::Dispatch::SalesOrderCost::New.call(id,
+                                                               form_values: params[:sales_order_cost],
+                                                               form_errors: res.errors,
+                                                               remote: fetch?(r))
+            end
+          end
+        end
+      end
       r.on 'complete_invoice' do
         check_auth!('dispatch', 'edit')
         store_last_referer_url(:sale_complete_invoice)
@@ -125,7 +136,10 @@ class Framework < Roda
                                      value: res[:pv_code]),
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'mr_sales_order_item_mr_product_variant_number',
-                                     value: res[:pv_number])],
+                                     value: res[:pv_number]),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'mr_sales_order_item_unit_price',
+                                     value: res[:pv_wa_cost])],
                      'Selected Product Variant')
       end
       r.on 'new' do    # NEW
@@ -137,28 +151,10 @@ class Framework < Roda
         res = interactor.create_mr_sales_order(params[:mr_sales_order])
         if res.success
           if fetch?(r)
-            row_keys = %i[
-              id
-              customer_party_role_id
-              dispatch_location_id
-              issue_transaction_id
-              vat_type_id
-              account_code_id
-              erp_customer_number
-              created_by
-              fin_object_code
-              sales_order_number
-              valid_until
-              shipped_at
-              integration_error
-              integration_completed
-              shipped
-            ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            redirect_via_json("/pack_material/sales/mr_sales_orders/#{res.instance}/edit")
           else
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            r.redirect "/pack_material/sales/mr_sales_orders/#{res.instance}/edit"
           end
         else
           re_show_form(r, res, url: '/pack_material/sales/mr_sales_orders/new') do
@@ -219,6 +215,54 @@ class Framework < Roda
           check_auth!('dispatch', 'delete')
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_mr_sales_order_item(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    # SALES ORDER COSTS
+    # --------------------------------------------------------------------------
+    r.on 'sales_order_costs', Integer do |id|
+      interactor = PackMaterialApp::SalesOrderCostInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:sales_order_costs, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { PackMaterial::Dispatch::SalesOrderCost::Edit.call(id) }
+      end
+      r.is do
+        r.get do       # SHOW
+          check_auth!('dispatch', 'read')
+          show_partial { PackMaterial::Dispatch::SalesOrderCost::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_sales_order_cost(id, params[:sales_order_cost])
+          if res.success
+            update_grid_row(id,
+                            changes: {
+                              mr_sales_order_id: res.instance[:mr_sales_order_id],
+                              mr_cost_type_id: res.instance[:mr_cost_type_id],
+                              cost_type_code: res.instance[:cost_type_code],
+                              amount: res.instance[:amount]
+                            },
+                            notice: res.message)
+          else
+            re_show_form(r, res) { PackMaterial::Dispatch::SalesOrderCost::Edit.call(id, form_values: params[:sales_order_cost], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('dispatch', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_sales_order_cost(id)
           if res.success
             delete_grid_row(id, notice: res.message)
           else

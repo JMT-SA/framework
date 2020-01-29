@@ -12,15 +12,12 @@ Sequel.migration do
 
       String :erp_customer_number
       String :created_by
-      # String :sales_account_code
       String :fin_object_code
 
       Integer :sales_order_number
+      String :erp_invoice_number
 
-      DateTime :valid_until
-      # DateTime :completed_at
       DateTime :shipped_at
-
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
@@ -65,7 +62,7 @@ Sequel.migration do
       # TrueClass :active, default: true
 
       index [:mr_sales_order_id], name: :fki_mr_sales_order_items_mr_sales_orders
-      index [:mr_product_variant_id], name: :fki_mr_sales_order_items_material_resource_product_variants, unique: true
+      index [:mr_sales_order_id, :mr_product_variant_id], name: :fki_mr_sales_order_items_material_resource_product_variants, unique: true
       # index [:inventory_uom_id], name: :fki_mr_sales_order_items_uoms
     end
     pgt_created_at(:mr_sales_order_items, :created_at, function_name: :mr_sales_order_items_set_created_at, trigger_name: :set_created_at)

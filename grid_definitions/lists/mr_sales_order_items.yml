@@ -6,12 +6,6 @@
   :icon: delete
   :is_delete: true
   :popup: true
-- :separator: true
-- :url: "/development/statuses/list/mr_sales_order_items/$:id$"
-  :text: status
-  :icon: information-solid
-  :title: Status
-  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/pack_material/sales/mr_sales_order/$:mr_sales_order_id$/mr_sales_order_items/new"

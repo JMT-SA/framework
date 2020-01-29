@@ -1,0 +1,107 @@
+---
+:caption: Sales Order Costs
+:sql: "SELECT \"sales_order_costs\".\"id\",\r\n       \"sales_order_costs\".\"mr_sales_order_id\",\r\n
+  \      \"sales_order_costs\".\"mr_cost_type_id\",\r\n       \"sales_order_costs\".\"amount\",\r\n
+  \      \"mr_cost_types\".\"cost_type_code\"\r\nFROM \"sales_order_costs\" \r\n    JOIN
+  \"mr_cost_types\" ON \"mr_cost_types\".\"id\" = \"sales_order_costs\".\"mr_cost_type_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: sales_order_costs.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_sales_order_id:
+    :name: mr_sales_order_id
+    :sequence_no: 2
+    :caption: Mr sales order
+    :namespaced_name: sales_order_costs.mr_sales_order_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_cost_type_id:
+    :name: mr_cost_type_id
+    :sequence_no: 3
+    :caption: Mr cost type
+    :namespaced_name: sales_order_costs.mr_cost_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  amount:
+    :name: amount
+    :sequence_no: 4
+    :caption: Amount
+    :namespaced_name: sales_order_costs.amount
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cost_type_code:
+    :name: cost_type_code
+    :sequence_no: 5
+    :caption: Cost type code
+    :namespaced_name: mr_cost_types.cost_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: sales_order_costs.mr_sales_order_id
+  :caption: Mr sales order
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT erp_customer_number, id FROM mr_sales_orders ORDER BY erp_customer_number
+- :column: sales_order_costs.mr_cost_type_id
+  :caption: Mr cost type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cost_type_code, id FROM mr_cost_types ORDER BY cost_type_code

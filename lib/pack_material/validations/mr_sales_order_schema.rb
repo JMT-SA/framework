@@ -14,7 +14,6 @@ module PackMaterialApp
     optional(:created_by, Types::StrippedString).maybe(:str?)
     required(:fin_object_code, Types::StrippedString).maybe(:str?)
     optional(:sales_order_number, :integer).maybe(:int?)
-    required(:valid_until, :date_time).filled(:date_time?)
     optional(:shipped_at, :date_time).maybe(:date_time?)
     optional(:integration_error, :bool).maybe(:bool?)
     optional(:integration_completed, :bool).maybe(:bool?)

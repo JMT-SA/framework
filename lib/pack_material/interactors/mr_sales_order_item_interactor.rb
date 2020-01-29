@@ -81,7 +81,7 @@ module PackMaterialApp
     end
 
     def check_permission(task, id = nil, sales_order_id = nil)
-      TaskPermissionCheck::MrSalesOrderItem.call(task, id, sales_order_id: sales_order_id, current_user: @user)
+      TaskPermissionCheck::MrSalesOrderItem.call(task, id, sales_order_id: sales_order_id)
     end
 
     def mr_sales_order(id)

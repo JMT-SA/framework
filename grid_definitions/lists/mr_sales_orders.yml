@@ -1,0 +1,44 @@
+---
+:dataminer_definition: mr_sales_orders
+:actions:
+- :url: "/pack_material/sales/mr_sales_orders/$:id$/edit"
+  :text: view
+  :icon: view-show
+  :title: View
+  :hide_if_false: shipped
+- :url: "/pack_material/sales/mr_sales_orders/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_true: shipped
+- :url: "/pack_material/sales/mr_sales_orders/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: shipped
+- :separator: true
+- :url: "/development/statuses/list/mr_sales_orders/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/sales/mr_sales_orders/new"
+  :text: New Sales Order
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :unshipped:
+    - :col: mr_sales_orders.shipped
+      :op: =
+      :val: false
+  :shipped:
+    - :col: mr_sales_orders.shipped
+      :op: =
+      :val: true
+:captions:
+  :conditions:
+    :unshipped: Sales Orders
+    :shipped: Shipped Sales Orders

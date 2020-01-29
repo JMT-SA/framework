@@ -1,11 +1,6 @@
 ---
 :dataminer_definition: mr_purchase_invoice_costs
 :actions:
-- :url: "/pack_material/replenish/mr_purchase_invoice_costs/$:id$"
-  :text: view
-  :icon: view-show
-  :title: View
-  :popup: true
 - :url: "/pack_material/replenish/mr_purchase_invoice_costs/$:id$/edit"
   :text: edit
   :icon: edit
@@ -15,11 +10,6 @@
   :text: delete
   :icon: delete
   :is_delete: true
-  :popup: true
-- :url: "/development/statuses/list/mr_purchase_invoice_costs/$:id$"
-  :text: status
-  :icon: information-solid
-  :title: Status
   :popup: true
 :page_controls:
 - :control_type: :link

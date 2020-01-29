@@ -1,0 +1,7 @@
+---
+:dataminer_definition: sales_order_costs
+:conditions:
+  :standard:
+    - :col: sales_order_costs.mr_sales_order_id
+      :op: =
+      :val: $:mr_sales_order_id$

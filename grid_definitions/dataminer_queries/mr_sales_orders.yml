@@ -1,0 +1,422 @@
+---
+:caption: Sales Orders
+:sql: SELECT "mr_sales_orders"."id", "mr_sales_orders"."customer_party_role_id", "mr_sales_orders"."dispatch_location_id",
+  "mr_sales_orders"."issue_transaction_id", "mr_sales_orders"."vat_type_id", "mr_sales_orders"."account_code_id",
+  "mr_sales_orders"."erp_customer_number", "mr_sales_orders"."created_by", "mr_sales_orders"."fin_object_code",
+  "mr_sales_orders"."sales_order_number", "mr_sales_orders"."shipped_at", "mr_sales_orders"."created_at",
+  "mr_sales_orders"."updated_at", "mr_sales_orders"."integration_error", "mr_sales_orders"."integration_completed",
+  "mr_sales_orders"."shipped", "account_codes"."description", fn_party_role_name("mr_sales_orders"."customer_party_role_id")
+  AS customer_party_role, "locations"."location_long_code" AS dispatch_location_location_long_code,
+  "mr_inventory_transactions"."created_by" AS mr_inventory_transactions_created_by,
+  "mr_vat_types"."vat_type_code" AS vat_type_vat_type_code, fn_current_status('mr_sales_orders',
+  "mr_sales_orders"."id") AS status FROM "mr_sales_orders" LEFT JOIN "account_codes"
+  ON "account_codes"."id" = "mr_sales_orders"."account_code_id" LEFT JOIN "locations"
+  ON "locations"."id" = "mr_sales_orders"."dispatch_location_id" LEFT JOIN "mr_inventory_transactions"
+  ON "mr_inventory_transactions"."id" = "mr_sales_orders"."issue_transaction_id" LEFT
+  JOIN "mr_vat_types" ON "mr_vat_types"."id" = "mr_sales_orders"."vat_type_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_sales_orders.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_party_role_id:
+    :name: customer_party_role_id
+    :sequence_no: 2
+    :caption: Customer party role
+    :namespaced_name: mr_sales_orders.customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dispatch_location_id:
+    :name: dispatch_location_id
+    :sequence_no: 3
+    :caption: Dispatch location
+    :namespaced_name: mr_sales_orders.dispatch_location_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  issue_transaction_id:
+    :name: issue_transaction_id
+    :sequence_no: 4
+    :caption: Issue transaction
+    :namespaced_name: mr_sales_orders.issue_transaction_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vat_type_id:
+    :name: vat_type_id
+    :sequence_no: 5
+    :caption: Vat type
+    :namespaced_name: mr_sales_orders.vat_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  account_code_id:
+    :name: account_code_id
+    :sequence_no: 6
+    :caption: Account code
+    :namespaced_name: mr_sales_orders.account_code_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_customer_number:
+    :name: erp_customer_number
+    :sequence_no: 7
+    :caption: ERP Customer no
+    :namespaced_name: mr_sales_orders.erp_customer_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 8
+    :caption: Created by
+    :namespaced_name: mr_sales_orders.created_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fin_object_code:
+    :name: fin_object_code
+    :sequence_no: 9
+    :caption: FIN Obj Code
+    :namespaced_name: mr_sales_orders.fin_object_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sales_order_number:
+    :name: sales_order_number
+    :sequence_no: 10
+    :caption: SO no
+    :namespaced_name: mr_sales_orders.sales_order_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_at:
+    :name: shipped_at
+    :sequence_no: 11
+    :caption: Shipped at
+    :namespaced_name: mr_sales_orders.shipped_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 12
+    :caption: Created at
+    :namespaced_name: mr_sales_orders.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 13
+    :caption: Updated at
+    :namespaced_name: mr_sales_orders.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  integration_error:
+    :name: integration_error
+    :sequence_no: 14
+    :caption: Integration error
+    :namespaced_name: mr_sales_orders.integration_error
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  integration_completed:
+    :name: integration_completed
+    :sequence_no: 15
+    :caption: Integration completed
+    :namespaced_name: mr_sales_orders.integration_completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped:
+    :name: shipped
+    :sequence_no: 16
+    :caption: Shipped
+    :namespaced_name: mr_sales_orders.shipped
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 17
+    :caption: Description
+    :namespaced_name: account_codes.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_party_role:
+    :name: customer_party_role
+    :sequence_no: 18
+    :caption: Customer party role
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dispatch_location_location_long_code:
+    :name: dispatch_location_location_long_code
+    :sequence_no: 19
+    :caption: Dispatch loc long code
+    :namespaced_name: locations.location_long_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_inventory_transactions_created_by:
+    :name: mr_inventory_transactions_created_by
+    :sequence_no: 20
+    :caption: Inv transactions created by
+    :namespaced_name: mr_inventory_transactions.created_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vat_type_vat_type_code:
+    :name: vat_type_vat_type_code
+    :sequence_no: 21
+    :caption: Vat Type Code
+    :namespaced_name: mr_vat_types.vat_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 22
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_sales_orders.customer_party_role_id
+  :caption: Customer party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: mr_sales_orders.dispatch_location_id
+  :caption: Dispatch location
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT location_long_code, id FROM locations ORDER BY location_long_code
+- :column: mr_sales_orders.issue_transaction_id
+  :caption: Issue transaction
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT created_by, id FROM mr_inventory_transactions ORDER BY created_by
+- :column: mr_sales_orders.vat_type_id
+  :caption: Vat type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT vat_type_code, id FROM mr_vat_types ORDER BY vat_type_code
+- :column: mr_sales_orders.account_code_id
+  :caption: Account code
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT description, id FROM account_codes ORDER BY description
+- :column: mr_sales_orders.shipped
+  :caption: Shipped
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

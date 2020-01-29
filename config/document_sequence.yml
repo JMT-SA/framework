@@ -33,6 +33,11 @@ doc_seqs_credit_note_number:
   data_type: :integer
   table: mr_goods_returned_notes
   column: credit_note_number
+doc_seqs_sales_order_number:
+  db_sequence_name: doc_seqs_sales_order_number
+  data_type: :integer
+  table: mr_sales_orders
+  column: sales_order_number
 dummy_invoice:
   db_sequence_name: doc_seqs_inv
   data_type: :string

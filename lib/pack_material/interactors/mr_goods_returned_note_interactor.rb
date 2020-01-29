@@ -103,11 +103,13 @@ module PackMaterialApp
     end
 
     def email_credit_note_defaults(id, user)
+      # View Logic
       instance = mr_goods_returned_note(id)
+      del_no = repo.find_hash(:mr_deliveries, instance[:mr_delivery_id])[:delivery_number]
       {
         to: nil,
         cc: user.email,
-        subject: "Goods Returned Note: #{instance.credit_note_number}"
+        subject: "Goods Returned Note: #{instance.credit_note_number} (DEL: #{del_no})"
       }
     end
 

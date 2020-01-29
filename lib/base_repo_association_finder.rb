@@ -96,6 +96,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
       raise ArgumentError, "parent_table #{parent_table} must be a Symbol" unless parent_table.is_a?(Symbol)
 
       rule.keys.each { |k| raise ArgumentError, "Unknown parent-table key: #{k}" unless VALID_PARENT_KEYS.include?(k) }
+      raise ArgumentError, 'Parent tables columns rule must be an Array' if rule[:columns] && !rule[:columns].is_a?(Array)
     end
   end
 

@@ -180,5 +180,60 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
         show_json_notice('Report queued to be generated and sent')
       end
     end
+
+    # SALES ORDER
+    # ---------------------------------------------------------------------------
+    r.on 'print_sales_order', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'sales_order',
+                                    user: current_user.login_name,
+                                    file: 'sales_order',
+                                    params: {
+                                      mr_sales_order_id: id,
+                                      keep_file: true
+                                    })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+    r.on 'print_so_waybill', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'sales_order_waybill',
+                                    user: current_user.login_name,
+                                    file: 'sales_order_waybill',
+                                    params: {
+                                      mr_sales_order_id: id,
+                                      keep_file: true
+                                    })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+    r.on 'email_sales_order', Integer do |id|
+      r.get do
+        interactor = PackMaterialApp::MrSalesOrderInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        show_partial_or_page(r) do
+          Development::Generators::General::Email.call(remote: true,
+                                                       email_options: interactor.email_sales_order_defaults(id, current_user),
+                                                       action: "/pack_material/reports/email_sales_order/#{id}")
+        end
+      end
+      r.post do
+        opts = {
+          email_settings: params[:mail],
+          user_name: current_user.login_name,
+          reports: [{
+            report_name: 'print_sales_order',
+            file: 'sales_order',
+            report_params: { mr_sales_order_id: id,
+                             keep_file: true }
+          }]
+        }
+        DevelopmentApp::EmailJasperReport.enqueue(opts)
+        show_json_notice('Report queued to be generated and sent')
+      end
+    end
   end
 end

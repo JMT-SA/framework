@@ -37,6 +37,7 @@ public/js/ag-enterprise-activation.js
 .idea/
 .rake_tasks~
 .rakeTasks
+.rake_t_cache
 
 ## Vim
 tags

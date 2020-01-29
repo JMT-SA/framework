@@ -1,0 +1,24 @@
+---
+:dataminer_definition: sales_order_costs
+:actions:
+- :url: "/pack_material/sales/sales_order_costs/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/pack_material/sales/sales_order_costs/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/sales/mr_sales_orders/$:mr_sales_order_id$/sales_order_costs/new"
+  :text: New Cost
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: sales_order_costs.mr_sales_order_id
+      :op: =
+      :val: $:mr_sales_order_id$

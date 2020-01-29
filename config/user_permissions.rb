@@ -24,21 +24,34 @@ module Crossbeams
           purchase_order: { approve: false, short_supplied: false },
           delivery: { review: false },
           tripsheets: { confirm_arrival: false },
-          goods_returned_note: { ship: false }
-          # stock_adj: { sign_off: false, approve: true, take_out_rubbish: true },
-          # invoice: { complete: false, approve: { fruit: true, assets: false } }
+          goods_returned_note: { ship: false },
+          sales_order: { ship: false, integrate: false }
         }
       }.freeze
 
       DOCUMENTATION = {
         WEBAPP => {
-          stock_adj: { approve: 'Approve a stock adjustment', sign_off: 'Sign off on a stock adjustment' },
-          purchase_order: { approve: 'Approve a purchase order', short_supplied: 'Force complete a purchase order and mark it as short supplied' },
-          delivery: { review: 'Review the delivery to accept over supply and quantity differences on line items' },
-          tripsheets: { confirm_arrival: 'Confirm arrival of the Tripsheet at the Receiving Bay of the Planned Location' },
-          goods_returned_note: { ship: 'Ship Goods Returned Note by reducing stock at applicable Dispatch location' }
-          # stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
-          # invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
+          stock_adj: {
+            approve: 'Approve a stock adjustment',
+            sign_off: 'Sign off on a stock adjustment'
+          },
+          purchase_order: {
+            approve: 'Approve a purchase order',
+            short_supplied: 'Force complete a purchase order and mark it as short supplied'
+          },
+          delivery: {
+            review: 'Review the delivery to accept over supply and quantity differences on line items'
+          },
+          tripsheets: {
+            confirm_arrival: 'Confirm arrival of the Tripsheet at the Receiving Bay of the Planned Location'
+          },
+          goods_returned_note: {
+            ship: 'Ship Goods Returned Note by reducing stock at applicable Dispatch location'
+          },
+          sales_order: {
+            ship: 'Ship Sales Order goods by reducing stock at applicable Dispatch location',
+            integrate: 'Integrate Sales Order with ERP'
+          }
         }
       }.freeze
 

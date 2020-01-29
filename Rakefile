@@ -71,8 +71,6 @@ namespace :menu do
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
-              elsif ENV.fetch('RACK_ENV') == 'dev'
-                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -91,8 +89,6 @@ namespace :menu do
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
-              elsif ENV.fetch('RACK_ENV') == 'dev'
-                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -143,8 +139,6 @@ namespace :db do
     require 'sequel'
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
-              elsif ENV.fetch('RACK_ENV') == 'dev'
-                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -159,8 +153,6 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
-              elsif ENV.fetch('RACK_ENV') == 'dev'
-                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -180,8 +172,6 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
-              elsif ENV.fetch('RACK_ENV') == 'dev'
-                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -201,8 +191,6 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
-              elsif ENV.fetch('RACK_ENV') == 'dev'
-                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end
@@ -226,8 +214,6 @@ namespace :db do
     Sequel.extension :migration
     db_name = if ENV.fetch('RACK_ENV') == 'test'
                 ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
-              elsif ENV.fetch('RACK_ENV') == 'dev'
-                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_dev').join
               else
                 ENV.fetch('DATABASE_URL')
               end

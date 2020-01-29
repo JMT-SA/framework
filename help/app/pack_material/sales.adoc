@@ -1,0 +1,15 @@
+## Sales Orders
+
+All Sales Order Items must be completed, no blank quantities or prices.
+
+Dispatch location and Account code must be saved, please click Submit.
+
+### Ship Goods
+
+The Stock needed to ship the sale must be in the allocated Dispatch location
+
+Will destroy the appropriate amount of stock from the allocated Dispatch location and allow you to print the Sales Order and the Waybill.
+
+### Complete Sales Order
+
+Sends the Sales Order details through to the Accounting System

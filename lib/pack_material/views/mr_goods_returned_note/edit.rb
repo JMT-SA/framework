@@ -7,6 +7,7 @@ module PackMaterial
         def self.call(id, user, form_values: nil, form_errors: nil, interactor: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:mr_goods_returned_note, :edit, id: id, form_values: form_values, current_user: user, interactor: interactor)
           rules   = ui_rule.compile
+          cannot_edit = rules[:shipped]
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
@@ -38,7 +39,9 @@ module PackMaterial
               section.form do |form|
                 form.caption 'Edit Goods Returned Note'
                 form.action "/pack_material/dispatch/mr_goods_returned_notes/#{id}"
-                form.method :update
+                form.method :update unless cannot_edit
+                form.view_only! if cannot_edit
+                form.no_submit! if cannot_edit
                 form.row do |row|
                   row.column do |column|
                     column.add_field :credit_note_number

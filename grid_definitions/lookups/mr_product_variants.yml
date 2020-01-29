@@ -1,0 +1,16 @@
+---
+:dataminer_definition: material_resource_product_variants
+:lookups:
+  :standard:
+    :url: /pack_material/sales/mr_sales_orders/mrpv_location_lookup_result/$:id$
+#    :url: /pack_material/sales/mr_sales_orders/$:mr_sales_order_id$/mrpv_location_lookup_result/$:id$
+    :section_caption: Select Product Variant
+#    :conditions: standard
+#:conditions:
+#  :standard:
+#    - :col: mr_skus.sku_number
+#      :op: in
+#      :val: $:allowed_sku_numbers$
+#    - :col: mr_sku_locations.location_id
+#      :op: in
+#      :val: $:allowed_locations$

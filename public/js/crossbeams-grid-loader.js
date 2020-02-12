@@ -632,8 +632,8 @@ const crossbeamsGridEvents = {
       </button>
       <label><input type="checkbox" onchange="crossbeamsGridEvents.setSortForRowView('${gridId}', this)" ${sorted ? 'checked="y"' : ''}> Sort column names</label>
       </div>
-      <div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;">
-      <table class="thinbordertable" style="margin:0 0.5em">
+      <div style="overflow-y:auto;top:40px;bottom:10px;left:10px;right:10px;min-height:200px;max-height:400px;">
+      <table class="thinbordertable grid-row-view" style="margin:0 0.5em">
       <thead>
       <tr><th>Column</th><th style="min-width:15em">Value</th></tr>
       </thead>

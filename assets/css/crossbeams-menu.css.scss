@@ -299,7 +299,6 @@ $menuText: $menu3LevelText;
   }
 
 
-
   .Menu, .functional-area-menu ul {
     color: black;
   }
@@ -453,7 +452,12 @@ $menuText: $menu3LevelText;
     margin-top: 90px;
   }
 
-  #menuSearch { position: absolute; top: 2px; right: 300px; width: 10em; }
+  #menuSearch {
+    position: absolute;
+    top: 2px;
+    right: 350px;
+    width: 10em;
+  }
 
 }
 /*

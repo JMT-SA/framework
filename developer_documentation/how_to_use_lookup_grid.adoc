@@ -148,6 +148,7 @@ Definition files are YAML files stored in `grid_definitions/lookups/`.
 3. URL to be called when the user has selected a row in the lookup grid. The URL can be formatted in two ways:
    * With no token ('/function/program/lookup_result') the id value of the chosen row will be added to the end: '/function/program/lookup_result/99'.
    * With token ('/function/program/$:id$/lookup_result') the id value will replace '$:id$': '/function/program/99/lookup_result'
+   * Note that for both these options, other parameters can be provided that will be filled from the selected row. e.g. `$:role_name$` will be replaced by the value of the `role_name` column in the selected row..
 4. Optional. The caption can be fixed or it can be a snippet of SQL to be run.
    * Fixed: just provide any string.
    * SQL: Must start with SELECT and include a parameter replacement ($:token$). e.g. `SELECT 'For ' || user_name FROM users WHERE id = %:user_id$`

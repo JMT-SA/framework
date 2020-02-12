@@ -1,0 +1,145 @@
+= Scripts
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Scripts
+
+Scripts inherit from BaseScript.
+
+They are called in this way: 
+
+  RACK_ENV=production ruby base_script.rb ClassNameOfScriptToRun args
+
+See link:/yarddocthis/scripts=base_script.rb[BaseScript methods] for a list of built-in methods.
+
+There are two types of scripts - those that form part of the application and those created to perform data fixes.
+
+Application scripts::
+stored in the `scripts` dir.
+Data fix scripts::
+stored in the `scriptfixes` dir.
+
+When running a datafix on a server, copy it to the `scripts` dir before running it. After running, delete it or leave it (the next deploy will remove it).
+Note that on a production server, these directories will be below the `current` directory.
+
+=== Writing a script
+
+1. Inherit from BaseScript
+2. Provide a detailed comment above the class with sections **What this script does** and **Reason for this script**. See <<Example>> below.
+2. Implement a `run` method that performs the required work.
+3. Return a `Crossbeams::Response` object from the `run` method.
+4. If the script is run in debug mode, print output of what would change without updating anything.
+
+Scripts do not load the full application - there are no interactors, entities or repositories available.
+Scripts should implement their own DB calls.
+
+Basically the following is available:
+
+* `DB` - the Sequel databse connection.
+* `AppConst`
+* `Crossbeams::InfoError`
+* `Crossbeams::Responses`
+* `ErrorMailer`
+
+The `BaseScript` makes the following attributes available in the inheriting class:
+
+* `args` - the commandline arguments.
+* `root_dir` - the root path of the application.
+* `debug_mode` - `true` if the environment variable `DEBUG` has been set.
+
+The following helper methods are available in the script:
+
+send_exception_email(error, subject: nil, message: nil)::
+Send an email when an exception has occurred.
+send_error_email(subject: nil, message: nil)::
+Send an email to notfy of an error condition.
+log_infodump(keyname, key, description, information)::
+Write a dump of useful information about the run to a text log file. Be as descriptive as possible, including context. See <<Example>> below.
+log_status(table_name, id, status, comment: nil, user_name: nil)::
+Log a status to a table - the same as for a repository class.
+log_multiple_statuses(table_name, in_ids, status, comment: nil, user_name: nil)::
+Log a status for several records - the same as for a repository class.
+
+=== Example
+
+[source,ruby]
+----
+# frozen_string_literal: true
+
+# What this script does:
+# ----------------------
+# Find all pallets without gross weight that have a nett weight.
+# and set their gross weight to their nett weight.
+#
+# Reason for this script:
+# -----------------------
+# Habata Badlands wanted to capture nett weights, not gross.
+# They have since realised that they need to know the gross
+# and derive the nett.
+#
+class HBBFixGrossNett < BaseScript
+  def run # rubocop:disable Metrics/AbcSize
+    pallet_ids = DB[:pallets]
+      .exclude(nett_weight: nil)
+      .where(gross_weight: nil)
+      .order(:id)
+      .select_map(:id)
+    p "Records affected: #{pallet_ids.count}"
+
+    pallet_ids.each do |pallet_id|
+      nett_weight = DB[:pallets]
+                    .where(id: pallet_id)
+                    .get(:nett_weight)
+
+      attrs = { gross_weight: nett_weight }
+      if debug_mode
+        p "Updated pallet #{pallet_id}: #{attrs}"
+      else
+        DB.transaction do
+          p "Updated pallet #{pallet_id}: #{attrs}"
+          DB[:pallets].where(id: pallet_id).update(attrs)
+        end
+      end
+    end
+
+    pallet_numbers = DB[:pallets]
+                     .where(id: pallet_ids)
+                     .select_map(:pallet_number)
+
+    infodump = <<~STR
+      Script: HBBFixGrossNett
+
+      What this script does:
+      ----------------------
+      Find all pallets without gross weight that have a nett weight.
+      and set their gross weight to their nett weight.
+
+      Reason for this script:
+      -----------------------
+      Habata Badlands wanted to capture nett weights, not gross.
+      They have since realised that they need to know the gross
+      and derive the nett.
+
+      Results:
+      --------
+      Updated pallet gross_weight = nett_weight for the following pallets:
+
+      pallet ids: #{pallet_ids.join(', ')}
+
+      pallet numbers:
+      #{pallet_numbers.join("\n")}
+    STR
+    log_infodump(:data_fix,
+                 :badlands,
+                 :set_gross_weight,
+                 infodump)
+
+    if debug_mode
+      success_response('Dry run complete')
+    else
+      success_response('Bin weights set')
+    end
+  end
+end
+----

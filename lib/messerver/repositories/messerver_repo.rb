@@ -230,6 +230,7 @@ module MesserverApp
       request = Net::HTTP::Post.new(uri.request_uri)
       http.open_timeout = 5
       http.read_timeout = 10
+
       request.body = post_body.join
       request['Content-Type'] = "boundary=#{AppConst::POST_FORM_BOUNDARY}"
       log_request(request)

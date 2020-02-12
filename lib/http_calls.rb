@@ -2,7 +2,7 @@
 
 # A class for making HTTP calls
 module Crossbeams
-  class HTTPCalls
+  class HTTPCalls # rubocop:disable Metrics/ClassLength
     include Crossbeams::Responses
     attr_reader :use_ssl
 
@@ -14,6 +14,50 @@ module Crossbeams
       uri, http = setup_http(url)
       http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
+      headers.each do |k, v|
+        request.add_field(k.to_s, v.to_s)
+      end
+      request.body = params.to_json
+
+      log_request(request)
+
+      response = http.request(request)
+      format_response(response, uri)
+    rescue Timeout::Error
+      failed_response('The call to the server timed out.', timeout: true)
+    rescue Errno::ECONNREFUSED
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      failed_response("There was an error: #{e.message}")
+    end
+
+    def json_put(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
+      uri, http = setup_http(url)
+      http.use_ssl = use_ssl if use_ssl
+      request = Net::HTTP::Put.new(uri.request_uri, 'Content-Type' => 'application/json')
+      headers.each do |k, v|
+        request.add_field(k.to_s, v.to_s)
+      end
+      request.body = params.to_json
+
+      log_request(request)
+
+      response = http.request(request)
+      format_response(response, uri)
+    rescue Timeout::Error
+      failed_response('The call to the server timed out.', timeout: true)
+    rescue Errno::ECONNREFUSED
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      failed_response("There was an error: #{e.message}")
+    end
+
+    def json_delete(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
+      uri, http = setup_http(url)
+      http.use_ssl = use_ssl if use_ssl
+      request = Net::HTTP::Delete.new(uri.request_uri, 'Content-Type' => 'application/json')
       headers.each do |k, v|
         request.add_field(k.to_s, v.to_s)
       end

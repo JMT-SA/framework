@@ -98,6 +98,7 @@ class BaseQueJob < Que::Job
       .where(job_class: name)
       .where(jsonb_col.contains(Sequel.pg_jsonb(args)))
       .where(finished_at: nil)
+      .where(expired_at: nil)
       .count.nonzero?.nil?
   end
 

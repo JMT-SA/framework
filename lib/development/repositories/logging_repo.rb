@@ -51,6 +51,14 @@ module DevelopmentApp
     end
 
     # Write out a dump of information for later inspection.
+    # The first three parameters are used to name the logfile.
+    # Log files are written to log/infodump.
+    #
+    # @param keyname [string] the general context of the action.
+    # @param key [string] the specific context of the action.
+    # @param description [string] A short description of the context (preferably without spaces)
+    # @param information [string] the text to dump in the logfile.
+    # @return [void]
     def log_infodump(keyname, key, description, information)
       dir = File.join(ENV['ROOT'], 'log', 'infodump')
       Dir.mkdir(dir) unless Dir.exist?(dir)

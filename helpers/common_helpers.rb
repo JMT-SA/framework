@@ -44,7 +44,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       content = render_partial { form }
       update_dialog_content(content: content, error: res.message)
     else
-      flash[:error] = res.message
+      flash[:error] = res.message.tr("\n", ' ')
       stash_page(form)
       route.redirect url || '/'
     end

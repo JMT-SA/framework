@@ -2208,7 +2208,7 @@ module DevelopmentApp
 
       def make_function_menu
         <<~RUBY
-          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.applet}]
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.applet}.rb]
 
           # Then run [bundle exec rake menu:migrate]
 

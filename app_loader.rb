@@ -25,6 +25,7 @@ require './config/masterfile_extract_config'
 require './config/observers_list'
 require './config/status_header_definitions'
 require './config/user_permissions'
+require './lib/crossbeams_errors'
 require './lib/error_mailer'
 require './lib/crossbeams_message_bus'
 require './lib/types_for_dry'
@@ -52,24 +53,6 @@ ENV['VERSION'] = File.read('VERSION')
 ENV['GRID_QUERIES_LOCATION'] ||= File.expand_path('grid_definitions/dataminer_queries', __dir__)
 
 DM_CONNECTIONS = DataminerConnections.new
-
-module Crossbeams
-  # When something in the framework goes wrong/is not called properly.
-  class FrameworkError < StandardError
-  end
-
-  # When an exception has occurred and you want just the message to be conveyed to the user.
-  class InfoError < StandardError
-  end
-
-  # User does not have the required permission.
-  class AuthorizationError < StandardError
-  end
-
-  # The task is not permitted.
-  class TaskNotPermittedError < StandardError
-  end
-end
 
 # Ensure the locks dir exists for Que jobs
 FileUtils.mkdir_p(File.join(__dir__, 'tmp', 'job_locks'))

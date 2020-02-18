@@ -505,7 +505,7 @@ module PackMaterialApp
     end
 
     def resolve_location_id_from_scan(val, scan_field)
-      if ['', 'location_short_code', 'id'].include?(scan_field)
+      if ['', 'location_short_code'].include?(scan_field)
         location_id_from_location_short_code(val)
       else
         val

@@ -3,11 +3,11 @@
 module PackMaterialApp
   class CreateMrStock < BaseService
     # @param [Object] sku_ids
-    # @param [Object] business_process_id
     # @param [Hash] opts
+    #   Mandatory: business_process_id, to_location_id, ref_no
     #   Contains quantities: [Array] of hashes { sku_id: sku_id, qty: qty }
     #                        Mandatory unless delivery_id present
-    #   Contains location_long_code, delivery_id, ref_no, parent_transaction_id
+    #   Optional: delivery_id, parent_transaction_id
     def initialize(sku_ids = [], opts = {})
       @repo = MrStockRepo.new
       @transaction_repo = PackMaterialApp::TransactionsRepo.new

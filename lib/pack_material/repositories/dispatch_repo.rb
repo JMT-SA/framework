@@ -267,7 +267,7 @@ module PackMaterialApp
       {
         pv_code: mrpv[:product_variant_code],
         pv_number: mrpv[:product_variant_number],
-        pv_wa_cost: mrpv[:weighted_average_cost]
+        pv_wa_cost: mrpv[:weighted_average_cost].to_s
       }
     end
 

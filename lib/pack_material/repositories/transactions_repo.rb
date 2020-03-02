@@ -308,12 +308,13 @@ module PackMaterialApp
                             wrapper: PackMaterialApp::MrBulkStockAdjustmentItem)
     end
 
-    def rmd_update_bulk_stock_adjustment_item(attrs) # rubocop:disable Metrics/AbcSize
+    def rmd_update_bulk_stock_adjustment_item(attrs)
       item = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: attrs[:mr_bulk_stock_adjustment_id],
                                                        mr_sku_id: attrs[:mr_sku_id],
                                                        location_id: attrs[:location_id]).first
-      return failed_response('Item does not exist') unless item || stock_take_on?(attrs[:mr_bulk_stock_adjustment_id])
 
+      # We are allowing for them to create items from PDT's for all bulk stock adjustments now
+      # return failed_response('Item does not exist') unless item || stock_take_on?(attrs[:mr_bulk_stock_adjustment_id])
       item_id = if item.nil?
                   create_mr_bulk_stock_adjustment_item(attrs)
                 else

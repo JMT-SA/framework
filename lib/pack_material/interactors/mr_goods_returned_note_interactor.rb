@@ -55,19 +55,24 @@ module PackMaterialApp
         repo.update_with_document_number('doc_seqs_credit_note_number', id)
         grn = repo.find_mr_goods_returned_note(id)
         loc_id = grn.dispatch_location_id
+        issue_id = nil
         attrs = {
           business_process_id: repo.grn_business_process_id,
           user_name: @user.user_name,
-          parent_transaction_id: grn.issue_transaction_id,
+          parent_transaction_id: issue_id,
           ref_no: grn.credit_note_number
         }
         items = res.instance
         items.each do |item|
-          PackMaterialApp::RemoveMrStock.call(item[:sku_id], loc_id, item[:qty], attrs)
+          attrs[:parent_transaction_id] = issue_id
+          result = PackMaterialApp::RemoveMrStock.call(item[:sku_id], loc_id, item[:qty], attrs)
+          transaction_item_id = result.instance
+          issue_id ||= TransactionsRepo.new.find_mr_inventory_transaction_item(transaction_item_id)&.mr_inventory_transaction_id
         end
 
         repo.mark_as_shipped(id)
         repo.update_delivery_grn_status(grn.mr_delivery_id)
+        repo.update(:mr_goods_returned_notes, id, issue_transaction_id: issue_id)
         log_status('mr_goods_returned_notes', id, 'SHIPPED')
         log_transaction
       end

@@ -42,10 +42,11 @@ module PackMaterialApp
       costs = @repo.so_costs(@id)
 
       request_xml = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
-        xml.purchase_invoice do # rubocop:disable Metrics/BlockLength
+        xml.sales_invoice do # rubocop:disable Metrics/BlockLength
           xml.internal_invoice_number @sales_order.sales_order_number
           xml.customer_code @sales_order.erp_customer_number
           xml.account_code @sales_order.account_code
+          xml.shipped_at @sales_order.shipped_at
           xml.invoice_total so_totals[:total]
           xml.subtotal so_totals[:subtotal]
           xml.vat so_totals[:vat]
@@ -67,7 +68,7 @@ module PackMaterialApp
                 xml.description line_item[:product_variant_code]
                 xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '', no_decimals: 5)
                 xml.quantity UtilityFunctions.delimited_number(line_item[:quantity_required], delimiter: '', no_decimals: 2)
-                xml.line_total line_item[:line_total]
+                xml.line_total UtilityFunctions.delimited_number(line_item[:line_total], delimiter: '', no_decimals: 2)
                 xml.cost UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
                 xml.fifo UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
               end

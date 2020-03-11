@@ -2,13 +2,13 @@
 :caption: Material Resource Product Variants
 :sql: "SELECT \"material_resource_product_variants\".\"id\", \r\n\"material_resource_product_variants\".\"sub_type_id\",
   \r\n\"material_resource_product_variants\".\"product_variant_id\", \r\n\"material_resource_product_variants\".\"product_variant_table_name\",
-  \r\n\"material_resource_product_variants\".\"product_variant_number\", \r\n\"material_resource_product_variants\".\"old_product_code\",
+  \r\n\"material_resource_product_variants\".\"product_variant_code\", \"material_resource_product_variants\".\"old_product_code\",
   \r\n\"material_resource_product_variants\".\"supplier_lead_time\", \r\n\"material_resource_product_variants\".\"minimum_stock_level\",
-  \r\n\"material_resource_product_variants\".\"re_order_stock_level\", \r\n\"material_resource_product_variants\".\"use_fixed_batch_number\",
-  \r\n\"material_resource_product_variants\".\"mr_internal_batch_number_id\", \r\n\"material_resource_product_variants\".\"created_at\",
-  \r\n\"material_resource_product_variants\".\"updated_at\"\r\nFROM \"material_resource_product_variants\"\r\nJOIN
-  \"mr_internal_batch_numbers\" ON \"material_resource_product_variants\".\"mr_internal_batch_number_id\"
-  = \"mr_internal_batch_numbers\".\"id\""
+  \r\n\"material_resource_product_variants\".\"re_order_stock_level\", \r\n\"material_resource_product_variants\".\"product_variant_number\",
+  \r\n\"material_resource_product_variants\".\"use_fixed_batch_number\", \r\n\"material_resource_product_variants\".\"mr_internal_batch_number_id\",
+  \r\n\"material_resource_product_variants\".\"created_at\", \r\n\"material_resource_product_variants\".\"updated_at\"\r\nFROM
+  \"material_resource_product_variants\"\r\nJOIN \"mr_internal_batch_numbers\" ON
+  \"material_resource_product_variants\".\"mr_internal_batch_number_id\" = \"mr_internal_batch_numbers\".\"id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -22,6 +22,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -37,6 +38,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -52,6 +54,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -67,22 +70,24 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  product_variant_number:
-    :name: product_variant_number
+  product_variant_code:
+    :name: product_variant_code
     :sequence_no: 5
-    :caption: Product variant number
-    :namespaced_name: material_resource_product_variants.product_variant_number
-    :data_type: :integer
-    :width: 
+    :caption: Code
+    :namespaced_name: material_resource_product_variants.product_variant_code
+    :data_type: :string
+    :width: 240
     :format: 
     :hide: false
-    :groupable: true
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -91,12 +96,13 @@
   old_product_code:
     :name: old_product_code
     :sequence_no: 6
-    :caption: Old product code
+    :caption: Old Code
     :namespaced_name: material_resource_product_variants.old_product_code
     :data_type: :string
-    :width: 
+    :width: 240
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -106,12 +112,13 @@
   supplier_lead_time:
     :name: supplier_lead_time
     :sequence_no: 7
-    :caption: Supplier lead time
+    :caption: Lead time
     :namespaced_name: material_resource_product_variants.supplier_lead_time
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -121,12 +128,13 @@
   minimum_stock_level:
     :name: minimum_stock_level
     :sequence_no: 8
-    :caption: Minimum stock level
+    :caption: Min Stock
     :namespaced_name: material_resource_product_variants.minimum_stock_level
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -136,12 +144,29 @@
   re_order_stock_level:
     :name: re_order_stock_level
     :sequence_no: 9
-    :caption: Re order stock level
+    :caption: Re order
     :namespaced_name: material_resource_product_variants.re_order_stock_level
+    :data_type: :integer
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_number:
+    :name: product_variant_number
+    :sequence_no: 10
+    :caption: 'No'
+    :namespaced_name: material_resource_product_variants.product_variant_number
     :data_type: :integer
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -150,13 +175,14 @@
     :group_max: false
   use_fixed_batch_number:
     :name: use_fixed_batch_number
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Use fixed batch number
     :namespaced_name: material_resource_product_variants.use_fixed_batch_number
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -165,13 +191,14 @@
     :group_max: false
   mr_internal_batch_number_id:
     :name: mr_internal_batch_number_id
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Fixed batch number
     :namespaced_name: material_resource_product_variants.mr_internal_batch_number_id
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -180,13 +207,14 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Created at
     :namespaced_name: material_resource_product_variants.created_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -195,13 +223,14 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Updated at
     :namespaced_name: material_resource_product_variants.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

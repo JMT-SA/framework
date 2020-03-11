@@ -7,7 +7,6 @@
   \ \"mr_bulk_stock_adjustment_items\".\"old_product_code\",\r\n  \"mr_bulk_stock_adjustment_items\".\"location_long_code\",\r\n
   \ \"mr_bulk_stock_adjustment_items\".\"inventory_uom_code\",\r\n  \"mr_bulk_stock_adjustment_items\".\"scan_to_location_long_code\",\r\n
   \ \"mr_bulk_stock_adjustment_items\".\"system_quantity\",\r\n  \"mr_bulk_stock_adjustment_items\".\"actual_quantity\",\r\n
-  \ \"mr_bulk_stock_adjustment_items\".\"stock_take_complete\",\r\n  \"mr_bulk_stock_adjustment_items\".\"active\",\r\n
   \ \"mr_bulk_stock_adjustment_items\".\"created_at\",\r\n  \"mr_bulk_stock_adjustment_items\".\"updated_at\"\r\nFROM
   \"mr_bulk_stock_adjustment_items\"\r\n  JOIN \"mr_bulk_stock_adjustments\" ON \"mr_bulk_stock_adjustments\".\"id\"
   = \"mr_bulk_stock_adjustment_items\".\"mr_bulk_stock_adjustment_id\"\r\n"
@@ -224,41 +223,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  stock_take_complete:
-    :name: stock_take_complete
-    :sequence_no: 14
-    :caption: Stock take complete
-    :namespaced_name: mr_bulk_stock_adjustment_items.stock_take_complete
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  active:
-    :name: active
-    :sequence_no: 15
-    :caption: Active
-    :namespaced_name: mr_bulk_stock_adjustment_items.active
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 16
+    :sequence_no: 14
     :caption: Created at
     :namespaced_name: mr_bulk_stock_adjustment_items.created_at
     :data_type: :datetime
@@ -274,7 +241,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 17
+    :sequence_no: 15
     :caption: Updated at
     :namespaced_name: mr_bulk_stock_adjustment_items.updated_at
     :data_type: :datetime

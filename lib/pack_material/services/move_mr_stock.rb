@@ -44,16 +44,12 @@ module PackMaterialApp
 
     def move_stock
       res = @repo.create_sku_location_ids([@sku_id], @to_location_id)
+      return res unless res.success
 
-      if res.success
-        res = @repo.update_sku_location_quantity(@sku_id, @quantity, @from_location_id, add: false)
-        res = if res.success
-                @repo.update_sku_location_quantity(@sku_id, @quantity, @to_location_id, add: true)
-              else
-                failed_response('Insufficient stock at From Location')
-              end
-      end
-      res
+      res = @repo.update_sku_location_quantity(@sku_id, @quantity, @from_location_id, add: false)
+      return failed_response('Insufficient stock at From Location') unless res.success
+
+      @repo.update_sku_location_quantity(@sku_id, @quantity, @to_location_id, add: true)
     end
 
     def create_inventory_transaction_item

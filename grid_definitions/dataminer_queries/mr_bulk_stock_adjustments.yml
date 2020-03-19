@@ -2,9 +2,8 @@
 :caption: Bulk Stock Adjustments
 :sql: "SELECT \"mr_bulk_stock_adjustments\".\"id\",\r\n       fn_current_status('mr_bulk_stock_adjustments',
   \"mr_bulk_stock_adjustments\".\"id\") AS status,\r\n       \"mr_bulk_stock_adjustments\".\"ref_no\",\r\n
-  \      \"mr_bulk_stock_adjustments\".\"stock_adjustment_number\",\r\n       \"mr_bulk_stock_adjustments\".\"is_stock_take\",\r\n
-  \      \"mr_bulk_stock_adjustments\".\"completed\",\r\n       \"mr_bulk_stock_adjustments\".\"approved\",\r\n
-  \      \"mr_bulk_stock_adjustments\".\"signed_off\",\r\n       \"mr_bulk_stock_adjustments\".\"active\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"stock_adjustment_number\",\r\n       \"mr_bulk_stock_adjustments\".\"completed\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"approved\",\r\n       \"mr_bulk_stock_adjustments\".\"signed_off\",\r\n
   \      \"mr_bulk_stock_adjustments\".\"created_at\",\r\n       \"mr_bulk_stock_adjustments\".\"updated_at\",\r\n
   \      exists(select location_id from crossbeams_framework.public.mr_bulk_stock_adjustments_locations
   where mr_bulk_stock_adjustment_id = \"mr_bulk_stock_adjustments\".\"id\") as has_locations,\r\n
@@ -80,25 +79,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  is_stock_take:
-    :name: is_stock_take
-    :sequence_no: 5
-    :caption: Is stock take
-    :namespaced_name: mr_bulk_stock_adjustments.is_stock_take
-    :data_type: :boolean
-    :width: 120
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   completed:
     :name: completed
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Completed
     :namespaced_name: mr_bulk_stock_adjustments.completed
     :data_type: :boolean
@@ -114,7 +97,7 @@
     :group_max: false
   approved:
     :name: approved
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Approved
     :namespaced_name: mr_bulk_stock_adjustments.approved
     :data_type: :boolean
@@ -130,7 +113,7 @@
     :group_max: false
   signed_off:
     :name: signed_off
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Signed off
     :namespaced_name: mr_bulk_stock_adjustments.signed_off
     :data_type: :boolean
@@ -144,25 +127,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 9
-    :caption: Active
-    :namespaced_name: mr_bulk_stock_adjustments.active
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 10
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: mr_bulk_stock_adjustments.created_at
     :data_type: :datetime
@@ -178,7 +145,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 11
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: mr_bulk_stock_adjustments.updated_at
     :data_type: :datetime
@@ -194,7 +161,7 @@
     :group_max: false
   has_locations:
     :name: has_locations
-    :sequence_no: 12
+    :sequence_no: 10
     :caption: Has locations
     :namespaced_name: 
     :data_type: :string
@@ -210,7 +177,7 @@
     :group_max: false
   has_skus:
     :name: has_skus
-    :sequence_no: 13
+    :sequence_no: 11
     :caption: Has skus
     :namespaced_name: 
     :data_type: :string
@@ -226,7 +193,7 @@
     :group_max: false
   storage_type_id:
     :name: storage_type_id
-    :sequence_no: 14
+    :sequence_no: 12
     :caption: Storage type
     :namespaced_name: 
     :data_type: :string

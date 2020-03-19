@@ -10,6 +10,12 @@ The Stock needed to ship the sale must be in the allocated Dispatch location
 
 Will destroy the appropriate amount of stock from the allocated Dispatch location and allow you to print the Sales Order and the Waybill.
 
+### Manage Costs
+
+Costs can be edited as soon as the Sales Order can be shipped.
+
+Once the Sales Order has been integrated the costs can no longer be edited.
+
 ### Complete Sales Order
 
 Sends the Sales Order details through to the Accounting System

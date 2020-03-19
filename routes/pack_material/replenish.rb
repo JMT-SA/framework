@@ -89,6 +89,16 @@ class Framework < Roda
         end
         r.redirect("/pack_material/replenish/mr_purchase_orders/#{id}/edit")
       end
+      r.on 'unapprove_purchase_order' do   # EDIT
+        check_auth!('replenish', 'edit')
+        res = interactor.unapprove_purchase_order(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect("/pack_material/replenish/mr_purchase_orders/#{id}/edit")
+      end
       r.on 'short_supplied' do   # EDIT
         check_auth!('replenish', 'edit')
         res = interactor.short_supplied_purchase_order(id)

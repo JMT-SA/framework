@@ -42,10 +42,11 @@ module PackMaterialApp
       costs = @repo.so_costs(@id)
 
       request_xml = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
-        xml.purchase_invoice do # rubocop:disable Metrics/BlockLength
+        xml.sales_invoice do # rubocop:disable Metrics/BlockLength
           xml.internal_invoice_number @sales_order.sales_order_number
           xml.customer_code @sales_order.erp_customer_number
           xml.account_code @sales_order.account_code
+          xml.shipped_at @sales_order.shipped_at
           xml.invoice_total so_totals[:total]
           xml.subtotal so_totals[:subtotal]
           xml.vat so_totals[:vat]
@@ -67,7 +68,7 @@ module PackMaterialApp
                 xml.description line_item[:product_variant_code]
                 xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '', no_decimals: 5)
                 xml.quantity UtilityFunctions.delimited_number(line_item[:quantity_required], delimiter: '', no_decimals: 2)
-                xml.line_total line_item[:line_total]
+                xml.line_total UtilityFunctions.delimited_number(line_item[:line_total], delimiter: '', no_decimals: 2)
                 xml.cost UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
                 xml.fifo UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
               end
@@ -80,7 +81,7 @@ module PackMaterialApp
 
     def make_http_call(xml)
       http = Crossbeams::HTTPCalls.new
-      res  = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, xml)
+      res  = http.xml_post(AppConst::ERP_SALES_INVOICE_URI, xml)
       res.success ? res : (raise Crossbeams::InfoError, res.message)
     end
 
@@ -88,7 +89,7 @@ module PackMaterialApp
       resp = Nokogiri::XML(response)
       message = resp.xpath('//error').text
       instance = {
-        purchase_invoice_number: resp.xpath('//purchase_invoice_number').text
+        sales_invoice_number: resp.xpath('//sales_invoice_number').text
       }
       if message.empty?
         success_response('ok', instance)
@@ -100,7 +101,7 @@ module PackMaterialApp
     def apply_changes(formatted_res)
       @repo.transaction do
         if formatted_res.success
-          @so_repo.so_complete_invoice(@id, formatted_res.instance)
+          @repo.so_complete_invoice(@id, formatted_res.instance)
           @repo.log_status('mr_sales_orders', @id, 'SALES ORDER COMPLETED', user_name: @user_name)
         else
           @repo.update_mr_sales_order(@id, integration_error: true)

@@ -69,17 +69,20 @@ module PackMaterialApp
         repo.update_with_document_number('doc_seqs_sales_order_number', id)
         so = repo.find_mr_sales_order(id)
         loc_id = so.dispatch_location_id
+        issue_id = nil
         attrs = {
           business_process_id: repo.sales_order_business_process_id,
           user_name: @user.user_name,
-          parent_transaction_id: so.issue_transaction_id,
           ref_no: so.sales_order_number
         }
         items = res.instance
         items.each do |item|
-          PackMaterialApp::RemoveMrStock.call(item[:sku_id], loc_id, item[:qty], attrs)
+          attrs[:parent_transaction_id] = issue_id
+          result = PackMaterialApp::RemoveMrStock.call(item[:sku_id], loc_id, item[:qty], attrs)
+          transaction_item_id = result.instance
+          issue_id ||= TransactionsRepo.new.find_mr_inventory_transaction_item(transaction_item_id)&.mr_inventory_transaction_id
         end
-        repo.update(:mr_sales_orders, id, shipped: true, shipped_at: DateTime.now)
+        repo.update(:mr_sales_orders, id, shipped: true, shipped_at: DateTime.now, issue_transaction_id: issue_id)
         log_status('mr_sales_orders', id, 'SHIPPED')
         log_transaction
       end
@@ -93,13 +96,11 @@ module PackMaterialApp
 
     def complete_invoice(id)
       assert_permission!(:integrate, id)
-      # return success_response('GRN Purchase Invoice has already been Queued') if already_enqueued?(id)
-
       repo.transaction do
         PackMaterialApp::CompleteSalesOrder.call(id, @user.user_name, false, nil)
         log_transaction
         instance = mr_sales_order(id)
-        success_response("Sales Order #{instance.sales_order_number}: Sales Order Invoice Queued", instance)
+        success_response("Sales Order #{instance.sales_order_number}: Sales Order Invoice Sent", instance)
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

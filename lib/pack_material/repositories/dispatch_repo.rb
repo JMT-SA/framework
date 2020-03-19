@@ -330,6 +330,16 @@ module PackMaterialApp
     def create_mr_sales_order(attrs)
       customer = DB[:customers].where(party_role_id: attrs[:customer_party_role_id]).first
       create(:mr_sales_orders, attrs.merge(erp_customer_number: customer[:erp_customer_number]))
+      # id = create(:mr_sales_orders, attrs.merge(erp_customer_number: customer[:erp_customer_number]))
+      # return id unless (vehicle_job_id = attrs[:vehicle_job_id])
+      #
+      # DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id).all.each do |unit|
+      #   location = unit[:]
+      #   create_mr_sales_order_item(mr_sales_order_id: id,
+      #                              quantity_required: unit[:quantity_offloaded],
+      #                              mr_product_variant_id: DB[:mr_skus].where(id: unit[:mr_sku_id]).get(:mr_product_variant_id))
+      # end
+      # id
     end
 
     def create_mr_sales_order_item(attrs)
@@ -391,7 +401,17 @@ module PackMaterialApp
       update(:mr_sales_orders, id,
              integration_error: false,
              integration_completed: true,
-             erp_invoice_number: attrs[:purchase_invoice_number])
+             erp_invoice_number: attrs[:sales_invoice_number])
+    end
+
+    def for_select_tripsheets
+      []
+      # in_use = DB[:mr_sales_orders].select_map(:vehicle_job_id)
+      # DB[:vehicle_jobs].where(offloaded: true,
+      #                         )
+      #  Offloaded
+      # to location sales dispatch (for any)
+      # has not been used for other sales orders
     end
   end
 end

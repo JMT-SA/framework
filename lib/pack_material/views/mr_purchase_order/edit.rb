@@ -13,7 +13,7 @@ module PackMaterial
             page.form_values form_values
             page.form_errors form_errors
 
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.add_control(control_type: :link,
                                   text: 'Back to Purchase Orders',
                                   url: "/list/mr_purchase_orders/with_params?key=#{rules[:completed] ? 'completed' : 'incomplete'}",
@@ -30,6 +30,13 @@ module PackMaterial
                                   prompt: true,
                                   id: 'mr_purchase_order_approve_button',
                                   visible: rules[:can_approve],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Unapprove Purchase Order',
+                                  url: "/pack_material/replenish/mr_purchase_orders/#{id}/unapprove_purchase_order",
+                                  prompt: true,
+                                  id: 'mr_purchase_order_unapprove_button',
+                                  visible: rules[:can_unapprove],
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Short Supplied',

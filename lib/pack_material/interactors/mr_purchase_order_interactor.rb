@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MrPurchaseOrderInteractor < BaseInteractor
+  class MrPurchaseOrderInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_mr_purchase_order(params) # rubocop:disable Metrics/AbcSize
       assert_permission!(:create)
       res = validate_mr_purchase_order_params(params)
@@ -46,6 +46,19 @@ module PackMaterialApp
         log_transaction
       end
       success_response('Purchase Order Approved', instance)
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    end
+
+    def unapprove_purchase_order(id)
+      assert_permission!(:unapprove, id)
+      instance = mr_purchase_order(id)
+      repo.transaction do
+        repo.update(:mr_purchase_orders, id, approved: false)
+        log_status('mr_purchase_orders', id, 'UNAPPROVED')
+        log_transaction
+      end
+      success_response('Purchase Order Unapproved', instance)
     rescue Crossbeams::TaskNotPermittedError => e
       failed_response(e.message)
     end

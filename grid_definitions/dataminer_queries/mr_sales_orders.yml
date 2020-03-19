@@ -1,19 +1,24 @@
 ---
 :caption: Sales Orders
-:sql: SELECT "mr_sales_orders"."id", "mr_sales_orders"."customer_party_role_id", "mr_sales_orders"."dispatch_location_id",
-  "mr_sales_orders"."issue_transaction_id", "mr_sales_orders"."vat_type_id", "mr_sales_orders"."account_code_id",
-  "mr_sales_orders"."erp_customer_number", "mr_sales_orders"."created_by", "mr_sales_orders"."fin_object_code",
-  "mr_sales_orders"."sales_order_number", "mr_sales_orders"."shipped_at", "mr_sales_orders"."created_at",
-  "mr_sales_orders"."updated_at", "mr_sales_orders"."integration_error", "mr_sales_orders"."integration_completed",
-  "mr_sales_orders"."shipped", "account_codes"."description", fn_party_role_name("mr_sales_orders"."customer_party_role_id")
-  AS customer_party_role, "locations"."location_long_code" AS dispatch_location_location_long_code,
-  "mr_inventory_transactions"."created_by" AS mr_inventory_transactions_created_by,
-  "mr_vat_types"."vat_type_code" AS vat_type_vat_type_code, fn_current_status('mr_sales_orders',
-  "mr_sales_orders"."id") AS status FROM "mr_sales_orders" LEFT JOIN "account_codes"
-  ON "account_codes"."id" = "mr_sales_orders"."account_code_id" LEFT JOIN "locations"
-  ON "locations"."id" = "mr_sales_orders"."dispatch_location_id" LEFT JOIN "mr_inventory_transactions"
-  ON "mr_inventory_transactions"."id" = "mr_sales_orders"."issue_transaction_id" LEFT
-  JOIN "mr_vat_types" ON "mr_vat_types"."id" = "mr_sales_orders"."vat_type_id"
+:sql: "SELECT\r\n    \"mr_sales_orders\".\"id\",\r\n    \"mr_sales_orders\".\"customer_party_role_id\",\r\n
+  \   \"mr_sales_orders\".\"dispatch_location_id\",\r\n    \"mr_sales_orders\".\"issue_transaction_id\",\r\n
+  \   \"mr_sales_orders\".\"sales_order_number\",\r\n    \"mr_sales_orders\".\"vat_type_id\",\r\n
+  \   \"mr_sales_orders\".\"account_code_id\",\r\n    \"mr_sales_orders\".\"erp_customer_number\",\r\n
+  \   \"mr_sales_orders\".\"created_by\",\r\n    \"mr_sales_orders\".\"fin_object_code\",\r\n
+  \   \"mr_sales_orders\".\"shipped_at\",\r\n    \"mr_sales_orders\".\"created_at\",\r\n
+  \   \"mr_sales_orders\".\"updated_at\",\r\n    \"mr_sales_orders\".\"integration_error\",\r\n
+  \   \"mr_sales_orders\".\"integration_completed\",\r\n    \"mr_sales_orders\".\"shipped\",\r\n
+  \   \"account_codes\".\"description\",\r\n    fn_party_role_name (\"mr_sales_orders\".\"customer_party_role_id\")
+  AS customer_party_role,\r\n    \"locations\".\"location_long_code\" AS dispatch_location_location_long_code,\r\n
+  \   \"mr_inventory_transactions\".\"created_by\" AS mr_inventory_transactions_created_by,\r\n
+  \   \"mr_vat_types\".\"vat_type_code\" AS vat_type_vat_type_code,\r\n    fn_current_status
+  ('mr_sales_orders', \"mr_sales_orders\".\"id\") AS status\r\nFROM\r\n    \"mr_sales_orders\"\r\n
+  \   LEFT JOIN \"account_codes\" ON \"account_codes\".\"id\" = \"mr_sales_orders\".\"account_code_id\"\r\n
+  \   LEFT JOIN \"locations\" ON \"locations\".\"id\" = \"mr_sales_orders\".\"dispatch_location_id\"\r\n
+  \   LEFT JOIN \"mr_inventory_transactions\" ON \"mr_inventory_transactions\".\"id\"
+  = \"mr_sales_orders\".\"issue_transaction_id\"\r\n    LEFT JOIN \"mr_vat_types\"
+  ON \"mr_vat_types\".\"id\" = \"mr_sales_orders\".\"vat_type_id\"\r\nORDER BY\r\n
+  \   \"mr_sales_orders\".\"sales_order_number\" DESC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -82,9 +87,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  sales_order_number:
+    :name: sales_order_number
+    :sequence_no: 5
+    :caption: SO no
+    :namespaced_name: mr_sales_orders.sales_order_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   vat_type_id:
     :name: vat_type_id
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Vat type
     :namespaced_name: mr_sales_orders.vat_type_id
     :data_type: :integer
@@ -100,7 +121,7 @@
     :group_max: false
   account_code_id:
     :name: account_code_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Account code
     :namespaced_name: mr_sales_orders.account_code_id
     :data_type: :integer
@@ -116,7 +137,7 @@
     :group_max: false
   erp_customer_number:
     :name: erp_customer_number
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: ERP Customer no
     :namespaced_name: mr_sales_orders.erp_customer_number
     :data_type: :string
@@ -132,7 +153,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created by
     :namespaced_name: mr_sales_orders.created_by
     :data_type: :string
@@ -148,26 +169,10 @@
     :group_max: false
   fin_object_code:
     :name: fin_object_code
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: FIN Obj Code
     :namespaced_name: mr_sales_orders.fin_object_code
     :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  sales_order_number:
-    :name: sales_order_number
-    :sequence_no: 10
-    :caption: SO no
-    :namespaced_name: mr_sales_orders.sales_order_number
-    :data_type: :integer
     :width: 
     :format: 
     :hide: false

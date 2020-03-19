@@ -22,5 +22,6 @@ module PackMaterialApp
 
   NewMrSalesOrderSchema = Dry::Validation.Params do
     required(:customer_party_role_id, :integer).filled(:int?)
+    required(:vehicle_job_id, :integer).maybe(:int?)
   end
 end

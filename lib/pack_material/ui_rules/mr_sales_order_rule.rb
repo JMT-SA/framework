@@ -46,7 +46,8 @@ module UiRules
 
     def new_fields
       {
-        customer_party_role_id: { renderer: :select, options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER), caption: 'Please select Customer', required: true }
+        customer_party_role_id: { renderer: :select, options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER), caption: 'Please select Customer', required: true },
+        vehicle_job_id: { renderer: :select, options: @repo.for_select_tripsheets, caption: 'Please select Tripsheet' }
       }
     end
 

@@ -25,6 +25,8 @@ module PackMaterialApp
           mutable_check
         when :approve
           approve_check
+        when :unapprove
+          unapprove_check
         else
           raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}"
         end
@@ -47,6 +49,14 @@ module PackMaterialApp
         return failed_response('Purchase Order has no items') if no_items?
         return all_ok if no_purchase_order_number?
         return failed_response('Purchase Order is already approved') if approved?
+
+        all_ok
+      end
+
+      def unapprove_check
+        return failed_response('Purchase Order has not been approved yet') unless approved?
+        return failed_response('Purchase Order has started receiving deliveries') if deliveries_has_been_received?
+        return failed_response 'User is not allowed to approve Purchase Orders' unless can_user_approve?
 
         all_ok
       end

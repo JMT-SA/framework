@@ -225,7 +225,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           email_settings: params[:mail],
           user_name: current_user.login_name,
           reports: [{
-            report_name: 'print_sales_order',
+            report_name: 'sales_order',
             file: 'sales_order',
             report_params: { mr_sales_order_id: id,
                              keep_file: true }

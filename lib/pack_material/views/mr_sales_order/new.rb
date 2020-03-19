@@ -17,6 +17,7 @@ module PackMaterial
               form.action '/pack_material/sales/mr_sales_orders'
               form.remote! if remote
               form.add_field :customer_party_role_id
+              form.add_field :vehicle_job_id
             end
           end
 

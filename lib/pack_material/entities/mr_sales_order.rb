@@ -6,6 +6,7 @@ module PackMaterialApp
     attribute :customer_party_role_id, Types::Integer
     attribute :dispatch_location_id, Types::Integer
     attribute :issue_transaction_id, Types::Integer
+    attribute :vehicle_job_id, Types::Integer
     attribute :vat_type_id, Types::Integer
     attribute :account_code_id, Types::Integer
     attribute :account_code, Types::String

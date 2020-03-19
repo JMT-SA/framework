@@ -81,7 +81,7 @@ module PackMaterialApp
 
     def make_http_call(xml)
       http = Crossbeams::HTTPCalls.new
-      res  = http.xml_post(AppConst::ERP_PURCHASE_INVOICE_URI, xml)
+      res  = http.xml_post(AppConst::ERP_SALES_INVOICE_URI, xml)
       res.success ? res : (raise Crossbeams::InfoError, res.message)
     end
 
@@ -89,7 +89,7 @@ module PackMaterialApp
       resp = Nokogiri::XML(response)
       message = resp.xpath('//error').text
       instance = {
-        purchase_invoice_number: resp.xpath('//purchase_invoice_number').text
+        sales_invoice_number: resp.xpath('//sales_invoice_number').text
       }
       if message.empty?
         success_response('ok', instance)
@@ -101,7 +101,7 @@ module PackMaterialApp
     def apply_changes(formatted_res)
       @repo.transaction do
         if formatted_res.success
-          @so_repo.so_complete_invoice(@id, formatted_res.instance)
+          @repo.so_complete_invoice(@id, formatted_res.instance)
           @repo.log_status('mr_sales_orders', @id, 'SALES ORDER COMPLETED', user_name: @user_name)
         else
           @repo.update_mr_sales_order(@id, integration_error: true)

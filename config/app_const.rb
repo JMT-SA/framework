@@ -142,6 +142,7 @@ class AppConst
   LOCATIONS_PM = 'PM'
 
   ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI')
+  ERP_SALES_INVOICE_URI = ENV.fetch('ERP_SALES_INVOICE_URI')
 
   BIG_ZERO = BigDecimal('0')
   # The maximum size of an integer in PostgreSQL

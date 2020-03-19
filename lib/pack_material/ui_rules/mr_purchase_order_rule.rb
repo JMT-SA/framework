@@ -11,6 +11,7 @@ module UiRules
       apply_form_values
 
       rules[:can_approve]                = can_approve unless @mode == :new || @mode == :preselect
+      rules[:can_unapprove]              = can_unapprove unless @mode == :new || @mode == :preselect
       rules[:po_sub_totals]              = @repo.po_sub_totals(@options[:id]) if @mode == :edit
       rules[:show_only]                  = @form_object.approved if @mode == :edit
       rules[:completed]                  = @form_object.deliveries_received if @mode == :edit
@@ -51,8 +52,8 @@ module UiRules
         fin_object_code: { renderer: :label },
         valid_until: { renderer: :label },
         supplier_party_role_id: { renderer: :hidden },
-        supplier_name: { renderer: :label, with_value: sup.party_name },
-        supplier_erp_number: { renderer: :label, with_value: sup.erp_supplier_number },
+        supplier_name: { renderer: :label, with_value: sup&.party_name },
+        supplier_erp_number: { renderer: :label, with_value: sup&.erp_supplier_number },
         remarks: { renderer: :label },
         purchase_order_number: { renderer: :label },
         is_consignment_stock: { renderer: :label, as_boolean: true }
@@ -97,8 +98,8 @@ module UiRules
       sup = supplier
       fields = {
         status: { renderer: :hidden },
-        supplier_name: { renderer: :label, with_value: sup.party_name },
-        supplier_erp_number: { renderer: :label, with_value: sup.erp_supplier_number },
+        supplier_name: { renderer: :label, with_value: sup&.party_name },
+        supplier_erp_number: { renderer: :label, with_value: sup&.erp_supplier_number },
         supplier_party_role_id: { renderer: :hidden },
         purchase_order_number: { renderer: :label }
       }
@@ -155,6 +156,11 @@ module UiRules
 
     def can_approve
       res = @perm.call(:approve, @options[:id], @options[:current_user])
+      res.success
+    end
+
+    def can_unapprove
+      res = @perm.call(:unapprove, @options[:id], @options[:current_user])
       res.success
     end
 

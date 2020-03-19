@@ -322,7 +322,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

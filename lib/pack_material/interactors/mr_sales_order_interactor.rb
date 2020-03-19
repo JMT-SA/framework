@@ -96,13 +96,11 @@ module PackMaterialApp
 
     def complete_invoice(id)
       assert_permission!(:integrate, id)
-      # return success_response('GRN Purchase Invoice has already been Queued') if already_enqueued?(id)
-
       repo.transaction do
         PackMaterialApp::CompleteSalesOrder.call(id, @user.user_name, false, nil)
         log_transaction
         instance = mr_sales_order(id)
-        success_response("Sales Order #{instance.sales_order_number}: Sales Order Invoice Queued", instance)
+        success_response("Sales Order #{instance.sales_order_number}: Sales Order Invoice Sent", instance)
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

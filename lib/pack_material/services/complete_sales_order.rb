@@ -40,6 +40,8 @@ module PackMaterialApp
       products = @repo.products_for_sales_order(@id)
       so_totals = @repo.so_sub_totals(@id, delimiter: '', no_decimals: 5)
       costs = @repo.so_costs(@id)
+      total_cost_of_sales = products.sum { |r| r[:weighted_average_cost] * r[:quantity_required] }
+      cost_of_sales = UtilityFunctions.delimited_number(total_cost_of_sales, delimiter: '', no_decimals: 2)
 
       request_xml = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
         xml.sales_invoice do # rubocop:disable Metrics/BlockLength
@@ -74,6 +76,28 @@ module PackMaterialApp
               end
             end
           end
+          xml.profit_loss_journal do
+            xml.transaction_date @sales_order.shipped_at
+            xml.reference 'MBB'
+            xml.items do
+              xml.item do
+                xml.account '10650'
+                xml.object 'PGM, PML, PPM, FUT'
+                xml.description 'Profit/Loss on Packing Material'
+                xml.base_debit cost_of_sales
+                xml.base_credit nil
+              end
+              xml.item do
+                xml.account '77000'
+                xml.object nil
+                xml.description 'Inventory'
+                xml.base_debit nil
+                xml.base_credit cost_of_sales
+              end
+            end
+            xml.total_base_debit
+            xml.total_base_credit
+          end
         end
       end
       request_xml.to_xml
@@ -89,7 +113,8 @@ module PackMaterialApp
       resp = Nokogiri::XML(response)
       message = resp.xpath('//error').text
       instance = {
-        sales_invoice_number: resp.xpath('//sales_invoice_number').text
+        sales_invoice_number: resp.xpath('//sales_invoice_number').text,
+        erp_profit_loss_number: resp.xpath('//profit_loss_number').text
       }
       if message.empty?
         success_response('ok', instance)

@@ -1,5 +1,5 @@
 ---
-:dataminer_definition: locations
+:dataminer_definition: vehicle_jobs_locations
 :multiselect:
   :vehicle_jobs:
     :url: "/pack_material/tripsheets/vehicle_jobs/link_locations/$:id$"

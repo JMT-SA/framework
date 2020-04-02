@@ -17,6 +17,7 @@ module UiRules
         rules[:can_manage_prices] = can_manage_prices
         rules[:show_only] = @form_object.completed || @form_object.approved
         rules[:signed_off] = @form_object.signed_off
+        set_back_button
       end
       set_caption if @mode == :new
 
@@ -34,6 +35,18 @@ module UiRules
                                end
 
       form_name 'mr_bulk_stock_adjustment'
+    end
+
+    def set_back_button
+      back_caption, completed_key, standard_key = if @form_object.carton_assembly
+                                                    ['Back to Carton Assembly', 'carton_completed', 'carton_assembly']
+                                                  elsif @form_object.staging_consumption
+                                                    ['Back to Staging Consumption', 'staging_completed', 'staging_consumption']
+                                                  else
+                                                    ['Back to Bulk Stock Adjustments', 'completed', 'standard']
+                                                  end
+      rules[:back_caption] = back_caption
+      rules[:back_link] = "/list/mr_bulk_stock_adjustments/with_params?key=#{rules[:completed] ? completed_key : standard_key}"
     end
 
     def set_caption

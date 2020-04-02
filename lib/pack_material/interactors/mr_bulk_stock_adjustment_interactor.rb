@@ -26,9 +26,9 @@ module PackMaterialApp
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
-      attrs = res.to_h
       repo.transaction do
-        id = repo.create_mr_bulk_stock_adjustment(attrs.merge(user_name: @user.user_name))
+        id = repo.create_mr_bulk_stock_adjustment(res)
+        repo.prep_bulk_stock_adjustment(id)
         log_status('mr_bulk_stock_adjustments', id, 'CREATED')
         log_transaction
       end
@@ -164,7 +164,20 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def stock_item_adjust(params)
+    def integrate_bulk_stock_adjustment(id)
+      assert_permission!(:integrate, id)
+      repo.transaction do
+        PackMaterialApp::IntegrateBulkStockAdjustment.call(id, @user.user_name, false, nil)
+        log_transaction
+        log_status('mr_bulk_stock_adjustments', id, 'INTEGRATED')
+        instance = mr_bulk_stock_adjustment(id)
+        success_response('Integrated Bulk Stock Adjustment', instance)
+      end
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    end
+
+    def stock_item_adjust(params) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       bulk_stock_adjustment_id = repo.bulk_stock_adjustment_id_from_number(params[:stock_adjustment_number])
       can_adjust_stock = TaskPermissionCheck::MrBulkStockAdjustment.call(:adjust_stock, bulk_stock_adjustment_id)
       if can_adjust_stock.success
@@ -179,6 +192,8 @@ module PackMaterialApp
         return failed_response('Location not found, please use location short code') unless location_id
 
         location_id = Integer(location_id)
+        res = repo.validate_allowed_sku_location(bulk_stock_adjustment_id, sku_id, location_id)
+        return res unless res.success
 
         repo.transaction do
           log_transaction

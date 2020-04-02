@@ -1,0 +1,447 @@
+---
+:caption: Vehicle Jobs Locations
+:sql: "SELECT locations.id,\r\n       locations.primary_storage_type_id,\r\n       locations.location_type_id,\r\n
+  \      locations.primary_assignment_id,\r\n       locations.location_long_code,\r\n
+  \      locations.location_description,\r\n       locations.active,\r\n       locations.location_short_code,\r\n
+  \      locations.print_code,\r\n       locations.has_single_container,\r\n       locations.virtual_location,\r\n
+  \      locations.can_be_moved,\r\n       locations.can_store_stock,\r\n       locations.consumption_area,\r\n
+  \      locations.created_at,\r\n       locations.updated_at,\r\n       location_types.location_type_code,\r\n
+  \      location_assignments.assignment_code,\r\n       location_storage_types.storage_type_code,\r\n
+  \      \"locations\".\"location_storage_definition_id\",\r\n       \"location_storage_definitions\".\"storage_definition_code\",\r\n
+  \      (SELECT array_agg(cc.location_long_code) as path\r\n        FROM (SELECT
+  c.location_long_code\r\n              FROM locations AS c\r\n                       JOIN
+  tree_locations AS t1 ON t1.ancestor_location_id = c.id\r\n              WHERE t1.descendant_location_id
+  = locations.id\r\n              ORDER BY t1.path_length DESC) AS cc) AS path_array,\r\n
+  \      (SELECT MAX(path_length)\r\n        FROM tree_locations\r\n        WHERE
+  descendant_location_id = locations.id) + 1 AS level\r\nFROM locations\r\n         JOIN
+  location_types ON location_types.id = locations.location_type_id\r\n         JOIN
+  location_assignments ON location_assignments.id = locations.primary_assignment_id\r\n
+  \        JOIN location_storage_types ON location_storage_types.id = locations.primary_storage_type_id\r\n
+  \        LEFT JOIN \"location_storage_definitions\" ON \"location_storage_definitions\".\"id\"
+  = \"locations\".\"location_storage_definition_id\"\r\nWHERE \"locations\".\"active\"\r\n
+  \ AND not locations.restricted\r\n  AND not location_types.location_type_code =
+  'DISPATCH'\r\n  AND not location_types.location_type_code = 'STAGING'\r\n  AND not
+  locations.id in (select locations.id\r\n                           from locations\r\n
+  \                                   join tree_locations tl on locations.id = tl.descendant_location_id\r\n
+  \                          where tl.ancestor_location_id = (select locations.id\r\n
+  \                                                           from locations\r\n                                                                     join
+  location_types on locations.location_type_id = location_types.id\r\n                                                            where
+  location_types.location_type_code = 'STAGING'))\r\n\r\nORDER BY (SELECT string_agg(\"cc\".\"location_long_code\",
+  ';') AS path\r\n          FROM (SELECT \"c\".\"location_long_code\" FROM \"locations\"
+  c JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\"\r\n
+  \               WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
+  \               ORDER BY \"t1\".\"path_length\" DESC) cc)"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: locations.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  primary_storage_type_id:
+    :name: primary_storage_type_id
+    :sequence_no: 2
+    :caption: Primary storage type
+    :namespaced_name: locations.primary_storage_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_type_id:
+    :name: location_type_id
+    :sequence_no: 3
+    :caption: Location type
+    :namespaced_name: locations.location_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  primary_assignment_id:
+    :name: primary_assignment_id
+    :sequence_no: 4
+    :caption: Primary assignment
+    :namespaced_name: locations.primary_assignment_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_long_code:
+    :name: location_long_code
+    :sequence_no: 5
+    :caption: Long code
+    :namespaced_name: locations.location_long_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_description:
+    :name: location_description
+    :sequence_no: 6
+    :caption: Location description
+    :namespaced_name: locations.location_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 7
+    :caption: Active
+    :namespaced_name: locations.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_short_code:
+    :name: location_short_code
+    :sequence_no: 8
+    :caption: Location short code
+    :namespaced_name: locations.location_short_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  print_code:
+    :name: print_code
+    :sequence_no: 9
+    :caption: Print code
+    :namespaced_name: locations.print_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_single_container:
+    :name: has_single_container
+    :sequence_no: 10
+    :caption: Has single container
+    :namespaced_name: locations.has_single_container
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  virtual_location:
+    :name: virtual_location
+    :sequence_no: 11
+    :caption: Virtual location
+    :namespaced_name: locations.virtual_location
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  can_be_moved:
+    :name: can_be_moved
+    :sequence_no: 12
+    :caption: Can be moved
+    :namespaced_name: locations.can_be_moved
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  can_store_stock:
+    :name: can_store_stock
+    :sequence_no: 13
+    :caption: Can store stock
+    :namespaced_name: locations.can_store_stock
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  consumption_area:
+    :name: consumption_area
+    :sequence_no: 14
+    :caption: Consumption area
+    :namespaced_name: locations.consumption_area
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 15
+    :caption: Created at
+    :namespaced_name: locations.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 16
+    :caption: Updated at
+    :namespaced_name: locations.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_type_code:
+    :name: location_type_code
+    :sequence_no: 17
+    :caption: Location type code
+    :namespaced_name: location_types.location_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  assignment_code:
+    :name: assignment_code
+    :sequence_no: 18
+    :caption: Assignment code
+    :namespaced_name: location_assignments.assignment_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  storage_type_code:
+    :name: storage_type_code
+    :sequence_no: 19
+    :caption: Storage type code
+    :namespaced_name: location_storage_types.storage_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_storage_definition_id:
+    :name: location_storage_definition_id
+    :sequence_no: 20
+    :caption: Location storage definition
+    :namespaced_name: locations.location_storage_definition_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  storage_definition_code:
+    :name: storage_definition_code
+    :sequence_no: 21
+    :caption: Storage definition code
+    :namespaced_name: location_storage_definitions.storage_definition_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  path_array:
+    :name: path_array
+    :sequence_no: 22
+    :caption: Path array
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  level:
+    :name: level
+    :sequence_no: 23
+    :caption: Level
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: locations.primary_storage_type_id
+  :caption: Primary storage type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 3
+  :list_def: SELECT storage_type_code, id FROM location_storage_types ORDER BY storage_type_code
+- :column: locations.location_type_id
+  :caption: Location type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 2
+  :list_def: SELECT location_type_code, id FROM location_types ORDER BY location_type_code
+- :column: locations.primary_assignment_id
+  :caption: Primary assignment
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 3
+  :list_def: SELECT assignment_code, id FROM location_assignments ORDER BY assignment_code
+- :column: locations.location_long_code
+  :caption: Location code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: locations.can_store_stock
+  :caption: Can Store Stock
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def: 

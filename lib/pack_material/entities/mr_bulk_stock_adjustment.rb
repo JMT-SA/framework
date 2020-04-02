@@ -11,7 +11,13 @@ module PackMaterialApp
     attribute :completed, Types::Bool
     attribute :approved, Types::Bool
     attribute :signed_off, Types::Bool
+    attribute :carton_assembly, Types::Bool
+    attribute :staging_consumption, Types::Bool
+    attribute :integration_error, Types::Bool
+    attribute :integration_completed, Types::Bool
+    attribute :integrated_at, Types::DateTime
     attribute :active, Types::Bool
     attribute :ref_no, Types::StrippedString
+    attribute :erp_depreciation_number, Types::StrippedString
   end
 end

@@ -14,6 +14,7 @@ module PackMaterialApp
     attribute :erp_invoice_number, Types::String
     attribute :created_by, Types::String
     attribute :fin_object_code, Types::String
+    attribute :client_reference_number, Types::String
     attribute :sales_order_number, Types::Integer
     attribute :shipped_at, Types::DateTime
     attribute :integration_error, Types::Bool

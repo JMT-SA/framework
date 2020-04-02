@@ -21,6 +21,8 @@
   :icon: list
   :popup: true
   :hide_if_true: completed
+  :hide_if_true: carton_assembly
+  :hide_if_true: staging_consumption
 - :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$"
   :text: delete
   :icon: delete
@@ -40,3 +42,89 @@
   :text: New Bulk Stock Adjustment
   :style: :button
   :behaviour: :popup
+  :hide_for_key:
+    - staging_consumption
+    - staging_completed
+    - carton_assembly
+    - carton_completed
+- :control_type: :link
+  :url: "/pack_material/transactions/mr_bulk_stock_adjustments/new?bsa_type=consumption"
+  :text: New Staging Consumption
+  :style: :button
+  :behaviour: :popup
+  :hide_for_key:
+    - standard
+    - completed
+    - carton_assembly
+    - carton_completed
+- :control_type: :link
+  :url: "/pack_material/transactions/mr_bulk_stock_adjustments/new?bsa_type=carton_assembly"
+  :text: New Carton Assembly Consumption
+  :style: :button
+  :behaviour: :popup
+  :hide_for_key:
+    - standard
+    - completed
+    - staging_consumption
+    - staging_completed
+:conditions:
+  :standard:
+    - :col: mr_bulk_stock_adjustments.carton_assembly
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.staging_consumption
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.completed
+      :op: =
+      :val: false
+  :completed:
+    - :col: mr_bulk_stock_adjustments.carton_assembly
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.staging_consumption
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.completed
+      :op: =
+      :val: true
+  :staging_consumption:
+    - :col: mr_bulk_stock_adjustments.carton_assembly
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.staging_consumption
+      :op: =
+      :val: true
+    - :col: mr_bulk_stock_adjustments.completed
+      :op: =
+      :val: false
+  :staging_completed:
+    - :col: mr_bulk_stock_adjustments.carton_assembly
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.staging_consumption
+      :op: =
+      :val: true
+    - :col: mr_bulk_stock_adjustments.completed
+      :op: =
+      :val: true
+  :carton_assembly:
+    - :col: mr_bulk_stock_adjustments.carton_assembly
+      :op: =
+      :val: true
+    - :col: mr_bulk_stock_adjustments.staging_consumption
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.completed
+      :op: =
+      :val: false
+  :carton_completed:
+    - :col: mr_bulk_stock_adjustments.carton_assembly
+      :op: =
+      :val: true
+    - :col: mr_bulk_stock_adjustments.staging_consumption
+      :op: =
+      :val: false
+    - :col: mr_bulk_stock_adjustments.completed
+      :op: =
+      :val: true

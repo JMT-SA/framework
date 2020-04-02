@@ -67,6 +67,7 @@ module PackMaterial
                     column.add_field :vat_type_id
                     column.add_field :account_code_id
                     column.add_field :fin_object_code
+                    column.add_field :client_reference_number
                     column.add_text so_totals(rules)
                   end
                 end

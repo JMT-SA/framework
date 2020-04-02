@@ -77,5 +77,27 @@ module PackMaterialApp
       end
       success_response('ok')
     end
+
+    def bsa_integration(id, attrs)
+      update(:mr_bulk_stock_adjustments, id,
+             integration_error: false,
+             integration_completed: true,
+             integration_at: attrs[:time],
+             erp_depreciation_number: attrs[:erp_depreciation_number])
+    end
+
+    def depreciation_value(mr_bulk_stock_adjustment_id) # rubocop:disable Metrics/AbcSize
+      items = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: mr_bulk_stock_adjustment_id).all
+      value = 0
+      items.each do |item|
+        wa_cost = DB[:material_resource_product_variants].where(
+          id: DB[:mr_skus].where(
+            id: item[:mr_sku_id]
+          ).get(:mr_product_variant_id)
+        ).get(:weighted_average_cost)
+        value += (item[:system_quantity] - item[:actual_quantity]) * wa_cost
+      end
+      value * -1
+    end
   end
 end

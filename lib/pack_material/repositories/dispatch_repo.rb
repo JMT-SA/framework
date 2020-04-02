@@ -401,6 +401,7 @@ module PackMaterialApp
       update(:mr_sales_orders, id,
              integration_error: false,
              integration_completed: true,
+             erp_profit_loss_number: attrs[:erp_profit_loss_number],
              erp_invoice_number: attrs[:sales_invoice_number])
     end
 

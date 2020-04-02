@@ -10,13 +10,16 @@ module UiRules
       apply_form_values
 
       if @mode == :edit
+        rules[:can_integrate] = can_integrate
         rules[:can_sign_off] = can_sign_off
         rules[:can_complete] = can_complete
         rules[:can_approve] = can_approve
         rules[:can_manage_prices] = can_manage_prices
         rules[:show_only] = @form_object.completed || @form_object.approved
         rules[:signed_off] = @form_object.signed_off
+        set_back_button
       end
+      set_caption if @mode == :new
 
       common_values_for_fields case @mode
                                when :new
@@ -32,6 +35,29 @@ module UiRules
                                end
 
       form_name 'mr_bulk_stock_adjustment'
+    end
+
+    def set_back_button
+      back_caption, completed_key, standard_key = if @form_object.carton_assembly
+                                                    ['Back to Carton Assembly', 'carton_completed', 'carton_assembly']
+                                                  elsif @form_object.staging_consumption
+                                                    ['Back to Staging Consumption', 'staging_completed', 'staging_consumption']
+                                                  else
+                                                    ['Back to Bulk Stock Adjustments', 'completed', 'standard']
+                                                  end
+      rules[:back_caption] = back_caption
+      rules[:back_link] = "/list/mr_bulk_stock_adjustments/with_params?key=#{rules[:completed] ? completed_key : standard_key}"
+    end
+
+    def set_caption
+      rules[:caption] = case @options[:bsa_type]
+                        when 'consumption'
+                          'Start Consumption'
+                        when 'carton_assembly'
+                          'Carton Assembly'
+                        else
+                          'New Bulk Stock Adjustment'
+                        end
     end
 
     def show_fields
@@ -82,10 +108,20 @@ module UiRules
     end
 
     def new_fields
-      {
-        business_process_id: { renderer: :select, options: @transaction_repo.for_select_bsa_business_processes, caption: 'Business Process', required: true },
+      fields = {
+        carton_assembly: { renderer: :hidden },
+        staging_consumption: { renderer: :hidden },
         ref_no: { required: true }
       }
+      fields[:business_process_id] = if @options[:bsa_type]
+                                       { renderer: :hidden }
+                                     else
+                                       { renderer: :select,
+                                         options: @transaction_repo.for_select_bsa_business_processes,
+                                         caption: 'Business Process',
+                                         required: true }
+                                     end
+      fields
     end
 
     def make_form_object
@@ -95,8 +131,15 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(business_process_id: nil,
-                                    ref_no: nil)
+      consumption_process_id = @repo.get_id(:business_processes, process: AppConst::PROCESS_CONSUMPTION)
+      @form_object = case @options[:bsa_type]
+                     when 'consumption'
+                       OpenStruct.new(business_process_id: consumption_process_id, ref_no: nil, carton_assembly: false, staging_consumption: true)
+                     when 'carton_assembly'
+                       OpenStruct.new(business_process_id: consumption_process_id, ref_no: nil, carton_assembly: true, staging_consumption: false)
+                     else
+                       OpenStruct.new(business_process_id: nil, ref_no: nil, carton_assembly: false, staging_consumption: false)
+                     end
     end
 
     def sku_numbers
@@ -131,6 +174,11 @@ module UiRules
 
     def can_sign_off
       res = @perm.call(:sign_off, @options[:id], @options[:current_user])
+      res.success
+    end
+
+    def can_integrate
+      res = @perm.call(:integrate, @options[:id], @options[:current_user])
       res.success
     end
 

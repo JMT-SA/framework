@@ -122,6 +122,17 @@ class Framework < Roda
         end
         redirect_to_stored_referer(r, :bulk_stock_adjustment_decline)
       end
+      r.on 'integrate' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:bulk_stock_adjustment_integrate)
+        res = interactor.integrate_bulk_stock_adjustment(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :bulk_stock_adjustment_integrate)
+      end
 
       r.on 'edit' do   # EDIT
         check_auth!('transactions', 'edit')
@@ -227,7 +238,7 @@ class Framework < Roda
       end
       r.on 'new' do    # NEW
         check_auth!('transactions', 'new')
-        show_partial_or_page(r) { PackMaterial::Transactions::MrBulkStockAdjustment::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { PackMaterial::Transactions::MrBulkStockAdjustment::New.call(params[:bsa_type], remote: fetch?(r)) }
       end
       r.on 'link_mr_skus', Integer do |id|
         r.post do
@@ -275,18 +286,26 @@ class Framework < Roda
             completed
             approved
             signed_off
+            carton_assembly
+            staging_consumption
+            integration_error
+            integration_completed
+            integrated_at
+            erp_depreciation_number
           ]
           storage_type_id = interactor.pack_material_storage_type_id
+          has_skus_and_locations = res.instance.carton_assembly || res.instance.staging_consumption
           add_grid_row(attrs: select_attributes(res.instance,
                                                 row_keys,
                                                 storage_type_id: storage_type_id,
-                                                has_locations: false,
-                                                has_skus: false,
+                                                has_locations: has_skus_and_locations,
+                                                has_skus: has_skus_and_locations,
                                                 status: 'CREATED'),
                        notice: res.message)
         else
           re_show_form(r, res, url: '/pack_material/transactions/mr_bulk_stock_adjustments/new') do
-            PackMaterial::Transactions::MrBulkStockAdjustment::New.call(form_values: params[:mr_bulk_stock_adjustment],
+            PackMaterial::Transactions::MrBulkStockAdjustment::New.call(params[:bsa_type],
+                                                                        form_values: params[:mr_bulk_stock_adjustment],
                                                                         form_errors: res.errors,
                                                                         remote: fetch?(r))
           end

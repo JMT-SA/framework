@@ -140,10 +140,29 @@ class TestBaseRepo < MiniTestWithHooks
   end
 
   def test_select_values
-    test_query = 'SELECT * FROM users'
-    x = BaseRepo.new.select_values(test_query)
-    y = DB[test_query].select_map
-    assert_equal y, x
+    actual = BaseRepo.new.select_values(:users, :id)
+    expect = DB[:users].select_map(:id)
+    assert_equal expect, actual
+
+    actual = BaseRepo.new.select_values(:users, :id, id: [1, 2])
+    expect = DB[:users].where(id: [1, 2]).select_map(:id)
+    assert_equal expect, actual
+  end
+
+  def test_select_values_in_order
+    assert_raises { BaseRepo.new.select_values_in_order(:users, :id) }
+
+    actual = BaseRepo.new.select_values_in_order(:users, :id, order: :id)
+    expect = DB[:users].order(:id).select_map(:id)
+    assert_equal expect, actual
+
+    actual = BaseRepo.new.select_values_in_order(:users, :id, order: :id, where: { id: [1, 2] })
+    expect = DB[:users].where(id: [1, 2]).order(:id).select_map(:id)
+    assert_equal expect, actual
+
+    actual = BaseRepo.new.select_values_in_order(:users, :id, order: :id, where: { id: [1, 2] }, descending: true)
+    expect = DB[:users].where(id: [1, 2]).reverse(:id).select_map(:id)
+    assert_equal expect, actual
   end
 
   def test_hash_for_jsonb_col
@@ -163,6 +182,35 @@ class TestBaseRepo < MiniTestWithHooks
     assert_equal expected, result.class.name
 
     result = BaseRepo.new.array_for_db_col(nil)
+    assert_nil result
+  end
+
+  def test_prepare_array_values_for_db
+    params = { a: 1, b: '2', c: [1,2,3], d: 123.3, e: [1,2], f: nil, g: [] }
+
+    result = BaseRepo.new.prepare_array_values_for_db(params)
+    expected = ["a: Integer", "b: String", "c: Sequel::Postgres::PGArray", "d: Float", "e: Sequel::Postgres::PGArray", "f: NilClass", "g: Sequel::Postgres::PGArray"]
+    assert_equal expected, result.map { |k, v| "#{k}: #{v.class.name}" }
+
+    test_schema = Dry::Validation.Params do
+      configure { config.type_specs = true }
+
+      required(:a, :integer).filled(:int?)
+      required(:b, Types::StrippedString).filled(:str?)
+      required(:c, Types::IntArray).filled { each(:int?) }
+      required(:d, %i[nil decimal]).filled(:decimal?)
+      required(:e, Types::IntArray).filled { each(:int?) }
+      required(:f, Types::StrippedString).maybe(:str?)
+      required(:g, Types::IntArray).maybe { each(:int?) }
+    end
+
+    res = test_schema.call(params)
+    p res unless res.errors.empty?
+    result = BaseRepo.new.prepare_array_values_for_db(res)
+    expected = ["a: Integer", "b: String", "c: Sequel::Postgres::PGArray", "d: BigDecimal", "e: Sequel::Postgres::PGArray", "f: NilClass", "g: Sequel::Postgres::PGArray"]
+    assert_equal expected, result.map { |k, v| "#{k}: #{v.class.name}" }
+    
+    result = BaseRepo.new.prepare_array_values_for_db(nil)
     assert_nil result
   end
 

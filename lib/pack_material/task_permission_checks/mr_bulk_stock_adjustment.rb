@@ -2,7 +2,7 @@
 
 module PackMaterialApp
   module TaskPermissionCheck
-    class MrBulkStockAdjustment < BaseService
+    class MrBulkStockAdjustment < BaseService # rubocop:disable Metrics/ClassLength
       attr_reader :task, :entity
       def initialize(task, mr_bulk_stock_adjustment_id = nil, current_user = nil)
         @task = task

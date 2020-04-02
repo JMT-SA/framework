@@ -113,6 +113,20 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[table_name].where(args).get(column)
   end
 
+  # Get the id for a record in a table for a given WHERE clause.
+  # Raises an exception if more than one row is returned.
+  # Returns nil if no match is found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param args [Hash] the where-clause conditions.
+  # @return [integer] the id value for the matching record or nil.
+  def get_id(table_name, args)
+    ids = DB[table_name].where(args).select_map(:id)
+    raise Crossbeams::FrameworkError, '"get_id" method must return only one record' if ids.length > 1
+
+    ids.first
+  end
+
   # Find the first row in a table matching some condition.
   # Returns nil if it is not found.
   #
@@ -242,8 +256,38 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #
   # @param query [String] the SQL query to run.
   # @return [Array] the values from the first column of each row.
-  def select_values(query)
-    DB[query].select_map
+  # def select_values(query)
+  #   DB[query].select_map
+  # end
+
+  # Get an array of ordered values from a dataset.
+  # Optionally filtered by a WHERE clause.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param columns [Symbol,Array] the column (or array of columns) to query.
+  # @param where [Hash] the where-clause conditions. Optional.
+  # @param order [Symbol] the order by clause.
+  # @param descending [Boolean] return in decending order. Default is false.
+  # @return [Array] the values from the column(s) of each row.
+  def select_values_in_order(table_name, columns, where: nil, order:, descending: false)
+    ds = DB[table_name]
+    ds = ds.where(where) if where
+    ds = ds.order(order) if order && !descending
+    ds = ds.reverse(order) if order && descending
+    ds.select_map(columns)
+  end
+
+  # Get an array of values from a dataset.
+  # Optionally filtered by a WHERE clause.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param columns [Symbol,Array] the column (or array of columns) to query.
+  # @param args [Hash] the where-clause conditions. Optional.
+  # @return [Array] the values from the column(s) of each row.
+  def select_values(table_name, columns, args = nil)
+    ds = DB[table_name]
+    ds = ds.where(args) if args
+    ds.select_map(columns)
   end
 
   # Get a list of values from the +master_lists+ table for a particular +list_type+.
@@ -272,6 +316,21 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     return nil if arr.nil?
 
     Sequel.pg_array(arr)
+  end
+
+  # Transform array values in a hash to pg_arrays.
+  # Any values not of type Array are returned unchanged.
+  #
+  # e.g. If input parameters include a collection of ids to be stored
+  # in an array column in the database, passing the params through
+  # this method will prepare the ids correctly for persisting.
+  #
+  # @param args [hash,Dry::Validation] the hash or Dry::Validation result.
+  # @return [hash] the transformed hash.
+  def prepare_array_values_for_db(args)
+    return nil if args.nil?
+
+    args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v) : v }
   end
 
   # Helper to convert rows of records to a Hash that can be used for optgroups in a select.
@@ -454,6 +513,21 @@ module MethodBuilder
   # - Set to true if this table does not have an +active+ column,
   #   or to return inactive records as well as active ones.
   def build_for_select(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+    # POSSIBLE WAY OF DEFINING METHODS - faster?
+    # ds_ar = ["dataset = DB[:#{table_name}]"]
+    # ds_ar << "dataset = make_order(dataset, order_by: #{options[:order_by].inspect}#{', desc: true' if options[:desc]})" if options[:order_by]
+    # ds_ar << 'dataset = dataset.where(:active)' unless options[:no_active_check]
+    # ds_ar << 'dataset = dataset.where(opts[:where]) if opts[:where]'
+    # lbl = options[:label] || options[:value]
+    # val = options[:value]
+    # call_sel = lbl == val ? "select_single(dataset, :#{val})" : "select_two(dataset, #{lbl.inspect}, :#{val})"
+    #
+    # class_eval(<<~RUBY, __FILE__, __LINE__ + 1)
+    #   def for_select_#{options[:alias] || table_name}(opts = {})
+    #     #{ds_ar.join("\n")}
+    #     #{call_sel}
+    #   end
+    # RUBY
     define_method(:"for_select_#{options[:alias] || table_name}") do |opts = {}|
       dataset = DB[table_name]
       dataset = make_order(dataset, options) if options[:order_by]

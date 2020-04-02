@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class CompleteSalesOrder < BaseService
+  class CompleteSalesOrder < BaseService # rubocop:disable Metrics/ClassLength
     # Complete a sales order and send XML representation to accounting system.
     # - use the `just_show_xml` flag to check the XML output without modifying the db.
     #

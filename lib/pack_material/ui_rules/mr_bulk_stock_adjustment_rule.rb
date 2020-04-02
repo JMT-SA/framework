@@ -18,6 +18,7 @@ module UiRules
         rules[:show_only] = @form_object.completed || @form_object.approved
         rules[:signed_off] = @form_object.signed_off
       end
+      set_caption if @mode == :new
 
       common_values_for_fields case @mode
                                when :new
@@ -33,6 +34,17 @@ module UiRules
                                end
 
       form_name 'mr_bulk_stock_adjustment'
+    end
+
+    def set_caption
+      rules[:caption] = case @options[:bsa_type]
+                        when 'consumption'
+                          'Start Consumption'
+                        when 'carton_assembly'
+                          'Carton Assembly'
+                        else
+                          'New Bulk Stock Adjustment'
+                        end
     end
 
     def show_fields
@@ -83,10 +95,20 @@ module UiRules
     end
 
     def new_fields
-      {
-        business_process_id: { renderer: :select, options: @transaction_repo.for_select_bsa_business_processes, caption: 'Business Process', required: true },
+      fields = {
+        carton_assembly: { renderer: :hidden },
+        staging_consumption: { renderer: :hidden },
         ref_no: { required: true }
       }
+      fields[:business_process_id] = if @options[:bsa_type]
+                                       { renderer: :hidden }
+                                     else
+                                       { renderer: :select,
+                                         options: @transaction_repo.for_select_bsa_business_processes,
+                                         caption: 'Business Process',
+                                         required: true }
+                                     end
+      fields
     end
 
     def make_form_object
@@ -96,8 +118,15 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(business_process_id: nil,
-                                    ref_no: nil)
+      consumption_process_id = @repo.get_id(:business_processes, process: AppConst::PROCESS_CONSUMPTION)
+      @form_object = case @options[:bsa_type]
+                     when 'consumption'
+                       OpenStruct.new(business_process_id: consumption_process_id, ref_no: nil, carton_assembly: false, staging_consumption: true)
+                     when 'carton_assembly'
+                       OpenStruct.new(business_process_id: consumption_process_id, ref_no: nil, carton_assembly: true, staging_consumption: false)
+                     else
+                       OpenStruct.new(business_process_id: nil, ref_no: nil, carton_assembly: false, staging_consumption: false)
+                     end
     end
 
     def sku_numbers

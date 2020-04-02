@@ -88,7 +88,7 @@ module PackMaterialApp
       process_id = attrs[:business_process_id]
       return failed_response('Business Process is not allowed') unless valid_bulk_stock_adjustment_business_process_ids.include?(process_id)
 
-      create(:mr_bulk_stock_adjustments, business_process_id: process_id, ref_no: attrs[:ref_no])
+      create(:mr_bulk_stock_adjustments, attrs)
     end
 
     def valid_bulk_stock_adjustment_business_process_ids
@@ -98,9 +98,33 @@ module PackMaterialApp
         # AppConst::PROCESS_STOCK_TAKE_ON, # NOTE: This is only for initial Stock Take on, this should never be used again
         AppConst::PROCESS_STOCK_SALES,
         AppConst::PROCESS_WASTE_CREATED,
-        AppConst::PROCESS_DESTROYED_FOR_WASTE
+        AppConst::PROCESS_DESTROYED_FOR_WASTE,
+        AppConst::PROCESS_CONSUMPTION
       ]
       DB[:business_processes].where(process: processes).map(:id)
+    end
+
+    def prep_bulk_stock_adjustment(bsa_id) # rubocop:disable Metrics/AbcSize
+      bsa = DB[:mr_bulk_stock_adjustments].where(id: bsa_id)
+      return nil unless bsa.get(:business_process_id) == get_id(:business_processes, process: AppConst::PROCESS_CONSUMPTION)
+
+      location_ids = if bsa[:carton_assembly]
+                       [get_id(:locations, location_long_code: AppConst::LOCATIONS_CARTON_ASSEMBLY)]
+                     else
+                       staging_id = get_id(:locations, location_type_id: get_id(:location_types, location_type_code: 'STAGING'))
+                       DB[:locations]
+                         .join(:tree_locations, descendant_location_id: Sequel[:locations][:id])
+                         .where(ancestor_location_id: staging_id).select_map(:id)
+                     end
+
+      sku_locations = DB[:mr_sku_locations].where(location_id: location_ids)
+      link_locations(bsa_id, location_ids)
+      link_mr_skus(bsa_id, sku_locations.select_map(:mr_sku_id))
+      sku_locations.all.each do |sku_location|
+        create_mr_bulk_stock_adjustment_item(mr_sku_id: sku_location[:mr_sku_id],
+                                             location_id: sku_location[:location_id],
+                                             mr_bulk_stock_adjustment_id: bsa_id)
+      end
     end
 
     def pack_material_storage_type_id
@@ -396,6 +420,22 @@ module PackMaterialApp
         TO LOC: #{replenish_repo.location_long_code_from_location_id(item.get(:to_location_id))}<br>
         QTY: #{UtilityFunctions.delimited_number(item.get(:quantity), delimiter: '')} items.<br>
       HTML
+    end
+
+    def validate_allowed_sku_location(bulk_stock_adjustment_id, sku_id, location_id)
+      valid = DB[:mr_bulk_stock_adjustments_locations].where(
+        mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id,
+        location_id: location_id
+      ).get(:id)
+      return failed_response('This location has not been associated with the Bulk Stock Adjustment', location_id) unless valid
+
+      valid = DB[:mr_bulk_stock_adjustments_sku_numbers].where(
+        mr_bulk_stock_adjustment_id: bulk_stock_adjustment_id,
+        mr_sku_id: sku_id
+      ).get(:id)
+      return failed_response('This location has not been associated with the Bulk Stock Adjustment', sku_id) unless valid
+
+      success_response('ok')
     end
   end
 end

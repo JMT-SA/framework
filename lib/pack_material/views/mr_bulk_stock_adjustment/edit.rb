@@ -15,8 +15,8 @@ module PackMaterial
 
             page.section do |section| # rubocop:disable Metrics/BlockLength
               section.add_control(control_type: :link,
-                                  text: 'Back to Bulk Stock Adjustments',
-                                  url: '/list/mr_bulk_stock_adjustments',
+                                  text: rules[:back_caption],
+                                  url: rules[:back_link],
                                   style: :back_button)
               section.add_control(control_type: :link,
                                   text: 'Complete',

@@ -164,6 +164,19 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
+    def integrate_bulk_stock_adjustment(id)
+      assert_permission!(:integrate, id)
+      repo.transaction do
+        PackMaterialApp::IntegrateBulkStockAdjustment.call(id, @user.user_name, false, nil)
+        log_transaction
+        log_status('mr_bulk_stock_adjustments', id, 'INTEGRATED')
+        instance = mr_bulk_stock_adjustment(id)
+        success_response('Integrated Bulk Stock Adjustment', instance)
+      end
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    end
+
     def stock_item_adjust(params)
       bulk_stock_adjustment_id = repo.bulk_stock_adjustment_id_from_number(params[:stock_adjustment_number])
       can_adjust_stock = TaskPermissionCheck::MrBulkStockAdjustment.call(:adjust_stock, bulk_stock_adjustment_id)

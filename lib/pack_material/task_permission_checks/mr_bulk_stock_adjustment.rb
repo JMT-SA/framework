@@ -22,7 +22,8 @@ module PackMaterialApp
         approve: :approve_check,
         reopen: :reopen_check,
         decline: :decline_check,
-        sign_off: :sign_off_check
+        sign_off: :sign_off_check,
+        integrate: :integrate_check
       }.freeze
 
       def call
@@ -98,6 +99,13 @@ module PackMaterialApp
         all_ok
       end
 
+      def integrate_check
+        return failed_response 'User is not allowed to integrate Bulk Stock Adjustments' unless can_user_integrate?
+        return failed_response 'Bulk Stock Adjustment has not been signed off' unless signed_off?
+
+        all_ok
+      end
+
       def completed?
         @entity.completed
       end
@@ -124,6 +132,10 @@ module PackMaterialApp
 
       def can_user_sign_off?
         Crossbeams::Config::UserPermissions.can_user?(@user, :stock_adj, :sign_off)
+      end
+
+      def can_user_integrate?
+        Crossbeams::Config::UserPermissions.can_user?(@user, :stock_adj, :integrate)
       end
     end
   end

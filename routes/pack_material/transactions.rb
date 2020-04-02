@@ -122,6 +122,17 @@ class Framework < Roda
         end
         redirect_to_stored_referer(r, :bulk_stock_adjustment_decline)
       end
+      r.on 'integrate' do
+        check_auth!('transactions', 'edit')
+        store_last_referer_url(:bulk_stock_adjustment_integrate)
+        res = interactor.integrate_bulk_stock_adjustment(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_stored_referer(r, :bulk_stock_adjustment_integrate)
+      end
 
       r.on 'edit' do   # EDIT
         check_auth!('transactions', 'edit')

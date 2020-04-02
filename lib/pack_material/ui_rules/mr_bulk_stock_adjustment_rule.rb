@@ -10,6 +10,7 @@ module UiRules
       apply_form_values
 
       if @mode == :edit
+        rules[:can_integrate] = can_integrate
         rules[:can_sign_off] = can_sign_off
         rules[:can_complete] = can_complete
         rules[:can_approve] = can_approve
@@ -131,6 +132,11 @@ module UiRules
 
     def can_sign_off
       res = @perm.call(:sign_off, @options[:id], @options[:current_user])
+      res.success
+    end
+
+    def can_integrate
+      res = @perm.call(:integrate, @options[:id], @options[:current_user])
       res.success
     end
 

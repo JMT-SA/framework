@@ -57,6 +57,13 @@ module PackMaterial
                                     prompt: true,
                                     style: :button)
               end
+              if rules[:can_integrate]
+                section.add_control(control_type: :link,
+                                    text: 'Integrate',
+                                    url: "/pack_material/transactions/mr_bulk_stock_adjustments/#{id}/integrate",
+                                    prompt: true,
+                                    style: :button)
+              end
             end
             page.section do |section|
               section.show_border!

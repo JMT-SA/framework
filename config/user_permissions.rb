@@ -20,7 +20,7 @@ module Crossbeams
 
       BASE = {
         WEBAPP => {
-          stock_adj: { approve: false, sign_off: false },
+          stock_adj: { approve: false, sign_off: false, integrate: false },
           purchase_order: { approve: false, short_supplied: false },
           delivery: { review: false },
           tripsheets: { confirm_arrival: false },
@@ -33,7 +33,8 @@ module Crossbeams
         WEBAPP => {
           stock_adj: {
             approve: 'Approve a stock adjustment',
-            sign_off: 'Sign off on a stock adjustment'
+            sign_off: 'Sign off on a stock adjustment',
+            integrate: 'Integrate Bulk Stock Adjustment with ERP'
           },
           purchase_order: {
             approve: 'Approve a purchase order',

@@ -13,6 +13,7 @@ module PackMaterialApp
     optional(:erp_customer_number, Types::StrippedString).filled(:str?)
     optional(:created_by, Types::StrippedString).maybe(:str?)
     required(:fin_object_code, Types::StrippedString).maybe(:str?)
+    required(:client_reference_number, Types::StrippedString).maybe(:str?)
     optional(:sales_order_number, :integer).maybe(:int?)
     optional(:shipped_at, :date_time).maybe(:date_time?)
     optional(:integration_error, :bool).maybe(:bool?)

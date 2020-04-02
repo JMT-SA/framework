@@ -39,6 +39,7 @@ module UiRules
         vat_type_id: { renderer: :label, with_value: @replenish_repo.find_mr_vat_type(@form_object.vat_type_id)&.vat_type_code, caption: 'Vat Type' },
         dispatch_location_id: { renderer: :label, with_value: dispatch_loc },
         fin_object_code: { renderer: :label },
+        client_reference_number: { renderer: :label },
         valid_until: { renderer: :label },
         account_code_id: { renderer: :label, with_value: account_code_id_label, caption: 'Account Code' }
       }
@@ -56,7 +57,8 @@ module UiRules
         dispatch_location_id: { renderer: :select, options: @repo.dispatch_locations, selected: @form_object&.dispatch_location_id, readonly: @form_object.shipped, required: true, prompt: true },
         vat_type_id: { renderer: :select, options: @replenish_repo.for_select_mr_vat_types, selected: @form_object&.vat_type_id, caption: 'Vat Type', required: true, prompt: true },
         account_code_id: { renderer: :select, options: @general_repo.for_select_account_codes_with_descriptions, selected: @form_object&.account_code_id, caption: 'Account Code', required: true, prompt: true },
-        fin_object_code: {}
+        fin_object_code: {},
+        client_reference_number: {}
       }
       fields.merge(common_fields)
     end

@@ -2,7 +2,7 @@
 
 module UiRules
   class MrBulkStockAdjustmentRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = PackMaterialApp::TransactionsRepo.new
       @transaction_repo = PackMaterialApp::TransactionsRepo.new
       @perm = PackMaterialApp::TaskPermissionCheck::MrBulkStockAdjustment
@@ -17,6 +17,7 @@ module UiRules
         rules[:can_manage_prices] = can_manage_prices
         rules[:show_only] = @form_object.completed || @form_object.approved
         rules[:signed_off] = @form_object.signed_off
+        rules[:consumption] = @form_object.staging_consumption || @form_object.carton_assembly
         set_back_button
       end
       set_caption if @mode == :new
@@ -46,7 +47,7 @@ module UiRules
                                                     ['Back to Bulk Stock Adjustments', 'completed', 'standard']
                                                   end
       rules[:back_caption] = back_caption
-      rules[:back_link] = "/list/mr_bulk_stock_adjustments/with_params?key=#{rules[:completed] ? completed_key : standard_key}"
+      rules[:back_link] = "/list/mr_bulk_stock_adjustments/with_params?key=#{@form_object.completed ? completed_key : standard_key}"
     end
 
     def set_caption

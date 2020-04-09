@@ -69,7 +69,7 @@
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: true
     :group_by_seq: 

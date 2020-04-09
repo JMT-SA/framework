@@ -91,19 +91,25 @@ module PackMaterial
                                   text: 'Stock Adjustment Sheet',
                                   url: "/pack_material/reports/stock_adjustment_sheet/#{id}",
                                   loading_window: true,
-                                  visible: !rules[:signed_off],
+                                  visible: !rules[:signed_off] || rules[:consumption],
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Preliminary Report',
                                   url: "/pack_material/reports/preliminary_report/#{id}",
                                   loading_window: true,
-                                  visible: !rules[:signed_off],
+                                  visible: !rules[:signed_off] || rules[:consumption],
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Signed Off Report',
                                   url: "/pack_material/reports/signed_off_report/#{id}",
                                   loading_window: true,
-                                  visible: rules[:signed_off],
+                                  visible: rules[:signed_off] && !rules[:consumption],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Consumption Report',
+                                  url: "/pack_material/reports/consumption_report/#{id}",
+                                  loading_window: true,
+                                  visible: rules[:consumption] && rules[:signed_off],
                                   style: :button)
             end
 

@@ -128,3 +128,11 @@
     - :col: mr_bulk_stock_adjustments.completed
       :op: =
       :val: true
+:captions:
+  :conditions:
+    :standard: Bulk Stock Adjustments
+    :completed: Completed Bulk Stock Adjustments
+    :staging_consumption: Staging Bulk Stock Adjustments
+    :staging_completed: Completed Staging Bulk Stock Adjustments
+    :carton_assembly: Carton Assembly Bulk Stock Adjustments
+    :carton_completed: Completed Carton Assembly Bulk Stock Adjustments

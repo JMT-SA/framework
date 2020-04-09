@@ -65,5 +65,18 @@ module DevelopmentApp
       fn = File.join(dir, "#{keyname}_#{key}_#{Time.now.strftime('%Y_%m_%d_%H_%M_%S')}_#{description}.log")
       File.open(fn, 'w') { |f| f.puts information }
     end
+
+    def logged_actions_sql_for_transaction(id)
+      tx_id = get_with_args(Sequel[:audit][:logged_actions], :transaction_id, event_id: id)
+      # This should change to include affected table and changes
+      # (client_query could be an insert/update to tbl1, but a trigger updated tbl2)
+      # Query run      : SQL
+      # table affected : table_name
+      # changes made   : changed_fields / row_data (depending on action - I = insert, D = delete, U = update, T = truncate)
+      # if table_name <> query INSERT INTO | DELETE FROM | UPDATE | TRUNCATE then display table and changed fields (if blank, show row data as insert?)
+      DB[Sequel[:audit][:logged_actions]]
+        .where(transaction_id: tx_id)
+        .select_map(:client_query)
+    end
   end
 end

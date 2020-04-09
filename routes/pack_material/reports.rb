@@ -111,6 +111,19 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'consumption_report', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'consumption_report',
+                                    user: current_user.login_name,
+                                    file: 'consumption_report',
+                                    params: { mr_bulk_stock_adjustment_id: id,
+                                              keep_file: true })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
     r.on 'preliminary_report', Integer do |id|
       res = CreateJasperReport.call(report_name: 'preliminary_report',
                                     user: current_user.login_name,

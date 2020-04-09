@@ -35,6 +35,10 @@ module DevelopmentApp
       [diff_with_excluded_fields(left), diff_with_excluded_fields(right)]
     end
 
+    def transaction_sql(id)
+      repo.logged_actions_sql_for_transaction(id)
+    end
+
     private
 
     def changed_fields_for_right(logged_action)

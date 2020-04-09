@@ -13,7 +13,8 @@
   \      exists(select mr_sku_id from crossbeams_framework.public.mr_bulk_stock_adjustments_sku_numbers
   where mr_bulk_stock_adjustment_id = \"mr_bulk_stock_adjustments\".\"id\") as has_skus,\r\n
   \      (SELECT id from crossbeams_framework.public.location_storage_types where
-  storage_type_code = 'Pack Material') as storage_type_id\r\nFROM \"mr_bulk_stock_adjustments\""
+  storage_type_code = 'Pack Material') as storage_type_id\r\nFROM \"mr_bulk_stock_adjustments\"\r\nORDER
+  BY \"mr_bulk_stock_adjustments\".\"stock_adjustment_number\" desc"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -53,7 +54,7 @@
   ref_no:
     :name: ref_no
     :sequence_no: 3
-    :caption: REF NO
+    :caption: Ref No
     :namespaced_name: mr_bulk_stock_adjustments.ref_no
     :data_type: :string
     :width: 
@@ -69,7 +70,7 @@
   stock_adjustment_number:
     :name: stock_adjustment_number
     :sequence_no: 4
-    :caption: SA NO
+    :caption: BSA No
     :namespaced_name: mr_bulk_stock_adjustments.stock_adjustment_number
     :data_type: :integer
     :width: 
@@ -85,7 +86,7 @@
   erp_depreciation_number:
     :name: erp_depreciation_number
     :sequence_no: 5
-    :caption: ERP DEPR NO
+    :caption: ERP Depr No
     :namespaced_name: mr_bulk_stock_adjustments.erp_depreciation_number
     :data_type: :string
     :width: 

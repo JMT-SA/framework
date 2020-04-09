@@ -31,6 +31,12 @@ class Framework < Roda
         left, right = interactor.diff_action(id)
         show_partial { Development::Logging::LoggedAction::Diff.call(id, left, right) }
       end
+
+      r.on 'transaction_sql' do
+        check_auth!('logging', 'read')
+        sql = interactor.transaction_sql(id)
+        show_partial { Development::Logging::LoggedAction::TransactionSql.call(id, sql) }
+      end
     end
 
     # QUE JOBS

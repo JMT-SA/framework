@@ -504,11 +504,20 @@ module PackMaterialApp
       }
     end
 
-    def resolve_location_id_from_scan(val, scan_field)
+    # Given a scanned or entered value and the scan_field
+    # value from a form, return the valid location_id or nil.
+    #
+    # @param value [string,integer] the scanned or entered value
+    # @param scan_field [string] the type of scan (blank if the value was typed in)
+    # @return [intger,nil] the location_id or nil if input was invalid or not found
+    def resolve_location_id_from_scan(value, scan_field)
+      not_found = nil
       if ['', 'location_short_code'].include?(scan_field)
-        location_id_from_location_short_code(val)
+        location_id_from_short_code(value)
+      elsif value.is_a?(Numeric) || value =~ /\A\d+\Z/
+        get_id(:locations, id: value)
       else
-        val
+        not_found
       end
     end
 

@@ -330,16 +330,6 @@ module PackMaterialApp
     def create_mr_sales_order(attrs)
       customer = DB[:customers].where(party_role_id: attrs[:customer_party_role_id]).first
       create(:mr_sales_orders, attrs.merge(erp_customer_number: customer[:erp_customer_number]))
-      # id = create(:mr_sales_orders, attrs.merge(erp_customer_number: customer[:erp_customer_number]))
-      # return id unless (vehicle_job_id = attrs[:vehicle_job_id])
-      #
-      # DB[:vehicle_job_units].where(vehicle_job_id: vehicle_job_id).all.each do |unit|
-      #   location = unit[:]
-      #   create_mr_sales_order_item(mr_sales_order_id: id,
-      #                              quantity_required: unit[:quantity_offloaded],
-      #                              mr_product_variant_id: DB[:mr_skus].where(id: unit[:mr_sku_id]).get(:mr_product_variant_id))
-      # end
-      # id
     end
 
     def create_mr_sales_order_item(attrs)

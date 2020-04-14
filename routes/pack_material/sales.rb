@@ -139,7 +139,7 @@ class Framework < Roda
                                      value: res[:pv_number]),
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'mr_sales_order_item_unit_price',
-                                     value: res[:pv_wa_cost])],
+                                     value: res[:pv_wa_cost].to_f)],
                      'Selected Product Variant')
       end
       r.on 'new' do    # NEW

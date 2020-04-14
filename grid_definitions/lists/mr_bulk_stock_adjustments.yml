@@ -20,9 +20,7 @@
   :text: Locations
   :icon: list
   :popup: true
-  :hide_if_true: completed
-  :hide_if_true: carton_assembly
-  :hide_if_true: staging_consumption
+  :hide_if_true: hide_locations
 - :url: "/pack_material/transactions/mr_bulk_stock_adjustments/$:id$"
   :text: delete
   :icon: delete

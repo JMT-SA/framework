@@ -82,7 +82,7 @@ module PackMaterialApp
       update(:mr_bulk_stock_adjustments, id,
              integration_error: false,
              integration_completed: true,
-             integration_at: attrs[:time],
+             integrated_at: attrs[:time],
              erp_depreciation_number: attrs[:erp_depreciation_number])
     end
 

@@ -521,6 +521,10 @@ module PackMaterialApp
       end
     end
 
+    def location_id_from_short_code(location_short_code)
+      get_id(:locations, location_short_code: location_short_code)
+    end
+
     def location_id_from_location_short_code(value)
       DB[:locations].where(location_short_code: value).get(:id)
     end

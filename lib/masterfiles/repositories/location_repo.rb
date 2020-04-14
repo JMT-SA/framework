@@ -85,10 +85,6 @@ module MasterfilesApp
       DB[:locations].where(location_long_code: location_long_code).get(:id)
     end
 
-    def location_id_from_short_code(location_short_code)
-      get_id(:locations, location_short_code: location_short_code)
-    end
-
     # Given a location id, find its parent of a particular location type.
     def find_parent_of_type(location_type_code, location_id)
       query = <<~SQL

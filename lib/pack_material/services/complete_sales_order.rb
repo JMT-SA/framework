@@ -72,7 +72,7 @@ module PackMaterialApp
                 xml.line_total UtilityFunctions.delimited_number(line_item[:line_total], delimiter: '', no_decimals: 2)
                 xml.cost UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
                 xml.fifo UtilityFunctions.delimited_number(line_item[:weighted_average_cost], delimiter: '', no_decimals: 5)
-                xml.location 'ISD'
+                xml.location 'PMAT'
               end
             end
           end

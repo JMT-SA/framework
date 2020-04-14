@@ -13,8 +13,10 @@
   \      exists(select mr_sku_id from crossbeams_framework.public.mr_bulk_stock_adjustments_sku_numbers
   where mr_bulk_stock_adjustment_id = \"mr_bulk_stock_adjustments\".\"id\") as has_skus,\r\n
   \      (SELECT id from crossbeams_framework.public.location_storage_types where
-  storage_type_code = 'Pack Material') as storage_type_id\r\nFROM \"mr_bulk_stock_adjustments\"\r\nORDER
-  BY \"mr_bulk_stock_adjustments\".\"stock_adjustment_number\" desc"
+  storage_type_code = 'Pack Material') as storage_type_id,\r\n(\"mr_bulk_stock_adjustments\".\"completed\"
+  or \"mr_bulk_stock_adjustments\".\"carton_assembly\" or  \"mr_bulk_stock_adjustments\".\"staging_consumption\")
+  as hide_locations\r\nFROM \"mr_bulk_stock_adjustments\"\r\nORDER BY \"mr_bulk_stock_adjustments\".\"stock_adjustment_number\"
+  desc"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -295,6 +297,22 @@
     :name: storage_type_id
     :sequence_no: 18
     :caption: Storage type
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  hide_locations:
+    :name: hide_locations
+    :sequence_no: 19
+    :caption: Hide locations
     :namespaced_name: 
     :data_type: :string
     :width: 

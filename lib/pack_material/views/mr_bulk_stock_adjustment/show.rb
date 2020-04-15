@@ -4,7 +4,7 @@ module PackMaterial
   module Transactions
     module MrBulkStockAdjustment
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:mr_bulk_stock_adjustment, :show, id: id)
           rules   = ui_rule.compile
 
@@ -17,6 +17,9 @@ module PackMaterial
               form.add_field :completed
               form.add_field :approved
               form.add_field :signed_off
+              form.add_field :integration_error
+              form.add_field :integration_completed
+              form.add_field :status
               form.add_field :sku_numbers_list
               form.add_field :location_list
             end

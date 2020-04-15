@@ -78,7 +78,7 @@ module PackMaterialApp
       resp = Nokogiri::XML(response)
       message = resp.xpath('//error').text
       instance = {
-        erp_depreciation_number: resp.xpath('//depreciation_number').text,
+        journal_number: resp.xpath('//journal_number').text,
         time: @time
       }
       if message.empty?

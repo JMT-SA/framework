@@ -83,7 +83,7 @@ module PackMaterialApp
              integration_error: false,
              integration_completed: true,
              integrated_at: attrs[:time],
-             erp_depreciation_number: attrs[:erp_depreciation_number])
+             erp_depreciation_number: attrs[:journal_number])
     end
 
     def depreciation_value(mr_bulk_stock_adjustment_id) # rubocop:disable Metrics/AbcSize
@@ -97,7 +97,7 @@ module PackMaterialApp
         ).get(:weighted_average_cost)
         value += (item[:system_quantity] - item[:actual_quantity]) * wa_cost
       end
-      value * -1
+      value
     end
   end
 end

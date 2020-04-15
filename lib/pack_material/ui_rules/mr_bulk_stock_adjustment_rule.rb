@@ -64,6 +64,7 @@ module UiRules
     def show_fields
       {
         stock_adjustment_number: { renderer: :label },
+        erp_depreciation_number: { renderer: :label },
         ref_no: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
@@ -77,6 +78,7 @@ module UiRules
     def edit_fields
       {
         stock_adjustment_number: { renderer: :label },
+        erp_depreciation_number: { renderer: :label },
         ref_no: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
@@ -105,6 +107,7 @@ module UiRules
     def view_header_fields
       {
         stock_adjustment_number: { renderer: :label },
+        erp_depreciation_number: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
         signed_off: { renderer: :label, as_boolean: true },

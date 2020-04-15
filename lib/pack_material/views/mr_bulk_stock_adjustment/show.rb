@@ -13,6 +13,7 @@ module PackMaterial
             page.form do |form|
               form.view_only!
               form.add_field :stock_adjustment_number
+              form.add_field :erp_depreciation_number
               form.add_field :ref_no
               form.add_field :completed
               form.add_field :approved

@@ -115,7 +115,7 @@ module PackMaterialApp
       message = resp.xpath('//error').text
       instance = {
         sales_invoice_number: resp.xpath('//sales_invoice_number').text,
-        erp_profit_loss_number: resp.xpath('//profit_loss_number').text
+        journal_number: resp.xpath('//journal_number').text
       }
       if message.empty?
         success_response('ok', instance)

@@ -75,6 +75,7 @@ module PackMaterial
                 form.row do |row|
                   row.column do |col|
                     col.add_field :stock_adjustment_number
+                    col.add_field :erp_depreciation_number
                     col.add_field :ref_no
                     col.add_field :status
                   end

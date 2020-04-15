@@ -56,6 +56,7 @@ module PackMaterialApp
           xml.costs do
             costs.each do |cost|
               xml.cost do
+                xml.item 'NS100107'
                 xml.cost_code cost[:cost_type_code]
                 xml.account_code cost[:account_code]
                 xml.amount UtilityFunctions.delimited_number(cost[:amount], delimiter: '', no_decimals: 2)
@@ -112,7 +113,8 @@ module PackMaterialApp
 
     def format_response(response)
       resp = Nokogiri::XML(response)
-      message = resp.xpath('//error').text
+      message = resp.xpath('//invoice_error').text
+      message ||= resp.xpath('//error').text
       instance = {
         sales_invoice_number: resp.xpath('//sales_invoice_number').text,
         journal_number: resp.xpath('//journal_number').text

@@ -100,6 +100,7 @@ module PackMaterialApp
       end
 
       def integrate_check
+        return failed_response 'Bulk Stock Adjustment has already been integrated' if integrated?
         return failed_response 'User is not allowed to integrate Bulk Stock Adjustments' unless can_user_integrate?
         return failed_response 'Bulk Stock Adjustment has not been signed off' unless signed_off?
 
@@ -116,6 +117,10 @@ module PackMaterialApp
 
       def signed_off?
         @entity.signed_off
+      end
+
+      def integrated?
+        @entity.integration_completed
       end
 
       def no_items?

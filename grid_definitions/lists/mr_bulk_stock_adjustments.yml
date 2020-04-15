@@ -41,6 +41,7 @@
   :style: :button
   :behaviour: :popup
   :hide_for_key:
+    - completed
     - staging_consumption
     - staging_completed
     - carton_assembly
@@ -53,6 +54,7 @@
   :hide_for_key:
     - standard
     - completed
+    - staging_completed
     - carton_assembly
     - carton_completed
 - :control_type: :link
@@ -63,6 +65,7 @@
   :hide_for_key:
     - standard
     - completed
+    - carton_completed
     - staging_consumption
     - staging_completed
 :conditions:

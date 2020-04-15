@@ -366,13 +366,9 @@ module PackMaterialApp
     end
 
     def so_costs(mr_sales_order_id)
-      DB[:sales_order_costs]
-        .join(:mr_cost_types, id: :mr_cost_type_id)
-        .join(:mr_sales_orders, id: Sequel[:sales_order_costs][:mr_sales_order_id])
-        .join(:account_codes, id: Sequel[:mr_sales_orders][:account_code_id])
-        .where(mr_sales_order_id: mr_sales_order_id)
-        .select(:cost_type_code, :amount, Sequel[:account_codes][:account_code])
-        .all
+      DB[:sales_order_costs].join(:mr_cost_types, id: :mr_cost_type_id)
+                            .where(mr_sales_order_id: mr_sales_order_id)
+                            .select(:cost_type_code, :amount, :account_code).all
     end
 
     def products_for_sales_order(mr_sales_order_id)
@@ -391,18 +387,8 @@ module PackMaterialApp
       update(:mr_sales_orders, id,
              integration_error: false,
              integration_completed: true,
-             erp_profit_loss_number: attrs[:erp_profit_loss_number],
+             erp_profit_loss_number: attrs[:journal_number],
              erp_invoice_number: attrs[:sales_invoice_number])
-    end
-
-    def for_select_tripsheets
-      []
-      # in_use = DB[:mr_sales_orders].select_map(:vehicle_job_id)
-      # DB[:vehicle_jobs].where(offloaded: true,
-      #                         )
-      #  Offloaded
-      # to location sales dispatch (for any)
-      # has not been used for other sales orders
     end
   end
 end

@@ -19,5 +19,6 @@ module PackMaterialApp
     attribute :active, Types::Bool
     attribute :ref_no, Types::StrippedString
     attribute :erp_depreciation_number, Types::StrippedString
+    attribute :status, Types::String
   end
 end

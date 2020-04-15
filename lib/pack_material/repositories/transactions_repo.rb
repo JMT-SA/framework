@@ -324,6 +324,12 @@ module PackMaterialApp
       update(:mr_bulk_stock_adjustments, id, signed_off: true)
     end
 
+    def find_mr_bulk_stock_adjustment(id)
+      find_with_association(:mr_bulk_stock_adjustments, id,
+                            lookup_functions: [{ function: :fn_current_status, args: ['mr_bulk_stock_adjustments', :id], col_name: :status }],
+                            wrapper: PackMaterialApp::MrBulkStockAdjustment)
+    end
+
     def find_mr_bulk_stock_adjustment_item(id)
       find_with_association(:mr_bulk_stock_adjustment_items, id,
                             parent_tables: [{ parent_table: :uoms,

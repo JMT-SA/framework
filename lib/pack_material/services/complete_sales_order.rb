@@ -59,6 +59,7 @@ module PackMaterialApp
                 xml.cost_code cost[:cost_type_code]
                 xml.account_code cost[:account_code]
                 xml.amount UtilityFunctions.delimited_number(cost[:amount], delimiter: '', no_decimals: 2)
+                xml.object 'OTH'
               end
             end
           end

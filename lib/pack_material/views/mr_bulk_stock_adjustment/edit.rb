@@ -76,11 +76,14 @@ module PackMaterial
                   row.column do |col|
                     col.add_field :stock_adjustment_number
                     col.add_field :ref_no
+                    col.add_field :status
                   end
                   row.column do |col|
                     col.add_field :completed
                     col.add_field :approved
                     col.add_field :signed_off
+                    col.add_field :integration_error
+                    col.add_field :integration_completed
                   end
                 end
               end

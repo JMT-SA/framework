@@ -67,7 +67,10 @@ module UiRules
         ref_no: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
-        signed_off: { renderer: :label, as_boolean: true }
+        signed_off: { renderer: :label, as_boolean: true },
+        integration_error: { renderer: :hidden },
+        integration_completed: { renderer: :label, as_boolean: true, caption: 'Sent to ERP system' },
+        status: { renderer: :label }
       }
     end
 
@@ -77,7 +80,10 @@ module UiRules
         ref_no: { renderer: :label },
         completed: { renderer: :label, as_boolean: true },
         approved: { renderer: :label, as_boolean: true },
-        signed_off: { renderer: :label, as_boolean: true }
+        signed_off: { renderer: :label, as_boolean: true },
+        integration_error: { renderer: :hidden },
+        integration_completed: { renderer: :label, as_boolean: true, caption: 'Sent to ERP system' },
+        status: { renderer: :label }
       }
     end
 
@@ -104,7 +110,10 @@ module UiRules
         signed_off: { renderer: :label, as_boolean: true },
         ref_no: { renderer: :label },
         sku_numbers_list: { renderer: :list, items: sku_numbers, caption: 'SKU Numbers' },
-        location_list: { renderer: :list, items: locations, caption: 'Location Codes' }
+        location_list: { renderer: :list, items: locations, caption: 'Location Codes' },
+        integration_error: { renderer: :hidden },
+        integration_completed: { renderer: :label, as_boolean: true, caption: 'Sent to ERP system' },
+        status: { renderer: :label }
       }
     end
 

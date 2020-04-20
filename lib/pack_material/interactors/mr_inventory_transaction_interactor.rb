@@ -92,6 +92,8 @@ module PackMaterialApp
     end
 
     def existing_stock?(from_location_id, sku_number)
+      return nil unless sku_number && from_location_id
+
       sku_id = repo.sku_id_for_sku_number(sku_number)
       repo.existing_sku_locations_for(sku_id, from_location_id).first
     end

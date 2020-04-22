@@ -282,7 +282,7 @@ module PackMaterialApp
       stock = DB[:mr_sku_locations].where(mr_sku_id: sku_ids)
       # NOTE: We might want to exclude consignment stock here
       actual_qty = stock.sum(:quantity)
-      return failed_response('We do not have this product in stock') unless actual_qty.positive?
+      return failed_response('We do not have this product in stock') unless actual_qty&.positive?
 
       return failed_response("Quantity available: #{UtilityFunctions.delimited_number(actual_qty)}") unless requested_qty <= actual_qty
 

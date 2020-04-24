@@ -49,8 +49,8 @@ module PackMaterialApp
           xml.description "Correction of PMAT Stock - BSA #{@bsa.stock_adjustment_number}"
           xml.items do
             xml.item do
-              xml.account '77300'
-              xml.object 'OTH'
+              xml.account '10650' #'77300' #10650
+              xml.object 'PGM' #'OTH'
               xml.description "Correction of PMAT Stock - BSA #{@bsa.stock_adjustment_number}"
               xml.base_debit depreciation_value
               xml.base_credit nil

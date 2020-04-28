@@ -54,8 +54,6 @@ module DataminerApp
 
         CrosstabApplier.new(repo.db_connection_for(db_name), rpt, params, crosstab_hash).convert_report if params[:crosstab]
         rpt
-        # rescue StandardError => e
-        #   return "ERROR: #{e.message}"
       end
     end
 

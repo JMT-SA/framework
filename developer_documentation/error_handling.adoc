@@ -5,11 +5,63 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 == Error-handling
 
-TODO: Some general principles, Exception classes, roda errors, jobs, dev mode skip err-handling (pros and cons)
+The webapp handles unchecked exceptions in a standard way, so (_usually_) you do not need to rescue unexpected exceptions.
+These handlers ensure:
+
+* An appropriate rendering of the message (and sometimes the stacktrace) in the UI.
+* Logging of the message and stacktrace.
+* Sending an error email message with all relevant details included.
+
+Sometimes (especially when dealing with robots) you will need to handle exceptions and transform them to an appropriate response.
+
+=== Error classes
+
+Crossbeams::FrameworkError:: Raise this when encountering an error in the framework (e.g. a required client setting is invalid)
+Crossbeams::InfoError:: Raise this as an "error message". When some exceptional condition arises that is user-related -- e.g. you wish to break out of a transaction, but just display a message to the user and not send an error email or log a stacktrace.
+
+=== Developers - skip built-in error handling
+
+You can skip the built-in error-handling by setting the environment variable `NO_ERR_HANDLE=y`.
+
+==== Pros
+
+You get the built-in rack errors page in the browser instead of an error message -- so you can debug from the browser itself.
+
+==== Cons
+
+* If an exception is raised during a fetch request, the message you receive will most likely be from the response handler failing to parse the HTML error page as JSON. (`"Invalid token <.."`)
+* You do not see what the user sees -- how the situation will be handled in production.
+* You do not see the error email (that would be sent in production) in the output from the job que.
+
+=== Built-in exception handling
+
+There are a few strategies for recovering from exceptions.
+Fetch requests are handled slightly differently from normal pages.
+
+==== Webapp - standard requests
+
+When an exception is raised during a standard request, the application will display a new page with the error message in it. The stacktrace is shown in the app console and en email is sent with the exception information.
+
+==== Webapp - fetch requests
+
+When an exception is raised during a standard request, the application will display the error message in a red notice in the same browser page and show the stacktrace in the javascript console of the browser. An email is sent with the exception information.
+
+==== Webapp - "robot" pages
+
+These are handled like exceptions in standard requests -- which the robots will not understand as they expect a standard `RobotResponder` response.
+For this reason, the developer **must** handle all exceptions by doing the following:
+
+* Return a sensible error message to the robot.
+* `puts` the error message and stacktrace to the log.
+* Send an error email with useful context (method called, parameters sent etc.).
+
+==== Jobs
+
+The exception is displayed in the job console and an exception email is sent. Note that if the job is retried the exception email is not re-sent.
 
 === ErrorMailer
 
-Sometimes when an exception is raised but handled, we still need to be notified. This is what `ErrorMailer` allows.
+Sometimes when an exception is raised but handled, we still need to be notified. This is what `ErrorMailer` accomplishes.
 
 There are two methods in this module:
 
@@ -18,34 +70,34 @@ send_error_email:: Takes a subject and message and sends an email.
 
 See link:/yarddocthis/lib=error_mailer.rb[ErrorMailer methods] for the method definitions.
 
+==== Add useful context to email message
+
+In interactors you have a helper method available to you named `decorate_mail_message` which takes a string -- your message context.
+
+This method will take your message string and add the URL path and the request's IP address to it so there is a lot of useful context at the top of the email body.
+
+==== Example
+
 Here's an example of error-handling including calling the **exception** and **error** methods:
 [source,ruby]
 ----
 def json_post(url, params)
-  uri, http = setup_http(url)
-  request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
-  request.body = params.to_json
-
-  log_request(request)
-
-  response = http.request(request)
+  # Some code here …
   if response.code == '200'
     success_response(response.code, response)
   else
     msg = "An HTTP call responded with error code #{response.code}"
     ErrorMailer.send_error_email(subject: msg,                      #<1>
-                                 message: response.body)
+                                 message: decorate_mail_message(response.body))
   end
-  format_response(response, uri)
 rescue Timeout::Error
   failed_response('The call to the server timed out.', timeout: true)
-rescue Errno::ECONNREFUSED
-  msg = 'The connection was refused. Perhaps the server is not running.'
-  failed_response(msg, refused: true)
 rescue StandardError => e
   ErrorMailer.send_exception_email(e,                               #<2>
                                    subject: self.class.name,
-                                   message: "URI is #{uri}")
+                                   message: decorate_mail_message("URI is #{uri}"))
+  puts e.message
+  puts e.backtrace.join("\n")
   failed_response("There was an error: #{e.message}")
 end
 ----

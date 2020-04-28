@@ -31,6 +31,19 @@ To achieve this, the `order_items.yml` file would include the following:
 
 This will become a WHERE clause like this: `WHERE order_id = 1`.
 
+NOTE: There are three special values you can use for `:val:` -- `$:START_OF_DAY$`, `$:END_OF_DAY$` and `$:TODAY$`. These return today at 00:00am, today at 23:59:59 and today respectively.
+[source,yaml]
+----
+:conditions:
+  :today:
+    - :col: created_at
+      :op: '>='
+      :val: $:START_OF_DAY$
+    - :col: created_at
+      :op: '<='
+      :val: $:END_OF_DAY$
+----
+
 ==== 2. As a section of a page
 
 In this case you have a page with a form for header data and a grid for item data. As an example, we use order and order items - where `order_items` has an `order_id` column (belongs_to `id` on `orders`). And we use the same `order_items.yml` file as above.
@@ -79,6 +92,23 @@ This example of `order_items.yml` list file will return different rows for the f
 ----
 <1> Key is `standard`, uses `WHERE order_id = 1`
 <2> Key is `customer`, uses `WHERE customer_id = 5 AND NOT active`
+
+=== Special parameters for limit and offset
+
+You can limit the number of rows returned by using the parameters `_limit` and `_offset`.
+This will override any limit/offest defined in the report definition.
+
+e.g. for a list URL: `/list/order_items` will return all rows from the query, while `/list/order_items?_limit=20` will return only 20 rows.
+
+e.g. for a parameterised list URL: `/list/order_items/with_params?key=standard&id=1` will return all rows from the query, while `/list/order_items/with_params?key=standard&id=1&_limit=20` will return only 20 rows.
+
+In a view you can add the limit to the url:
+[source,ruby]
+----
+section.add_grid('order_grid', '/list/order_items?_limit=12')
+----
+
+NOTE: The underscore is important: `_limit` and `_offset`.
 
 === Controls at the top of the page
 

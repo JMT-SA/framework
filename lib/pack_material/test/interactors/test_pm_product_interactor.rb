@@ -196,21 +196,21 @@ module PackMaterialApp
       test_attrs = pm_product_attrs
       # optional(:material_resource_sub_type_id).filled(:int?)
       x = interactor.send(:validate_pm_product_params, test_attrs.reject { |k| k == :material_resource_sub_type_id })
-      assert_empty x. errors
+      assert_empty x.errors
 
       x = interactor.send(:validate_pm_product_params, test_attrs.merge(material_resource_sub_type_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:material_resource_sub_type_id])
 
       # optional(:commodity_id).filled(:int?)
       x = interactor.send(:validate_pm_product_params, test_attrs.reject { |k| k == :commodity_id })
-      assert_empty x. errors
+      assert_empty x.errors
 
       x = interactor.send(:validate_pm_product_params, test_attrs.merge(commodity_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:commodity_id])
 
       # optional(:marketing_variety_id).filled(:int?)
       x = interactor.send(:validate_pm_product_params, test_attrs.reject { |k| k == :marketing_variety_id })
-      assert_empty x. errors
+      assert_empty x.errors
 
       x = interactor.send(:validate_pm_product_params, test_attrs.merge(marketing_variety_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:marketing_variety_id])
@@ -268,14 +268,14 @@ module PackMaterialApp
 
       # optional(:commodity_id, :integer).filled(:int?)
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.reject { |k| k == :commodity_id })
-      assert_empty x. errors
+      assert_empty x.errors
 
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.merge(commodity_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:commodity_id])
 
       # optional(:marketing_variety_id, :integer).filled(:int?)
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.reject { |k| k == :marketing_variety_id })
-      assert_empty x. errors
+      assert_empty x.errors
 
       x = interactor.send(:validate_clone_pm_product_params, test_attrs.merge(marketing_variety_id: 'name'))
       assert_equal(['must be an integer'], x.errors[:marketing_variety_id])
@@ -347,7 +347,7 @@ module PackMaterialApp
       test_attrs = pm_product_variant_attrs
       # optional(:id, :integer).filled(:int?)
       x = interactor.send(:validate_pm_product_variant_params, test_attrs.reject { |k| k == :id })
-      assert_empty x. errors
+      assert_empty x.errors
 
       x = interactor.send(:validate_pm_product_variant_params, test_attrs.merge(id: 'name'))
       assert_equal(['must be an integer'], x.errors[:id])

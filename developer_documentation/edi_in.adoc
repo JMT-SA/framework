@@ -1,0 +1,141 @@
+= EDI-IN process
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== EDI-IN process
+
+The EDI-IN process receives an edi file (typically from ftp, but sometimes also dropped in a folder from and email attachment), validates and processes it.
+
+A lot of infrastructure is provided by the framework so that transformations can be written to mostly concentrate on applying business logic.
+
+=== Environment - variables and directories
+
+The `EDI_RECEIVE_DIR` environment variable is required to identify the folder from which EDI files are processed.
+e.g. `EDI_RECEIVE_DIR=/home/nspack/edi/receive`.
+
+A typical folder structure would look something like this:
+
+----
+nsack
+├── edi_filedrop                #<1>
+├── edi
+│   ├── processed               #<2>
+│   ├── process_errors          #<3>
+│   └── receive                 #<4>
+└─── ftp_transfer
+     └─── edi_in
+          ├── paltrack
+          │   ├── errors
+          │   ├── receive       #<5>
+          │   ├── transmit
+          │   └── transmitted
+          └── um_clients
+              ├── errors
+              ├── receive       #<6>
+              ├── transmit
+              └── transmitted
+----
+<1> A dir where files can be dropped from emails.
+<2> Where a file is moved after successful processing.
+<3> Where a file is moved after unsuccessful processing.
+<4> Where files are copied to by the EDI receive script.
+<5> An example of where a file received via ftp sould be dropped.
+<6> Another ftp receive example.
+
+Scheduled jobs check dirs **(1)**, **(5)** and **(6)** and move the files to **(4)** while generating an edi receive job.
+
+=== Scheduled jobs
+
+These are typically kicked off in `cron` - e.g.:
+[source,bash]
+----
+# EDI IN
+*/1 * * * * cd $HOME/nspack/current && RACK_ENV=production chruby-exec 2.5.5 -- ruby scripts/base_script.rb EdiReceiveCheck $HOME/ftp_transfer/edi_in/um_clients/receive
+*/1 * * * * cd $HOME/nspack/current && RACK_ENV=production chruby-exec 2.5.5 -- ruby scripts/base_script.rb EdiReceiveCheck $HOME/edi_filedrop
+----
+The example above runs two cron jobs every minute - one to check an ftp dir and one to check an email drop dir.
+
+Each job runs the EDI receive script:
+[source,bash]
+----
+ruby scripts/base_script.rb EdiReceiveCheck <dir_name>
+----
+This checks the directory for any newly received EDI files and for each one found, moves the file to `EDI_RECEIVE_DIR` and creates a job to process it.
+
+=== Receive Job
+
+The receive job is `EdiApp::Job::ReceiveEdiIn`.
+
+This job creates a record in `edi_in_transformations` table, figures out the flow type (PO, LI etc.) and using the flow type instantiates an appropriate service to process the file.
+The service is named from the flow type -- so a `PO` file will be handled by `EdiApp::PoIn` and an `LI` file will be handled by `EdiApp::LiIn`.
+
+=== EDI-IN Service
+
+The service to process a file inherit from `BaseEdiInService`.
+
+The `initialize` method **must** implement the following at a minimum:
+[source,ruby]
+----
+def initialize(edi_in_transaction_id, file_path, logger, edi_result)
+  super(edi_in_transaction_id, file_path, logger, edi_result)
+end
+----
+
+All processing must be implemented via the `call` method which should implement a structure like this:
+[source,ruby]
+----
+def call
+  # For flat files, check all required fields are present:
+  missing_required_fields(only_rows: 'OP')
+  # (For XML files, this has already been handled).
+
+  # Set the match_data variable (for matching to older edis): (see note below)
+  match_data_on(data)
+
+  if there_are_missing_masterfiles # however this is implemented..
+    missing_masterfiles_detected(notes_describing_what_is_missing)
+    return failed_response('Missing masterfiles', notes_describing_what_is_missing)
+  end
+
+  # Check that the data conforms to business rules and if it does:
+  business_validation_passed
+
+  # Optionally: check if there are discrepancies in the data
+  # If there are:
+  discrepancies_detected('optionally more context here')
+  return failed_response('Discrepancies detected')
+
+  # Do the work to create/update data..
+
+  success_response('PO processed')
+end
+----
+
+[NOTE]
+====
+**Match data** -- mark older EDI as _newer_edi_received_
+
+Set this to a value that uniquely identifies the data in the file. This is used to check if there are outstanding edi-in transactions for the same data. If there are matches, those records have their `newer_edi_received` and `reprocessed` flags set to true. (This might need to be set to a hash of a combination of fields)
+
+If there is no unique value (e.g. for a list of pallets), set it to a comma-separated list (e.g. pallet numbers) and the logic will apply if *any* of the elements in the list match.
+
+**NB** if there is only one value, suffix it with a comma (`['a', 'b']` => `'a,b'` -- and: `['a']` => `'a,'`).
+====
+
+==== Variables available from the `BaseEdiInService`
+
+flow_type:: The flow type of this process (`PO`, `LI` etc.)
+file_name:: The name of the file being processed (does not include the path)
+edi_records:: The file contents presented as a Ruby structure (`Array` for flat files and `Hash` for XML files)
+
+==== Methods available from the `BaseEdiInService`
+
+missing_required_fields(only_rows: nil):: (For flat files) Checks if any required fields are missing. Raises an exception if they are. If this passes, `edi_in_transaction.schema_valid` will be `true`.
+log(msg):: Write `msg` to the log file at the `info` level.
+log_err(msg):: Write `msg` to the log file at the `error` level.
+newer_edi_received(notes = nil):: Set the `edi_in_transaction.newer_edi_recived` column to `true` and optionally set the `notes` column.
+missing_masterfiles_detected(notes):: Set the `edi_in_transaction.has_missing_masterfiles` column to `true` and set the `notes` column.
+business_validation_passed:: Set the `edi_in_transaction.valid` column to `true`.
+discrepancies_detected(notes):: Set the `edi_in_transaction.discrepancies_detected` column to `true` and set the `notes` column.
+

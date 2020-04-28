@@ -23,8 +23,8 @@ ENV['RACK_ENV'] ||= 'development'
 require 'bundler'
 Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
-require_relative '../config/app_const'
 require_relative '../config/environment'
+require_relative '../config/app_const'
 require_relative '../lib/crossbeams_errors'
 require_relative '../lib/crossbeams_responses'
 require_relative '../lib/error_mailer'
@@ -183,7 +183,7 @@ class EgScript < BaseScript
   end
 end
 
-Dir['./scripts/*.rb'].each { |f| require f unless f.match?(/base_script/) }
+Dir['./scripts/*.rb'].sort.each { |f| require f unless f.match?(/base_script/) }
 
 klass = ARGV.shift
 script = Module.const_get(klass).send(:new, ARGV)

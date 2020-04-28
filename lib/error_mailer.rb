@@ -43,6 +43,7 @@ module ErrorMailer
     Que.enqueue mail_opts, job_class: 'DevelopmentApp::SendMailJob', queue: AppConst::QUEUE_NAME
   end
 
+  # This should be a private method, but as it is in a Module function, it cannot be private.
   def calculate_recipients(append_recipients, recipients: nil)
     send_to = if recipients
                 recipients.is_a?(Array) ? recipients.map { |t, e| "#{t}<#{e}>" }.join(',') : recipients

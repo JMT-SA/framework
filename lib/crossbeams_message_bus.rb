@@ -9,7 +9,7 @@ module Crossbeams
     # @param message_type [symbol] the type of message (:information, :warning, :error)
     # @return [void]
     def broadcast(message, message_type: :information)
-      send_message(message, message_type: message_type)
+      send_bus_message(message, message_type: message_type)
     end
 
     # Send a message to all users or a targeted user

@@ -36,11 +36,13 @@ module MasterfilesApp
       ok_response
     end
 
-    def add_new_label_template(label_def)
+    def add_new_label_template(label_def) # rubocop:disable Metrics/AbcSize
+      app_names = label_def[:variables].first&.values
+      app_names = app_names.first[:applications].first unless app_names.nil?
       id = repo.create_label_template(
         label_template_name: label_def[:label_name],
         description: label_def[:label_name],
-        application: label_def[:variables].first.values.first[:applications].first,
+        application: app_names || 'Unknown',
         variables: variables_list(label_def),
         variable_rules: variables_as_json(label_def)
       )
@@ -63,7 +65,7 @@ module MasterfilesApp
     def variables_list(label_def)
       return nil if label_def[:variables].nil? || label_def[:variables].empty?
 
-      repo.array_for_db_col(label_def[:variables].map { |v| v.keys.first.to_s })
+      repo.array_of_text_for_db_col(label_def[:variables].map { |v| v.keys.first.to_s })
     end
   end
 end

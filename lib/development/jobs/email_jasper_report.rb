@@ -17,6 +17,7 @@ module DevelopmentApp
       res = CreateJasperReport.call(report_name: spec[:report_name],
                                     user: user,
                                     file: spec[:file],
+                                    debug_mode: spec[:debug_mode] || false,
                                     params: spec[:report_params].merge(return_full_path: true))
       unless res.success
         send_bus_message("Failed to build report '#{spec[:report_name]}' - #{res.message}",

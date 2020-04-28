@@ -16,17 +16,17 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: e0a26bbefe17f725e27a10d2b59c46037b6cd599
+  revision: 3cf3cc2e2767e27fb9e0df88efe61025a2a81832
   specs:
-    crossbeams-layout (0.3.8)
+    crossbeams-layout (0.4.2)
       diffy
       rouge
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-menu_migrations.git
-  revision: 4118b8087a8ef499c0261bded8736efa1ce4662b
+  revision: 2f29c409728c5a661830b3902bd4c0ea79c99536
   specs:
-    crossbeams-menu_migrations (0.1.0)
+    crossbeams-menu_migrations (0.1.1)
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-rack_middleware.git
@@ -38,10 +38,10 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 60bd51123be8a43bf5bc5db3e9ea6b9d8f53d73b
+  revision: cf3e82f7d0180fa09a49cd71dc7fb99ddacad236
   specs:
-    roda-data_grid (0.2.3)
-      axlsx
+    roda-data_grid (0.4.1)
+      caxlsx
       crossbeams-dataminer
       crossbeams-layout
       roda
@@ -54,10 +54,6 @@ GEM
     asciidoctor (2.0.8)
     ast (2.4.0)
     awesome_print (1.8.0)
-    axlsx (2.0.1)
-      htmlentities (~> 4.3.1)
-      nokogiri (>= 1.4.1)
-      rubyzip (~> 1.0.0)
     bcrypt (3.1.11)
     byebug (10.0.2)
     capistrano (3.11.0)
@@ -73,6 +69,11 @@ GEM
       sshkit (~> 1.3)
     capistrano-passenger (0.2.0)
       capistrano (~> 3.0)
+    caxlsx (3.0.1)
+      htmlentities (~> 4.3, >= 4.3.4)
+      mimemagic (~> 0.3)
+      nokogiri (~> 1.10, >= 1.10.4)
+      rubyzip (>= 1.3.0, < 3)
     clipboard (1.1.1)
     coderay (1.1.2)
     concurrent-ruby (1.1.4)
@@ -121,7 +122,7 @@ GEM
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
-    jaro_winkler (1.5.2)
+    jaro_winkler (1.5.4)
     json (2.1.0)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -133,6 +134,7 @@ GEM
       rack (>= 1.1.3)
     metaclass (0.0.4)
     method_source (0.9.0)
+    mimemagic (0.3.4)
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
@@ -146,12 +148,12 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (5.0.2)
-    nokogiri (1.10.7)
+    nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
-    parallel (1.17.0)
-    parser (2.6.3.0)
+    parallel (1.19.1)
+    parser (2.7.1.1)
       ast (~> 2.4.0)
-    pg (1.0.0)
+    pg (1.2.3)
     pg_query (1.1.0)
     pry (0.11.3)
       coderay (~> 1.1.0)
@@ -166,7 +168,7 @@ GEM
       pry (~> 0.11)
       yard (~> 0.9.11)
     que (1.0.0.beta3)
-    rack (2.0.8)
+    rack (2.2.2)
     rack-console (1.3.1)
       rack (>= 1.1)
       rack-test
@@ -175,13 +177,14 @@ GEM
     rack_csrf (2.6.0)
       rack (>= 1.1.0)
     rainbow (3.0.0)
-    rake (12.3.1)
+    rake (13.0.1)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
     rerun (0.13.0)
       listen (~> 3.0)
-    roda (3.27.0)
+    rexml (3.2.4)
+    roda (3.31.0)
       rack
     roda-message_bus (1.0.0)
       message_bus (>= 2.0.0)
@@ -190,23 +193,24 @@ GEM
     rodauth (1.16.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rouge (3.14.0)
-    rubocop (0.71.0)
+    rouge (3.18.0)
+    rubocop (0.82.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
-      parser (>= 2.6)
+      parser (>= 2.7.0.1)
       rainbow (>= 2.2.2, < 4.0)
+      rexml
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 1.7)
+      unicode-display_width (>= 1.4.0, < 2.0)
     ruby-progressbar (1.10.1)
     ruby_dep (1.5.0)
-    rubyzip (1.0.0)
+    rubyzip (2.3.0)
     sassc (2.0.1)
       ffi (~> 1.9)
       rake
-    sequel (5.7.1)
-    sequel_pg (1.11.0)
-      pg (>= 0.18.0)
+    sequel (5.31.0)
+    sequel_pg (1.13.0)
+      pg (>= 0.18.0, != 1.2.0)
       sequel (>= 4.38.0)
     sequel_postgresql_triggers (1.4.0)
       sequel
@@ -218,8 +222,8 @@ GEM
       eventmachine (~> 1.0, >= 1.0.4)
       rack (>= 1, < 3)
     tilt (2.0.9)
-    unicode-display_width (1.6.0)
-    yard (0.9.12)
+    unicode-display_width (1.7.0)
+    yard (0.9.24)
 
 PLATFORMS
   ruby
@@ -238,9 +242,10 @@ DEPENDENCIES
   crossbeams-menu_migrations!
   crossbeams-rack_middleware!
   dotenv
-  dry-inflector
-  dry-struct
-  dry-validation
+  dry-inflector (= 0.1.2)
+  dry-struct (= 0.6.0)
+  dry-types (= 0.14.0)
+  dry-validation (= 0.13.0)
   faker
   mail
   message_bus

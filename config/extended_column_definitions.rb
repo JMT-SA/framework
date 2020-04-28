@@ -27,7 +27,7 @@ module Crossbeams
         config = config_for(table)
         return if config.nil?
 
-        config.keys.each { |k| form.add_field("extcol_#{k}".to_sym) }
+        config.each_key { |k| form.add_field("extcol_#{k}".to_sym) }
       end
 
       # Looks up the configuration rules for an extended column.
@@ -71,7 +71,7 @@ module Crossbeams
 
       def verify_client_keys
         errs = []
-        EXTENDED_COLUMNS.each { |_, v| v.keys.each { |key| errs << "Client code key must be a string: #{key.inspect}" unless key.is_a?(String) } }
+        EXTENDED_COLUMNS.each { |_, v| v.each_key { |key| errs << "Client code key must be a string: #{key.inspect}" unless key.is_a?(String) } }
         errs
       end
 

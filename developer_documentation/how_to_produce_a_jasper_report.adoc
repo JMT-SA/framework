@@ -41,6 +41,7 @@ def create_report
   CreateJasperReport.call(report_name: 'abc',
                           user: current_user.login_name,
                           file: output_file_name_to_be_saved_without_extension_or_path,
+                          debug_mode: <optional, true/false>
                           params: hash_of_report_parameters)
 end
 
@@ -48,14 +49,25 @@ end
 res = interactor.create_report
 
 if res.success
-  # show_json_notice('Sent to printer') # For PRINT MODE
-  change_window_location_via_json(res.instance, request.path)
+  # For PRINT MODE:
+  show_json_notice('Sent to printer')
+
+  # For GENERATE MODE:
+  change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+
+  # When generating XLS or RTF files which are downloaded by the browser,
+  # add download: true so the browser window stops showing the spinner.
+  change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance),
+                                  request.path,
+                                  download: true)
 else
   show_error(res.message, fetch?(r))
 end
 ----
 
 If params includes `keep_file: true`, the script that runs the report will be saved in the tmp dir below the root.
+
+NOTE: If `debug_mode` is present and true, logging of variable values etc. will take place. Check the console or something like `/var/log/nginx/error.log` for output.
 
 The report is generated with the following default parameters which can be overridden by including them in the `params` hash (Note the **case** of the keys is important)):
 
@@ -81,9 +93,30 @@ param_name: false           # Jasper gets param_name: 'false'
 If a report parameter sent to Jasper has to be a date value, it must be expressed like this:
 [source, ruby]
 ----
-param_name: "#{attrs[:from_date]} 00:00:00|date" # if Ruby Date
-param_name: "#{attrs[:from_date_time]}|date"     # if Ruby DateTime/Time
+# if Ruby Date:
+param_name: "#{attrs[:from_date]} 00:00:00|date"
+
+# if Ruby DateTime/Time:
+param_name: "#{attrs[:from_date_time].strftime('%Y-%m-%d %H:%M:%S')}|date"
 ----
+====
+
+[NOTE]
+====
+If a report parameter sent to Jasper has to be an array of integers, it must be presented as a string of comma-separated numbers (no spaces!) and expressed like this:
+[source, ruby]
+----
+list_of_ids ='1,2,3'
+param_name: "#{list_of_ids}|intarray"  # => [1,2,3]
+----
+====
+
+[NOTE]
+====
+Other methods of forcing parameter datatypes are:
+
+* `|integer` - ensure the value is an integer. This should happen automatically when the string can be coerced to int.
+* `|string` - ensure the value is a string. This is required if the value could be an integer but should be sent to Jasper as a string.
 ====
 
 === Generate and email a report
@@ -101,7 +134,7 @@ An example from a route:
 ----
 r.on 'email_report', Integer do |id|
   r.get do
-    interactor = TheInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    interactor = TheInteractor.new(current_user, {}, { route_url: request.path }, {})
     email_opts = interactor.email_report_defaults(id, current_user)
     show_partial_or_page(r) do
       Development::Generators::General::Email.call(remote: true,
@@ -142,6 +175,7 @@ opts = {
     {
       report_name: 'the_other_report',
       file: 'your_second_report_sir',
+      debug_mode: true, # If you want to see what variables were set
       report_params: { the_report_id: id, sky: 'blue' }
     }
   ]

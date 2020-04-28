@@ -62,14 +62,6 @@
     }, 0); // Disable the button with a delay so the form still submits...
   }
 
-  class HttpError extends Error {
-    constructor(response) {
-      super(`${response.status} for ${response.url}`);
-      this.name = 'HttpError';
-      this.response = response;
-    }
-  }
-
   /**
    * loadDialogContent - fetches the given url and calls setDialogContent
    *                     to replace the dialog's content area.
@@ -87,7 +79,11 @@
     })
     .then(response => response.json())
     .then((data) => {
-      crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+      if (data.redirect) {
+        window.location = data.redirect;
+      } else {
+        crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+      }
     }).catch((data) => {
       crossbeamsUtils.fetchErrorHandler(data);
     });
@@ -111,11 +107,11 @@
       }
       if (data.flash) {
         if (data.flash.notice) {
-          Jackbox.success(data.flash.notice);
+          crossbeamsUtils.showSuccess(data.flash.notice);
         }
         if (data.flash.error) {
           if (data.exception) {
-            Jackbox.error(data.flash.error, { time: 20 });
+            crossbeamsUtils.showError(data.flash.error);
             if (data.backtrace) {
               console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
               console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -123,7 +119,7 @@
               console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
-            Jackbox.error(data.flash.error);
+            crossbeamsUtils.showError(data.flash.error);
           }
         }
       }
@@ -180,6 +176,13 @@
     document.body.addEventListener('change', (event) => {
       if (event.target.dataset && event.target.dataset.observeInputChange) {
         crossbeamsUtils.observeInputChange(event.target, event.target.dataset.observeInputChange);
+      }
+      // When the date or time portion of a datetime changes, update its hidden value.
+      if (event.target.dataset && event.target.dataset.datetime) {
+        const id = event.target.id.replace(/(_date|_time)$/, '');
+        const valD = document.getElementById(`${id}_date`).value;
+        const valT = document.getElementById(`${id}_time`).value;
+        document.getElementById(id).value = `${valD}T${valT}`;
       }
     }, false);
 
@@ -282,11 +285,11 @@
         input.select();
         try {
           document.execCommand('copy');
-          Jackbox.information('Copied to clipboard');
+          crossbeamsUtils.showInformation('Copied to clipboard');
           window.getSelection().removeAllRanges();
           input.blur();
         } catch (e) {
-          Jackbox.warning('Cannot copy, hit Ctrl+C to copy the selected text');
+          crossbeamsUtils.showWarning('Cannot copy, hit Ctrl+C to copy the selected text');
         }
       }
       // Close a modal dialog
@@ -367,11 +370,11 @@
             // Only if not redirect...
             if (data.flash) {
               if (data.flash.notice) {
-                Jackbox.success(data.flash.notice);
+                crossbeamsUtils.showSuccess(data.flash.notice);
               }
               if (data.flash.error) {
                 if (data.exception) {
-                  Jackbox.error(data.flash.error, { time: 20 });
+                  crossbeamsUtils.showError(data.flash.error);
                   if (data.backtrace) {
                     console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                     console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -379,7 +382,7 @@
                     console.groupEnd(); // eslint-disable-line no-console
                   }
                 } else {
-                  Jackbox.error(data.flash.error);
+                  crossbeamsUtils.showError(data.flash.error);
                 }
               }
             }

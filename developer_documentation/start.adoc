@@ -43,6 +43,7 @@ Pictoral overview of application.
 
 * link:/developer_documentation/grids.adoc[Grids]
 * link:/developer_documentation/grid_actions.adoc[Grid actions]
+* link:/developer_documentation/defining_a_grid_in_code.adoc[Defining a grid in code]
 
 ==== UI: pages
 
@@ -64,6 +65,10 @@ Pictoral overview of application.
 * link:/developer_documentation/utility_functions.adoc[Utility functions]
 * link:/developer_documentation/jobs.adoc[Jobs (Que)]
 * link:/developer_documentation/scripts.adoc[Scripts]
+* link:/developer_documentation/export_data.adoc[Export data]
++
+Via configuration, export data to file or email.
+* link:/developer_documentation/edi_in.adoc[EDI-IN process]
 
 ==== Testing
 

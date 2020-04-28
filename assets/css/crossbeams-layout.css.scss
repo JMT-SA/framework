@@ -347,6 +347,16 @@ div.cbl-input.label-field {
   min-height: 4em;
 }
 
+.cbl-list-scroll-short {
+  height: 5rem;
+  overflow-y: auto;
+}
+
+.cbl-list-scroll-medium {
+  height: 11rem;
+  overflow-y: auto;
+}
+
 .crossbeams-field, .rodauth .form-group {
   display: flex;
 }

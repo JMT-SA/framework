@@ -48,7 +48,7 @@ module MasterfilesApp
     def variable_list(var_list)
       return nil if var_list.empty?
 
-      repo.array_for_db_col(var_list.map { |var| display_varname(var) })
+      repo.array_of_text_for_db_col(var_list.map { |var| display_varname(var) })
     end
 
     def validate_variable_names(instance, var_list)

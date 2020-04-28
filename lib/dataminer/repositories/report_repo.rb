@@ -137,7 +137,7 @@ module DataminerApp
     end
 
     # Take a grid query definition and replace its where clause, returning the modified SQL.
-    # Assuems the where clause will be of the form: "WHERE id = value", but can be modified in other ways.
+    # Assumes the where clause will be of the form: "WHERE id = value", but can be modified in other ways.
     #
     # @param id [string] the query definition file name (without 'yml')
     # @param value [string, integer] the value to match.

@@ -234,7 +234,7 @@ element
     .Menu > li ul .Icon,
     .Menu.-floating .Icon,
     .Menu > li ul *[data-icon]:before,
-    .Menu.-floating *[data-icon]:before,
+    .Menu.-floating *[data-icon]:before
     {
         font-size: 18px;
     }

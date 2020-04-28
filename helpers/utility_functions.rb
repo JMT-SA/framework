@@ -143,11 +143,17 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
           [k.respond_to?(:to_sym) ? k.to_sym : k, symbolize_keys(v)]
         end
       ]
+    elsif hash.is_a?(Array)
+      hash.map { |a| symbolize_keys(a) }
     else
       hash
     end
   end
 
+  # Change keys in a nested hash into string keys.
+  #
+  # @param hash [hash] the hash with keys to stringify.
+  # @return [hash]
   def stringify_keys(hash)
     if hash.is_a?(Hash)
       Hash[
@@ -192,6 +198,15 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
     exp = 6 if exp > 6
 
     format('%<size>.1f %<unit>s', size: size.to_f / 1024**exp, unit: units[exp])
+  end
+
+  # Check if the mime type of a file is XML
+  #
+  # @param file_path [string] the file
+  # @return [boolean] - true if the file is an XML file
+  def xml_file?(file_path)
+    typ = IO.popen(['file', '--brief', '--mime-type', file_path], in: :close, err: :close) { |io| io.read.chomp }
+    typ == 'application/xml'
   end
 
   # Takes a string and returns an array from text split on commas and new lines.

@@ -1,0 +1,315 @@
+= Defining a grid in code
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Defining a grid in code
+
+Sometimes a grid needs to be defined in code rather than in a `.yml` file. This could be because the grid is built up from a query that cannot be defined as a dataminer query or perhaps a grid needs to be built from data in memory.
+
+== Use
+
+Use the `Crossbeams::DataGrid::ColumnDefiner` class and call `make_columns` on it.
+Use the result as the `columnDefs` portion of the JSON hash returned to the browser.
+
+[source,ruby]
+----
+coldef = Crossbeams::DataGrid::ColumnDefiner.new
+cols = coldef.make_columns do |mk|
+  #..
+end
+{ columnDefs: cols, rowDefs: [] }.to_json
+----
+
+== Columns
+
+Columns are specified in a DSL:
+
+[source,ruby]
+----
+cols = coldef.make_columns do |mk|
+  mk.integer 'id', 'ID', hide: true
+  mk.col 'code', 'The code'
+  mk.col 'description', nil, width: 200
+  mk.numeric 'total'
+  mk.boolean 'active'
+end
+----
+
+Column types with their arguments:
+
+col:: `col(field, caption = nil, options = {})`
++
+A string column.
+integer:: `integer(field, caption = nil, options = {})`
++
+Integer column. `data_type` is set to `:integer`.
+numeric:: `numeric(field, caption = nil, options = {})`
++
+Numeric column. `data_type` is set to `:number` and `format` defaults to `delimited_1000`.
+boolean:: `boolean(field, caption = nil, options = {})`
++
+Boolean column. `data_type` is set to `:boolean`.
+href:: `href(link, field, options = {})`
++
+Link.
+href_prompt:: `href_prompt(link, field, options = {})`
++
+Link with yes/no confirmation.
+
+NOTE: The options for `href` and `href_prompt` differ from the options for other columns (See below)
+
+The available column options are:
+
+|===
+|option |description |possible values |default
+
+|:hide
+|Should the column be hidden?
+|Boolean
+|`false`
+
+|:tooltip
+|Tooltip to display for the column header
+|String
+|The value of `caption`
+
+|:width
+|Column width.
+|Integer
+|According to data_type: number: 120, all others: 100.
+
+|:data_type
+|The data type of the column
+|:string, :integer, :number, :boolean, :date, :datetime
+|`:string`
+
+|:groupable
+|Can the user group or pivot by this column?
+|Boolean
+|`false`
+
+|:group_by_seq
+|Sequence no to group by. When set, the grid will be loaded with grouping
+|Integer
+|None
+
+|:pinned
+|Is this column pinned?
+|String: `left` or `right`
+|None
+
+|:editable
+|Can the column be edited inline?
+|Boolean
+|`false`
+
+|:cellEditor
+|The type of inline editor to use
+|String: `numeric`, `select`, `textarea`
+|`input` text box
+
+|:cellEditorParams
+|For `select` cell editor only
+|Hash. Can contain `:values` array and `:width` to define the width of the select
+|None
+
+|:format
+|Apply a format to display the cell
+|String: `delimited_1000`, `delimited_1000_4` or `datetime_with_secs`
+|None (except `:datetime` columns default to displaying without seconds or time zone)
+
+|===
+
+The available href options are:
+
+|===
+|option |description |possible values |default
+
+|:fetch_renderer
+|Is this a fetch or normal request?
+|`true` for a fetch request, absent or `false` for a normal request.
+|`false`
+
+|:width
+|Column width.
+|Integer
+|60
+
+|===
+
+== Actions
+
+Actions are built up under the `action_column` method.
+
+e.g.
+[source,ruby]
+----
+mk.action_column do |act|
+  act.view_link 'view_path'
+  act.popup_link 'Do something', '/some_path/$col1$/some_more',
+                 col1: 'id',
+                 icon: 'list',
+                 title: 'Do This Thing',
+                 hide_if_null: :active
+  act.separator
+  act.submenu('Sub') do |sub|
+    sub.popup_edit_link '/edit_path/$col1$', col1: 'id'
+    sub.separator
+    sub.popup_delete_link '/delete_path/$col1$', col1: 'id', prompt: 'Delete this?'
+  end
+end
+----
+
+|===
+|Method |description |arguments
+
+|`submenu`
+|Build a submenu - you can use any of these action methods to build the menu within a block
+|text - the submenu caption
+
+|`separator`
+|Renders a separator line between two menu options
+|None
+
+|`link`
+|Present a link to a new page
+a|* text - the href caption
+* url - the URL to call
+* options - see below
+
+|`view_link`
+|Render a link with text `view` and a view icon
+a|* url - the URL to call
+* options - see below
+
+|`new_link`
+|Render a link with text `new` and a new icon
+a|* url - the URL to call
+* options - see below
+
+|`edit_link`
+|Render a link with text `edit` and a edit icon
+a|* url - the URL to call
+* options - see below
+
+|`delete_link`
+|Render a link with text `delete` that will prompt the user and a delete icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_link`
+|Present a link in a popup dialog
+a|* text - the href caption
+* url - the URL to call
+* options - see below
+
+|`popup_view_link`
+|Render a link in a popup dialog with text `view` and a view icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_new_link`
+|Render a link in a popup dialog with text `new` and a new icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_edit_link`
+|Render a link in a popup dialog with text `edit` and a edit icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_delete_link`
+|Make a DELETE fetch request link with text `delete` that will prompt the user and a delete icon
+a|* url - the URL to call
+* options - see below
+
+|===
+
+==== Action method options
+
+* auth
+* has_permission
+* is_delete (set by delete links)
+* icon (set by view, new, edit and delete links)
+* prompt (set by delete links)
+* title
+* title_field
+* popup (set to true by all `popup_` methods)
+* loading_window
+* hide_if_null
+* hide_if_present
+* hide_if_true
+* hide_if_false
+
+See link:/developer_documentation/grid_actions.adoc#_actions[Grid Actions] for an explanation of these options.
+
+== Example
+
+Here is an example showing basic usage.
+
+=== Route code
+
+[source,ruby]
+----
+r.is do
+  show_page { Development::Logging::LoggedAction::Show.call(id) }
+end
+
+r.on 'grid' do
+  interactor.logged_actions_grid(id)
+rescue StandardError => e
+  show_json_exception(e)
+end
+----
+
+=== View code
+
+[source,ruby]
+----
+layout = Crossbeams::Layout::Page.build(rules) do |page|
+  page.add_grid('logged_actions',
+                "/development/logging/logged_actions/#{id}/grid",
+                caption: 'Column details')
+end
+----
+
+=== Interactor code
+
+[source,ruby]
+----
+def logged_actions_grid(id)
+  logged_action = repo.find_logged_action(id)
+  row_defs = current_action_data_record(logged_action.table_name.to_sym, logged_action.row_data_id)
+
+  {
+    columnDefs: col_defs_for_logged_actions(logged_action),
+    rowDefs: row_defs
+  }.to_json
+end
+
+def col_defs_for_logged_actions(logged_action) # rubocop:disable Metrics/AbcSize
+  col_names = DevelopmentRepo.new.table_col_names(logged_action.table_name)
+  Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+    mk.action_column do |act|
+      act.popup_link 'Detail diff', '/development/logging/logged_actions/$col1$/diff',
+                     col1: 'event_id',
+                     icon: 'list',
+                     title: 'View differences',
+                     hide_if_null: :event_id
+    end
+    mk.col 'action_tstamp_tx', 'Action time'
+    mk.col 'action'
+    mk.col 'user_name', 'User', width: 200
+    mk.col 'context'
+    mk.col 'route_url'
+    mk.col 'request_ip'
+    make_columns_for(col_names, logged_action.table_name).each do |col|
+      mk.col col[:field], nil, col[:options]
+    end
+    mk.boolean 'statement_only', 'Stmt only?'
+    mk.integer 'event_id'
+    mk.integer 'id', nil, hide: true
+  end
+end
+----

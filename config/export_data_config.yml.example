@@ -1,0 +1,25 @@
+---
+pallet_sequences:
+  grid: all_pallet_sequences
+  out_dir: /home/nspack/csv_exports
+  export_hidden_fields: true
+  boolean_as_yn: true
+  prefix_long_numbers_with_quote: true
+  zip_for_mail: true
+  email:
+    to: info@nosoft.biz
+    subject: All pallets report
+    body: All pallets report generated from NSpack
+  uploads: (STILL TO COME) dropbox, server, share etc
+  subgroups: (STILL TO COME) BLYSW, DUNSW etc
+  conditions:
+    - col: id
+      op: =
+      val: 24
+bins:
+  grid: rmt_bins
+  out_dir: /home/nspack/csv_exports
+shipped_pallets:
+  report: shipped_pallets
+  out_dir: /home/nspack/csv_exports
+

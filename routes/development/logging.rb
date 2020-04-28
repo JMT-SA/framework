@@ -39,6 +39,24 @@ class Framework < Roda
       end
     end
 
+    # EXPORT DATA EVENT LOGS
+    # --------------------------------------------------------------------------
+    r.on 'export_data_event_logs', Integer do |id|
+      interactor = DevelopmentApp::ExportDataEventLogInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:export_data_event_logs, id) do
+        handle_not_found(r)
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('logging', 'read')
+          show_partial { Development::Logging::ExportDataEventLog::Show.call(id) }
+        end
+      end
+    end
+
     # QUE JOBS
     # --------------------------------------------------------------------------
     r.on 'que_jobs', Integer do |id|

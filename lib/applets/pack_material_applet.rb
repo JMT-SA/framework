@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 root_dir = File.expand_path('..', __dir__)
-Dir["#{root_dir}/pack_material/entities/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/interactors/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/jobs/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/modules/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/repositories/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/services/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/task_permission_checks/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/ui_rules/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/validations/*.rb"].each { |f| require f }
-Dir["#{root_dir}/pack_material/views/**/*.rb"].each { |f| require f }
+Dir["#{root_dir}/pack_material/entities/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/interactors/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/jobs/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/modules/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/repositories/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/services/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/task_permission_checks/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/ui_rules/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/validations/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/pack_material/views/**/*.rb"].sort.each { |f| require f }
 
 module PackMaterialApp
   DOMAIN_NAME = 'Pack Material'

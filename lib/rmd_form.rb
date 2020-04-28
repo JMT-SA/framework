@@ -148,7 +148,7 @@ module Crossbeams
       div_css_class = options[:as_table_cell] ? '' : ' class="pa2 bg-moon-gray br2"'
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}#{tr_css_class}><th#{td_css_class} align="left">#{label}</th>
-        <td#{td_css_class}><div#{div_css_class}>#{field_value(value) || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
+        <td#{td_css_class}><div#{div_css_class} id="#{form_name}_#{name}_value">#{field_value(value) || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
       HTML
     end

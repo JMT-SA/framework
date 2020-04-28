@@ -38,6 +38,7 @@ require './lib/base_service'
 require './lib/base_step'
 require './lib/doc_search'
 require './lib/document_sequence'
+require './lib/export_data'
 require './lib/help_index_builder'
 require './lib/http_calls'
 require './lib/local_store' # Will only work for processes running from one dir.
@@ -45,8 +46,8 @@ require './lib/rmd_form'
 require './lib/ui_rules'
 require './lib/library_versions'
 require './lib/dataminer_connections'
-Dir['./helpers/**/*.rb'].each { |f| require f }
-Dir['./lib/applets/*.rb'].each { |f| require f }
+Dir['./helpers/**/*.rb'].sort.each { |f| require f }
+Dir['./lib/applets/*.rb'].sort.each { |f| require f }
 
 ENV['ROOT'] = File.dirname(__FILE__)
 ENV['VERSION'] = File.read('VERSION')

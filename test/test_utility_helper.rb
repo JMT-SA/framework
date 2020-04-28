@@ -79,4 +79,19 @@ class TestUtilityFunctions < Minitest::Test
 
     assert_raises(ArgumentError) { UtilityFunctions.days_since(123, 3) }
   end
+
+  def test_scientific_notation_to_s
+    [
+      [1,1],
+      ['123', '123'],
+      ['1.0e2', '100.0'],
+      ['X1.0e2', 'X1.0e2'],
+      ['1.0e2X', '1.0e2X'],
+      [true, true],
+      ['false', 'false'],
+      ['L123', 'L123']
+    ].each do |val, expect|
+      assert_equal expect, UtilityFunctions.scientific_notation_to_s(val)
+    end
+  end
 end

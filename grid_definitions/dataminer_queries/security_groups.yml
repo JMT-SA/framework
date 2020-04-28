@@ -63,7 +63,7 @@
     :sequence_no: 5
     :caption: Created at
     :namespaced_name: created_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: true
@@ -79,7 +79,7 @@
     :sequence_no: 6
     :caption: Updated at
     :namespaced_name: updated_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: true

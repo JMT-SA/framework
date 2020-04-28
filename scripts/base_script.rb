@@ -23,8 +23,8 @@ ENV['RACK_ENV'] ||= 'development'
 require 'bundler'
 Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
-require_relative '../config/environment'
 require_relative '../config/app_const'
+require_relative '../config/environment'
 require_relative '../lib/crossbeams_errors'
 require_relative '../lib/crossbeams_responses'
 require_relative '../lib/error_mailer'

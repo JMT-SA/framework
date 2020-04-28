@@ -10,15 +10,15 @@ module PackMaterialApp
     # @param just_show_xml [bool] set to true to just return XML from the call without updating the db.
     def initialize(user_name, just_show_xml = false, block = nil, opts = {}) # rubocop:disable Metrics/AbcSize
       @block = block
-      @repo           = PurchaseInvoiceRepo.new
+      @repo = PurchaseInvoiceRepo.new
       @replenish_repo = ReplenishRepo.new
-      @dispatch_repo  = DispatchRepo.new
+      @dispatch_repo = DispatchRepo.new
       @purchase_invoice_repo = PurchaseInvoiceRepo.new
-      @log_repo       = DevelopmentApp::LoggingRepo.new
-      @user_name      = user_name
-      @grn_id         = opts[:mr_goods_returned_note_id]
-      @id             = opts[:delivery_id]
-      @just_show_xml  = just_show_xml
+      @log_repo = DevelopmentApp::LoggingRepo.new
+      @user_name = user_name
+      @grn_id = opts[:mr_goods_returned_note_id]
+      @id = opts[:delivery_id]
+      @just_show_xml = just_show_xml
 
       @goods_returned_note = @dispatch_repo.find_mr_goods_returned_note(@grn_id) if @grn_id
       @id ||= @goods_returned_note&.mr_delivery_id

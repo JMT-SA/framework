@@ -540,7 +540,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   end
 
   def build_json_action(action) # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Layout/AlignHash
+    # rubocop:disable Layout/HashAlignment
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
       change_select_value:    ->(act) { action_change_select_value(act) },
@@ -557,10 +557,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       clear_form_validation:  ->(act) { action_clear_form_validation(act) },
       set_required:           ->(act) { action_set_required(act) },
       set_checked:            ->(act) { action_set_checked(act) }
-      # redirect:               ->(act) { action_redirect(act) }       // url
-      # replace_dialog:         ->(act) { action_replace_dialog(act) } // url
+      # redirect:             ->(act) { action_redirect(act) }       // url
+      # replace_dialog:       ->(act) { action_replace_dialog(act) } // url
     }[action.type].call(action)
-    # rubocop:enable Layout/AlignHash
+    # rubocop:enable Layout/HashAlignment
   end
 
   def action_replace_select_options(action)

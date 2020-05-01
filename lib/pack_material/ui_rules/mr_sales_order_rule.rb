@@ -62,7 +62,7 @@ module UiRules
         vat_type_id: { renderer: :select, options: @replenish_repo.for_select_mr_vat_types, selected: @form_object&.vat_type_id, caption: 'Vat Type', required: true, prompt: true },
         account_code_id: { renderer: :select, options: @general_repo.for_select_account_codes_with_descriptions, selected: @form_object&.account_code_id, caption: 'Account Code', required: true, prompt: true },
         fin_object_code: {},
-        client_reference_number: {}
+        client_reference_number: { required: true }
       }
       fields.merge(common_fields)
     end

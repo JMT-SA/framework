@@ -17,7 +17,7 @@ The following renderers are available to a page:
 |<<Renderer::Input>>
 
 |:datetime
-|<<Renderer::Input>>
+|<<Renderer::Datetime>>
 
 |:email
 |<<Renderer::Input>>
@@ -98,7 +98,6 @@ a|
 * :email
 * :url
 * :date
-* :datetime
 * :month
 * :time
 * :password
@@ -115,6 +114,7 @@ a|
 a|
 * :no_spaces (user cannot type in a space)
 * :lowercase_underscore (can only type underscore or lowercase)
+* :ipv4_address (user must enter a valid 1pv4 address)
 * A regular expression used as the HTML5 `pattern` attribute of the input.
 |n/a
 
@@ -206,6 +206,92 @@ Must start with ".".
 |If true, a button will render next to the input which allow the user to copy the contents to the clipboard.
 |true or false
 |false
+
+|===
+
+=== Renderer::Datetime
+
+Renders two input text boxes - one for the date portion and another for the time portion.
+
+Given a field named `aaa` with a datetime value, the params returned will include:
+
+* `:aaa` - this is the combined datetime value to be used.
+* `:aaa_date` - this is just the date portion : to be ignored.
+* `:aaa_time` - this is just the time portion : to be ignored.
+
+|===
+|attribute |description |possible values |default
+
+|:caption
+|The label text
+|any text
+|The field name with underscores converted to spaces
+and all words start with initial capital letter.
+
+|:placeholder
+|Placeholder text
+|Any text
+|n/a
+
+|:title
+|Title (hint)
+|Any text
+|None.
+
+|:maxvalue_date
+|HTML `max` attribute. For the date portion only, restrict to a maximum value.
+|Any number
+|n/a
+
+|:minvalue_date
+|HTML `min` attribute. For the date portion only, restrict to a minimum value.
+|Any number
+|n/a
+
+|:maxvalue_time
+|HTML `max` attribute. For the time portion only, restrict to a maximum value.
+|Any number
+|n/a
+
+|:minvalue_time
+|HTML `min` attribute. For the time portion only, restrict to a minimum value.
+|Any number
+|n/a
+
+|:readonly
+|HTML `readonly` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the value cannot be changed in the browser.
+|true or false
+|false
+
+|:disabled
+|HTML `disabled` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the field cannot be filled-in, renders with a grey background and the field and its value will not be POSTed back to the server.
+|true or false
+|false
+
+|:required
+|HTML `required` attribute. Set to `true` if this value is `true`, else the attribute is not present. If true, the browser will complain if no value is provided.
+|true or false
+|false
+
+|:hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|true or false
+|false
+
+|:invisible
+|If true, the field will not render in the form at all.
+|true or false
+|false
+
+|:parent_field
+|The name of the Hash field this field belongs to. Useful to render an element in a JSONB hash.
+|Symbol
+|None
+
+|:hint
+|Hint text to be shown to the user. A question-mark icon appears in the label that the user can click on to display this text. Text can include HTML tags for formatting.
+|HTML text
+|None
 
 |===
 
@@ -317,6 +403,13 @@ and all words start with initial capital letter.
 |`true` or `false`
 |`false`
 
+|:format
+|Specify a format to be applied to the label text.
+a|Symbol: `:without_timezone` or `:without_timezone_or_seconds`. These apply to Time values - stripping "+0200" or ":00 +0200" from the end of the time string.
+
+To render text with linebreaks, use `:preformat`.
+|None
+
 |===
 
 === Renderer::List
@@ -336,6 +429,16 @@ and all words start with initial capital letter.
 |The list of items to display. If a two-dimensional array is provided, just the first element is displayed.
 |a one-dimensional or two-diemnsional array
 |None. Required.
+
+|:scroll_height
+|Restrict the list to a certain height and show scrollbars if the list is longer.
+|`:short` or `:medium`
+|None.
+
+|:filled_background
+|If true, draw a border and set the background to grey.
+|`true` or `false`
+|`false`
 
 |:hide_on_load
 |HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.

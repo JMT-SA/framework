@@ -15,15 +15,17 @@
 # - printer: 'no_printer'. In PRINT mode, this MUST be provided.
 # - OUT_FILE_TYPE: 'PDF'. This can be PDF, CSV, XLS, RTF. Ignored in PRINT mode.
 # - top_level_dir: ''. Use this if the report is stored in a subdir of the report dir.
-class CreateJasperReport < BaseService
-  attr_reader :report_name, :user, :keep_file, :top_level_dir, :printer, :report_parameters
+class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
+  attr_reader :report_name, :user, :parent_folder, :keep_file, :top_level_dir, :printer, :report_parameters, :debug_mode
 
   NO_PRINTER = 'no_printer'
 
-  def initialize(report_name:, user:, file:, params: {})
+  def initialize(report_name:, user:, file:, parent_folder: nil, debug_mode: false, params: {}) # rubocop:disable Metrics/ParameterLists
     params = params.dup
     @report_name = report_name
     @user = user
+    @parent_folder = parent_folder
+    @debug_mode = debug_mode
     @keep_file = params.delete(:keep_file)
     @return_full_path = params.delete(:return_full_path)
     @top_level_dir = params.delete(:top_level_dir) || ''
@@ -37,7 +39,7 @@ class CreateJasperReport < BaseService
     clear_temp_file
     log_report_result(result)
 
-    if result.to_s.include?('JMT Jasper error:') && (errors = result.split('JMT Jasper error:')).length.positive?
+    if result.to_s.include?('Jasper error:') && (errors = result.split('Jasper error:')).length.positive?
       send_error_mail(result)
       failed_response("Jasper printing error: <br>#{errors[1]}")
     elsif @mode == 'GENERATE'
@@ -53,7 +55,7 @@ class CreateJasperReport < BaseService
     body = <<~STR
       Jasper report "#{report_name}" did not succeed.
 
-      Error  : #{result.split('JMT Jasper error:')[1]}
+      Error  : #{result.split('Jasper error:')[1].strip}
 
       User   : #{user}
 
@@ -96,7 +98,13 @@ class CreateJasperReport < BaseService
   end
 
   def command
-    @command ||= "java -jar JasperReportPrinter.jar \"#{report_dir}\" #{report_name} \"#{printer}\" \"#{connection_string}\" #{report_parameters}"
+    @command ||= "#{debug_switch}java -jar JasperReportPrinter.jar \"#{report_dir}\" #{report_name} \"#{printer}\" \"#{connection_string}\" #{report_parameters}"
+  end
+
+  def debug_switch
+    return '' unless debug_mode
+
+    'DEBUG=y '
   end
 
   def log_report_details
@@ -120,7 +128,11 @@ class CreateJasperReport < BaseService
   end
 
   def report_definitions_dir
-    @report_definitions_dir ||= ENV['JASPER_REPORTS_PATH']
+    @report_definitions_dir ||= if parent_folder.nil_or_empty?
+                                  ENV['JASPER_REPORTS_PATH']
+                                else
+                                  "#{ENV['JASPER_REPORTS_PATH']}/#{parent_folder}"
+                                end
   end
 
   def add_output_path(file)

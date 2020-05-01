@@ -68,14 +68,14 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def assert_sub_tables_valid! # rubocop:disable Metrics/AbcSize
+  def assert_sub_tables_valid!
     @sub_tables.each do |rule|
       sub_table = rule.fetch(:sub_table)
       raise ArgumentError, "Sub_table #{sub_table} must be a Symbol" unless sub_table.is_a?(Symbol)
       raise ArgumentError, "Sub_table #{sub_table} cannot be joined via a join table AND an id keys array" if rule.key?(:id_keys_column) && (rule.key?(:join_table) || rule.key?(:uses_join_table))
 
-      rule.keys.each { |k| raise ArgumentError, "Unknown sub-table key: #{k}" unless VALID_SUB_KEYS.include?(k) }
-      rule.keys.each { |k| validate_sub_table_rule!(k, rule) }
+      rule.each_key { |k| raise ArgumentError, "Unknown sub-table key: #{k}" unless VALID_SUB_KEYS.include?(k) }
+      rule.each_key { |k| validate_sub_table_rule!(k, rule) }
     end
   end
 
@@ -86,7 +86,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
       raise ArgumentError, "Args for function #{function} must be an Array" unless args.is_a?(Array)
 
       _ = rule.fetch(:col_name)
-      rule.keys.each { |k| raise ArgumentError, "Unknown lookup-function key: #{k}" unless VALID_LKP_KEYS.include?(k) }
+      rule.each_key { |k| raise ArgumentError, "Unknown lookup-function key: #{k}" unless VALID_LKP_KEYS.include?(k) }
     end
   end
 
@@ -95,7 +95,7 @@ class BaseRepoAssocationFinder # rubocop:disable Metrics/ClassLength
       parent_table = rule.fetch(:parent_table)
       raise ArgumentError, "parent_table #{parent_table} must be a Symbol" unless parent_table.is_a?(Symbol)
 
-      rule.keys.each { |k| raise ArgumentError, "Unknown parent-table key: #{k}" unless VALID_PARENT_KEYS.include?(k) }
+      rule.each_key { |k| raise ArgumentError, "Unknown parent-table key: #{k}" unless VALID_PARENT_KEYS.include?(k) }
       raise ArgumentError, 'Parent tables columns rule must be an Array' if rule[:columns] && !rule[:columns].is_a?(Array)
     end
   end

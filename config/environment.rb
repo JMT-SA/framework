@@ -14,6 +14,7 @@ db_name = if ENV.fetch('RACK_ENV') == 'test'
           end
 require 'sequel'
 require 'logger'
+Sequel.extension(:pg_json_ops)
 DB = Sequel.connect(db_name)
 if ENV.fetch('RACK_ENV') == 'development' && !ENV['DONOTLOGSQL']
   DB.logger = if ENV['LOGSQLTOFILE']
@@ -25,9 +26,10 @@ end
 DB.extension(:connection_validator) # Ensure connections are not lost over time.
 DB.extension :pg_array
 DB.extension :pg_json
-Sequel.extension(:pg_json_ops)
 DB.extension :pg_hstore
 DB.extension :pg_inet
+Sequel.application_timezone = :local
+Sequel.database_timezone = :utc
 
 Que.connection = DB
 Que.job_middleware.push(

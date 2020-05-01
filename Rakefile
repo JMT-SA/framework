@@ -185,6 +185,19 @@ namespace :db do
     puts "Recent migrations:\n#{migrations.join("\n")}"
   end
 
+  desc 'Apply db seeds to masterfiles'
+  task mf_seeds: :dotenv_with_override do
+    require 'sequel'
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              else
+                ENV.fetch('DATABASE_URL')
+              end
+    db = Sequel.connect(db_name)
+    db.run(File.read('./db/seeds/20_masterfile_data.sql'))
+    puts 'Masterfile seeds applied'
+  end
+
   desc 'Run migrations'
   task :migrate, [:version] => :dotenv_with_override do |_, args|
     require 'sequel'
@@ -195,6 +208,7 @@ namespace :db do
                 ENV.fetch('DATABASE_URL')
               end
     db = Sequel.connect(db_name)
+    db.extension :pg_timestamptz
     if args[:version]
       puts "Migrating to version #{args[:version]}"
       Sequel::Migrator.run(db, 'db/migrations', target: args[:version].to_i)
@@ -218,6 +232,7 @@ namespace :db do
                 ENV.fetch('DATABASE_URL')
               end
     db = Sequel.connect(db_name)
+    db.extension :pg_timestamptz
     migrations = if db.tables.include?(:schema_migrations)
                    db[:schema_migrations].reverse(:filename).first(2).map { |r| r[:filename] }
                  else
@@ -254,7 +269,7 @@ namespace :db do
             #   TrueClass :active, default: true
             #   DateTime :created_at, null: false
             #   DateTime :updated_at, null: false
-            #
+
             #   index [:some_id], name: :fki_table_name_some_table_name
             #   index [:my_uniq_name], name: :table_name_unique_my_uniq_name, unique: true
             # end
@@ -311,7 +326,7 @@ namespace :db do
               # DateTime :other
               DateTime :created_at, null: false
               DateTime :updated_at, null: false
-              #
+
               # index [:code], name: :#{nm}_unique_code, unique: true
               # index [:some_id], name: :fki_#{nm}_some_table_name
             end

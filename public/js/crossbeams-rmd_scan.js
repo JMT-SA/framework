@@ -245,6 +245,11 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
         scannableInputs.forEach((e) => {
           if (e.value === '' && cnt === 0 && (publicAPIs.bypassRules || e.dataset.scanRule === scanPack.scanType)) {
             e.value = scanPack.value;
+            const evt = new Event('change', {
+              bubbles: true,
+            });
+            e.dispatchEvent(evt);
+
             e.readOnly = true;
             const field = document.getElementById(`${e.id}_scan_field`);
             if (field) {

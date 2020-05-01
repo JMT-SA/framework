@@ -40,7 +40,7 @@ class HelpIndexBuilder
 
   def build_entries(content)
     ar = []
-    content.keys.each do |group|
+    content.each_key do |group|
       ar << "\n== #{group}\n"
       content[group].each do |file|
         ar << "* link:/#{file}[#{File.basename(file).delete_suffix('.adoc').gsub('_', ' ').capitalize}]\n"

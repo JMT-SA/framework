@@ -101,16 +101,20 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[table_name].where(id: id).get(column)
   end
 
-  # Get a single value from a record given any WHERE clause
-  # NB: only the first record is returned - even when the WHERE clause
-  #     would return more than one row.
+  # Get a single value (or set of values) from a record given any WHERE clause.
+  # If an array of columns are given, an array of values will be returned.
+  # An exception is raised if the query returns more than one record.
   #
   # @param table_name [Symbol] the db table name.
-  # @param column [Symbol] the column (or array of columns) to query.
+  # @param column [Symbol] the column (or array of columns) to return.
   # @param args [Hash] the where-clause conditions.
   # @return [any] the column value for the matching record or nil.
-  def get_with_args(table_name, column, args)
-    DB[table_name].where(args).get(column)
+  def get_value(table_name, column, args)
+    values = DB[table_name].where(args).select_map(column)
+    raise Crossbeams::FrameworkError, '"get_value" method must return only one record' if values.length > 1
+    return nil if values.empty?
+
+    values.first
   end
 
   # Get the id for a record in a table for a given WHERE clause.
@@ -125,6 +129,18 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     raise Crossbeams::FrameworkError, '"get_id" method must return only one record' if ids.length > 1
 
     ids.first
+  end
+
+  # Get id of existing record or Create a record, returning the id
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param attrs [Hash, OpenStruct] the fields and their values.
+  # @return [Integer] the id of the new record.
+  def get_id_or_create(table_name, attrs)
+    existing_id = get_id(table_name, attrs.to_h)
+    return existing_id if existing_id
+
+    create(table_name, attrs)
   end
 
   # Find the first row in a table matching some condition.
@@ -311,26 +327,39 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # Helper to convert a Ruby Array into a value that postgresql will understand.
   #
   # @param arr [Array] the array to convert.
+  # @param array_type [Symbol] the type of array (:integer / :text). Default is :integer.
   # @return [Sequel::Postgres::PGArray] Postgres version of the Array.
-  def array_for_db_col(arr)
+  def array_for_db_col(arr, array_type: :integer)
     return nil if arr.nil?
 
-    Sequel.pg_array(arr)
+    Sequel.pg_array(arr, array_type)
   end
 
-  # Transform array values in a hash to pg_arrays.
+  # Helper to convert a Ruby Array into a value that postgresql will understand.
+  #
+  # @param arr [Array] the array to convert.
+  # @return [Sequel::Postgres::PGArray] Postgres version of the Array.
+  def array_of_text_for_db_col(arr)
+    array_for_db_col(arr, array_type: :text)
+  end
+
+  # Transform integer array values in a hash to pg_arrays.
   # Any values not of type Array are returned unchanged.
+  #
+  # Note: this will not work unless all arrays are of the same type.
+  # - use :integer or :text.
   #
   # e.g. If input parameters include a collection of ids to be stored
   # in an array column in the database, passing the params through
   # this method will prepare the ids correctly for persisting.
   #
   # @param args [hash,Dry::Validation] the hash or Dry::Validation result.
+  # @param array_type [Symbol] the type of array (:integer / :text). Default is :integer.
   # @return [hash] the transformed hash.
-  def prepare_array_values_for_db(args)
+  def prepare_array_values_for_db(args, array_type: :integer)
     return nil if args.nil?
 
-    args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v) : v }
+    args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v, array_type: array_type) : v }
   end
 
   # Helper to convert rows of records to a Hash that can be used for optgroups in a select.
@@ -349,7 +378,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #    optgroup_array(recs, :type, :sub, :id)
   #    # => { 'A' => [['B', 1], ['C', 2], ['E', 7]], 'B' => [['D', 4]] }
   def optgroup_array(recs, group_name, label, value = label)
-    Hash[recs.map { |r| [r[group_name], r[label], r[value]] }.group_by(&:first).map { |k, v| [k, v.map { |i| [i[1], i[2]] }] }]
+    Hash[recs.map { |r| [r[group_name], r[label], r[value]] }.group_by(&:first).map { |k, v| [k, v.map { |i| [i[1], i[2]] }] }] # rubocop:disable Style/HashTransformValues
   end
 
   # Log the context of a transaction. Useful for joining to logged_actions table which has no context.

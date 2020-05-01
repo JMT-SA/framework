@@ -1,4 +1,3 @@
-
 // Object to keep track of the grids in a page - so they can be looked up by div id.
 /**
  * In-browser store of grids on the page.
@@ -49,6 +48,258 @@ const crossbeamsGridStore = {
   },
 };
 
+const crossbeamsGridFormatters = {
+  testRender: function testRender(params) {
+    return `<b>${params.value.toUpperCase()}</b>`;
+  },
+
+  nextChar: function nextChar(c) {
+    return String.fromCharCode(c.charCodeAt(0) + 1);
+  },
+
+  // Is the last item in an array of context menu items a separator?
+  lastIsSeparator: (items) => {
+    if (!items || items.length < 1) {
+      return false;
+    }
+    if (!items[items.length - 1].value) {
+      return false;
+    }
+    return items[items.length - 1].value === '---';
+  },
+
+  // Go through a list of context items and remove any trailing separators.
+  removeTrailingSeparatorItems: (items) => {
+    let cleanItems = items;
+    while (crossbeamsGridFormatters.lastIsSeparator(cleanItems)) {
+      cleanItems = cleanItems.slice(0, -1);
+    }
+    return cleanItems;
+  },
+
+  makeContextNode: function makeContextNode(key, prefix, items, item, params) {
+    let node = {};
+    let urlComponents = [];
+    let url;
+    let subKey = 'a';
+    let subPrefix = '';
+    let subnode;
+    let titleValue;
+    const checkBooleans = (checks, boolVal, data) => {
+      let ok = false;
+      checks.split(',').forEach((field) => {
+        if (data[field] === boolVal) {
+          ok = true;
+        }
+      });
+      return ok;
+    };
+    const checkNulls = (checks, nullPresent, data) => {
+      let ok = false;
+      checks.split(',').forEach((field) => {
+        if (nullPresent && data[field] === null) {
+          ok = true;
+        }
+        if (!nullPresent && data[field] !== null) {
+          ok = true;
+        }
+      });
+      return ok;
+    };
+    if (item.title_field) {
+      titleValue = params.data[item.title_field];
+    } else {
+      titleValue = item.title ? item.title : '';
+      if (titleValue.indexOf('$:') > -1) {
+        titleValue = titleValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
+      }
+    }
+    if (item.is_separator) {
+      // Add a separator - but only if the previous item is not also a separator.
+      if (items.length > 0 && items[items.length - 1].value !== '---') {
+        return { key: `${prefix}${key}`, name: item.text, value: '---' };
+      }
+      return null;
+    } else if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
+      // No show of item
+      return null;
+    } else if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
+      // No show of item
+      return null;
+    } else if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
+      // No show of item
+      return null;
+    } else if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
+      // No show of item
+      return null;
+    } else if (item.is_submenu) {
+      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null };
+      item.items.forEach((subitem) => {
+        subKey = crossbeamsGridFormatters.nextChar(subKey);
+        subPrefix = `${prefix}${key}_`;
+        subnode = crossbeamsGridFormatters.makeContextNode(subKey,
+                                                           subPrefix,
+                                                           node.items,
+                                                           subitem, params);
+        if (subnode !== null) {
+          node.items.push(subnode);
+        }
+      });
+      node.items = crossbeamsGridFormatters.removeTrailingSeparatorItems(node.items);
+      if (node.items.length > 0) {
+        return node;
+      }
+      return null;
+    }
+    urlComponents = item.url.split('$');
+    url = '';
+    urlComponents.forEach((cmp, index) => {
+      if (index % 2 === 0) {
+        url += cmp;
+      } else {
+        url += params.data[item[cmp]];
+      }
+    });
+    return { key: `${prefix}${key}`,
+      name: item.text,
+      url,
+      prompt: item.prompt,
+      method: item.method,
+      title: item.title,
+      title_field: titleValue,
+      icon: item.icon,
+      popup: item.popup,
+      loading_window: item.loading_window,
+      row_id: params.data.id,
+    };
+  },
+
+  menuActionsRenderer: function menuActionsRenderer(params) {
+    if (!params.data) { return null; }
+    let valueObj = params.value;
+    if (valueObj === undefined || valueObj === null) {
+      valueObj = params.valueGetter();
+    }
+    if (valueObj.length === 0) { return ''; }
+
+    let items = [];
+    let node;
+    const prefix = '';
+    let key = 'a';
+    valueObj.forEach((item) => {
+      key = crossbeamsGridFormatters.nextChar(key);
+      node = crossbeamsGridFormatters.makeContextNode(key, prefix, items, item, params);
+      if (node !== null) {
+        items.push(node);
+      }
+    });
+    // If items are hidden, the last item(s) could be separators.
+    // Remove them here.
+    items = crossbeamsGridFormatters.removeTrailingSeparatorItems(items);
+    if (items.length === 0) {
+      return '';
+    }
+    // svg: chevron-right
+    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"/></svg></button>`;
+  },
+
+  // Return a number with thousand separator and at least 2 digits after the decimal.
+  numberWithCommas2: function numberWithCommas2(params) {
+    if (!params.data) { return null; }
+
+    return crossbeamsUtils.formatNumberWithCommas(params.value, 2);
+  },
+
+  // Return a number with thousand separator and at least 4 digits after the decimal.
+  numberWithCommas4: function numberWithCommas4(params) {
+    if (!params.data) { return null; }
+
+    return crossbeamsUtils.formatNumberWithCommas(params.value, 4);
+  },
+
+  booleanFormatter: function booleanFormatter(params) {
+    if (!params.data) { return null; }
+
+    if (params.value === '' || params.value === null) { return ''; }
+    if (params.value === true || params.value === 't' || params.value === 'true' || params.value === 'y' || params.value === 1) {
+      return '<span class="ac_icon_check">&nbsp;</span>';
+    }
+    return '<span class="ac_icon_uncheck">&nbsp;</span>';
+  },
+
+  // Remove the time zone portion of a datetime column.
+  dateTimeWithoutZoneFormatter: function dateTimeWithoutZoneFormatter(params) {
+    if (!params.data) { return null; }
+
+    if (params.value === '' || params.value === null) { return ''; }
+    return params.value.replace(/ \+\d\d\d\d$/, '');
+  },
+
+  // Remove the seconds and time zone portion of a datetime column.
+  dateTimeWithoutSecsOrZoneFormatter: function dateTimeWithoutSecsOrZoneFormatter(params) {
+    if (!params.data) { return null; }
+
+    if (params.value === '' || params.value === null) { return ''; }
+    return params.value.replace(/:\d\d \+\d\d\d\d$/, '');
+  },
+
+  // Format a column to display as an icon.
+  // The column format is: "icon_name[,colour][,indent level]"
+  // - colour defaults to grey
+  // - indent level defaults to 0
+  iconFormatter: function iconFormatter(params) {
+    if (!params.data) { return null; }
+    if (params.value === '' || params.value === null) { return ''; }
+
+    const icoCol = params.value.split(',');
+    if (!icoCol[1]) icoCol.push('gray'); // default colour
+    if (!icoCol[2]) {                    // default indent from "level" column
+      if (params.data.level) {
+        icoCol.push(params.data.level - 1);
+      } else {
+        icoCol.push(0);
+      }
+    }
+    return `<span class="cbl-icon" style="color:${icoCol[1]};margin-left:${icoCol[2] * 0.75}rem">
+        <img src="/app_icons/${icoCol[0]}.svg" onload="SVGInject(this)">
+      </span>`;
+  },
+
+  hrefInlineFormatter: function hrefInlineFormatter(params) {
+    return `<a href="/books/${params.value}/edit">edit</a>`;
+  },
+
+  // The Tachyon classes required to style a link as a button.
+  buttonClassForLinks: function buttonClassForLinks(bgColour) {
+    return `link dim br1 ph2 dib white bg-${bgColour || 'green'}`;
+  },
+
+  hrefSimpleFormatter: function hrefSimpleFormatter(params) {
+    const vals = params.value.split('|');
+    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href="${vals[0]}">${vals[1]}</a>`;
+  },
+
+  hrefSimpleFetchFormatter: function hrefSimpleFetchFormatter(params) {
+    const vals = params.value.split('|');
+    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" data-remote-link="true" href="${vals[0]}">${vals[1]}</a>`;
+  },
+
+  // Creates a link that when clicked prompts for a yes/no answer.
+  // Column value is in the format "url|linkText|prompt|method".
+  // Only url and linkText are required.
+  hrefPromptFormatter: function hrefPromptFormatter(params) {
+    let url = '';
+    let linkText = '';
+    let prompt;
+    let method;
+    [url, linkText, prompt, method] = params.value.split('|');
+    prompt = prompt || 'Are you sure?';
+    method = (method || 'post').toLowerCase();
+    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href='#' data-prompt="${prompt}" data-method="${method}" data-url="${url}"
+    onclick="crossbeamsGridEvents.promptClick(this);">${linkText}</a>`;
+  },
+};
+
 /**
  * Handle various events related to interactions with the grid.
  * @namespace
@@ -78,7 +329,7 @@ const crossbeamsGridEvents = {
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     const rowNode = gridOptions.api.getRowNode(id);
     if (rowNode === undefined) {
-      Jackbox.error(`Could not find a grid with id "${id}".`, { time: 20 });
+      crossbeamsUtils.showError(`Could not find a grid with id "${id}".`);
       console.log('No grid with id:', id); // eslint-disable-line no-console
       return;
     }
@@ -135,6 +386,8 @@ const crossbeamsGridEvents = {
         const form = document.createElement('form');
         const element1 = document.createElement('input');
         const csrf = document.createElement('input');
+        form.style.position = 'absolute';
+        form.style.left = '-1000px';
         form.method = 'POST';
         form.action = url;
         element1.value = ids.join(',');
@@ -145,6 +398,10 @@ const crossbeamsGridEvents = {
         form.appendChild(csrf);
         document.body.appendChild(form);
         form.submit();
+      };
+
+      const saveLoading = () => {
+        crossbeamsUtils.loadingWindow(`${url}?selection[list]=${ids.join(',')}`);
       };
 
       // Save via a remote fetch call that renders in a dialog.
@@ -167,7 +424,7 @@ const crossbeamsGridEvents = {
           body: form,
         }).then((response) => {
           if (response.status === 404) {
-            Jackbox.error('The requested resource was not found', { time: 20 });
+            crossbeamsUtils.showError('The requested resource was not found');
             return {};
           }
           return response.json();
@@ -210,11 +467,11 @@ const crossbeamsGridEvents = {
           // Only if not redirect...
           if (data.flash) {
             if (data.flash.notice) {
-              Jackbox.success(data.flash.notice);
+              crossbeamsUtils.showSuccess(data.flash.notice);
             }
             if (data.flash.error) {
               if (data.exception) {
-                Jackbox.error(data.flash.error, { time: 20 });
+                crossbeamsUtils.showError(data.flash.error);
                 if (data.backtrace) {
                   console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                   console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -222,7 +479,7 @@ const crossbeamsGridEvents = {
                   console.groupEnd(); // eslint-disable-line no-console
                 }
               } else {
-                Jackbox.error(data.flash.error);
+                crossbeamsUtils.showError(data.flash.error);
               }
             }
           }
@@ -238,6 +495,8 @@ const crossbeamsGridEvents = {
         saveFunc = saveRemote;
       } else if (saveMethod === 'dialog') {
         saveFunc = saveToPopup;
+      } else if (saveMethod === 'loading') {
+        saveFunc = saveLoading;
       }
 
       crossbeamsUtils.confirm({
@@ -289,7 +548,7 @@ const crossbeamsGridEvents = {
     }).then((response) => {
       if (response.status === 404) {
         crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
-        Jackbox.error('The requested resource was not found', { time: 20 });
+        crossbeamsUtils.showError('The requested resource was not found');
         return {};
       }
       return response.json();
@@ -307,18 +566,18 @@ const crossbeamsGridEvents = {
         // Only if not redirect...
         if (data.flash) {
           if (data.flash.notice) {
-            Jackbox.success(data.flash.notice);
+            crossbeamsUtils.showSuccess(data.flash.notice);
           }
           if (data.flash.info) {
-            Jackbox.information(data.flash.info);
+            crossbeamsUtils.showInformation(data.flash.info);
           }
           if (data.flash.warning) {
-            Jackbox.warning(data.flash.warning);
+            crossbeamsUtils.showWarning(data.flash.warning);
           }
           if (data.flash.error) {
             crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
             if (data.exception) {
-              Jackbox.error(data.flash.error, { time: 20 });
+              crossbeamsUtils.showError(data.flash.error);
               if (data.backtrace) {
                 console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                 console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -326,7 +585,7 @@ const crossbeamsGridEvents = {
                 console.groupEnd(); // eslint-disable-line no-console
               }
             } else {
-              Jackbox.error(data.flash.error);
+              crossbeamsUtils.showError(data.flash.error);
             }
           }
         }
@@ -374,7 +633,7 @@ const crossbeamsGridEvents = {
         rIdx = rowNode.rowIndex;
       }
       gridOptions.api.ensureColumnVisible(event.target.dataset.colName);
-      gridOptions.api.setFocusedCell(rIdx, event.target.dataset.colName);
+      gridOptions.api.setFocusedCell(rIdx, event.target.dataset.colName); // ??? no effect
     });
   },
 
@@ -464,6 +723,9 @@ const crossbeamsGridEvents = {
         if (testStr.length > 12 && !isNaN(testStr) && !testStr.includes('.')) {
           return `'${testStr}`;
         }
+      }
+      if (parms.column.colDef.valueFormatter) {
+        return (parms.column.colDef.valueFormatter({ data: parms.node.data, value: parms.value }));
       }
       return parms.value;
     };
@@ -658,6 +920,12 @@ const crossbeamsGridEvents = {
               if (colDef.valueFormatter.name === 'numberWithCommas4') {
                 return crossbeamsUtils.formatNumberWithCommas(data, 4);
               }
+              if (colDef.valueFormatter.name === 'dateTimeWithoutZoneFormatter') {
+                return crossbeamsGridFormatters.dateTimeWithoutZoneFormatter({ data: 'some', value: data });
+              }
+              if (colDef.valueFormatter.name === 'dateTimeWithoutSecsOrZoneFormatter') {
+                return crossbeamsGridFormatters.dateTimeWithoutSecsOrZoneFormatter({ data: 'some', value: data });
+              }
             }
             return data;
           })(rowNode.data[k])}
@@ -694,242 +962,6 @@ const crossbeamsGridEvents = {
     // ALSO: disable link automatically while call is being processed...
     event.stopPropagation();
     event.preventDefault();
-  },
-};
-
-const crossbeamsGridFormatters = {
-  testRender: function testRender(params) {
-    return `<b>${params.value.toUpperCase()}</b>`;
-  },
-
-  nextChar: function nextChar(c) {
-    return String.fromCharCode(c.charCodeAt(0) + 1);
-  },
-
-  // Is the last item in an array of context menu items a separator?
-  lastIsSeparator: (items) => {
-    if (!items || items.length < 1) {
-      return false;
-    }
-    if (!items[items.length - 1].value) {
-      return false;
-    }
-    return items[items.length - 1].value === '---';
-  },
-
-  // Go through a list of context items and remove any trailing separators.
-  removeTrailingSeparatorItems: (items) => {
-    let cleanItems = items;
-    while (crossbeamsGridFormatters.lastIsSeparator(cleanItems)) {
-      cleanItems = cleanItems.slice(0, -1);
-    }
-    return cleanItems;
-  },
-
-  makeContextNode: function makeContextNode(key, prefix, items, item, params) {
-    let node = {};
-    let urlComponents = [];
-    let url;
-    let subKey = 'a';
-    let subPrefix = '';
-    let subnode;
-    let titleValue;
-    const checkBooleans = (checks, boolVal, data) => {
-      let ok = false;
-      checks.split(',').forEach((field) => {
-        if (data[field] === boolVal) {
-          ok = true;
-        }
-      });
-      return ok;
-    };
-    const checkNulls = (checks, nullPresent, data) => {
-      let ok = false;
-      checks.split(',').forEach((field) => {
-        if (nullPresent && data[field] === null) {
-          ok = true;
-        }
-        if (!nullPresent && data[field] !== null) {
-          ok = true;
-        }
-      });
-      return ok;
-    };
-    if (item.title_field) {
-      titleValue = params.data[item.title_field];
-    } else {
-      titleValue = item.title ? item.title : '';
-      if (titleValue.indexOf('$:') > -1) {
-        titleValue = titleValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
-      }
-    }
-    if (item.is_separator) {
-      // Add a separator - but only if the previous item is not also a separator.
-      if (items.length > 0 && items[items.length - 1].value !== '---') {
-        return { key: `${prefix}${key}`, name: item.text, value: '---' };
-      }
-      return null;
-    } else if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
-      // No show of item
-      return null;
-    } else if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
-      // No show of item
-      return null;
-    } else if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
-      // No show of item
-      return null;
-    } else if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
-      // No show of item
-      return null;
-    } else if (item.is_submenu) {
-      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null };
-      item.items.forEach((subitem) => {
-        subKey = crossbeamsGridFormatters.nextChar(subKey);
-        subPrefix = `${prefix}${key}_`;
-        subnode = crossbeamsGridFormatters.makeContextNode(subKey,
-                                                           subPrefix,
-                                                           node.items,
-                                                           subitem, params);
-        if (subnode !== null) {
-          node.items.push(subnode);
-        }
-      });
-      node.items = crossbeamsGridFormatters.removeTrailingSeparatorItems(node.items);
-      if (node.items.length > 0) {
-        return node;
-      }
-      return null;
-    }
-    urlComponents = item.url.split('$');
-    url = '';
-    urlComponents.forEach((cmp, index) => {
-      if (index % 2 === 0) {
-        url += cmp;
-      } else {
-        url += params.data[item[cmp]];
-      }
-    });
-    return { key: `${prefix}${key}`,
-      name: item.text,
-      url,
-      prompt: item.prompt,
-      method: item.method,
-      title: item.title,
-      title_field: titleValue,
-      icon: item.icon,
-      popup: item.popup,
-      loading_window: item.loading_window,
-      row_id: params.data.id,
-    };
-  },
-
-  menuActionsRenderer: function menuActionsRenderer(params) {
-    if (!params.data) { return null; }
-    let valueObj = params.value;
-    if (valueObj === undefined || valueObj === null) {
-      valueObj = params.valueGetter();
-    }
-    if (valueObj.length === 0) { return ''; }
-
-    let items = [];
-    let node;
-    const prefix = '';
-    let key = 'a';
-    valueObj.forEach((item) => {
-      key = crossbeamsGridFormatters.nextChar(key);
-      node = crossbeamsGridFormatters.makeContextNode(key, prefix, items, item, params);
-      if (node !== null) {
-        items.push(node);
-      }
-    });
-    // If items are hidden, the last item(s) could be separators.
-    // Remove them here.
-    items = crossbeamsGridFormatters.removeTrailingSeparatorItems(items);
-    if (items.length === 0) {
-      return '';
-    }
-    // svg: chevron-right
-    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"/></svg></button>`;
-  },
-
-  // Return a number with thousand separator and at least 2 digits after the decimal.
-  numberWithCommas2: function numberWithCommas2(params) {
-    if (!params.data) { return null; }
-
-    return crossbeamsUtils.formatNumberWithCommas(params.value, 2);
-  },
-
-  // Return a number with thousand separator and at least 4 digits after the decimal.
-  numberWithCommas4: function numberWithCommas4(params) {
-    if (!params.data) { return null; }
-
-    return crossbeamsUtils.formatNumberWithCommas(params.value, 4);
-  },
-
-  booleanFormatter: function booleanFormatter(params) {
-    if (!params.data) { return null; }
-
-    if (params.value === '' || params.value === null) { return ''; }
-    if (params.value === true || params.value === 't' || params.value === 'true' || params.value === 'y' || params.value === 1) {
-      return '<span class="ac_icon_check">&nbsp;</span>';
-    }
-    return '<span class="ac_icon_uncheck">&nbsp;</span>';
-  },
-
-  // Format a column to display as an icon.
-  // The column format is: "icon_name[,colour][,indent level]"
-  // - colour defaults to grey
-  // - indent level defaults to 0
-  iconFormatter: function iconFormatter(params) {
-    if (!params.data) { return null; }
-    if (params.value === '' || params.value === null) { return ''; }
-
-    const icoCol = params.value.split(',');
-    if (!icoCol[1]) icoCol.push('gray'); // default colour
-    if (!icoCol[2]) {                    // default indent from "level" column
-      if (params.data.level) {
-        icoCol.push(params.data.level - 1);
-      } else {
-        icoCol.push(0);
-      }
-    }
-    return `<span class="cbl-icon" style="color:${icoCol[1]};margin-left:${icoCol[2] * 0.75}rem">
-        <img src="/app_icons/${icoCol[0]}.svg" onload="SVGInject(this)">
-      </span>`;
-  },
-
-  hrefInlineFormatter: function hrefInlineFormatter(params) {
-    return `<a href="/books/${params.value}/edit">edit</a>`;
-  },
-
-  // The Tachyon classes required to style a link as a button.
-  buttonClassForLinks: function buttonClassForLinks(bgColour) {
-    return `link dim br1 ph2 dib white bg-${bgColour || 'green'}`;
-  },
-
-  hrefSimpleFormatter: function hrefSimpleFormatter(params) {
-    const vals = params.value.split('|');
-    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href="${vals[0]}">${vals[1]}</a>`;
-  },
-
-  hrefSimpleFetchFormatter: function hrefSimpleFetchFormatter(params) {
-    const vals = params.value.split('|');
-    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" data-remote-link="true" href="${vals[0]}">${vals[1]}</a>`;
-  },
-
-  // Creates a link that when clicked prompts for a yes/no answer.
-  // Column value is in the format "url|linkText|prompt|method".
-  // Only url and linkText are required.
-  hrefPromptFormatter: function hrefPromptFormatter(params) {
-    let url = '';
-    let linkText = '';
-    let prompt;
-    let method;
-    [url, linkText, prompt, method] = params.value.split('|');
-    prompt = prompt || 'Are you sure?';
-    method = (method || 'post').toLowerCase();
-    return `<a class="${crossbeamsGridFormatters.buttonClassForLinks()}" href='#' data-prompt="${prompt}" data-method="${method}" data-url="${url}"
-    onclick="crossbeamsGridEvents.promptClick(this);">${linkText}</a>`;
   },
 };
 
@@ -1269,6 +1301,12 @@ const crossbeamsGridStaticLoader = {
           if (col[attr] === 'crossbeamsGridFormatters.numberWithCommas4') {
             newCol[attr] = crossbeamsGridFormatters.numberWithCommas4;
           }
+          if (col[attr] === 'crossbeamsGridFormatters.dateTimeWithoutZoneFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.dateTimeWithoutZoneFormatter;
+          }
+          if (col[attr] === 'crossbeamsGridFormatters.dateTimeWithoutSecsOrZoneFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.dateTimeWithoutSecsOrZoneFormatter;
+          }
         } else if (attr === 'cellEditor') {
           if (['numericCellEditor',
             'agPopupTextCellEditor',
@@ -1337,7 +1375,7 @@ const crossbeamsGridStaticLoader = {
     crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
     // If the grid has no horizontal scrollbar, hide the scroll to column dropdown.
     const grdEl = document.getElementById(gridOptions.context.domGridId);
-    const vport = grdEl.querySelector('.ag-body-viewport');
+    const vport = grdEl.querySelector('.ag-body-horizontal-scroll-viewport');
     crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
       colDefs,
       vport.scrollWidth > vport.offsetWidth);
@@ -1363,55 +1401,61 @@ const crossbeamsGridStaticLoader = {
    */
   const loadGrid = function loadGrid(grid, gridOptions) {
     const url = grid.getAttribute('data-gridurl');
-    if (url === '') return; // must be loaded statically
+    if (url === '') return; // this grid must be loaded statically
 
-    const httpRequest = new XMLHttpRequest();
-    httpRequest.open('GET', url);
-
-    httpRequest.onreadystatechange = () => {
-      let httpResult = null;
+    fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      throw new HttpError(response);
+    })
+    .then((data) => {
       let newColDefs = null;
-
-      if (httpRequest.readyState === 4 && httpRequest.status === 200) {
-        httpResult = JSON.parse(httpRequest.responseText);
-        if (httpResult.exception) {
-          crossbeamsUtils.alert({ prompt: httpResult.flash.error, type: 'error' });
-          if (httpResult.backtrace) {
-            console.groupCollapsed('EXCEPTION:', httpResult.exception, httpResult.flash.error); // eslint-disable-line no-console
-            console.info('==Backend Backtrace=='); // eslint-disable-line no-console
-            console.info(httpResult.backtrace.join('\n')); // eslint-disable-line no-console
-            console.groupEnd(); // eslint-disable-line no-console
-          }
-          return null;
+      if (data.exception) {
+        crossbeamsUtils.alert({ prompt: data.flash.error, type: 'error' });
+        if (data.backtrace) {
+          console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+          console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+          console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+          console.groupEnd(); // eslint-disable-line no-console
         }
+        return null;
+      }
 
-        if (httpResult.nestedColumnDefs) {
-          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['1']);
-          midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['2']);
-          detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['3']);
-        } else {
-          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.columnDefs);
-        }
-        gridOptions.api.setColumnDefs(newColDefs);
-        gridOptions.api.setRowData(httpResult.rowDefs);
-        if (!gridOptions.forPrint) {
-          crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
-            newColDefs,
-            httpResult.fieldUpdateUrl,
-            httpResult.extraContext);
+      if (data.nestedColumnDefs) {
+        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['1']);
+        midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['2']);
+        detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['3']);
+      } else {
+        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.columnDefs);
+      }
+      gridOptions.api.setColumnDefs(newColDefs);
+      gridOptions.api.setRowData(data.rowDefs);
+      if (!gridOptions.forPrint) {
+        crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
+          newColDefs,
+          data.fieldUpdateUrl,
+          data.extraContext);
 
-          if (httpResult.multiselect_ids) {
-            gridOptions.api.forEachNode((node) => {
-              if (node.data && httpResult.multiselect_ids.includes(node.data.id)) {
-                node.setSelected(true);
-              }
-            });
-          }
+        if (data.multiselect_ids) {
+          gridOptions.api.forEachNode((node) => {
+            if (node.data && data.multiselect_ids.includes(node.data.id)) {
+              node.setSelected(true);
+            }
+          });
         }
       }
       return null;
-    };
-    httpRequest.send();
+    }).catch((data) => {
+      crossbeamsUtils.fetchErrorHandler(data);
+    });
   };
 
   const listenForGrid = function listenForGrid() {
@@ -1627,6 +1671,9 @@ const crossbeamsGridStaticLoader = {
     loadGrid(grid, gridOptions);
   };
 
+  // reloadGrid(id)
+  // get options from id, reload url (delete grid and call loadGrid again)
+
   document.addEventListener('DOMContentLoaded', () => {
     listenForGrid();
   });
@@ -1745,7 +1792,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // }).then(response => response.json())
               }).then((response) => {
                 if (response.status === 404) {
-                  Jackbox.error('The requested resource was not found', { time: 20 });
+                  crossbeamsUtils.showError('The requested resource was not found');
                   return {};
                 }
                 return response.json();
@@ -1769,11 +1816,11 @@ document.addEventListener('DOMContentLoaded', () => {
                   // Only if not redirect...
                   if (data.flash) {
                     if (data.flash.notice) {
-                      Jackbox.success(data.flash.notice);
+                      crossbeamsUtils.showSuccess(data.flash.notice);
                     }
                     if (data.flash.error) {
                       if (data.exception) {
-                        Jackbox.error(data.flash.error, { time: 20 });
+                        crossbeamsUtils.showError(data.flash.error);
                         if (data.backtrace) {
                           console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                           console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -1781,7 +1828,7 @@ document.addEventListener('DOMContentLoaded', () => {
                           console.groupEnd(); // eslint-disable-line no-console
                         }
                       } else {
-                        Jackbox.error(data.flash.error);
+                        crossbeamsUtils.showError(data.flash.error);
                       }
                     }
                   }

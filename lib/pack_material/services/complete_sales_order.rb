@@ -47,12 +47,13 @@ module PackMaterialApp
         xml.sales_invoice do # rubocop:disable Metrics/BlockLength
           xml.internal_invoice_number @sales_order.sales_order_number
           xml.customer_code @sales_order.erp_customer_number
-          xml.account_code @sales_order.account_code
+          xml.account_code '10650'
           xml.shipped_at @sales_order.shipped_at
           xml.invoice_total so_totals[:total]
           xml.subtotal so_totals[:subtotal]
           xml.vat so_totals[:vat]
           xml.object 'PGM'
+          xml.customer_order_number @sales_order.client_reference_number
           xml.costs do
             costs.each do |cost|
               xml.cost do
@@ -67,7 +68,7 @@ module PackMaterialApp
           xml.line_items do
             products.each do |line_item|
               xml.line_item do
-                xml.item 'NS100120'
+                xml.item 'NS100057'
                 xml.description line_item[:product_variant_code]
                 xml.unit_price UtilityFunctions.delimited_number(line_item[:unit_price], delimiter: '', no_decimals: 5)
                 xml.quantity UtilityFunctions.delimited_number(line_item[:quantity_required], delimiter: '', no_decimals: 2)

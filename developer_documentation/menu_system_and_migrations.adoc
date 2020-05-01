@@ -188,12 +188,13 @@ add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, 
 
 [source,ruby]
 ----
-drop_program_function(key, functional_area:, program:)
+drop_program_function(key, functional_area:, program: match_group: nil)
 ----
 
 * `key` - the program function name (String, capitalised)
 * `:program` - the program name (String, capitalised)
 * `:functional_area` - the functional area name (String, capitalised)
+* `:match_group` - the group name (String, matching case of value in db)
 
 [source,ruby]
 ----
@@ -204,8 +205,9 @@ change_program_function(key, options = {})
 * options
 ** `:program` - the program name (String, capitalised)
 ** `:functional_area` - the functional area name (String, capitalised)
+** `:match_group` - the current group name (String, matching case of value in db)
 ** `:seq` - the program sequence
-** `:group` - the group name
+** `:group` - the new group name, or nil to unset it
 ** `:url` - the URL to callfrom this menu item
 ** `:restricted` - if true, specific users need to be linked to the item to see it
 ** `:show_in_iframe` - if true, render the URL inside an iframe

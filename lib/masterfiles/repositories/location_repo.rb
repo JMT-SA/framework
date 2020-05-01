@@ -82,7 +82,7 @@ module MasterfilesApp
     end
 
     def location_id_from_long_code(location_long_code)
-      DB[:locations].where(location_long_code: location_long_code).get(:id)
+      get_id(:locations, location_long_code: location_long_code)
     end
 
     # Given a location id, find its parent of a particular location type.

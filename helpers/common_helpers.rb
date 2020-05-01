@@ -372,10 +372,12 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   #
   # @param new_location [string] - the new url.
   # @param log_url [string] - the url to log in the console.
+  # @param download [boolean] - is this report to be downloaded? (set true for XLS, CSV, RTF). Defaults to false.
   # @return [JSON] a JSON response.
-  def change_window_location_via_json(new_location, log_url = nil)
+  def change_window_location_via_json(new_location, log_url = nil, download: false)
     res = { location: new_location }
     res[:log_url] = log_url unless log_url.nil?
+    res[:download] = true if download
     res.to_json
   end
 
@@ -540,7 +542,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   end
 
   def build_json_action(action) # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Layout/AlignHash
+    # rubocop:disable Layout/HashAlignment
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
       change_select_value:    ->(act) { action_change_select_value(act) },
@@ -560,7 +562,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       # redirect:               ->(act) { action_redirect(act) }       // url
       # replace_dialog:         ->(act) { action_replace_dialog(act) } // url
     }[action.type].call(action)
-    # rubocop:enable Layout/AlignHash
+    # rubocop:enable Layout/HashAlignment
   end
 
   def action_replace_select_options(action)

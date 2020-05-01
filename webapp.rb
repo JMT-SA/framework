@@ -83,7 +83,7 @@ class Framework < Roda
       # = if prod and unexpected exception type, just display "something whent wrong" and log
     end
   end
-  Dir['./routes/*.rb'].each { |f| require f }
+  Dir['./routes/*.rb'].sort.each { |f| require f }
 
   route do |r|
     r.assets unless ENV['RACK_ENV'] == 'production'
@@ -134,7 +134,7 @@ class Framework < Roda
                                               keep_file: true })
       if res.success
         # show_json_notice('Sent to printer')
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end

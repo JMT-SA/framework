@@ -203,7 +203,7 @@ module DevelopmentApp
         date: "'2010-01-01'",
         decimal: 'Faker::Number.decimal',
         integer_array: 'BaseRepo.new.array_for_db_col([1, 2, 3])',
-        string_array: "BaseRepo.new.array_for_db_col(['A', 'B', 'C'])",
+        string_array: "BaseRepo.new.array_of_text_for_db_col(['A', 'B', 'C'])",
         jsonb: '{}'
       }.freeze
 
@@ -1167,6 +1167,8 @@ module DevelopmentApp
             this_col = opts.table_meta.col_lookup[f]
             if this_col[:type] == :boolean
               "fields[:#{f}] = { renderer: :label, as_boolean: true }"
+            elsif this_col[:type] == :datetime
+              "fields[:#{f}] = { renderer: :label, format: :without_timezone_or_seconds }"
             else
               "fields[:#{f}] = { renderer: :label }"
             end
@@ -2152,15 +2154,15 @@ module DevelopmentApp
           # frozen_string_literal: true
 
           root_dir = File.expand_path('..', __dir__)
-          Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].each { |f| require f }
-          #{job_comment}Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }
-          #{srv_comment}Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
-          # Dir["\#{root_dir}/#{opts.applet}/task_permission_checks/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].sort.each { |f| require f }
+          #{job_comment}Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].sort.each { |f| require f }
+          #{srv_comment}Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].sort.each { |f| require f }
+          # Dir["\#{root_dir}/#{opts.applet}/task_permission_checks/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].sort.each { |f| require f }
 
           module #{opts.classnames[:module]}
           end
@@ -2234,7 +2236,7 @@ module DevelopmentApp
 
       def make_program_menu
         <<~RUBY
-          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.program_text}]
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.program}.rb]
           # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
 
           # Then run [bundle exec rake menu:migrate]
@@ -2259,7 +2261,7 @@ module DevelopmentApp
 
       def make_progfunc_menu
         <<~RUBY
-          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.singlename}]
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.singlename}.rb]
           # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
           # Or add it to the existing migration for program #{make_caption(opts.program_text)}.
 

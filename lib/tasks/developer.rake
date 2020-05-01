@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require File.expand_path('../../config/env_var_rules.rb', __dir__)
+require File.expand_path('../../helpers/utility_functions.rb', __dir__)
 
 # Rake tasks for setting up development environment.
 class AppDevTasks
@@ -34,6 +35,20 @@ class AppDevTasks
       desc 'Validate presence of ENV variables'
       task :validateenv do
         EnvVarRules.new.validate
+      end
+
+      desc 'Clear the SQL log file'
+      namespace :log do
+        task :clear do
+          fn = 'log/sql.log'
+          if File.exist?(fn)
+            file = File.new(fn)
+            puts "SQL log file is #{UtilityFunctions.filesize(file.size)} in size.\nTruncating."
+          else
+            puts 'No SQL log file. Creating.'
+          end
+          `cat /dev/null > #{fn}`
+        end
       end
     end
   end

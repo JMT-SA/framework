@@ -1,0 +1,68 @@
+= Export data
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Export data
+
+Data exports are carried out by calling:
+[source,sh]
+----
+RACK_ENV=production bundle exec rake app:export[keyname]
+----
+Where `keyname` is a key in `config/export_data_config.yml` (which encapsulates the rules for how to execute the `keyname` export task).
+
+=== Configuration
+
+A sample configuration file could look like this:
+[source,yml]
+----
+pallet_sequences:
+  grid: all_pallet_sequences                       #<1>
+  out_dir: /home/nspack/export_data                #<2>
+  export_hidden_fields: true                       #<3>
+  boolean_as_yn: false                             #<4>
+  prefix_long_numbers_with_quote: false            #<5>
+  output_format: xls                               #<6>
+  zip_for_mail: true                               #<7>
+  email:                                           #<8>
+    to: james@nosoft.biz
+    subject: All pallets report
+    body: All pallets report generated from NSpack
+  conditions:                                      #<9>
+    - col: season
+      op: =
+      val: 2020
+shipped_pallets:
+  report: shipped_pallets                          #<10>
+  out_dir: /home/nspack/export_data
+----
+<1> Use `all_pallet_sequences.yml` **grid** definition. _Required_. See point (9).
+<2> Output directory. _Required_.
+<3> _Optional_. Default is `false` (hidden columns are ignored). Set to `true` to include hidden columns.
+<4> _Optional_. Default is `true`. If `true`, boolean columns export as `"Y"` for `true` and `"N"` for `false`.
+<5> _Optional_. Default is `true`. If `true`, columns containing only numbers longer than 12 will be exported with a leading `'`. (e.g. pallet_number - so spreadsheets treat them as text).
+<6> _Optional_. Default is `csv`. Can also be set to `xls` to export in Excel format.
+<7> _Optional_. Default is `false`. If `true`, a zip file will be created.
+<8> _Optional_. If present, these settings will be used to email a copy of the output file.
+<9> _Optional_. If present, these conditions will be converted into a where clause for the extract.
+<10> Use `shipped_pallets.yml` **report** definition. _Required_. See point (1).
+
+== Elements
+
+=== Required elements
+
+grid:: The export will make use of this dataminer grid definition (name of the file without `.yml`). System looks in `grid_definitions/dataminer_queries` dir.
+report:: As for `grid`, but the `.yml` file will be loaded from `reports` dir.
+out_dir:: The full path to the directory where the output file is to be written.
+
+=== Optional elements
+
+export_hidden_fields:: Will be set to `false` if not specified. Typically a grid's hidden fields should not be exported. If you do want them as columns, set this to true.
+boolean_as_yn:: Will be set to `true` if not specified. When `true`, the column will show `Y` or `N`. When false the column will contain `true` and `false`.
+prefix_long_numbers_with_quote:: Will be set to `true` if not specified. Required when exporting a column of long digits to csv (e.g. a pallet number) in order to get a spreadsheet to treat the field as text. Outputs `'123456789012345` instead of just `123456789012345`.
+output_format:: The format to write the file in. Possible values are `csv` and `xls`. Default is `csv`.
+zip_for_mail:: If true, the output file will be zipped.
+email:: When present, these values are used to email the completed extract.
+conditions:: When present, these conditions will be applied to the dataminer report query.
+

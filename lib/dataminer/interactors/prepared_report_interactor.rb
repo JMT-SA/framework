@@ -19,9 +19,9 @@ module DataminerApp
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
       # logger.info input_parameters.inspect
-      parms   = []
+      parms = []
       # Check if this should become an IN parmeter (list of equal checks for a column.
-      eq_sel  = input_parameters.select { |p| p['op'] == '=' }.group_by { |p| p['col'] }
+      eq_sel = input_parameters.select { |p| p['op'] == '=' }.group_by { |p| p['col'] }
       in_sets = {}
       in_keys = []
       eq_sel.each do |col, qp|
@@ -54,8 +54,6 @@ module DataminerApp
 
         CrosstabApplier.new(repo.db_connection_for(db_name), rpt, params, crosstab_hash).convert_report if params[:crosstab]
         rpt
-        # rescue StandardError => e
-        #   return "ERROR: #{e.message}"
       end
     end
 

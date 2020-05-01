@@ -28,6 +28,9 @@ class AppConst
   # Client-specific code
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
+  SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
+  URL_BASE = ENV.fetch('URL_BASE')
+  APP_CAPTION = ENV.fetch('APP_CAPTION')
 
   PO_ACCOUNT_CODE = ENV['PO_ACCOUNT_CODE']
   PO_FIN_OBJECT_CODE = ENV['PO_FIN_OBJECT_CODE']

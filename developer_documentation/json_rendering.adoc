@@ -26,7 +26,12 @@ Replaces the current dialog's content with the response from `url`.
 Replaces the current window's content with the response from `url`.
 This should be used in the response to a link loaded in a "loading_window" (see Link: `loading_window` option).
 
-    change_window_location_via_json(new_location, log_url = nil)
+`log_url` will log the passed url to the console. (Usually set this to `request.path`). This can help with debugging.
+
+Use the `download` option if the route will return a file for download. Otherwise the loading window continues
+to show that it is loading after the file has been downloaded.
+
+    change_window_location_via_json(new_location, log_url = nil, download: fale)
 
 ==== Redirect to the last grid
 

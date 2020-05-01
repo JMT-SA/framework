@@ -6,8 +6,11 @@ module Crossbeams
     include Crossbeams::Responses
     attr_reader :use_ssl
 
-    def initialize(use_ssl = false)
+    def initialize(use_ssl = false, responder: nil, open_timeout: 5, read_timeout: 10)
       @use_ssl = use_ssl
+      @responder = responder
+      @open_timeout = open_timeout
+      @read_timeout = read_timeout
     end
 
     def json_post(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
@@ -95,9 +98,31 @@ module Crossbeams
       failed_response("There was an error: #{e.message}")
     end
 
-    def request_get(url)
+    def request_get(url, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
+      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Get.new(uri.request_uri)
+      headers.each do |k, v|
+        request.add_field(k.to_s, v.to_s)
+      end
+      response = http.request(request)
+      log_request(request)
+
+      format_response(response, uri)
+    rescue Timeout::Error
+      failed_response('The call to the server timed out.', timeout: true)
+    rescue Errno::ECONNREFUSED
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      failed_response("There was an error: #{e.message}")
+    end
+
+    def request_post(url, fields) # rubocop:disable Metrics/AbcSize
+      uri, http = setup_http(url)
+      http.use_ssl = use_ssl if use_ssl
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.set_form_data(fields)
       log_request(request)
       response = http.request(request)
 
@@ -117,13 +142,15 @@ module Crossbeams
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
 
-      http.open_timeout = 5
-      http.read_timeout = 10
+      http.open_timeout = @open_timeout
+      http.read_timeout = @read_timeout
 
       [uri, http]
     end
 
     def format_response(response, context)
+      return @responder.format_response(response, context) if @responder
+
       if response.code == '200'
         success_response(response.code, response)
       else

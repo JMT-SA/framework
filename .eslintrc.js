@@ -25,6 +25,7 @@ module.exports = {
     "Selectr": false,
     "Sortable": false,
     "multi": false,
+    "HttpError": false,
     "crossbeamsRmdScan": false,
     "crossbeamsDialogLevel1": false,
     "crossbeamsDialogLevel2": false,

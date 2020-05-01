@@ -158,6 +158,21 @@ a|* :p
 * :b or :strong
 |None
 
+|options - :dom_id
+|DOM id for the enclosing div.
+|String
+|None
+
+|options - :hide_on_load
+|HTML `hidden` attribute for the field wrapper. If true, the text will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|`true` or `false`
+|`false`
+
+|options - :css_classes
+|CSS Classes separated by spaces. e.g. `"b orange"` for bold, orange text.
+|String
+|None
+
 |options - :toggle_button
 |Display the text hidden with a button that shows/hides it.
 |`true` or `false`.
@@ -199,6 +214,16 @@ column.add_list([['FP', 1], ['MGP', 2], ['CONS', 3]])
 |The label text
 |any text
 |None.
+
+|options - :scroll_height
+|Restrict the list to a certain height and show scrollbars if the list is longer.
+|`:short` or `:medium`
+|None.
+
+|options - :filled_background
+|If true, draw a border and set the background to grey.
+|`true` or `false`
+|`false`
 
 |===
 
@@ -494,6 +519,11 @@ end
 |A file name.
 |`String`.
 |None.
+
+|no_padding
+|Remove surrounding padding in display.
+|Boolean - `true` or `false`.
+|`false`
 
 |===
 

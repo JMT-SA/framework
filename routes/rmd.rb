@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Dir['./routes/rmd/*.rb'].each { |f| require f }
+Dir['./routes/rmd/*.rb'].sort.each { |f| require f }
 
 class Framework < Roda
   route('rmd') do |r|

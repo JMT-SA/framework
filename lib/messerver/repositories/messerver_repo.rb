@@ -104,6 +104,10 @@ module MesserverApp
       success_response('Preview label', res.instance.body)
     end
 
+    def bulk_registration_mode(mes_module, start = true)
+      request_uri(bulk_registration_mode_uri(mes_module, start))
+    end
+
     private
 
     def publish_part_of_body(printer_type, targets)
@@ -284,7 +288,9 @@ module MesserverApp
     def send_error_email(response, context)
       body = []
       body << "The call to MesServer was:\n#{context}" unless context.nil?
-      body << if response.body.encoding == Encoding::ASCII_8BIT
+      body << if response.body.nil?
+                'Empty response body received'
+              elsif response.body.encoding == Encoding::ASCII_8BIT
                 'An image was probably returned from MesServer'
               else
                 "The response from MesServer was:\n-------------------------------\n#{response.body}"
@@ -331,6 +337,10 @@ module MesserverApp
 
     def preview_published_label_uri
       URI.parse("#{AppConst::LABEL_SERVER_URI}LabelPreview")
+    end
+
+    def bulk_registration_mode_uri(mes_module, start = true)
+      URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=SetCardRegistrationState&Name=#{mes_module}&Status=#{start}")
     end
 
     def log_request(request)

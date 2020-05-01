@@ -25,7 +25,9 @@ class Framework < Roda
     r.on :id do |id|
       r.is do
         session[:last_grid_url] = "/list/#{id}"
-        show_page { render_data_grid_page(id, fit_height: true, bookmark_row_on_action: !fetch?(r)) }
+        opts = { fit_height: true, bookmark_row_on_action: !fetch?(r) }
+        opts[:query_string] = request.query_string if request.query_string
+        show_page { render_data_grid_page(id, opts) }
       end
 
       r.on 'with_params' do

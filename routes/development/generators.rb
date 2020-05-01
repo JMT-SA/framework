@@ -33,6 +33,23 @@ class Framework < Roda
       end
     end
 
+    r.on 'script_scaffolds' do
+      r.on 'new' do    # NEW
+        show_page { Development::Generators::ScriptScaffolds::New.call }
+      end
+
+      r.post do        # CREATE
+        res = DevelopmentApp::ScriptScaffoldNewSchema.call(params[:scaffold] || {})
+        errors = res.messages
+        if errors.empty?
+          result = DevelopmentApp::GenerateNewScriptScaffold.call(res)
+          show_page { Development::Generators::ScriptScaffolds::Show.call(result) }
+        else
+          show_page { Development::Generators::ScriptScaffolds::New.call(params[:scaffold], errors) }
+        end
+      end
+    end
+
     # GENERAL
     # --------------------------------------------------------------------------
     r.on 'email_test' do

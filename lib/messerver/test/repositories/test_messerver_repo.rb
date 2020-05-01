@@ -15,7 +15,7 @@ module MesserverApp
     end
 
     def test_printer_list
-      pl = { 'PrinterList' => ['PRN-01', 'PRN-02'] }
+      pl = { 'PrinterList' => %w[PRN-01 PRN-02] }
       MesserverRepo.any_instance.stubs(:request_uri).returns(success_response('ok', OpenStruct.new(body: pl.to_yaml, response_code: '200')))
       res = repo.printer_list
       assert res.success
@@ -32,7 +32,7 @@ module MesserverApp
     end
 
     def test_publish_target_list
-      pl = { 'PublishServerList' => ['Server-01', 'Server-02'] }
+      pl = { 'PublishServerList' => %w[Server-01 Server-02] }
       MesserverRepo.any_instance.stubs(:request_uri).returns(success_response('ok', OpenStruct.new(body: pl.to_yaml, response_code: '200')))
       res = repo.publish_target_list
       assert res.success
@@ -65,7 +65,7 @@ module MesserverApp
     end
 
     def test_send_publish_status
-      pl = { 'Data' => ['Server-01-OK', 'Server-02-OK'] }
+      pl = { 'Data' => %w[Server-01-OK Server-02-OK] }
       MesserverRepo.any_instance.stubs(:request_uri).returns(success_response('ok', OpenStruct.new(body: pl.to_yaml, response_code: '200')))
       res = repo.send_publish_status('Zebra', 'a/path/to/file')
       assert res.success

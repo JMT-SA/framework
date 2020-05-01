@@ -17,7 +17,7 @@ module SecurityApp
     def find_with_permissions(id)
       security_group = find(:security_groups, SecurityGroup, id)
       domain_obj = DomainSecurityGroup.new(security_group)
-      ids = select_values("SELECT security_permission_id FROM security_groups_security_permissions WHERE security_group_id = #{id}")
+      ids = select_values(:security_groups_security_permissions, :security_permission_id, security_group_id: id)
       domain_obj.security_permissions = DB[:security_permissions].where(id: ids).map { |sp| SecurityPermission.new(sp) }
       domain_obj
     end

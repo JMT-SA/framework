@@ -10,6 +10,7 @@ module LabelPrintingApp
     def initialize(label_name, instance)
       @label_name = label_name
       @instance = instance
+      @supporting_data = {}
       raise ArgumentError if label_name.nil?
     end
 

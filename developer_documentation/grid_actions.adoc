@@ -29,7 +29,7 @@ The actions are rendered as a context menu that can include submenu groupings.
       - complete
     :hide_if_null: another_field_id,further_field
   - :separator: true
-  - submenu:
+  - :submenu:
      :text: Submenu caption
      :items:
        - :url: /path/to/this/resource
@@ -241,23 +241,25 @@ Possible options in the `:multiselect` section:
 [source,yaml]
 ----
 :multiselect:
-  :keyname:                                              # <1>
-    :url: "/path/to/call/on/save"                        # <2>
-    :section_caption: "SELECT statement or fixed string" # <3>
-    :grid_caption: "Fixed string"                        # <4>
-    :preselect: "SELECT statement"                       # <5>
-    :multiselect_save_method: dialog/remote/http         # <6>
-    :can_be_cleared: true                                # <7>
-    :conditions: some_key                                # <8>
+  :keyname:                                               # <1>
+    :url: "/path/to/call/on/save"                         # <2>
+    :section_caption: "SELECT statement or fixed string"  # <3>
+    :grid_caption: "Fixed string"                         # <4>
+    :preselect: "SELECT statement"                        # <5>
+    :multiselect_save_method: dialog/remote/http/loading  # <6>
+    :can_be_cleared: true                                 # <7>
+    :conditions: some_key                                 # <8>
 ----
 <1> Keyname to match `?key=` part of calling URL.
 <2> The path to be called when the user saves a selection.
 <3> Caption can be a `SELECT` query that returns the caption (using tokens from the URL) or a fixed string.
 <4> Caption that appears in grid header. Fixed string. Defaults to List def caption or report caption.
 <5> A `SELECT` statement that returns an `id` column. Matching ids in the grid will be pre-selected.
-<6> Optional. How to save -- defaults to `http` which sends a POST request.
-    `remote` will send a `POST fetch` request.
-    `dialog` will send a `GET fetch` request that will render in a modal dialog.
+<6> Optional. How to save -- defaults to `http`.
+    * `http` will send a `POST` request.
+    * `remote` will send a `POST fetch` request.
+    * `dialog` will send a `GET fetch` request that will render in a modal dialog.
+    * `loading` will send a `GET fetch` request that will render in a `loading` window.
 <7> Optional. Can the user select no rows at all (to clear a previous selection). Default is `false`.
 <8> Conditions key points to an entry in the `:conditions:` section to be used to filter the grid. See conditions section in filtered lists (above).
 

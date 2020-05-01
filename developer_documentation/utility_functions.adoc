@@ -55,3 +55,58 @@ UtilityFunctions.symbolize_keys(example)
 
 # => { one: { two: { three: 3 }, four: 4 } }
 ----
+
+Takes a string and returns an array from text split on commas and new lines.
+[source,ruby]
+----
+example  = ("ABC, DEF\n'GHI'")
+
+UtilityFunctions.parse_string_to_array(example)
+
+# => ['ABC', 'DEF', 'GHI']
+----
+
+Returns the non numeric elements of an array of strings.
+[source,ruby]
+----
+example  = ['12C', '234']
+
+UtilityFunctions.non_numeric_elements(example)
+
+# => ['12C']
+----
+
+Transforms a string in scientific notation to a string in float format.
+
+Especially useful for displaying JSON values.
+[source,ruby]
+----
+str  = '3.4e2'
+bool = true
+
+UtilityFunctions.scientific_notation_to_s(str)
+# => '340.0'
+
+UtilityFunctions.scientific_notation_to_s(bool)
+# => true
+
+json_hash = { "nett_weight" => "0.303e3",
+              "gross_weight" => "0.34e3",
+              "weighed_manually" => true }
+json_hash.transform_values { |v| UtilityFunctions.scientific_notation_to_s(v) }
+# =>  { "nett_weight" => "303.0", "gross_weight" => "340.0", "weighed_manually" => true}
+----
+
+Wrap text/SQL
+
+Default is to wrap at 120 characters, but there is a parameter available to override.
+
+SQL will receiver a newline before every FROM/WHERE/JOIN/VALUES as well.
+[source,ruby]
+----
+UtilityFunctions.wrapped_text(str)
+UtilityFunctions.wrapped_text(str, 80)
+
+UtilityFunctions.wrapped_sql(sql)
+UtilityFunctions.wrapped_sql(sql, 80)
+----

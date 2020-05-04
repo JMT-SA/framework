@@ -21,7 +21,7 @@ module PackMaterialApp
 
     def wa_cost(mrpv_id) # rubocop:disable Metrics/AbcSize
       total_qty = total_quantity(mrpv_id)
-      return nil unless total_qty
+      return nil unless total_qty&.positive?
 
       rest = total_qty
       total_amt = 0

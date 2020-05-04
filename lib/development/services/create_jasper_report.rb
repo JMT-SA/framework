@@ -31,15 +31,16 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
     @top_level_dir = params.delete(:top_level_dir) || ''
     @printer = params.delete(:printer) || NO_PRINTER
     @output_file = add_output_path(file)
+    @use_older_jasper_engine = true # TEMPORARY set to true to use older reporting engine
     make_report_parameters_string(params)
   end
 
-  def call
+  def call # rubocop:disable Metrics/AbcSize
     result = run_report
     clear_temp_file
     log_report_result(result)
 
-    if result.to_s.include?('Jasper error:') && (errors = result.split('Jasper error:')).length.positive?
+    if result.to_s.include?(error_string_key) && (errors = result.split(error_string_key)).length.positive?
       send_error_mail(result)
       failed_response("Jasper printing error: <br>#{errors[1]}")
     elsif @mode == 'GENERATE'
@@ -51,11 +52,15 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
 
   private
 
+  def error_string_key
+    @use_older_jasper_engine ? 'JMT Jasper error:' : 'Jasper error:'
+  end
+
   def send_error_mail(result)
     body = <<~STR
       Jasper report "#{report_name}" did not succeed.
 
-      Error  : #{result.split('Jasper error:')[1].strip}
+      Error  : #{result.split(error_string_key)[1].strip}
 
       User   : #{user}
 

@@ -139,6 +139,7 @@ module PackMaterialApp
         res = PackMaterialApp::BulkStockAdjustmentService.call(id, nil, user_name: @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
+        repo.update_weighted_average_costs(id)
         log_status('mr_bulk_stock_adjustments', id, 'SIGNED OFF')
         repo.signed_off_mr_bulk_stock_adjustment(id)
 

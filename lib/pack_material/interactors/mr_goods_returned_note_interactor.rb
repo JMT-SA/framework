@@ -84,12 +84,13 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def complete_invoice(id)
+    def complete_invoice(id) # rubocop:disable Metrics/AbcSize
       assert_permission!(:complete_invoice, id)
       return success_response('GRN Purchase Invoice has already been Queued') if already_enqueued?(id)
 
       repo.transaction do
         PackMaterialApp::CompletePurchaseInvoice.call(@user.user_name, false, nil, mr_goods_returned_note_id: id)
+        repo.update_weighted_average_costs(id)
         log_transaction
         instance = mr_goods_returned_note(id)
         success_response("GRN #{instance.credit_note_number}: Purchase Invoice Queued", instance)

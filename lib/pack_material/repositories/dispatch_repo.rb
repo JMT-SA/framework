@@ -390,5 +390,12 @@ module PackMaterialApp
              erp_profit_loss_number: attrs[:journal_number],
              erp_invoice_number: attrs[:sales_invoice_number])
     end
+
+    def update_weighted_average_costs(grn_id)
+      items = DB[:mr_delivery_items].where(mr_delivery_id: DB[:mr_goods_returned_notes].where(id: grn_id).get(:mr_delivery_id)).all
+      items.each do |item|
+        WaCostRepo.new.update_wa_cost(item[:mr_product_variant_id])
+      end
+    end
   end
 end

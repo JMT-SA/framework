@@ -53,7 +53,12 @@ module PackMaterialApp
 
       variant_id = create(:pack_material_product_variants, attrs)
       create_matres_product_variant(sub_type_id, variant_id)
+      update_weighted_average_cost(variant_id)
       success_response('ok', variant_id)
+    end
+
+    def update_weighted_average_cost(variant_id)
+      WaCostRepo.new.update_wa_cost(variant_id)
     end
 
     # Select the variant-defining columns with their values from a set of attributes.

@@ -10,6 +10,11 @@ module PackMaterialApp
       end
     end
 
+    def update_wa_cost(mrpv_id)
+      cost = wa_cost(mrpv_id) || BigDecimal('0')
+      DB[:material_resource_product_variants].where(id: mrpv_id).update(weighted_average_cost: cost)
+    end
+
     def wa_cost_for_sku_id(sku_id)
       pv_id = DB[:mr_skus].where(id: sku_id).get(:mr_product_variant_id)
       wa_cost(pv_id)

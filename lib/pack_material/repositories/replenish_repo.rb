@@ -703,7 +703,12 @@ module PackMaterialApp
                                     .map { |r| { pv_id: r[:mr_product_variant_id], price: r[:invoiced_unit_price] } }
       items.each do |item|
         update_mr_product_variant_current_prices(item)
+        update_weighted_average_cost(item[:pv_id])
       end
+    end
+
+    def update_weighted_average_cost(variant_id)
+      WaCostRepo.new.update_wa_cost(variant_id)
     end
 
     def update_mr_product_variant_current_prices(item)

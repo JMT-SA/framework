@@ -136,6 +136,8 @@ module PackMaterialApp
     end
 
     def putaway_delivery(attrs) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, Metrics/AbcSize
+      return validation_failed_response(delivery_number: attrs[:delivery_number], messages: { delivery_number: ["Delivery Number can't be blank"] }) if attrs[:delivery_number].nil_or_empty?
+
       delivery_id = repo.delivery_id_from_number(attrs[:delivery_number])
       can_putaway = TaskPermissionCheck::MrDelivery.call(:putaway, delivery_id)
       if can_putaway.success

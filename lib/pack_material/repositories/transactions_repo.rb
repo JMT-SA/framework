@@ -443,5 +443,17 @@ module PackMaterialApp
 
       success_response('ok')
     end
+
+    def update_weighted_average_costs(bsa_id)
+      items = DB[:mr_bulk_stock_adjustment_items].where(mr_bulk_stock_adjustment_id: bsa_id).all
+      items.each do |item|
+        mrpv_id = DB[:mr_skus].where(id: item[:mr_sku_id]).get(:mr_product_variant_id)
+        update_weighted_average_cost(mrpv_id)
+      end
+    end
+
+    def update_weighted_average_cost(variant_id)
+      WaCostRepo.new.update_wa_cost(variant_id)
+    end
   end
 end

@@ -353,7 +353,7 @@
     :sequence_no: 21
     :caption: Item created at
     :namespaced_name: mr_inventory_transactions.created_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false

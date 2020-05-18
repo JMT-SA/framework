@@ -181,12 +181,16 @@ class Framework < Roda
         res = interactor.inline_update(id, params)
         if res.success
           parent_id = interactor.mr_sales_order_item(id)&.mr_sales_order_id
+          sub_totals = interactor.so_sub_totals(parent_id)
+          sub_total_actions = so_sub_total_changes(sub_totals)
           permission_res = interactor.can_ship(parent_id)
-          if permission_res.success
-            json_actions([OpenStruct.new(type: :show_element, dom_id: 'mr_sales_orders_ship_button')], res.message)
-          else
-            json_actions([OpenStruct.new(type: :hide_element, dom_id: 'mr_sales_orders_ship_button')], res.message)
-          end
+          actions = []
+          actions << if permission_res.success
+                       OpenStruct.new(type: :show_element, dom_id: 'mr_sales_orders_ship_button')
+                     else
+                       OpenStruct.new(type: :hide_element, dom_id: 'mr_sales_orders_ship_button')
+                     end
+          json_actions(sub_total_actions + actions, res.message)
         else
           show_json_error(res.message, status: 200)
         end
@@ -271,6 +275,15 @@ class Framework < Roda
         end
       end
     end
+  end
+
+  def so_sub_total_changes(sub_totals)
+    [
+      OpenStruct.new(dom_id: 'so_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
+      OpenStruct.new(dom_id: 'so_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+      OpenStruct.new(dom_id: 'so_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
+      OpenStruct.new(dom_id: 'so_totals_total', type: :replace_inner_html, value: sub_totals[:total])
+    ]
   end
 end
 # rubocop:enable Metrics/ClassLength

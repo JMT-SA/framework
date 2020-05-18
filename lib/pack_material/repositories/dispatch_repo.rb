@@ -333,8 +333,7 @@ module PackMaterialApp
     end
 
     def create_mr_sales_order_item(attrs)
-      wa_cost = DB[:material_resource_product_variants].where(id: attrs[:mr_product_variant_id]).get(:weighted_average_cost)
-      create(:mr_sales_order_items, attrs.to_h.merge(unit_price: wa_cost))
+      create(:mr_sales_order_items, attrs)
     end
 
     def so_sub_totals(id, opts = {})

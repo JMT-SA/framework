@@ -125,10 +125,10 @@ module PackMaterial
           <<~HTML
             <div class="fr">
             <table><tbody>
-            <tr><th class="tr pr2">Sub-total</th><td class="tr"><span id="del_totals_subtotal">#{rules[:so_sub_totals][:subtotal]}</span></td></tr>
-            <tr><th class="tr pr2">Costs</th><td class="tr"><span id="del_totals_costs">#{rules[:so_sub_totals][:costs]}</span></td></tr>
-            <tr><th class="tr pr2">VAT</th><td class="tr"><span id="del_totals_vat">#{rules[:so_sub_totals][:vat]}</span></td></tr>
-            <tr><th class="tr pr2">Total</th><td class="tr b bb bt"><span id="del_totals_total">#{rules[:so_sub_totals][:total]}</span></td></tr>
+            <tr><th class="tr pr2">Sub-total</th><td class="tr"><span id="so_totals_subtotal">#{rules[:so_sub_totals][:subtotal]}</span></td></tr>
+            <tr><th class="tr pr2">Costs</th><td class="tr"><span id="so_totals_costs">#{rules[:so_sub_totals][:costs]}</span></td></tr>
+            <tr><th class="tr pr2">VAT</th><td class="tr"><span id="so_totals_vat">#{rules[:so_sub_totals][:vat]}</span></td></tr>
+            <tr><th class="tr pr2">Total</th><td class="tr b bb bt"><span id="so_totals_total">#{rules[:so_sub_totals][:total]}</span></td></tr>
             </tbody></table>
             </div>
           HTML

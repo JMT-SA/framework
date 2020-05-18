@@ -92,6 +92,10 @@ module PackMaterialApp
       repo.find_mr_sales_order_item(id)
     end
 
+    def so_sub_totals(sales_order_id)
+      repo.so_sub_totals(sales_order_id)
+    end
+
     private
 
     def repo

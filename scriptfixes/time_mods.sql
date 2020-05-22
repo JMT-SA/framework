@@ -51,8 +51,8 @@ ALTER COLUMN created_at TYPE timestamp with time zone,
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE customers
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE destination_cities
 ALTER COLUMN updated_at TYPE timestamp with time zone,
@@ -79,10 +79,6 @@ ALTER COLUMN created_at TYPE timestamp with time zone,
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE label_templates
-ALTER COLUMN created_at TYPE timestamp with time zone,
-ALTER COLUMN updated_at TYPE timestamp with time zone;
-
-ALTER TABLE labels
 ALTER COLUMN created_at TYPE timestamp with time zone,
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
@@ -115,29 +111,29 @@ ALTER COLUMN created_at TYPE timestamp with time zone,
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE material_resource_domains
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE material_resource_product_columns
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE material_resource_product_variant_party_roles
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE material_resource_product_variants
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
-ALTER COLUMN wa_cost_updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone,
+ALTER COLUMN wa_cost_updated_at TYPE timestamp with time zone;
 
 ALTER TABLE material_resource_sub_types
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE material_resource_types
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mes_modules
 ALTER COLUMN created_at TYPE timestamp with time zone,
@@ -147,79 +143,79 @@ ALTER TABLE message_bus
 ALTER COLUMN added_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_bulk_stock_adjustment_items
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_bulk_stock_adjustments
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_deliveries
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN supplier_invoice_date TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN supplier_invoice_date TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_delivery_item_batches
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_delivery_items
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_goods_returned_note_items
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_goods_returned_notes
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_internal_batch_numbers
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_inventory_transactions
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_purchase_invoice_costs
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_purchase_order_items
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_purchase_orders
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone,
-ALTER COLUMN valid_until TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone,
+ALTER COLUMN valid_until TYPE timestamp with time zone;
 
 ALTER TABLE mr_sales_order_items
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_sales_orders
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN shipped_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN shipped_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_skus
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE organizations
 ALTER COLUMN created_at TYPE timestamp with time zone,
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE pack_material_products
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE pack_material_product_variants
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE parties
 ALTER COLUMN created_at TYPE timestamp with time zone,
@@ -282,8 +278,8 @@ ALTER COLUMN created_at TYPE timestamp with time zone,
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE suppliers
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE target_market_group_types
 ALTER COLUMN created_at TYPE timestamp with time zone,
@@ -311,20 +307,20 @@ ALTER COLUMN created_at TYPE timestamp with time zone,
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE vehicle_jobs
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone,
-ALTER COLUMN when_loaded TYPE timestamp without time zone,
-ALTER COLUMN when_loading TYPE timestamp without time zone,
-ALTER COLUMN when_offloaded TYPE timestamp without time zone,
-ALTER COLUMN when_offloading TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone,
+ALTER COLUMN when_loaded TYPE timestamp with time zone,
+ALTER COLUMN when_loading TYPE timestamp with time zone,
+ALTER COLUMN when_offloaded TYPE timestamp with time zone,
+ALTER COLUMN when_offloading TYPE timestamp with time zone;
 
 ALTER TABLE vehicle_job_units
-ALTER COLUMN created_at TYPE timestamp without time zone,
-ALTER COLUMN updated_at TYPE timestamp without time zone,
-ALTER COLUMN when_loaded TYPE timestamp without time zone,
-ALTER COLUMN when_loading TYPE timestamp without time zone,
-ALTER COLUMN when_offloaded TYPE timestamp without time zone,
-ALTER COLUMN when_offloading TYPE timestamp without time zone;
+ALTER COLUMN created_at TYPE timestamp with time zone,
+ALTER COLUMN updated_at TYPE timestamp with time zone,
+ALTER COLUMN when_loaded TYPE timestamp with time zone,
+ALTER COLUMN when_loading TYPE timestamp with time zone,
+ALTER COLUMN when_offloaded TYPE timestamp with time zone,
+ALTER COLUMN when_offloading TYPE timestamp with time zone;
 
 
 -- Re-create dropped views:

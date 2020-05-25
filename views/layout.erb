@@ -145,7 +145,7 @@
 
       // MessageBus handling --- START
       MessageBus.baseUrl = "/terminus/";
-      const logged_in_user = '<%= current_user ? current_user.login_name : "unknown" %>';
+      const logged_in_user = '<%= current_user ? current_user.user_name : "unknown" %>';
 
       MessageBus.subscribe("/terminus", function(msg){
         console.log('MSG', msg);

@@ -125,7 +125,7 @@ There is a job `DevelopmentApp::EmailJasperReport` which will create the report(
 
 Parameter options for the `run` method are:
 
-* `:user_name` - the user name (typically `current_user.login_name`)
+* `:user_name` - the user name (typically `current_user.user_name`)
 * `:email_settings` - the to/subject and body values for the email.
 * `:reports` - an array of parameters for one or more reports.
 
@@ -145,7 +145,7 @@ r.on 'email_report', Integer do |id|
   r.post do
     opts = {
       email_settings: params[:mail],
-      user: current_user.login_name,
+      user: current_user.user_name,
       reports: [
         {
           report_name: 'the_report',

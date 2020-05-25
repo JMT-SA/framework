@@ -29,7 +29,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       r.post do
         opts = {
           email_settings: params[:mail],
-          user_name: current_user.login_name,
+          user_name: current_user.user_name,
           reports: [
             {
               report_name: 'print_purchase_order',
@@ -181,7 +181,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       r.post do
         opts = {
           email_settings: params[:mail],
-          user_name: current_user.login_name,
+          user_name: current_user.user_name,
           reports: [{
             report_name: 'print_credit_note',
             file: 'credit_note',
@@ -236,7 +236,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       r.post do
         opts = {
           email_settings: params[:mail],
-          user_name: current_user.login_name,
+          user_name: current_user.user_name,
           reports: [{
             report_name: 'sales_order',
             file: 'sales_order',

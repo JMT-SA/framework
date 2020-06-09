@@ -12,16 +12,14 @@ module PackMaterialApp
         log_status('mr_sales_orders', id, 'CREATED')
         log_transaction
       end
-      instance = mr_sales_order(id)
-      so_number = instance.sales_order_number
-      success_response("Created Sales Order #{so_number ? 'No: ' + so_number : ''}", id)
+      success_response('Created Sales Order', id)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { base: ['This Sales Order already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_mr_sales_order(id, params) # rubocop:disable Metrics/AbcSize
+    def update_mr_sales_order(id, params)
       res = validate_mr_sales_order_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -31,8 +29,7 @@ module PackMaterialApp
         log_transaction
       end
       instance = mr_sales_order(id)
-      so_number = instance.sales_order_number
-      success_response("Updated Sales Order #{so_number ? 'No: ' + so_number : ''}", instance)
+      success_response('Updated Sales Order', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -207,10 +207,12 @@ module PackMaterialApp
       update(:mr_goods_returned_note_items, id, "#{attrs[:column_name]}": attrs[:column_value])
     end
 
-    def grn_complete_invoice(id, attrs)
+    def grn_complete_invoice(user_name, id, attrs)
       update(:mr_goods_returned_notes, id,
              invoice_error: false,
              invoice_completed: true,
+             invoice_completed_at: DateTime.now,
+             invoice_completed_by: user_name,
              erp_purchase_order_number: attrs[:purchase_order_number],
              erp_purchase_invoice_number: attrs[:purchase_invoice_number])
     end
@@ -382,10 +384,12 @@ module PackMaterialApp
         .all
     end
 
-    def so_complete_invoice(id, attrs)
+    def so_complete_invoice(user_name, id, attrs)
       update(:mr_sales_orders, id,
              integration_error: false,
              integration_completed: true,
+             invoice_completed_at: DateTime.now,
+             invoice_completed_by: user_name,
              erp_profit_loss_number: attrs[:journal_number],
              erp_invoice_number: attrs[:sales_invoice_number])
     end

@@ -4,7 +4,7 @@ module PackMaterial
   module Transactions
     module StockMovementReport
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: false)
+        def self.call(form_values: nil, form_errors: nil, remote: false) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:stock_movement_report, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -16,8 +16,19 @@ module PackMaterial
               form.caption 'New Stock Movement Report'
               form.action '/pack_material/transactions/movement_report'
               form.remote! if remote
-              form.add_field :start_date
-              form.add_field :end_date
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :start_month
+                end
+                row.column do |col|
+                  col.add_field :start_year
+                end
+              end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :end_date
+                end
+              end
             end
           end
 

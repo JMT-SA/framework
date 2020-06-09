@@ -168,5 +168,22 @@ class AppConst
     SS ES LK SD SR SJ SE CH SY TW TJ TZ TH TL TG TK TO TT TN TR TM TC TV
     UG UA AE GB UM US UY UZ VU VE VN VG VI WF EH YE ZM ZW AX
   ].freeze
+
+  MONTHS_OF_THE_YEAR = [
+    %w[Jan 01],
+    %w[Feb 02],
+    %w[Mar 03],
+    %w[Apr 04],
+    %w[May 05],
+    %w[Jun 06],
+    %w[Jul 07],
+    %w[Aug 08],
+    %w[Sep 09],
+    %w[Oct 10],
+    %w[Nov 11],
+    %w[Dec 12]
+  ].freeze
+
+  REPORT_YEARS = %w[2019 2020].freeze
 end
 # rubocop:enable Metrics/ClassLength

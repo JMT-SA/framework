@@ -26,8 +26,9 @@ module UiRules
 
     def new_fields
       {
-        start_date: { subtype: :date },
-        end_date: { subtype: :date }
+        start_month: { renderer: :select, options: AppConst::MONTHS_OF_THE_YEAR, sort_items: false, required: true },
+        start_year: { renderer: :select, options: AppConst::REPORT_YEARS, required: true },
+        end_date: { subtype: :date, required: true }
       }
     end
 
@@ -38,7 +39,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(start_date: nil, end_date: nil)
+      @form_object = OpenStruct.new(start_month: nil, start_year: nil, end_date: nil)
     end
   end
 end

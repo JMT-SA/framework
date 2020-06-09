@@ -13,6 +13,42 @@ class Framework < Roda
       interactor.recalculate_wa_costs
       redirect_to_last_grid(r)
     end
+
+    # ADHOC STOCK TRANSACTIONS
+    # --------------------------------------------------------------------------
+    r.on 'movement_report' do
+      interactor = PackMaterialApp::StockMovementInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'show' do
+        show_page { PackMaterial::Transactions::StockMovementReport::Show.call(start_date, end_date) }
+      end
+      r.on 'new' do
+        check_auth!('transactions', 'new')
+        show_partial_or_page(r) { PackMaterial::Transactions::StockMovementReport::New.call(remote: fetch?(r)) }
+      end
+      r.on 'report' do
+        # interactor.logged_actions_grid(id)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+      r.on 'records' do
+        # interactor.logged_actions_grid(id)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+      r.post do
+        res = interactor.create_stock_movement_report(params[:stock_movement_report])
+        if res.success
+          show_json_notice(res.message)
+        #  redirect to show
+        else
+          re_show_form(r, res, url: '/pack_material/transactions/movement_report/new') do
+            PackMaterial::Transactions::StockMovementReport::New.call(form_values: params[:stock_movement_report],
+                                                                      form_errors: res.errors,
+                                                                      remote: fetch?(r))
+          end
+        end
+      end
+    end
     # ADHOC STOCK TRANSACTIONS
     # --------------------------------------------------------------------------
     r.on 'adhoc_stock_transactions', Integer do |id|

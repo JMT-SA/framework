@@ -91,7 +91,7 @@ module PackMaterialApp
     def apply_changes(formatted_res)
       @repo.transaction do
         if formatted_res.success
-          @bsa_repo.bsa_integration(@id, formatted_res.instance)
+          @bsa_repo.bsa_integration(@user_name, @id, formatted_res.instance)
           @repo.log_status('mr_bulk_stock_adjustments', @id, 'BSA INTEGRATED', user_name: @user_name)
         else
           @repo.update_mr_bulk_stock_adjustment(@id, integration_error: true)

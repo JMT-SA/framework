@@ -3,14 +3,18 @@
 :sql: "SELECT \"mr_bulk_stock_adjustments\".\"id\",\r\n       fn_current_status('mr_bulk_stock_adjustments',
   \"mr_bulk_stock_adjustments\".\"id\") AS status,\r\n       \"mr_bulk_stock_adjustments\".\"ref_no\",\r\n
   \      \"mr_bulk_stock_adjustments\".\"stock_adjustment_number\",\r\n       \"mr_bulk_stock_adjustments\".\"erp_depreciation_number\",\r\n
-  \      \"mr_bulk_stock_adjustments\".\"completed\",\r\n       \"mr_bulk_stock_adjustments\".\"approved\",\r\n
-  \      \"mr_bulk_stock_adjustments\".\"signed_off\",\r\n       \"mr_bulk_stock_adjustments\".\"carton_assembly\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"completed\",\r\n       \"mr_bulk_stock_adjustments\".\"completed_by\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"completed_at\",\r\n       \"mr_bulk_stock_adjustments\".\"approved\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"approved_by\",\r\n       \"mr_bulk_stock_adjustments\".\"approved_at\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"signed_off\",\r\n       \"mr_bulk_stock_adjustments\".\"signed_off_by\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"signed_off_at\",\r\n       \"mr_bulk_stock_adjustments\".\"carton_assembly\",\r\n
   \      \"mr_bulk_stock_adjustments\".\"staging_consumption\",\r\n       \"mr_bulk_stock_adjustments\".\"integration_completed\",\r\n
   \      \"mr_bulk_stock_adjustments\".\"integration_error\",\r\n       \"mr_bulk_stock_adjustments\".\"integrated_at\",\r\n
-  \      \"mr_bulk_stock_adjustments\".\"created_at\",\r\n       \"mr_bulk_stock_adjustments\".\"updated_at\",\r\n
-  \      exists(select location_id from crossbeams_framework.public.mr_bulk_stock_adjustments_locations
-  where mr_bulk_stock_adjustment_id = \"mr_bulk_stock_adjustments\".\"id\") as has_locations,\r\n
-  \      exists(select mr_sku_id from crossbeams_framework.public.mr_bulk_stock_adjustments_sku_numbers
+  \      \"mr_bulk_stock_adjustments\".\"integrated_by\",\r\n       \"mr_bulk_stock_adjustments\".\"created_at\",\r\n
+  \      \"mr_bulk_stock_adjustments\".\"updated_at\",\r\n       exists(select location_id
+  from crossbeams_framework.public.mr_bulk_stock_adjustments_locations where mr_bulk_stock_adjustment_id
+  = \"mr_bulk_stock_adjustments\".\"id\") as has_locations,\r\n       exists(select
+  mr_sku_id from crossbeams_framework.public.mr_bulk_stock_adjustments_sku_numbers
   where mr_bulk_stock_adjustment_id = \"mr_bulk_stock_adjustments\".\"id\") as has_skus,\r\n
   \      (SELECT id from crossbeams_framework.public.location_storage_types where
   storage_type_code = 'Pack Material') as storage_type_id,\r\n(\"mr_bulk_stock_adjustments\".\"completed\"
@@ -117,9 +121,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  completed_by:
+    :name: completed_by
+    :sequence_no: 7
+    :caption: Completed by
+    :namespaced_name: mr_bulk_stock_adjustments.completed_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 8
+    :caption: Completed at
+    :namespaced_name: mr_bulk_stock_adjustments.completed_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   approved:
     :name: approved
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Approved
     :namespaced_name: mr_bulk_stock_adjustments.approved
     :data_type: :boolean
@@ -133,9 +169,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  approved_by:
+    :name: approved_by
+    :sequence_no: 10
+    :caption: Approved by
+    :namespaced_name: mr_bulk_stock_adjustments.approved_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  approved_at:
+    :name: approved_at
+    :sequence_no: 11
+    :caption: Approved at
+    :namespaced_name: mr_bulk_stock_adjustments.approved_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   signed_off:
     :name: signed_off
-    :sequence_no: 8
+    :sequence_no: 12
     :caption: Signed off
     :namespaced_name: mr_bulk_stock_adjustments.signed_off
     :data_type: :boolean
@@ -149,9 +217,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  signed_off_by:
+    :name: signed_off_by
+    :sequence_no: 13
+    :caption: Signed off by
+    :namespaced_name: mr_bulk_stock_adjustments.signed_off_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  signed_off_at:
+    :name: signed_off_at
+    :sequence_no: 14
+    :caption: Signed off at
+    :namespaced_name: mr_bulk_stock_adjustments.signed_off_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   carton_assembly:
     :name: carton_assembly
-    :sequence_no: 9
+    :sequence_no: 15
     :caption: Carton assembly
     :namespaced_name: mr_bulk_stock_adjustments.carton_assembly
     :data_type: :boolean
@@ -167,7 +267,7 @@
     :group_max: false
   staging_consumption:
     :name: staging_consumption
-    :sequence_no: 10
+    :sequence_no: 16
     :caption: Staging consumption
     :namespaced_name: mr_bulk_stock_adjustments.staging_consumption
     :data_type: :boolean
@@ -183,7 +283,7 @@
     :group_max: false
   integration_completed:
     :name: integration_completed
-    :sequence_no: 11
+    :sequence_no: 17
     :caption: Integrated
     :namespaced_name: mr_bulk_stock_adjustments.integration_completed
     :data_type: :boolean
@@ -199,7 +299,7 @@
     :group_max: false
   integration_error:
     :name: integration_error
-    :sequence_no: 12
+    :sequence_no: 18
     :caption: Error
     :namespaced_name: mr_bulk_stock_adjustments.integration_error
     :data_type: :boolean
@@ -215,7 +315,7 @@
     :group_max: false
   integrated_at:
     :name: integrated_at
-    :sequence_no: 13
+    :sequence_no: 19
     :caption: Integrated at
     :namespaced_name: mr_bulk_stock_adjustments.integrated_at
     :data_type: :datetime
@@ -229,9 +329,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  integrated_by:
+    :name: integrated_by
+    :sequence_no: 20
+    :caption: Integrated by
+    :namespaced_name: mr_bulk_stock_adjustments.integrated_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 14
+    :sequence_no: 21
     :caption: Created at
     :namespaced_name: mr_bulk_stock_adjustments.created_at
     :data_type: :datetime
@@ -247,7 +363,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 22
     :caption: Updated at
     :namespaced_name: mr_bulk_stock_adjustments.updated_at
     :data_type: :datetime
@@ -263,7 +379,7 @@
     :group_max: false
   has_locations:
     :name: has_locations
-    :sequence_no: 16
+    :sequence_no: 23
     :caption: Has locations
     :namespaced_name: 
     :data_type: :string
@@ -279,7 +395,7 @@
     :group_max: false
   has_skus:
     :name: has_skus
-    :sequence_no: 17
+    :sequence_no: 24
     :caption: Has skus
     :namespaced_name: 
     :data_type: :string
@@ -295,7 +411,7 @@
     :group_max: false
   storage_type_id:
     :name: storage_type_id
-    :sequence_no: 18
+    :sequence_no: 25
     :caption: Storage type
     :namespaced_name: 
     :data_type: :string
@@ -311,7 +427,7 @@
     :group_max: false
   hide_locations:
     :name: hide_locations
-    :sequence_no: 19
+    :sequence_no: 26
     :caption: Hide locations
     :namespaced_name: 
     :data_type: :string

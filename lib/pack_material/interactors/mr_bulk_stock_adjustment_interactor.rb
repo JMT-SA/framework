@@ -91,7 +91,7 @@ module PackMaterialApp
     def complete_bulk_stock_adjustment(id)
       assert_permission!(:complete, id)
       repo.transaction do
-        repo.complete_mr_bulk_stock_adjustment(id)
+        repo.complete_mr_bulk_stock_adjustment(id, @user.user_name)
         log_transaction
         log_status('mr_bulk_stock_adjustments', id, 'COMPLETED')
         instance = mr_bulk_stock_adjustment(id)
@@ -120,7 +120,7 @@ module PackMaterialApp
         log_transaction
 
         log_status('mr_bulk_stock_adjustments', id, 'APPROVED')
-        repo.approve_mr_bulk_stock_adjustment(id)
+        repo.approve_mr_bulk_stock_adjustment(id, @user.user_name)
 
         instance = mr_bulk_stock_adjustment(id)
         success_response('Approved Bulk Stock Adjustment', instance)
@@ -141,7 +141,7 @@ module PackMaterialApp
 
         repo.update_weighted_average_costs(id)
         log_status('mr_bulk_stock_adjustments', id, 'SIGNED OFF')
-        repo.signed_off_mr_bulk_stock_adjustment(id)
+        repo.signed_off_mr_bulk_stock_adjustment(id, @user.user_name)
 
         instance = mr_bulk_stock_adjustment(id)
         success_response('Signed Off Bulk Stock Adjustment', instance)
@@ -170,7 +170,6 @@ module PackMaterialApp
       repo.transaction do
         PackMaterialApp::IntegrateBulkStockAdjustment.call(id, @user.user_name, false, nil)
         log_transaction
-        log_status('mr_bulk_stock_adjustments', id, 'INTEGRATED')
         instance = mr_bulk_stock_adjustment(id)
         success_response('Integrated Bulk Stock Adjustment', instance)
       end

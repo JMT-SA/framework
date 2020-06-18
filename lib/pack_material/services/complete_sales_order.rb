@@ -130,7 +130,7 @@ module PackMaterialApp
     def apply_changes(formatted_res)
       @repo.transaction do
         if formatted_res.success
-          @repo.so_complete_invoice(@id, formatted_res.instance)
+          @repo.so_complete_invoice(@user_name, @id, formatted_res.instance)
           @repo.log_status('mr_sales_orders', @id, 'SALES ORDER COMPLETED', user_name: @user_name)
         else
           @repo.update_mr_sales_order(@id, integration_error: true)

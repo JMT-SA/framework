@@ -78,10 +78,11 @@ module PackMaterialApp
       success_response('ok')
     end
 
-    def bsa_integration(id, attrs)
+    def bsa_integration(user_name, id, attrs)
       update(:mr_bulk_stock_adjustments, id,
              integration_error: false,
              integration_completed: true,
+             integrated_by: user_name,
              integrated_at: attrs[:time],
              erp_depreciation_number: attrs[:journal_number])
     end

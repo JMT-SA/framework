@@ -48,6 +48,7 @@ module PackMaterial
                 form.action "/pack_material/sales/mr_sales_orders/#{id}"
                 form.remote!
                 form.method :update
+                form.no_submit! if rules[:shipped]
                 form.row do |row|
                   row.column do |column|
                     column.add_field :sales_order_number

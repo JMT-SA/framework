@@ -304,24 +304,42 @@ module PackMaterialApp
       MasterfilesApp::LocationRepo.new
     end
 
-    def complete_mr_bulk_stock_adjustment(id)
-      update(:mr_bulk_stock_adjustments, id, completed: true)
+    def complete_mr_bulk_stock_adjustment(id, user_name)
+      update(:mr_bulk_stock_adjustments, id,
+             completed_by: user_name,
+             completed_at: DateTime.now,
+             completed: true)
     end
 
     def reopen_mr_bulk_stock_adjustment(id)
-      update(:mr_bulk_stock_adjustments, id, completed: false)
+      update(:mr_bulk_stock_adjustments, id,
+             completed_by: nil,
+             completed_at: nil,
+             completed: false)
     end
 
-    def approve_mr_bulk_stock_adjustment(id)
-      update(:mr_bulk_stock_adjustments, id, approved: true)
+    def approve_mr_bulk_stock_adjustment(id, user_name)
+      update(:mr_bulk_stock_adjustments, id,
+             approved_by: user_name,
+             approved_at: DateTime.now,
+             approved: true)
     end
 
     def decline_mr_bulk_stock_adjustment(id)
-      update(:mr_bulk_stock_adjustments, id, approved: false, completed: false)
+      update(:mr_bulk_stock_adjustments, id,
+             approved_by: nil,
+             approved_at: nil,
+             approved: false,
+             completed_by: nil,
+             completed_at: nil,
+             completed: false)
     end
 
-    def signed_off_mr_bulk_stock_adjustment(id)
-      update(:mr_bulk_stock_adjustments, id, signed_off: true)
+    def signed_off_mr_bulk_stock_adjustment(id, user_name)
+      update(:mr_bulk_stock_adjustments, id,
+             signed_off_by: user_name,
+             signed_off_at: DateTime.now,
+             signed_off: true)
     end
 
     def find_mr_bulk_stock_adjustment(id)

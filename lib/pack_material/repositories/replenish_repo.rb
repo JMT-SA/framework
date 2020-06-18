@@ -268,6 +268,8 @@ module PackMaterialApp
       update(:mr_deliveries, id,
              invoice_error: false,
              invoice_completed: true,
+             invoice_completed_at: DateTime.now,
+             invoice_completed_by: user_name,
              erp_purchase_order_number: attrs[:purchase_order_number],
              erp_purchase_invoice_number: attrs[:purchase_invoice_number])
     end

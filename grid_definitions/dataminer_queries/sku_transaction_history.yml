@@ -11,9 +11,8 @@
   as transaction_id,\r\n    \"mr_inventory_transactions\".\"created_by\",\r\n    \"mr_inventory_transactions\".\"mr_inventory_transaction_type_id\",\r\n
   \   \"mr_inventory_transaction_types\".\"type_name\",\r\n    \"mr_inventory_transactions\".\"is_adhoc\",\r\n
   \   \"business_processes\".\"process\",\r\n    \"mr_inventory_transactions\".\"active\",\r\n
-  \   \"mr_inventory_transactions\".\"created_at\" as item_created_at,\r\n    \"mr_inventory_transactions\".\"created_at\",\r\n
-  \   \"mr_inventory_transactions\".\"updated_at\"\r\nFROM mr_inventory_transaction_items\r\n
-  \        LEFT JOIN mr_skus ON mr_skus.id = mr_inventory_transaction_items.mr_sku_id\r\n
+  \   \"mr_inventory_transactions\".\"created_at\",\r\n    \"mr_inventory_transactions\".\"updated_at\"\r\nFROM
+  mr_inventory_transaction_items\r\n         LEFT JOIN mr_skus ON mr_skus.id = mr_inventory_transaction_items.mr_sku_id\r\n
   \        LEFT JOIN mr_inventory_transactions ON mr_inventory_transaction_items.mr_inventory_transaction_id
   = mr_inventory_transactions.id\r\n         LEFT JOIN locations from_locations on
   from_locations.id = \"mr_inventory_transaction_items\".from_location_id\r\n         LEFT
@@ -348,25 +347,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  item_created_at:
-    :name: item_created_at
-    :sequence_no: 21
-    :caption: Item created at
-    :namespaced_name: mr_inventory_transactions.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 22
+    :sequence_no: 21
     :caption: Created at
     :namespaced_name: mr_inventory_transactions.created_at
     :data_type: :datetime
@@ -382,7 +365,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 23
+    :sequence_no: 22
     :caption: Updated at
     :namespaced_name: mr_inventory_transactions.updated_at
     :data_type: :datetime

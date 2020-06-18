@@ -156,7 +156,7 @@ module PackMaterialApp
     def apply_delivery_changes(formatted_res)
       @repo.transaction do
         if formatted_res.success
-          @replenish_repo.delivery_complete_invoice(@id, formatted_res.instance)
+          @replenish_repo.delivery_complete_invoice(@user_name, @id, formatted_res.instance)
           @repo.log_status('mr_deliveries', @id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
         else
           @replenish_repo.update_mr_delivery(@id, invoice_error: true)
@@ -169,7 +169,7 @@ module PackMaterialApp
     def apply_grn_changes(formatted_res)
       @repo.transaction do
         if formatted_res.success
-          @dispatch_repo.grn_complete_invoice(@grn_id, formatted_res.instance)
+          @dispatch_repo.grn_complete_invoice(@user_name, @grn_id, formatted_res.instance)
           @repo.log_status('mr_goods_returned_notes', @grn_id, 'PURCHASE INVOICE COMPLETED', user_name: @user_name)
         else
           @dispatch_repo.update_mr_goods_returned_note(@grn_id, invoice_error: true)

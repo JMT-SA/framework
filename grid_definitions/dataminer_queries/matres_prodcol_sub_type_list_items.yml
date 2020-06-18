@@ -1,10 +1,10 @@
 ---
 :caption: Master List Items for Product Columns
 :sql: "SELECT \"material_resource_product_columns\".\"id\" AS product_column_id,\r\n
-  \      \"material_resource_product_columns\".\"column_name\",\r\n       \"material_resource_master_list_items\".\"id\",\r\n
-  \      \"material_resource_master_list_items\".\"short_code\",\r\n       \"material_resource_master_list_items\".\"description\",\r\n
-  \      \"material_resource_master_list_items\".\"active\",\r\n       \"material_resource_master_list_items\".\"long_name\",\r\n
-  \      \"material_resource_master_list_items\".\"material_resource_master_list_id\"
+  \      \"material_resource_sub_types\".\"sub_type_name\",\r\n       \"material_resource_product_columns\".\"column_name\",\r\n
+  \      \"material_resource_master_list_items\".\"id\",\r\n       \"material_resource_master_list_items\".\"short_code\",\r\n
+  \      \"material_resource_master_list_items\".\"description\",\r\n       \"material_resource_master_list_items\".\"active\",\r\n
+  \      \"material_resource_master_list_items\".\"long_name\",\r\n       \"material_resource_master_list_items\".\"material_resource_master_list_id\"
   AS master_list_id,\r\n       \"material_resource_master_lists\".\"material_resource_sub_type_id\"
   AS sub_type_id,\r\n       exists(select id from pack_material_products where material_resource_sub_type_id
   = \"material_resource_master_lists\".\"material_resource_sub_type_id\") as has_products\r\nFROM
@@ -12,10 +12,11 @@
   ON \"material_resource_master_lists\".\"material_resource_product_column_id\" =
   \"material_resource_product_columns\".\"id\"\r\n         LEFT JOIN \"material_resource_master_list_items\"
   ON \"material_resource_master_list_items\".\"material_resource_master_list_id\"
-  = \"material_resource_master_lists\".\"id\"\r\nWHERE \"material_resource_product_columns\".\"id\"
-  IN (SELECT unnest(\"product_column_ids\")\r\n                                                   FROM
-  \"material_resource_sub_types\"\r\n                                                   WHERE
-  \"id\" = \"material_resource_master_lists\".\"material_resource_sub_type_id\")"
+  = \"material_resource_master_lists\".\"id\"\r\n         LEFT JOIN \"material_resource_sub_types\"
+  ON material_resource_master_lists.material_resource_sub_type_id = material_resource_sub_types.id\r\nWHERE
+  \"material_resource_product_columns\".\"id\" IN (SELECT unnest(\"product_column_ids\")\r\n
+  \                                                  FROM \"material_resource_sub_types\"\r\n
+  \                                                  WHERE \"id\" = \"material_resource_master_lists\".\"material_resource_sub_type_id\")"
 :limit: 
 :offset: 
 :external_settings:
@@ -37,9 +38,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  sub_type_name:
+    :name: sub_type_name
+    :sequence_no: 2
+    :caption: Sub type name
+    :namespaced_name: material_resource_sub_types.sub_type_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   column_name:
     :name: column_name
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Column name
     :namespaced_name: material_resource_product_columns.column_name
     :data_type: :string
@@ -55,7 +72,7 @@
     :group_max: false
   id:
     :name: id
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Id
     :namespaced_name: material_resource_master_list_items.id
     :data_type: :integer
@@ -71,7 +88,7 @@
     :group_max: false
   short_code:
     :name: short_code
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Short code
     :namespaced_name: material_resource_master_list_items.short_code
     :data_type: :string
@@ -87,7 +104,7 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Description
     :namespaced_name: material_resource_master_list_items.description
     :data_type: :string
@@ -103,7 +120,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Active
     :namespaced_name: material_resource_master_list_items.active
     :data_type: :boolean
@@ -119,7 +136,7 @@
     :group_max: false
   long_name:
     :name: long_name
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Long name
     :namespaced_name: material_resource_master_list_items.long_name
     :data_type: :string
@@ -135,7 +152,7 @@
     :group_max: false
   master_list_id:
     :name: master_list_id
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Master list
     :namespaced_name: material_resource_master_list_items.material_resource_master_list_id
     :data_type: :string
@@ -151,13 +168,13 @@
     :group_max: false
   sub_type_id:
     :name: sub_type_id
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Sub type
     :namespaced_name: material_resource_master_lists.material_resource_sub_type_id
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -167,7 +184,7 @@
     :group_max: false
   has_products:
     :name: has_products
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Has products
     :namespaced_name: 
     :data_type: :boolean

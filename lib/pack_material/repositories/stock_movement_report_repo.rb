@@ -21,10 +21,16 @@ module PackMaterialApp
 
     def validate_stock_movement_report_date_params(attrs)
       start_date = Date.new(attrs[:start_year].to_i, attrs[:start_month].to_i, 1)
+      return validation_failed_response(OpenStruct.new(messages: { base: ['Start Date must be after Stock Take On Date.'] })) if start_date <= stock_take_on_date
+
       end_date = attrs[:end_date]
       return validation_failed_response(OpenStruct.new(messages: { base: ['End Date must be after Start Date.'] })) if end_date <= start_date
 
       success_response('Dates are valid.', { start_date: start_date, end_date: end_date })
+    end
+
+    def stock_take_on_date
+      Date.parse(AppConst::STOCK_TAKE_ON_DATE)
     end
 
     def stock_movement_report_records(start_date, end_date)

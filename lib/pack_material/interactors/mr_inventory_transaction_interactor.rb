@@ -102,7 +102,27 @@ module PackMaterialApp
       WaCostRepo.new.calculate_wa_costs
     end
 
+    def weighted_average_records_grid
+      {
+        columnDefs: records_column_definitions,
+        rowDefs: WaCostRepo.new.weighted_average_cost_records
+      }.to_json
+    end
+
     private
+
+    def records_column_definitions
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.integer 'mr_product_variant_id', 'MRPV ID', width: 130
+        mk.integer 'sku_number', nil, hide: true
+        mk.integer 'sku_id', nil, hide: true
+        mk.integer 'applicable_id', nil, width: 130
+        mk.numeric 'quantity', nil, width: 130
+        mk.col 'type', nil, width: 130
+        mk.numeric 'price', nil, width: 130
+        mk.col 'created_at', nil, width: 180
+      end
+    end
 
     def repo
       @repo ||= TransactionsRepo.new

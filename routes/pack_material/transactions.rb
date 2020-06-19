@@ -13,6 +13,19 @@ class Framework < Roda
       interactor.recalculate_wa_costs
       redirect_to_last_grid(r)
     end
+    # WEIGHTED AVERAGES
+    # --------------------------------------------------------------------------
+    r.on 'weighted_averages' do
+      interactor = PackMaterialApp::MrInventoryTransactionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'show' do
+        show_page { PackMaterial::Transactions::WeightedAverages::Show.call }
+      end
+      r.on 'records' do
+        interactor.weighted_average_records_grid
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+    end
 
     # ADHOC STOCK TRANSACTIONS
     # --------------------------------------------------------------------------

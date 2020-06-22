@@ -264,7 +264,7 @@ module PackMaterialApp
       update_with_document_number('doc_seqs_waybill_number', id) unless waybill_no
     end
 
-    def delivery_complete_invoice(id, attrs)
+    def delivery_complete_invoice(user_name, id, attrs)
       update(:mr_deliveries, id,
              invoice_error: false,
              invoice_completed: true,

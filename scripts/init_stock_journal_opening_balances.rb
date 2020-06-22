@@ -7,7 +7,7 @@ class InitStockJournalOpeningBalances < BaseScript
 
     dates = DB["select generate_series(('2019_07_01')::date, ('2020_06_01')::date, interval '1 month');"].all.map { |r| r[:generate_series].strftime('%Y-%m-%d') }
     dates.each do |date|
-      script = %(INSERT INTO stock_journal_entries (mr_product_variant_id, opening_balance, opening_balance_at)
+      script = %(INSERT INTO stock_journal_entries (mr_product_variant_id, opening_balance, opening_balance_on)
                   SELECT mrpv.id, fn_stock_total_at(mrpv.id, ('2019_01_01')::date, ('#{date}')::date), ('#{date}')::date
                   FROM material_resource_product_variants mrpv;)
       sql_info << script

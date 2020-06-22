@@ -51,6 +51,20 @@ module PackMaterialApp
       DB[:vw_weighted_average_cost_records].all
     end
 
+    def tmp_weighted_average_cost_records
+      DB["select vw.mr_product_variant_id,
+                 mrpv.product_variant_code,
+                 vw.sku_number,
+                 vw.sku_id,
+                 vw.id as applicable_id,
+                 vw.quantity,
+                 vw.type,
+                 vw.price,
+                 vw.created_at
+          from vw_weighted_average_cost_records vw
+          left join material_resource_product_variants mrpv on vw.mr_product_variant_id = mrpv.id;"].all
+    end
+
     # @return [Array] Query returning wa_cost records including Sales Order Items
     def wa_cost_records
       DB["select ROW_NUMBER() OVER() as id,

@@ -116,7 +116,7 @@ module PackMaterialApp
         mk.integer 'mr_product_variant_id', 'MRPV ID', width: 130
         mk.integer 'sku_number', nil, hide: true
         mk.integer 'sku_id', nil, hide: true
-        mk.integer 'id', 'applicable_id', width: 130
+        mk.integer 'id', 'Applicable ID', width: 130
         mk.numeric 'quantity', nil, width: 130
         mk.col 'type', nil, width: 130
         mk.numeric 'price', nil, width: 130

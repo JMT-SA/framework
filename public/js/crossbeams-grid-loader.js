@@ -85,6 +85,7 @@ const crossbeamsGridFormatters = {
     let subPrefix = '';
     let subnode;
     let titleValue;
+    let promptValue;
     const checkBooleans = (checks, boolVal, data) => {
       let ok = false;
       checks.split(',').forEach((field) => {
@@ -113,6 +114,10 @@ const crossbeamsGridFormatters = {
       if (titleValue.indexOf('$:') > -1) {
         titleValue = titleValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
       }
+    }
+    promptValue = item.prompt;
+    if (promptValue && promptValue.indexOf('$:') > -1) {
+      promptValue = promptValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
     }
     if (item.is_separator) {
       // Add a separator - but only if the previous item is not also a separator.
@@ -163,7 +168,7 @@ const crossbeamsGridFormatters = {
     return { key: `${prefix}${key}`,
       name: item.text,
       url,
-      prompt: item.prompt,
+      prompt: promptValue,
       method: item.method,
       title: item.title,
       title_field: titleValue,
@@ -327,6 +332,10 @@ const crossbeamsGridEvents = {
   updateGridInPlace: function updateGridInPlace(id, changes) {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
+    if (gridOptions === undefined) {
+      crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
+      return;
+    }
     const rowNode = gridOptions.api.getRowNode(id);
     if (rowNode === undefined) {
       crossbeamsUtils.showError(`Could not find a grid with id "${id}".`);
@@ -347,7 +356,11 @@ const crossbeamsGridEvents = {
   addRowToGrid: function addRowToGrid(row) {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
-    gridOptions.api.updateRowData({ add: [row] });
+    if (gridOptions) {
+      gridOptions.api.updateRowData({ add: [row] });
+    } else {
+      crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
+    }
   },
 
   /**

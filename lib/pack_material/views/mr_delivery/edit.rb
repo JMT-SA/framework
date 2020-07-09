@@ -130,7 +130,7 @@ module PackMaterial
                                  height: 16,
                                  caption: 'Delivery Line Items')
               end
-              if rules[:invoice_completed]
+              if rules[:invoice_completed] && !rules[:over_supply_accepted]
                 section.add_grid('del_items',
                                  "/list/mr_delivery_items_show/grid?key=standard&delivery_id=#{id}",
                                  height: 16,

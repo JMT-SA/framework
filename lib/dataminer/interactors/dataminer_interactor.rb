@@ -44,7 +44,7 @@ module DataminerApp
         return page
       end
       # {"limit"=>"", "offset"=>"", "crosstab"=>{"row_columns"=>["organization_code", "commodity_code", "fg_code_old"], "column_columns"=>"grade_code", "value_columns"=>"no_pallets"}, "btnSubmit"=>"Run report", "json_var"=>"[]"}
-      page.report.ordered_columns.each do |col|
+      page.report.ordered_columns.each do |col| # rubocop:disable Metrics/BlockLength
         hs                  = { headerName: col.caption, field: col.name, hide: col.hide, headerTooltip: col.caption }
         hs[:width]          = col.width unless col.width.nil?
         hs[:enableValue]    = true if %i[integer number].include?(col.data_type)
@@ -66,6 +66,9 @@ module DataminerApp
           hs[:cellClass]    = 'grid-boolean-column'
           hs[:width]        = 100 if col.width.nil?
         end
+        hs[:width] = 140 if col.width.nil? && col.data_type == :datetime
+        hs[:valueFormatter] = 'crossbeamsGridFormatters.dateTimeWithoutSecsOrZoneFormatter' if col.data_type == :datetime
+        hs[:valueFormatter] = 'crossbeamsGridFormatters.dateTimeWithoutZoneFormatter' if col.format == :datetime_with_secs
 
         hs[:cellRenderer] = 'crossbeamsGridFormatters.iconFormatter' if col.name == 'icon'
 

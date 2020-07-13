@@ -3,25 +3,25 @@
 
 link:/developer_documentation/start.adoc[Back to documentation home]
 
-== JSON rendering
+= JSON rendering
 
 This doc shows which helpers are available in route files to return JSON responses to update the page without reloading.
 
-=== Updating a dialog
+== Updating a dialog
 
-==== Replace the contents of a dialog
+=== Replace the contents of a dialog
 
 Renders the text in `:content` in the current dialog's body.
 
     update_dialog_content(content:, notice: nil, error: nil)
 
-==== Change the contents of a dialog by loading another URL
+=== Change the contents of a dialog by loading another URL
 
 Replaces the current dialog's content with the response from `url`.
 
     load_via_json(url, notice: nil)
 
-==== Change the contents of a window by loading another URL
+=== Change the contents of a window by loading another URL
 
 Replaces the current window's content with the response from `url`.
 This should be used in the response to a link loaded in a "loading_window" (see Link: `loading_window` option).
@@ -33,19 +33,19 @@ to show that it is loading after the file has been downloaded.
 
     change_window_location_via_json(new_location, log_url = nil, download: fale)
 
-==== Redirect to the last grid
+=== Redirect to the last grid
 
 This uses a redirect to load the page that rendered the last grid.
 
     redirect_to_last_grid(route)
 
-==== Redirect to a URL
+=== Redirect to a URL
 
 Pass the URL and the app will redirect to it.
 
   redirect_via_json(url)
 
-==== Redirect to either a grid or page (using stored referer)
+=== Redirect to either a grid or page (using stored referer)
 
 Sometimes a page can be launched from a grid or from one or more other pages and after some action has been taken, you want to redirect to the appropriate page.
 
@@ -61,13 +61,13 @@ Then when you want to redirect back, call:
 
 NOTE: `key` in both cases is a `Symbol`.
 
-==== Reload the dialog that opened the current dialog
+=== Reload the dialog that opened the current dialog
 
 When a dialog opens another dialog, you might want to close the second dialog and then reload (refresh) the first dialog with the response from the original or another URL.
 
     reload_previous_dialog_via_json(url, notice: nil)
 
-==== Close the dialog and update the grid
+=== Close the dialog and update the grid
 
 After a grid action opens a dialog and changes are saved from the dialog, you might want to update certain values on the currect row without reloading the page.
 
@@ -76,7 +76,7 @@ After a grid action opens a dialog and changes are saved from the dialog, you mi
 `id` is the id of the row to change, but can also be an array of ids if you want to update several rows with the same changes.
 `changes` is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
 
-==== Close the dialog and add a row to the grid
+=== Close the dialog and add a row to the grid
 
 Like with updating a grid row, this will close the dialog and append a row to the underlying grid.
 
@@ -86,7 +86,7 @@ Like with updating a grid row, this will close the dialog and append a row to th
 
 `add_grid_row` will automatically set the `created_at` and `updated_at` fields in the new row if the grid has them (so they do not need to be included int the `attrs` Hash).
 
-=== Changing DOM elements
+== Changing DOM elements
 
 The main helper for this is `json_actions` which receives an array of actions to be carried out in the page and an optional flash message to be displayed and optional flag to indicate that a dialog should not be closed after processing the response in the page.
 Each action is of a specific type which tells the calling javascript what to do.
@@ -105,155 +105,162 @@ json_actions([OpenStruct.new(type: :replace_multi_options,
              'Re-assigned product columns')
 ----
 
-==== Actions
+=== Actions
 
-===== Replace the value of an input element
+==== Replace the value of an input element
 
 Works on `input` elements (including hidden or disabled ones).
 
-type: `:replace_input_value`.
+type:: `:replace_input_value`.
 
-dom_id: the value of the `id` attribute of the input element in the page. This is usually a combination of the `form_name` and `field_name`.
+dom_id:: the value of the `id` attribute of the input element in the page. This is usually a combination of the `form_name` and `field_name`.
 e.g. if a form named `users` has a field named `surname`, then the dom_id will be `users_surname`.
 
-value: the value you want to change it to.
+value:: the value you want to change it to.
 
-===== Change the value of a select element
+==== Change the value of a select element
 
 Works on `select` elements.
 
-type: `:change_select_value`.
+type:: `:change_select_value`.
 
-dom_id: the value of the `id` attribute of the select element in the page. This is usually a combination of the `form_name` and `field_name`.
+dom_id:: the value of the `id` attribute of the select element in the page. This is usually a combination of the `form_name` and `field_name`.
 e.g. if a form named `users` has a field named `surname`, then the dom_id will be `users_surname`.
 
-value: the value of the option you want to be selected.
+value:: the value of the option you want to be selected.
 
-===== Replace the inner HTML of a DOM element
+==== Replace the inner HTML of a DOM element
 
 Works on DOM elements (usually for label text).
 
-type: `:replace_inner_html`.
+type:: `:replace_inner_html`.
 
-dom_id: the value of the `id` attribute of the element in the page.
+dom_id:: the value of the `id` attribute of the element in the page.
 
-value: the value you want to change it to.
+value:: the value you want to change it to.
 
-===== Replace the options in a multi element
+==== Replace the contents of a dialog
+
+Works when loading a new popup dialog.
+
+type:: `:replace_dialog`.
+
+content:: the content for the dialog.
+
+==== Replace the options in a multi element
 
 Works on `Multi.js` elements only.
 
-type: `:replace_multi_options`.
+type:: `:replace_multi_options`.
 
-dom_id: as for `:replace_input_value`.
+dom_id:: as for `:replace_input_value`.
 
-options_array: A one- or two-dimensional array.
+options_array:: A one- or two-dimensional array.
 
-===== Replace the options in a select element
+==== Replace the options in a select element
 
 Works on `Selectr.js` elements only.
 
-type: `replace_select_options`
+type:: `replace_select_options`
 
-dom_id: as for `:replace_input_value`.
+dom_id:: as for `:replace_input_value`.
 
-options_array: A one- or two-dimensional array.
+options_array:: A one- or two-dimensional array.
 
-===== Replace the items in a list element
+==== Replace the items in a list element
 
 Works on `ol` or `ul` elements only.
 
-type: `:replace_list_items`.
+type:: `:replace_list_items`.
+dom_id:: as for `:replace_input_value`.
+items:: An array of `Strings`. This should be an array of arrays if the list is rendered with `remove_item_url`.
+The first element of the array displays as the list item text, while the second is the id value that becomes part of the URL when the user clicks the icon to remove an item.
 
-dom_id: as for `:replace_input_value`.
-
-items: An array of `Strings`.
-
-===== Set the readOnly attribute of an input
-
-Works on a DOM input element with an id.
-
-type: `:set_readonly`.
-
-dom_id: the value of the `id` attribute of the input element in the page.
-
-readonly: (true or false) - if true, the input will be set to readOnly. if false, the input will become editable.
-
-===== Set the required attribute of an input
+==== Set the readOnly attribute of an input
 
 Works on a DOM input element with an id.
 
-type: `:set_required`.
+type:: `:set_readonly`.
 
-dom_id: the value of the `id` attribute of the input element in the page.
+dom_id:: the value of the `id` attribute of the input element in the page.
 
-required: (true or false) - if true, the input will be set to required. if false, the required attribute will be removed from the input.
+readonly:: (true or false) - if true, the input will be set to readOnly. if false, the input will become editable.
 
-===== Set the checked attribute of an input
+==== Set the required attribute of an input
+
+Works on a DOM input element with an id.
+
+type:: `:set_required`.
+
+dom_id:: the value of the `id` attribute of the input element in the page.
+
+required:: (true or false) - if true, the input will be set to required. if false, the required attribute will be removed from the input.
+
+==== Set the checked attribute of an input
 
 Works on a DOM checkbox element with an id.
 
-type: `:set_checked`.
+type:: `:set_checked`.
 
-dom_id: the value of the `id` attribute of the checkbox element in the page.
+dom_id:: the value of the `id` attribute of the checkbox element in the page.
 
-checked: (true or false) - if true, the `checked` attribute on the checkbox will be set. if false, it will be unset.
+checked:: (true or false) - if true, the `checked` attribute on the checkbox will be set. if false, it will be unset.
 
-===== Hide a DOM element
+==== Hide a DOM element
 
 Works on any DOM element with an id.
 
-type: `:hide_element`.
+type:: `:hide_element`.
 
-dom_id: the value of the `id` attribute of the element in the page. This will typically be the id of the field_wrapper of an input. (See note below).
+dom_id:: the value of the `id` attribute of the element in the page. This will typically be the id of the field_wrapper of an input. (See note below).
 
-reclaim_space: (optional, defaults to true) - if true, the page will repaint to use the hidden area. If not, the hidden element will become a blank area in the page. This is generally better in order to stop inputs from moving around on the page too much.
+reclaim_space:: (optional, defaults to true) - if true, the page will repaint to use the hidden area. If not, the hidden element will become a blank area in the page. This is generally better in order to stop inputs from moving around on the page too much.
 
 NOTE: To hide a form element when a page is first displayed, set the `:hide_on_load` attribute of its renderer to true.
 
-===== Show a DOM element
+==== Show a DOM element
 
 Works on any DOM element with an id.
 
-type: `:show_element`.
+type:: `:show_element`.
 
-dom_id: the value of the `id` attribute of the element in the page. This will typically be the id of the field_wrapper of an input. (See note below).
+dom_id:: the value of the `id` attribute of the element in the page. This will typically be the id of the field_wrapper of an input. (See note below).
 
-reclaim_space: (optional, defaults to true) - if true, the page will rearange to accomodate the shown area. If not, the element will become visible in the already-blank area in the page. This is generally better in order to stop inputs from moving around on the page too much.
+reclaim_space:: (optional, defaults to true) - if true, the page will rearange to accomodate the shown area. If not, the element will become visible in the already-blank area in the page. This is generally better in order to stop inputs from moving around on the page too much.
 
 NOTE: _wrapper_id_ : If a field is named `name` in a form named `users`, the input field's id will be `users_name` and the div surrounding the input and label will have the id `users_name_field_wrapper`.
 
-===== Clear validation error messages from a form
+==== Clear validation error messages from a form
 
 Clears all UI text and styling from validation errors of a particular form.
 
-type: `:clear_form_validation`.
+type:: `:clear_form_validation`.
 
-dom_id: the `id` of the `<form>`. (Use `form.form_id 'abc'` in the view to set this value)
+dom_id:: the `id` of the `<form>`. (Use `form.form_id 'abc'` in the view to set this value)
 
-===== Add a row to a grid
+==== Add a row to a grid
 
 As part of a set of actions, adds a row to a grid.
 
-type: `:add_grid_row`.
-attrs: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+type:: `:add_grid_row`.
+attrs:: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
 
-===== Update a grid row
+==== Update a grid row
 
 As part of a set of actions, updates the columns of a row or rows in a grid.
 
-type: `:update_grid_row`.
+type:: `:update_grid_row`.
 
-ids: the id (or Array of ids) of the row(s) to change.
-changes: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
+ids:: the id (or Array of ids) of the row(s) to change.
+changes:: a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
 
-===== Delete a grid row
+==== Delete a grid row
 
-type: `:delete_grid_row`.
+type:: `:delete_grid_row`.
 
-id: the id of the row to delete.
+id:: the id of the row to delete.
 
-==== Single actions
+=== Single actions
 
 There are also helper methods available that are easier to use when only returning a singe action.
 These work exactly the same as for their counterparts above.
@@ -287,7 +294,7 @@ json_clear_form_validation(dom_id, message: nil, keep_dialog_open: false)
 
 == Other responses
 
-=== Empty (blank) response
+== Empty (blank) response
 
 When there is no need to do anything at all, you can return a plain JSON success response.
 
@@ -295,7 +302,7 @@ When there is no need to do anything at all, you can return a plain JSON success
 
 This merely responds with status `200`.
 
-=== Undo an inline edit of a grid column
+== Undo an inline edit of a grid column
 
 Undo an inline-edit from a grid (e.g. when a validation fails). Optionally display a message.
 

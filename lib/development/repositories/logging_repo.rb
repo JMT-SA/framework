@@ -26,19 +26,31 @@ module DevelopmentApp
 
     def logged_actions_for_id(table_name, id)
       query = <<~SQL
-        SELECT a.event_id, a.action_tstamp_tx,
+        SELECT a.table_name, a.transaction_id, a.event_id, a.action_tstamp_tx,
          CASE a.action WHEN 'I' THEN 'INS' WHEN 'U' THEN 'UPD'
           WHEN 'D' THEN 'DEL' ELSE 'TRUNC' END AS action,
          l.user_name, l.context, l.route_url, l.request_ip,
          a.statement_only, a.row_data, a.changed_fields,
+         a.client_query,
          ROW_NUMBER() OVER() + 1 AS id
         FROM audit.logged_actions a
         LEFT OUTER JOIN audit.logged_action_details l ON l.transaction_id = a.transaction_id AND l.action_tstamp_tx = a.action_tstamp_tx
-        WHERE a.table_name = '#{table_name}'
-          AND a.row_data_id = #{id}
+        WHERE a.table_name = ?
+          AND a.row_data_id = ?
         ORDER BY a.action_tstamp_tx DESC
       SQL
-      DB[query].all
+      DB[query, table_name, id].all
+    end
+
+    def logged_transaction_statuses(transaction_id, action_tstamp_tx)
+      query = <<~SQL
+        SELECT transaction_id, action_tstamp_tx, table_name, row_data_id,
+               status, comment, user_name
+        FROM audit.status_logs
+        WHERE transaction_id = ?
+          AND action_tstamp_tx = ?
+      SQL
+      DB[query, transaction_id, action_tstamp_tx].all
     end
 
     def logged_actions_sql_for_transaction(id)

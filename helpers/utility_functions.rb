@@ -206,7 +206,7 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   # @return [boolean] - true if the file is an XML file
   def xml_file?(file_path)
     typ = IO.popen(['file', '--brief', '--mime-type', file_path], in: :close, err: :close) { |io| io.read.chomp }
-    typ == 'application/xml'
+    %w[application/xml text/xml].include?(typ)
   end
 
   # Takes a string and returns an array from text split on commas and new lines.

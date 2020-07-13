@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-
 # A class for defining global constants in a central place.
-class AppConst
+class AppConst # rubocop:disable Metrics/ClassLength
   def self.development?
     ENV['RACK_ENV'] == 'development'
   end
@@ -62,6 +60,9 @@ class AppConst
   SHARED_CONFIG_HOST_PORT = ENV.fetch('SHARED_CONFIG_HOST_PORT')
   LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
   LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
+  LABEL_PUBLISH_NOTIFY_URLS = ENV.fetch('LABEL_PUBLISH_NOTIFY_URLS', '').split(',')
+  BATCH_PRINT_MAX_LABELS = ENV.fetch('BATCH_PRINT_MAX_LABELS', 20).to_i
+  PREVIEW_PRINTER_TYPE = ENV.fetch('PREVIEW_PRINTER_TYPE', 'zebra')
 
   # Printers
   PRINTER_USE_INDUSTRIAL = 'INDUSTRIAL'
@@ -170,6 +171,9 @@ class AppConst
     UG UA AE GB UM US UY UZ VU VE VN VG VI WF EH YE ZM ZW AX
   ].freeze
 
+  RPT_INDUSTRY = ENV['RPT_INDUSTRY']
+  JASPER_REPORTS_PATH = ENV['JASPER_REPORTS_PATH']
+
   MONTHS_OF_THE_YEAR = [
     %w[Jan 01],
     %w[Feb 02],
@@ -187,4 +191,3 @@ class AppConst
 
   REPORT_YEARS = %w[2019 2020].freeze
 end
-# rubocop:enable Metrics/ClassLength

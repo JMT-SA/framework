@@ -558,9 +558,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
       clear_form_validation:  ->(act) { action_clear_form_validation(act) },
       set_required:           ->(act) { action_set_required(act) },
-      set_checked:            ->(act) { action_set_checked(act) }
+      set_checked:            ->(act) { action_set_checked(act) },
       # redirect:               ->(act) { action_redirect(act) }       // url
-      # replace_dialog:         ->(act) { action_replace_dialog(act) } // url
+      replace_dialog:         ->(act) { action_replace_dialog(act) }
     }[action.type].call(action)
     # rubocop:enable Layout/HashAlignment
   end

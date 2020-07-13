@@ -19,7 +19,11 @@ module Development
                   if rules[:rows].first[:status] == 'No current status' # time.nil?
                     col.add_notice 'No status detail', notice_type: :info
                   else
-                    col.add_table(rules[:rows], rules[:cols], pivot: true, header_captions: rules[:header_captions])
+                    col.add_table(rules[:rows],
+                                  rules[:cols],
+                                  pivot: true,
+                                  header_captions: rules[:header_captions],
+                                  cell_transformers: { action_tstamp_tx: ->(a) { a&.strftime('%Y-%m-%d %H:%M:%S') } })
                   end
                 end
               end

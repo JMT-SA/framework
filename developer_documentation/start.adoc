@@ -4,7 +4,7 @@
 
 == Crossbeams framework
 
-=== Running the app
+== Running the app
 
 The following special environment variables are available when running the app:
 
@@ -22,7 +22,7 @@ Handy Rake prep tasks
 * Run `bundle exec rake developers:listenv` to get a list of environment variables and their descriptions.
 * Run `bundle exec rake developers:validateenv` to list which environment variables are missing from `.env.local`.
 
-=== General
+== General
 
 * link:/developer_documentation/overview.adoc[Overview]
 +
@@ -31,7 +31,7 @@ Pictoral overview of application.
 * link:/developer_documentation/cron.adoc[cron jobs]
 * link:/developer_documentation/aliases.adoc[Bash aliases]
 
-=== Reference
+== Reference
 
 * link:/developer_documentation/app_config.adoc[App Configuration]
 * link:/developer_documentation/routes.adoc[Routing]
@@ -39,13 +39,13 @@ Pictoral overview of application.
 * link:/developer_documentation/menu_system_and_migrations.adoc[Menu system and migrations]
 * link:/developer_documentation/error_handling.adoc[Error-handling]
 
-==== UI: grids
+=== UI: grids
 
 * link:/developer_documentation/grids.adoc[Grids]
 * link:/developer_documentation/grid_actions.adoc[Grid actions]
 * link:/developer_documentation/defining_a_grid_in_code.adoc[Defining a grid in code]
 
-==== UI: pages
+=== UI: pages
 
 * link:/developer_documentation/page_layout.adoc[Page layout]
 * link:/developer_documentation/non_field_renderers.adoc[Non-field Renderers]
@@ -58,7 +58,7 @@ Pictoral overview of application.
 * link:/developer_documentation/ui_rules.adoc[UI Rules]
 * link:/developer_documentation/help_system.adoc[Help system]
 
-==== Backend
+=== Backend
 
 * link:/developer_documentation/repositories.adoc[Repositories]
 * link:/developer_documentation/services.adoc[Services]
@@ -69,22 +69,23 @@ Pictoral overview of application.
 +
 Via configuration, export data to file or email.
 * link:/developer_documentation/edi_in.adoc[EDI-IN process]
+* link:/developer_documentation/edi_out.adoc[EDI-OUT process]
 
-==== Testing
+=== Testing
 
 * link:/developer_documentation/test_helpers.adoc[Test helpers]
 * link:/developer_documentation/test_helpers_route.adoc[Test helpers for routes]
 * link:/developer_documentation/test_seeds.adoc[Test seeds]
 
 ////
-=== Tutorials
+== Tutorials
 
 * Build CRUD from scaffold
 ////
 
-=== How-to guides
+== How-to guides
 
-==== Database
+=== Database
 
 * How to link:/developer_documentation/migrations.adoc[generate and run migrations].
 * How to link:/developer_documentation/how_to_log_status_and_changes.adoc[log status and data changes] (Audit).
@@ -93,14 +94,14 @@ Via configuration, export data to file or email.
 Block users from changing table data that application code requires.
 * How to link:/developer_documentation/how_to_populate_entity_with_associated_entities.adoc[populate an entity with associated entities].
 
-==== UI
+=== UI
 
 * How to link:/developer_documentation/how_to_use_multiselect_grid.adoc[use a multiselect grid].
 * How to link:/developer_documentation/how_to_use_lookup_grid.adoc[set up a lookup grid].
 * How to link:/developer_documentation/how_to_test_rmd_scanning.adoc[test RMD scanning].
 * How to link:/developer_documentation/how_to_implement_a_back_button.adoc[implement a Back button].
 
-==== Config
+=== Config
 
 * How to link:/developer_documentation/how_to_work_with_document_sequence_numbers.adoc[work with document sequence numbers].
 * How to link:/developer_documentation/how_to_set_up_implementation_owner.adoc[set up the implementation owner].
@@ -108,7 +109,7 @@ Block users from changing table data that application code requires.
 +
 Client-defined columns for a table.
 
-==== Other
+=== Other
 
 * How to link:/developer_documentation/how_to_use_repositories.adoc[use repositories].
 * How to link:/developer_documentation/how_to_do_dry_validation.adoc[do dry validation].
@@ -120,7 +121,14 @@ Client-defined columns for a table.
 // * How to layout a multi-column form.
 // * How to layout a page to include a form and a grid.
 
-=== Yard Doc
+== MesServer
+
+MesServer is the java interface between web applications and printers and robots.
+
+* link:/developer_documentation/messerver_install.adoc[Install MesServer].
+* link:/developer_documentation/messerver_config.adoc[Configure MesServer].
+
+== Yard Doc
 
 View source code documentation for methods in the following files:
 

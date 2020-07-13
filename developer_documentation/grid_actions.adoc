@@ -124,7 +124,9 @@ The link will be POSTed to the server with `_method` = `'DELETE'` if the user ch
 
 |:prompt
 |Text - a question to ask the user.
-|If present, a prompt dialog will show this text, asking the user to choose OK to continue or Cancel.
+a|If present, a prompt dialog will show this text, asking the user to choose OK to continue or Cancel.
+
+You can include tokens (`$:xxx$`) in the string and they will be replaced by corresponding column values (`$:xxx$` will be replaced by the value in the `xxx` column of the selected row).
 
 |:auth
 |A Hash with `:function`, `:program` and `:permission` keys.

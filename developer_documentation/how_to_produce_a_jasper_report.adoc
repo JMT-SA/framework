@@ -12,6 +12,18 @@ At installation there are two environment variables that need to be set up: `JAS
 * `JASPER_REPORTING_ENGINE_PATH` is a fully qualified path that points to the directory where the `JasperReportPrinter.jar` is installed.
 * `JASPER_REPORTS_PATH` is a fully qualified path that points to the directory containing the designed jasper report files.
 
+=== Per industry/client overrides for Japser reports
+
+Reports are stored in 3 ways - per system, per industry or per client.
+
+* The per-system reports are used by all installations.
+* The per-industry reports will differ per industry (melons vs citrus for example).
+* The per-client reports are tailored specifically to the client.
+
+For a per-industry report, the `parent_folder` parameter must be set to the value of `AppConst::RPT_INDUSTRY`.
+
+For a per-client report, the system will ignore the `parent_folder` parameter and use the client-specific version of the report (if it exists). i.e. this report will be used instead of a per-system or per-industry report without any need to specify this in the calling code.
+
 === UI link to load report in a new window
 
 To load the report in a new window, the link must include `data-loading-window="true"`.
@@ -42,6 +54,7 @@ def create_report
                           user: current_user.login_name,
                           file: output_file_name_to_be_saved_without_extension_or_path,
                           debug_mode: <optional, true/false>
+                          parent_folder: <optional, typically set to AppConst::RPT_INDUSTRY>
                           params: hash_of_report_parameters)
 end
 
@@ -125,7 +138,7 @@ There is a job `DevelopmentApp::EmailJasperReport` which will create the report(
 
 Parameter options for the `run` method are:
 
-* `:user_name` - the user name (typically `current_user.user_name`)
+* `:user_name` - the user name (typically `current_user.login_name`)
 * `:email_settings` - the to/subject and body values for the email.
 * `:reports` - an array of parameters for one or more reports.
 
@@ -145,7 +158,7 @@ r.on 'email_report', Integer do |id|
   r.post do
     opts = {
       email_settings: params[:mail],
-      user: current_user.user_name,
+      user: current_user.login_name,
       reports: [
         {
           report_name: 'the_report',

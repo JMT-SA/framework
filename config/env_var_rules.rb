@@ -70,6 +70,24 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     (NO_OVERRIDE.map { |a| a.keys.first } + CAN_OVERRIDE.map { |a| a.keys.first } + MUST_OVERRIDE.map { |a| a.keys.first } + OPTIONAL.map { |a| a.keys.first }).sort.join("\n")
   end
 
+  def client_settings # rubocop:disable Metrics/AbcSize
+    one_hash = {}
+    NO_OVERRIDE.each { |h| one_hash[h.keys.first] = h.values.first }
+    CAN_OVERRIDE.each { |h| one_hash[h.keys.first] = h.values.first }
+    MUST_OVERRIDE.each { |h| one_hash[h.keys.first] = h.values.first }
+    OPTIONAL.each { |h| one_hash[h.keys.first] = h.values.first }
+    keys = (NO_OVERRIDE.map { |a| a.keys.first } + CAN_OVERRIDE.map { |a| a.keys.first } + MUST_OVERRIDE.map { |a| a.keys.first } + OPTIONAL.map { |a| a.keys.first }).sort
+    ar = []
+    keys.each do |key|
+      hs = { key: key, env_val: (ENV[key.to_s] || '').gsub(',', ', ') } # rubocop:disable Lint/Env
+      description = one_hash[key]
+      hs[:key] = %(<span class="fw5 near-black">#{key}</span><br><span class="f6">#{description}</span>)
+      hs[:const_val] = AppConst.const_defined?(key) ? AppConst.const_get(key).to_s.gsub(',', ', ') : nil
+      ar << hs
+    end
+    ar
+  end
+
   def root_path
     @root_path ||= File.expand_path('..', __dir__)
   end
@@ -93,7 +111,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
   end
 
   def format(array)
-    array.map { |var| "#{var.keys.first.to_s.ljust(25)} : #{var.values.first}" }.join("\n")
+    array.map { |var| "#{var.keys.first.to_s.ljust(48)} : #{var.values.first}" }.join("\n")
   end
 
   def validate

@@ -31,7 +31,7 @@ broadcast(message, message_type: :information)
 broadcast('I want to say something')
 broadcast('I want to say something', message_type: :warning)
 
-# message_type can be :information (default), :warning or :error
+# message_type can be :information (default), :success, :warning or :error
 ----
 
 === send_bus_message method

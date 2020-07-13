@@ -161,7 +161,8 @@ module SecurityApp
       query = <<~SQL
         SELECT f.id AS functional_area_id, p.id AS program_id, pf.id,
         f.functional_area_name, p.program_sequence, p.program_name, pf.group_name,
-        pf.program_function_name, pf.url, pf.program_function_sequence, pf.show_in_iframe
+        pf.program_function_name, pf.url, pf.program_function_sequence, pf.show_in_iframe,
+        pf.hide_if_const_true, pf.hide_if_const_false
         FROM program_functions pf
         JOIN programs p ON p.id = pf.program_id
         JOIN programs_users pu ON pu.program_id = pf.program_id
@@ -193,7 +194,8 @@ module SecurityApp
       query = <<~SQL
         SELECT f.id AS functional_area_id, p.id AS program_id, pf.id,
         f.functional_area_name, p.program_sequence, p.program_name, pf.group_name,
-        pf.program_function_name, pf.url, pf.program_function_sequence, pf.show_in_iframe
+        pf.program_function_name, pf.url, pf.program_function_sequence, pf.show_in_iframe,
+        pf.hide_if_const_true, pf.hide_if_const_false
         FROM program_functions pf
         JOIN programs p ON p.id = pf.program_id
         JOIN programs_users pu ON pu.program_id = pf.program_id

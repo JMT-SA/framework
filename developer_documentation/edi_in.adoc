@@ -5,7 +5,7 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 == EDI-IN process
 
-The EDI-IN process receives an edi file (typically from ftp, but sometimes also dropped in a folder from and email attachment), validates and processes it.
+The EDI-IN process receives an edi file (typically from ftp, but sometimes also dropped in a folder from an email attachment), validates and processes it.
 
 A lot of infrastructure is provided by the framework so that transformations can be written to mostly concentrate on applying business logic.
 
@@ -72,7 +72,7 @@ The service is named from the flow type -- so a `PO` file will be handled by `Ed
 
 === EDI-IN Service
 
-The service to process a file inherit from `BaseEdiInService`.
+The service to process a file inherits from `BaseEdiInService`.
 
 The `initialize` method **must** implement the following at a minimum:
 [source,ruby]
@@ -135,7 +135,7 @@ missing_required_fields(only_rows: nil):: (For flat files) Checks if any require
 log(msg):: Write `msg` to the log file at the `info` level.
 log_err(msg):: Write `msg` to the log file at the `error` level.
 newer_edi_received(notes = nil):: Set the `edi_in_transaction.newer_edi_recived` column to `true` and optionally set the `notes` column.
-missing_masterfiles_detected(notes):: Set the `edi_in_transaction.has_missing_masterfiles` column to `true` and set the `notes` column.
+missing_masterfiles_detected(notes):: Set the `edi_in_transaction.has_missing_master_files` column to `true` and set the `notes` column.
 business_validation_passed:: Set the `edi_in_transaction.valid` column to `true`.
 discrepancies_detected(notes):: Set the `edi_in_transaction.discrepancies_detected` column to `true` and set the `notes` column.
 

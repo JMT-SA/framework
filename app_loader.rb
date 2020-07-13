@@ -18,6 +18,11 @@ require_relative 'config/environment'
 
 require 'base64'
 require 'pstore'
+require 'net/http'
+require 'net/ping'
+require 'uri'
+require 'pry' if ENV.fetch('RACK_ENV') == 'development'
+
 require './config/app_const'
 require './config/extended_column_definitions'
 require './config/mail_settings'

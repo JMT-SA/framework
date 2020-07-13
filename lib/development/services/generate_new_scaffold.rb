@@ -431,6 +431,9 @@ module DevelopmentApp
                 success_response("Deleted #{opts.classnames[:text_name].downcase} \#{name}")
               rescue Crossbeams::InfoError => e
                 failed_response(e.message)
+              rescue Sequel::ForeignKeyConstraintViolation => e
+                puts e.message
+                failed_response("Unable to delete #{opts.classnames[:text_name].downcase}. It is still referenced\#{e.message.partition('referenced').last}")
               end
 
               # def complete_a_#{opts.singlename}(id, params)

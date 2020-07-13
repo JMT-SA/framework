@@ -27,7 +27,7 @@ e.g.
   repo.transaction do
     repo.update_security_group(id, attrs)
     log_transaction
-    log_status('security_groups', id, 'SOMETHING_CHANGED')
+    log_status('security_groups', id, 'SOMETHING CHANGED')
   end
 ----
 

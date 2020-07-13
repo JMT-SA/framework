@@ -3,7 +3,7 @@
 
 link:/developer_documentation/start.adoc[Back to documentation home]
 
-== Menu system and migrations
+= Menu system and migrations
 
 This system uses a 3-tier menu system:
 
@@ -11,12 +11,12 @@ Functional areas :: A grouping of programs this will be something like `Security
 Programs:: A grouping of program functions. This is the level at which a user is given access.
 Program functions:: These are the menu items that are associated with URLs. They can also optionally be grouped within the program.
 
-=== Menu migrations
+== Menu migrations
 
 Menu migrations are a way of defining menu items in a way that is consistent across all installations.
 The migrations use the `Crossbeams::MenuMigrations` gem which is heavily influenced by the `Sequel` database migration code.
 
-==== Migration files
+=== Migration files
 
 Migration files are stored in `db/menu` directory and are named with a prefix of `YYYYMMDDHHMM_`
 
@@ -24,7 +24,7 @@ Migration files are stored in `db/menu` directory and are named with a prefix of
 
 Migrations are run in ascending order of this prefix, so if one migration depends on another, its prefix must sort after the other.
 
-==== Writing migration files.
+=== Writing migration files.
 
 Migration files call `Crossbeams::MenuMigrations::Migrator.migration` to do the migration.
 
@@ -45,7 +45,9 @@ Crossbeams::MenuMigrations::Migrator.migration('WebApp', true) do
 end
 ----
 
-There are nine migration methods:
+=== The ten migration methods
+
+There are ten migration methods:
 
 * `add_functional_area` - creates a `functional_areas` record.
 * `add_program` - creates a `programs` record and a `programs_webapps` record.
@@ -56,8 +58,11 @@ There are nine migration methods:
 * `change_functional_area` - changes aspects of a `functional_areas` record.
 * `change_program` - changes aspects of a `programs` record.
 * `change_program_function` - changes aspects of a `program_functions` record.
+* `move_program_function` - moves a `program_functions` record to a different program.
 
-Here's a typical example of creating all levels:
+=== Examples
+
+Here's a typical example of **creating** all levels:
 [source,ruby]
 ----
 Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
@@ -78,7 +83,7 @@ end
 
 NOTE: The down block only needs to drop the functional area - because it will delete all associated programs and program functions. Make sure you never drop e.g. a functional area that was added in an earlier migration file.
 
-And here's an example of changes:
+And here's an example of **changes**:
 [source,ruby]
 ----
 Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
@@ -92,7 +97,8 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
                             seq: 22,
                             url: '/another/path/here',
                             group: 'Together',
-                            rename: 'Commodity Groups'
+                            rename: 'Commodity Groups',
+                            hide_if_const_true: 'PALLET_IS_IN_STOCK_WHEN_VERIFIED,PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION'
   end
 
   down do
@@ -102,7 +108,8 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
                             seq: 1,
                             url: '/list/commodities',
                             group: nil,
-                            rename: 'Commodities'
+                            rename: 'Commodities',
+                            hide_if_const_true: nil
     change_functional_area 'Lookups', rename: 'Masterfiles'
     change_program 'Product Definitions',
                    functional_area: 'Masterfiles',
@@ -117,7 +124,39 @@ Note particularly the order of things in the `down` block:
 * The second line renames the functional area back to `'Masterfiles'`
 * So the third line uses `functional_area: 'Masterfiles'`
 
-=== Migration methods
+And here's an example of a program function **move**:
+[source,ruby]
+----
+Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
+  up do
+    move_program_function 'Commodities',
+                           functional_area: 'Lookups',
+                           program: 'Product Definitions',
+                           to_program: 'Fruit'
+    change_program_function 'Commodities',
+                            functional_area: 'Lookups',
+                            program: 'Fruit',
+                            url: '/list/fruit_commodities'
+  end
+
+  down do
+    change_program_function 'Commodities',
+                            functional_area: 'Lookups',
+                            program: 'Fruit',
+                            url: '/list/commodities'
+    move_program_function 'Commodities',
+                           functional_area: 'Lookups',
+                           program: 'Fruit',
+                           to_program: 'Product Definitions'
+  end
+end
+----
+
+NOTE: The order of change and move methods can be switched around any way, so make sure the `program` value is correct in each case for the particular order in the `up` and in the `down`.
+
+== Migration methods
+
+=== add_functional_area
 
 [source,ruby]
 ----
@@ -127,12 +166,16 @@ add_functional_area(key, rmd_menu: false)
 * `key` - the functional area name (String, capitalised)
 * `:rmd_menu` - set to true if this menu is only available on RMDs.
 
+=== drop_functional_area
+
 [source,ruby]
 ----
 drop_functional_area(key)
 ----
 
 * `key` - the functional area name (String, capitalised)
+
+=== change_functional_area
 
 [source,ruby]
 ----
@@ -144,6 +187,8 @@ change_functional_area(key, options = {})
 ** `:rmd_menu` (boolean)
 ** `:rename` (string) the new name for the functional area
 
+=== add_program
+
 [source,ruby]
 ----
 add_program(key, functional_area:, seq: 1)
@@ -153,6 +198,8 @@ add_program(key, functional_area:, seq: 1)
 * `:functional_area` - the functional area name (String, capitalised)
 * `:seq` - the program sequence (default 1)
 
+=== drop_program
+
 [source,ruby]
 ----
 drop_program(key, functional_area:)
@@ -160,6 +207,8 @@ drop_program(key, functional_area:)
 
 * `key` - the program name (String, capitalised)
 * `:functional_area` - the functional area name (String, capitalised)
+
+=== change_program
 
 [source,ruby]
 ----
@@ -172,9 +221,11 @@ change_program(key, options = {})
 ** `:seq` - the program sequence
 ** `:rename` (string) the new name for the program
 
+=== add_program_function
+
 [source,ruby]
 ----
-add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, restricted: false, show_in_iframe: false)
+add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, restricted: false, show_in_iframe: false, hide_if_const_true: nil, hide_if_const_false: nil)
 ----
 
 * `key` - the program function name (String, capitalised)
@@ -185,6 +236,10 @@ add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, 
 * `:url` - the URL to callfrom this menu item
 * `:restricted` - if true, specific users need to be linked to the item to see it
 * `:show_in_iframe` - if true, render the URL inside an iframe
+* `:hide_if_const_true` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to true, the menu will be hidden
+* `:hide_if_const_false` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to false, the menu will be hidden
+
+=== drop_program_function
 
 [source,ruby]
 ----
@@ -195,6 +250,8 @@ drop_program_function(key, functional_area:, program: match_group: nil)
 * `:program` - the program name (String, capitalised)
 * `:functional_area` - the functional area name (String, capitalised)
 * `:match_group` - the group name (String, matching case of value in db)
+
+=== change_program_function
 
 [source,ruby]
 ----
@@ -212,8 +269,24 @@ change_program_function(key, options = {})
 ** `:restricted` - if true, specific users need to be linked to the item to see it
 ** `:show_in_iframe` - if true, render the URL inside an iframe
 ** `:rename` (string) the new name for the program function
+** `:hide_if_const_true` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to true, the menu will be hidden. Set to nil to clear
+** `:hide_if_const_false` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to false, the menu will be hidden. Set to nil to clear
 
-=== Running migrations
+=== move_program_function
+
+[source,ruby]
+----
+move_program_function(key, options = {})
+----
+
+* `key` - the program function name (String, capitalised)
+* options
+** `:program` - the program name (String, capitalised)
+** `:functional_area` - the functional area name (String, capitalised)
+** `:to_program` - the new program name (String, capitalised). Required.
+** `:to_functional_area` - the new program's functional area (only required if it differs from the current functional area).
+
+== Running migrations
 
 Run menu migrations using `rake`:
 
@@ -222,7 +295,7 @@ Run menu migrations using `rake`:
 `bundle exec rake menu:migrate[201905010101]`:: Run all un-applied migrations in sequence down to (or up to) the prefix in `[]`
 `bundle exec rake menu:migrate[0]`:: Run the down migration of all applied migrations (removes all menu items)
 
-=== Menu permissions
+== Menu permissions
 
 A user can be given permission to see a menu item in one of to ways:
 

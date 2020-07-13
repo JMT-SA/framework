@@ -111,8 +111,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @return [any] the column value for the matching record or nil.
   def get_value(table_name, column, args)
     values = DB[table_name].where(args).select_map(column)
-    raise Crossbeams::FrameworkError, '"get_value" method must return only one record' if values.length > 1
-    return nil if values.empty?
+    raise Crossbeams::FrameworkError, %("get_value" method must return only one record for #{table_name}, #{column}, #{args}) if values.length > 1
 
     values.first
   end
@@ -126,7 +125,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @return [integer] the id value for the matching record or nil.
   def get_id(table_name, args)
     ids = DB[table_name].where(args).select_map(:id)
-    raise Crossbeams::FrameworkError, '"get_id" method must return only one record' if ids.length > 1
+    raise Crossbeams::FrameworkError, %("get_id" method must return only one record for #{table_name}, #{args}) if ids.length > 1
 
     ids.first
   end
@@ -541,7 +540,7 @@ module MethodBuilder
   # no_activity_check: Boolean
   # - Set to true if this table does not have an +active+ column,
   #   or to return inactive records as well as active ones.
-  def build_for_select(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+  def build_for_select(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize, Metrics/PerceivedComplexity
     # POSSIBLE WAY OF DEFINING METHODS - faster?
     # ds_ar = ["dataset = DB[:#{table_name}]"]
     # ds_ar << "dataset = make_order(dataset, order_by: #{options[:order_by].inspect}#{', desc: true' if options[:desc]})" if options[:order_by]
@@ -561,7 +560,11 @@ module MethodBuilder
       dataset = DB[table_name]
       dataset = make_order(dataset, options) if options[:order_by]
       dataset = dataset.where(:active) unless options[:no_active_check]
-      dataset = dataset.where(opts[:where]) if opts[:where]
+      if opts[:where]
+        raise Crossbeams::FrameworkError, 'WHERE clause in "for_select" must be a hash' unless opts[:where].is_a?(Hash)
+
+        dataset = dataset.where(opts[:where].transform_values { |v| v == '' ? nil : v })
+      end
       lbl = options[:label] || options[:value]
       val = options[:value]
       lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)

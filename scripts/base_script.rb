@@ -80,8 +80,8 @@ class BaseScript
   # @param subject [string] optional, the email subject.
   # @param message [string] optional, the mail body.
   # @return [void]
-  def send_error_email(subject: nil, message: nil)
-    ErrorMailer.send_error_email(subject, message)
+  def send_error_email(subject: nil, message: nil, recipients: nil)
+    ErrorMailer.send_error_email(subject: subject, message: message, recipients: recipients)
   end
 
   # Write out a dump of information for later inspection.

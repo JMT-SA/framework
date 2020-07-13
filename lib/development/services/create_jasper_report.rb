@@ -15,6 +15,15 @@
 # - printer: 'no_printer'. In PRINT mode, this MUST be provided.
 # - OUT_FILE_TYPE: 'PDF'. This can be PDF, CSV, XLS, RTF. Ignored in PRINT mode.
 # - top_level_dir: ''. Use this if the report is stored in a subdir of the report dir.
+#
+# A note about report variants...
+# -------------------------------
+# A report dir in the JAPSER_REPORTS_PATH will be available for all installations.
+# A report dir in a sub dir named by the RPT_INDUSTRY will be specific to the current installation's industry.
+# A report dir in a sub dir named by the CLIENT_CODE will be specific to the current implementation (client) only.
+#
+# This service will check to see if there is a client-specific report and use it if present by overwriting the parent_folder value.
+#
 class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
   attr_reader :report_name, :user, :parent_folder, :keep_file, :top_level_dir, :printer, :report_parameters, :debug_mode
 
@@ -31,7 +40,7 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
     @top_level_dir = params.delete(:top_level_dir) || ''
     @printer = params.delete(:printer) || NO_PRINTER
     @output_file = add_output_path(file)
-    @use_older_jasper_engine = true # TEMPORARY set to true to use older reporting engine
+    adjust_parent_folder
     make_report_parameters_string(params)
   end
 
@@ -124,6 +133,14 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
     puts '---'
   end
 
+  def adjust_parent_folder
+    return unless AppConst::CLIENT_CODE
+
+    return unless File.exist?(File.join(AppConst::JASPER_REPORTS_PATH, AppConst::CLIENT_CODE, @top_level_dir, @report_name))
+
+    @parent_folder = AppConst::CLIENT_CODE
+  end
+
   def report_dir
     @report_dir ||= "#{report_definitions_dir}/#{top_level_dir.blank? ? '' : top_level_dir + '/'}#{report_name}"
   end
@@ -132,11 +149,12 @@ class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
     @path ||= ENV['JASPER_REPORTING_ENGINE_PATH']
   end
 
+  # maybe check if dir exists under parent folder or not...
   def report_definitions_dir
     @report_definitions_dir ||= if parent_folder.nil_or_empty?
-                                  ENV['JASPER_REPORTS_PATH']
+                                  AppConst::JASPER_REPORTS_PATH
                                 else
-                                  "#{ENV['JASPER_REPORTS_PATH']}/#{parent_folder}"
+                                  "#{AppConst::JASPER_REPORTS_PATH}/#{parent_folder}"
                                 end
   end
 

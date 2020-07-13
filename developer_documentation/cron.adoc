@@ -40,5 +40,25 @@ NOTE: Use the appropriate ruby version for the installation. (wherever you see `
 
 [source,bash]
 ----
-@reboot sleep 60 && cd $HOME/messerver/MesServer && screen -d -m -S messerver ./start.sh
+@reboot sleep 60 && cd $home/messerver/messerver && screen -d -m -s messerver ./start.sh
+----
+
+==== Database maintenance
+
+Archive backups job will clear all but 31 days' db backups and on the 1st of every month copy the backup to the `monthly` subdir of `backup` dir
+[source,bash]
+----
+# DB: Nightly reindex
+0 1 * * *  reindexdb -aq --username postgres --no-password
+
+# DB: Nightly vacuum
+0 2 * * * vacuumdb -aqw --username postgres --no-password
+
+# DB: Nightly backup
+0 3 * * * pg_dump --username postgres --no-password --format custom --blobs --compress 5 nspack | bzip2 -c > $HOME/backup/nspack_ud_`date +\%Y-\%m-\%d`.backup.bz2
+
+# Archive backups
+0 4 * * * $HOME/bin/archive_and_clear.rb $HOME/backup nspack_ud_`date +\%Y-\%m-\%d`.backup.bz2
+# OR...
+0 4 * * * cd $HOME/bin && chruby-exec 2.5.5 -- ./archive_and_clear.rb $HOME/backup nspack_ud_`date +\%Y-\%m-\%d`.backup.bz2
 ----

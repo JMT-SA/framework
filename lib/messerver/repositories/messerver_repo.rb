@@ -79,7 +79,7 @@ module MesserverApp
     end
 
     def print_published_label(label_template_name, vars, quantity, printer, host = nil)
-      res = post_print_or_preview(print_published_label_uri(host), label_template_name, vars, quantity, printer)
+      res = post_print_or_preview(print_published_label_uri(host), label_template_name, vars, quantity: quantity, printer: printer)
       unless res.success
         res = if res.instance[:response_code].to_s == '404'
                 failed_response('The label was not found. Has it been published yet?')
@@ -91,8 +91,8 @@ module MesserverApp
       success_response('Printed label', res.instance.body)
     end
 
-    def preview_published_label(label_template_name, vars)
-      res = post_print_or_preview(preview_published_label_uri, label_template_name, vars)
+    def preview_published_label(label_template_name, vars, printer_type = AppConst::PREVIEW_PRINTER_TYPE)
+      res = post_print_or_preview(preview_published_label_uri, label_template_name, vars, printer_type: printer_type)
       unless res.success
         res = if res.instance[:response_code].to_s == '404'
                 failed_response('The label was not found. Has it been published yet?')
@@ -197,13 +197,22 @@ module MesserverApp
       failed_response("There was an error: #{e.message}")
     end
 
-    def post_print_or_preview(uri, label_template_name, vars, quantity = nil, printer = nil) # rubocop:disable Metrics/AbcSize
+    def post_print_or_preview(uri, label_template_name, vars, options = {}) # rubocop:disable Metrics/AbcSize
+      printer_type = options[:printer_type]
+      quantity = options[:quantity]
+      printer = options[:printer]
       # <ProductLabel PID="223" Status="true" Printer="PRN-23" LabelTemplateFile="KRM_Carton_Lbl_PL.nsld" Threading="true" RunNumber="2018_AP_18351_11_181A" Code="42DP42"  F0="E2" F1="01100217924066" F2="200004224184" F3="(GDL 10) Golden Delicious"
       post_body = []
       if printer
         post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
         post_body << "Content-Disposition: form-data; name=\"printername\"\r\n"
         post_body << "\r\n#{printer}"
+        post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
+      end
+      if printer_type
+        post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"
+        post_body << "Content-Disposition: form-data; name=\"printertype\"\r\n"
+        post_body << "\r\n#{printer_type}"
         post_body << "\r\n--#{AppConst::POST_FORM_BOUNDARY}--\r\n"
       end
       post_body << "--#{AppConst::POST_FORM_BOUNDARY}\r\n"

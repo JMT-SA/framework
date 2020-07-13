@@ -75,6 +75,21 @@ These are jobs that must run on their own. For example a `PS` stock EDI in trans
 If you define a job as a `single instance`, at start it will write a lock file (in `tmp/job_locks`) which will be deleted at the end.
 At start it will also set a retry for 30 seconds if the lock file exists.
 
+=== Non-retry jobs
+
+Often it does not make sense for a job to be retried after there is an error.
+
+In that case, set the `maximum_retry_count` to zero on the class:
+[source,ruby]
+----
+module PackMaterialApp
+  class TestJob < BaseQueJob
+    self.maximum_retry_count = 0
+    # ...
+  end
+end
+----
+
 === Adding a job to the queue
 
 Jobs should be added to the queue within a transaction (so that if other work fails and the transaction rolls back, the job will also be removed from the queue.

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <%= csrf_metatag %>
 
-    <title><%= ENV['APP_CAPTION'] %></title>
+    <title><%= AppConst::APP_CAPTION %></title>
 
     <!-- FAVICON start -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -67,7 +67,7 @@
   </head>
   <body class="site" data-utf-8-ensurer="О">
     <div class="pt3 pl3 f5 f4-ns fw6 mt2 ml2 mid-gray">
-        <%= ENV['APP_CAPTION'] %>
+        <%= AppConst::APP_CAPTION %>
     </div>
     <div id="container">
       <% if flash[:error] %>

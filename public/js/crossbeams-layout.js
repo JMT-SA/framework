@@ -100,7 +100,7 @@
     .then(response => response.json())
     .then((data) => {
       if (data.actions) {
-        if (!data.exception) {
+        if (!data.exception && !data.keep_dialog_open) {
           crossbeamsUtils.closePopupDialog();
         }
         crossbeamsUtils.processActions(data.actions);
@@ -208,7 +208,15 @@
       if (event.target.dataset && event.target.dataset.brieflyDisableWith) {
         preventMultipleSubmitsBriefly(event.target);
       }
-      // Expand or collapse FoldUps
+      // Call a URL to remove an item from a List
+      if (event.target.closest('[data-remove-item]')) {
+        const elem = event.target.closest('li');
+        const ol = elem.parentNode;
+        const url = ol.dataset.removeItemUrl.replace(/\$:(.*?)\$/g, elem.dataset.itemId);
+        event.stopPropagation();
+        event.preventDefault();
+        fetchRemoteLink(url);
+      }
       if (event.target.closest('[data-expand-collapse]')) {
         const elem = event.target.closest('[data-expand-collapse]');
         const open = elem.dataset.expandCollapse === 'open';

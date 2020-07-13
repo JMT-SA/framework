@@ -1,0 +1,43 @@
+= Install MesServer
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Install MesServer
+
+MesServer requires that Java is installed. e.g. `sudo apt install openjdk-8-jdk`.
+
+Obtain an archive of the MesServer files and unzip it -- typically in a directory named `nosoft`, giving a directory structure like this:
+----
+nosoft/
+├── lib
+│   ├── apache
+│   ├── barcodes
+│   ├── ftp
+│   ├── graphics
+│   ├── jetty
+│   ├── nosoft         #<1>
+│   ├── printers
+│   ├── serial
+│   └── web
+├── messerver          #<2>
+│   ├── config         #<3>
+│   ├── data
+│   ├── downloads      #<4>
+│   ├── logs           #<5>
+│   ├── screensaver
+│   └── web
+└── web
+    ├── NoSoft
+    ├── clients
+    ├── html
+    ├── icons
+    ├── images
+    └── nsld           #<6>
+----
+<1> Java jarfiles are stored here. `MesServer.jar` is in `lib/nosoft`.
+<2> The `start.sh` shellscript for starting MesServer is found here.
+<3> All config for listing printers, robots and FTP settings are in xml files under this dir.
+<4> This dir is used for copying jar files to other servers/robots on the network.
+<5> Logfiles are written to this dir.
+<6> Published labels are stored within this dir.

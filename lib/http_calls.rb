@@ -13,6 +13,17 @@ module Crossbeams
       @read_timeout = read_timeout
     end
 
+    # See if a host is reachable via ping.
+    #
+    # @param url_or_host [string] the url, hostname or ip address to check.
+    # @return [boolean] True if the ping succeeded.
+    def can_ping?(url_or_host)
+      uri = URI.parse(url_or_host)
+      pe = Net::Ping::External.new(uri.host || uri.path)
+      pe.timeout = 1
+      pe.ping?
+    end
+
     def json_post(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
       http.use_ssl = use_ssl if use_ssl
@@ -118,10 +129,14 @@ module Crossbeams
       failed_response("There was an error: #{e.message}")
     end
 
-    def request_post(url, fields) # rubocop:disable Metrics/AbcSize
+    def request_post(url, fields, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
       http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri)
+      headers.each do |k, v|
+        request.add_field(k.to_s, v.to_s)
+      end
+
       request.set_form_data(fields)
       log_request(request)
       response = http.request(request)

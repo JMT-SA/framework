@@ -1,0 +1,61 @@
+= Configure MesServer
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Configure MesServer
+
+For detailed documentation, see https://docs.google.com/document/d/1x_61mKBI4sksGFf4NNGTQUx-E9poJdmN3reg5tcfTVA/edit?usp=sharing
+
+Configuration is set in XML files in the config subdirectory (typically `nosoft/messerver/config`).
+
+In order to be able to run MesServer on a local development machine, at a minimum, the following is required in `config.xml`
+(Change all instances of `192.168.50.54` to the ip address of your computer):
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+(C) 2020, NoSoft ROBOT / T210 XML Setup File
+-->
+
+<SystemSchema>
+  <Messages>
+    <MsgQueLength>3500</MsgQueLength>
+  </Messages>
+
+  <Logging>
+    <LogQueLength>3501</LogQueLength>
+    <LogDayCycle>5</LogDayCycle>
+  </Logging>
+
+  <System>
+    <Company>NoSoft</Company>
+    <LocalInterface>192.168.50.54</LocalInterface>
+    <ServerInterface>192.168.50.54</ServerInterface>
+    <CentralLabelStore>false</CentralLabelStore>
+    <LineProductionUnit>false</LineProductionUnit>
+    <Cms>false</Cms>
+    <Mqtt>false</Mqtt>
+    <SystemDebug>true</SystemDebug>
+  </System>
+
+  <Devices>
+    <Clock    Name="Clock" Function="Clock"      NetworkInterface="0" Port="0" />
+    <Ethernet Name="Eth00" Function="tcpserver"  NetworkInterface="192.168.50.54" Port="2000" NetMask="255.255.255.0" GateWay="192.168.50.54" TTL="10000" />
+    <Ethernet Name="Eth01" Function="httpserver" NetworkInterface="192.168.50.54" Port="2080" NetMask="255.255.255.0" GateWay="192.168.50.54" TTL="15000" />
+  </Devices>
+
+  <Peripherals>
+    <Printer Name="PRN-01" Type="zebra" Language="zpl" Alias="Label Designer" Model="GK420d" ConnectionType="TCP" NetworkInterface="192.168.50.175" Port="9100" TTL="10000" Username="" Password="" PixelsMM="8" />
+  </Peripherals>
+
+  <Modules>
+    <Module Name="MES-01" Type="messerver" Function="messerver" Alias="Local MesServer" NetworkInterface="192.168.50.54" Port="2000" TTL="10000" Publishing="true" PrinterTypes="Zebra" />
+  </Modules>
+</SystemSchema>
+----
+
+== Run MesServer
+
+In the `nosoft/messerver` directory, type `./start.sh`.

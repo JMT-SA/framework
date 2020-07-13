@@ -1,0 +1,102 @@
+= EDI-OUT process
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== EDI-OUT process
+
+The EDI-OUT process creates an edi file from rules provided in the `edi_out_rules` table and in a few configurations.
+
+A lot of infrastructure is provided by the framework so that transformations can be written to mostly concentrate on applying business logic.
+
+=== Environment - variables and directories
+
+For EDI out processes to work, the following configuration needs to be in place:
+
+==== Fixed config (applies universally)
+
+NOTE: This config is typically only changed in the code base when a new flow is introduced.
+
+edi/schemas/schema_record_sizes.yml:: Stores record lengths (for flat files) or output file type for each flow type.
+edi/schemas/<flow.xml>|<flow.yml>|<flow.xsd>:: Schema definition for output files - one file per flow type.
+AppConst::EDI_FLOW_*:: Constants for flow types (e.g. `EDI_FLOW_PO = 'PO'` for PO flow type)
+AppConst::EDI_OUT_RULES_TEMPLATE:: A has of rules to govern the CRUD around `edi_out_rules` table.
+
+==== Client-specific config
+
+NOTE: This config is set up per client.
+
+edi_out_rules table:: Table that stores destinations for each flow type. There is a UI CRUD environment for maintaining this table.
+Environment variable `EDI_NETWORK_ADDRESS`:: The client's EDI network address.
+config/edi_out_config.yml:: Stores file path rules - see schema above.
+
+A typical folder structure would look something like this and `edi_out_config` would point to it:
+
+----
+ftp_transfer/
+├── edi_out
+│   ├── head_office      #<1>
+│   │   ├── errors
+│   │   ├── receive
+│   │   ├── transmit
+│   │   └── transmitted
+│   └── paltrack         #<1>
+│       ├── errors
+│       ├── receive
+│       ├── transmit
+│       └── transmitted
+└── email_out            #<2>
+----
+<1> Keys that match entries in config.
+<2> Folder where email out files are generated before being attached to emails.
+
+=== Starting an EDI process
+
+An EDI OUT process is kicked off from code (e.g. PO when a load is shipped) or from a rake task (e.g. a cron schedule will fire a PS flow).
+
+The `EdiApp::SendEdiOut` service does some preparation (including deciding if an edi can run or not) and kicks off a job (`EdiApp::Job::SendEdiOut`) which loads the particular flow service to do the processing and calls it.
+
+The flow looks like this:
+
+Code / Rake task -> `EdiApp::SendEdiOut` -> `EdiApp::Job::SendEdiOut` -> FlowOut service
+
+=== Calling the SendEdiOut service
+
+Pass in the following parameters to `EdiApp::SendEdiOut.call()`:
+
+flow_type:: EDI out flow to be generated.
+party_role_id:: The party_role_id if the flow is generate for a party role, else `nil`. (e.g. a PS for a marketing org)
+user_name:: The `users.user_name` of 'System' if the transform is not initiated by a user.
+record_id:: The id of a record if the flow is generated from a particular resource. (e.g. PO will use `loads.id`)
+
+=== Implementing an EDI-OUT Service
+
+The service to process a file inherit from `BaseEdiOutService`.
+
+The `initialize` method **must** implement the call to `super` at a minimum:
+[source,ruby]
+----
+def initialize(edi_out_transaction_id, logger)
+  super(AppConst::EDI_FLOW_xx, edi_out_transaction_id, logger)
+end
+----
+
+All processing must be implemented via the `call` method.
+
+==== Variables available from the `BaseEdiOutService`
+
+flow_type:: The flow type of this process (`PO`, `LI` etc.)
+record_id:: The id of the resource being processed (e.g. `loads.id` for a PO)
+party_role_id:: The id of the party_role in use (e.g. marketing org for a PO)
+record_entries:: A Hash to be filled with data for output. For flat files, add arrays per row type, for csf files, add an array per the flow type. Adding records is typically done via a helper method, not by directly manipulating this object.
+
+==== Methods available from the `BaseEdiOutService`
+
+validate_data(identifiers, check_lengths = false):: Validate data for a flat file EDI against the flow's schema. Limit to certain identifiers.
+build_hash_from_data(rec, rec_id):: Builds up a hash from a query `rec` and adds it to `record_entries[rec_id]`.
+add_recordadd_record(record_type, rec = {}):: Add a hash to `record_entries` for `record_type`.
+create_flat_file:: creates the flat file from `record_entries`.
+add_csv_record(rec):: add a csv formatted record to `record_entries` from the `rec` hash.
+create_csv_file:: creates the csv file from `record_entries`.
+log(msg):: Write `msg` to the log file at the `info` level.
+log_err(msg):: Write `msg` to the log file at the `error` level.

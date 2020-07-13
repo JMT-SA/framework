@@ -321,6 +321,7 @@ class Framework < Roda
             tripsheet_number
             planned_location_id
             virtual_location_id
+            when_loading
             when_loaded
             when_offloaded
             loaded

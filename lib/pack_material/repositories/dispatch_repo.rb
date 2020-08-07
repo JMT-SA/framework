@@ -19,10 +19,10 @@ module PackMaterialApp
     crud_calls_for :mr_goods_returned_note_items, name: :mr_goods_returned_note_item, wrapper: MrGoodsReturnedNoteItem
 
     build_for_select :mr_sales_orders,
-                     label: :erp_customer_number,
+                     label: :sales_order_number,
                      value: :id,
                      no_active_check: true,
-                     order_by: :erp_customer_number
+                     order_by: :sales_order_number
 
     crud_calls_for :mr_sales_orders, name: :mr_sales_order, wrapper: MrSalesOrder
 

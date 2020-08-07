@@ -9,14 +9,14 @@ Sequel.migration do
 
       String :created_by, null: false
       String :remarks, text: true
-      Integer :sr_credit_note_number, null: true
+      Integer :sales_return_number, null: true
 
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
       index [:mr_sales_order_id], name: :sales_returns_unique_mr_sales_orders, unique: true
     end
-    run 'CREATE SEQUENCE doc_seqs_sr_credit_note_number;'
+    run 'CREATE SEQUENCE doc_seqs_sales_return_number;'
 
     pgt_created_at(:mr_sales_returns,
                    :created_at,
@@ -54,7 +54,7 @@ Sequel.migration do
   end
 
   down do
-    run 'DROP SEQUENCE doc_seqs_sr_credit_note_number;'
+    run 'DROP SEQUENCE doc_seqs_sales_return_number;'
 
     drop_trigger(:mr_sales_return_items, :set_created_at)
     drop_function(:mr_sales_return_items_set_created_at)

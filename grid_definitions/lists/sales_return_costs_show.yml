@@ -1,0 +1,8 @@
+---
+:dataminer_definition: sales_return_costs
+:conditions:
+  :standard:
+    - :col: sales_return_costs.mr_sales_return_id
+      :op: =
+      :val: $:mr_sales_return_id$
+

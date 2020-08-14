@@ -25,7 +25,8 @@ module Crossbeams
           delivery: { review: false },
           tripsheets: { confirm_arrival: false },
           goods_returned_note: { ship: false },
-          sales_order: { ship: false, integrate: false }
+          sales_order: { ship: false, integrate: false },
+          sales_return: { verify: false, integrate: false }
         }
       }.freeze
 
@@ -52,6 +53,10 @@ module Crossbeams
           sales_order: {
             ship: 'Ship Sales Order goods by reducing stock at applicable Dispatch location',
             integrate: 'Integrate Sales Order with ERP'
+          },
+          sales_return: {
+            verify: 'Verify Sales Return',
+            integrate: 'Integrate Sales Return with ERP'
           }
         }
       }.freeze

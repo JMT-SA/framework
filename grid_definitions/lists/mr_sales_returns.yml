@@ -1,21 +1,28 @@
 ---
 :dataminer_definition: mr_sales_returns
 :actions:
-- :url: "/pack_material/dispatch/mr_sales_returns/$:id$"
+- :url: "/pack_material/sales_returns/mr_sales_returns/$:id$/edit"
   :text: view
   :icon: view-show
   :title: View
-  :popup: true
-- :url: "/pack_material/dispatch/mr_sales_returns/$:id$/edit"
+  :hide_if_false: completed
+- :url: "/pack_material/sales_returns/mr_sales_returns/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
-  :popup: true
-- :url: "/pack_material/dispatch/mr_sales_returns/$:id$"
+  :hide_if_true: verified
+- :url: "/pack_material/sales_returns/mr_sales_returns/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: verified
+- :url: "/pack_material/sales_returns/print_sku_barcode?mr_sales_return_id=$:id$"
+  :text: Print SKU barcode
+  :icon: printer
+  :title: Print SKU barcode
+  :popup: true
+  :hide_if_false: verified
 - :separator: true
 - :url: "/development/statuses/list/mr_sales_returns/$:id$"
   :text: status
@@ -24,7 +31,32 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/pack_material/dispatch/mr_sales_returns/new"
+  :url: "/pack_material/sales_returns/mr_sales_returns/new"
   :text: New Sales Return
   :style: :button
   :behaviour: :popup
+  :hide_for_key:
+    - completed
+:conditions:
+  :unverified:
+    - :col: mr_sales_returns.verified
+      :op: =
+      :val: false
+  :verified:
+    - :col: mr_sales_returns.verified
+      :op: =
+      :val: true
+  :incomplete:
+    - :col: mr_sales_returns.completed
+      :op: =
+      :val: false
+  :completed:
+    - :col: mr_sales_returns.completed
+      :op: =
+      :val: true
+:captions:
+  :conditions:
+    :unverified: Sales Returns
+    :verified: Verified Sales Returns
+    :incomplete: Sales Returns
+    :completed: Completed Sales Returns

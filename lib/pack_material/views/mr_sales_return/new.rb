@@ -14,7 +14,7 @@ module PackMaterial
             page.form_errors form_errors
             page.form do |form|
               form.caption 'New Sales Return'
-              form.action '/pack_material/dispatch/mr_sales_returns'
+              form.action '/pack_material/sales_returns/mr_sales_returns'
               form.remote! if remote
               form.add_field :mr_sales_order_id
             end

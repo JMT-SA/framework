@@ -48,7 +48,23 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def verify_sales_return(id)
+    def verify_sales_return(id)  # rubocop:disable Metrics/AbcSize
+      attrs = { verified: true,
+                verified_by: @user.user_name,
+                verified_at: Time.now }
+
+      repo.transaction do
+        repo.update_sales_return(id, attrs)
+        res = PackMaterialApp::CreateSalesReturnSKUS.call(id, @user.user_name)
+        raise Crossbeams::InfoError, res.message unless res.success
+
+        repo.update_with_document_number('doc_seqs_sales_return_number', id)
+        sales_order_id = repo.sales_return_order(id)
+        dispatch_repo.update_mr_sales_order(sales_order_id, { returned: true }) unless repo.sales_order_partially_returned?(sales_order_id)
+        log_transaction
+        log_status('mr_sales_returns', id, 'VERIFIED')
+      end
+
       instance = mr_sales_return(id)
       success_response("Verified sales return #{instance.sales_return_number}",
                        instance)
@@ -77,6 +93,10 @@ module PackMaterialApp
 
     def repo
       @repo ||= SalesReturnRepo.new
+    end
+
+    def dispatch_repo
+      @dispatch_repo ||= DispatchRepo.new
     end
 
     def mr_sales_return(id)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MrSalesReturnItemInteractor < BaseInteractor
+  class MrSalesReturnItemInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_mr_sales_return_item(parent_id, params)  # rubocop:disable Metrics/AbcSize
       params[:mr_sales_return_id] = parent_id
 
@@ -50,7 +50,7 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def inline_update(id, params) # rubocop:disable Metrics/AbcSize
+    def inline_update(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       remarks = params[:column_name] == 'remarks'
       res = remarks ? validate_inline_update_remarks_params(params) : validate_inline_update_quantity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -62,12 +62,21 @@ module PackMaterialApp
 
       repo.transaction do
         repo.inline_update_sales_return_items(id, res)
+        sales_order_item_id = repo.sales_return_order_item(id)
+        dispatch_repo.update_mr_sales_order_item(sales_order_item_id, { returned: true }) if repo.sales_order_item_fully_returned?(id)
         log_status('mr_sales_return_items', id, 'INLINE ADJUSTMENT')
         log_transaction
       end
       success_response('Updated Sales Return Item')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def print_sku_barcode(params)
+      res = validate_print_sku_barcode_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, res.to_h.merge(delivery_number: res[:sales_return_number]), res.to_h.merge(supporting_data: nil))
     end
 
     def assert_permission!(task, id = nil, sales_return_id: nil)
@@ -101,6 +110,10 @@ module PackMaterialApp
       @repo ||= SalesReturnRepo.new
     end
 
+    def dispatch_repo
+      @dispatch_repo ||= DispatchRepo.new
+    end
+
     def validate_mr_sales_return_item_params(params)
       MrSalesReturnItemSchema.call(params)
     end
@@ -115,6 +128,10 @@ module PackMaterialApp
 
     def validate_inline_update_remarks_params(params)
       MrSalesReturnItemInlineRemarksSchema.call(params)
+    end
+
+    def validate_print_sku_barcode_params(params)
+      MrSalesReturnItemPrintSKUBarcodeSchema.call(params)
     end
   end
 end

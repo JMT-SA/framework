@@ -12,6 +12,7 @@ module PackMaterialApp
     attribute :completed_by, Types::String
     attribute :verified, Types::Bool
     attribute :verified_by, Types::String
+    attribute :receipt_location_id, Types::Integer
   end
 
   class MrSalesReturnFlat < Dry::Struct
@@ -30,5 +31,6 @@ module PackMaterialApp
     attribute :status, Types::String
     attribute :created_at, Types::DateTime
     attribute :updated_at, Types::DateTime
+    attribute :receipt_location_id, Types::Integer
   end
 end

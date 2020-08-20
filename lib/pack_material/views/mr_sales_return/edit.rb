@@ -8,7 +8,8 @@ module PackMaterial
           ui_rule = UiRules::Compiler.new(:mr_sales_return, :edit, id: id, form_values: form_values, current_user: user, interactor: interactor)
           rules   = ui_rule.compile
 
-          cannot_edit = rules[:completed]
+          cannot_edit = rules[:verified]
+          cannot_add_items = rules[:verified] || rules[:completed]
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
@@ -57,6 +58,7 @@ module PackMaterial
                     column.add_field :issue_transaction_id
                     column.add_field :sales_order_number
                     column.add_field :created_by
+                    column.add_field :receipt_location_id
                   end
 
                   row.column do |column|
@@ -84,18 +86,25 @@ module PackMaterial
 
             page.section do |section|
               section.show_border!
-              sales_return_items_grid = rules[:verified] ? 'mr_sales_return_items_show' : 'mr_sales_return_items'
-              section.add_control(control_type: :link,
-                                  text: 'New Item',
-                                  url: "/pack_material/sales_returns/mr_sales_returns/#{id}/mr_sales_return_items/new",
-                                  style: :button,
-                                  behaviour: :popup,
-                                  grid_id: 'sales_return_items',
-                                  css_class: 'mb1')
-              section.add_grid('sales_return_items',
-                               "/list/#{sales_return_items_grid}/grid?key=standard&mr_sales_return_id=#{id}",
-                               height: 16,
-                               caption: 'Sales Return Items')
+              if cannot_add_items
+                section.add_grid('sales_return_items',
+                                 "/list/mr_sales_return_items_show/grid?key=standard&mr_sales_return_id=#{id}",
+                                 height: 16,
+                                 caption: 'Sales Return Items')
+              else
+                section.add_control(control_type: :link,
+                                    text: 'New Item',
+                                    url: "/pack_material/sales_returns/mr_sales_returns/#{id}/mr_sales_return_items/new",
+                                    style: :button,
+                                    behaviour: :popup,
+                                    grid_id: 'sales_return_items',
+                                    css_class: 'mb1')
+
+                section.add_grid('sales_return_items',
+                                 "/list/mr_sales_return_items/grid?key=standard&mr_sales_return_id=#{id}",
+                                 height: 16,
+                                 caption: 'Sales Return Items')
+              end
             end
           end
 

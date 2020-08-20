@@ -5,7 +5,7 @@
   :text: view
   :icon: view-show
   :title: View
-  :hide_if_false: completed
+  :hide_if_false: verified
 - :url: "/pack_material/sales_returns/mr_sales_returns/$:id$/edit"
   :text: edit
   :icon: edit
@@ -17,12 +17,6 @@
   :is_delete: true
   :popup: true
   :hide_if_true: verified
-- :url: "/pack_material/sales_returns/print_sku_barcode?mr_sales_return_id=$:id$"
-  :text: Print SKU barcode
-  :icon: printer
-  :title: Print SKU barcode
-  :popup: true
-  :hide_if_false: verified
 - :separator: true
 - :url: "/development/statuses/list/mr_sales_returns/$:id$"
   :text: status

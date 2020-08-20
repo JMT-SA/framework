@@ -5,6 +5,7 @@ module UiRules
     def generate_rules  # rubocop:disable Metrics/AbcSize
       @repo = PackMaterialApp::SalesReturnRepo.new
       @dispatch_repo = PackMaterialApp::DispatchRepo.new
+      @location_repo = MasterfilesApp::LocationRepo.new
       @perm = PackMaterialApp::TaskPermissionCheck::MrSalesReturn
       make_form_object
       apply_form_values
@@ -14,7 +15,7 @@ module UiRules
                                when :new
                                  new_fields
                                else
-                                 rules[:completed] ? common_fields.merge(show_fields) : common_fields.merge(edit_fields)
+                                 rules[:verified] || rules[:completed] ? common_fields.merge(show_fields) : common_fields.merge(edit_fields)
                                end
 
       form_name 'mr_sales_return'
@@ -31,7 +32,7 @@ module UiRules
     def new_fields
       {
         mr_sales_order_id: { renderer: :select,
-                             options: @dispatch_repo.for_select_mr_sales_orders,
+                             options: @dispatch_repo.for_select_mr_sales_orders(where: { shipped: true, returned: false }),
                              caption: 'Sales Order',
                              required: true }
       }
@@ -41,13 +42,21 @@ module UiRules
       {
         remarks: { renderer: :textarea,
                    rows: 5 },
+        receipt_location_id: { renderer: :select,
+                               options: @location_repo.for_select_receiving_bays,
+                               caption: 'Receiving Bay',
+                               required: true },
         sales_return_number: { renderer: :hidden }
       }
     end
 
     def show_fields
+      receiving_bay_label = @location_repo.find_location(@form_object.receipt_location_id)&.location_long_code
       {
         sales_return_number: { renderer: :label },
+        receipt_location_id: { renderer: :label,
+                               with_value: receiving_bay_label,
+                               caption: 'Receiving Bay' },
         remarks: { renderer: :label }
       }
     end
@@ -64,7 +73,7 @@ module UiRules
 
     def make_form_object
       @form_object = if @mode == :new
-                       OpenStruct.new(mr_delivery_id: nil)
+                       OpenStruct.new(mr_sales_order_id: nil)
                      else
                        @repo.find_mr_sales_return(@options[:id])
                      end

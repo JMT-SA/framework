@@ -9,6 +9,7 @@ module PackMaterialApp
     required(:issue_transaction_id, :integer).maybe(:int?)
     required(:remarks, Types::StrippedString).maybe(:str?)
     required(:sales_return_number, :integer).maybe(:int?)
+    required(:receipt_location_id, :integer).filled(:int?)
   end
 
   NewMrSalesReturnSchema = Dry::Validation.Params do

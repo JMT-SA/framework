@@ -205,6 +205,27 @@ class Framework < Roda
         end
       end
 
+      # BARCODE
+      # --------------------------------------------------------------------------
+      r.on 'print_sku_barcode' do
+        interactor = PackMaterialApp::MrSalesReturnItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        r.get do
+          show_partial { PackMaterial::Dispatch::MrSalesReturnItem::PrintBarcode.call(id) }
+        end
+        r.patch do
+          res = interactor.print_sku_barcode(params[:mr_sales_return_item])
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) do
+              PackMaterial::Dispatch::MrSalesReturnItem::PrintBarcode.call(id,
+                                                                           form_values: params[:mr_sales_return_item],
+                                                                           form_errors: res.errors)
+            end
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('dispatch', 'read')

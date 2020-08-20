@@ -58,7 +58,7 @@ module PackMaterialApp
       def complete_sales_return_check
         return failed_response 'Sales Return has not been verified' unless verified?
         return failed_response 'Sales Return has already been completed' if completed?
-        return failed_response 'User is not allowed to integrate Sales Return' if can_user_integrate?
+        return failed_response 'User is not allowed to integrate Sales Return' unless can_user_integrate?
 
         all_ok
       end

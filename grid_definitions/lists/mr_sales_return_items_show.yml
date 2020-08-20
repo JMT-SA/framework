@@ -1,5 +1,16 @@
 ---
 :dataminer_definition: mr_sales_return_items
+:actions:
+  - :url: "/pack_material/sales_returns/mr_sales_return_items/$:id$/print_sku_barcode"
+    :text: Print SKU barcode
+    :icon: printer
+    :title: Print SKU barcode
+    :popup: true
+  - :url: "/development/statuses/list/mr_sales_return_items/$:id$"
+    :text: status
+    :icon: information-solid
+    :title: Status
+    :popup: true
 :conditions:
   :standard:
     - :col: mr_sales_return_items.mr_sales_return_id

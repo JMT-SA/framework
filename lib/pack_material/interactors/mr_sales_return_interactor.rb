@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  class MrSalesReturnInteractor < BaseInteractor
+  class MrSalesReturnInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_mr_sales_return(params)  # rubocop:disable Metrics/AbcSize
       res = validate_new_mr_sales_return_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -73,11 +73,25 @@ module PackMaterialApp
     end
 
     def complete_sales_return(id)
+      repo.transaction do
+        sales_order_id = repo.sales_return_order(id)
+        PackMaterialApp::CompleteSalesOrder.call(sales_order_id, @user.user_name, false, nil, { mr_sales_return_id: id })
+        log_transaction
+      end
       instance = mr_sales_return(id)
       success_response("Completed sales return #{instance.sales_return_number}",
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def email_sales_return_defaults(id, user)
+      instance = mr_sales_return(id)
+      {
+        to: nil,
+        cc: user.email,
+        subject: "Sales Return: #{instance.sales_return_number} (ORDER: #{instance.sales_order_number})"
+      }
     end
 
     def assert_permission!(task, id = nil)

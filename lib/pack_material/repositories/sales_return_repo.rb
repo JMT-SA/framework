@@ -260,5 +260,26 @@ module PackMaterialApp
       available_qty = record.get(:quantity_required) - record.get(:quantity_returned)
       available_qty.zero?
     end
+
+    def products_for_sales_return(sales_return_id)
+      DB[:mr_sales_return_items]
+        .join(:mr_sales_order_items, id: :mr_sales_order_item_id)
+        .join(:material_resource_product_variants, id: :mr_product_variant_id)
+        .where(mr_sales_return_id: sales_return_id)
+        .select(:quantity_returned,
+                :unit_price,
+                :product_variant_code,
+                :weighted_average_cost,
+                (Sequel[:mr_sales_return_items][:quantity_returned] * Sequel[:mr_sales_order_items][:unit_price]).as(:line_total))
+        .all
+    end
+
+    def complete_sales_return(user_name, id, _attrs)
+      attrs = { integration_error: false,
+                completed: true,
+                completed_at: DateTime.now,
+                completed_by: user_name }
+      update(:mr_sales_returns, id, attrs)
+    end
   end
 end

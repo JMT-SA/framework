@@ -46,7 +46,7 @@ module PackMaterial
 
             page.section do |section|
               section.form do |form|
-                form.caption 'Edit Sales Return'
+                form.caption cannot_edit ? 'View Sales Return' : 'Edit Sales Return'
                 form.action "/pack_material/sales_returns/mr_sales_returns/#{id}"
                 form.method :update unless cannot_edit
                 form.view_only! if cannot_edit

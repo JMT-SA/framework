@@ -1,0 +1,227 @@
+---
+:caption: Sales Return Items
+:sql: "SELECT \"mr_sales_return_items\".\"id\", \"mr_sales_return_items\".\"mr_sales_return_id\",
+  \"mr_sales_return_items\".\"mr_sales_order_item_id\", \"mr_sales_return_items\".\"remarks\",
+  \"mr_sales_return_items\".\"quantity_returned\", \"mr_sales_order_items\".\"quantity_required\",
+  \"mr_sales_order_items\".\"unit_price\", \"material_resource_product_variants\".\"product_variant_code\",
+  \"mr_sales_return_items\".\"created_at\", \"mr_sales_return_items\".\"updated_at\",
+  \"mr_sales_returns\".\"created_by\", fn_current_status('mr_sales_return_items',
+  \"mr_sales_return_items\".\"id\") AS status FROM \"mr_sales_return_items\" \r\nLEFT
+  JOIN \"mr_sales_order_items\" ON \"mr_sales_order_items\".\"id\" = \"mr_sales_return_items\".\"mr_sales_order_item_id\"
+  \r\nLEFT JOIN \"mr_sales_returns\" ON \"mr_sales_returns\".\"id\" = \"mr_sales_return_items\".\"mr_sales_return_id\"\r\nLEFT
+  JOIN \"material_resource_product_variants\" ON \"material_resource_product_variants\".\"id\"
+  = \"mr_sales_order_items\".\"mr_product_variant_id\""
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mr_sales_return_items.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_sales_return_id:
+    :name: mr_sales_return_id
+    :sequence_no: 2
+    :caption: Mr sales return
+    :namespaced_name: mr_sales_return_items.mr_sales_return_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mr_sales_order_item_id:
+    :name: mr_sales_order_item_id
+    :sequence_no: 3
+    :caption: Mr sales order item
+    :namespaced_name: mr_sales_return_items.mr_sales_order_item_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 4
+    :caption: Remarks
+    :namespaced_name: mr_sales_return_items.remarks
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_returned:
+    :name: quantity_returned
+    :sequence_no: 5
+    :caption: Qty returned
+    :namespaced_name: mr_sales_return_items.quantity_returned
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity_required:
+    :name: quantity_required
+    :sequence_no: 6
+    :caption: Qty required
+    :namespaced_name: mr_sales_order_items.quantity_required
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  unit_price:
+    :name: unit_price
+    :sequence_no: 7
+    :caption: Unit price
+    :namespaced_name: mr_sales_order_items.unit_price
+    :data_type: :number
+    :width: 120
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_variant_code:
+    :name: product_variant_code
+    :sequence_no: 8
+    :caption: Product variant code
+    :namespaced_name: material_resource_product_variants.product_variant_code
+    :data_type: :string
+    :width: 300
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: mr_sales_return_items.created_at
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: mr_sales_return_items.updated_at
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 11
+    :caption: Created by
+    :namespaced_name: mr_sales_returns.created_by
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 12
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mr_sales_return_items.mr_sales_return_id
+  :caption: Mr sales return
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT created_by, id FROM mr_sales_returns ORDER BY created_by
+- :column: mr_sales_return_items.mr_sales_order_item_id
+  :caption: Mr sales order item
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT remarks, id FROM mr_sales_order_items ORDER BY remarks

@@ -19,6 +19,7 @@ module PackMaterialApp
     optional(:integration_error, :bool).maybe(:bool?)
     optional(:integration_completed, :bool).maybe(:bool?)
     optional(:shipped, :bool).maybe(:bool?)
+    required(:returned, :bool).maybe(:bool?)
   end
 
   NewMrSalesOrderSchema = Dry::Validation.Params do

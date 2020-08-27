@@ -24,6 +24,10 @@ module PackMaterialApp
       weighted_average_cost_records.select { |r| r[:mr_product_variant_id] == mrpv_id }
     end
 
+    def wa_cost_records_for_variant_with_sales(mrpv_id)
+      wa_cost_records.select { |r| r[:mr_product_variant_id] == mrpv_id }
+    end
+
     def wa_cost(mrpv_id) # rubocop:disable Metrics/AbcSize
       total_qty = total_quantity(mrpv_id)
       return nil unless total_qty&.positive?
@@ -31,6 +35,25 @@ module PackMaterialApp
       rest = total_qty
       total_amt = 0
       records = wa_cost_records_for_variant(mrpv_id)
+      records.each do |r|
+        qty = r[:quantity]
+        rest -= qty.abs
+        next if r[:price].nil?
+
+        amt = (rest.positive? || rest.zero? ? r[:quantity] : rest.abs) * r[:price]
+        total_amt += amt
+        break if rest.negative?
+      end
+      total_amt / total_qty
+    end
+
+    def wa_cost_with_sales(mrpv_id) # rubocop:disable Metrics/AbcSize
+      total_qty = total_quantity(mrpv_id)
+      return nil unless total_qty&.positive?
+
+      rest = total_qty
+      total_amt = 0
+      records = wa_cost_records_for_variant_with_sales(mrpv_id)
       records.each do |r|
         qty = r[:quantity]
         rest -= qty.abs

@@ -11,5 +11,6 @@ module PackMaterialApp
     attribute :product_variant_number, Types::Integer
     attribute :product_variant_code, Types::String
     attribute :status, Types::String
+    attribute :returned, Types::Bool
   end
 end

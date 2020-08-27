@@ -151,23 +151,10 @@ class Framework < Roda
         res = interactor.create_mr_sales_return(params[:mr_sales_return])
         if res.success
           if fetch?(r)
-            row_keys = %i[
-              id
-              mr_sales_order_id
-              sales_order_number
-              erp_customer_number
-              sales_return_number
-              issue_transaction_id
-              created_by
-              remarks
-              status
-            ]
-
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            redirect_via_json("/pack_material/sales_returns/mr_sales_returns/#{res.instance[:id]}/edit")
           else
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            r.redirect "/pack_material/sales_returns/mr_sales_returns/#{res.instance[:id]}/edit"
           end
         else
           re_show_form(r, res, url: '/pack_material/sales_returns/mr_sales_returns/new') do

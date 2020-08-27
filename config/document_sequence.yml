@@ -45,3 +45,8 @@ dummy_invoice:
   digit_length: 7
   table: invoices
   column: invoice_ref
+doc_seqs_sales_return_number:
+  db_sequence_name: doc_seqs_sales_return_number
+  data_type: :integer
+  table: mr_sales_returns
+  column: sales_return_number

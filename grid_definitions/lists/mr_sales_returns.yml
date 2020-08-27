@@ -1,0 +1,56 @@
+---
+:dataminer_definition: mr_sales_returns
+:actions:
+- :url: "/pack_material/sales_returns/mr_sales_returns/$:id$/edit"
+  :text: view
+  :icon: view-show
+  :title: View
+  :hide_if_false: verified
+- :url: "/pack_material/sales_returns/mr_sales_returns/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_true: verified
+- :url: "/pack_material/sales_returns/mr_sales_returns/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: verified
+- :separator: true
+- :url: "/development/statuses/list/mr_sales_returns/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/pack_material/sales_returns/mr_sales_returns/new"
+  :text: New Sales Return
+  :style: :button
+  :behaviour: :popup
+  :hide_for_key:
+    - completed
+:conditions:
+  :unverified:
+    - :col: mr_sales_returns.verified
+      :op: =
+      :val: false
+  :verified:
+    - :col: mr_sales_returns.verified
+      :op: =
+      :val: true
+  :incomplete:
+    - :col: mr_sales_returns.completed
+      :op: =
+      :val: false
+  :completed:
+    - :col: mr_sales_returns.completed
+      :op: =
+      :val: true
+:captions:
+  :conditions:
+    :unverified: Sales Returns
+    :verified: Verified Sales Returns
+    :incomplete: Sales Returns
+    :completed: Completed Sales Returns

@@ -20,5 +20,6 @@ module PackMaterialApp
     attribute :integration_completed, Types::Bool
     attribute :shipped, Types::Bool
     attribute :status, Types::Bool
+    attribute :returned, Types::Bool
   end
 end

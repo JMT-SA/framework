@@ -129,6 +129,7 @@ module PackMaterialApp
           xml.internal_invoice_number @sales_order.sales_order_number
           xml.customer_code @sales_order.erp_customer_number
           xml.account_code '10650'
+          xml.payment_term 'CN'
           xml.shipped_at @sales_order.shipped_at
           xml.invoice_total so_totals[:total]
           xml.subtotal so_totals[:subtotal]

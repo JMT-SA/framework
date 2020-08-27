@@ -1,12 +1,15 @@
 ---
 :caption: Sales Returns
-:sql: SELECT "mr_sales_returns"."id", "mr_sales_returns"."mr_sales_order_id", "mr_sales_orders"."sales_order_number",
-  "mr_sales_orders"."erp_customer_number",  "mr_sales_returns"."sales_return_number",
-  "mr_sales_returns"."issue_transaction_id", "mr_sales_returns"."created_by", "mr_sales_returns"."remarks","mr_sales_returns"."created_at",
-  "mr_sales_returns"."updated_at", "mr_inventory_transactions"."created_by" AS mr_inventory_transactions_created_by,  "mr_sales_returns"."verified",  "mr_sales_returns"."completed",
-  fn_current_status('mr_sales_returns', "mr_sales_returns"."id") AS status FROM "mr_sales_returns"
-  LEFT JOIN "mr_inventory_transactions" ON "mr_inventory_transactions"."id" = "mr_sales_returns"."issue_transaction_id"
-  JOIN "mr_sales_orders" ON "mr_sales_orders"."id" = "mr_sales_returns"."mr_sales_order_id"
+:sql: "SELECT \"mr_sales_returns\".\"id\",\r\n fn_current_status('mr_sales_returns',
+  \"mr_sales_returns\".\"id\") AS status,\r\n\"mr_sales_returns\".\"mr_sales_order_id\",
+  \"mr_sales_orders\".\"sales_order_number\",  \"mr_sales_returns\".\"sales_return_number\",
+  \ \"mr_sales_orders\".\"erp_customer_number\",\"mr_sales_returns\".\"issue_transaction_id\",\r\n\"mr_sales_returns\".\"created_by\",
+  \r\n\r\n\"mr_sales_returns\".\"created_at\",\r\n \"mr_sales_returns\".\"updated_at\",
+  \r\n\"mr_inventory_transactions\".\"created_by\" AS mr_inventory_transactions_created_by,
+  \r\n \"mr_sales_returns\".\"verified\", \r\n\"mr_sales_returns\".\"completed\",\r\n\"mr_sales_returns\".\"remarks\"\r\n\r\n
+  FROM \"mr_sales_returns\" LEFT JOIN \"mr_inventory_transactions\" ON \"mr_inventory_transactions\".\"id\"
+  = \"mr_sales_returns\".\"issue_transaction_id\" JOIN \"mr_sales_orders\" ON \"mr_sales_orders\".\"id\"
+  = \"mr_sales_returns\".\"mr_sales_order_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -27,9 +30,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  status:
+    :name: status
+    :sequence_no: 2
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 240
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   mr_sales_order_id:
     :name: mr_sales_order_id
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Mr sales order
     :namespaced_name: mr_sales_returns.mr_sales_order_id
     :data_type: :integer
@@ -45,11 +64,11 @@
     :group_max: false
   sales_order_number:
     :name: sales_order_number
-    :sequence_no: 3
-    :caption: Sales order number
+    :sequence_no: 4
+    :caption: SO no
     :namespaced_name: mr_sales_orders.sales_order_number
     :data_type: :integer
-    :width: 120
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -59,13 +78,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  erp_customer_number:
-    :name: erp_customer_number
-    :sequence_no: 4
-    :caption: Erp customer number
-    :namespaced_name: mr_sales_orders.erp_customer_number
-    :data_type: :string
-    :width: 120
+  sales_return_number:
+    :name: sales_return_number
+    :sequence_no: 5
+    :caption: SR no
+    :namespaced_name: mr_sales_returns.sales_return_number
+    :data_type: :integer
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -75,13 +94,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  sales_return_number:
-    :name: sales_return_number
-    :sequence_no: 5
-    :caption: Sales return number
-    :namespaced_name: mr_sales_returns.sales_return_number
-    :data_type: :integer
-    :width: 120
+  erp_customer_number:
+    :name: erp_customer_number
+    :sequence_no: 6
+    :caption: ERP customer no
+    :namespaced_name: mr_sales_orders.erp_customer_number
+    :data_type: :string
+    :width: 140
     :format: 
     :hide: false
     :pinned: 
@@ -93,7 +112,7 @@
     :group_max: false
   issue_transaction_id:
     :name: issue_transaction_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Issue transaction
     :namespaced_name: mr_sales_returns.issue_transaction_id
     :data_type: :integer
@@ -109,25 +128,9 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Created by
     :namespaced_name: mr_sales_returns.created_by
-    :data_type: :string
-    :width: 120
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  remarks:
-    :name: remarks
-    :sequence_no: 8
-    :caption: Remarks
-    :namespaced_name: mr_sales_returns.remarks
     :data_type: :string
     :width: 120
     :format: 
@@ -195,7 +198,7 @@
     :data_type: :boolean
     :width: 100
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -211,7 +214,7 @@
     :data_type: :boolean
     :width: 100
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -219,17 +222,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  status:
-    :name: status
+  remarks:
+    :name: remarks
     :sequence_no: 14
-    :caption: Status
-    :namespaced_name: 
+    :caption: Remarks
+    :namespaced_name: mr_sales_returns.remarks
     :data_type: :string
-    :width: 150
+    :width: 240
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -259,12 +262,12 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 
 - :column: mr_sales_returns.verified
   :caption: Verified
   :data_type: :string
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 

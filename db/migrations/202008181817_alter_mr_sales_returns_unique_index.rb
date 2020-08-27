@@ -1,11 +1,11 @@
 Sequel.migration do
   up do
     alter_table(:mr_sales_returns) do
-      drop_constraint :sales_returns_unique_mr_sales_orders
+      drop_index [:mr_sales_order_id], name: :sales_returns_unique_mr_sales_orders
     end
     alter_table(:mr_sales_return_items) do
-      drop_constraint :sales_returns_unique_mr_sales_order_items
-      add_unique_constraint [:mr_sales_return_id, :mr_sales_order_item_id], name: :sales_return_items_uniq
+      drop_index [:mr_sales_order_item_id], name: :sales_returns_unique_mr_sales_order_items
+      add_index [:mr_sales_return_id, :mr_sales_order_item_id], name: :sales_return_items_uniq, unique: true
     end
     alter_table(:mr_sales_orders) do
       add_column :returned, TrueClass, default: false
@@ -17,11 +17,11 @@ Sequel.migration do
 
   down do
     alter_table(:mr_sales_returns) do
-      add_unique_constraint [:mr_sales_order_id], name: :sales_returns_unique_mr_sales_orders
+      add_index [:mr_sales_order_id], name: :sales_returns_unique_mr_sales_orders, unique: true
     end
     alter_table(:mr_sales_return_items) do
-      drop_constraint :sales_return_items_uniq
-      add_unique_constraint [:mr_sales_order_item_id], name: :sales_returns_unique_mr_sales_order_items
+      drop_index :sales_return_items_uniq
+      add_index [:mr_sales_order_item_id], name: :sales_returns_unique_mr_sales_order_items, unique: true
     end
     alter_table(:mr_sales_orders) do
       drop_column :returned

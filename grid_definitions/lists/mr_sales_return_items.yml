@@ -6,6 +6,7 @@
     :icon: delete
     :is_delete: true
     :popup: true
+    :hide_if_true: returned
   - :separator: true
   - :url: "/development/statuses/list/mr_sales_return_items/$:id$"
     :text: status

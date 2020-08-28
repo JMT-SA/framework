@@ -59,8 +59,7 @@ module PackMaterialApp
         raise Crossbeams::InfoError, res.message unless res.success
 
         repo.update_with_document_number('doc_seqs_sales_return_number', id)
-        sales_order_id = repo.sales_return_order(id)
-        dispatch_repo.update_mr_sales_order(sales_order_id, { returned: true }) unless repo.sales_order_partially_returned?(sales_order_id)
+        repo.update_sales_return_order_status(id)
         log_transaction
         log_status('mr_sales_returns', id, 'VERIFIED')
       end

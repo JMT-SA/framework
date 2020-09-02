@@ -96,8 +96,9 @@ class Framework < Roda
               cost_type_code
               amount
             ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            sub_totals = interactor.sales_return_sub_totals(id)
+            json_actions(sr_sub_total_changes(sub_totals) +
+                             [OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys, cost_type_code: res.instance[:cost_type_code]))], res.message)
           else
             re_show_form(r, res, url: "/pack_material/dispatch/mr_sales_returns/#{id}/sales_return_costs/new") do
               PackMaterial::Dispatch::SalesReturnCost::New.call(id,
@@ -181,12 +182,16 @@ class Framework < Roda
         res = interactor.inline_update(id, params)
         if res.success
           parent_id = interactor.mr_sales_return_item(id)&.mr_sales_return_id
+          sub_totals = interactor.sales_return_sub_totals(parent_id)
+          sub_total_actions = sr_sub_total_changes(sub_totals)
           permission_res = interactor.verify_sales_return(parent_id)
-          if permission_res.success
-            json_actions([OpenStruct.new(type: :show_element, dom_id: 'mr_sales_returns_verify_button')], res.message)
-          else
-            json_actions([OpenStruct.new(type: :hide_element, dom_id: 'mr_sales_returns_verify_button')], res.message)
-          end
+          actions = []
+          actions << if permission_res.success
+                       OpenStruct.new(type: :show_element, dom_id: 'mr_sales_returns_verify_button')
+                     else
+                       OpenStruct.new(type: :hide_element, dom_id: 'mr_sales_returns_verify_button')
+                     end
+          json_actions(sub_total_actions + actions, res.message)
         else
           show_json_error(res.message, status: 200)
         end
@@ -268,14 +273,16 @@ class Framework < Roda
         r.patch do     # UPDATE
           res = interactor.update_sales_return_cost(id, params[:sales_return_cost])
           if res.success
-            update_grid_row(id,
-                            changes: {
-                              mr_sales_return_id: res.instance[:mr_sales_return_id],
-                              mr_cost_type_id: res.instance[:mr_cost_type_id],
-                              cost_type_code: res.instance[:cost_type_code],
-                              amount: res.instance[:amount]
-                            },
-                            notice: res.message)
+            sub_totals = interactor.sales_return_sub_totals(res.instance[:mr_sales_return_id])
+            json_actions(sr_sub_total_changes(sub_totals) +
+                             [OpenStruct.new(ids: id,
+                                             type: :update_grid_row,
+                                             changes: { mr_sales_return_id: res.instance[:mr_sales_return_id],
+                                                        mr_cost_type_id: res.instance[:mr_cost_type_id],
+                                                        cost_type_code: res.instance[:cost_type_code],
+                                                        amount: res.instance[:amount] })],
+                         res.message)
+
           else
             re_show_form(r, res) do
               PackMaterial::Dispatch::SalesReturnCost::Edit.call(id,
@@ -299,10 +306,10 @@ class Framework < Roda
   end
   def sr_sub_total_changes(sub_totals)
     [
-      OpenStruct.new(dom_id: 'sr_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
-      OpenStruct.new(dom_id: 'sr_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
-      OpenStruct.new(dom_id: 'sr_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
-      OpenStruct.new(dom_id: 'sr_totals_total', type: :replace_inner_html, value: sub_totals[:total])
+      OpenStruct.new(dom_id: 'sales_return_totals_subtotal', type: :replace_inner_html, value: sub_totals[:subtotal]),
+      OpenStruct.new(dom_id: 'sales_return_totals_costs', type: :replace_inner_html, value: sub_totals[:costs]),
+      OpenStruct.new(dom_id: 'sales_return_totals_vat', type: :replace_inner_html, value: sub_totals[:vat]),
+      OpenStruct.new(dom_id: 'sales_return_totals_total', type: :replace_inner_html, value: sub_totals[:total])
     ]
   end
 end

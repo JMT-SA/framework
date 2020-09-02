@@ -278,11 +278,13 @@ module PackMaterialApp
         .all
     end
 
-    def complete_sales_return(user_name, id, _attrs)
+    def complete_sales_return(user_name, id, params)
       attrs = { integration_error: false,
                 completed: true,
                 completed_at: DateTime.now,
-                completed_by: user_name }
+                completed_by: user_name,
+                erp_invoice_number: params[:sales_invoice_number],
+                erp_profit_loss_number: params[:journal_number] }
       update(:mr_sales_returns, id, attrs)
     end
 

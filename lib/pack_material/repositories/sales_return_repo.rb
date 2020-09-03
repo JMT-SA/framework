@@ -77,7 +77,7 @@ module PackMaterialApp
     def sales_return_sub_totals(id, opts = {})
       subtotal = sales_return_total_items(id)
       costs = sales_return_total_costs(id)
-      vat = sales_return_total_vat(id, subtotal)
+      vat = sales_return_total_vat(id, subtotal + costs)
       {
         subtotal: UtilityFunctions.delimited_number(subtotal, opts),
         costs: UtilityFunctions.delimited_number(costs, opts),

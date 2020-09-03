@@ -53,6 +53,10 @@ module PackMaterialApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def sales_return_sub_totals(sales_return_id)
+      repo.sales_return_sub_totals(sales_return_id)
+    end
+
     private
 
     def repo

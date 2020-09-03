@@ -9,7 +9,7 @@ module PackMaterialApp
     required(:mr_product_variant_id, :integer).maybe(:int?)
     required(:quantity_required, :decimal).filled(:decimal?, gt?: 0)
     required(:unit_price, :decimal).filled(:decimal?, gt?: 0)
-    required(:returned, :bool).maybe(:bool?)
+    optional(:returned, :bool).maybe(:bool?)
   end
 
   MrSalesOrderItemInlineSchema = Dry::Validation.Params do

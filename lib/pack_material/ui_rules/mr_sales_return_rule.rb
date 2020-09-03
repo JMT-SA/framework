@@ -26,7 +26,7 @@ module UiRules
       rules[:completed] = @form_object.completed
       rules[:can_verify_sales_return] = can_verify_sales_return
       rules[:can_complete_sales_return] = can_complete_sales_return
-      rules[:sales_return_sub_totals] = @repo.sales_return_sub_totals(@options[:id], delimiter: '', no_decimals: 2)
+      rules[:sales_return_sub_totals] = @repo.sales_return_sub_totals(@options[:id])
     end
 
     def new_fields

@@ -5,7 +5,7 @@
   \"mr_sales_return_items\".\"quantity_returned\", \"mr_sales_order_items\".\"quantity_required\",
   \"mr_sales_order_items\".\"unit_price\", \"material_resource_product_variants\".\"product_variant_code\",
   \"mr_sales_return_items\".\"created_at\", \"mr_sales_return_items\".\"updated_at\",
-  \"mr_sales_returns\".\"created_by\", fn_current_status('mr_sales_return_items',
+  \"mr_sales_returns\".\"created_by\", \"mr_sales_order_items\".\"returned\", fn_current_status('mr_sales_return_items',
   \"mr_sales_return_items\".\"id\") AS status FROM \"mr_sales_return_items\" \r\nLEFT
   JOIN \"mr_sales_order_items\" ON \"mr_sales_order_items\".\"id\" = \"mr_sales_return_items\".\"mr_sales_order_item_id\"
   \r\nLEFT JOIN \"mr_sales_returns\" ON \"mr_sales_returns\".\"id\" = \"mr_sales_return_items\".\"mr_sales_return_id\"\r\nLEFT
@@ -192,9 +192,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  returned:
+    :name: returned
+    :sequence_no: 12
+    :caption: Returned?
+    :namespaced_name: mr_sales_order_items.returned
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   status:
     :name: status
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Status
     :namespaced_name: 
     :data_type: :string

@@ -257,7 +257,11 @@ module PackMaterialApp
 
     def sales_order_item_fully_returned?(sales_return_item_id)
       record = sales_order_item_record(sales_return_item_id)
-      available_qty = record.get(:quantity_required) - record.get(:quantity_returned)
+      quantity_returned = DB[:mr_sales_return_items]
+                          .where(mr_sales_order_item_id: record.get(:mr_sales_order_item_id))
+                          .sum(:quantity_returned)
+
+      available_qty = record.get(:quantity_required) - quantity_returned
       available_qty.zero?
     end
 
@@ -274,12 +278,25 @@ module PackMaterialApp
         .all
     end
 
-    def complete_sales_return(user_name, id, _attrs)
+    def complete_sales_return(user_name, id, params)
       attrs = { integration_error: false,
                 completed: true,
                 completed_at: DateTime.now,
-                completed_by: user_name }
+                completed_by: user_name,
+                erp_invoice_number: params[:sales_invoice_number],
+                erp_profit_loss_number: params[:journal_number] }
       update(:mr_sales_returns, id, attrs)
+    end
+
+    def update_sales_return_order_status(sales_return_id)
+      sales_order_id = sales_return_order(sales_return_id)
+      sales_return_item_ids = DB[:mr_sales_return_items].where(mr_sales_return_id: sales_return_id).map(:id)
+      sales_return_item_ids.each do |item_id|
+        item_fully_returned = sales_order_item_fully_returned?(item_id)
+        update(:mr_sales_order_items, sales_return_order_item(item_id), { returned: item_fully_returned })
+      end
+      order_partially_returned = sales_order_partially_returned?(sales_order_id)
+      update(:mr_sales_orders, sales_order_id, { returned: true }) unless order_partially_returned
     end
   end
 end

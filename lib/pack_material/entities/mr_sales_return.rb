@@ -14,6 +14,8 @@ module PackMaterialApp
     attribute :verified_by, Types::String
     attribute :receipt_location_id, Types::Integer
     attribute :integration_error, Types::Bool
+    attribute :erp_invoice_number, Types::String
+    attribute :erp_profit_loss_number, Types::String
   end
 
   class MrSalesReturnFlat < Dry::Struct
@@ -34,5 +36,7 @@ module PackMaterialApp
     attribute :updated_at, Types::DateTime
     attribute :receipt_location_id, Types::Integer
     attribute :integration_error, Types::Bool
+    attribute :erp_invoice_number, Types::String
+    attribute :erp_profit_loss_number, Types::String
   end
 end

@@ -50,7 +50,7 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def inline_update(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def inline_update(id, params) # rubocop:disable Metrics/AbcSize
       remarks = params[:column_name] == 'remarks'
       res = remarks ? validate_inline_update_remarks_params(params) : validate_inline_update_quantity_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -62,8 +62,6 @@ module PackMaterialApp
 
       repo.transaction do
         repo.inline_update_sales_return_items(id, res)
-        sales_order_item_id = repo.sales_return_order_item(id)
-        dispatch_repo.update_mr_sales_order_item(sales_order_item_id, { returned: true }) if repo.sales_order_item_fully_returned?(id)
         log_status('mr_sales_return_items', id, 'INLINE ADJUSTMENT')
         log_transaction
       end
@@ -102,6 +100,10 @@ module PackMaterialApp
 
     def mr_sales_return_item(id)
       repo.find_mr_sales_return_item(id)
+    end
+
+    def sales_return_sub_totals(sales_return_id)
+      repo.sales_return_sub_totals(sales_return_id)
     end
 
     private

@@ -173,6 +173,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   RPT_INDUSTRY = ENV['RPT_INDUSTRY']
   JASPER_REPORTS_PATH = ENV['JASPER_REPORTS_PATH']
+  JRUBY_JASPER_HOST_PORT = ENV.fetch('JRUBY_JASPER_HOST_PORT')
 
   MONTHS_OF_THE_YEAR = [
     %w[Jan 01],

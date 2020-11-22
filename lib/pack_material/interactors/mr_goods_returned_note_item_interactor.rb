@@ -12,7 +12,7 @@ module PackMaterialApp
         attrs[:mr_delivery_item_batch_id] = id
       end
       res = validate_mr_goods_returned_note_item_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -32,10 +32,10 @@ module PackMaterialApp
 
     def update_mr_goods_returned_note_item(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_mr_goods_returned_note_item_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = validate_grn_quantity_amount(id, params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_goods_returned_note_item(id, res)
@@ -67,7 +67,7 @@ module PackMaterialApp
     def inline_update(id, params) # rubocop:disable Metrics/AbcSize
       remarks = params[:column_name] == 'remarks'
       res = remarks ? validate_inline_update_remarks_params(params) : validate_inline_update_quantity_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       unless remarks
         result = validate_grn_quantity_amount(id, params)
@@ -111,7 +111,9 @@ module PackMaterialApp
     end
 
     def validate_mr_goods_returned_note_item_params(params)
-      MrGoodsReturnedNoteItemSchema.call(params)
+      # MrGoodsReturnedNoteItemSchema.call(params)
+      contract = MrGoodsReturnedNoteItemContract.new
+      contract.call(params)
     end
 
     def validate_inline_update_quantity_params(params)

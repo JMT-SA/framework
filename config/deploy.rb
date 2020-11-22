@@ -144,6 +144,13 @@ namespace :devops do
       execute :touch, "#{shared_path}/.env.local"
     end
   end
+
+  desc 'Update grid licence key'
+  task :update_grid_licence do
+    on roles(:app) do |_|
+      upload! 'public/js/ag-enterprise-activation.js', "#{shared_path}/public/js/ag-enterprise-activation.js"
+    end
+  end
 end
 
 namespace :deploy do

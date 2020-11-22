@@ -35,6 +35,12 @@ module DevelopmentApp
         # -----------------------
         # #{comment_indent(reason)}
         #
+        # To run:
+        # -------
+        # Debug : DEBUG=y RACK_ENV=production ruby scripts/base_script.rb #{script_class}
+        # Live  : RACK_ENV=production ruby scripts/base_script.rb #{script_class}
+        # Dev   : ruby scripts/base_script.rb #{script_class}
+        #
         class #{script_class} < BaseScript
           def run
             # Do some work here...

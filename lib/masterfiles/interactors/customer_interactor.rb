@@ -7,7 +7,7 @@ module MasterfilesApp
   class CustomerInteractor < BaseInteractor
     def create_customer(params)
       res = validate_new_customer_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       result = nil
       repo.transaction do
@@ -26,7 +26,7 @@ module MasterfilesApp
 
     def update_customer(id, params)
       res = validate_edit_customer_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       result = nil
       repo.transaction do

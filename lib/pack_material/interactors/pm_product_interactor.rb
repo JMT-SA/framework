@@ -7,21 +7,21 @@ module PackMaterialApp
   class PmProductInteractor < BaseInteractor
     def create_pm_product(params)
       res = validate_pm_product_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       pm_product_create(res)
     end
 
     def clone_pm_product(params)
       res = validate_clone_pm_product_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       pm_product_create(res)
     end
 
     def update_pm_product(id, params)
       res = validate_pm_product_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       resp = nil
       repo.transaction do
@@ -49,7 +49,7 @@ module PackMaterialApp
       return parent_id_missing unless parent_id
 
       res = validate_pm_product_variant_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       pm_product_variant_create(res)
     end
@@ -59,7 +59,7 @@ module PackMaterialApp
       return parent_id_missing unless parent_id
 
       res = validate_clone_pm_product_variant_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       pm_product_variant_create(res)
     end
@@ -81,7 +81,7 @@ module PackMaterialApp
 
     def update_pm_product_variant(id, params)
       res = validate_pm_product_variant_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pm_product_variant(id, res)

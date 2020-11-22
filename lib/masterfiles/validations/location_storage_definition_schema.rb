@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  LocationStorageDefinitionSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:storage_definition_code, Types::StrippedString).filled(:str?)
-    required(:storage_definition_format, Types::StrippedString).filled(:str?)
-    required(:storage_definition_description, Types::StrippedString).filled(:str?)
+  LocationStorageDefinitionSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:storage_definition_code).filled(Types::StrippedString)
+    required(:storage_definition_format).filled(Types::StrippedString)
+    required(:storage_definition_description).filled(Types::StrippedString)
   end
 end

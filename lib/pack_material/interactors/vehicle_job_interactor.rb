@@ -4,9 +4,9 @@
 
 module PackMaterialApp
   class VehicleJobInteractor < BaseInteractor
-    def create_vehicle_job(params) # rubocop:disable Metrics/AbcSize
+    def create_vehicle_job(params)
       res = validate_vehicle_job_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -24,7 +24,7 @@ module PackMaterialApp
 
     def update_vehicle_job(id, params)
       res = validate_update_vehicle_job_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_vehicle_job(id, res)
@@ -204,7 +204,7 @@ module PackMaterialApp
       vehicle_job_id = repo.vehicle_job_id_from_number(params[:tripsheet_number])
       sku_ids = replenish_repo.sku_ids_from_numbers(params[:sku_number])
       res = validate_loading_vehicle_unit_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       location_id = replenish_repo.resolve_location_id_from_scan(params[:location], params[:location_scan_field])
       return failed_response('Location not found, please use location short code') unless location_id
@@ -218,7 +218,7 @@ module PackMaterialApp
 
     def update_planned_location(id, params)
       res = validate_update_planned_loc_vehicle_job_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_planned_location(id, res)
       success_response('ok')

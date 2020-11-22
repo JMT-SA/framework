@@ -1,32 +1,26 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  NewBulkStockAdjustmentSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:business_process_id, :integer).filled(:int?)
-    optional(:ref_no, Types::StrippedString).filled(:str?)
-    optional(:is_stock_take, :bool).maybe(:bool?)
-    optional(:carton_assembly, :bool).maybe(:bool?)
-    optional(:staging_consumption, :bool).maybe(:bool?)
+  NewBulkStockAdjustmentSchema = Dry::Schema.Params do
+    optional(:business_process_id).filled(:integer)
+    optional(:ref_no).filled(Types::StrippedString)
+    optional(:is_stock_take).maybe(:bool)
+    optional(:carton_assembly).maybe(:bool)
+    optional(:staging_consumption).maybe(:bool)
   end
 
-  ItemAdjustMrBulkStockAdjustmentSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:stock_adjustment_number, :integer).filled(:int?)
-    required(:stock_adjustment_number_scan_field, Types::StrippedString).maybe(:str?)
-    required(:location, Types::StrippedString).filled(:str?)
-    required(:location_scan_field, Types::StrippedString).maybe(:str?)
-    required(:sku_number, :integer).filled(:int?)
-    required(:sku_number_scan_field, Types::StrippedString).maybe(:str?)
-    required(:quantity, :decimal).filled(:decimal?)
+  ItemAdjustMrBulkStockAdjustmentSchema = Dry::Schema.Params do
+    required(:stock_adjustment_number).filled(:integer)
+    required(:stock_adjustment_number_scan_field).maybe(Types::StrippedString)
+    required(:location).filled(Types::StrippedString)
+    required(:location_scan_field).maybe(Types::StrippedString)
+    required(:sku_number).filled(:integer)
+    required(:sku_number_scan_field).maybe(Types::StrippedString)
+    required(:quantity).filled(:decimal)
   end
 
-  MrBulkStockAdjustmentPriceSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:column_name, Types::StrippedString).filled(:str?)
-    required(:column_value, :decimal).filled(:decimal?, gt?: 0)
+  MrBulkStockAdjustmentPriceSchema = Dry::Schema.Params do
+    required(:column_name).filled(Types::StrippedString)
+    required(:column_value).filled(:decimal, gt?: 0)
   end
 end

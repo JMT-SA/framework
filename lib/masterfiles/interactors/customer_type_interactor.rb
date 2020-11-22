@@ -4,7 +4,7 @@ module MasterfilesApp
   class CustomerTypeInteractor < BaseInteractor
     def create_customer_type(params)
       res = validate_customer_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -18,7 +18,7 @@ module MasterfilesApp
 
     def update_customer_type(id, params)
       res = validate_customer_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_customer_type(id, res)

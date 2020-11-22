@@ -40,7 +40,12 @@ class Framework < Roda
         r.delete do    # DELETE
           check_auth!('parties', 'delete')
           res = interactor.delete_organization(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
+          end
         end
       end
     end

@@ -28,10 +28,10 @@ module DevelopmentApp
         @label_field         = params[:label_field] || @table_meta.likely_label_field
         @shared_repo_name    = params[:shared_repo_name]
         @shared_factory_name = params[:shared_factory_name]
-        @nested_route        = params[:nested_route_parent].empty? ? nil : params[:nested_route_parent]
+        @nested_route        = params[:nested_route_parent].nil_or_empty? ? nil : params[:nested_route_parent]
         @new_from_menu       = params[:new_from_menu].nil? ? false : params[:new_from_menu]
-        @services            = params[:services].empty? ? [] : params[:services].split(',').map(&:strip)
-        @jobs                = params[:jobs].empty? ? [] : params[:jobs].split(',').map(&:strip)
+        @services            = params[:services].nil_or_empty? ? [] : params[:services].split(',').map(&:strip)
+        @jobs                = params[:jobs].nil_or_empty? ? [] : params[:jobs].split(',').map(&:strip)
       end
 
       def classnames # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -223,38 +223,31 @@ module DevelopmentApp
       }.freeze
 
       VALIDATION_TYPE_LOOKUP = {
-        integer: ':integer',
-        string: 'Types::StrippedString',
-        boolean: ':bool',
-        # datetime: ':date_time',
-        datetime: ':time',
-        date: ':date',
-        time: ':time',
-        float: ':float',
-        decimal: ':decimal',
-        jsonb: ':hash',
-        integer_array: ':array',
-        string_array: ':array'
+        integer: 'filled(:integer)',
+        string: 'filled(Types::StrippedString)',
+        boolean: 'filled(:bool)',
+        datetime: 'filled(:time)',
+        date: 'filled(:date)',
+        time: 'filled(:time)',
+        float: 'filled(:float)',
+        decimal: 'filled(:decimal)',
+        jsonb: 'filled(:hash)',
+        integer_array: 'filled(:array).each(:integer)',
+        string_array: 'filled(:array).each(:string)'
       }.freeze
 
       VALIDATION_OPTIONAL_TYPE_LOOKUP = {
-        # integer: ':integer',
-        # string: 'Types::StrippedString',
-        # boolean: ':bool',
-        # datetime: ':date_time',
-        datetime: '[:nil, :time]',
-        date: '[:nil, :date]',
-        time: '[:nil, :time]',
-        float: '[:nil, :float]',
-        decimal: '[:nil, :decimal]' # ,
-        # jsonb: ':hash',
-        # integer_array: ':array',
-        # string_array: ':array'
-      }.freeze
-
-      VALIDATION_ARRAY_LOOKUP = {
-        integer_array: ' { each(:int?) }',
-        string_array: ' { each(:str?) }'
+        integer: 'maybe(:integer)',
+        string: 'maybe(Types::StrippedString)',
+        boolean: 'maybe(:bool)',
+        datetime: 'maybe(:time)',
+        date: 'maybe(:date)',
+        time: 'maybe(:time)',
+        float: 'maybe(:float)',
+        decimal: 'maybe(:decimal)',
+        jsonb: 'maybe(:hash)',
+        integer_array: 'maybe(:array).each(:integer) # OR: maybe(:array).maybe { each(:integer) } # if param can be nil (not [])',
+        string_array: 'maybe(:array).each(:string) # OR: maybe(:array).maybe { each(:string) } # if param can be nil (not [])'
       }.freeze
 
       def initialize(table)
@@ -328,17 +321,23 @@ module DevelopmentApp
         data
       end
 
-      def column_dry_validation_type(column, optional = false)
-        if optional
-          VALIDATION_OPTIONAL_TYPE_LOOKUP[@col_lookup[column][:type]] || VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+      def column_dry_validation_type(column, max, optional = false)
+        s = if optional
+              VALIDATION_OPTIONAL_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+            else
+              VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+            end
+
+        if max
+          s.sub(')', ", #{max})")
         else
-          VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
+          s
         end
       end
-
-      def column_dry_validation_array_extra(column)
-        VALIDATION_ARRAY_LOOKUP[@col_lookup[column][:type]]
-      end
+      #
+      # def column_dry_validation_array_extra(column)
+      #   VALIDATION_ARRAY_LOOKUP[@col_lookup[column][:type]]
+      # end
 
       def column_dry_validation_expect_type(column)
         VALIDATION_EXPECT_LOOKUP[@col_lookup[column][:type]] || "(Types::??? (#{@col_lookup[column][:type]}))"
@@ -389,7 +388,7 @@ module DevelopmentApp
             class #{opts.classnames[:interactor]} < BaseInteractor
               def create_#{opts.singlename}(#{needs_id}params)#{add_parent_to_params}
                 res = validate_#{opts.singlename}_params(params)
-                return validation_failed_response(res) unless res.messages.empty?
+                return validation_failed_response(res) if res.failure?
 
                 id = nil
                 repo.transaction do
@@ -408,7 +407,7 @@ module DevelopmentApp
 
               def update_#{opts.singlename}(id, params)
                 res = validate_#{opts.singlename}_params(params)
-                return validation_failed_response(res) unless res.messages.empty?
+                return validation_failed_response(res) if res.failure?
 
                 repo.transaction do
                   repo.update_#{opts.singlename}(id, res)
@@ -683,9 +682,7 @@ module DevelopmentApp
           # frozen_string_literal: true
 
           module #{opts.classnames[:module]}
-            #{opts.classnames[:schema]} = Dry::Validation.Params do
-              configure { config.type_specs = true }
-
+            #{opts.classnames[:schema]} = Dry::Schema.Params do
               #{attr.join("\n    ")}
             end
           end
@@ -698,14 +695,11 @@ module DevelopmentApp
         attr = []
         opts.table_meta.columns_without(%i[created_at updated_at active]).each do |col|
           detail = opts.table_meta.col_lookup[col]
-          fill_opt = detail[:allow_null] ? 'maybe' : 'filled'
           max = detail[:max_length] && detail[:max_length] < 200 ? "max_size?: #{detail[:max_length]}" : nil
-          rules = [opts.table_meta.column_dry_validation_expect_type(col), max, opts.table_meta.column_dry_validation_array_extra(col)].compact.join(', ')
-          rules = rules.sub(/,\s+{/, ' {')
           attr << if col == :id
-                    "optional(:#{col}, #{opts.table_meta.column_dry_validation_type(col, detail[:allow_null])}).#{fill_opt}#{rules}"
+                    "optional(:#{col}).#{opts.table_meta.column_dry_validation_type(col, max, detail[:allow_null])}"
                   else
-                    "required(:#{col}, #{opts.table_meta.column_dry_validation_type(col, detail[:allow_null])}).#{fill_opt}#{rules}"
+                    "required(:#{col}).#{opts.table_meta.column_dry_validation_type(col, max, detail[:allow_null])}"
                   end
         end
         attr

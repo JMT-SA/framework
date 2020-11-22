@@ -166,6 +166,19 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
     end
   end
 
+  # Validate that an id is not longer than the maximum database integer value.
+  #
+  # @param colname [symbol] the name of the column.
+  # @param value [string] the id value.
+  # @return [Dry::Schema::Result] the validation result.
+  def validate_integer_length(colname, value)
+    raise ArgumentError, "#{self.class.name}: colname #{colname} must be a Symbol" unless colname.is_a?(Symbol)
+
+    Dry::Schema.Params do
+      required(colname).filled(:integer, lt?: AppConst::MAX_DB_INT)
+    end.call(colname => value)
+  end
+
   # Calculate the 4-digit pick ref:
   #
   # 1: Second digit of the ISO week
@@ -232,5 +245,21 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   # @return [string] the path with "?seq=nnn" appended. (nnn is time in seconds)
   def cache_bust_url(path)
     "#{path}?seq=#{Time.now.nsec}"
+  end
+
+  # Render HTML to display a loading graphic - optionally with message.
+  #
+  # @param message [string] optional message to display.
+  # @return [string] rendered HTML
+  def loading_message(message = nil)
+    Crossbeams::Layout::LoadingMessage.new(caption: message, wrap_for_centre: true).render
+  end
+
+  # Render an SVG icon.
+  #
+  # @param name [symbol] the name of the icon to render.
+  # @return [string] rendered SVG.
+  def icon(name, options = {})
+    Crossbeams::Layout::Icon.new(name, options).render
   end
 end

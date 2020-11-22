@@ -52,11 +52,11 @@ module MasterfilesApp
     end
 
     def validate_variable_names(instance, var_list)
-      messages = check_variables(instance, var_list)
-      if messages.empty?
+      errs = check_variables(instance, var_list)
+      if errs.empty?
         success_response('ok')
       else
-        validation_failed_response(OpenStruct.new(messages: { base: messages }))
+        validation_failed_response(OpenStruct.new(messages: { base: errs }))
       end
     rescue Crossbeams::FrameworkError => e
       failed_response(e.message)

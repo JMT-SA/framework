@@ -7,7 +7,7 @@ module MasterfilesApp
   class OrganizationInteractor < BaseInteractor
     def create_organization(params)
       res = validate_organization_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       response = nil
       repo.transaction do
@@ -22,11 +22,13 @@ module MasterfilesApp
       end
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { short_description: ['This organization already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_organization(id, params)
       res = validate_organization_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       role_ids = attrs.delete(:role_ids)
@@ -40,6 +42,8 @@ module MasterfilesApp
       else
         validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
       end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_organization(id)
@@ -53,6 +57,10 @@ module MasterfilesApp
       else
         validation_failed_response(OpenStruct.new(messages: response[:error]))
       end
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete organization. Still referenced #{e.message.partition('referenced').last}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def assign_organization_roles(id, role_ids)

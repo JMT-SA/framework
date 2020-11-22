@@ -23,7 +23,7 @@ module PackMaterialApp
 
     def create_mr_bulk_stock_adjustment(params)
       res = validate_mr_bulk_stock_adjustment_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -42,7 +42,7 @@ module PackMaterialApp
 
     def update_mr_bulk_stock_adjustment(id, params)
       res = validate_mr_bulk_stock_adjustment_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_bulk_stock_adjustment(id, res)
@@ -182,7 +182,7 @@ module PackMaterialApp
       can_adjust_stock = TaskPermissionCheck::MrBulkStockAdjustment.call(:adjust_stock, bulk_stock_adjustment_id)
       if can_adjust_stock.success
         res = validate_stock_item_adjust_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         sku_ids = replenish_repo.sku_ids_from_numbers(params[:sku_number])
         sku_id = sku_ids[0]
@@ -221,7 +221,7 @@ module PackMaterialApp
       can_update_prices = TaskPermissionCheck::MrBulkStockAdjustmentPrice.call(:update_prices, id)
       if can_update_prices.success
         res = validate_mr_bulk_stock_adjustment_price_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         repo.transaction do
           repo.set_price_adjustment_inline(id, res)

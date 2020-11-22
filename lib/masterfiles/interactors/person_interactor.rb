@@ -4,7 +4,7 @@ module MasterfilesApp
   class PersonInteractor < BaseInteractor
     def create_person(params) # rubocop:disable Metrics/AbcSize
       res = validate_person_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       response = nil
       repo.transaction do
@@ -18,11 +18,13 @@ module MasterfilesApp
       end
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { person: ['This person already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_person(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_person_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       role_ids = attrs.delete(:role_ids)
@@ -36,6 +38,8 @@ module MasterfilesApp
       else
         validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
       end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_person(id)

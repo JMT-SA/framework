@@ -120,7 +120,7 @@ Set this to a value that uniquely identifies the data in the file. This is used 
 
 If there is no unique value (e.g. for a list of pallets), set it to a comma-separated list (e.g. pallet numbers) and the logic will apply if *any* of the elements in the list match.
 
-**NB** if there is only one value, suffix it with a comma (`['a', 'b']` => `'a,b'` -- and: `['a']` => `'a,'`).
+**NB** Use the helper function `prepare_array_for_match(array)` to convert an array to match data.
 ====
 
 ==== Variables available from the `BaseEdiInService`

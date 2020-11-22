@@ -10,7 +10,7 @@ module LabelPrintingApp
     def initialize(label_name, instance, params, host = nil)
       @label_name = label_name
       @instance = instance
-      @quantity = params[:no_of_prints] || 1
+      @quantity = params[:no_of_prints] || params[:qty_to_print] || 1
       @printer_id = params[:printer]
       @supporting_data = params[:supporting_data] || {}
       @host = host

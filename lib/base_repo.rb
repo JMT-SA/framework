@@ -14,6 +14,14 @@
 class BaseRepo # rubocop:disable Metrics/ClassLength
   include Crossbeams::Responses
 
+  # Cache the data type of all columns of all tables in the system
+  DB_TABLE_COLS = Hash[DB.tables
+                         .reject { |table| table == :schema_migrations }
+                         .map { |t| [t, Hash[DB.schema(t).map { |f, s| [f, s[:type]] }]] }] # rubocop:disable Style/HashTransformValues
+  DB_AUDIT_COLS = Hash[DB.tables(schema: :audit)
+                         .reject { |table| table == :schema_migrations }
+                         .map { |t| [t, Hash[DB.schema(t, schema: :audit).map { |f, s| [f, s[:type]] }]] }] # rubocop:disable Style/HashTransformValues
+
   # Wraps Sequel's transaction so that it is not exposed to calling code.
   #
   # @param block [Block] the work to take place within the transaction.
@@ -163,7 +171,18 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param args [Hash] the where-clause conditions.
   # @return [Hash, nil] the row as a Hash.
   def where_hash(table_name, args)
-    DB[table_name].where(args).first
+    hash = DB[table_name].where(args).first
+    return nil if hash.nil?
+
+    hash.each do |k, v|
+      case hash[k]
+      when Sequel::Postgres::JSONBHash
+        hash[k] = v.to_h
+      when Sequel::Postgres::PGArray
+        hash[k] = v.to_a
+      end
+    end
+    hash
   end
 
   # Checks to see if a row exists that meets the given requirements.
@@ -238,7 +257,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param attrs [Hash, OpenStruct] the fields and their values.
   # @return [Integer] the id of the new record.
   def create(table_name, attrs)
-    DB[table_name].insert(attrs.to_h)
+    DB[table_name].insert(prepare_values_for_db(table_name, attrs))
   end
 
   # Update a record.
@@ -247,7 +266,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param id [Integer] the id of the record.
   # @param attrs [Hash, OpenStruct] the fields and their values.
   def update(table_name, id, attrs)
-    DB[table_name].where(id: id).update(attrs.to_h)
+    DB[table_name].where(id: id).update(prepare_values_for_db(table_name, attrs))
   end
 
   # Delete a record.
@@ -359,6 +378,44 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     return nil if args.nil?
 
     args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v, array_type: array_type) : v }
+  end
+
+  # Take the attributes to be inserted/updated on a table
+  # and convert any arrays/hashes into their appropriate
+  # database-specific types.
+  #
+  # @param table_name [Symbol, Sequel::SQL::QualifiedIdentifier] the table name (or qualified name)
+  # @param args [hash,dry validation result] the attributes to apply.
+  # @return [hash] the modified attributes suitable for the DB.
+  def prepare_values_for_db(table_name, args)
+    return nil if args.nil?
+
+    hash = args.to_h.clone
+    hash.each do |k, v|
+      case column_type(table_name, k)
+      when :integer_array
+        hash[k] = array_for_db_col(v)
+      when :string_array
+        hash[k] = array_for_db_col(v, array_type: :text)
+      when :jsonb
+        hash[k] = hash_for_jsonb_col(v)
+      end
+    end
+
+    hash
+  end
+
+  # Get the data type of a table column.
+  #
+  # @param table_name [Symbol, Sequel::SQL::QualifiedIdentifier] the table name (or qualified name)
+  # @param column [symbol] the column name
+  # @return [symbol] the column's data type
+  def column_type(table_name, column)
+    if table_name.is_a?(Symbol)
+      DB_TABLE_COLS[table_name][column]
+    else
+      DB_AUDIT_COLS[table_name.table][column]
+    end
   end
 
   # Helper to convert rows of records to a Hash that can be used for optgroups in a select.
@@ -513,9 +570,9 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     dataset.select(value_name).map { |rec| rec[value_name] }
   end
 
-  def select_two(dataset, label_name, value_name)
+  def select_two(dataset, label_name, value_name, separator)
     if label_name.is_a?(Array)
-      dataset.select(*label_name, value_name).map { |rec| [label_name.map { |nm| rec[nm] }.join(' - '), rec[value_name]] }
+      dataset.select(*label_name, value_name).map { |rec| [label_name.map { |nm| rec[nm] }.join(separator || ' - '), rec[value_name]] }
     else
       dataset.select(label_name, value_name).map { |rec| [rec[label_name], rec[value_name]] }
     end
@@ -531,6 +588,8 @@ module MethodBuilder
   # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
   # label: String or Array
   # - The display column. Defaults to the value column. If an Array, will display each column separated by ' - '
+  # label_separator: String
+  # - for Array labels, the string between columns (defaults to ' - ')
   # value: String
   # - The value column. Required.
   # order_by: String
@@ -567,7 +626,7 @@ module MethodBuilder
       end
       lbl = options[:label] || options[:value]
       val = options[:value]
-      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)
+      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val, options[:label_separator])
     end
   end
 
@@ -586,7 +645,7 @@ module MethodBuilder
       dataset = DB[table_name].exclude(:active)
       lbl = options[:label] || options[:value]
       val = options[:value]
-      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)
+      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val, options[:label_separator])
     end
   end
 

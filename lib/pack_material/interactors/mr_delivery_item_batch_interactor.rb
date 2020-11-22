@@ -7,7 +7,7 @@ module PackMaterialApp
       can_create = TaskPermissionCheck::MrDeliveryItemBatch.call(:create, delivery_item_id: parent_id)
       if can_create.success
         res = validate_mr_delivery_item_batch_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         id = nil
         repo.transaction do
@@ -28,7 +28,7 @@ module PackMaterialApp
       can_update = TaskPermissionCheck::MrDeliveryItemBatch.call(:update, id)
       if can_update.success
         res = validate_mr_delivery_item_batch_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         repo.transaction do
           repo.update_mr_delivery_item_batch(id, res)
@@ -66,9 +66,9 @@ module PackMaterialApp
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, instance, options)
     end
 
-    def resolve_print_sku_barcode_params(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def resolve_print_sku_barcode_params(params) # rubocop:disable Metrics/AbcSize
       res = validate_print_sku_barcode_params(params)
-      return nil unless res.messages.empty?
+      return nil if res.failure?
 
       id = params[:mr_delivery_item_batch_id] || params[:mr_delivery_item_id] || params[:mr_sku_id]
       type = nil

@@ -32,7 +32,7 @@ module MasterfilesApp
       x = interactor.send(:validate_person_params, prsn_attrs_without_surname)
       refute_empty x.errors
       expected = { surname: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:first_name).filled(:str?)
       prsn_attrs_without_first_name = person_attrs.reject { |k, _| k == :first_name }
@@ -44,7 +44,7 @@ module MasterfilesApp
       x = interactor.send(:validate_person_params, prsn_attrs_without_first_name)
       refute_empty x.errors
       expected = { first_name: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:title).filled(:str?)
       prsn_attrs_without_title = person_attrs.reject { |k, _| k == :title }
@@ -56,7 +56,7 @@ module MasterfilesApp
       x = interactor.send(:validate_person_params, prsn_attrs_without_title)
       refute_empty x.errors
       expected = { title: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:vat_number).maybe(:str?)
       prsn_attrs_without_vat_number = person_attrs.reject { |k, _| k == :vat_number }
@@ -69,7 +69,7 @@ module MasterfilesApp
       prsn_attrs_without_vat_number[:vat_number] = 1
       x = interactor.send(:validate_person_params, prsn_attrs_without_vat_number)
       expected = { vat_number: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:role_ids).each(:int?)
       prsn_attrs_without_role_ids = person_attrs.reject { |k, _| k == :role_ids }
@@ -80,7 +80,7 @@ module MasterfilesApp
       x = interactor.send(:validate_person_params, prsn_attrs_without_role_ids)
       refute_empty x.errors
       expected = { role_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
     end
 
     def test_create_person
@@ -124,7 +124,7 @@ module MasterfilesApp
       PersonInteractor.any_instance.stubs(:assign_person_roles).returns(failed_response)
       x = interactor.update_person(1, update_attrs)
       expected = interactor.validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
-      assert_equal(expected, x)
+      assert_equal(expected.errors, x.errors)
     end
 
     def test_delete_person

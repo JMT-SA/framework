@@ -12,7 +12,7 @@ class Framework < Roda
   include DataminerHelpers
   include RmdHelpers
 
-  use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
+  use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session', same_site: :lax
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
   use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb' # , session: request.session
 
@@ -49,7 +49,7 @@ class Framework < Roda
   plugin :json_parser
   plugin :message_bus
   plugin :status_handler
-  plugin :cookies, path: '/'
+  plugin :cookies, path: '/', same_site: :lax
   plugin :rodauth do
     db DB
     enable :login, :logout # , :change_password
@@ -61,7 +61,7 @@ class Framework < Roda
     login_column :login_name
     accounts_table :vw_active_users # Only active users can login.
     account_password_hash_column :password_hash
-    template_opts(layout_opts: { path: 'views/layout_auth.erb' })
+    template_opts(layout_opts: { path: File.join(ENV['ROOT'], 'views/layout_auth.erb') })
     after_login do
       # On successful login, see if the user had given a specific path that required the login and redirect to it.
       path = request.cookies['pre_login_path']
@@ -307,10 +307,10 @@ class Framework < Roda
                                      :rackmid,
                                      :datagrid,
                                      :ag_grid,
+                                     :jasper,
                                      :choices,
                                      :sortable,
                                      :konva,
-                                     :lodash,
                                      :multi,
                                      :sweetalert)
       @layout = Crossbeams::Layout::Page.build do |page, _|

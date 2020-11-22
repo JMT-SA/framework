@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MaterialResourceProductVariantPartyRoleSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:material_resource_product_variant_id, :integer).filled(:int?)
-    required(:supplier_id, :integer).maybe(:int?)
-    required(:customer_id, :integer).maybe(:int?)
-    required(:party_stock_code, Types::StrippedString).maybe(:str?)
-    required(:supplier_lead_time, :integer).maybe(:int?)
-    required(:is_preferred_supplier, :bool).maybe(:bool?)
+  MaterialResourceProductVariantPartyRoleSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:material_resource_product_variant_id).filled(:integer)
+    required(:supplier_id).maybe(:integer)
+    required(:customer_id).maybe(:integer)
+    required(:party_stock_code).maybe(Types::StrippedString)
+    required(:supplier_lead_time).maybe(:integer)
+    required(:is_preferred_supplier).maybe(:bool)
   end
 end

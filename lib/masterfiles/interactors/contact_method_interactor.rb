@@ -4,7 +4,7 @@ module MasterfilesApp
   class ContactMethodInteractor < BaseInteractor
     def create_contact_method(params)
       res = validate_contact_method_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_contact_method(res)
       instance = contact_method(id)
@@ -16,7 +16,7 @@ module MasterfilesApp
 
     def update_contact_method(id, params)
       res = validate_contact_method_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_contact_method(id, res)
       instance = contact_method(id)

@@ -7,7 +7,7 @@ module MasterfilesApp
   class TargetMarketInteractor < BaseInteractor
     def create_tm_group_type(params)
       res = validate_tm_group_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -21,7 +21,7 @@ module MasterfilesApp
 
     def update_tm_group_type(id, params)
       res = validate_tm_group_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_tm_group_type(id, res)
@@ -41,7 +41,7 @@ module MasterfilesApp
 
     def create_tm_group(params)
       res = validate_tm_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -56,7 +56,7 @@ module MasterfilesApp
 
     def update_tm_group(id, params)
       res = validate_tm_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_tm_group(id, res)
@@ -75,7 +75,7 @@ module MasterfilesApp
 
     def create_target_market(params)
       res = validate_target_market_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = res.to_h
       country_ids = res.delete(:country_ids)
@@ -95,7 +95,7 @@ module MasterfilesApp
 
     def update_target_market(id, params)
       res = validate_target_market_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = res.to_h
       country_ids = res.delete(:country_ids)

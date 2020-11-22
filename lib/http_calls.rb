@@ -163,11 +163,13 @@ module Crossbeams
       [uri, http]
     end
 
-    def format_response(response, context)
+    def format_response(response, context) # rubocop:disable Metrics/AbcSize
       return @responder.format_response(response, context) if @responder
 
       if response.code == '200'
         success_response(response.code, response)
+      elsif response.code == '429'
+        failed_response("The destination server has received too many requests at this time. (quota exceeded) The response code is #{response.code}", response.code)
       else
         msg = response.code.start_with?('5') ? 'The destination server encountered an error.' : 'The request was not successful.'
         send_error_email(response, context)

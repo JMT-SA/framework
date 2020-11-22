@@ -4,7 +4,7 @@ module MasterfilesApp
   class CultivarInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_cultivar_group(params)
       res = validate_cultivar_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_cultivar_group(res)
       instance = cultivar_group(id)
@@ -15,7 +15,7 @@ module MasterfilesApp
 
     def update_cultivar_group(id, params)
       res = validate_cultivar_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_cultivar_group(id, res)
       instance = cultivar_group(id)
@@ -37,7 +37,7 @@ module MasterfilesApp
 
     def create_cultivar(params)
       res = validate_cultivar_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_cultivar(res)
       instance = cultivar(id)
@@ -48,13 +48,10 @@ module MasterfilesApp
 
     def update_cultivar(id, params)
       res = validate_cultivar_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_cultivar(id, res)
       instance = cultivar(id)
-      # comm_repo = MasterfilesApp::CommodityRepo.new
-      # commodity_code = comm_repo.find_commodity(instance.commodity_id)&.code
-      # success_response("Updated cultivar #{cultivar.cultivar_name}", instance.to_h.merge(commodity_code: commodity_code))
       success_response("Updated cultivar #{instance.cultivar_name}", instance)
     end
 
@@ -66,7 +63,7 @@ module MasterfilesApp
 
     def create_marketing_variety(cultivar_id, params)
       res = validate_marketing_variety_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_marketing_variety(cultivar_id, res)
       instance = marketing_variety(id)
@@ -77,7 +74,7 @@ module MasterfilesApp
 
     def update_marketing_variety(id, params)
       res = validate_marketing_variety_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_marketing_variety(id, res)
       instance = marketing_variety(id)

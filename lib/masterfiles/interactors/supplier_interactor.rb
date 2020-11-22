@@ -7,7 +7,7 @@ module MasterfilesApp
   class SupplierInteractor < BaseInteractor
     def create_supplier(params)
       res = validate_new_supplier_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       result = nil
       repo.transaction do
@@ -26,7 +26,7 @@ module MasterfilesApp
 
     def update_supplier(id, params)
       res = validate_edit_supplier_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       result = nil
       repo.transaction do

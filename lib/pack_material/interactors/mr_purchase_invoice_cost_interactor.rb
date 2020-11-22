@@ -17,7 +17,7 @@ module PackMaterialApp
     def create_mr_purchase_invoice_cost(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_delivery_id] = parent_id
       res = validate_mr_purchase_invoice_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -35,7 +35,7 @@ module PackMaterialApp
 
     def update_mr_purchase_invoice_cost(id, params)
       res = validate_mr_purchase_invoice_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_purchase_invoice_cost(id, res)

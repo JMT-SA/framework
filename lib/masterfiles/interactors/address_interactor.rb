@@ -4,7 +4,7 @@ module MasterfilesApp
   class AddressInteractor < BaseInteractor
     def create_address(params)
       res = validate_address_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_address(res)
       instance = address(id)
@@ -16,7 +16,7 @@ module MasterfilesApp
     def update_address(id, params)
       @address_id = id
       res = validate_address_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_address(id, res)
       instance = address(id)

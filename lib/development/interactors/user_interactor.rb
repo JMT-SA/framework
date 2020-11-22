@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module DevelopmentApp
-  class UserInteractor < BaseInteractor
+  class UserInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def prepare_password(user_validation)
       new_user = user_validation.to_h
       new_user[:password_hash] = BCrypt::Password.create(new_user.delete(:password))
@@ -14,7 +11,8 @@ module DevelopmentApp
 
     def create_user(params)
       res = validate_new_user_params(params)
-      return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+      # return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_user(prepare_password(res))
       instance = user(id)
@@ -26,7 +24,7 @@ module DevelopmentApp
 
     def update_user(id, params)
       res = validate_user_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure? # if res.failure?
 
       repo.update_user(id, res)
       instance = user(id)
@@ -44,7 +42,8 @@ module DevelopmentApp
       return invalid_password unless matching_password?(id, params[:old_password])
 
       res = validate_change_user_params(params)
-      return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+      # return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.save_new_password(id, params[:password])
@@ -57,7 +56,8 @@ module DevelopmentApp
     def set_user_password(id, params)
       # Force the user's password to the new value.
       res = validate_change_password(params)
-      return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+      # return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.save_new_password(id, params[:password])
@@ -69,7 +69,7 @@ module DevelopmentApp
 
     def set_user_permissions(id, ids, params)
       res = validate_user_permission(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = repo.update_user_permission(ids, res.to_h[:security_group_id])
       success_response("Updated permissions for #{user(id).user_name}",
@@ -98,22 +98,22 @@ module DevelopmentApp
       validation_failed_response(OpenStruct.new(messages: { old_password: ['Incorrect password'] }))
     end
 
-    def hide_passwords_in_validation_errors(res)
-      new_res = res.to_h
-      new_res[:messages] = {}
-      res.errors.each do |e, m|
-        new_res[:messages][e] = m.map do |t|
-          if t.start_with?('must not be equal')
-            'cannot be the same as the old password'
-          elsif t.start_with?('must be equal')
-            'must match the password'
-          else
-            t
-          end
-        end
-      end
-      OpenStruct.new(new_res)
-    end
+    # def hide_passwords_in_validation_errors(res)
+    #   new_res = res.to_h
+    #   new_res[:messages] = {}
+    #   res.errors.to_h.each do |e, m|
+    #     new_res[:messages][e] = m.map do |t|
+    #       if t.start_with?('must not be equal')
+    #         'cannot be the same as the old password'
+    #       elsif t.start_with?('must be equal')
+    #         'must match the password'
+    #       else
+    #         t
+    #       end
+    #     end
+    #   end
+    #   OpenStruct.new(new_res)
+    # end
 
     def matching_password?(id, password)
       hs = repo.find_hash(:users, id)
@@ -133,7 +133,9 @@ module DevelopmentApp
     end
 
     def validate_new_user_params(params)
-      UserNewSchema.call(params)
+      # UserNewSchema.call(params)
+      contract = UserNewContract.new
+      contract.call(params)
     end
 
     def validate_user_params(params)
@@ -141,13 +143,15 @@ module DevelopmentApp
     end
 
     def validate_change_user_params(params)
-      UserChangeSchema.call(params)
+      # UserChangeSchema.call(params)
+      contract = UserChangeContract.new
+      contract.call(params)
     end
 
     def validate_change_password(params)
-      UserPasswordSchema.call(params)
+      # UserPasswordSchema.call(params)
+      contract = UserPasswordContract.new
+      contract.call(params)
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

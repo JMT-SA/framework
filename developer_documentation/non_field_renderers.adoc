@@ -19,6 +19,7 @@ The following renderers that do not bind to fields in a form are available:
 * <<Diff>>
 * <<ProgressStep>>
 * <<RepeatingRequest>>
+* <<LoadingMessage>>
 * <<Notice>>
 * <<ExpandCollapseFoldUps>>
 
@@ -536,6 +537,21 @@ end
 |Boolean - `true` or `false`.
 |`false`
 
+|max_pane_width
+|Max width in pixels for each pane. If set and the differences render wider than the max, horizontal scrollbars will show.
+|Boolean - `true` or `false`.
+|`false`
+
+|unnest_records
+|For nested hashes, show ancestor keys on each line. Both hashes are sorted by their keys if `:sort_nested` is `true`.
+|Boolean - `true` or `false`.
+|`false`
+
+|sort_nested
+|For nested hashes, sort hashes by their keys.
+|Boolean - `true` or `false`.
+|`true`
+
 |===
 
 === ProgressStep
@@ -599,7 +615,7 @@ Render a div and attach a url to it to be called periodically.
 e.g.
 [source,ruby]
 ----
-section.add_repeatable_request('/path/to/action', 1000, '<p>Some content</p>')
+section.add_repeating_request('/path/to/action', 1000, '<p>Some content</p>')
 ----
 
 |===
@@ -644,6 +660,78 @@ Optional: to change the state of a step in a ProgressStep control to finalised, 
 { updateMessage: { content: 'New content', finaliseProgressStep: 'cbl-current-step' } }.to_json
 ----
 NOTE: `continuePolling` can be set to false or can be omitted to stop the repeats.
+
+=== LoadingMessage
+
+This control renders an animated glyph to show that something is in the process of being loaded.
+
+NOTE: This will usually be rendered as part of some other markup, so there is also a helper method: `UtilityFunctions.loading_message`.
+
+e.g.
+[source,ruby]
+----
+section.add_text UtilityFunctions.loading_message('Fetching results')
+
+# OR
+
+section.add_text Crossbeams::Layout::LoadingMessage.new(caption: 'Fetching results').render
+----
+
+|===
+|attribute |description |possible values |default
+
+|options - :caption
+|Text to display alongside the glyph
+|String
+|`nil`
+
+|options - :dom_id
+|A DOM id to identify the rendered div,
+|String
+|None
+
+|options - :wrap_for_centre
+|If true, the caption will render inside a paragraph which will align more-or-less with the glyph.
+|Boolean
+|`false`
+
+|===
+
+=== Icon
+
+This control renders an SVG icon.
+
+NOTE: This will usually be rendered as part of some other markup, so there is also a helper method: `UtilityFunctions.icon`.
+
+e.g.
+[source,ruby]
+----
+section.add_text UtilityFunctions.icon(:copy)
+
+# OR
+
+section.add_text Crossbeams::Layout::Icon.new(:copy).render
+----
+
+|===
+|attribute |description |possible values |default
+
+|name
+|The icon to be displayed.
+|`Symbol`. Must match one of the possible link:/development/layout_icons[values].
+|None. Required.
+
+|options - :css_class
+|Space-separated list of CSS classes
+|String
+|`nil`
+
+|options - :attrs
+|DOM attributes
+|Array
+|`[]`
+
+|===
 
 === Notice
 

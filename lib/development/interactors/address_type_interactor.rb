@@ -16,7 +16,7 @@ module DevelopmentApp
 
     def create_address_type(params)
       res = validate_address_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -30,7 +30,7 @@ module DevelopmentApp
 
     def update_address_type(id, params)
       res = validate_address_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_address_type(id, res)

@@ -4,7 +4,7 @@ module PackMaterialApp
   class SalesReturnCostInteractor < BaseInteractor
     def create_sales_return_cost(parent_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_sales_return_cost_params(params.merge(mr_sales_return_id: parent_id))
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module PackMaterialApp
 
     def update_sales_return_cost(id, params)
       res = validate_sales_return_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_sales_return_cost(id, res)

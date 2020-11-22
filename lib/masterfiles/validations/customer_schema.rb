@@ -1,20 +1,16 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  NewCustomerSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:party_id, :integer).filled(:int?)
-    required(:customer_type_ids, Types::IntArray).filled { each(:int?) }
-    required(:erp_customer_number, Types::StrippedString).maybe(:str?)
+  NewCustomerSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:party_id).filled(:integer)
+    required(:customer_type_ids).filled(:array).each(:integer)
+    required(:erp_customer_number).maybe(Types::StrippedString)
   end
 
-  EditCustomerSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:customer_type_ids, Types::IntArray).filled { each(:int?) }
-    required(:erp_customer_number, Types::StrippedString).maybe(:str?)
+  EditCustomerSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:customer_type_ids).filled(:array).each(:integer)
+    required(:erp_customer_number).maybe(Types::StrippedString)
   end
 end

@@ -45,7 +45,7 @@ module MasterfilesApp
       x = interactor.send(:validate_organization_params, org_attrs_without_short_description)
       refute_empty x.errors
       expected = { short_description: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:medium_description).maybe(:str?)
       org_attrs_without_medium_description = organization_attrs.reject { |k, _| k == :medium_description }
@@ -58,7 +58,7 @@ module MasterfilesApp
       org_attrs_without_medium_description[:medium_description] = 1
       x = interactor.send(:validate_organization_params, org_attrs_without_medium_description)
       expected = { medium_description: ['must be a string'] }
-      assert_equal(x.errors, expected)
+      assert_equal(x.errors.to_h, expected)
 
       # required(:long_description).maybe(:str?)
       org_attrs_without_long_description = organization_attrs.reject { |k, _| k == :long_description }
@@ -71,7 +71,7 @@ module MasterfilesApp
       org_attrs_without_long_description[:long_description] = 1
       x = interactor.send(:validate_organization_params, org_attrs_without_long_description)
       expected = { long_description: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:vat_number).maybe(:str?)
       org_attrs_without_vat_number = organization_attrs.reject { |k, _| k == :vat_number }
@@ -84,7 +84,7 @@ module MasterfilesApp
       org_attrs_without_vat_number[:vat_number] = 1
       x = interactor.send(:validate_organization_params, org_attrs_without_vat_number)
       expected = { vat_number: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:role_ids).each(:int?)
       org_attrs_without_role_ids = organization_attrs.reject { |k, _| k == :role_ids }
@@ -95,7 +95,7 @@ module MasterfilesApp
       x = interactor.send(:validate_organization_params, org_attrs_without_role_ids)
       refute_empty x.errors
       expected = { role_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # OrganizationSchema = Dry::Validation.Params do
       #   # required(:party_id).filled(:int?)

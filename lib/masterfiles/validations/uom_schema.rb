@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  UomSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:uom_type_id, :integer).filled(:int?)
-    required(:uom_code, Types::StrippedString).filled(:str?)
+  UomSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:uom_type_id).filled(:integer)
+    required(:uom_code).filled(Types::StrippedString)
   end
 end

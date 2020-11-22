@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  PersonSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:surname, Types::StrippedString).filled(:str?)
-    required(:first_name, Types::StrippedString).filled(:str?)
-    required(:title, Types::StrippedString).filled(:str?)
-    required(:vat_number, Types::StrippedString).maybe(:str?)
-    required(:role_ids, Types::IntArray).filled { each(:int?) }
-    # required(:active, :bool).filled(:bool?)
+  PersonSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:surname).filled(Types::StrippedString)
+    required(:first_name).filled(Types::StrippedString)
+    required(:title).filled(Types::StrippedString)
+    required(:vat_number).maybe(Types::StrippedString)
+    required(:role_ids).filled(:array).each(:integer)
+    # required(:active).filled(:bool)
   end
 end

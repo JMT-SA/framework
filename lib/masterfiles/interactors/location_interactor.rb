@@ -6,7 +6,7 @@ module MasterfilesApp
   class LocationInteractor < BaseInteractor
     def create_location_type(params)
       res = validate_location_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -21,7 +21,7 @@ module MasterfilesApp
 
     def update_location_type(id, params)
       res = validate_location_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_location_type(id, res)
@@ -42,7 +42,7 @@ module MasterfilesApp
 
     def create_root_location(params) # rubocop:disable Metrics/AbcSize
       res = validate_location_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -59,7 +59,7 @@ module MasterfilesApp
 
     def create_location(parent_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_location_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -76,7 +76,7 @@ module MasterfilesApp
 
     def update_location(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_location_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_location(id, res)
@@ -101,7 +101,7 @@ module MasterfilesApp
 
     def create_location_assignment(params)
       res = validate_location_assignment_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -116,7 +116,7 @@ module MasterfilesApp
 
     def update_location_assignment(id, params)
       res = validate_location_assignment_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_location_assignment(id, res)
@@ -137,7 +137,7 @@ module MasterfilesApp
 
     def create_location_storage_type(params)
       res = validate_location_storage_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -152,7 +152,7 @@ module MasterfilesApp
 
     def update_location_storage_type(id, params)
       res = validate_location_storage_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_location_storage_type(id, res)

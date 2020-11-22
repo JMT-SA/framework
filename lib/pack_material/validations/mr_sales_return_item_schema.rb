@@ -1,41 +1,34 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MrSalesReturnItemSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:mr_sales_return_id, :integer).filled(:int?)
-    required(:mr_sales_order_item_id, :integer).filled(:int?)
-    optional(:remarks, Types::StrippedString).maybe(:str?)
-    optional(:quantity_returned, %i[nil decimal]).maybe(:decimal?)
+  MrSalesReturnItemSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:mr_sales_return_id).filled(:integer)
+    required(:mr_sales_order_item_id).filled(:integer)
+    optional(:remarks).maybe(Types::StrippedString)
+    # optional(:quantity_returned).maybe(%i[nil decimal])
+    optional(:quantity_returned).maybe(:decimal)
   end
 
-  MrSalesReturnItemInlineQuantitySchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:column_name, Types::StrippedString).filled(:str?)
-    required(:column_value, :decimal).maybe(:decimal?, gt?: 0)
+  MrSalesReturnItemInlineQuantitySchema = Dry::Schema.Params do
+    required(:column_name).filled(Types::StrippedString)
+    required(:column_value).maybe(:decimal, gt?: 0)
   end
 
-  MrSalesReturnItemInlineRemarksSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:column_name, Types::StrippedString).filled(:str?)
-    required(:column_value, Types::StrippedString).maybe(:str?)
+  MrSalesReturnItemInlineRemarksSchema = Dry::Schema.Params do
+    required(:column_name).filled(Types::StrippedString)
+    required(:column_value).maybe(Types::StrippedString)
   end
 
-  MrSalesReturnItemPrintSKUBarcodeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:mr_sales_return_item_id, :integer).filled(:int?)
-    required(:sales_return_number, :integer).filled(:int?)
-    required(:sku_id, :integer).filled(:int?)
-    required(:sku_number, :integer).filled(:int?)
-    required(:product_variant_code, Types::StrippedString).maybe(:str?)
-    required(:product_variant_number, Types::StrippedString).maybe(:str?)
-    required(:batch_number, Types::StrippedString).maybe(:str?)
-    required(:printer, :integer).filled(:int?)
-    required(:no_of_prints, :integer).filled(:int?, gt?: 0)
+  MrSalesReturnItemPrintSKUBarcodeSchema = Dry::Schema.Params do
+    required(:mr_sales_return_item_id).filled(:integer)
+    required(:sales_return_number).filled(:integer)
+    required(:sku_id).filled(:integer)
+    required(:sku_number).filled(:integer)
+    required(:product_variant_code).maybe(Types::StrippedString)
+    required(:product_variant_number).maybe(Types::StrippedString)
+    required(:batch_number).maybe(Types::StrippedString)
+    required(:printer).filled(:integer)
+    required(:no_of_prints).filled(:integer, gt?: 0)
   end
 end

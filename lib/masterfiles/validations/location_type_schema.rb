@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  LocationTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:location_type_code, Types::StrippedString).filled(:str?)
-    required(:short_code, Types::StrippedString).filled(:str?)
-    required(:can_be_moved, :bool).filled(:bool?)
+  LocationTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:location_type_code).filled(Types::StrippedString)
+    required(:short_code).filled(Types::StrippedString)
+    required(:can_be_moved).filled(:bool)
   end
 end

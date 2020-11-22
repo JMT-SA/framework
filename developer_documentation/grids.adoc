@@ -186,6 +186,9 @@ Every time an editable cell is changed, a URL will be called with the row id, th
     role:
       :editor: :select
       :value_sql: SELECT code FROM roles # <9>
+    company:
+      :editor: :search_select            # <10>
+      :value_sql: SELECT company FROM companies
 ----
 <1> This is required. The url should include `$:id$` which will be replaced with the row's id value.
 <2> This is required. `editable_fields` is a Hash of column names with options for editing.
@@ -196,6 +199,7 @@ Every time an editable cell is changed, a URL will be called with the row id, th
 <7> `width` is in pixels for setting the width of items. Optional -- the default value is 200.
 <8> `values` is an array of values.
 <9> `value_sql` must be a SELECT query. The first column of every row forms the select's options. The query can include parameters from the page (when the list url is a `with_params` type) in the form `$:param_name$`.
+<10> The search_select editor is specified **exactly** like a `select` editor. This editor allows the user to filter the select options. Only use it when you know that there can be many select options.
 
 NOTE: The field name keys for `editable_fields` are Strings, not Symbols, so they do not get a `:` in front.
 

@@ -14,9 +14,9 @@ module PackMaterialApp
       MrDeliveryTermSchema.call(params)
     end
 
-    def create_mr_delivery_term(params) # rubocop:disable Metrics/AbcSize
+    def create_mr_delivery_term(params)
       res = validate_mr_delivery_term_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -33,7 +33,7 @@ module PackMaterialApp
 
     def update_mr_delivery_term(id, params)
       res = validate_mr_delivery_term_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_delivery_term(id, res)

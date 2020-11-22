@@ -4,7 +4,8 @@ require File.join(File.expand_path('./../', __FILE__), 'test_helper')
 
 class TestUserPemissions < MiniTest::Test
   class EntityData < Dry::Struct
-    attribute :permission_tree, Types::JSON::Hash
+    # attribute :permission_tree, Types::JSON::Hash
+    attribute :permission_tree, Types::Hash
   end
 
   def config(key)

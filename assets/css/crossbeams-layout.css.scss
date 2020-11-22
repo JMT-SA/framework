@@ -4,6 +4,159 @@
 .brown {
   color: #a52a2a;
 }
+/* Tachyons colours for use within ag grid rows
+   - redefined here because the specificity rule
+     of the colour on its own gets clobbered
+     by the grid's built-in style.
+*/
+div.ag-row.brown {
+  color: #a52a2a;
+}
+div.ag-row.black {
+  color: #000000;
+}
+div.ag-row.washed-yellow {
+  color: #FFFF00;
+}
+div.ag-row.near-black {
+  color: #111111;
+}
+div.ag-row.dark-gray {
+  color: #333333;
+}
+div.ag-row.mid-gray {
+  color: #555555;
+}
+div.ag-row.gray {
+  color: #777777;
+}
+div.ag-row.silver {
+  color: #999999;
+}
+div.ag-row.light-silver {
+  color: #AAAAAA;
+}
+div.ag-row.moon-gray {
+  color: #CCCCCC;
+}
+div.ag-row.light-gray {
+  color: #EEEEEE;
+}
+div.ag-row.near-white {
+  color: #F4F4F4;
+}
+div.ag-row.white {
+  color: #FFFFFF;
+}
+div.ag-row.dark-red {
+  color: #E7040F;
+}
+div.ag-row.red {
+  color: #FF4136;
+}
+div.ag-row.light-red {
+  color: #FF725C;
+}
+div.ag-row.orange {
+  color: #FF6300;
+}
+div.ag-row.gold {
+  color: #FFB700;
+}
+div.ag-row.yellow {
+  color: #FFD700;
+}
+div.ag-row.light-yellow {
+  color: #FBF1A9;
+}
+div.ag-row.purple {
+  color: #5E2CA5;
+}
+div.ag-row.light-purple {
+  color: #A463F2;
+}
+div.ag-row.dark-pink {
+  color: #D5008F;
+}
+div.ag-row.hot-pink {
+  color: #FF41B4;
+}
+div.ag-row.pink {
+  color: #FF80CC;
+}
+div.ag-row.light-pink {
+  color: #FFA3D7;
+}
+div.ag-row.dark-green {
+  color: #137752;
+}
+div.ag-row.green {
+  color: #19A974;
+}
+div.ag-row.light-green {
+  color: #9EEBCF;
+}
+div.ag-row.navy {
+  color: #001B44;
+}
+div.ag-row.dark-blue {
+  color: #00449E;
+}
+div.ag-row.blue {
+  color: #357EDD;
+}
+div.ag-row.light-blue {
+  color: #96CCFF;
+}
+div.ag-row.lightest-blue {
+  color: #CDECFF;
+}
+div.ag-row.washed-blue {
+  color: #F6FFFE;
+}
+div.ag-row.washed-green {
+  color: #E8FDF5;
+}
+div.ag-row.washed-yellow {
+  color: #FFFCEB;
+}
+div.ag-row.washed-red {
+  color: #FFDFDF;
+}
+
+// Popup editor:
+div.ag-editor-popup {
+  max-height: 20em;
+  overflow-y: scroll;
+  background-color: #f5f7f7;
+  display: flex;
+  flex-direction: column;
+}
+div.ag-editor-popup input {
+  flex-grow: 1;
+}
+div.ag-editor-popup ul li {
+  padding: 0.1em 0.5em;
+  font-size: 1.2em;
+  min-height: 1.2em;
+}
+div.ag-editor-popup li.selected {
+  background-color: #b7e4ff;
+}
+div.ag-editor-popup li:hover {
+  background-color: #d6d6e0;
+}
+div.ag-editor-popup ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Override AG-Grid z-index for popups so that they are foreward enough in grids inside dialogs */
+.ag-theme-balham .ag-popup-child {
+  z-index: 30 !important;
+}
+
 /* Force editable grid column to render when in modal */
 .ag-theme-balham .ag-popup-editor {
   z-index: 30 !important;

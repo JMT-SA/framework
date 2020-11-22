@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 module SecurityApp
-  ProgramFunctionSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:program_function_name, Types::StrippedString).filled(:str?)
-    required(:url, Types::StrippedString).filled(:str?)
-    required(:program_function_sequence, :integer).filled(:int?, gt?: 0)
-    required(:group_name, Types::StrippedString).maybe(:str?)
-    required(:restricted_user_access, :bool).filled(:bool?)
-    required(:active, :bool).filled(:bool?)
-    optional(:show_in_iframe, :bool).filled(:bool?)
-    optional(:program_id, :integer).filled(:int?)
+  ProgramFunctionSchema = Dry::Schema.Params do
+    required(:program_function_name).filled(Types::StrippedString)
+    required(:url).filled(Types::StrippedString)
+    required(:program_function_sequence).filled(:integer, gt?: 0)
+    required(:group_name).maybe(Types::StrippedString)
+    required(:restricted_user_access).filled(:bool)
+    required(:active).filled(:bool)
+    optional(:show_in_iframe).filled(:bool)
+    optional(:program_id).filled(:integer)
   end
 end

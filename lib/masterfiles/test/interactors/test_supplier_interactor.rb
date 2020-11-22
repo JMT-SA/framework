@@ -81,7 +81,7 @@ module MasterfilesApp
       x = interactor.send(:validate_new_supplier_params, attrs_without_supplier_type_ids)
       refute_empty x.errors
       expected = { supplier_type_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:erp_supplier_number).maybe(:str?)
       attrs_without_erp_supplier_number = attrs.reject { |k, _| k == :erp_supplier_number }
@@ -94,7 +94,7 @@ module MasterfilesApp
       attrs_without_erp_supplier_number[:erp_supplier_number] = 1
       x = interactor.send(:validate_new_supplier_params, attrs_without_erp_supplier_number)
       expected = { erp_supplier_number: ['must be a string'] }
-      assert_equal(x.errors, expected)
+      assert_equal(x.errors.to_h, expected)
     end
 
     def test_validate_edit_supplier_params
@@ -117,7 +117,7 @@ module MasterfilesApp
       x = interactor.send(:validate_edit_supplier_params, attrs_without_supplier_type_ids)
       refute_empty x.errors
       expected = { supplier_type_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:erp_supplier_number).maybe(:str?)
       attrs_without_erp_supplier_number = attrs.reject { |k, _| k == :erp_supplier_number }
@@ -130,7 +130,7 @@ module MasterfilesApp
       attrs_without_erp_supplier_number[:erp_supplier_number] = 1
       x = interactor.send(:validate_edit_supplier_params, attrs_without_erp_supplier_number)
       expected = { erp_supplier_number: ['must be a string'] }
-      assert_equal(x.errors, expected)
+      assert_equal(x.errors.to_h, expected)
     end
 
     def supplier_attrs

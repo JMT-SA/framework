@@ -125,27 +125,31 @@ const crossbeamsGridFormatters = {
         return { key: `${prefix}${key}`, name: item.text, value: '---' };
       }
       return null;
-    } else if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
+    }
+    if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
+    }
+    if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
+    }
+    if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
+    }
+    if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
       // No show of item
       return null;
-    } else if (item.is_submenu) {
-      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null };
+    }
+    if (item.is_submenu) {
+      node = {
+        key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null,
+      };
       item.items.forEach((subitem) => {
         subKey = crossbeamsGridFormatters.nextChar(subKey);
         subPrefix = `${prefix}${key}_`;
-        subnode = crossbeamsGridFormatters.makeContextNode(subKey,
-                                                           subPrefix,
-                                                           node.items,
-                                                           subitem, params);
+        subnode = crossbeamsGridFormatters.makeContextNode(subKey, subPrefix, node.items, subitem, params);
         if (subnode !== null) {
           node.items.push(subnode);
         }
@@ -165,7 +169,8 @@ const crossbeamsGridFormatters = {
         url += params.data[item[cmp]];
       }
     });
-    return { key: `${prefix}${key}`,
+    return {
+      key: `${prefix}${key}`,
       name: item.text,
       url,
       prompt: promptValue,
@@ -205,7 +210,7 @@ const crossbeamsGridFormatters = {
       return '';
     }
     // svg: chevron-right
-    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"/></svg></button>`;
+    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"/></svg></button>`; // eslint-disable-line max-len
   },
 
   // Return a number with thousand separator and at least 2 digits after the decimal.
@@ -235,6 +240,7 @@ const crossbeamsGridFormatters = {
   // Remove the time zone portion of a datetime column.
   dateTimeWithoutZoneFormatter: function dateTimeWithoutZoneFormatter(params) {
     if (!params.data) { return null; }
+    if (!params.value) { return null; }
 
     if (params.value === '' || params.value === null) { return ''; }
     return params.value.replace(/ \+\d\d\d\d$/, '');
@@ -258,7 +264,7 @@ const crossbeamsGridFormatters = {
 
     const icoCol = params.value.split(',');
     if (!icoCol[1]) icoCol.push('gray'); // default colour
-    if (!icoCol[2]) {                    // default indent from "level" column
+    if (!icoCol[2]) { //                 // default indent from "level" column
       if (params.data.level) {
         icoCol.push(params.data.level - 1);
       } else {
@@ -344,7 +350,11 @@ const crossbeamsGridEvents = {
     }
 
     Object.keys(changes).forEach((k) => {
-      rowNode.setDataValue(k, changes[k]);
+      if (rowNode.data[k] === undefined) {
+        crossbeamsUtils.showWarning(`Unable to update the grid properly - "${k}" is not one of the grid's columns.`);
+      } else {
+        rowNode.setDataValue(k, changes[k]);
+      }
     });
   },
 
@@ -357,7 +367,16 @@ const crossbeamsGridEvents = {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     if (gridOptions) {
-      gridOptions.api.updateRowData({ add: [row] });
+      const missing = Object.keys(row).filter(a => gridOptions.columnApi.getColumn(a) === null && a !== 'created_at' && a !== 'updated_at');
+      if (missing.length > 0) {
+        crossbeamsUtils.showWarning(`Unable to add row to the grid - columns not defined in the grid: ${missing.join(', ')}.`);
+      } else {
+        missing.forEach((col) => {
+          delete row[col];
+        });
+        const nodes = gridOptions.api.applyTransaction({ add: [row] });
+        gridOptions.api.ensureNodeVisible(nodes.add[0]);
+      }
     } else {
       crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
     }
@@ -372,7 +391,7 @@ const crossbeamsGridEvents = {
     const thisGridId = crossbeamsUtils.currentGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     const rowNode = gridOptions.api.getRowNode(id);
-    gridOptions.api.updateRowData({ remove: [rowNode] });
+    gridOptions.api.applyTransaction({ remove: [rowNode] });
   },
 
   /**
@@ -450,7 +469,7 @@ const crossbeamsGridEvents = {
               this.updateGridInPlace(gridRow.id, gridRow.changes);
             });
           } else if (data.addRowToGrid) {
-            this.addRowToGrid(data.addRowToGrid.changes);
+            this.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.atStart);
           } else if (data.actions) {
             if (data.keep_dialog_open) {
               closeDialog = false;
@@ -470,7 +489,7 @@ const crossbeamsGridEvents = {
             });
             const sortable = Array.from(dlgContent.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
             sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
-                                                     elem.dataset.sortableGroup));
+              elem.dataset.sortableGroup));
           } else {
             console.log('Not sure what to do with this:', data); // eslint-disable-line no-console
           }
@@ -670,7 +689,6 @@ const crossbeamsGridEvents = {
     btn.hidden = false;
     btn.dataset.bookmarkRowId = rowId;
 
-
     const bkmkClick = function bkmkClick() {
       const gridOptions = crossbeamsGridStore.getGrid(gridId);
       const node = gridOptions.api.getRowNode(btn.dataset.bookmarkRowId);
@@ -733,7 +751,7 @@ const crossbeamsGridEvents = {
 
       if (parms.value) {
         testStr = `${parms.value}`;
-        if (testStr.length > 12 && !isNaN(testStr) && !testStr.includes('.')) {
+        if (testStr.length > 12 && !Number.isNaN(Number(testStr)) && !testStr.includes('.')) {
           return `'${testStr}`;
         }
       }
@@ -962,7 +980,8 @@ const crossbeamsGridEvents = {
     const method = target.dataset.method;
     const caller = () => {
       document.body.innerHTML += `<form id="dynForm" action="${url}"
-        method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" /><input name="_method" type="hidden" value="${+method}" /></form>`;
+        method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" />
+        <input name="_method" type="hidden" value="${+method}" /></form>`;
       document.getElementById('dynForm').submit();
     };
 
@@ -973,10 +992,136 @@ const crossbeamsGridEvents = {
     });
     // TODO: make call via AJAX & reload grid? Or http to server to figure it out?.....
     // ALSO: disable link automatically while call is being processed...
-    event.stopPropagation();
-    event.preventDefault();
+    target.stopPropagation();
+    target.preventDefault();
   },
 };
+
+// ------------------------------
+// || SEARCHABLE SELECT EDITOR ||
+// ------------------------------
+
+// function to act as a class
+function SearchableSelectCellEditor() {}
+
+// SearchableSelectCellEditor.prototype.build = function build() {
+this.build = function build() {
+  this.eList.innerHTML = '';
+  this.filtered_params.forEach((param) => {
+    const li = document.createElement('li');
+    li.textContent = param;
+    if (param === this.selected) {
+      li.classList.add('selected');
+    }
+    this.eList.appendChild(li);
+  });
+};
+
+// gets called once before the renderer is used
+SearchableSelectCellEditor.prototype.init = (params) => {
+  this.selected = params.value;
+  this.container = document.createElement('div');
+  this.container.setAttribute('class', 'ag-editor-popup');
+  this.params = params;
+  this.filtered_params = params.values;
+  this.eInput = document.createElement('input');
+  this.eInput.placeholder = 'Filter options';
+  this.container.appendChild(this.eInput);
+  this.eList = document.createElement('ul');
+  this.container.appendChild(this.eList);
+  this.build();
+
+  const that = this;
+  this.eList.addEventListener('click', (e) => {
+    that.eList.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
+    that.selected = e.target.textContent;
+    e.target.classList.add('selected'); // remove all others...
+    that.params.stopEditing();
+  });
+
+  this.eInput.addEventListener('keyup', () => {
+    const searchTerm = that.eInput.value.toUpperCase();
+    if (searchTerm === '') {
+      that.filtered_params = that.params.values;
+    } else {
+      that.filtered_params = that.params.values.filter(item => item && item.toUpperCase().includes(searchTerm));
+    }
+    that.build();
+  });
+};
+
+// gets called once when grid ready to insert the element
+SearchableSelectCellEditor.prototype.getGui = () => this.container;
+
+// focus and select can be done after the gui is attached
+SearchableSelectCellEditor.prototype.afterGuiAttached = () => this.eInput.focus();
+
+// returns the new value after editing
+SearchableSelectCellEditor.prototype.getValue = () => this.selected;
+
+// if true, then this editor will appear in a popup
+SearchableSelectCellEditor.prototype.isPopup = () => true;
+
+// // ----------------------------------------
+// // || SEARCHABLE SELECT EDITOR - Choices ||
+// // ----------------------------------------
+//
+// // function to act as a class
+// function SearchableSelectCellEditor() {}
+//
+// // gets called once before the renderer is used
+// SearchableSelectCellEditor.prototype.init = (params) => {
+//   this.eInput = document.createElement('select');
+//   params.values.forEach((item) => {
+//     const option = document.createElement('option');
+//     option.value = item;
+//     option.text = item;
+//     if (params.value && params.value === item) {
+//       option.selected = true;
+//     }
+//     this.eInput.appendChild(option);
+//   });
+// };
+//
+// // gets called once when grid ready to insert the element
+// SearchableSelectCellEditor.prototype.getGui = () => this.eInput;
+//
+// // focus and select can be done after the gui is attached
+// SearchableSelectCellEditor.prototype.afterGuiAttached = () => {
+//   this.eChoice = new Choices(this.eInput, {
+//     searchEnabled: true,
+//     searchResultLimit: 100,
+//     removeItemButton: true,
+//     itemSelectText: '',
+//     classNames: {
+//       containerOuter: 'choices cbl-input',
+//       containerInner: 'choices__inner_cbl',
+//       highlightedState: 'is-highlighted_cbl',
+//     },
+//     shouldSort: true,
+//     searchFields: ['label'],
+//     fuseOptions: {
+//       include: 'score',
+//       threshold: 0.25,
+//     },
+//   });
+//   this.eChoice.showDropdown();
+// };
+//
+// // returns the new value after editing
+// SearchableSelectCellEditor.prototype.getValue = () => this.eChoice.getValue(true);
+//
+// // any cleanup we need to be done here
+// SearchableSelectCellEditor.prototype.destroy = () => {
+//   this.eChoice.destroy();
+// };
+//
+// // if true, then this editor will appear in a popup
+// SearchableSelectCellEditor.prototype.isPopup = () => true;
+
+// -------------------------
+// || NUMERIC CELL EDITOR ||
+// -------------------------
 
 // function to act as a class
 function NumericCellEditor() {
@@ -1051,7 +1196,7 @@ NumericCellEditor.prototype.destroy = () => {
 };
 
 // if true, then this editor will appear in a popup
-  // and we could leave this method out also, false is the default
+// and we could leave this method out also, false is the default
 NumericCellEditor.prototype.isPopup = () => true;
 
 // -------------------------------------------------------------------
@@ -1118,8 +1263,7 @@ Level2PanelCellRenderer.prototype.setupLevel2Grid = function setupLevel2Grid(l2D
 Level2PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
   const parentRecord = params.node.parent.data;
 
-  const template =
-    `<div class="full-width-panel">
+  const template = `<div class="full-width-panel">
        <div class="full-width-grid" style="height:100%"></div>
        <div class="full-width-grid-toolbar">
             <b>Functional area: </b>${parentRecord.functional_area_name}
@@ -1177,7 +1321,6 @@ Level2PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
   eDetailGrid.addEventListener('DOMMouseScroll', mouseWheelListener);
 };
 
-
 Level3PanelCellRenderer.prototype.init = function init(params) {
   // trick to convert string of html into dom object
   const eTemp = document.createElement('div');
@@ -1209,8 +1352,7 @@ Level3PanelCellRenderer.prototype.setupDetailGrid = function setupDetailGrid(l3D
 Level3PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
   const parentRecord = params.node.parent.data;
 
-  const template =
-    `<div class="full-width-panel"style="background-color: silver">
+  const template = `<div class="full-width-panel"style="background-color: silver">
        <div class="full-width-grid" style="height:100%"></div>
        <div class="full-width-grid-toolbar">
             <b>Program: </b>s${parentRecord.program_name}
@@ -1325,6 +1467,7 @@ const crossbeamsGridStaticLoader = {
             'agPopupTextCellEditor',
             'agPopupSelectCellEditor',
             'agRichSelectCellEditor',
+            'searchableSelectCellEditor',
             'agLargeTextCellEditor'].indexOf(col[attr]) > -1) {
             newCol[attr] = col[attr];
           } else {
@@ -1335,7 +1478,7 @@ const crossbeamsGridStaticLoader = {
             newCol.cellEditorParams = {
               values: col[attr].values,
               cellRenderer: function cellRenderer(params) {
-                return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`;
+                return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`; // eslint-disable-line max-len
               },
             };
           } else {
@@ -1423,52 +1566,52 @@ const crossbeamsGridStaticLoader = {
         'X-Custom-Request-Type': 'Fetch',
       }),
     })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      }
-      throw new HttpError(response);
-    })
-    .then((data) => {
-      let newColDefs = null;
-      if (data.exception) {
-        crossbeamsUtils.alert({ prompt: data.flash.error, type: 'error' });
-        if (data.backtrace) {
-          console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
-          console.info('==Backend Backtrace=='); // eslint-disable-line no-console
-          console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
-          console.groupEnd(); // eslint-disable-line no-console
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        throw new HttpError(response);
+      })
+      .then((data) => {
+        let newColDefs = null;
+        if (data.exception) {
+          crossbeamsUtils.alert({ prompt: data.flash.error, type: 'error' });
+          if (data.backtrace) {
+            console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+            console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+            console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+            console.groupEnd(); // eslint-disable-line no-console
+          }
+          return null;
+        }
+
+        if (data.nestedColumnDefs) {
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['1']);
+          midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['2']);
+          detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['3']);
+        } else {
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.columnDefs);
+        }
+        gridOptions.api.setColumnDefs(newColDefs);
+        gridOptions.api.setRowData(data.rowDefs);
+        if (!gridOptions.forPrint) {
+          crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
+            newColDefs,
+            data.fieldUpdateUrl,
+            data.extraContext);
+
+          if (data.multiselect_ids) {
+            gridOptions.api.forEachNode((node) => {
+              if (node.data && data.multiselect_ids.includes(node.data.id)) {
+                node.setSelected(true);
+              }
+            });
+          }
         }
         return null;
-      }
-
-      if (data.nestedColumnDefs) {
-        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['1']);
-        midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['2']);
-        detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['3']);
-      } else {
-        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.columnDefs);
-      }
-      gridOptions.api.setColumnDefs(newColDefs);
-      gridOptions.api.setRowData(data.rowDefs);
-      if (!gridOptions.forPrint) {
-        crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
-          newColDefs,
-          data.fieldUpdateUrl,
-          data.extraContext);
-
-        if (data.multiselect_ids) {
-          gridOptions.api.forEachNode((node) => {
-            if (node.data && data.multiselect_ids.includes(node.data.id)) {
-              node.setSelected(true);
-            }
-          });
-        }
-      }
-      return null;
-    }).catch((data) => {
-      crossbeamsUtils.fetchErrorHandler(data);
-    });
+      }).catch((data) => {
+        crossbeamsUtils.fetchErrorHandler(data);
+      });
   };
 
   const listenForGrid = function listenForGrid() {
@@ -1573,6 +1716,7 @@ const crossbeamsGridStaticLoader = {
           sortable: true,
           filter: true,
         },
+        allowDragFromColumnsToolPanel: true,
         rowSelection: 'single',
         popupParent: document.body,
         enableCharts: true,
@@ -1614,6 +1758,32 @@ const crossbeamsGridStaticLoader = {
           }
           return null;
         },
+        // getRowStyle(params) {
+        //   if (params.data) {
+        //     if (params.data.colour_rule) {
+        //       switch (params.data.colour_rule) {
+        //         case 'error':
+        //           return { color: 'red' };
+        //         case 'warning':
+        //           return { color: 'orange' };
+        //         case 'inactive':
+        //           return { color: 'gray;font-style:italic' };
+        //         case 'ready':
+        //           return { color: 'blue' };
+        //         case 'ok':
+        //           return { color: 'green' };
+        //         case 'inprogress':
+        //           return { color: 'purple' };
+        //         default:
+        //           return { color: params.data.colour_rule };
+        //       }
+        //     }
+        //     if (typeof params.data.active !== 'undefined' && !params.data.active) {
+        //       return { color: 'gray;font-style:italic' };
+        //     }
+        //   }
+        //   return null;
+        // },
         onFilterChanged() {
           if (!forPrint) {
             let filterLength = 0;
@@ -1625,6 +1795,7 @@ const crossbeamsGridStaticLoader = {
         },
         components: {
           numericCellEditor: NumericCellEditor,
+          searchableSelectCellEditor: SearchableSelectCellEditor,
           // moodEditor: MoodEditor
         },
         onCellEditingStarted(evt) {
@@ -1677,7 +1848,9 @@ const crossbeamsGridStaticLoader = {
     }
 
     // Index rows by the id column...
-    gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
+    if (grid.dataset.gridurl !== '') {
+      gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
+    }
 
     new agGrid.Grid(grid, gridOptions); // eslint-disable-line no-new
     crossbeamsGridStore.addGrid(gridId, gridOptions);
@@ -1820,7 +1993,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
                     });
                   } else if (data.addRowToGrid) {
-                    crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
+                    crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.atStart);
                   } else if (data.actions) {
                     crossbeamsUtils.processActions(data.actions);
                   } else {

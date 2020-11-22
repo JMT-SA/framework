@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MatresTypeSchema = Dry::Validation.Params do
+  MatresTypeSchema = Dry::Schema.Params do
     optional(:id).filled(:int?)
     required(:material_resource_domain_id).filled(:int?)
     required(:type_name).filled(:str?)
-    required(:short_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
+    required(:short_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
   end
 end

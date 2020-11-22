@@ -1,50 +1,42 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MrInventoryTransactionSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:mr_inventory_transaction_type_id, :integer).maybe(:int?)
-    required(:to_location_id, :integer).maybe(:int?)
-    required(:business_process_id, :integer).maybe(:int?)
-    required(:created_by, Types::StrippedString).filled(:str?)
-    required(:ref_no, Types::StrippedString).maybe(:str?)
-    required(:is_adhoc, :bool).maybe(:bool?)
+  MrInventoryTransactionSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:mr_inventory_transaction_type_id).maybe(:integer)
+    required(:to_location_id).maybe(:integer)
+    required(:business_process_id).maybe(:integer)
+    required(:created_by).filled(Types::StrippedString)
+    required(:ref_no).maybe(Types::StrippedString)
+    required(:is_adhoc).maybe(:bool)
   end
 
-  AdhocTransactionSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:sku_number, :integer).maybe(:int?)
-    required(:business_process_id, :integer).maybe(:int?)
-    required(:to_location_id, :integer).maybe(:int?)
-    optional(:vehicle_id, :integer).maybe(:int?)
-    required(:quantity, :decimal).maybe(:decimal?, gt?: 0)
-    required(:ref_no, Types::StrippedString).filled(:str?)
-    required(:is_adhoc, :bool).maybe(:bool?)
+  AdhocTransactionSchema = Dry::Schema.Params do
+    required(:sku_number).maybe(:integer)
+    required(:business_process_id).maybe(:integer)
+    required(:to_location_id).maybe(:integer)
+    optional(:vehicle_id).maybe(:integer)
+    required(:quantity).maybe(:decimal, gt?: 0)
+    required(:ref_no).filled(Types::StrippedString)
+    required(:is_adhoc).maybe(:bool)
   end
 
-  AdhocRmdMoveStockSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:sku_number, :integer).filled(:int?)
-    required(:business_process_id, :integer).filled(:int?)
-    optional(:to_location_id, :integer).filled(:int?)
-    required(:from_location_id, :integer).filled(:int?)
-    required(:quantity, :decimal).filled(:decimal?, gt?: 0)
-    required(:ref_no, Types::StrippedString).filled(:str?)
+  AdhocRmdMoveStockSchema = Dry::Schema.Params do
+    required(:sku_number).filled(:integer)
+    required(:business_process_id).filled(:integer)
+    optional(:to_location_id).filled(:integer)
+    required(:from_location_id).filled(:integer)
+    required(:quantity).filled(:decimal, gt?: 0)
+    required(:ref_no).filled(Types::StrippedString)
   end
 
-  FinalAdhocRmdMoveStockSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:sku_ids, Types::Array).filled { each(:int?) }
-    required(:business_process_id, :integer).filled(:int?)
-    required(:to_location_id, :integer).filled(:int?)
-    required(:quantity, :decimal).filled(:decimal?, gt?: 0)
-    required(:ref_no, Types::StrippedString).filled(:str?)
-    required(:user_name, Types::StrippedString).filled(:str?)
-    required(:location_id, :integer).filled(:int?)
+  FinalAdhocRmdMoveStockSchema = Dry::Schema.Params do
+    required(:sku_ids).filled(:array).each(:integer)
+    required(:business_process_id).filled(:integer)
+    required(:to_location_id).filled(:integer)
+    required(:quantity).filled(:decimal, gt?: 0)
+    required(:ref_no).filled(Types::StrippedString)
+    required(:user_name).filled(Types::StrippedString)
+    required(:location_id).filled(:integer)
   end
 end

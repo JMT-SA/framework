@@ -27,7 +27,7 @@ module MasterfilesApp
       my_addr[:address_type_id] = 'Some string value'
       x = interactor.send(:validate_address_params, my_addr)
       assert_equal(['must be an integer'], x.errors[:address_type_id])
-      refute_empty x.errors
+      refute_empty x.errors.to_h
 
       my_addr[:address_type_id] = '1'
       x = interactor.send(:validate_address_params, my_addr)
@@ -43,7 +43,7 @@ module MasterfilesApp
       x = interactor.send(:validate_address_params, addr_attrs_without_address_line1)
       refute_empty x.errors
       expected = { address_line_1: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:address_line_2).maybe(:str?)
       addr_attrs_without_address_line2 = address_attrs.reject { |k, _| k == :address_line_2 }
@@ -56,7 +56,7 @@ module MasterfilesApp
       addr_attrs_without_address_line2[:address_line_2] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_address_line2)
       expected = { address_line_2: ['must be a string'] }
-      assert_equal(x.errors, expected)
+      assert_equal(x.errors.to_h, expected)
 
       # required(:address_line_3).maybe(:str?)
       addr_attrs_without_address_line3 = address_attrs.reject { |k, _| k == :address_line_3 }
@@ -69,7 +69,7 @@ module MasterfilesApp
       addr_attrs_without_address_line3[:address_line_3] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_address_line3)
       expected = { address_line_3: ['must be a string'] }
-      assert_equal(x.errors, expected)
+      assert_equal(x.errors.to_h, expected)
 
       # required(:city).maybe(:str?)
       addr_attrs_without_city = address_attrs.reject { |k, _| k == :city }
@@ -82,7 +82,7 @@ module MasterfilesApp
       addr_attrs_without_city[:city] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_city)
       expected = { city: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:postal_code).maybe(:str?)
       addr_attrs_without_postal_code = address_attrs.reject { |k, _| k == :postal_code }
@@ -95,7 +95,7 @@ module MasterfilesApp
       addr_attrs_without_postal_code[:postal_code] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_postal_code)
       expected = { postal_code: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:country).maybe(:str?)
       addr_attrs_without_country = address_attrs.reject { |k, _| k == :country }
@@ -108,7 +108,7 @@ module MasterfilesApp
       addr_attrs_without_country[:country] = 1
       x = interactor.send(:validate_address_params, addr_attrs_without_country)
       expected = { country: ['must be a string'] }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
     end
 
     def test_create_address

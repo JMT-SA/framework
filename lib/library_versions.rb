@@ -16,7 +16,8 @@ class LibraryVersions
     sortable: %i[jsver sortable],
     konva: %i[jsver konva],
     lodash: %i[jsver lodash],
-    multi: %i[jsver multi]
+    multi: %i[jsver multi],
+    jasper: %i[jasper jasper]
   }.freeze
 
   # Javascript strategies - use send to call private methods.
@@ -59,6 +60,13 @@ class LibraryVersions
     format_lib(klass, Object.const_get(klass).const_get('VERSION'))
   end
 
+  def jasper(_)
+    repo = DevelopmentApp::JasperReportRepo.new
+    { library: 'Jruby Jasper', version: repo.jasper_version }
+  rescue StandardError => e
+    { library: 'Jruby Jasper', version: e.message }
+  end
+
   def jsver(key)
     js_strategy = JS_STRATEGY[key]
     return format_lib('Unknown directive', key) if js_strategy.nil?
@@ -67,7 +75,14 @@ class LibraryVersions
   end
 
   def ag_grid_version
-    format_lib('AG-Grid', File.readlines('public/js/ag-grid-enterprise.min.js', encoding: 'UTF-8').first.chomp.split(' v').last)
+    lines = File.readlines('public/js/ag-grid-enterprise.min.js', encoding: 'UTF-8')
+    l1 = lines.first
+    ver = if l1.start_with?('/**')
+            lines[2].chomp.split(' v').last
+          else
+            l1.chomp.split(' v').last
+          end
+    format_lib('AG-Grid', ver)
   end
 
   def selectr_version

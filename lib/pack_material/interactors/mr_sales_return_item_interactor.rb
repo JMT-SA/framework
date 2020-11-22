@@ -6,7 +6,7 @@ module PackMaterialApp
       params[:mr_sales_return_id] = parent_id
 
       res = validate_mr_sales_return_item_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -25,7 +25,7 @@ module PackMaterialApp
 
     def update_mr_sales_return_item(id, params)
       res = validate_mr_sales_return_item_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_sales_return_item(id, res)
@@ -53,7 +53,7 @@ module PackMaterialApp
     def inline_update(id, params) # rubocop:disable Metrics/AbcSize
       remarks = params[:column_name] == 'remarks'
       res = remarks ? validate_inline_update_remarks_params(params) : validate_inline_update_quantity_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       unless remarks
         result = validate_sales_return_quantity_amount(id, params)
@@ -72,7 +72,7 @@ module PackMaterialApp
 
     def print_sku_barcode(params)
       res = validate_print_sku_barcode_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_SKU_BARCODE, res.to_h.merge(delivery_number: res[:sales_return_number]), res.to_h.merge(supporting_data: nil))
     end

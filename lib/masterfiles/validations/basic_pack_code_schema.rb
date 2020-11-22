@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  BasicPackCodeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:basic_pack_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
-    required(:length_mm, :integer).maybe(:int?)
-    required(:width_mm, :integer).maybe(:int?)
-    required(:height_mm, :integer).maybe(:int?)
+  BasicPackCodeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:basic_pack_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
+    required(:length_mm).maybe(:integer)
+    required(:width_mm).maybe(:integer)
+    required(:height_mm).maybe(:integer)
   end
 end

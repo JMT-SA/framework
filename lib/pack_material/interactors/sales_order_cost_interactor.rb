@@ -2,9 +2,9 @@
 
 module PackMaterialApp
   class SalesOrderCostInteractor < BaseInteractor
-    def create_sales_order_cost(parent_id, params) # rubocop:disable Metrics/AbcSize
+    def create_sales_order_cost(parent_id, params)
       res = validate_sales_order_cost_params(params.merge(mr_sales_order_id: parent_id))
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module PackMaterialApp
 
     def update_sales_order_cost(id, params)
       res = validate_sales_order_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_sales_order_cost(id, res)

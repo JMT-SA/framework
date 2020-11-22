@@ -81,7 +81,7 @@ module MasterfilesApp
       x = interactor.send(:validate_new_customer_params, attrs_without_customer_type_ids)
       refute_empty x.errors
       expected = { customer_type_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:erp_customer_number).maybe(:str?)
       attrs_without_erp_customer_number = attrs.reject { |k, _| k == :erp_customer_number }
@@ -94,7 +94,7 @@ module MasterfilesApp
       attrs_without_erp_customer_number[:erp_customer_number] = 1
       x = interactor.send(:validate_new_customer_params, attrs_without_erp_customer_number)
       expected = { erp_customer_number: ['must be a string'] }
-      assert_equal(x.errors, expected)
+      assert_equal(x.errors.to_h, expected)
     end
 
     def test_validate_edit_customer_params
@@ -117,7 +117,7 @@ module MasterfilesApp
       x = interactor.send(:validate_edit_customer_params, attrs_without_customer_type_ids)
       refute_empty x.errors
       expected = { customer_type_ids: { 0 => ['must be an integer'], 1 => ['must be an integer'], 2 => ['must be an integer'] } }
-      assert_equal(expected, x.errors)
+      assert_equal(expected, x.errors.to_h)
 
       # required(:erp_customer_number).maybe(:str?)
       attrs_without_erp_customer_number = attrs.reject { |k, _| k == :erp_customer_number }
@@ -130,7 +130,7 @@ module MasterfilesApp
       attrs_without_erp_customer_number[:erp_customer_number] = 1
       x = interactor.send(:validate_edit_customer_params, attrs_without_erp_customer_number)
       expected = { erp_customer_number: ['must be a string'] }
-      assert_equal(x.errors, expected)
+      assert_equal(x.errors.to_h, expected)
     end
 
     def customer_attrs

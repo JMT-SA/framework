@@ -4,7 +4,7 @@ module MasterfilesApp
   class SupplierTypeInteractor < BaseInteractor
     def create_supplier_type(params)
       res = validate_supplier_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -18,7 +18,7 @@ module MasterfilesApp
 
     def update_supplier_type(id, params)
       res = validate_supplier_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_supplier_type(id, res)

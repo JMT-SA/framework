@@ -10,7 +10,7 @@ module SecurityApp
     attribute :id, Types::Integer
     attribute :security_group_name, Types::String
 
-    attribute :security_permissions, Types::Array.default([]) do
+    attribute :security_permissions, Types::Array.default([].freeze) do
       attribute :id, Types::Integer
       attribute :security_permission, Types::String
     end

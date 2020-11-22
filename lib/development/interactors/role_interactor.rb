@@ -16,7 +16,7 @@ module DevelopmentApp
 
     def create_role(params)
       res = validate_role_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -30,7 +30,7 @@ module DevelopmentApp
 
     def update_role(id, params)
       res = validate_role_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_role(id, res)

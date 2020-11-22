@@ -9,4 +9,4 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 * Repositories handle all the database reads and writes.
 * Application code should not perform any database calls directly - only through a repository method - and all SQL should be defined in repository methods.
 * The only exception to this is in the SQL in dataminer yml query definition files.
-* A repository method should return only `Hash`es, `Dry::Struct`s, `OpenStruct`s -- or `Array`s of one of the three.
+* A repository method should return only `Hash`, `Dry::Struct`, `OpenStruct`, `Array` or a primitive type like `Integer`. These can be wrapped in a `Crossbeams::Response` object.

@@ -371,7 +371,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # in an array column in the database, passing the params through
   # this method will prepare the ids correctly for persisting.
   #
-  # @param args [hash,Dry::Validation] the hash or Dry::Validation result.
+  # @param args [hash,Dry::Validation::Result] the hash or Dry::Validation result.
   # @param array_type [Symbol] the type of array (:integer / :text). Default is :integer.
   # @return [hash] the transformed hash.
   def prepare_array_values_for_db(args, array_type: :integer)

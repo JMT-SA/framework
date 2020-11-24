@@ -7,12 +7,14 @@ declare
     qty_rec numeric;
     qty_ret numeric;
     qty_sold numeric;
+    qty_sales_ret numeric;
 begin
     select fn_stock_quantity_bsa(in_id, start_date, end_date) into qty_bsa;
     select fn_stock_quantity_received(in_id, start_date, end_date) into qty_rec;
     select fn_stock_quantity_returned(in_id, start_date, end_date) into qty_ret;
     select fn_stock_quantity_sold(in_id, start_date, end_date) into qty_sold;
-    return (qty_bsa + qty_rec - qty_ret - qty_sold);
+    select fn_stock_quantity_sales_returned(in_id, start_date, end_date) into qty_sales_ret;
+    return (qty_bsa + qty_rec - qty_ret - qty_sold + qty_sales_ret);
 end
 $$;
 

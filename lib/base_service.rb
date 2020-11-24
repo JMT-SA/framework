@@ -37,4 +37,13 @@ class BaseService
   def all_ok
     success_response 'Permission ok'
   end
+
+  # @param [Symbol] action UserPermissions action
+  # @param [Symbol] context UserPermissions context
+  # @return [TrueClass]
+  def can_user?(action, context)
+    raise Crossbeams::FrameworkError, '@user is not defined for method can_user?' unless @user
+
+    Crossbeams::Config::UserPermissions.can_user?(@user, context, action)
+  end
 end

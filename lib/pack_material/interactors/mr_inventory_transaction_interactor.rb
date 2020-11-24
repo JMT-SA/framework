@@ -105,7 +105,8 @@ module PackMaterialApp
     def weighted_average_records_grid
       {
         columnDefs: records_column_definitions,
-        rowDefs: WaCostRepo.new.tmp_weighted_average_cost_records
+        rowDefs: WaCostRepo.new.wa_cost_records
+        # rowDefs: WaCostRepo.new.tmp_weighted_average_cost_records
       }.to_json
     end
 

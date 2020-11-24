@@ -11,7 +11,3 @@ where soi.mr_product_variant_id = in_id
 $$;
 
 alter function fn_stock_quantity_sold(integer, date, date) owner to postgres;
-
-
-
-

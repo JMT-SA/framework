@@ -1,20 +1,17 @@
 # frozen_string_literal: true
 
+require 'drb/drb'
+
 # Generate a file or print from a Jasper report.
 #
-# To run: CreateJasperReport.call(report_name: 'abc',
-#                                 user: current_user.login_name,
-#                                 file: file_name_without_extension_or_path,
-#                                 params: hash_of_report_parameters)
+# To run:
+#     jasper_params = JasperParams.new('adc', current_user.login_name, param1: 'val', param2: 123)
+#     CreateJasperReport.call(jasper_params)
 #
-# If params includes keep_file: true, the script that runs the report will be saved in
-# the tmp dir below the root.
-#
-# The report is generated with the following default parameters which can be overridden (Note the case of the keys is important)):
-# - MODE: 'GENERATE'. Generate will create a file, PRINT will send the report directly to the printer.
-# - printer: 'no_printer'. In PRINT mode, this MUST be provided.
-# - OUT_FILE_TYPE: 'PDF'. This can be PDF, CSV, XLS, RTF. Ignored in PRINT mode.
-# - top_level_dir: ''. Use this if the report is stored in a subdir of the report dir.
+# The report is generated with the following default parameters which can be overridden (e.g. jasper_param.mode = :xls)
+# - mode: :pdf. Can be :rtf, :xls, :csv or :print.
+# - file_name: Same as report_name. This is the name of the output file without extension.
+# - printer: nil. In :print mode, this MUST be provided.
 #
 # A note about report variants...
 # -------------------------------
@@ -25,157 +22,144 @@
 # This service will check to see if there is a client-specific report and use it if present by overwriting the parent_folder value.
 #
 class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
-  attr_reader :report_name, :user, :parent_folder, :keep_file, :top_level_dir, :printer, :report_parameters, :debug_mode
+  attr_reader :jasper_params, :parent_folder, :repo
 
-  NO_PRINTER = 'no_printer'
+  FILE_TYPES = {
+    pdf: 'pdf',
+    xls: 'xlsx',
+    rtf: 'rtf',
+    csv: 'csv'
+  }.freeze
 
-  def initialize(report_name:, user:, file:, parent_folder: nil, debug_mode: false, params: {}) # rubocop:disable Metrics/ParameterLists
-    params = params.dup
-    @report_name = report_name
-    @user = user
-    @parent_folder = parent_folder
-    @debug_mode = debug_mode
-    @keep_file = params.delete(:keep_file)
-    @return_full_path = params.delete(:return_full_path)
-    @top_level_dir = params.delete(:top_level_dir) || ''
-    @printer = params.delete(:printer) || NO_PRINTER
-    @output_file = add_output_path(file)
+  def initialize(jasper_params)
+    @repo = DevelopmentApp::JasperReportRepo.new
+    @jasper_params = jasper_params
+    @parent_folder = jasper_params.parent_folder
+    @output_file = add_output_path
+    @file_type = FILE_TYPES[jasper_params.mode]
     adjust_parent_folder
-    make_report_parameters_string(params)
   end
 
-  def call # rubocop:disable Metrics/AbcSize
-    result = run_report
-    clear_temp_file
-    log_report_result(result)
+  def call
+    log_report_details
+    output = if jasper_params.mode == :print
+               print_report
+             else
+               generate_report
+             end
 
-    if result.to_s.include?(error_string_key) && (errors = result.split(error_string_key)).length.positive?
-      send_error_mail(result)
-      failed_response("Jasper printing error: <br>#{errors[1]}")
-    elsif @mode == 'GENERATE'
-      success_response('Report has been generated', download_file)
+    if output[:success]
+      handle_success(output)
     else
-      success_response('Report has been sent to the printer')
+      handle_failure(output)
     end
   end
 
   private
 
-  def error_string_key
-    @use_older_jasper_engine ? 'JMT Jasper error:' : 'Jasper error:'
+  def handle_success(output)
+    log_report_result(output)
+    if jasper_params.mode == :print
+      success_response("Report has been sent to #{jasper_params.printer} for printing")
+    else
+      save_file(output)
+      success_response('Report has been generated', download_file)
+    end
   end
 
-  def send_error_mail(result)
+  def handle_failure(output)
+    send_error_mail(output)
+    log_report_result(output)
+    failed_response("Jasper printing error: <br>#{output[:msg]}")
+  end
+
+  def print_report
+    repo.print_report(jasper_params.user_name,
+                      jasper_params.report_name,
+                      report_dir,
+                      jasper_params.printer,
+                      jasper_params.params)
+  end
+
+  def generate_report
+    repo.generate_report_string(jasper_params.user_name,
+                                jasper_params.report_name,
+                                report_dir,
+                                jasper_params.mode,
+                                jasper_params.params)
+  end
+
+  def save_file(output)
+    file = "#{@output_file}.#{@file_type}"
+    File.open(file, 'w') { |f| f << output[:doc] }
+  end
+
+  def send_error_mail(result) # rubocop:disable Metrics/AbcSize
+    e_type = result[:error_type] ? "#{result[:error_type]}: " : ''
+    trace = result[:backtrace] ? "\n\n#{result[:backtrace].join("\n")}" : ''
     body = <<~STR
-      Jasper report "#{report_name}" did not succeed.
+      Jasper report "#{jasper_params.report_name}" did not succeed.
 
-      Error  : #{result.split(error_string_key)[1].strip}
+      Error  : #{e_type}#{result[:msg]}
 
-      User   : #{user}
+      User   : #{jasper_params.user_name}
 
-      Command: #{command}
+      Mode   : #{show_mode}
+
+      Params : #{jasper_params.params.inspect}
 
       Result : #{result}
+      #{trace}
     STR
-    ErrorMailer.send_error_email(subject: "Jasper error for #{report_name}",
+    ErrorMailer.send_error_email(subject: "Jasper error for #{jasper_params.report_name}",
                                  message: body)
   end
 
   def download_file
     file = "#{@output_file}.#{@file_type.downcase}"
-    return file if @return_full_path
+    return file if jasper_params.return_full_path
 
     File.relative_path(File.join(ENV['ROOT'], 'public'), file)
   end
 
-  def clear_temp_file
-    File.delete(print_command_file_name) unless keep_file
-  end
-
-  def connection_string
-    "jdbc:postgresql://#{DB.opts[:host]}:#{DB.opts[:port] || 5432}/#{DB.opts[:database]}?user=#{DB.opts[:user]}&password=#{DB.opts[:password]}"
-  end
-
-  def print_command_file_name
-    @print_command_file_name ||= File.join(ENV['ROOT'], 'tmp', "#{report_name}_#{user}_#{Time.now.strftime('%m_%d_%Y_%H_%M_%S')}.sh")
-  end
-
-  def run_report
-    log_report_details
-
-    File.open(print_command_file_name, 'w') do |f|
-      f.puts "cd #{path}"
-      f.puts command
-    end
-
-    `sh #{print_command_file_name}`
-  end
-
-  def command
-    @command ||= "#{debug_switch}java -jar JasperReportPrinter.jar \"#{report_dir}\" #{report_name} \"#{printer}\" \"#{connection_string}\" #{report_parameters}"
-  end
-
-  def debug_switch
-    return '' unless debug_mode
-
-    'DEBUG=y '
-  end
-
   def log_report_details
-    puts "--- JASPER REPORT : #{report_name} :: #{Time.now}"
-    puts "USER   : #{user}"
-    puts "COMMAND: #{command}"
+    puts "--- JASPER REPORT : #{jasper_params.report_name} :: #{Time.now}"
+    puts "USER   : #{jasper_params.user_name}"
+    puts "MODE   : #{show_mode}"
+    puts "PARAMS : #{jasper_params.params.inspect}"
     puts '-'
   end
 
+  def show_mode
+    if jasper_params.mode == :print
+      "Print to #{jasper_params.printer}"
+    else
+      jasper_params.mode
+    end
+  end
+
   def log_report_result(result)
-    puts "RESULT : #{result}"
+    puts "RESULT : #{result[:msg]}"
     puts '---'
   end
 
   def adjust_parent_folder
     return unless AppConst::CLIENT_CODE
 
-    return unless File.exist?(File.join(AppConst::JASPER_REPORTS_PATH, AppConst::CLIENT_CODE, @top_level_dir, @report_name))
+    return unless File.exist?(File.join(AppConst::JASPER_REPORTS_PATH, AppConst::CLIENT_CODE, jasper_params.report_name))
 
     @parent_folder = AppConst::CLIENT_CODE
   end
 
   def report_dir
-    @report_dir ||= "#{report_definitions_dir}/#{top_level_dir.blank? ? '' : top_level_dir + '/'}#{report_name}"
+    @report_dir ||= if parent_folder.nil_or_empty?
+                      AppConst::JASPER_REPORTS_PATH
+                    else
+                      "#{AppConst::JASPER_REPORTS_PATH}/#{parent_folder}"
+                    end
   end
 
-  def path
-    @path ||= ENV['JASPER_REPORTING_ENGINE_PATH']
-  end
-
-  # maybe check if dir exists under parent folder or not...
-  def report_definitions_dir
-    @report_definitions_dir ||= if parent_folder.nil_or_empty?
-                                  AppConst::JASPER_REPORTS_PATH
-                                else
-                                  "#{AppConst::JASPER_REPORTS_PATH}/#{parent_folder}"
-                                end
-  end
-
-  def add_output_path(file)
-    File.join(ENV['ROOT'], 'public', 'downloads', 'jasper', file)
-  end
-
-  def make_report_parameters_string(params)
-    params[:SUBREPORT_DIR] = "#{File.join(report_definitions_dir, @top_level_dir, @report_name)}/"
-    @mode = params.fetch(:MODE, 'GENERATE')
-    params[:MODE] ||= @mode
-    @file_type = params.fetch(:OUT_FILE_TYPE, 'PDF').upcase
-    params[:OUT_FILE_TYPE] = @file_type
-    params[:OUT_FILE_NAME] = @output_file
-    assert_params_valid!(params)
-    @report_parameters = params.map { |k, v| "\"#{k}=#{v}\"" }.join(' ')
-  end
-
-  def assert_params_valid!(params)
-    raise ArgumentError, "\"#{params[:MODE]}\" is not a valid MODE for Jasper printing (expect GENERATE or PRINT)" unless %w[GENERATE PRINT].include?(params.fetch(:MODE))
-    raise ArgumentError, "\"#{params[:OUT_FILE_TYPE]}\" is not a valid OUT_FILE_TYPE for Jasper printing (expect PDF, CSV, XLS or RTF)" unless %w[PDF CSV XLS RTF].include?(params.fetch(:OUT_FILE_TYPE))
-    raise ArgumentError, 'In print mode a printer must be included in the parameters' if @printer == NO_PRINTER && params[:MODE] == 'PRINT'
+  def add_output_path
+    File.join(ENV['ROOT'], 'public', 'downloads', 'jasper', jasper_params.file_name)
   end
 end

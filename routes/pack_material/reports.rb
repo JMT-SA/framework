@@ -5,11 +5,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     # MR PURCHASE ORDERS
     # --------------------------------------------------------------------------
     r.on 'print_purchase_order', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'print_purchase_order',
-                                    user: current_user.login_name,
-                                    file: 'print_purchase_order',
-                                    params: { mr_purchase_order_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('print_purchase_order',
+                                       current_user.login_name,
+                                       mr_purchase_order_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -34,8 +34,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
             {
               report_name: 'print_purchase_order',
               file: 'purchase_order',
-              report_params: { mr_purchase_order_id: id,
-                               keep_file: true }
+              report_params: { mr_purchase_order_id: id }
             }
           ]
         }
@@ -45,11 +44,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'delivery_received', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'delivery_received_note',
-                                    user: current_user.login_name,
-                                    file: 'delivery_received_note',
-                                    params: { delivery_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('delivery_received_note',
+                                       current_user.login_name,
+                                       delivery_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -58,11 +57,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'waybill_note', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'waybill_note',
-                                    user: current_user.login_name,
-                                    file: 'waybill_note',
-                                    params: { delivery_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('waybill_note',
+                                       current_user.login_name,
+                                       delivery_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -71,11 +70,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'delivery_purchase_invoice', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'delivery_purchase_invoice',
-                                    user: current_user.login_name,
-                                    file: 'delivery_purchase_invoice',
-                                    params: { delivery_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('delivery_purchase_invoice',
+                                       current_user.login_name,
+                                       delivery_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -86,11 +85,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     # BULK STOCK ADJUSTMENTS
     # --------------------------------------------------------------------------
     r.on 'stock_adjustment_sheet', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'stock_adjustment_sheet',
-                                    user: current_user.login_name,
-                                    file: 'stock_adjustment_sheet',
-                                    params: { mr_bulk_stock_adjustment_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('stock_adjustment_sheet',
+                                       current_user.login_name,
+                                       mr_bulk_stock_adjustment_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -99,11 +98,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'signed_off_report', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'signed_off_report',
-                                    user: current_user.login_name,
-                                    file: 'signed_off_report',
-                                    params: { mr_bulk_stock_adjustment_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('signed_off_report',
+                                       current_user.login_name,
+                                       mr_bulk_stock_adjustment_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -112,11 +111,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'consumption_report', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'consumption_report',
-                                    user: current_user.login_name,
-                                    file: 'consumption_report',
-                                    params: { mr_bulk_stock_adjustment_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('consumption_report',
+                                       current_user.login_name,
+                                       mr_bulk_stock_adjustment_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -125,11 +124,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'preliminary_report', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'preliminary_report',
-                                    user: current_user.login_name,
-                                    file: 'preliminary_report',
-                                    params: { mr_bulk_stock_adjustment_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('preliminary_report',
+                                       current_user.login_name,
+                                       mr_bulk_stock_adjustment_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -140,11 +139,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     # TRIPSHEETS
     # ---------------------------------------------------------------------------
     r.on 'tripsheet', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'tripsheet',
-                                    user: current_user.login_name,
-                                    file: 'tripsheet',
-                                    params: { vehicle_job_id: id,
-                                              keep_file: true })
+      jasper_params = JasperParams.new('tripsheet',
+                                       current_user.login_name,
+                                       vehicle_job_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -155,13 +154,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     # GOODS RETURNED NOTE
     # ---------------------------------------------------------------------------
     r.on 'print_credit_note', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'credit_note',
-                                    user: current_user.login_name,
-                                    file: 'credit_note',
-                                    params: {
-                                      mr_goods_returned_note_id: id,
-                                      keep_file: true
-                                    })
+      jasper_params = JasperParams.new('credit_note',
+                                       current_user.login_name,
+                                       mr_goods_returned_note_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -185,8 +182,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           reports: [{
             report_name: 'print_credit_note',
             file: 'credit_note',
-            report_params: { mr_goods_returned_note_id: id,
-                             keep_file: true }
+            report_params: { mr_goods_returned_note_id: id }
           }]
         }
         DevelopmentApp::EmailJasperReport.enqueue(opts)
@@ -197,13 +193,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     # SALES ORDER
     # ---------------------------------------------------------------------------
     r.on 'print_sales_order', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'sales_order',
-                                    user: current_user.login_name,
-                                    file: 'sales_order',
-                                    params: {
-                                      mr_sales_order_id: id,
-                                      keep_file: true
-                                    })
+      jasper_params = JasperParams.new('sales_order',
+                                       current_user.login_name,
+                                       mr_sales_order_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -211,13 +205,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
     end
     r.on 'print_so_waybill', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'sales_order_waybill',
-                                    user: current_user.login_name,
-                                    file: 'sales_order_waybill',
-                                    params: {
-                                      mr_sales_order_id: id,
-                                      keep_file: true
-                                    })
+      jasper_params = JasperParams.new('sales_order_waybill',
+                                       current_user.login_name,
+                                       mr_sales_order_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -240,8 +232,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           reports: [{
             report_name: 'sales_order',
             file: 'sales_order',
-            report_params: { mr_sales_order_id: id,
-                             keep_file: true }
+            report_params: { mr_sales_order_id: id }
           }]
         }
         DevelopmentApp::EmailJasperReport.enqueue(opts)
@@ -252,13 +243,11 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
     # SALES RETURNS
     # ---------------------------------------------------------------------------
     r.on 'print_sales_return', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'sales_return',
-                                    user: current_user.login_name,
-                                    file: 'sales_return',
-                                    params: {
-                                      mr_sales_return_id: id,
-                                      keep_file: true
-                                    })
+      jasper_params = JasperParams.new('sales_return',
+                                       current_user.login_name,
+                                       mr_sales_return_id: id)
+      res = CreateJasperReport.call(jasper_params)
+
       if res.success
         change_window_location_via_json(res.instance, request.path)
       else
@@ -282,8 +271,7 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
           reports: [{
             report_name: 'print_sales_return',
             file: 'sales_return',
-            report_params: { mr_sales_return_id: id,
-                             keep_file: true }
+            report_params: { mr_sales_return_id: id }
           }]
         }
         DevelopmentApp::EmailJasperReport.enqueue(opts)

@@ -16,4 +16,3 @@ where (skus4.mr_product_variant_id = in_id or skus3.mr_product_variant_id = in_i
 $$;
 
 alter function fn_stock_quantity_returned(integer, date, date) owner to postgres;
-

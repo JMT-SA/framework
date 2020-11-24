@@ -54,7 +54,7 @@ GEM
     asciidoctor (2.0.8)
     ast (2.4.0)
     awesome_print (1.8.0)
-    bcrypt (3.1.11)
+    bcrypt (3.1.16)
     byebug (10.0.2)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)

@@ -7,10 +7,13 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 === Installation config
 
-At installation there are two environment variables that need to be set up: `JASPER_REPORTING_ENGINE_PATH` and `JASPER_REPORTS_PATH`.
+At installation there are two environment variables that need to be set up: `JRUBY_JASPER_HOST_PORT` and `JASPER_REPORTS_PATH`.
 
-* `JASPER_REPORTING_ENGINE_PATH` is a fully qualified path that points to the directory where the `JasperReportPrinter.jar` is installed.
+* `JRUBY_JASPER_HOST_PORT` is the port at which the `jruby_japser` interface is running. The default value is `9998`.
 * `JASPER_REPORTS_PATH` is a fully qualified path that points to the directory containing the designed jasper report files.
+
+`jruby_jasper` must be running on the system, listening on the same port as `JRUBY_JASPER_HOST_PORT`.
+See https://github.com/NoSoft-SA/jruby_jasper (README and INSTALL docs).
 
 === Per industry/client overrides for Japser reports
 
@@ -42,33 +45,71 @@ end
 
 === Generating a report
 
-Use the `CreateJasperReport` service to create a pdf report.
-The service returns a success/failure response object. A successful response has the name of the generated file as the instance value for `GENERATE` mode, or nil for `PRINT` mode..
+Use the `JasperParams` class and the `CreateJasperReport` service to print or create a pdf/csv/xlsx/rtf report.
+The service returns a success/failure response object. A successful response has the name of the generated file as the instance value (for any mode other than `:print` - which will be nil).
 
-NOTE: To show a pdf in a loading window, return a JSON hash with the key `location` and the value set to the generated file.
+NOTE: In a route, to display a generated pdf in a loading window, return a JSON hash with the key `location` and the value set to the file name.
+
+First create a `JasperParams` object with the report name, user and report parameters:
 [source, ruby]
 ----
-# Interactor:
-def create_report
-  CreateJasperReport.call(report_name: 'abc',
-                          user: current_user.login_name,
-                          file: output_file_name_to_be_saved_without_extension_or_path,
-                          debug_mode: <optional, true/false>
-                          parent_folder: <optional, typically set to AppConst::RPT_INDUSTRY>
-                          params: hash_of_report_parameters)
-end
+jasper_params = JasperParams.new('report_name',
+                                 current_user.login_name,
+                                 param1: 'val',
+                                 param2: 123)
+----
+Then - if any defaults need to be changed, set them:
+[source, ruby]
+----
+jasper_params.mode = :xls
+jasper_params.file_name = 'report_name_tweaked'
+----
+Available `jasper_params` attributes are:
 
+|===
+|attribute |description |default
+
+|mode
+|Can be `:pdf`, `:xls`, `:csv`, `:rtf` or `:print`
+|`:pdf`
+
+|file_name
+|The file name (without path/ext) for the output
+|Same as `report_name`
+
+|parent_folder
+|Provided if the report dir is not an immediate subdir of `JASPER_REPORTS_PATH`. Typically set to `AppConst::RPT_INDUSTRY`
+|`nil`
+
+|printer
+|The printer name. Only used when `mode` is `:print`
+|`nil`
+
+|return_full_path
+|If false, path is relative to `public` dir. If true, the full path is returned.
+|`false`
+
+|===
+
+Call the service to generate or print the report:
+[source, ruby]
+----
+res = CreateJasperReport.call(jasper_params)
+----
+Display the report:
+[source, ruby]
+----
 # Route
 res = interactor.create_report
 
 if res.success
-  # For PRINT MODE:
+  # For :print mode:
   show_json_notice('Sent to printer')
 
-  # For GENERATE MODE:
+  # For any other mode:
   change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
 
-  # When generating XLS or RTF files which are downloaded by the browser,
+  # When generating XLSX or RTF files which are downloaded by the browser,
   # add download: true so the browser window stops showing the spinner.
   change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance),
                                   request.path,
@@ -78,59 +119,11 @@ else
 end
 ----
 
-If params includes `keep_file: true`, the script that runs the report will be saved in the tmp dir below the root.
+=== Debugging/Logging
 
-NOTE: If `debug_mode` is present and true, logging of variable values etc. will take place. Check the console or something like `/var/log/nginx/error.log` for output.
+The `jruby_jasper` app uses Java's Log4j2 logging. The default is to log to console at error level. When running as a systemd service, this output appears in syslog (typically `/var/log/syslog`). The settings can be tweaked by editing `config/log4j2.xml` in the `jruby_jasper` dir.
 
-The report is generated with the following default parameters which can be overridden by including them in the `params` hash (Note the **case** of the keys is important)):
-
-- MODE: `GENERATE`. Generate will create a file, PRINT will send the report directly to the printer.
-- printer: `no_printer`. In PRINT mode, this MUST be provided.
-- OUT_FILE_TYPE: `PDF`. This can be PDF, CSV, XLS, RTF. Ignored in PRINT mode.
-- top_level_dir: `''`. Use this if the report is stored in a subdir of the report dir.
-
-[NOTE]
-====
-If a report parameter sent to Jasper has to be a boolean value, it must be expressed like this:
-[source, ruby]
-----
-param_name: 'false|boolean' # Jasper gets param_name: false
-
-# The following will not work correctly:
-param_name: false           # Jasper gets param_name: 'false'
-----
-====
-
-[NOTE]
-====
-If a report parameter sent to Jasper has to be a date value, it must be expressed like this:
-[source, ruby]
-----
-# if Ruby Date:
-param_name: "#{attrs[:from_date]} 00:00:00|date"
-
-# if Ruby DateTime/Time:
-param_name: "#{attrs[:from_date_time].strftime('%Y-%m-%d %H:%M:%S')}|date"
-----
-====
-
-[NOTE]
-====
-If a report parameter sent to Jasper has to be an array of integers, it must be presented as a string of comma-separated numbers (no spaces!) and expressed like this:
-[source, ruby]
-----
-list_of_ids ='1,2,3'
-param_name: "#{list_of_ids}|intarray"  # => [1,2,3]
-----
-====
-
-[NOTE]
-====
-Other methods of forcing parameter datatypes are:
-
-* `|integer` - ensure the value is an integer. This should happen automatically when the string can be coerced to int.
-* `|string` - ensure the value is a string. This is required if the value could be an integer but should be sent to Jasper as a string.
-====
+Any change to the config file requires a restart of the service (e.g. `sudo systemctl restart jruby_jasper.service`)
 
 === Generate and email a report
 
@@ -188,7 +181,6 @@ opts = {
     {
       report_name: 'the_other_report',
       file: 'your_second_report_sir',
-      debug_mode: true, # If you want to see what variables were set
       report_params: { the_report_id: id, sky: 'blue' }
     }
   ]

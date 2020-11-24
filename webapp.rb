@@ -12,7 +12,7 @@ class Framework < Roda
   include DataminerHelpers
   include RmdHelpers
 
-  use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session', same_site: :lax
+  use Rack::Session::Cookie, secret: 'some_new_nice_longish_random_string_DSKJH4378EYR7EGKUFH', key: '_pm_app_session', same_site: :lax
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
   use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb' # , session: request.session
 
@@ -50,7 +50,7 @@ class Framework < Roda
   plugin :message_bus
   plugin :status_handler
   plugin :cookies, path: '/', same_site: :lax
-  plugin :rodauth do
+  plugin :rodauth, csrf: :rack_csrf do
     db DB
     enable :login, :logout # , :change_password
     logout_route 'a_dummy_route' # Override 'logout' route so that we have control over it.

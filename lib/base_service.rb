@@ -38,12 +38,13 @@ class BaseService
     success_response 'Permission ok'
   end
 
+  # Helper to shorten the repetitive call to Crossbeams::Config::UserPermissions
+  #
+  # @param [Symbol] user User user
   # @param [Symbol] action UserPermissions action
   # @param [Symbol] context UserPermissions context
   # @return [TrueClass]
-  def can_user?(action, context)
-    raise Crossbeams::FrameworkError, '@user is not defined for method can_user?' unless @user
-
-    Crossbeams::Config::UserPermissions.can_user?(@user, context, action)
+  def can_user?(user, action, context)
+    Crossbeams::Config::UserPermissions.can_user?(user, context, action)
   end
 end

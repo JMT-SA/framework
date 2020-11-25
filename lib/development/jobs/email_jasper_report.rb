@@ -15,7 +15,7 @@ module DevelopmentApp
 
     def build_report(user, spec) # rubocop:disable Metrics/AbcSize
       jasper_params = JasperParams.new(spec[:report_name],
-                                       current_user.login_name,
+                                       user.login_name,
                                        spec[:report_params])
       jasper_params.return_full_path = true
       jasper_params.file_name = spec[:file] if spec[:file]

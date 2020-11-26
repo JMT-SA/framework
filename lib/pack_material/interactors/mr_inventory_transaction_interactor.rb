@@ -120,7 +120,7 @@ module PackMaterialApp
         mk.integer 'sku_id', nil, hide: true
         mk.integer 'applicable_id', 'Applicable ID', width: 130
         mk.numeric 'quantity', nil, width: 130
-        mk.col 'type', nil, width: 130
+        mk.col 'record_type', nil, width: 130
         mk.numeric 'price', nil, width: 130
         mk.col 'created_at', nil, width: 180
       end

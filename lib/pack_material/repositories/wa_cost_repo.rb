@@ -27,7 +27,7 @@ module PackMaterialApp
     def wa_cost(mrpv_id) # rubocop:disable Metrics/AbcSize
       # Only do the calculation if there is stock
       total_qty = total_quantity(mrpv_id)
-      p "TOTAL QTY"
+      p 'TOTAL QTY'
       p total_qty.to_f
       return nil unless total_qty&.positive?
 
@@ -37,40 +37,42 @@ module PackMaterialApp
       # for each record
       fix_remainder = 0
       records.each do |r|
+        # ignore record if it does not have a price set
+        # ignore record if it is a consumption record
+        next if r[:price].nil? || r[:price].eql?(0) || (r[:quantity].negative? && r[:record_type] == 'bulk stock adjustment item')
+
         # grab the qty
         # Note: we expect some negative quantities from the vw
         qty = r[:quantity]
-        # p qty.to_f
-        puts "#{qty.to_f},#{r[:price].to_f}"
-        # p "Whole qty: #{qty.to_f}"
+        p qty.to_f
+        # puts "#{qty.to_f},#{r[:price].to_f}"
+        p "Whole qty: #{qty.to_f}"
         # records are ordered by latest first
         # ensure that the record is valid by checking that it does not exceed the qty we have in stock
-        rest -= qty
+        rest -= qty.abs
 
-        # p "rest #{rest.to_f}"
-        # p "type: #{r[:record_type]}"
-        # p "price: #{r[:price].to_f} (next if nil)"
-        # ignore record if it does not have a price set
-        next if r[:price].nil?
+        p "rest #{rest.to_f}"
+        p "type: #{r[:record_type]}"
+        p "price: #{r[:price].to_f} (next if nil)"
 
         # Determine the applicable qty:
         applicable_qty = rest.negative? ? (r[:quantity] + rest) : r[:quantity]
         fix_remainder = rest * r[:price]
-        # p "appl qty #{applicable_qty.to_f}"
+        p "appl qty #{applicable_qty.to_f}"
 
         # Calculate amt = factor * price * applicable qty
         amt = applicable_qty * r[:price] # * r[:factor]
-        # p "amt #{amt.to_f}"
+        p "amt #{amt.to_f}"
 
         fix_remainder -= amt
 
         total_amt += amt
-        # p "total amt #{total_amt.to_f}"
-        # p '----------------------------------------'
-        break if rest.negative?
+        p "total amt #{total_amt.to_f}"
+        p '----------------------------------------'
+        break if rest.negative? || rest.eql?(0)
       end
-    total_amt += fix_remainder if rest.positive?
-    total_amt / total_qty
+      total_amt += fix_remainder if rest.positive?
+      total_amt / total_qty
     end
 
     def total_quantity(mrpv_id)

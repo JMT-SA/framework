@@ -14,11 +14,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Take an environment variable and interpret it
   # as a boolean.
-  def self.make_boolean(key, required: false)
+  #
+  # If required is true, the variable MUST have a value.
+  # If default_true is true, the value will be set to true if the variable has no value.
+  def self.make_boolean(key, required: false, default_true: false)
     val = if required
             ENV.fetch(key)
           else
-            ENV.fetch(key, 'f')
+            ENV.fetch(key, default_true ? 't' : 'f')
           end
     check_true(val)
   end

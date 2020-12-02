@@ -90,7 +90,7 @@ module UiRules
         fin_object_code: {},
         valid_until: { subtype: :datetime, required: true },
         remarks: { renderer: :textarea },
-        is_consignment_stock: { renderer: :hidden } # { renderer: :checkbox }
+        is_consignment_stock: { renderer: :checkbox }
       }
     end
 

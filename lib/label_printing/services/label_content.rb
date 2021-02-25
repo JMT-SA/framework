@@ -19,6 +19,10 @@ module LabelPrintingApp
       (@supporting_data[:packed_date] || Date.today).strftime('%Y-%m-%d')
     end
 
+    def current_time
+      (@supporting_data[:packed_time] || Time.now).strftime('%Y-%m-%d %H:%M')
+    end
+
     private
 
     # Take a field and format it for barcode printing.

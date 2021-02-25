@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  AccountCodeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:account_code, :integer).filled(:int?)
-    required(:description, Types::StrippedString).filled(:str?)
+  AccountCodeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:account_code).filled(:integer)
+    required(:description).filled(Types::StrippedString)
   end
 end

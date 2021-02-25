@@ -4,7 +4,7 @@ module PackMaterialApp
   class MrInventoryTransactionInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_adhoc_stock_transaction(sku_location_id, params, type) # rubocop:disable Metrics/AbcSize
       res = validate_adhoc_transaction_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = prep_adhoc_transaction_params(sku_location_id, res)
       return res unless res.success
@@ -43,7 +43,7 @@ module PackMaterialApp
       params[:business_process_id] = repo.process_id(params[:business_process])
 
       res = validate_adhoc_rmd_move_stock_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       success_response('OK', res)
     end
@@ -63,7 +63,7 @@ module PackMaterialApp
                                                                     user_name: @user.user_name,
                                                                     to_location_id: to_location_id,
                                                                     location_id: params[:from_location_id]))
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       can_action = TaskPermissionCheck::MrInventoryTransaction.call(:move,
                                                                     sku_ids: sku_ids,

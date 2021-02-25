@@ -44,7 +44,7 @@ module MasterfilesApp
         short_description: Faker::Company.unique.name.to_s,
         medium_description: Faker::Company.name.to_s,
         long_description: Faker::Company.name.to_s,
-        vat_number: Faker::Number.number(10),
+        vat_number: Faker::Number.number(digits: 10),
         active: true,
         role_ids: []
       }

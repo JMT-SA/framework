@@ -4,7 +4,7 @@ module MasterfilesApp
   class CommodityInteractor < BaseInteractor
     def create_commodity_group(params)
       res = validate_commodity_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_commodity_group(res)
       instance = commodity_group(id)
@@ -15,7 +15,7 @@ module MasterfilesApp
 
     def update_commodity_group(id, params)
       res = validate_commodity_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_commodity_group(id, res)
       instance = commodity_group(id)
@@ -37,7 +37,7 @@ module MasterfilesApp
 
     def create_commodity(params)
       res = validate_commodity_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_commodity(res)
       instance = commodity(id)
@@ -48,7 +48,7 @@ module MasterfilesApp
 
     def update_commodity(id, params)
       res = validate_commodity_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_commodity(id, res)
       instance = commodity(id)

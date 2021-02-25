@@ -4,7 +4,7 @@ module MasterfilesApp
   class DestinationInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_region(params)
       res = validate_region_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -19,7 +19,7 @@ module MasterfilesApp
 
     def update_region(id, params)
       res = validate_region_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_region(id, res)
@@ -44,7 +44,7 @@ module MasterfilesApp
 
     def create_country(id, params)
       res = validate_country_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       country_id = nil
       repo.transaction do
@@ -58,7 +58,7 @@ module MasterfilesApp
 
     def update_country(id, params)
       res = validate_country_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_country(id, res)
@@ -82,7 +82,7 @@ module MasterfilesApp
 
     def create_city(id, params)
       res = validate_city_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       city_id = nil
       repo.transaction do
@@ -96,7 +96,7 @@ module MasterfilesApp
 
     def update_city(id, params)
       res = validate_city_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_city(id, res)

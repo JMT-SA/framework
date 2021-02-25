@@ -33,13 +33,13 @@ module LabelApp
 
     def create_printer_application(params) # rubocop:disable Metrics/AbcSize
       res = validate_printer_application_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
         id = repo.create_printer_application(res)
         repo.unset_default_printer(id, res) if res.to_h[:default_printer]
-        log_status('printer_applications', id, 'CREATED')
+        log_status(:printer_applications, id, 'CREATED')
         log_transaction
       end
       instance = printer_application(id)
@@ -51,7 +51,7 @@ module LabelApp
 
     def update_printer_application(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_printer_application_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_printer_application(id, res)
@@ -67,7 +67,7 @@ module LabelApp
       name = printer_application(id).application
       repo.transaction do
         repo.delete_printer_application(id)
-        log_status('printer_applications', id, 'DELETED')
+        log_status(:printer_applications, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted printer application #{name}")

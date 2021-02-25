@@ -114,7 +114,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
     return OpenStruct.new(messages: {}) unless validator
 
     res = validator.call(select_extended_columns_params(params))
-    errs = { messages: res.messages.transform_keys { |k| "extcol_#{k}".to_sym } }
+    errs = { messages: res.errors.to_h.transform_keys { |k| "extcol_#{k}".to_sym } }
     fields = res.to_h.transform_keys { |k| "extcol_#{k}".to_sym }
     OpenStruct.new(errs.merge(fields))
   end
@@ -229,8 +229,8 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   # @param params [Hash] the request parameters.
   # @return [DryValidationResponse]
   def validate_changed_value_as_int(params)
-    Dry::Validation.Params do
-      required(:changed_value).maybe(:int?)
+    Dry::Schema.Params do
+      required(:changed_value).maybe(:integer)
     end.call(params)
   end
 
@@ -240,7 +240,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   # @param params [Hash] the request parameters.
   # @return [DryValidationResponse]
   def validate_changed_value_as_str(params)
-    Dry::Validation.Params do
+    Dry::Schema.Params do
       required(:changed_value).maybe(:str?)
     end.call(params)
   end

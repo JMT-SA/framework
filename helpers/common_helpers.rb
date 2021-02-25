@@ -7,10 +7,17 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     view('crossbeams_layout_page')
   end
 
-  def show_rmd_page(&block)
+  # Show a Crossbeams::Layout page rendered in a particular page layout
+  # - The block must return a Crossbeams::Layout::Page
+  def show_page_in_layout(layout, &block)
     @layout = block.yield
     @layout.add_csrf_tag(csrf_tag)
-    view('crossbeams_layout_page', layout: 'layout_rmd')
+    view('crossbeams_layout_page', layout: layout)
+  end
+
+  # RMD pages always render in layout_rmd.
+  def show_rmd_page(&block)
+    show_page_in_layout('layout_rmd', &block)
   end
 
   # Render a block of Crossbeams::Layout DSL as string.
@@ -154,7 +161,6 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def move_validation_errors_to_base(messages, keys, highlights: {}) # rubocop:disable Metrics/AbcSize
     interim = messages || {}
     Array(keys).each do |key|
-      # raise ArgumentError, "Move validation errors - key not present: #{key}" unless interim.key?(key)
       next unless interim.key?(key) # Note: It only needs to move error message to base if it exists in the first place
 
       if highlights.key?(key)
@@ -163,7 +169,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
         interim[:base_with_highlights][:highlights] = Array(interim[:base_with_highlights][:highlights]) + Array(highlights.delete(key))
       else
         interim[:base] ||= []
-        interim[:base] += Array(interim.delete(key))
+        # interim[:base] += Array(interim.delete(key))
+        interim[:base] += Array(interim.delete(key)).map { |msg| "#{key.to_s.gsub('_', ' ').capitalize} #{msg}" }
       end
     end
     interim
@@ -257,14 +264,28 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @current_user = nil
   end
 
+  # Get the id of a functional area and store as instance valiable
+  #
+  # @param functional_area_name [string] the functional area
+  # @return [integer]
   def store_current_functional_area(functional_area_name)
     @functional_area_id = SecurityApp::MenuRepo.new.functional_area_id_for_name(functional_area_name)
   end
 
+  # Return the functional_area_id instance variable
+  #
+  # @return [integer] functional area id.
   def current_functional_area
     @functional_area_id
   end
 
+  # Is the current user authorised for a particular menu access permission?
+  # Always returns false is there is no logged-on user.
+  #
+  # @param programs [string, array] the program name(s)
+  # @param sought_permission [string] the security permission
+  # @param functional_area_id [nil,integer] the functional area. Optional, typically set by the route
+  # @return [boolean] true if authorised
   def authorised?(programs, sought_permission, functional_area_id = nil)
     return false unless current_user
 
@@ -273,13 +294,34 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     prog_repo.authorise?(current_user, Array(programs), sought_permission, functional_area_id)
   end
 
+  # Using functional area name, is the current user authorised for a particular menu access permission?
+  # Always returns false is there is no logged-on user.
+  #
+  # @param functional_area_name [string] the functional area.
+  # @param programs [string, array] the program name(s)
+  # @param sought_permission [string] the security permission
+  # @return [boolean] true if authorised
   def auth_blocked?(functional_area_name, programs, sought_permission)
     store_current_functional_area(functional_area_name)
     !authorised?(programs, sought_permission)
   end
 
+  # Raise an authorization exception if the current user is not
+  # authorised for a particular menu access permission.
+  #
+  # @param programs [string, array] the program name(s)
+  # @param sought_permission [string] the security permission
+  # @param functional_area_id [nil,integer] the functional area. Optional, typically set by the route
+  # @return [void]
   def check_auth!(programs, sought_permission, functional_area_id = nil)
     raise Crossbeams::AuthorizationError unless authorised?(programs, sought_permission, functional_area_id)
+  end
+
+  # Raises an authorization exception if not running in development mode.
+  #
+  # @return [void]
+  def check_dev_only!
+    raise Crossbeams::AuthorizationError unless AppConst.development?
   end
 
   # Called by RodAuth after successful login to check if user
@@ -422,7 +464,6 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param notice [String/Nil] the flash message to show.
   # @return [JSON] the changes to be applied.
   def add_grid_row(attrs:, notice: nil)
-    # res = { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
     res = action_add_grid_row(attrs: attrs)
     res[:flash] = { notice: notice } if notice
     res.to_json
@@ -509,6 +550,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :change_select_value, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
   end
 
+  def json_replace_url(dom_id, value, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :replace_url, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
+  end
+
   def json_replace_inner_html(dom_id, value, message: nil, keep_dialog_open: false)
     json_actions(OpenStruct.new(type: :replace_inner_html, dom_id: dom_id, value: value), message, keep_dialog_open: keep_dialog_open)
   end
@@ -546,6 +591,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     {
       replace_input_value:    ->(act) { action_replace_input_value(act) },
       change_select_value:    ->(act) { action_change_select_value(act) },
+      replace_url:            ->(act) { action_replace_url(act) },
       replace_inner_html:     ->(act) { action_replace_inner_html(act) },
       replace_select_options: ->(act) { action_replace_select_options(act) },
       replace_multi_options:  ->(act) { action_replace_multi_options(act) },
@@ -581,8 +627,16 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     { change_select_value: { id: action.dom_id, value: action.value } }
   end
 
+  def action_replace_url(action)
+    { replace_url: { id: action.dom_id, value: action.value } }
+  end
+
   def action_replace_inner_html(action)
     { replace_inner_html: { id: action.dom_id, value: action.value } }
+  end
+
+  def action_replace_dialog(action)
+    { replace_dialog: { content: action.content } }
   end
 
   def action_replace_list_items(action)

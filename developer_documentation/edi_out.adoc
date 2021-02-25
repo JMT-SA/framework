@@ -20,15 +20,15 @@ NOTE: This config is typically only changed in the code base when a new flow is 
 edi/schemas/schema_record_sizes.yml:: Stores record lengths (for flat files) or output file type for each flow type.
 edi/schemas/<flow.xml>|<flow.yml>|<flow.xsd>:: Schema definition for output files - one file per flow type.
 AppConst::EDI_FLOW_*:: Constants for flow types (e.g. `EDI_FLOW_PO = 'PO'` for PO flow type)
-AppConst::EDI_OUT_RULES_TEMPLATE:: A has of rules to govern the CRUD around `edi_out_rules` table.
+AppConst::EDI_OUT_RULES_TEMPLATE:: A hash of rules to govern the CRUD around `edi_out_rules` table.
 
 ==== Client-specific config
 
 NOTE: This config is set up per client.
 
-edi_out_rules table:: Table that stores destinations for each flow type. There is a UI CRUD environment for maintaining this table.
+edi_out_rules table:: Table that stores destinations for each flow type. There is a UI CRUD environment for maintaining this table. See menu item `EDI | Config | OUT Rules`.
 Environment variable `EDI_NETWORK_ADDRESS`:: The client's EDI network address.
-config/edi_out_config.yml:: Stores file path rules - see schema above.
+config/edi_out_config.yml:: Stores file path rules - see structure below.
 
 A typical folder structure would look something like this and `edi_out_config` would point to it:
 
@@ -49,6 +49,37 @@ ftp_transfer/
 ----
 <1> Keys that match entries in config.
 <2> Folder where email out files are generated before being attached to emails.
+
+=== Structure of edi_out_config.yml
+
+This file is named `config/edi_out_config.yml`. In deployed systems it is in `shared/config`.
+
+The keys in `:out_dirs` and `:mail_recipients` are used in the EDI out rules CRUD to select targets for EDI files.
+
+An example:
+[source,yaml]
+----
+:root: "$HOME/ftp_transfer"                  #<1>
+:email_dir: "$ROOT/edi_mail_out"             #<2>
+:send_edi:
+  :po: false                                 #<3>
+  :ps: true                                  #<4>
+:out_dirs:
+  :paltrack: "$ROOT/edi_out/paltrack"        #<5>
+  :head_office: "$ROOT/edi_out/head_office"
+:mail_recipients:
+  :ajax:                                     #<6>
+    :to: person1@place.com,person2@place.com #<7>
+    :cc: someone@here.com                    #<8>
+----
+<1> The directory under which all other out directories live.
+<2> All files to be sent by mail will be written to this directory.
+<3> The sending of a flow type can be switched off by setting this to false.
+<4> If this is not true, the flow type will not be sent.
+<5> These keys match the name in the folder structure - see previous section. Not the use of `$ROOT` as a shortcut.
+<6> This is a mail key. There can be several.
+<7> The email addresses that will receive the file for `mail:ajax` target. A comma-separated list. No spaces.
+<8> The `cc` is typically used to send a copy of the file to someone on site. A comma-separated list. No spaces.
 
 === Starting an EDI process
 
@@ -94,7 +125,7 @@ record_entries:: A Hash to be filled with data for output. For flat files, add a
 
 validate_data(identifiers, check_lengths = false):: Validate data for a flat file EDI against the flow's schema. Limit to certain identifiers.
 build_hash_from_data(rec, rec_id):: Builds up a hash from a query `rec` and adds it to `record_entries[rec_id]`.
-add_recordadd_record(record_type, rec = {}):: Add a hash to `record_entries` for `record_type`.
+add_record(record_type, rec = {}):: Add a hash to `record_entries` for `record_type`.
 create_flat_file:: creates the flat file from `record_entries`.
 add_csv_record(rec):: add a csv formatted record to `record_entries` from the `rec` hash.
 create_csv_file:: creates the csv file from `record_entries`.

@@ -19,7 +19,7 @@ module PackMaterialApp
       can_create = TaskPermissionCheck::MrPurchaseOrderCost.call(:create, purchase_order_id: parent_id)
       if can_create.success
         res = validate_mr_purchase_order_cost_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         id = nil
         repo.transaction do
@@ -36,11 +36,11 @@ module PackMaterialApp
       validation_failed_response(OpenStruct.new(messages: { id: ['This purchase order cost already exists'] }))
     end
 
-    def update_mr_purchase_order_cost(id, params) # rubocop:disable Metrics/AbcSize
+    def update_mr_purchase_order_cost(id, params)
       can_update = TaskPermissionCheck::MrPurchaseOrderCost.call(:update, id)
       if can_update.success
         res = validate_mr_purchase_order_cost_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         repo.transaction do
           repo.update_mr_purchase_order_cost(id, res)

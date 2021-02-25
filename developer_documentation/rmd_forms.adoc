@@ -379,6 +379,11 @@ Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{fiel
 |Boolean
 |`false`
 
+|options - :value_class
+|Supply a css class to apply to the rendering of the label value. Use Tachyons classes (`b` for bold, `blue` for blue etc.)
+|String
+|None.
+
 |===
 
 === Method: add_toggle

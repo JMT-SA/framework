@@ -83,6 +83,66 @@ class Framework < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'hide_grid_columns' do
+      check_dev_only!
+      check_auth!('reports', 'edit')
+
+      r.is do
+        r.get do
+          show_page { DM::Admin::HideGridColumns.call }
+        end
+        r.post do
+          res = interactor.hide_grid_columns(params[:report])
+          if res.success
+            r.redirect "/dataminer/admin/hide_grid_columns/#{res.instance[:type]}/#{res.instance[:file]}"
+          else
+            flash[:error] = 'Choose one of Lists or Searches'
+            r.redirect '/dataminer/admin/hide_grid_columns'
+          end
+        end
+      end
+
+      r.on 'change_lists_col', String, String do |file, grid_col_name|
+        res = interactor.save_hide_list_column(params.merge(file: file, grid_col: grid_col_name))
+        if res.success
+          change = params[:column_value] == 'true' ? 'Hiding' : 'Showing'
+          show_json_notice("#{change} #{grid_col_name} for #{AppConst::CLIENT_SET[params[:column_name]]}")
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :warning)
+        end
+      end
+
+      r.on 'change_searches_col', String, String do |file, grid_col_name|
+        res = interactor.save_hide_search_column(params.merge(file: file, grid_col: grid_col_name))
+        if res.success
+          change = params[:column_value] == 'true' ? 'Hiding' : 'Showing'
+          show_json_notice("#{change} #{grid_col_name} for #{AppConst::CLIENT_SET[params[:column_name]]}")
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :warning)
+        end
+      end
+
+      r.on 'lists', String do |file|
+        show_page { DM::Admin::HideGridColumnsList.call(file) }
+      end
+
+      r.on 'lists_grid', String do |file|
+        interactor.build_list_grid(file)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+
+      r.on 'searches', String do |file|
+        show_page { DM::Admin::HideGridColumnsSearch.call(file) }
+      end
+
+      r.on 'searches_grid', String do |file|
+        interactor.build_search_grid(file)
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+    end
+
     r.on :id do |id|
       id = id.gsub('%20', ' ')
 

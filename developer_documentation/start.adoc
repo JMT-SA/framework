@@ -100,6 +100,7 @@ Block users from changing table data that application code requires.
 * How to link:/developer_documentation/how_to_use_lookup_grid.adoc[set up a lookup grid].
 * How to link:/developer_documentation/how_to_test_rmd_scanning.adoc[test RMD scanning].
 * How to link:/developer_documentation/how_to_implement_a_back_button.adoc[implement a Back button].
+* How to link:/developer_documentation/how_to_show_progress.adoc[show a user that an action is in progress].
 
 === Config
 
@@ -141,3 +142,4 @@ View source code documentation for methods in the following files:
 * link:/yarddocthis/lib=rmd_form.rb[RMD Form methods]
 * link:/yarddocthis/lib=base_step.rb[BaseStep methods]
 * link:/yarddocthis/lib=error_mailer.rb[ErrorMailer methods]
+* link:/yarddocthis/helpers=utility_functions.rb[Utility functions]

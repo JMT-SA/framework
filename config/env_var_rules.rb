@@ -24,6 +24,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DATABASE_URL: 'Database connection string in the format "postgres://USER:PASSS@HOST:PORT/DATABASE_NAME".' },
     { IMPLEMENTATION_OWNER: 'The name of the implementation client.' },
     { SHARED_CONFIG_HOST_PORT: 'IP address of shared_config in the format HOST:PORT' },
+    { JRUBY_JASPER_HOST_PORT: 'IP address of jruby jasper reporting engine in the format HOST:PORT' },
     { CHRUBY_STRING: 'The version of chruby used in development. Used in Rake tasks.' }
   ].freeze
 

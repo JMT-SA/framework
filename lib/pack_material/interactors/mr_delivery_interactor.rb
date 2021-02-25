@@ -6,7 +6,7 @@ module PackMaterialApp
       can_create = TaskPermissionCheck::MrDelivery.call(:create)
       if can_create.success
         res = validate_mr_delivery_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         id = nil
         repo.transaction do
@@ -27,7 +27,7 @@ module PackMaterialApp
       can_update = TaskPermissionCheck::MrDelivery.call(:update, id)
       if can_update.success
         res = validate_mr_delivery_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         repo.transaction do
           repo.update_mr_delivery(id, res)
@@ -44,7 +44,7 @@ module PackMaterialApp
       add_invoice = TaskPermissionCheck::MrDelivery.call(:add_invoice, id)
       if add_invoice.success
         res = validate_mr_delivery_purchase_invoice_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         repo.transaction do
           repo.update_mr_delivery(id, res)
@@ -142,7 +142,7 @@ module PackMaterialApp
       can_putaway = TaskPermissionCheck::MrDelivery.call(:putaway, delivery_id)
       if can_putaway.success
         res = validate_mr_delivery_putaway_params(attrs)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         to_location_id = repo.resolve_location_id_from_scan(attrs[:location], attrs[:location_scan_field])
         return validation_failed_response(location: attrs[:location], messages: { location: ['Location short code not found'] }) unless to_location_id

@@ -20,7 +20,7 @@ module SecurityApp
 
     def create_program(params, webapp)
       res = validate_program_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_program(res, webapp)
       instance = program(id)
@@ -30,7 +30,7 @@ module SecurityApp
 
     def update_program(id, params)
       res = validate_edit_program_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_program(id, res)
       instance = program(id)

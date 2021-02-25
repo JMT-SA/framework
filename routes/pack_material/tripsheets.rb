@@ -230,7 +230,7 @@ class Framework < Roda
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
           else
-            form_errors = move_validation_errors_to_base(res.errors, :valid_quantity)
+            # form_errors = move_validation_errors_to_base(res.errors, :valid_quantity)
             re_show_form(r, res, url: "/pack_material/tripsheets/vehicle_jobs/#{id}/vehicle_job_units/new") do
               PackMaterial::Tripsheets::VehicleJobUnit::New.call(id,
                                                                  form_values: params[:vehicle_job_unit],

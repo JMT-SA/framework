@@ -4,7 +4,7 @@ module PackMaterialApp
   class MrSalesOrderInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_mr_sales_order(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_mr_sales_order_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -21,7 +21,7 @@ module PackMaterialApp
 
     def update_mr_sales_order(id, params)
       res = validate_mr_sales_order_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_sales_order(id, res)

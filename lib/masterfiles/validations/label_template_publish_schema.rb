@@ -1,31 +1,21 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  LabelTemplatePublishSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    # required(:publish_data) do
-    #   schema do
-    required(:printer_type, Types::StrippedString).filled(:str?)
-    required(:labels).each do
-      schema do
-        required(:id, :integer).filled(:int?)
-        required(:label_name, Types::StrippedString).filled(:str?)
-        required(:variable_set, Types::StrippedString).filled(:str?)
-        required(:variables, :array).maybe(:array?) # { each(filled? > hash) }
-      end
-      #   end
-      # end
+  LabelTemplatePublishSchema = Dry::Schema.Params do
+    required(:printer_type).filled(Types::StrippedString)
+    required(:labels).array(:hash) do
+      required(:id).filled(:integer)
+      required(:label_name).filled(Types::StrippedString)
+      required(:variable_set).filled(Types::StrippedString)
+      required(:variables).maybe(:array) # { each(filled? > hash) }
     end
   end
 
-  LabelTemplatePublishInnerSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:group, Types::StrippedString).filled(:str?)
-    required(:resolver, Types::StrippedString).filled(:str?)
-    required(:group, Types::StrippedString).filled(:str?)
-    required(:applications, :array).filled(:array?, min_size?: 1) { each(:str?) }
+  LabelTemplatePublishInnerSchema = Dry::Schema.Params do
+    required(:group).filled(Types::StrippedString)
+    required(:resolver).filled(Types::StrippedString)
+    required(:group).filled(Types::StrippedString)
+    required(:applications).filled(:array, min_size?: 1).each(:string)
   end
 end
 __END__

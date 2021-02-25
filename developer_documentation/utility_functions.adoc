@@ -20,6 +20,8 @@ UtilityFunctions.days_ago(Date.today, 3)    # => Date - three days before Date.t
 UtilityFunctions.days_since(Date.today, 3)  # => Date - three days after Date.today.
 ----
 
+---
+
 Calculate the pick ref for today for a packhouse:
 [source,ruby]
 ----
@@ -35,6 +37,29 @@ UtilityFunctions.ip_from_uri('192.168.0.1')                # => '192.168.0.1'.
 UtilityFunctions.ip_from_uri('http://192.168.0.1:8080/')   # => '192.168.0.1'.
 ----
 
+---
+
+Validate that an integer is not longer than the database's maximum length.
+
+Useful when a barcode is scanned and an integer is expected, but something like a pallet number could be accidentally scanned.
+[source,ruby]
+----
+UtilityFunctions.validate_integer_length(:load_id, '123')
+#=> #<Dry::Validation::Result output={:load_id=>123} errors={}>
+
+UtilityFunctions.validate_integer_length(:load_id, '600980218296776168')
+#=> #<Dry::Validation::Result output={:load_id=>600980218296776168} errors={:load_id=>["must be less than 2147483647"]}>
+
+UtilityFunctions.validate_integer_length(:load_id, 'abc123')
+#<Dry::Validation::Result output={:load_id=>"abc123"} errors={:load_id=>["must be an integer"]}
+
+# Example usage:
+res = UtilityFunctions.validate_integer_length(:carton_number, carton_number)
+return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") if res.failure?
+----
+
+---
+
 Deep merge two nested hashes. For matching keys, the value on the right overrides the one on the left. Extra keys from the right are added to the result.
 [source,ruby]
 ----
@@ -46,6 +71,8 @@ UtilityFunctions.merge_recursively(left, right)
 #=> { one: { two: { three: 5 }, four: 4, seven: 7 } }
 ----
 
+---
+
 Change keys of a nested hash from strings to symbols.
 [source,ruby]
 ----
@@ -55,6 +82,8 @@ UtilityFunctions.symbolize_keys(example)
 
 # => { one: { two: { three: 3 }, four: 4 } }
 ----
+
+---
 
 Takes a string and returns an array from text split on commas and new lines.
 [source,ruby]
@@ -66,6 +95,8 @@ UtilityFunctions.parse_string_to_array(example)
 # => ['ABC', 'DEF', 'GHI']
 ----
 
+---
+
 Returns the non numeric elements of an array of strings.
 [source,ruby]
 ----
@@ -75,6 +106,8 @@ UtilityFunctions.non_numeric_elements(example)
 
 # => ['12C']
 ----
+
+---
 
 Transforms a string in scientific notation to a string in float format.
 
@@ -97,6 +130,8 @@ json_hash.transform_values { |v| UtilityFunctions.scientific_notation_to_s(v) }
 # =>  { "nett_weight" => "303.0", "gross_weight" => "340.0", "weighed_manually" => true}
 ----
 
+---
+
 Wrap text/SQL
 
 Default is to wrap at 120 characters, but there is a parameter available to override.
@@ -109,4 +144,20 @@ UtilityFunctions.wrapped_text(str, 80)
 
 UtilityFunctions.wrapped_sql(sql)
 UtilityFunctions.wrapped_sql(sql, 80)
+----
+
+=== UI functions
+
+Render an icon in HTML
+[source,ruby]
+----
+UtilityFunctions.icon(:at)
+# => renders an SVG @ icon.
+----
+
+Render a loading message (glyph optionally with a message)
+[source,ruby]
+----
+UtilityFunctions.loading_message('Something is busy')
+# => renders a "loading" glyph and the text next to it.
 ----

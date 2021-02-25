@@ -5,7 +5,7 @@ module PackMaterialApp
     def create_vehicle_job_unit(parent_id, params) # rubocop:disable Metrics/AbcSize
       assert_parent_permission!(:edit_header, parent_id)
       res = validate_new_vehicle_job_unit_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -26,7 +26,7 @@ module PackMaterialApp
 
     def update_vehicle_job_unit(id, params)
       res = validate_vehicle_job_unit_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_vehicle_job_unit(id, res)
@@ -53,7 +53,7 @@ module PackMaterialApp
     def inline_update(id, params)
       assert_permission!(:update, id)
       res = validate_vehicle_job_unit_inline_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.inline_update_vehicle_job_unit(id, res)
@@ -99,7 +99,9 @@ module PackMaterialApp
     end
 
     def validate_new_vehicle_job_unit_params(params)
-      NewVehicleJobUnitSchema.call(params)
+      # NewVehicleJobUnitSchema.call(params)
+      contract = NewVehicleJobUnitContract.new
+      contract.call(params)
     end
 
     def validate_vehicle_job_unit_params(params)

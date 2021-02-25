@@ -6,7 +6,7 @@ module PackMaterialApp
       assert_permission!(:create, nil, sales_order_id: parent_id)
       attrs = params.merge(mr_sales_order_id: parent_id)
       res = validate_mr_sales_order_item_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res1 = validate_mr_sales_order_item_quantity_required(res)
       return validation_failed_response(OpenStruct.new(messages: { quantity_required: [res1.message] })) unless res1.success
@@ -29,7 +29,7 @@ module PackMaterialApp
 
     def update_mr_sales_order_item(id, params)
       res = validate_mr_sales_order_item_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_sales_order_item(id, res)
@@ -55,7 +55,7 @@ module PackMaterialApp
 
     def inline_update(id, params)
       res = validate_mr_sales_order_item_inline_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.inline_update_sales_order_item(id, res)

@@ -14,9 +14,9 @@ module PackMaterialApp
       VehicleTypeSchema.call(params)
     end
 
-    def create_vehicle_type(params) # rubocop:disable Metrics/AbcSize
+    def create_vehicle_type(params)
       res = validate_vehicle_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -35,7 +35,7 @@ module PackMaterialApp
 
     def update_vehicle_type(id, params)
       res = validate_vehicle_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_vehicle_type(id, res)

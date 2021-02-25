@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  CommodityGroupSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).filled(:str?)
-    # required(:active, :bool).filled(:bool?)
+  CommodityGroupSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:code).filled(Types::StrippedString)
+    required(:description).filled(Types::StrippedString)
+    # required(:active).filled(:bool)
   end
 end

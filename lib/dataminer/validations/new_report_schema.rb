@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module DataminerApp
-  NewReportSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:database, Types::StrippedString).filled(:str?)
-    required(:filename, Types::StrippedString).filled(:str?)
-    required(:caption, Types::StrippedString).filled(:str?)
-    required(:sql, :string).filled(:str?)
+  NewReportSchema = Dry::Schema.Params do
+    optional(:database).filled(Types::StrippedString)
+    required(:filename).filled(Types::StrippedString)
+    required(:caption).filled(Types::StrippedString)
+    required(:sql).filled(:string)
   end
 end

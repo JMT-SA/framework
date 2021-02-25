@@ -260,6 +260,14 @@ const crossbeamsUtils = {
     const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
     sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
                                                               elem.dataset.sortableGroup));
+
+    // Repeating request: Check if there are any areas in the content that should be modified by polling...
+    const pollsters = dlg.querySelectorAll('[data-poll-message-url]');
+    pollsters.forEach((pollable) => {
+      const pollUrl = pollable.dataset.pollMessageUrl;
+      const pollInterval = pollable.dataset.pollMessageInterval;
+      crossbeamsUtils.pollMessage(pollable, pollUrl, pollInterval);
+    });
   },
 
   /**
@@ -306,7 +314,6 @@ const crossbeamsUtils = {
             crossbeamsUtils.showError(data.flash.error);
           }
         } else if (data.actions) {
-          console.log('GOT ACTIONS WITH FLASH');
           crossbeamsUtils.processActions(data.actions);
         } else {
           crossbeamsUtils.setDialogContent(`<div class="mt3"><div class="crossbeams-${noteStyle}-note"><p>${data.flash.error}</p></div></div>`);
@@ -593,6 +600,31 @@ const crossbeamsUtils = {
     }
   },
   /**
+   * Replace the url (href) of a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceURL: function replaceURL(action) {
+    const elem = document.getElementById(action.replace_url.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_url.id}"`,
+        title: 'Replace url: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (!elem.hasAttribute('href')) {
+      this.alert({
+        prompt: `This DOM element with id: "${action.replace_url.id}" has no HREF attribute`,
+        title: 'Replace url: incorrect DOM element',
+        type: 'error',
+      });
+      return;
+    }
+    elem.href = action.replace_url.value;
+  },
+  /**
    * Replace the contents of a DOM element.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
@@ -816,6 +848,9 @@ const crossbeamsUtils = {
       }
       if (action.change_select_value) {
         crossbeamsUtils.changeSelectValue(action);
+      }
+      if (action.replace_url) {
+        crossbeamsUtils.replaceURL(action);
       }
       if (action.replace_inner_html) {
         crossbeamsUtils.replaceInnerHtml(action);
@@ -1411,7 +1446,9 @@ const crossbeamsUtils = {
       throw new HttpError(response);
     })
     .then((data) => {
-      if (data.content) {
+      if (data.redirect) {
+        window.location = data.redirect;
+      } else if (data.content) {
         contentDiv.classList.remove('content-loading');
         contentDiv.innerHTML = data.content;
 

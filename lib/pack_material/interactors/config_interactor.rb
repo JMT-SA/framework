@@ -7,7 +7,7 @@ module PackMaterialApp
   class ConfigInteractor < BaseInteractor
     def create_matres_type(params)
       res = validate_matres_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_matres_type(res)
       instance = matres_type(id)
@@ -21,7 +21,7 @@ module PackMaterialApp
 
     def update_matres_type(id, params)
       res = validate_matres_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       response = repo.update_matres_type(id, res)
       extra = response[:message] ? (', ' + response[:message]) : ''
@@ -37,7 +37,7 @@ module PackMaterialApp
 
     def create_matres_sub_type(params)
       res = validate_matres_sub_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_matres_sub_type(res)
       instance = matres_sub_type(id)
@@ -48,7 +48,7 @@ module PackMaterialApp
 
     def update_matres_sub_type(id, params)
       res = validate_matres_sub_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       result = repo.update_matres_sub_type(id, res)
       if result.success
@@ -70,7 +70,7 @@ module PackMaterialApp
 
     def update_matres_config(id, params)
       res = validate_matres_sub_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_matres_sub_type(id, res)
       success_response('Updated the config')
@@ -88,7 +88,7 @@ module PackMaterialApp
 
     def update_product_code_configuration(id, params)
       res = validate_material_resource_type_config_code_columns_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_product_code_configuration(id, res)
@@ -98,7 +98,7 @@ module PackMaterialApp
 
     def create_matres_master_list_item(sub_type_id, params)
       res = validate_matres_master_list_item_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -117,7 +117,7 @@ module PackMaterialApp
 
     def update_matres_master_list_item(id, params)
       res = validate_matres_master_list_item_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_matres_master_list_item(id, res)
@@ -167,7 +167,8 @@ module PackMaterialApp
     end
 
     def validate_material_resource_type_config_code_columns_params(params)
-      MatresSubTypeConfigColumnsSchema.call(params)
+      contract = MatresSubTypeConfigColumnsContract.new
+      contract.call(params)
     end
 
     def matres_master_list_item(id)

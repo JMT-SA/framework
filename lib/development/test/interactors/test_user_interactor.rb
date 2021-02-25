@@ -20,7 +20,7 @@ module DevelopmentApp
       ]
       not_ok.each do |params, expect|
         res = interactor.send(:validate_user_params, params)
-        assert_equal expect, res.errors
+        assert_equal expect, res.errors.to_h
       end
     end
 

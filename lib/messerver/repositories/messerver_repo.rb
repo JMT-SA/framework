@@ -164,13 +164,13 @@ module MesserverApp
       log_request(request)
 
       response = http.request(request)
-      format_response(response, uri)
+      format_response(response, "#{uri}\nName: #{fname}\n(post_binary)")
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}\nScreen or print is #{screen_or_print}\nFname: #{fname}\nVars: #{vars.inspect}")
       failed_response("There was an error: #{e.message}")
     end
 
@@ -187,13 +187,13 @@ module MesserverApp
       log_request(request)
 
       response = http.request(request)
-      format_response(response, uri)
+      format_response(response, "#{uri}\nName: #{fname}\n(post_package)")
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}\nPrinter type is #{printer_type}\nTargets: #{targets.inspect}\nFname: #{fname}")
       failed_response("There was an error: #{e.message}")
     end
 
@@ -249,13 +249,13 @@ module MesserverApp
       log_request(request)
 
       response = http.request(request)
-      format_response(response, uri)
+      format_response(response, "#{uri}\nLabel: #{label_template_name}\nVars: #{vars.inspect}\nOptions: #{options.inspect}\n(post_print_or_preview)")
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}\nLabel is #{label_template_name}\nVars: #{vars.inspect}\nOptions: #{options.inspect}")
       failed_response("There was an error: #{e.message}")
     end
 
@@ -267,7 +267,7 @@ module MesserverApp
       log_request(request)
       response = http.request(request)
 
-      format_response(response, uri)
+      format_response(response, "#{uri}\n(request_uri)")
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED

@@ -166,6 +166,8 @@ module UiRules
       @options[:form_values].each do |k, v|
         @form_object[k] = if v.is_a?(Hash)
                             v.transform_keys(&:to_s)
+                          elsif v.is_a?(String) && v.empty?
+                            nil
                           else
                             v
                           end
@@ -305,6 +307,14 @@ module UiRules
     def change_select_value(actions)
       actions.map do |act|
         OpenStruct.new(type: :change_select_value,
+                       dom_id: act[:dom_id],
+                       value: act[:value])
+      end
+    end
+
+    def replace_url(actions)
+      actions.map do |act|
+        OpenStruct.new(type: :replace_url,
                        dom_id: act[:dom_id],
                        value: act[:value])
       end

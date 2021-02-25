@@ -27,7 +27,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
   end
 
   # Client-specific code
+  CLIENT_SET = {
+    'kr' => 'Kromco'
+  }.freeze
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
+  raise 'CLIENT_CODE must be lowercase.' unless CLIENT_CODE == CLIENT_CODE.downcase
+  raise "Unknown CLIENT_CODE - #{CLIENT_CODE}" unless CLIENT_SET.keys.include?(CLIENT_CODE)
+
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
   URL_BASE = ENV.fetch('URL_BASE')

@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MrVatTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:vat_type_code, Types::StrippedString).maybe(:str?)
-    required(:percentage_applicable, :decimal).maybe(:decimal?)
-    required(:vat_not_applicable, :bool).maybe(:bool?)
+  MrVatTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:vat_type_code).maybe(Types::StrippedString)
+    required(:percentage_applicable).maybe(:decimal)
+    required(:vat_not_applicable).maybe(:bool)
   end
 end

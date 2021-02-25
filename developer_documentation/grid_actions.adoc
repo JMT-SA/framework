@@ -28,6 +28,7 @@ The actions are rendered as a context menu that can include submenu groupings.
       - invoice
       - complete
     :hide_if_null: another_field_id,further_field
+    :hide_if_env_var: CLIENT_CODE:kr,NO_EDIT:<present>
   - :separator: true
   - :submenu:
      :text: Submenu caption
@@ -113,6 +114,22 @@ e.g. `A dialog for grade $:grade$ fruit` would render as `A dialog for grade 1X 
 |:hide_if_false
 |Name(s) of field(s) in the grid. Separated by commas - no spaces.
 |The item will not appear if any of the named fields' values is `false`.
+
+|:hide_if_env_var
+|String of `ENV var name`:`value` separated by commas.
+a|The item will not appear if there is any matching ENVIRONMENT VARIABLE/value combination.
+
+If the value is `<present>`, the action will be hidden if there is a matching ENVIRONMENT VARIABLE with _any_ value.
+
+Example: `:hide_if_env_var: CLIENT_CODE:kr,SOME_VAR:<present>`.
+
+|:show_if_env_var
+|String of `ENV var name`:`value` separated by commas.
+a|The item will only appear if there is any matching ENVIRONMENT VARIABLE/value combination.
+
+If the value is `<present>`, the action will be shown if there is a matching ENVIRONMENT VARIABLE with _any_ value.
+
+Example: `:show_if_env_var: CLIENT_CODE:kr,SOME_VAR:<present>`.
 
 |:is_delete
 |`true` or `false`

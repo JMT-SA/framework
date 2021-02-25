@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  UserSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    optional(:login_name, Types::StrippedString).filled(:str?)
-    required(:user_name, Types::StrippedString).maybe(:str?)
-    required(:email, Types::StrippedString).maybe(:str?)
-    optional(:profile, :hash).maybe(:hash?)
+  UserSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    optional(:login_name).filled(Types::StrippedString)
+    required(:user_name).filled(Types::StrippedString)
+    required(:email).maybe(Types::StrippedString)
+    optional(:profile).maybe(:hash)
   end
 end

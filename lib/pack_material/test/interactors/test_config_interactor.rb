@@ -293,17 +293,17 @@ module PackMaterialApp
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs)
       assert_empty x.errors
 
-      # required(:chosen_column_ids, :array).filled { each(:int?) }
+      # required(:chosen_column_ids).value(Types::IntArrayFromString)
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :chosen_column_ids })
       assert_equal(['is missing'], x.errors[:chosen_column_ids])
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(chosen_column_ids: nil))
-      assert_equal(['must be filled'], x.errors[:chosen_column_ids])
+      assert_equal(['must be an array'], x.errors[:chosen_column_ids])
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(chosen_column_ids: ''))
-      assert_equal(['must be filled'], x.errors[:chosen_column_ids])
+      assert_equal(['is missing'], x.errors[:chosen_column_ids])
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(chosen_column_ids: '1,2,3,w,5'))
       assert_equal(['must be an array'], x.errors[:chosen_column_ids])
 
-      # required(:columncodes_sorted_ids, Types::ArrayFromString).filled(:array?) { each(:int?) }
+      # required(:columncodes_sorted_ids).filled(Types::IntArrayFromString)
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.reject { |k| k == :columncodes_sorted_ids })
       assert_equal(['is missing'], x.errors[:columncodes_sorted_ids])
       x = interactor.send(:validate_material_resource_type_config_code_columns_params, test_attrs.merge(columncodes_sorted_ids: ''))

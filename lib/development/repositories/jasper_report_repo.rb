@@ -52,5 +52,23 @@ module DevelopmentApp
             end
       raise Crossbeams::FrameworkError, "The Jasper service is not reachable at #{AppConst::JRUBY_JASPER_HOST_PORT} : #{msg}"
     end
+
+    # Get the version of jruby_jasper and jasperreports in use.
+    def jasper_version
+      DRb.start_service
+      remote_object = DRbObject.new_with_uri("druby://#{AppConst::JRUBY_JASPER_HOST_PORT}")
+      ver = remote_object.version
+
+      DRb.stop_service
+      ver
+    rescue DRb::DRbConnError => e
+      DRb.stop_service # as ensure?
+      msg = if e.cause
+              e.cause.message
+            else
+              e.message
+            end
+      raise Crossbeams::FrameworkError, "The Jasper service is not reachable at #{AppConst::JRUBY_JASPER_HOST_PORT} : #{msg}"
+    end
   end
 end

@@ -2,7 +2,6 @@
 
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
-
 class Framework < Roda
   route 'general', 'masterfiles' do |r|
     # UOM TYPES
@@ -139,6 +138,5 @@ class Framework < Roda
     end
   end
 end
-
 # rubocop:enable Metrics/ClassLength
 # rubocop:enable Metrics/BlockLength

@@ -16,7 +16,7 @@ module PackMaterialApp
 
     def create_mr_cost_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_mr_cost_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -35,7 +35,7 @@ module PackMaterialApp
 
     def update_mr_cost_type(id, params)
       res = validate_mr_cost_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_cost_type(id, res)

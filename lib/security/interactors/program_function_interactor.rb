@@ -16,19 +16,19 @@ module SecurityApp
 
     def create_program_function(params)
       res = validate_program_function_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_program_function(res)
       instance = program_function(id)
       success_response("Created program function #{instance.program_function_name}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { code: ['This program function already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { program_function_name: ['This program function already exists'] }))
     end
 
     def update_program_function(id, params)
       res = validate_program_function_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_program_function(id, res)
       instance = program_function(id)

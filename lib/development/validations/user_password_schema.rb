@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  UserPasswordSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
+  class UserPasswordContract < Dry::Validation::Contract
+    params do
+      required(:password).filled(Types::StrippedString, min_size?: 4)
+      required(:password_confirmation).filled(Types::StrippedString, min_size?: 4)
+    end
 
-    required(:password, Types::StrippedString).filled(min_size?: 4)
-    required(:password_confirmation, Types::StrippedString).filled(:str?, min_size?: 4)
-
-    rule(password_confirmation: [:password]) do |password|
-      value(:password_confirmation).eql?(password)
+    rule(:password_confirmation, :password) do
+      key.failure('must match password') if values[:password] != values[:password_confirmation]
     end
   end
 end

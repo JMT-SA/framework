@@ -64,10 +64,8 @@ class TestCrossbeamsResponses < Minitest::Test
   end
 
   def test_validation_failed_with_dry
-    schema = Dry::Validation.Params do
-      configure { config.type_specs = true }
-
-      required(:in, Types::StrippedString).filled(:str?)
+    schema = Dry::Schema.Params do
+      required(:in).filled(Types::StrippedString)
     end
     validation = schema.call(dummy: nil)
     res = @test_obj.validation_failed_response(validation)
@@ -79,11 +77,9 @@ class TestCrossbeamsResponses < Minitest::Test
   end
 
   def test_validation_failed_with_dry_and_instance
-    schema = Dry::Validation.Params do
-      configure { config.type_specs = true }
-
-      required(:in, Types::StrippedString).filled(:str?)
-      required(:other, Types::StrippedString).filled(:str?)
+    schema = Dry::Schema.Params do
+      required(:in).filled(Types::StrippedString)
+      required(:other).filled(Types::StrippedString)
     end
     validation = schema.call(other: 'abc')
     res = @test_obj.validation_failed_response(validation)
@@ -93,19 +89,15 @@ class TestCrossbeamsResponses < Minitest::Test
   end
 
   def test_mixed_validation_failed
-    schema = Dry::Validation.Params do
-      configure { config.type_specs = true }
-
-      required(:in, Types::StrippedString).filled(:str?)
-      required(:other, Types::StrippedString).filled(:str?)
+    schema = Dry::Schema.Params do
+      required(:in).filled(Types::StrippedString)
+      required(:other).filled(Types::StrippedString)
     end
     validation = schema.call(other: 'abc')
 
-    schema2 = Dry::Validation.Params do
-      configure { config.type_specs = true }
-
-      required(:more, :integer).filled(:int?)
-      required(:extra, Types::StrippedString).filled(:str?)
+    schema2 = Dry::Schema.Params do
+      required(:more).filled(:integer)
+      required(:extra).filled(Types::StrippedString)
     end
     validation2 = schema2.call(more: 'str')
     res = @test_obj.mixed_validation_failed_response(validation, validation2)
@@ -115,11 +107,9 @@ class TestCrossbeamsResponses < Minitest::Test
   end
 
   def test_mixed_validation_failed_with_hash
-    schema = Dry::Validation.Params do
-      configure { config.type_specs = true }
-
-      required(:in, Types::StrippedString).filled(:str?)
-      required(:other, Types::StrippedString).filled(:str?)
+    schema = Dry::Schema.Params do
+      required(:in).filled(Types::StrippedString)
+      required(:other).filled(Types::StrippedString)
     end
     validation = schema.call(other: 'abc')
 

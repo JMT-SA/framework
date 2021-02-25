@@ -86,6 +86,8 @@ Like with updating a grid row, this will close the dialog and append a row to th
 
 `add_grid_row` will automatically set the `created_at` and `updated_at` fields in the new row if the grid has them (so they do not need to be included int the `attrs` Hash).
 
+The newly-added row will be scrolled into view if neccessary.
+
 == Changing DOM elements
 
 The main helper for this is `json_actions` which receives an array of actions to be carried out in the page and an optional flash message to be displayed and optional flag to indicate that a dialog should not be closed after processing the response in the page.
@@ -128,6 +130,16 @@ dom_id:: the value of the `id` attribute of the select element in the page. This
 e.g. if a form named `users` has a field named `surname`, then the dom_id will be `users_surname`.
 
 value:: the value of the option you want to be selected.
+
+==== Replace the URL of a DOM element
+
+Works on DOM elements (basically for anchors).
+
+type:: `:replace_url`.
+
+dom_id:: the value of the `id` attribute of the element in the page.
+
+value:: the value you want to change it to.
 
 ==== Replace the inner HTML of a DOM element
 
@@ -274,6 +286,8 @@ json_replace_multi_options(dom_id, options_array, message: nil, keep_dialog_open
 json_replace_input_value(dom_id, value, message: nil, keep_dialog_open: false)
 
 json_change_select_value(dom_id, value, message: nil, keep_dialog_open: false)
+
+json_replace_url(dom_id, value, message: nil, keep_dialog_open: false)
 
 json_replace_inner_html(dom_id, value, message: nil, keep_dialog_open: false)
 

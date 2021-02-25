@@ -114,4 +114,22 @@ class TestRMDForm < Minitest::Test
     assert_match(/<input type="checkbox"/, form.render)
     assert_match(/value="t" checked>/, form.render)
   end
+
+  def test_label_classes
+    form = make_form
+    form.add_label('test', 'Test', 'abc')
+    assert_match(/<div class="pa2 bg-moon-gray br2"/, form.render)
+
+    form = make_form
+    form.add_label('test', 'Test', 'abc', nil, value_class: 'red')
+    assert_match(/<div class="red pa2 bg-moon-gray br2"/, form.render)
+
+    form = make_form
+    form.add_label('test', 'Test', 'abc', nil, as_table_cell: true)
+    refute_match(/<div class="pa2 bg-moon-gray br2"/, form.render)
+
+    form = make_form
+    form.add_label('test', 'Test', 'abc', nil, as_table_cell: true, value_class: 'red')
+    assert_match(/<div class="red"/, form.render)
+  end
 end

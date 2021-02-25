@@ -20,7 +20,7 @@ module MasterfilesApp
         title: Faker::Company.name.to_s,
         first_name: Faker::Company.name.to_s,
         surname: Faker::Company.name.to_s,
-        vat_number: Faker::Number.number(10),
+        vat_number: Faker::Number.number(digits: 10),
         active: true
       }
       {
@@ -37,7 +37,7 @@ module MasterfilesApp
         short_description: Faker::Company.unique.name.to_s,
         medium_description: Faker::Company.name.to_s,
         long_description: Faker::Company.name.to_s,
-        vat_number: Faker::Number.number(10),
+        vat_number: Faker::Number.number(digits: 10),
         active: true
       }
       {
@@ -88,7 +88,7 @@ module MasterfilesApp
         address_line_2: Faker::Lorem.word,
         address_line_3: Faker::Lorem.word,
         city: Faker::Lorem.word,
-        postal_code: Faker::Number.number(4),
+        postal_code: Faker::Number.number(digits: 4),
         country: Faker::Lorem.word,
         active: true
       }

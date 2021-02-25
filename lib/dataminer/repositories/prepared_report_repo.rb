@@ -207,10 +207,14 @@ module DataminerApp
     end
 
     def next_seq_no(prepared_path, prefix)
+      hold_dir = Dir.pwd
+
       Dir.chdir(prepared_path)
       files = Dir.glob("#{prefix}_*")
       sequences = files.grep(/#{prefix}_\d+.yml/).map { |a| a.sub("#{prefix}_", '').sub('.yml', '').to_i }.sort
       next_or_re_use_missing_seq(sequences)
+    ensure
+      Dir.chdir(hold_dir)
     end
 
     # Get the next available sequence from a sorted array of integers.

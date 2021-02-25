@@ -18,13 +18,13 @@ class Framework < Roda
       end
 
       r.post do        # CREATE
-        res = DevelopmentApp::ScaffoldNewSchema.call(params[:scaffold] || {})
-        errors = res.messages
-        if errors.empty?
+        contract = DevelopmentApp::ScaffoldNewContract.new
+        res = contract.call(params[:scaffold] || {})
+        if res.success?
           result = DevelopmentApp::GenerateNewScaffold.call(res.to_h, request.roda_class)
           show_page { Development::Generators::Scaffolds::Show.call(result) }
         else
-          show_page { Development::Generators::Scaffolds::New.call(params[:scaffold], errors) }
+          show_page { Development::Generators::Scaffolds::New.call(params[:scaffold], res.errors.to_h) }
         end
       end
 
@@ -40,12 +40,11 @@ class Framework < Roda
 
       r.post do        # CREATE
         res = DevelopmentApp::ScriptScaffoldNewSchema.call(params[:scaffold] || {})
-        errors = res.messages
-        if errors.empty?
+        if res.success?
           result = DevelopmentApp::GenerateNewScriptScaffold.call(res)
           show_page { Development::Generators::ScriptScaffolds::Show.call(result) }
         else
-          show_page { Development::Generators::ScriptScaffolds::New.call(params[:scaffold], errors) }
+          show_page { Development::Generators::ScriptScaffolds::New.call(params[:scaffold], res.errors.to_h) }
         end
       end
     end

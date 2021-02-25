@@ -16,7 +16,7 @@ module DevelopmentApp
 
     def create_user_email_group(params)
       res = validate_user_email_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -32,7 +32,7 @@ module DevelopmentApp
 
     def update_user_email_group(id, params)
       res = validate_user_email_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_user_email_group(id, res)

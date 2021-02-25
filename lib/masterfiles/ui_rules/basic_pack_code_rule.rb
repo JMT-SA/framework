@@ -26,9 +26,9 @@ module UiRules
       {
         basic_pack_code: { required: true },
         description: {},
-        length_mm: {},
-        width_mm: {},
-        height_mm: {}
+        length_mm: { renderer: :integer },
+        width_mm: { renderer: :integer },
+        height_mm: { renderer: :integer }
       }
     end
 

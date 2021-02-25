@@ -5,7 +5,7 @@ module PackMaterialApp
     def create_mr_purchase_order(params) # rubocop:disable Metrics/AbcSize
       assert_permission!(:create)
       res = validate_mr_purchase_order_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -21,10 +21,10 @@ module PackMaterialApp
       failed_response(e.message)
     end
 
-    def update_mr_purchase_order(id, params) # rubocop:disable Metrics/AbcSize
+    def update_mr_purchase_order(id, params)
       assert_permission!(:update, id)
       res = validate_mr_purchase_order_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_purchase_order(id, res)

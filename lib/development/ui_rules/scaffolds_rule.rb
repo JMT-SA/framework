@@ -67,9 +67,12 @@ module UiRules
     end
 
     def applets_list
+      hold_dir = Dir.pwd
       dir = File.expand_path('../../applets', __dir__)
       Dir.chdir(dir)
       Dir.glob('*_applet.rb').map { |d| d.chomp('_applet.rb') }.push('other')
+    ensure
+      Dir.chdir(hold_dir)
     end
   end
 end

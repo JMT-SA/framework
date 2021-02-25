@@ -5,7 +5,7 @@ module PackMaterialApp
     def create_mr_bulk_stock_adjustment_item(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:mr_bulk_stock_adjustment_id] = parent_id
       res = validate_mr_bulk_stock_adjustment_item_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module PackMaterialApp
 
     def update_mr_bulk_stock_adjustment_item(id, params)
       res = validate_mr_bulk_stock_adjustment_item_update_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_bulk_stock_adjustment_item(id, res)
@@ -49,7 +49,7 @@ module PackMaterialApp
 
     def inline_update(id, params)
       res = validate_mr_bulk_stock_adjustment_item_inline_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.inline_update_bulk_stock_adjustment_item(id, res)

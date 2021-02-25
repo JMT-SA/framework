@@ -191,7 +191,7 @@ module DataminerApp
 
     def create_prepared_report(params)
       res = validate_prepared_report_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       # NB. Validate the report description - must be unique. (unless we are replacing an existing prep rpt.)
 
@@ -211,7 +211,7 @@ module DataminerApp
 
     def update_prepared_report(id, params)
       res = validate_prepared_report_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       PreparedReportRepo.new.save_prepared_report(id, params)
       success_response('Report has been updated', report_description: params[:report_description])

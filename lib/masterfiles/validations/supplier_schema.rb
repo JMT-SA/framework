@@ -1,20 +1,16 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  NewSupplierSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:party_id, :integer).filled(:int?)
-    required(:supplier_type_ids, Types::IntArray).filled { each(:int?) }
-    required(:erp_supplier_number, Types::StrippedString).maybe(:str?)
+  NewSupplierSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:party_id).filled(:integer)
+    required(:supplier_type_ids).filled(:array).each(:integer)
+    required(:erp_supplier_number).maybe(Types::StrippedString)
   end
 
-  EditSupplierSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:supplier_type_ids, Types::IntArray).filled { each(:int?) }
-    required(:erp_supplier_number, Types::StrippedString).maybe(:str?)
+  EditSupplierSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:supplier_type_ids).filled(:array).each(:integer)
+    required(:erp_supplier_number).maybe(Types::StrippedString)
   end
 end

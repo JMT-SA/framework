@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
 module LabelApp
-  MesModuleSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:module_code, Types::StrippedString).filled(:str?)
-    required(:module_type, Types::StrippedString).filled(:str?)
-    required(:server_ip, Types::StrippedString).filled(:str?)
-    required(:ip_address, Types::StrippedString).filled(:str?)
-    required(:port, :integer).filled(:int?)
-    required(:alias, Types::StrippedString).filled(:str?)
+  MesModuleSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:module_code).filled(Types::StrippedString)
+    required(:module_type).filled(Types::StrippedString)
+    required(:server_ip).filled(Types::StrippedString)
+    required(:ip_address).filled(Types::StrippedString)
+    required(:port).filled(:integer)
+    required(:alias).filled(Types::StrippedString)
   end
 end

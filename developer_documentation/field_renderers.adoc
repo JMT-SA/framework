@@ -110,12 +110,18 @@ a|
 |n/a
 
 |:pattern
-|Pattern to restrict input in the browser. (If no :title given, this will be the input's title)
+|Pattern to restrict input in the browser. (See `:pattern_title` below for setting the input's `title`)
 a|
 * :no_spaces (user cannot type in a space)
 * :lowercase_underscore (can only type underscore or lowercase)
+* :alphanumeric (can only type alphanumeric characters: A-Z, a-z, 0-9)
 * :ipv4_address (user must enter a valid 1pv4 address)
 * A regular expression used as the HTML5 `pattern` attribute of the input.
+|n/a
+
+|:pattern_title
+|Set's the input's title when a pattern is present and no :title has been provided. Default values are used for the built-in patterns above.
+|String
 |n/a
 
 |:force_lowercase

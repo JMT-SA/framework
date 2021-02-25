@@ -1,28 +1,24 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  ScaffoldNewSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:table, :string).filled
-    optional(:other, Types::StrippedString).maybe(:str?)
-    required(:program, Types::StrippedString).filled(:str?)
-    required(:label_field, Types::StrippedString).maybe(:str?)
-    required(:short_name, Types::StrippedString).filled(:str?)
-    required(:shared_repo_name, Types::StrippedString).maybe(:str?)
-    required(:shared_factory_name, Types::StrippedString).maybe(:str?)
-    required(:nested_route_parent, :string).maybe(:str?)
-    required(:new_from_menu, :bool).maybe(:bool?)
-    required(:jobs, :string).maybe(:str?)
-    required(:services, :string).maybe(:str?)
-
-    required(:applet, :string).filled(:str?).when(eql?: 'other') do
-      value(:other).filled?
+  class ScaffoldNewContract < Dry::Validation::Contract
+    params do
+      required(:table).filled(:string)
+      optional(:other).maybe(Types::StrippedString)
+      required(:program).filled(Types::StrippedString)
+      required(:label_field).maybe(Types::StrippedString)
+      required(:short_name).filled(Types::StrippedString)
+      required(:shared_repo_name).maybe(Types::StrippedString)
+      required(:shared_factory_name).maybe(Types::StrippedString)
+      required(:nested_route_parent).maybe(:string)
+      required(:new_from_menu).maybe(:bool)
+      required(:jobs).maybe(:string)
+      required(:services).maybe(:string)
+      required(:applet).filled(Types::StrippedString)
     end
 
-    # This validation rule also works (applet must be required too)
-    # validate(filled?: %i[applet other]) do |applet, other|
-    #   applet != 'other' || (!other.nil? && !other.empty?)
-    # end
+    rule(:other, :applet) do
+      key.failure 'must be filled in' if values[:applet] == 'other' && values[:other].nil?
+    end
   end
 end

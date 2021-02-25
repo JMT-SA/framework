@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  AddressTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:address_type, Types::StrippedString).filled(:str?)
+  AddressTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:address_type).filled(Types::StrippedString)
   end
 end

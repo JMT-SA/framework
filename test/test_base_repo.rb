@@ -192,16 +192,14 @@ class TestBaseRepo < MiniTestWithHooks
     expected = ["a: Integer", "b: String", "c: Sequel::Postgres::PGArray", "d: Float", "e: Sequel::Postgres::PGArray", "f: NilClass", "g: Sequel::Postgres::PGArray"]
     assert_equal expected, result.map { |k, v| "#{k}: #{v.class.name}" }
 
-    test_schema = Dry::Validation.Params do
-      configure { config.type_specs = true }
-
-      required(:a, :integer).filled(:int?)
-      required(:b, Types::StrippedString).filled(:str?)
-      required(:c, Types::IntArray).filled { each(:int?) }
-      required(:d, %i[nil decimal]).filled(:decimal?)
-      required(:e, Types::IntArray).filled { each(:int?) }
-      required(:f, Types::StrippedString).maybe(:str?)
-      required(:g, Types::IntArray).maybe { each(:int?) }
+    test_schema = Dry::Schema.Params do
+      required(:a).filled(:integer)
+      required(:b).filled(Types::StrippedString)
+      required(:c).filled(:array).each(:integer)
+      required(:d).filled(:decimal)
+      required(:e).filled(:array).each(:integer)
+      required(:f).maybe(Types::StrippedString)
+      required(:g).maybe(:array).each(:integer)
     end
 
     res = test_schema.call(params)

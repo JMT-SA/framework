@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  SupplierTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:type_code, Types::StrippedString).filled(:str?)
+  SupplierTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:type_code).filled(Types::StrippedString)
   end
 end

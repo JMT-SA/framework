@@ -4,7 +4,7 @@ module PackMaterialApp
   class MrGoodsReturnedNoteInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_mr_goods_returned_note(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_mr_goods_returned_note_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module PackMaterialApp
 
     def update_mr_goods_returned_note(id, params)
       res = validate_mr_goods_returned_note_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mr_goods_returned_note(id, res)

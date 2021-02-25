@@ -4,7 +4,7 @@ module MasterfilesApp
   class FruitSizeInteractor < BaseInteractor
     def create_std_fruit_size_count(params)
       res = validate_std_fruit_size_count_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_std_fruit_size_count(res)
       instance = std_fruit_size_count(id)
@@ -15,7 +15,7 @@ module MasterfilesApp
 
     def update_std_fruit_size_count(id, params)
       res = validate_std_fruit_size_count_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_std_fruit_size_count(id, res)
       instance = std_fruit_size_count(id)
@@ -31,7 +31,7 @@ module MasterfilesApp
     def create_fruit_actual_counts_for_pack(parent_id, params)
       params[:std_fruit_size_count_id] = parent_id
       res = validate_fruit_actual_counts_for_pack_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_fruit_actual_counts_for_pack(res)
       instance = fruit_actual_counts_for_pack(id)
@@ -42,7 +42,7 @@ module MasterfilesApp
 
     def update_fruit_actual_counts_for_pack(id, params)
       res = validate_fruit_actual_counts_for_pack_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = fruit_actual_counts_for_pack(id)
       repo.update_fruit_actual_counts_for_pack(id, res)
@@ -58,7 +58,7 @@ module MasterfilesApp
     def create_fruit_size_reference(parent_id, params)
       params[:fruit_actual_counts_for_pack_id] = parent_id
       res = validate_fruit_size_reference_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_fruit_size_reference(res)
       instance = fruit_size_reference(id)
@@ -69,7 +69,7 @@ module MasterfilesApp
 
     def update_fruit_size_reference(id, params)
       res = validate_fruit_size_reference_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_fruit_size_reference(id, res)
       instance = fruit_size_reference(id)

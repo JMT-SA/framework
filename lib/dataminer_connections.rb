@@ -52,18 +52,19 @@ class DataminerConnection
   attr_reader :name, :report_path, :prepared_report_path, :db,
               :connected, :connection_error
 
-  ConnSchema = Dry::Validation.Schema do
-    required(:name).value(format?: /\A[\da-z-]+\Z/)
-    required(:connection_string).maybe
-    required(:report_path).filled
-    required(:prepared_report_path).filled
-    optional(:connection)
+  ConnSchema = Dry::Schema.Params do
+    required(:name).value(:string, format?: /\A[\da-z-]+\Z/)
+    required(:connection_string).maybe(:string)
+    required(:report_path).filled(:string)
+    required(:prepared_report_path).filled(:string)
+    optional(:connection).value(type?: Sequel::Postgres::Database) # Possibly not neccessary...
   end
 
   def initialize(config) # rubocop:disable Metrics/AbcSize
     @connected = false
     validation = ConnSchema.call(config)
-    raise %(Dataminer report config is not correct: #{validation.messages.map { |k, v| "#{k} #{v.join(', ')}" }.join(', ')}) unless validation.success?
+    # raise %(Dataminer report config is not correct: #{validation.messages.map { |k, v| "#{k} #{v.join(', ')}" }.join(', ')}) unless validation.success?
+    raise %(Dataminer report config is not correct: #{validation.errors.to_h.map { |k, v| "#{k} #{v.join(', ')}" }.join(', ')}) unless validation.success?
 
     @name = validation[:name]
     @report_path = Pathname.new(validation[:report_path]).expand_path

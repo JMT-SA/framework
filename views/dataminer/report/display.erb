@@ -12,7 +12,7 @@
   <% if @page.report.external_settings[:colour_key] %>
     <%= Crossbeams::Layout::Grid.new(page_config, 'grd1', nil, caption: @page.report.caption, fit_height: true, bookmark_row_on_action: false, colour_key: @page.report.external_settings[:colour_key]).render %>
   <% else %>
-  <%= Crossbeams::Layout::Grid.new(page_config, 'grd1', nil, caption: @page.report.caption, fit_height: true, bookmark_row_on_action: false).render %>
+    <%= Crossbeams::Layout::Grid.new(page_config, 'grd1', nil, caption: @page.report.caption, fit_height: true, bookmark_row_on_action: false).render %>
   <% end %>
 </section>
 

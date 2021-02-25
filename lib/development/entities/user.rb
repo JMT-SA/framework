@@ -8,7 +8,9 @@ module DevelopmentApp
     attribute :password_hash, Types::String
     attribute :email, Types::String
     attribute :active, Types::Bool
-    attribute? :permission_tree, Types::JSON::Hash
-    attribute? :profile, Types::JSON::Hash
+    # attribute? :permission_tree, Types::JSON::Hash
+    # attribute? :profile, Types::JSON::Hash
+    attribute? :permission_tree, Types::Hash
+    attribute? :profile, Types::Hash
   end
 end

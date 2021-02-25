@@ -1,28 +1,26 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  MrSalesOrderSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:customer_party_role_id, :integer).filled(:int?)
-    required(:dispatch_location_id, :integer).filled(:int?)
-    optional(:issue_transaction_id, :integer).maybe(:int?)
-    required(:vat_type_id, :integer).filled(:int?)
-    required(:account_code_id, :integer).filled(:int?)
-    optional(:erp_customer_number, Types::StrippedString).filled(:str?)
-    optional(:created_by, Types::StrippedString).maybe(:str?)
-    required(:fin_object_code, Types::StrippedString).maybe(:str?)
-    required(:client_reference_number, Types::StrippedString).maybe(:str?)
-    optional(:sales_order_number, :integer).maybe(:int?)
-    optional(:shipped_at, :date_time).maybe(:date_time?)
-    optional(:integration_error, :bool).maybe(:bool?)
-    optional(:integration_completed, :bool).maybe(:bool?)
-    optional(:shipped, :bool).maybe(:bool?)
-    optional(:returned, :bool).maybe(:bool?)
+  MrSalesOrderSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:customer_party_role_id).filled(:integer)
+    required(:dispatch_location_id).filled(:integer)
+    optional(:issue_transaction_id).maybe(:integer)
+    required(:vat_type_id).filled(:integer)
+    required(:account_code_id).filled(:integer)
+    optional(:erp_customer_number).filled(Types::StrippedString)
+    optional(:created_by).maybe(Types::StrippedString)
+    required(:fin_object_code).maybe(Types::StrippedString)
+    required(:client_reference_number).maybe(Types::StrippedString)
+    optional(:sales_order_number).maybe(:integer)
+    optional(:shipped_at).maybe(:date_time)
+    optional(:integration_error).maybe(:bool)
+    optional(:integration_completed).maybe(:bool)
+    optional(:shipped).maybe(:bool)
+    optional(:returned).maybe(:bool)
   end
 
-  NewMrSalesOrderSchema = Dry::Validation.Params do
-    required(:customer_party_role_id, :integer).filled(:int?)
+  NewMrSalesOrderSchema = Dry::Schema.Params do
+    required(:customer_party_role_id).filled(:integer)
   end
 end

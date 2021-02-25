@@ -175,7 +175,7 @@ module DataminerApp
 
     def create_report(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_report_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       page = OpenStruct.new
       s = params[:filename].strip.downcase.tr(' ', '_').gsub(/_+/, '_').gsub(%r{[/:*?"\\<>\|\r\n]}i, '-')
@@ -520,11 +520,122 @@ module DataminerApp
       end
     end
 
+    def hide_grid_columns(params)
+      return success_response('ok', type: 'lists', file: params[:lists]) unless params[:lists].empty?
+      return failed_response('No parameter chosen') if params[:searches].empty?
+
+      success_response('ok', type: 'searches', file: params[:searches])
+    end
+
+    def build_list_grid(file)
+      build_list_search_grid(file, 'lists')
+    end
+
+    def build_search_grid(file)
+      build_list_search_grid(file, 'searches')
+    end
+
+    def build_list_search_grid(file, key) # rubocop:disable Metrics/AbcSize
+      yaml_def = load_list_search_yaml(key, file)
+
+      query_file = yaml_def[:dataminer_definition]
+      persistor = Crossbeams::Dataminer::YamlPersistor.new(File.join(ENV['GRID_QUERIES_LOCATION'], "#{query_file}.yml"))
+      report = Crossbeams::Dataminer::Report.load(persistor)
+
+      col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.col 'id', 'Column Name'
+        mk.col 'caption', 'Column caption'
+        mk.boolean 'hidden', 'Hidden'
+        AppConst::CLIENT_SET.each do |client_code, client_name|
+          mk.boolean client_code,
+                     client_name,
+                     width: 150,
+                     editable: true,
+                     cellEditor: 'select',
+                     cellEditorParams: { values: %w[true false] }
+        end
+      end
+      row_defs = report.ordered_columns.map do |col|
+        row = { id: col.name, caption: col.caption, hidden: col.hide }
+        AppConst::CLIENT_SET.each do |client_code, _|
+          row[client_code] = (yaml_def.dig(:hide_for_client, client_code) || []).include?(col.name)
+        end
+        row
+      end
+      save_url = "/dataminer/admin/hide_grid_columns/change_#{key}_col/#{file}/$:id$"
+      {
+        fieldUpdateUrl: save_url,
+        columnDefs: col_defs,
+        rowDefs: row_defs
+      }.to_json
+    end
+
+    def save_hide_list_column(params)
+      res = validate_hide_column_change(params)
+      return res unless res.success?
+
+      save_hide_status_of_column('lists', res)
+    end
+
+    def save_hide_search_column(params)
+      res = validate_hide_column_change(params)
+      return res unless res.success?
+
+      save_hide_status_of_column('searches', res)
+    end
+
+    def save_hide_status_of_column(key, params) # rubocop:disable Metrics/AbcSize
+      client_code = params[:column_name]
+      file = params[:file]
+      grid_col = params[:grid_col]
+      yaml_def = load_list_search_yaml(key, file)
+
+      hide = yaml_def[:hide_for_client] || {}
+      if params[:column_value]
+        hide[client_code] ||= []
+        hide[client_code] << grid_col
+      elsif hide[client_code]
+        hide[client_code] = hide[client_code].reject { |a| a == grid_col }
+        hide.delete(client_code) if hide[client_code].empty?
+      end
+      save_hide_for_client(key, file, yaml_def, hide)
+
+      success_response('ok')
+    end
+
     private
+
+    def list_search_yaml_file_name(key, file)
+      dir = File.expand_path("../#{key}", ENV['GRID_QUERIES_LOCATION'])
+      File.join(dir, file)
+    end
+
+    def load_list_search_yaml(key, file)
+      fn = list_search_yaml_file_name(key, file)
+      YAML.load_file(fn)
+    end
+
+    def save_hide_for_client(key, file, yaml_def, hide)
+      fn = list_search_yaml_file_name(key, file)
+      yaml_def[:hide_for_client] = hide
+      yaml_def.delete(:hide_for_client) if hide.empty?
+      File.open(fn, 'w') { |f| f << yaml_def.to_yaml }
+    end
 
     def unmodifiable_system_report(id)
       rpt_loc = ReportRepo::ReportLocation.new(id)
       rpt_loc.db == 'system' && !AppConst.development?
+    end
+
+    def validate_hide_column_change(params)
+      schema = Dry::Schema.Params do
+        required(:file).filled(:string)
+        required(:grid_col).filled(:string)
+        required(:column_name).filled(:string)
+        required(:column_value).filled(:bool)
+        required(:old_value).filled(:bool)
+      end
+      schema.call(params)
     end
 
     # ------------------------------------------------------------------------------------------------------

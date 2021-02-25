@@ -16,9 +16,13 @@ module Crossbeams
     # @param validation_results [Hash, Dry::Validation::Result, OpenStruct] the validation object and messages.
     # @return [OpenStruct] the response object.
     def validation_failed_response(validation_results)
+      # Dry::Schema::Result / Dry::Validation::Result
+      from_dry = validation_results.respond_to?(:failure?)
       OpenStruct.new(success: false,
-                     instance: validation_results.is_a?(Dry::Validation::Result) ? validation_results.to_h : validation_results.to_h.reject { |k, _| k == :messages },
-                     errors: validation_results.is_a?(Hash) ? validation_results[:messages] : validation_results.messages,
+                     # instance: validation_results.is_a?(Dry::Validation::Result) ? validation_results.to_h : validation_results.to_h.reject { |k, _| k == :messages },
+                     # errors: validation_results.is_a?(Hash) ? validation_results[:messages] : validation_results.messages,
+                     instance: from_dry ? validation_results.to_h : validation_results.to_h.reject { |k, _| k == :messages },
+                     errors: from_dry ? validation_results.errors.to_h : validation_results[:messages],
                      message: 'Validation error')
     end
 
@@ -56,7 +60,9 @@ module Crossbeams
       errs = {}
       instance = {}
       validation_results.each do |vr|
-        errs.merge!(vr.is_a?(Hash) ? vr[:messages] : vr.messages)
+        # errs.merge!(vr.is_a?(Hash) ? vr[:messages] : vr.messages)
+        # errs.merge!(vr.is_a?(Hash) ? vr[:messages] : vr.errors.to_h)
+        errs.merge!(vr.respond_to?(:failure?) ? vr.errors.to_h : vr[:messages])
         instance.merge!(vr.to_h)
       end
       OpenStruct.new(success: false,
@@ -118,8 +124,19 @@ module Crossbeams
       if res.errors.empty?
         res.message
       else
-        "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}"
+        "#{res.message} - #{res.errors.map { |fld, errs| "#{fld} #{unwrap_errors(errs)}" }.join('; ')}"
       end
+    end
+
+    # Take validation errors and unwrap Array or Hash.
+    # Do not call directly. Use +unwrap_failed_response+
+    #
+    # @param errs [array,hash] the validation errors for a particular field.
+    # @return [string] the list of validation errors for the field.
+    def unwrap_errors(errs)
+      return errs.join(', ') if errs.is_a?(Array)
+
+      errs.group_by { |_, v| v }.map { |k, v| ": #{v.length} item#{v.length == 1 ? '' : 's'} #{k.join(', ')}" }.join(', ')
     end
   end
 end

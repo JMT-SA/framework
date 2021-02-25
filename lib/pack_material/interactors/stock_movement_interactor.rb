@@ -4,7 +4,7 @@ module PackMaterialApp
   class StockMovementInteractor < BaseInteractor
     def create_stock_movement_report(params)
       res = validate_stock_movement_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.validate_stock_movement_report_date_params(res)
     end

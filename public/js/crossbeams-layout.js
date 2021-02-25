@@ -172,6 +172,14 @@
       }
     }, false);
 
+    // Repeating request: Check if there are any areas in the content that should be modified by polling...
+    const pollsters = document.querySelectorAll('[data-poll-message-url]');
+    pollsters.forEach((pollable) => {
+      const pollUrl = pollable.dataset.pollMessageUrl;
+      const pollInterval = pollable.dataset.pollMessageInterval;
+      crossbeamsUtils.pollMessage(pollable, pollUrl, pollInterval);
+    });
+
     // InputChange - check for observers
     document.body.addEventListener('change', (event) => {
       if (event.target.dataset && event.target.dataset.observeInputChange) {

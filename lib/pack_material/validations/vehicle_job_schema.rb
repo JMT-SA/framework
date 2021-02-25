@@ -1,40 +1,34 @@
 # frozen_string_literal: true
 
 module PackMaterialApp
-  NewVehicleJobSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:business_process_id, :integer).maybe(:int?)
-    required(:vehicle_id, :integer).maybe(:int?)
-    required(:departure_location_id, :integer).maybe(:int?)
-    # required(:tripsheet_number, :integer).maybe(:int?)
-    required(:planned_location_id, :integer).maybe(:int?)
-    required(:virtual_location_id, :integer).maybe(:int?)
-    required(:description, Types::StrippedString).maybe(:str?)
-    # required(:when_loaded, :date_time).maybe(:date_time?)
-    # required(:when_offloaded, :date_time).maybe(:date_time?)
+  NewVehicleJobSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:business_process_id).maybe(:integer)
+    required(:vehicle_id).maybe(:integer)
+    required(:departure_location_id).maybe(:integer)
+    # required(:tripsheet_number).maybe(:integer)
+    required(:planned_location_id).maybe(:integer)
+    required(:virtual_location_id).maybe(:integer)
+    required(:description).maybe(Types::StrippedString)
+    # required(:when_loaded).maybe(:date_time)
+    # required(:when_offloaded).maybe(:date_time)
   end
 
-  EditVehicleJobSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:business_process_id, :integer).maybe(:int?)
-    required(:vehicle_id, :integer).maybe(:int?)
-    required(:departure_location_id, :integer).maybe(:int?)
-    # required(:tripsheet_number, :integer).maybe(:int?)
-    required(:planned_location_id, :integer).maybe(:int?)
-    required(:virtual_location_id, :integer).maybe(:int?)
-    required(:description, Types::StrippedString).maybe(:str?)
-    # required(:when_loaded, :date_time).maybe(:date_time?)
-    # required(:when_offloaded, :date_time).maybe(:date_time?)
+  EditVehicleJobSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:business_process_id).maybe(:integer)
+    required(:vehicle_id).maybe(:integer)
+    required(:departure_location_id).maybe(:integer)
+    # required(:tripsheet_number).maybe(:integer)
+    required(:planned_location_id).maybe(:integer)
+    required(:virtual_location_id).maybe(:integer)
+    required(:description).maybe(Types::StrippedString)
+    # required(:when_loaded).maybe(:date_time)
+    # required(:when_offloaded).maybe(:date_time)
   end
 
-  UpdateVehicleJobSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:planned_location_id, :integer).maybe(:int?)
+  UpdateVehicleJobSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:planned_location_id).maybe(:integer)
   end
 end

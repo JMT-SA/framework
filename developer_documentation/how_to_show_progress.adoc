@@ -1,0 +1,142 @@
+= How to show progress to a user
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== How to show progress to a user
+
+Sometimes an action might take some time to complete, so the user should be made aware that the system is busy.
+These are some strategies for such situations.
+
+Here are two situations where the user waits for the action to end and one where the action is carried out asynchronously by a job and the user can continue to interact with the system.
+
+=== Show a new page
+
+Here a link will be opened in a new page, and the work will be started once the page has loaded. The user sees a loading glyph until the work is done.
+Once the work is done, a message could be shown, or a redirect could take place.
+
+Simplified e.g.
+[source,ruby]
+----
+# ROUTE
+
+r.on 'take_action' do
+  show_page { SomeView.call }
+end
+
+r.on 'do_work_redirect' do
+  res = interactor.work
+  flash[:notice] = res.message
+  redirect_to_last_grid(r)
+end
+
+r.on 'do_work_show' do
+  res = interactor.work
+  show_page { ResultView.call(res) }
+end
+----
+
+...and in the views:
+[source,ruby]
+----
+# SOMEVIEW
+page.callback_section do |section|
+  section.caption = 'Doing some work...'
+  section.add_text UtilityFunctions.loading_message('Something is happening...')
+  section.url = '/do_work_redirect'    # (or '/do_work_show')
+end
+
+# RESULTVIEW
+if res.success
+  page.add_notice(res.message, notice_type: :success)
+else
+  page.add_notice(res.message, notice_type: :error)
+end
+----
+
+NOTE: This works by using a `callback_section` which initially includes a loading glyph. On load, the callback calls another action to do the work, and once it is done, the page is updated/redirected.
+
+=== Show a dialog
+
+Here a dialog pops up when the user clicks a link and the dialog displays a loading glyph. Once the work is done, the page could be reloaded, redirected or the results could be shown in the dialog.
+
+Simplified e.g.
+[source,ruby]
+----
+# ROUTE
+
+r.on 'take_action' do
+  show_partial_or_page(r) { SomeView.call }
+end
+
+r.on 'do_work_redirect' do
+  res = interactor.work
+  flash[:notice] = res.message
+  { redirect: '/list/whatever' }.to_json
+end
+
+r.on 'do_work_show' do
+  res = interactor.work
+  { updateMessage: { content: render_partial { ResultView.call(res) },
+                     continuePolling: false } }.to_json
+end
+----
+
+...and in the views:
+[source,ruby]
+----
+# SOMEVIEW
+page.section do |section|
+  section.caption = 'Doing some work...'
+  section.add_repeating_request('/do_work_redirect', # (or '/do_work_show')
+                                1000,
+                                UtilityFunctions.loading_message('Something is happening...'))
+end
+
+# RESULTVIEW
+if res.success
+  page.add_notice(res.message, notice_type: :success)
+else
+  page.add_notice(res.message, notice_type: :error)
+end
+----
+
+NOTE: This works by using a `repeating_request` in the dialog which initially includes a loading glyph. On load, the `repeating_request` calls another action to do the work, and once it is done, the `repeating_request` is updated to stop polling and the results are shown or a redirect takes place.
+
+=== Show messages from a queued job
+
+Here the user gets immediate feedback from initiating the action and can continue interacting in the browser while a job runs in the background.
+The job can use `MessageBus` to send progress messages to the browser.
+
+Simplified e.g.
+[source,ruby]
+----
+# ROUTE
+
+r.on 'take_action' do
+  res = interactor.initiate_job
+  show_json_notice('Job has been started')
+end
+----
+
+...and in the (contrived example) job:
+[source,ruby]
+----
+# JOB
+
+total = pallets_array.length
+
+pallets_array.each_with_index do |pallet, index|
+  # show progress on every 5th pallet:
+  send_bus_message("Working - updating #{index + 1} of #{total}",
+                   message_type: :information,
+                   target_user: user_name) if (index + 1) % 5 == 0
+  do_work
+end
+
+send_bus_message("Work has completed - all #{total} changes were applied",
+                 message_type: :success,
+                 target_user: user_name)
+----
+
+NOTE: The bus message is targeted to the particular logged-in user, so only this user will see messages in their browser page (no matter what page they are on).

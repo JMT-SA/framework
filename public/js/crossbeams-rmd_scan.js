@@ -211,6 +211,7 @@ const crossbeamsRmdScan = (function crossbeamsRmdScan() { // eslint-disable-line
    */
   const startScanner = () => {
     const wsUrl = 'ws://127.0.0.1:2115';
+    // const wsUrl = 'ws://192.168.50.10:2115';
     let connectedState = false;
 
     if (webSocket !== undefined && webSocket.readyState !== WebSocket.CLOSED) { return; }

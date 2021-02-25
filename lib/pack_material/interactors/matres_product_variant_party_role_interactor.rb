@@ -8,7 +8,7 @@ module PackMaterialApp
     def create_matres_product_variant_party_role(parent_id, params)
       params[:material_resource_product_variant_id] = parent_id
       res = validate_matres_product_variant_party_role_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       result = nil
       repo.transaction do
@@ -25,7 +25,7 @@ module PackMaterialApp
 
     def update_matres_product_variant_party_role(id, params)
       res = validate_update_matres_product_variant_party_role_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_matres_product_variant_party_role(id, res)
@@ -59,7 +59,9 @@ module PackMaterialApp
     end
 
     def validate_matres_product_variant_party_role_params(params)
-      NewMatresProductVariantPartyRoleSchema.call(params)
+      # NewMatresProductVariantPartyRoleSchema.call(params)
+      contract = NewMatresProductVariantPartyRoleContract.new
+      contract.call(params)
     end
 
     def validate_update_matres_product_variant_party_role_params(params)

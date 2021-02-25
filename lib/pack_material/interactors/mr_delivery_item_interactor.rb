@@ -7,11 +7,11 @@ module PackMaterialApp
       can_create = TaskPermissionCheck::MrDeliveryItem.call(:create, delivery_id: parent_id)
       if can_create.success
         res = validate_mr_delivery_item_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         new_attrs = repo.prepare_delivery_item_quantities(res)
         res = validate_mr_delivery_item_params(new_attrs)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         id = nil
         repo.transaction do
@@ -32,11 +32,11 @@ module PackMaterialApp
       can_update = TaskPermissionCheck::MrDeliveryItem.call(:update, id)
       if can_update.success
         res = validate_mr_delivery_item_params(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         new_attrs = repo.prepare_delivery_item_quantities(res)
         res = validate_mr_delivery_item_params(new_attrs)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
 
         repo.transaction do
           repo.update_mr_delivery_item(id, res)
@@ -85,7 +85,7 @@ module PackMaterialApp
 
     def prepare_delivery_item_quantities(params)
       res = validate_mr_delivery_item_quantity_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h.transform_keys { |k| k.to_s.delete_prefix('mr_delivery_item_').to_sym }
       success_response('ok', repo.prepare_delivery_item_quantities(attrs))
@@ -104,11 +104,15 @@ module PackMaterialApp
     end
 
     def validate_mr_delivery_item_params(params)
-      MrDeliveryItemSchema.call(params)
+      # MrDeliveryItemSchema.call(params)
+      contract = MrDeliveryItemContract.new
+      contract.call(params)
     end
 
     def validate_mr_delivery_item_quantity_params(params)
-      MrDeliveryItemQuantitySchema.call(params)
+      # MrDeliveryItemQuantitySchema.call(params)
+      contract = MrDeliveryItemQuantityContract.new
+      contract.call(params)
     end
   end
 end

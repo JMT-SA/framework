@@ -22,15 +22,15 @@ module PackMaterialApp
     end
 
     rule(:remarks, :quantity_returned) do
-      key.failure('required if there is a quantity to be returned') if values[:quantity_returned].positive? && value[:remarks].nil?
+      key.failure('required if there is a quantity to be returned') if values[:quantity_returned].positive? && values[:remarks].nil?
     end
 
     rule(:remarks, :quantity_difference) do
-      key.failure('required if there is a quantity difference') if values[:quantity_difference].positive? && value[:remarks].nil?
+      key.failure('required if there is a quantity difference') if values[:quantity_difference].positive? && values[:remarks].nil?
     end
 
     rule(:remarks, :quantity_over_supplied) do
-      key.failure('required if there is an over supply') if values[:quantity_over_supplied].positive? && value[:remarks].nil?
+      key.failure('required if there is an over supply') if values[:quantity_over_supplied]&.positive? && values[:remarks].nil?
     end
   end
   # MrDeliveryItemSchema = Dry::Schema.Params do

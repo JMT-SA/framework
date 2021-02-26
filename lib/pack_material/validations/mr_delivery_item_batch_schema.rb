@@ -10,8 +10,8 @@ module PackMaterialApp
   end
 
   PrintSKUBarcodeSchema = Dry::Schema.Params do
-    optional(:mr_internal_batch_number_id).filled(:int?)
-    optional(:mr_delivery_item_batch_id).filled(:int?)
-    optional(:mr_sku_id).filled(:int?)
+    optional(:mr_internal_batch_number_id).filled(:integer)
+    optional(:mr_delivery_item_batch_id).filled(:integer)
+    optional(:mr_sku_id).filled(:integer)
   end
 end

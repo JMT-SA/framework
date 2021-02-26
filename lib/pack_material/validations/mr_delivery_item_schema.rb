@@ -10,7 +10,7 @@ module PackMaterialApp
       required(:quantity_on_note).filled(:decimal, gt?: 0)
       required(:quantity_received).filled(:decimal, gt?: 0)
       required(:quantity_returned).filled(:decimal, gteq?: 0)
-      required(:quantity_difference).filled(:decimal, gteq?: 0)
+      required(:quantity_difference).filled(:decimal)
       optional(:quantity_over_supplied).maybe(:decimal)
       optional(:quantity_under_supplied).maybe(:decimal)
       required(:invoiced_unit_price).maybe(:decimal)
@@ -23,6 +23,10 @@ module PackMaterialApp
 
     rule(:remarks, :quantity_returned) do
       key.failure('required if there is a quantity to be returned') if values[:quantity_returned].positive? && values[:remarks].nil?
+    end
+
+    rule(:quantity_difference) do
+      base.failure('Quantity Difference must be greater than or equal to 0') if values[:quantity_difference].negative?
     end
 
     rule(:remarks, :quantity_difference) do

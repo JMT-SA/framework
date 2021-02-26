@@ -24,7 +24,7 @@ module PackMaterialApp
       weighted_average_cost_records.select { |r| r[:mr_product_variant_id] == mrpv_id }
     end
 
-    def wa_cost(mrpv_id) # rubocop:disable Metrics/AbcSize
+    def wa_cost(mrpv_id) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       # Only do the calculation if there is stock
       total_qty = total_quantity(mrpv_id)
       p 'TOTAL QTY'

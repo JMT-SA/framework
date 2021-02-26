@@ -16,7 +16,7 @@ module PackMaterialApp
 
   MrDeliveryPurchaseInvoiceSchema = Dry::Schema.Params do
     required(:supplier_invoice_ref_number).filled(Types::StrippedString)
-    required(:supplier_invoice_date).filled(Types::DateTime)
+    required(:supplier_invoice_date).filled(:date)
   end
 
   MrDeliveryPutawaySchema = Dry::Schema.Params do

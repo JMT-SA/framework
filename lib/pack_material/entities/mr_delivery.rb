@@ -20,7 +20,7 @@ module PackMaterialApp
     attribute :reviewed, Types::Bool
     attribute :putaway_completed, Types::Bool
     attribute :status, Types::String
-    attribute :supplier_invoice_date, Types::DateTime
+    attribute :supplier_invoice_date, Types::Date
     attribute :invoice_completed, Types::Bool
     attribute? :erp_purchase_order_number, Types::String.optional
     attribute? :erp_purchase_invoice_number, Types::String.optional

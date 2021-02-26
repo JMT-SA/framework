@@ -124,7 +124,7 @@ module UiRules
       delivery     = @repo.find_mr_delivery(@options[:id])
       @form_object = if delivery.supplier_invoice_ref_number.nil?
                        OpenStruct.new(supplier_invoice_ref_number: nil,
-                                      supplier_invoice_date: UtilityFunctions.weeks_since(Time.now, 1))
+                                      supplier_invoice_date: UtilityFunctions.weeks_since(Time.now, 1).to_date)
                      else
                        delivery
                      end

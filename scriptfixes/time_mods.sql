@@ -152,7 +152,7 @@ ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_deliveries
 ALTER COLUMN created_at TYPE timestamp with time zone,
-ALTER COLUMN supplier_invoice_date TYPE timestamp with time zone,
+--ALTER COLUMN supplier_invoice_date TYPE timestamp with time zone, -- this has now been set to be a date
 ALTER COLUMN updated_at TYPE timestamp with time zone;
 
 ALTER TABLE mr_delivery_item_batches

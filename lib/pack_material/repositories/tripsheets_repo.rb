@@ -108,7 +108,7 @@ module PackMaterialApp
           id: attrs[:mr_sku_id]
         ).get(:sku_number)
       }
-      new_attrs = new_attrs.merge(attrs)
+      new_attrs = new_attrs.merge(attrs.to_h)
       new_attrs.delete(:available_quantity)
 
       unit_id = create(:vehicle_job_units, new_attrs)
